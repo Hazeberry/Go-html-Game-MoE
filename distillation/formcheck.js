@@ -19,16 +19,28 @@
  *
  * BEFUND an einer Partie (Mensch Schwarz gegen KI hard, KI gab auf):
  *
- *   Schwarz   naechster eigener Stein d=1 zu 92 %   voriger eigener Zug Md 1
- *             Endstellung 118 Steine in  1 Gruppe,   0 % mit <= 2 Freiheiten
- *   KI hard   naechster eigener Stein d=1 zu 69 %   voriger eigener Zug Md 5
- *             Endstellung  96 Steine in 30 Gruppen, 36 % mit <= 2 Freiheiten
+ *                              Schwarz        KI (hard)
+ *   naechster eigener Stein    d=1 zu 92 %    d=1 zu 69 %
+ *   voriger eigener Zug        Median 1       Median 5
+ *   Anbau in schwache Gruppe   1 von 106      8 von 65   (1 % gegen 12 %)
+ *   verlorene Steine           1              22, davon 21 auf einmal
+ *   Endstellung                118 in 1 Gr.   96 in 30 Gr.
+ *   davon <= 2 Freiheiten      0 %            36 %
  *
- * Die KI setzt ihre Steine also durchaus an eigene an (69 % Kontakt) und
- * zerfaellt trotzdem in 30 Fragmente. ANSCHLUSS UND ZUSAMMENHALT SIND NICHT
- * DASSELBE — ein Term, der Abstaende regelt (wie localityBonus oder ein
- * Formbonus mit Maximum bei d=2), zielt daneben; die Groesse, die
- * auseinanderlaeuft, ist die Gruppenzahl.
+ * Die KI setzt ihre Steine durchaus an eigene an (69 % Kontakt) und zerfaellt
+ * trotzdem in 30 Fragmente. ANSCHLUSS UND ZUSAMMENHALT SIND NICHT DASSELBE —
+ * ein Term, der Abstaende regelt (localityBonus oder ein Formbonus mit
+ * Maximum bei d=2), zielt daneben.
+ *
+ * SCHAERFER, aus dem Q-Verlauf derselben Partie (aus dem Bug-Report-Export,
+ * nicht aus dem SGF): die spaeter geschlagene 21er-Gruppe wuchs zwischen Zug
+ * 200 und 226 von 11 auf 21 Steine, waehrend ihre Freiheiten zwischen 5 und 2
+ * pendelten — und Q blieb die ganze Zeit bei +0,37 bis +0,43. Erst bei einer
+ * Freiheit stuerzte Q auf -0,88. Die Bewertung bepreist ANBAUEN
+ * (midOwnNeighborBonus 15, midOwnGroup2 +40, midOwnGroup3 +60) und
+ * FREIHEITEN (midLibBonus 30), aber nirgends das Produkt "viele Steine an
+ * wenigen Freiheiten". Ein 21-Steine-Klotz auf zwei Freiheiten kostet so
+ * wenig wie ein Einzelstein auf zwei Freiheiten.
  *
  * WAS DAS NICHT ZEIGT. Eine Partie, und zwar eine aufgegebene. Verlieren
  * erzeugt Fragmentierung genauso wie Fragmentierung Verlieren erzeugt; aus
@@ -85,16 +97,20 @@ function setzen(board, i, farbe) {
   board[i] = farbe;
   const gegner = farbe === 1 ? 2 : 1;
   const x = i % 19, y = (i - x) / 19;
+  let geschlagen = 0;
   for (const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
     const nx = x+dx, ny = y+dy;
     if (nx<0||nx>18||ny<0||ny>18) continue;
     const q = ny*19+nx;
     if (board[q] !== gegner) continue;
     const g = gruppeAb(board, q);
-    if (g.frei === 0) for (const p of g.steine) board[p] = 0;
+    if (g.frei === 0) { geschlagen += g.steine.length;
+                        for (const p of g.steine) board[p] = 0; }
   }
   const eigen = gruppeAb(board, i);       // Selbstmord (Chinese: illegal)
-  if (eigen.frei === 0) for (const p of eigen.steine) board[p] = 0;
+  if (eigen.frei === 0) { for (const p of eigen.steine) board[p] = 0;
+                          return {geschlagen, groesse: 0, frei: 0}; }
+  return {geschlagen, groesse: eigen.steine.length, frei: eigen.frei};
 }
 
 /* Gruppen und Freiheiten auf einem 19x19-Brett (Uint8, 0/1/2). */
@@ -128,7 +144,8 @@ function formkennzahlen(board, farbe) {
 }
 
 const roll = {};   // Rolle -> Messwerte
-const nimm = r => (roll[r] = roll[r] || {naechster: [], vorzug: [], form: [], partien: 0});
+const nimm = r => (roll[r] = roll[r] || {naechster: [], vorzug: [], form: [], partien: 0,
+                   anbau: 0, anbauSchwach: 0, verloren: 0, groessterVerlust: 0});
 
 let uebersprungen = 0;
 for (const datei of dateien) {
@@ -150,7 +167,16 @@ for (const datei of dateien) {
       r.vorzug.push(cheb(eigen[c][eigen[c].length-1], [x,y]));
     }
     eigen[c].push([x,y]);
-    setzen(board, y*19+x, c === 'B' ? 1 : 2);
+    const e = setzen(board, y*19+x, c === 'B' ? 1 : 2);
+    /* Einsatz in eine schwache Gruppe: der Zug haengt an eine BESTEHENDE
+       eigene Gruppe an (Ergebnis > 1 Stein) und die bleibt trotzdem bei
+       hoechstens drei Freiheiten. In der Beispielpartie 8 mal (12 % der
+       Anbauzuege) gegen 1 mal (1 %) beim Menschen. */
+    if (e.groesse > 1 && e.frei <= 3) r.anbauSchwach++;
+    if (e.groesse > 1) r.anbau++;
+    const gegner = nimm(namen[c === 'B' ? 'W' : 'B']);
+    if (e.geschlagen > gegner.groessterVerlust) gegner.groessterVerlust = e.geschlagen;
+    gegner.verloren += e.geschlagen;
   }
   for (const c of 'BW') {
     const f = formkennzahlen(board, c === 'B' ? 1 : 2);
@@ -173,6 +199,11 @@ for (const r of rollen) {
     + `>=4:${Math.round(kn.filter(x=>x>=4).length/kn.length*100)}%`);
   console.log(`   voriger eigener Zug:     Median ${med(kv).toFixed(1)} `
     + `Mittel ${mit(kv).toFixed(2)}`);
+  if (d.anbau) console.log(`   Anbau an eigene Gruppe:  ${d.anbau} Zuege, davon `
+    + `${d.anbauSchwach} in eine Gruppe mit <=3 Freiheiten `
+    + `(${Math.round(d.anbauSchwach/d.anbau*100)} %)`);
+  console.log(`   verlorene Steine:        ${d.verloren} gesamt, groesster `
+    + `Einzelverlust ${d.groessterVerlust}`);
   if (d.form.length) {
     const F = k => mit(d.form.map(f=>f[k]));
     console.log(`   Endstellung: ${F('steine').toFixed(0)} Steine in `
