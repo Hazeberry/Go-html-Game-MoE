@@ -384,6 +384,53 @@ Schlagen ist die „Endstellung" die Summe aller je gespielten Steine. Der erste
 Lauf meldete so 32 Gruppen und 54 % schwache Steine statt 30 und 36 % — zu
 Gunsten von mehr Zusammenhang, weil tote Steine Lücken schließen.
 
+### Der Engpass ist nicht Form, sondern der Preis einer schwachen Gruppe
+
+Der Bug-Report-Export derselben Partie enthält den Q-Verlauf, den das SGF nicht
+hat. Damit ließ sich die Ursache-oder-Symptom-Frage für diese Partie
+beantworten — und die Antwort verschiebt den ganzen Ansatz.
+
+Die 21 Steine, die bei Zug 229 starben, waren **eine** Gruppe: eine Mauer
+entlang Reihe 14. Ihre Geschichte:
+
+| Zug | Steine | Freiheiten | Weiß spielt | Q |
+|---|---|---|---|---|
+| 200 | 11 | 5 | M13 | +0,43 |
+| 212 | 14 | 3 | K14 | +0,41 |
+| 224 | 20 | 3 | F14 | +0,37 |
+| 226 | **21** | **2** | M14 | **+0,40** |
+| 228 | 21 | **1** | B19 (Ecke) | −0,88 |
+
+**Weiß hängte zwischen Zug 200 und 226 zehn Steine an eine Gruppe, die nie über
+fünf Freiheiten kam — und die Bewertung blieb bei +0,37 bis +0,43.** Erst bei
+einer Freiheit stürzte Q ab; da war die Gruppe nicht mehr zu retten, und der
+Eckzug B19 war folgerichtig, nicht blind. **Der Fehler liegt bei Zug 212 bis
+226.**
+
+Der Grund steht in den Parametern: Anbauen wird bezahlt
+(`midOwnNeighborBonus` 15, `midOwnGroup2` +40, `midOwnGroup3` +60), Freiheiten
+werden bezahlt (`midLibBonus` 30) — aber **nichts bepreist das Produkt aus
+beidem**. Ein 21-Steine-Klotz auf zwei Freiheiten kostet so wenig wie ein
+Einzelstein auf zwei Freiheiten. Das Risiko skaliert mit `Steine × Schwäche`,
+die Bewertung nicht.
+
+`formcheck.js` misst das jetzt als **Anbau in eine schwache Gruppe**: Züge, die
+an eine bestehende eigene Gruppe anhängen, die dabei bei ≤ 3 Freiheiten bleibt.
+
+| | Anbauzüge | davon in schwache Gruppe | verlorene Steine | größter Einzelverlust |
+|---|---|---|---|---|
+| Schwarz | 106 | **1 (1 %)** | 1 | 1 |
+| KI (hard) | 65 | **8 (12 %)** | 22 | **21** |
+
+**Damit ist der Kandidat für einen Term ein anderer als alle bisher
+diskutierten:** kein Formbonus bei d = 2 (die Abstände stimmen), kein
+Verbindungsbonus (die Gruppe *war* verbunden) — sondern eine Stellungsstrafe,
+die mit **Gruppengröße mal Schwäche** skaliert.
+
+Vorbehalt unverändert: eine Partie. Aber die Metrik braucht keine Q-Werte mehr
+und läuft über jedes SGF, die Prüfung an vielen Partien ist also nur noch eine
+Frage des Materials.
+
 ### Gap oder Spanne? Der Bezug hängt vom Term ab
 
 `lokalitaet_check.js` hat eine Ableitung widerlegt, die aus `spanne_check.js`
