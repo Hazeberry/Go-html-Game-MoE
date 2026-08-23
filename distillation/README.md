@@ -345,6 +345,44 @@ verschweigt, ob eine Zeile oder tausende betroffen sind.
 | `spanne_check.js` | Misst die Entscheidungsspanne von `evaluateMove` über alle legalen Züge. Gemessen: Spanne zum Median 45–1206, Abstand zum Zweitbesten aber 0,0–0,5. |
 | `datenkurve.py` | Datenmengen-Kurve mit Fehlerbalken, misst jede Epoche. Beantwortet, ob die Kopfgüte an der Datenmenge hängt oder an der Merkmalsform. |
 | `lokalitaet_check.js` | Gate-Sweep für `localityBonus`: ab welcher Dosis kippt die Zugwahl? Sekunden statt Partien — liefert den Wert, den ein A/B testen sollte. |
+| `formcheck.js` | Formmessung über einen Ordner SGF-Partien, getrennt nach Spielerrolle. Gruppenzahl, schwache Steine, Zugabstände. |
+
+### Anschluss ist nicht Zusammenhalt
+
+`formcheck.js` entstand aus der Frage, ob die Engine „Streuspiel" betreibt —
+isolierte Steine setzt, statt Basen zu bauen. An einer Partie (Mensch Schwarz
+gegen KI hard, die KI gab auf) gemessen:
+
+| | naechster eigener Stein d=1 | voriger eigener Zug | Endstellung | ≤2 Freiheiten |
+|---|---|---|---|---|
+| Schwarz (Mensch) | 92 % | Median 1 | 118 Steine, **1 Gruppe** | 0 % |
+| KI (hard) | 69 % | Median 5 | 96 Steine, **30 Gruppen** | 36 % |
+
+**Die KI setzt ihre Steine durchaus an eigene an** — 69 % Kontakt, nur 5 %
+weiter als drei entfernt — **und zerfällt trotzdem in 30 Fragmente.** Anschluss
+und Zusammenhalt sind nicht dasselbe.
+
+Das hat eine Konsequenz für jeden geplanten Formterm: ein Anreiz, der
+*Abstände* regelt — `localityBonus` auf den Gegnerzug ebenso wie ein Bonus mit
+Maximum bei d = 2 — zielt an dieser Beobachtung vorbei. Die Größe, die
+auseinanderläuft, ist die **Gruppenzahl**, und die senkt man durch
+Verbindungszüge, nicht durch Sprungdistanzen.
+
+Zwei Vorbehalte, ohne die die Zahlen mehr behaupten, als sie tragen:
+
+- **Eine Partie, und zwar eine aufgegebene.** Verlieren erzeugt
+  Fragmentierung genauso wie Fragmentierung Verlieren erzeugt; aus einer
+  Endstellung ist die Richtung nicht ablesbar. Zu klären wäre das über den
+  **Verlauf** der Gruppenzahl über viele Partien: läuft sie früh auseinander,
+  ist sie Ursache; erst im Zusammenbruch, ist sie Symptom.
+- **Freiheiten je Stein taugen als Kennzahl nicht.** Schwarz hat mit 0,69 den
+  *niedrigeren* Wert, weil eine große solide Masse sich einen Rand teilt.
+  Gruppenzahl und Schwach-Anteil tragen, dieser Mittelwert nicht.
+
+Beim Bauen fiel außerdem eine Falle auf, die den Befund verfälscht hätte: ohne
+Schlagen ist die „Endstellung" die Summe aller je gespielten Steine. Der erste
+Lauf meldete so 32 Gruppen und 54 % schwache Steine statt 30 und 36 % — zu
+Gunsten von mehr Zusammenhang, weil tote Steine Lücken schließen.
 
 ### Gap oder Spanne? Der Bezug hängt vom Term ab
 
