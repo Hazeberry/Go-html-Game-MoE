@@ -42,6 +42,14 @@
  * wenigen Freiheiten". Ein 21-Steine-Klotz auf zwei Freiheiten kostet so
  * wenig wie ein Einzelstein auf zwei Freiheiten.
  *
+ * GEGENPROBE, sobald Material da ist: die Ausgabe teilt jede Rolle nach
+ * RE[] in Siege und Niederlagen. Fragmentiert die KI auch dann, wenn sie
+ * GEWINNT, ist die Schwaeche ein Stilmerkmal und kein Verlustgrund — dann
+ * waere ein Term dafuer nicht begruendet, egal wie deutlich der Unterschied
+ * zum Menschen ausfaellt. Nur wenn Sieg und Niederlage auseinandergehen,
+ * traegt der Befund. Mit einer Partie je Seite meldet das Skript stattdessen
+ * "Vergleich braucht beides".
+ *
  * WAS DAS NICHT ZEIGT. Eine Partie, und zwar eine aufgegebene. Verlieren
  * erzeugt Fragmentierung genauso wie Fragmentierung Verlieren erzeugt; aus
  * einer Endstellung ist die Richtung nicht ablesbar. Dafuer braucht es viele
@@ -145,7 +153,8 @@ function formkennzahlen(board, farbe) {
 
 const roll = {};   // Rolle -> Messwerte
 const nimm = r => (roll[r] = roll[r] || {naechster: [], vorzug: [], form: [], partien: 0,
-                   anbau: 0, anbauSchwach: 0, verloren: 0, groessterVerlust: 0});
+                   anbau: 0, anbauSchwach: 0, verloren: 0, groessterVerlust: 0,
+                   spiele: []});
 
 let uebersprungen = 0;
 for (const datei of dateien) {
@@ -154,12 +163,18 @@ for (const datei of dateien) {
   if (sz && sz !== '19') { uebersprungen++; continue; }
   const namen = {B: (s.match(/PB\[([^\]]*)\]/) || [,'Schwarz'])[1],
                  W: (s.match(/PW\[([^\]]*)\]/) || [,'Weiss'])[1]};
+  /* RE[B+R], RE[W+12.5], RE[B+T] ... — nur die Siegerfarbe zaehlt hier.
+     Fehlt RE, gilt die Partie als unentschieden und faellt aus der
+     Ergebnis-Aufteilung heraus (nicht aus den Gesamtzahlen). */
+  const sieger = (s.match(/RE\[([BW])\+/) || [])[1] || null;
   const zuege = [...s.matchAll(/;([BW])\[([a-s]{2})\]/g)]
     .map(m => [m[1], m[2].charCodeAt(0)-97, m[2].charCodeAt(1)-97]);
   if (zuege.length < 20) { uebersprungen++; continue; }
 
   const board = new Uint8Array(361);
   const eigen = {B: [], W: []};
+  const proSpiel = {B: {anbau:0, schwach:0, verloren:0},
+                    W: {anbau:0, schwach:0, verloren:0}};
   for (const [c, x, y] of zuege) {
     const r = nimm(namen[c]);
     if (eigen[c].length) {
@@ -172,16 +187,20 @@ for (const datei of dateien) {
        eigene Gruppe an (Ergebnis > 1 Stein) und die bleibt trotzdem bei
        hoechstens drei Freiheiten. In der Beispielpartie 8 mal (12 % der
        Anbauzuege) gegen 1 mal (1 %) beim Menschen. */
-    if (e.groesse > 1 && e.frei <= 3) r.anbauSchwach++;
-    if (e.groesse > 1) r.anbau++;
-    const gegner = nimm(namen[c === 'B' ? 'W' : 'B']);
+    if (e.groesse > 1 && e.frei <= 3) { r.anbauSchwach++; proSpiel[c].schwach++; }
+    if (e.groesse > 1) { r.anbau++; proSpiel[c].anbau++; }
+    const gk = c === 'B' ? 'W' : 'B', gegner = nimm(namen[gk]);
     if (e.geschlagen > gegner.groessterVerlust) gegner.groessterVerlust = e.geschlagen;
     gegner.verloren += e.geschlagen;
+    proSpiel[gk].verloren += e.geschlagen;
   }
   for (const c of 'BW') {
     const f = formkennzahlen(board, c === 'B' ? 1 : 2);
-    if (f) nimm(namen[c]).form.push(f);
-    nimm(namen[c]).partien++;
+    const d = nimm(namen[c]);
+    if (f) d.form.push(f);
+    d.partien++;
+    d.spiele.push({gewonnen: sieger === null ? null : sieger === c,
+                   ...proSpiel[c], form: f});
   }
 }
 
@@ -204,6 +223,31 @@ for (const r of rollen) {
     + `(${Math.round(d.anbauSchwach/d.anbau*100)} %)`);
   console.log(`   verlorene Steine:        ${d.verloren} gesamt, groesster `
     + `Einzelverlust ${d.groessterVerlust}`);
+  /* Gegenprobe: fragmentiert diese Rolle auch dann, wenn sie GEWINNT? Nur
+     wenn sich Sieg und Niederlage unterscheiden, ist die Schwaeche ein
+     Verlustgrund und nicht blosser Stil. Ohne RE[] faellt eine Partie hier
+     heraus, zaehlt oben aber mit. */
+  const sieg = d.spiele.filter(x => x.gewonnen === true);
+  const nied = d.spiele.filter(x => x.gewonnen === false);
+  if (sieg.length && nied.length) {
+    const zeile = (name, g) => {
+      const anbau = g.reduce((a,x)=>a+x.anbau,0), schwach = g.reduce((a,x)=>a+x.schwach,0);
+      const verl = g.reduce((a,x)=>a+x.verloren,0);
+      const mitForm = g.filter(x=>x.form);
+      const gr = mit(mitForm.map(x=>x.form.gruppen));
+      const sw = mit(mitForm.map(x=>x.form.schwachAnteil));
+      return `   ${name} (${g.length}): Anbau schwach `
+        + `${anbau ? Math.round(schwach/anbau*100) : 0} %, `
+        + `${gr.toFixed(1)} Gruppen, ${(sw*100).toFixed(0)} % schwach, `
+        + `${(verl/g.length).toFixed(1)} Steine verloren je Partie`;
+    };
+    console.log(zeile('bei Sieg     ', sieg));
+    console.log(zeile('bei Niederl. ', nied));
+  } else if (d.spiele.length) {
+    const s2 = sieg.length, n2 = nied.length, o = d.spiele.length - s2 - n2;
+    console.log(`   Ergebnis-Aufteilung: ${s2} Siege, ${n2} Niederlagen`
+      + `${o ? `, ${o} ohne RE[]` : ''} — Vergleich braucht beides`);
+  }
   if (d.form.length) {
     const F = k => mit(d.form.map(f=>f[k]));
     console.log(`   Endstellung: ${F('steine').toFixed(0)} Steine in `
