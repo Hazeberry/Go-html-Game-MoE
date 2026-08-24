@@ -431,6 +431,31 @@ Vorbehalt unverändert: eine Partie. Aber die Metrik braucht keine Q-Werte mehr
 und läuft über jedes SGF, die Prüfung an vielen Partien ist also nur noch eine
 Frage des Materials.
 
+### 16 Partien: die Beschreibung hält, die Kausalfrage bleibt offen
+
+16 Exporte desselben Aufbaus (Mensch Schwarz gegen KI hard) bestätigen die
+Rate, und zwar durchgängig — nicht getragen von ein oder zwei Ausreißern:
+
+| | Anbauzüge | davon in schwache Gruppe | verlorene Steine gesamt | größter Einzelverlust |
+|---|---|---|---|---|
+| Schwarz (16×) | 1995 | **12 (1 %)** | 39 | 2 |
+| KI hard (16×) | 1318 | **224 (17 %)** | 392 | 29 |
+
+Je Partie gemessen liegt die KI-Rate zwischen **9 % und 25 %**, in allen 16
+Fällen weit über der menschlichen Gesamtrate von 1 % — keine Partie zieht den
+Schnitt nach oben, keine liegt nahe am Menschen.
+
+**Was das nicht klärt, und zwar die wichtigere Hälfte: alle 16 Partien sind
+`RE[B+R]`.** Die Ergebnis-Aufteilung aus `formcheck.js` (Sieg gegen Niederlage)
+meldet deshalb „Vergleich braucht beides" — es gibt keine KI-Siege in diesem
+Satz. Ob die KI auch in gewonnenen Partien so in schwache Gruppen investiert
+(Stil, kein Verlustgrund) oder nur in verlorenen (Ursache), bleibt unbeantwortet.
+Mehr Partien mit demselben Ergebnis erhärten die Beschreibung, nicht die
+Kausalität — dafür braucht es KI-Siege, etwa aus Selbstspiel-Partien des
+Harness (dort sind beide Seiten dieselbe Engine, das Ergebnis hängt also nicht
+an einem einzelnen menschlichen Gegner) oder aus Partien gegen eine schwächere
+KI-Stufe.
+
 ### Gap oder Spanne? Der Bezug hängt vom Term ab
 
 `lokalitaet_check.js` hat eine Ableitung widerlegt, die aus `spanne_check.js`
