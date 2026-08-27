@@ -204,6 +204,62 @@ mit und bewusste Abweichungen bleiben trotzdem erhalten. Bis dahin gilt:
 `dashReset` (`index.html:3697`) löscht den Speicher und stellt die gemessenen
 Werte wieder her.
 
+### Divergierendes Training, NaN-Priors, toter PUCT-Knoten
+
+Derselbe Speicher-Mechanismus hat einen zweiten Fehler sichtbar gemacht. Ein
+Bug-Report mit `netMaxBlend: 0,09` (Default im Repo: 0) meldete ab dem ersten
+KI-Zug einen `TypeError: Cannot read properties of null (reading 'idx')` in
+`mctsPUCT` — im Worker **und** im synchronen Fallback, also bei jedem Zug.
+
+Die Kette, von hinten aufgerollt:
+
+1. **REINFORCE hier divergiert.** Bei negativem Advantage maximiert der
+   Schritt `−log p(a)`; das hat kein Optimum, denn `p(a) → 0` erreicht man nur
+   mit `‖W‖ → ∞`. Der Gradient des gespielten Zuges ist `(1−p)·|lr|` und
+   schrumpft dabei *nicht*. Daraus wird eine Rückkopplung: größeres `W1` →
+   größere Aktivierungen → größere `W2`-Updates (`dL·hidden`) → größeres `dH`
+   → größeres `W1`. Gemessen an einem Repro über den `policy-net`-Block
+   (400 Züge/Partie): in **5 von 6 Läufen nicht-finite Float32-Gewichte binnen
+   30 Partien**, `|W2|` zuletzt Faktor ~10 pro Partie.
+2. **`save()` machte es dauerhaft.** Die NaN-Gewichte gingen ungeprüft nach
+   `localStorage['go_pnet']` und wurden beim nächsten Start ebenso ungeprüft
+   geladen. Kein Reload heilte das.
+3. **`forward()` gab NaN aus.** Sobald die Logits die Float32-Grenze reißen,
+   ist `logits[k] − maxL` gleich `Inf − Inf` = `NaN` — und damit *jede*
+   Wahrscheinlichkeit.
+4. **Ein einzelnes NaN vergiftete den ganzen Knoten.** Über den Score-Blend
+   (`(1−bw)·MoE + bw·Prior·scale`) landete es in `_mctsKids`, wo `Z = Σ w`
+   zu `NaN` wird und damit `P[r] = w[r]/Z` für **alle** Kinder.
+5. **PUCT stand ohne Kandidat da.** `NaN > -Infinity` ist `false`, also blieb
+   `best` auf `null` — und die nächste Zeile las `best.idx`.
+
+Behoben auf beiden Ebenen. Verteidigung: `_mctsKids` bildet Spannweite und
+Summe nur über finite Scores und fällt bei entarteter Softmax auf den
+Rang-Prior zurück; die PUCT-Auswahl vergleicht nur finite Scores und hat einen
+Fallback; der Score-Blend überspringt nicht-finite Priors; `forward()` liefert
+im Fehlerfall eine Gleichverteilung und zieht über `_healthy` den Blend
+sofort auf 0. Ursache: `netGradClip` (elementweise **und** über die
+Update-Norm), `netWeightDecay`, `netMaxNorm` (Max-Norm-Projektion je Schicht
+als Vielfaches der Init-Norm) und eine Dämpfung des negativen Advantage
+unterhalb von `1/361` — dort ist nichts mehr zu verlernen. Dazu Prüfungen vor
+jedem `save()`, beim `load()` (Selbstheilung für bereits vergiftete Browser)
+und ein Rollback auf den letzten gültigen Stand nach jeder Partie.
+
+Belege aus dem Repro über die ausgeschnittenen Skript-Blöcke:
+
+| Messung | vorher | nachher |
+|---|---|---|
+| Ein NaN unter 8 Wurzel-Scores | 8 von 8 Priors `NaN` | 0 von 8, Summe 1,000 |
+| `mctsPUCT` mit reiner NaN-Wurzelliste | `TypeError … 'idx'` | 482 Sims, Zug geliefert |
+| Vergiftete `go_pnet` (NaN) geladen | Crash bei jedem KI-Zug | verworfen, Netz startet frisch |
+| Vergiftete `go_pnet` (endlich, 1e20) | Crash bei jedem KI-Zug | Netz meldet sich ab, Partie läuft |
+| 40 Trainingspartien, reines Rauschen | nicht-finite Gewichte | `‖W1‖` 9,20 → 7,92, nie `NaN` |
+| 24 Trainingspartien im Harness | — | `‖W1‖` 8,91 / `‖W2‖` 14,92, Projektion greift nie |
+| `_mctsKids` bei finiten Scores | — | 94 212 Priors bitgleich zu vorher |
+
+`dashReset` setzt `netMaxBlend` auf 0 zurück und umgeht den Pfad damit — das
+war der Workaround, nicht der Fix.
+
 **Fürs Auswerten von Spielständen:** `reproduktion.board` ist die Stellung
 **vor** dem letzten KI-Zug — es ist die Eingabe, mit der die KI gerechnet hat
 (`mc`, `lastMove` und `aiColor` passen dazu). `meta.zug` und die ASCII-Anzeige
