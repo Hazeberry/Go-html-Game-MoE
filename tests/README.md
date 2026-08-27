@@ -29,12 +29,36 @@ niemand ausliefert.
 | Datei | Ebene | Inhalt |
 |---|---|---|
 | `nan-guards.js` | Logik im Prozess | `_mctsKids` bei NaN/Infinity, `mctsPUCT` mit vergifteter Wurzelliste, `forward`/`save`/`load`/`_backward`/`trainGame`-Schutz |
-| `training-stability.js` | Training | Gradienten-Deckel, Max-Norm-Projektion, Advantage-Dämpfung, dazu der ursprüngliche Repro-Lauf |
+| `training-stability.js` | Training | Regularisierungs-Parameter, Gradienten-Deckel, Max-Norm-Projektion, Advantage-Dämpfung, dazu der ursprüngliche Repro-Lauf |
 | `browser-nan.js` | echter Browser | Chromium, echter Web Worker, echtes `localStorage` — der Pfad, auf dem der Fehler gemeldet wurde |
 
 Der Browser-Test ist nicht redundant: die Node-Tests werten die Skript-Blöcke
 im Prozess aus und sehen den Worker nie. Der gemeldete Crash tötete aber erst
 den Worker und danach den synchronen Fallback.
+
+## Wohin ein neuer Test gehört
+
+| Was geprüft wird | Datei |
+|---|---|
+| Neue Guard-Logik — etwas fängt einen nicht-finiten oder entarteten Wert ab | `nan-guards.js` |
+| Trainingsdynamik oder Regularisierung — Gradienten, Normen, Dämpfung, Zerfall | `training-stability.js` |
+| Browser-spezifisches Verhalten oder `localStorage`-Interaktion | `browser-nan.js` |
+
+Die Trennung ist nicht kosmetisch, sie folgt den Kosten: `nan-guards.js`
+läuft in unter einer Sekunde und ist deshalb der Ort, an dem man beim
+Entwickeln ständig nachsieht. `training-stability.js` braucht zwanzig
+Sekunden, `browser-nan.js` startet einen Browser. Wer eine schnelle
+Zusicherung in eine langsame Datei legt, verliert sie faktisch — sie wird
+seltener ausgeführt.
+
+Ein Grenzfall, der schon vorkam: `save()` und `load()` fassen `localStorage`
+an, gehören aber trotzdem nach `nan-guards.js`, weil dort die
+*Entscheidung* geprüft wird (einen nicht-finiten Stand ablehnen). Nach
+`browser-nan.js` gehört der *Rundlauf* durch den echten Speicher — dass ein
+vergifteter Eintrag einen Reload nicht überlebt. Faustregel: Logik, die
+unter der Node-Schale identisch abläuft, bleibt in Node; alles, was nur im
+Browser anders ist (Worker, echter Speicher, DOM), gehört in den
+Browser-Test.
 
 ## Gegen den Stand vor dem Fix
 
@@ -43,8 +67,8 @@ Ein Test, der auf der kaputten Version grün ist, prüft nichts. Gemessen gegen
 
 | Datei | vor dem Fix | nach dem Fix |
 |---|---|---|
-| `nan-guards.js` | 2 von 12 bestanden | 12 von 12 |
-| `training-stability.js` | 0 von 4 | 4 von 4 |
+| `nan-guards.js` | 2 von 11 bestanden | 11 von 11 |
+| `training-stability.js` | 0 von 5 | 5 von 5 |
 | `browser-nan.js` | 1 von 3 | 3 von 3 |
 
 Die grünen Fälle im alten Stand prüfen bewusst *unverändertes* Verhalten und

@@ -59,6 +59,16 @@ function festerWuerfel(seed) {
   };
 }
 
+test('Die Regularisierungs-Parameter sind überhaupt gesetzt', () => {
+  /* Der Bug entstand in einer Version, die netGradClip noch nicht kannte.
+     Wer die Werte auf 0 stellt, schaltet den Schutz wieder ab — dann soll
+     wenigstens dieser Test daran erinnern, bevor die Tests darunter
+     stillschweigend nichts mehr prüfen. */
+  pruefe(PARAMS.netGradClip    >  0, 'netGradClip ist gesetzt');
+  pruefe(PARAMS.netMaxNorm     >  0, 'netMaxNorm ist gesetzt');
+  pruefe(PARAMS.netWeightDecay >= 0, 'netWeightDecay ist definiert');
+});
+
 test('Gradienten-Deckel begrenzt den Schritt auch bei riesigen Aktivierungen', () => {
   /* Das ist der Motor der Divergenz: das W2-Update ist dL·hidden. dL bleibt
      klein (≤ |lr|), hidden wuchs ungebremst mit W1 mit — also wuchs das

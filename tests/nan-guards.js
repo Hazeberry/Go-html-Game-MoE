@@ -181,14 +181,5 @@ test('trainGame(): ein divergierter Stand wird zurückgerollt statt gespeichert'
   pruefeGleich(netz._gameBuffer.length, 0, 'der Buffer wurde geleert');
 });
 
-test('Gradienten-Deckel und Max-Norm stehen an', () => {
-  /* Der Bug entstand mit netGradClip = 0 (gab es damals nicht). Wer die
-     Werte auf 0 stellt, schaltet den Schutz ab — dann soll wenigstens
-     dieser Test daran erinnern. */
-  pruefe(PARAMS.netGradClip  > 0, 'netGradClip ist gesetzt');
-  pruefe(PARAMS.netMaxNorm   > 0, 'netMaxNorm ist gesetzt');
-  pruefe(PARAMS.netWeightDecay >= 0, 'netWeightDecay ist definiert');
-});
-
 laufeTests('NaN-Schutz in MCTS/PUCT und Policy-Netz')
   .then(ok => process.exit(ok ? 0 : 1));
