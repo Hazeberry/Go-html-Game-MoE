@@ -12,6 +12,26 @@ node tests/browser-nan.js             # nur Ende-zu-Ende im Browser (~45 s)
 Keine `node_modules` nötig — bis auf den Browser-Test, der sich ohne
 Playwright selbst überspringt und den Gesamtlauf grün lässt.
 
+## In CI
+
+`.github/workflows/tests.yml` fährt die Tests bei jedem Push und jedem Pull
+Request auf `main`, in zwei Jobs: `node` (Guards + Training, keine
+Abhängigkeiten, ~30 s) und `browser` (installiert Chromium, deshalb getrennt).
+Der A/B-Harness läuft dort bewusst **nicht** mit — sein Zeitbudget ist
+Wall-Clock, das Ergebnis also nicht reproduzierbar, und ein Messwerkzeug ohne
+festes Ergebnis taugt nicht als Ja/Nein-Prüfung.
+
+Der Browser-Job setzt `REQUIRE_BROWSER=1`. Ohne die Variable überspringt sich
+der Test, wenn er Chromium nicht findet — in CI wäre der Lauf dann grün, ohne
+irgendetwas geprüft zu haben. Mit ihr ist eine fehlende Installation ein
+Fehlschlag.
+
+Das ist kein hypothetisches Risiko: die erste Fassung suchte Chromium unter
+`PLAYWRIGHT_BROWSERS_PATH` mit Rückfall auf einen festen Pfad. Auf einem
+GitHub-Runner ist die Variable nicht gesetzt und Playwright installiert nach
+`~/.cache/ms-playwright` — der Test hätte sich dort still übersprungen. Er
+fragt jetzt Playwright selbst nach dem Pfad (`chromium.executablePath()`).
+
 Jede Datei nimmt optional einen Pfad zu einer `index.html`. So lässt sich ein
 älterer Stand gegenprüfen:
 
