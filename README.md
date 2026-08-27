@@ -260,6 +260,11 @@ Belege aus dem Repro über die ausgeschnittenen Skript-Blöcke:
 `dashReset` setzt `netMaxBlend` auf 0 zurück und umgeht den Pfad damit — das
 war der Workaround, nicht der Fix.
 
+Gegen Rückfall abgesichert in [`tests/`](tests/): 19 Fälle in drei Dateien,
+drei davon im echten Browser mit Web Worker. Am Stand vor dem Fix fallen
+16 davon durch — die drei verbleibenden prüfen bewusst unverändertes
+Verhalten und müssen auf beiden Ständen halten.
+
 **Fürs Auswerten von Spielständen:** `reproduktion.board` ist die Stellung
 **vor** dem letzten KI-Zug — es ist die Eingabe, mit der die KI gerechnet hat
 (`mc`, `lastMove` und `aiColor` passen dazu). `meta.zug` und die ASCII-Anzeige
@@ -317,8 +322,15 @@ fallen zweimal an.
 index.html                      Spiel und Engine, eine Datei
 ab-harness.js                   Messrahmen; Kopfkommentar = Versuchsprotokoll
 distillation/                   Überwachtes Training fürs Policy-Netz
+tests/                          Regressionstests (node tests/run.js)
 .github/workflows/ab-harness.yml  Messläufe in CI, manuell startbar
 ```
+
+[`tests/`](tests/) prüft die NaN-Schutzschichten und die Trainings-Stabilität —
+ohne `node_modules`, gegen dieselben `<script>`-Blöcke, die ausgeliefert
+werden. Ein Test gegen eine Kopie prüft irgendwann etwas, das niemand
+ausliefert. Der Browser-Test braucht zusätzlich Playwright und überspringt
+sich ohne es.
 
 [`distillation/`](distillation/) enthält die Kette, um dem Policy-Netz starke
 Züge beizubringen, statt es aus Selbstspiel lernen zu lassen — samt der
