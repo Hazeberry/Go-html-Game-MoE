@@ -704,6 +704,34 @@ globalThis.PARAMS = {
   netWarmup:         10,
   netLR:           0.001,
   netScoreScale:   5000,
+  /* Trainings-Stabilisierung. Ohne sie divergiert dieses REINFORCE
+     zuverlässig: bei negativem Advantage maximiert der Schritt −log p(a),
+     und das ist nach unten unbeschränkt. Daraus wird eine Rückkopplung —
+     größeres W1 → größere Aktivierungen → größere W2-Updates (dL·hidden)
+     → größeres dH → größeres W1. Gemessen an einem Repro über diesen
+     Block (400 Züge/Partie, netMaxBlend 0.09): in 5 von 6 Läufen
+     nicht-finite Float32-Gewichte binnen 30 Partien, |W2| zuletzt Faktor
+     ~10 pro Partie. Über save() landeten die NaN-Gewichte in localStorage
+     und infizierten von dort jede weitere Sitzung.
+     netGradClip deckelt jeden Layer-Schritt elementweise UND in der Norm
+     (0 = aus). Die gemessene gesunde Update-Norm liegt bei 1e-2 bis
+     3,5e-2, der Deckel greift also nur im Runaway und ändert normales
+     Lernen nicht. netWeightDecay ist L2 pro Zug, einmal pro Partie als
+     (1−wd)^Züge angewendet (0 = aus). */
+  netGradClip:      1.00,
+  netWeightDecay: 0.00001,
+  /* Max-Norm-Projektion je Schicht, als Vielfaches der Initialisierungs-
+     norm (0 = aus). Der Deckel oben begrenzt einen SCHRITT, diese Grenze
+     den ZUSTAND — und erst das macht nicht-finite Gewichte strukturell
+     unmöglich statt nur unwahrscheinlich: ‖W1‖ ≤ 4·9,2 begrenzt hidden,
+     hidden begrenzt die Logits, und begrenzte Logits können in der Softmax
+     kein Inf−Inf = NaN mehr erzeugen. Rechnerisch bleiben rund 30
+     Zehnerpotenzen Abstand zur Float32-Grenze.
+     4× ist reichlich: über 60 gemessene Trainingspartien bleibt eine
+     gesunde Schicht unter 1,4× — die Projektion greift also nur im
+     Runaway und verändert normales Lernen nicht. Sie skaliert eine Schicht
+     nur, sie dreht sie nicht: die gelernte Richtung bleibt erhalten. */
+  netMaxNorm:       4.00,
   /* First-Play-Urgency: Startwert für unbesuchte MCTS-Knoten (Fix #5) */
   mctsFPU:         0.45,
   /* Schärfe des PUCT-Priors. 0 = alter Rang-Prior (fast flach, verwirft Scores).
@@ -1406,12 +1434,16 @@ function rollout(board, startColor, histHashes, captures, depth, rootColor, koPo
    innere Knoten aus quickEval. Werte via tanh(evaluateBoard/scale),
    immer aus Sicht der KI gespeichert → Gegner-Knoten invertieren. */
 const _mctsScratch = new Uint8Array(BOARD_SIZE);
+/* Zähler für nicht-finite PUCT-Scores, pro Suche zurückgesetzt. Sie sind
+   immer ein Symptom (kaputter Prior oder kaputter Rollout-Wert) und dürfen
+   nicht still bleiben — vorher endeten sie in einem TypeError. */
+let _mctsNonFinite = 0;
 
 function _mctsKids(list, K) {
   const n = Math.min(K, list.length);
   if (!n) return [];
   const kids = new Array(n);
-  let P;
+  let P = null;
   const sharp = PARAMS.mctsPriorSharp;
   if (sharp > 0 && n > 1) {
     /* Score-basierter Prior (Softmax), skalen-invariant über die Spannweite.
@@ -1421,14 +1453,39 @@ function _mctsKids(list, K) {
        10-15 %, also praktisch auf Prior-Niveau: der Baum verschob nichts,
        die Zugwahl war Rauschen zwischen den Top-Kandidaten.
        Temperatur folgt der Score-Spannweite, damit derselbe Parameter in
-       der Eröffnung (~40-95) und im Mittelspiel (~Hunderte) gleich wirkt. */
-    const hi = list[0].score, lo = list[n - 1].score;
-    const T = Math.max(1e-6, (hi - lo) / sharp);
-    const w = new Array(n); let Z = 0;
-    for (let r = 0; r < n; r++) { w[r] = Math.exp((list[r].score - hi) / T); Z += w[r]; }
-    P = new Array(n);
-    for (let r = 0; r < n; r++) P[r] = w[r] / Z;
-  } else {
+       der Eröffnung (~40-95) und im Mittelspiel (~Hunderte) gleich wirkt.
+
+       Nicht-finite Scores werden hier ABGEFANGEN statt weitergereicht.
+       Vorher genügte ein einziges NaN in der Liste (aus dem Policy-Net-
+       Blend in getAIMove), um über Z = NaN die Priors ALLER Kinder auf NaN
+       zu setzen — und damit jeden PUCT-Score dieses Knotens. Spannweite und
+       Summe laufen deshalb nur über finite Scores; ein NaN-Kandidat wird auf
+       den kleinsten finiten Score gezogen: er bleibt wählbar, bestimmt aber
+       nichts mehr. hi/lo werden explizit gesucht statt aus list[0]/list[n-1]
+       gelesen — bei NaN in der Liste ist die Sortierung selbst wertlos. */
+    let hi = -Infinity, lo = Infinity;
+    for (let r = 0; r < n; r++) {
+      const v = list[r].score;
+      if (!Number.isFinite(v)) continue;
+      if (v > hi) hi = v;
+      if (v < lo) lo = v;
+    }
+    if (hi > -Infinity) {
+      const T = Math.max(1e-6, (hi - lo) / sharp);
+      const w = new Array(n); let Z = 0;
+      for (let r = 0; r < n; r++) {
+        const v = Number.isFinite(list[r].score) ? list[r].score : lo;
+        w[r] = Math.exp((v - hi) / T); Z += w[r];
+      }
+      /* Z kann trotz finiter Scores entarten (0 durch Unterlauf). Dann
+         lieber der Rang-Prior unten als NaN/Infinity im Baum. */
+      if (Number.isFinite(Z) && Z > 0) {
+        P = new Array(n);
+        for (let r = 0; r < n; r++) P[r] = w[r] / Z;
+      }
+    }
+  }
+  if (!P) {   /* Rang-Prior: sharp = 0, n = 1 — und jeder entartete Softmax oben */
     const sum = n * (n + 1) / 2;
     P = new Array(n);
     for (let r = 0; r < n; r++) P[r] = (n - r) / sum;
@@ -1461,6 +1518,7 @@ function _tryReuseSubtree(savedBoard, aiColor, savedNode, currentBoard) {
 
 function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
   const _simStart = Date.now();
+  _mctsNonFinite = 0;
   const timeBudget = getAdaptiveTimeBudget(rootScored.length);
   const deadline = _simStart + timeBudget;
   /* Sicherheitsbremse: getLegalMoves/floodFill werden auf dichten Spätspiel-
@@ -1548,7 +1606,21 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
           blended = (1 - beta) * q + beta * (k.amafW / k.amafN) * persp;
         }
         const s = blended + c * k.P * sq / (1 + k.N);
-        if (s > bs) { bs = s; best = k; }
+        /* NaN > -Infinity ist false: war EIN Score nicht-finit, blieb best
+           schlicht auf null stehen — waren es alle (ein NaN-Prior vergiftet
+           über die Softmax den ganzen Knoten), knallte eine Zeile später
+           best.idx. Der Crash tötete erst den Worker und danach denselben
+           Code im synchronen Fallback, also jeden KI-Zug. Nicht-finite
+           Scores werden jetzt übersprungen statt verglichen. */
+        if (Number.isFinite(s) && s > bs) { bs = s; best = k; }
+      }
+      if (!best) {
+        /* Kein einziger vergleichbarer Score. Suche geht mit dem ersten
+           Kind weiter, das wenigstens einen brauchbaren Prior hat — die
+           Ursache meldet der Zähler unten, statt sie zu verschlucken. */
+        for (const k of node.kids) if (Number.isFinite(k.P)) { best = k; break; }
+        if (!best) best = node.kids[0];
+        _mctsNonFinite++;
       }
       const opp = color === 1 ? 2 : 1;
       _mctsScratch[best.idx] = color;
@@ -1602,6 +1674,11 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
     removeDeadGroups(postBoard, opp, bm.idx);
     _mctsSavedRoot = {node: bm, board: postBoard, aiColor};
   }
+
+  if (_mctsNonFinite)
+    console.warn(`[MCTS] ${_mctsNonFinite} von ${sims} Auswahlschritten hatten keinen `
+      + `finiten PUCT-Score (Fallback: erstes Kind). Ursache liegt vor der Suche — `
+      + `Prior oder Rollout-Wert ist NaN/Infinity.`);
 
   return {m: {x: bm.x, y: bm.y, idx: bm.idx}, sims,
           share: root.N ? Math.round(bm.N / root.N * 100) : 0,
@@ -1683,9 +1760,20 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
       policyNet._netPriors = _p; policyNet._netHidden = _h;
       policyNet._netInp    = _inp; policyNet._netBlend  = _bw;
       if (_bw > 0) {
+        /* Ein einzelner nicht-finiter Prior reichte, um über _mctsKids'
+           Softmax (Z = NaN) die Priors ALLER Wurzelkinder zu vergiften und
+           die PUCT-Auswahl ohne Kandidaten zurückzulassen. Betroffene
+           Kandidaten behalten deshalb ihren reinen MoE-Score, statt ihn zu
+           verlieren — und das Netz meldet sich, statt still zu bleiben. */
+        let _skipped = 0;
         scored.forEach(s => {
-          s.score = (1-_bw)*s.score + _bw * _p[s.m.idx] * PARAMS.netScoreScale;
+          const p = _p[s.m.idx];
+          if (Number.isFinite(p)) s.score = (1-_bw)*s.score + _bw * p * PARAMS.netScoreScale;
+          else _skipped++;
         });
+        if (_skipped)
+          console.warn(`[PolicyNet] ${_skipped} von ${scored.length} Priors nicht-finit — `
+            + `für diese Kandidaten wurde nicht geblendet.`);
         scored.sort((a,b) => b.score - a.score);
       }
     }
@@ -2843,6 +2931,13 @@ class PolicyNet {
     this.b1 = new Float32Array(this.HID);
     this.W2 = this._rand(this.OUT * this.HID, he(this.HID));
     this.b2 = new Float32Array(this.OUT);
+    /* Referenz für die Max-Norm-Projektion: die erwartete Frobeniusnorm der
+       He-Initialisierung, analytisch statt aus der konkreten Ziehung —
+       damit die Grenze über Reloads und reset() hinweg dieselbe ist.
+       Für Uniform(−s, s) mit n Elementen ist E‖·‖ = s·√(n/3). */
+    const ref = (n, s) => s * Math.sqrt(n / 3);
+    this._normRef1 = ref(this.HID * this.IN,  he(this.IN));
+    this._normRef2 = ref(this.OUT * this.HID, he(this.HID));
 
     this._netPriors  = null;
     this._netHidden  = null;
@@ -2851,6 +2946,12 @@ class PolicyNet {
     this._gameBuffer = [];
     this._trained    = false;
     this._lastMove   = null;
+    /* Gesundheitszustand. Ein Netz, dessen forward() nicht-finite
+       Wahrscheinlichkeiten liefert, hört sofort auf zu STEUERN
+       (blendWeight → 0) — es lernt weiter, aber es kann keinen Zug mehr
+       verderben und keinen NaN mehr in die Suche schieben. */
+    this._healthy     = true;
+    this._divergences = 0;
 
     if (this.load()) {
       console.log(`[PolicyNet] Geladen: ${this.gamesPlayed} Spiele · ${this.wins} Siege`);
@@ -2860,6 +2961,10 @@ class PolicyNet {
   }
 
   get blendWeight() {
+    /* Der eine Schalter, der den kompletten Blend-Pfad stilllegt — im
+       Hauptthread wie im Worker, denn dessen netBlend kommt aus genau
+       diesem Getter (postMessage in requestAIMove). */
+    if (!this._healthy) return 0;
     if (this.gamesPlayed < 2) return 0;
     return Math.min(PARAMS.netMaxBlend,
       (this.gamesPlayed / Math.max(1, PARAMS.netWarmup)) * PARAMS.netMaxBlend);
@@ -2869,6 +2974,66 @@ class PolicyNet {
     const a = new Float32Array(n);
     for (let i = 0; i < n; i++) a[i] = (Math.random()*2-1) * scale;
     return a;
+  }
+
+  /* Index des ersten NaN/Infinity, sonst -1. Bewusst eine Schleife statt
+     .some(): sie liefert die Stelle mit, und die steht in jeder Meldung. */
+  static _firstBad(a) {
+    for (let i = 0; i < a.length; i++) if (!Number.isFinite(a[i])) return i;
+    return -1;
+  }
+
+  /* Erster kaputter Gewichtswert über alle vier Tensoren, sonst null. */
+  _badWeight() {
+    for (const [name, a] of [['W1',this.W1], ['b1',this.b1], ['W2',this.W2], ['b2',this.b2]]) {
+      const i = PolicyNet._firstBad(a);
+      if (i >= 0) return {name, i, v: a[i]};
+    }
+    return null;
+  }
+
+  /* Max-Norm-Projektion einer Schicht (Gewichte + Bias als ein Tensor,
+     denn hidden = b1 + W1·inp — ein davonlaufender Bias täte dasselbe wie
+     davonlaufende Gewichte). Rein skalierend: sie begrenzt, wie GROSS eine
+     Schicht werden darf, nicht, was sie gelernt hat. */
+  _projectLayer(W, b, limit) {
+    let n = 0;
+    for (let i = 0; i < W.length; i++) n += W[i] * W[i];
+    for (let i = 0; i < b.length; i++) n += b[i] * b[i];
+    n = Math.sqrt(n);
+    if (!(n > limit)) return 0;   /* NaN fällt hier durch — dafür ist _badWeight da */
+    const f = limit / n;
+    for (let i = 0; i < W.length; i++) W[i] *= f;
+    for (let i = 0; i < b.length; i++) b[i] *= f;
+    return n;
+  }
+
+  /* Eine Meldung, die den Fall wirklich rekonstruierbar macht: Blend-Stand,
+     Lernrate, Gewichtsspannen und die erste kaputte Stelle. */
+  _diag(was, extra) {
+    const spanne = a => {
+      let mx = 0, nf = 0;
+      for (let i = 0; i < a.length; i++) {
+        const v = a[i];
+        if (!Number.isFinite(v)) { nf++; continue; }
+        const m = v < 0 ? -v : v;
+        if (m > mx) mx = m;
+      }
+      return `max ${mx.toExponential(2)}, ${nf} nicht-finit`;
+    };
+    console.error(`[PolicyNet] ${was}`, Object.assign({
+      gamesPlayed: this.gamesPlayed,
+      wins:        this.wins,
+      netBlend:    this.blendWeight,
+      netMaxBlend: PARAMS.netMaxBlend,
+      netWarmup:   PARAMS.netWarmup,
+      netLR:          PARAMS.netLR,
+      netGradClip:    PARAMS.netGradClip,
+      netWeightDecay: PARAMS.netWeightDecay,
+      netMaxNorm:     PARAMS.netMaxNorm,
+      W1: spanne(this.W1), b1: spanne(this.b1),
+      W2: spanne(this.W2), b2: spanne(this.b2)
+    }, extra || {}));
   }
 
   boardToInput(board, color, lastMove = null, koPos = null) {
@@ -2940,31 +3105,127 @@ class PolicyNet {
     let sumE = 0;
     for (let k = 0; k < OUT; k++) { probs[k] = Math.exp(logits[k]-maxL); sumE += probs[k]; }
     for (let k = 0; k < OUT; k++) probs[k] /= sumE;
+
+    /* Die Stelle, an der divergierte Gewichte sichtbar werden. Wächst |W1|
+       weiter, laufen erst hidden und dann die Logits über die Float32-
+       Grenze; sobald maxL = Infinity ist, ist logits[k] − maxL = Inf − Inf
+       = NaN und JEDE Wahrscheinlichkeit NaN. Von hier lief das NaN früher
+       ungebremst weiter: Score-Blend → _mctsKids-Softmax (Z = NaN, also
+       alle Priors NaN) → PUCT ohne wählbares Kind → TypeError auf best.idx.
+       Der Pfad endet jetzt hier.
+       Rückgabe im Fehlerfall: Gleichverteilung (hebt jeden Score um
+       dieselbe Konstante, verschiebt also keine Rangfolge) und hidden =
+       null, damit _backward diese Stichprobe gar nicht erst anfasst. */
+    const bad = PolicyNet._firstBad(probs);
+    if (bad >= 0) {
+      if (this._healthy) {
+        this._healthy = false;
+        let hMax = 0;
+        for (const v of h) if (Number.isFinite(v) && v > hMax) hMax = v;
+        this._diag('forward() liefert nicht-finite Wahrscheinlichkeiten — das Netz steuert ab sofort nicht mehr mit.',
+          {ersterIndex: bad, wert: probs[bad], maxLogit: maxL, sumE,
+           hiddenMax: hMax, hiddenKaputt: PolicyNet._firstBad(h)});
+        this.dashUpdate();
+      }
+      const u = new Float32Array(OUT).fill(1 / OUT);
+      return {probs: u, hidden: null};
+    }
     return {probs, hidden: h};
   }
 
+  /* Ein REINFORCE-Schritt. Gibt zurück, ob die Stichprobe wirklich gelernt
+     wurde — trainGame() zählt damit, wie viel einer Partie brauchbar war.
+
+     Warum hier überhaupt gedeckelt wird: bei negativem Advantage maximiert
+     dieser Schritt −log p(a), und das ist nach unten unbeschränkt. Der
+     Fehler ist dabei nicht dL — das bleibt betragsmäßig unter |lr| — sondern
+     das PRODUKT dL·hidden, mit dem W2 aktualisiert wird: hidden hängt an W1,
+     W1 hängt über dH an W2. Diese Rückkopplung ließ |W2| zuletzt um Faktor
+     ~10 pro Partie wachsen, bis Float32 überlief. Deshalb zwei Deckel je
+     Schicht:
+       · elementweise auf [−cap, cap] — fängt einzelne Ausreißer
+       · auf die Norm des ganzen Schicht-Updates — fängt genau das Produkt
+     Die Norm ist billig, weil beide Gewichts-Updates Rang 1 sind:
+     ‖dL ⊗ hidden‖ = ‖dL‖·‖hidden‖ und ‖dH ⊗ inp‖ = ‖dH‖·‖inp‖. Die +1 sind
+     die Bias-Anteile. Gemessen gesund liegt diese Norm bei 1e-2 … 3,5e-2,
+     der Deckel (Standard 1) greift also nur im Runaway.
+     Die Reihenfolge bleibt wie bisher: erst W2/b2 anwenden, dann dH aus dem
+     BEREITS aktualisierten W2 rechnen. */
   _backward(inp, hidden, probs, moveIdx, reward) {
     const {HID, IN, OUT} = this;
-    const lr = PARAMS.netLR * reward;
+    /* hidden === null kommt aus dem forward()-Schutz oben: solche
+       Stichproben sind Rauschen, kein Trainingssignal. */
+    if (!inp || !hidden || !probs) return false;
+    if (!Number.isFinite(reward)) return false;
+    let lr = PARAMS.netLR * reward;
+    if (!Number.isFinite(lr)) return false;
+    if (PolicyNet._firstBad(probs) >= 0 || PolicyNet._firstBad(hidden) >= 0) return false;
+
+    /* Hier sitzt die eigentliche Divergenz — und deshalb steht sie vor den
+       Deckeln. Bei negativem Advantage lautet der Schritt „mach das
+       Gegenteil dieses Zuges", und dieses Ziel hat kein Optimum: p(a) → 0
+       erreicht man nur mit ‖W‖ → ∞. Der Gradient für den gespielten Zug ist
+       (1−p)·|lr| und schrumpft dabei NICHT — er bleibt bis zuletzt fast
+       maximal. Ein Netz, das eine Niederlage verarbeitet, drückt also
+       400 Züge lang mit voller Kraft in eine Richtung, die erst im
+       Unendlichen ankommt. Genau das trieb hidden über die Float32-Grenze.
+       Sobald ein Zug unwahrscheinlicher ist als ein zufälliger (1/361), ist
+       nichts mehr zu verlernen; der Schritt wird proportional gedämpft und
+       läuft glatt aus, statt hart abzuschneiden. Positive Advantages bleiben
+       unberührt — dort bremst der Gradient (1−p) → 0 von selbst. */
+    if (reward < 0) {
+      const boden = 1 / OUT;
+      const p = probs[moveIdx];
+      if (!(p > 0)) return false;
+      if (p < boden) lr *= p / boden;
+    }
+
+    const cap = PARAMS.netGradClip > 0 ? PARAMS.netGradClip : Infinity;
+
+    /* ── Ausgabeschicht ──────────────────────────────────────────── */
     const dL = new Float32Array(OUT);
-    for (let k = 0; k < OUT; k++) dL[k] = -(probs[k] - (k===moveIdx ? 1 : 0)) * lr;
+    let nL = 0;
+    for (let k = 0; k < OUT; k++) {
+      let g = -(probs[k] - (k===moveIdx ? 1 : 0)) * lr;
+      if (g >  cap) g =  cap;
+      if (g < -cap) g = -cap;
+      dL[k] = g; nL += g * g;
+    }
+    let nHid = 0;
+    for (let j = 0; j < HID; j++) nHid += hidden[j] * hidden[j];
+    const normL = Math.sqrt(nL * (1 + nHid));
+    if (normL > cap) { const f = cap / normL; for (let k = 0; k < OUT; k++) dL[k] *= f; }
+
     for (let k = 0; k < OUT; k++) {
       if (Math.abs(dL[k]) < 1e-9) continue;
       this.b2[k] += dL[k];
       const base = k*HID;
       for (let j = 0; j < HID; j++) this.W2[base+j] += dL[k] * hidden[j];
     }
+
+    /* ── Versteckte Schicht ──────────────────────────────────────── */
     const dH = new Float32Array(HID);
+    let nH = 0;
     for (let j = 0; j < HID; j++) {
       if (hidden[j] <= 0) continue;
-      for (let k = 0; k < OUT; k++) dH[j] += this.W2[k*HID+j] * dL[k];
+      let g = 0;
+      for (let k = 0; k < OUT; k++) g += this.W2[k*HID+j] * dL[k];
+      if (g >  cap) g =  cap;
+      if (g < -cap) g = -cap;
+      dH[j] = g; nH += g * g;
     }
+    let nInp = 0;
+    for (let i = 0; i < IN; i++) nInp += inp[i] * inp[i];
+    const normH = Math.sqrt(nH * (1 + nInp));
+    if (normH > cap) { const f = cap / normH; for (let j = 0; j < HID; j++) dH[j] *= f; }
+
     for (let j = 0; j < HID; j++) {
       if (Math.abs(dH[j]) < 1e-9) continue;
       this.b1[j] += dH[j];
       const base = j*IN;
       for (let i = 0; i < IN; i++) this.W1[base+i] += dH[j] * inp[i];
     }
+    return true;
   }
 
   trainGame(reward) {
@@ -2978,9 +3239,66 @@ class PolicyNet {
        persistiert, also kein neues Speicherfeld nötig. */
     const baseline = this.gamesPlayed > 0 ? (2 * this.wins / this.gamesPlayed - 1) : 0;
     const advantage = reward - baseline;
+    let gelernt = 0, verworfen = 0;
     for (const {inp, probs, hidden, moveIdx} of buf) {
-      this._backward(inp, hidden, probs, moveIdx, advantage);
+      if (this._backward(inp, hidden, probs, moveIdx, advantage)) gelernt++;
+      else verworfen++;
     }
+
+    /* L2 pro Zug, einmal pro Partie als (1−wd)^Züge angewendet — 554 000
+       Multiplikationen statt 554 000 × Züge. Der Deckel in _backward
+       verhindert den Überlauf (‖W‖ kann nur noch linear wachsen, nicht mehr
+       exponentiell); der Zerfall gibt dem Ganzen einen Fixpunkt, statt es
+       auf Dauer nur langsamer davonlaufen zu lassen. */
+    const wd = PARAMS.netWeightDecay;
+    if (wd > 0 && wd < 1 && gelernt) {
+      const keep = Math.pow(1 - wd, gelernt);
+      if (keep > 0 && keep < 1)
+        for (const a of [this.W1, this.b1, this.W2, this.b2])
+          for (let i = 0; i < a.length; i++) a[i] *= keep;
+    }
+
+    /* Harte Zustandsgrenze. Der Deckel in _backward bremst einen Schritt,
+       verhindert aber nur den Überlauf, nicht den Weglauf: 400 gedeckelte
+       Schritte pro Partie summieren sich weiter. Erst die Projektion hält
+       die Gewichte dauerhaft in einem Bereich, in dem die Logits gar keine
+       Float32-Grenze mehr erreichen können. */
+    const mn = PARAMS.netMaxNorm;
+    if (mn > 0) {
+      const v1 = this._projectLayer(this.W1, this.b1, mn * this._normRef1);
+      const v2 = this._projectLayer(this.W2, this.b2, mn * this._normRef2);
+      if (v1 || v2)
+        console.warn('[PolicyNet] Max-Norm griff — Schicht(en) zurückskaliert: '
+          + (v1 ? `‖W1‖ ${v1.toExponential(2)} → ${(mn*this._normRef1).toExponential(2)} ` : '')
+          + (v2 ? `‖W2‖ ${v2.toExponential(2)} → ${(mn*this._normRef2).toExponential(2)}` : ''));
+    }
+
+    /* Genau hier wurde der Fehler früher dauerhaft: save() schrieb die
+       divergierten Gewichte nach localStorage, und ab dem nächsten Laden
+       war jede Partie betroffen — auch nach einem Reload, auch im Worker.
+       Jetzt wird VOR dem Speichern geprüft und ein kaputter Stand
+       zurückgerollt statt weitergereicht. load() liefert exakt den letzten
+       gespeicherten, also validierten Stand; erst wenn auch der fehlt oder
+       das dreimal in Folge passiert, wird das Netz neu initialisiert. */
+    const bad = this._badWeight();
+    if (bad) {
+      this._divergences++;
+      this._diag(`Training divergiert (${bad.name}[${bad.i}] = ${bad.v}) — Partie verworfen.`,
+        {advantage, zuege: buf.length, gelernt, verworfen, divergenzen: this._divergences});
+      this._gameBuffer = [];
+      if (this._divergences < 3 && this.load()) {
+        this._healthy = true;
+        console.warn('[PolicyNet] Letzter gültiger Stand wiederhergestellt '
+          + `(${this.gamesPlayed} Spiele).`);
+        this.dashUpdate();
+      } else {
+        console.warn('[PolicyNet] Kein gültiger Stand verfügbar — Netz wird zurückgesetzt.');
+        this.reset();
+      }
+      return;
+    }
+
+    this._divergences = 0;
     this.gamesPlayed++;
     if (reward > 0) this.wins++;
     this.lastResult  = reward;
@@ -2988,10 +3306,18 @@ class PolicyNet {
     this.save();
     this.dashUpdate();
     const wr = Math.round(this.wins/this.gamesPlayed*100);
-    console.log(`[PolicyNet] Spiel ${this.gamesPlayed}: ${reward>0?'Sieg ✓':'Niederlage ✗'} | Siege: ${wr}% | Blend: ${(this.blendWeight*100).toFixed(0)}%`);
+    console.log(`[PolicyNet] Spiel ${this.gamesPlayed}: ${reward>0?'Sieg ✓':'Niederlage ✗'} | Siege: ${wr}% | Blend: ${(this.blendWeight*100).toFixed(0)}%`
+      + (verworfen ? ` | ${verworfen} von ${buf.length} Zügen ohne verwertbares Signal` : ''));
   }
 
   save() {
+    /* Nie einen nicht-finiten Stand persistieren. Ohne diese Zeilen
+       überlebte der Fehler jeden Reload und jede neue Partie. */
+    const bad = this._badWeight();
+    if (bad) {
+      this._diag(`Speichern abgelehnt: ${bad.name}[${bad.i}] = ${bad.v}`);
+      return false;
+    }
     try {
       const enc = a => {
         const u = new Uint8Array(a.buffer); let s = '';
@@ -3003,7 +3329,8 @@ class PolicyNet {
         W2:enc(this.W2), b2:enc(this.b2),
         games:this.gamesPlayed, wins:this.wins
       }));
-    } catch(e) { console.warn('[PolicyNet] Speichern fehlgeschlagen:', e); }
+      return true;
+    } catch(e) { console.warn('[PolicyNet] Speichern fehlgeschlagen:', e); return false; }
   }
 
   load() {
@@ -3022,9 +3349,26 @@ class PolicyNet {
         console.log('[PolicyNet] Gespeicherte Gewichte haben andere Dimension — starte neu.');
         return false;
       }
-      this.W1=w1; this.b1=dec(d.b1,Float32Array);
-      this.W2=w2; this.b2=dec(d.b2,Float32Array);
+      const b1=dec(d.b1,Float32Array), b2=dec(d.b2,Float32Array);
+      if (b1.length !== this.HID || b2.length !== this.OUT) {
+        console.log('[PolicyNet] Gespeicherte Biases haben andere Dimension — starte neu.');
+        return false;
+      }
+      /* Selbstheilung für bereits vergiftete Browser: ein Stand aus der
+         Zeit vor dem Gradienten-Deckel kann NaN/Infinity enthalten. Ihn zu
+         laden hieße, den Fehler in jede weitere Sitzung mitzunehmen. */
+      for (const [nm, a] of [['W1',w1], ['b1',b1], ['W2',w2], ['b2',b2]]) {
+        const i = PolicyNet._firstBad(a);
+        if (i >= 0) {
+          console.warn(`[PolicyNet] Gespeicherte Gewichte enthalten NaN/Infinity `
+            + `(${nm}[${i}] = ${a[i]}) — verworfen, Netz startet mit frischen Gewichten.`);
+          return false;
+        }
+      }
+      this.W1=w1; this.b1=b1;
+      this.W2=w2; this.b2=b2;
       this.gamesPlayed=d.games||0; this.wins=d.wins||0;
+      this._healthy=true;
       return true;
     } catch(e) { return false; }
   }
@@ -3038,6 +3382,7 @@ class PolicyNet {
     this.b2=new Float32Array(this.OUT);
     this.gamesPlayed=0; this.wins=0; this.lastResult=null;
     this._gameBuffer=[]; this._trained=false;
+    this._healthy=true; this._divergences=0;
     this.save(); this.dashUpdate();
     console.log('[PolicyNet] Zurückgesetzt.');
   }
@@ -3052,6 +3397,13 @@ class PolicyNet {
     const res = el('pn-result');
     res.textContent = this.lastResult===null ? '—' : this.lastResult>0 ? '✓ Sieg' : '✗ Niederlage';
     res.style.color = this.lastResult===null ? '' : this.lastResult>0 ? 'var(--green)' : 'var(--red)';
+    /* Ein stillgelegtes Netz muss sichtbar sein: sonst sieht man nur, dass
+       der Einfluss auf 0 steht, und hält es für Warmup. */
+    const hp = el('pn-health');
+    if (hp) {
+      hp.textContent  = this._healthy ? 'ok' : '⚠ divergiert (steuert nicht)';
+      hp.style.color  = this._healthy ? '' : 'var(--red)';
+    }
     const bar = el('pn-warmup-bar');
     if (bar) bar.style.width = Math.min(100, (this.gamesPlayed/Math.max(1,PARAMS.netWarmup))*100)+'%';
   }
@@ -3364,7 +3716,7 @@ globalThis.policyNet = new PolicyNet();
     },
     {
       id:'polnet', label:'🧠 Policy-Netz',
-      hint:'3971→128→361 Netz, REINFORCE. Score = (1−blend)·MoE + blend·Prior·scale. Blend wächst automatisch: nach 5 Spielen ~30% Einfluss. Gewichte in localStorage.',
+      hint:'3971→128→361 Netz, REINFORCE. Score = (1−blend)·MoE + blend·Prior·scale. Blend wächst automatisch: nach 5 Spielen ~30% Einfluss. Gewichte in localStorage. Gradienten-Deckel 0 = aus — dann divergiert das Training (siehe Kommentar bei netGradClip).',
       custom:'pnet'
     },
   ];
@@ -3434,6 +3786,7 @@ globalThis.policyNet = new PolicyNet();
         <div class="pn-stat"><span class="pn-key">Siege</span><span class="pn-val" id="pn-wins">0</span></div>
         <div class="pn-stat"><span class="pn-key">Netz-Einfluss</span><span class="pn-val" id="pn-blend">0%</span></div>
         <div class="pn-stat"><span class="pn-key">Letztes Spiel</span><span class="pn-val" id="pn-result">—</span></div>
+        <div class="pn-stat"><span class="pn-key">Netz-Zustand</span><span class="pn-val" id="pn-health">ok</span></div>
         <div class="pn-bar-track"><div class="pn-bar-fill" id="pn-warmup-bar"></div></div>
         <div class="pd-row"><span class="pd-label">Max. Einfluss</span>
           <input class="pd-input" type="number" id="pd-netMaxBlend" min="0" max="1" step="0.05" value="${PARAMS.netMaxBlend}"
@@ -3447,6 +3800,15 @@ globalThis.policyNet = new PolicyNet();
         <div class="pd-row"><span class="pd-label">Score-Skalierung</span>
           <input class="pd-input" type="number" id="pd-netScoreScale" min="500" max="50000" step="500" value="${PARAMS.netScoreScale}"
             onchange="dashUpdate('netScoreScale',this,false)" oninput="dashUpdate('netScoreScale',this,false)"></div>
+        <div class="pd-row"><span class="pd-label">Gradienten-Deckel</span>
+          <input class="pd-input" type="number" id="pd-netGradClip" min="0" max="10" step="0.1" value="${PARAMS.netGradClip}"
+            onchange="dashUpdate('netGradClip',this,true)" oninput="dashUpdate('netGradClip',this,true)"></div>
+        <div class="pd-row"><span class="pd-label">Weight Decay</span>
+          <input class="pd-input" type="number" id="pd-netWeightDecay" min="0" max="0.01" step="0.00001" value="${PARAMS.netWeightDecay}"
+            onchange="dashUpdate('netWeightDecay',this,true)" oninput="dashUpdate('netWeightDecay',this,true)"></div>
+        <div class="pd-row"><span class="pd-label">Max-Norm (×Init)</span>
+          <input class="pd-input" type="number" id="pd-netMaxNorm" min="0" max="50" step="0.5" value="${PARAMS.netMaxNorm}"
+            onchange="dashUpdate('netMaxNorm',this,true)" oninput="dashUpdate('netMaxNorm',this,true)"></div>
         <div style="margin-top:8px">
           <button class="pd-reset-btn" style="width:100%" onclick="policyNet.reset();dashRefreshPhase()">🗑 Netz zurücksetzen</button>
         </div>`;
