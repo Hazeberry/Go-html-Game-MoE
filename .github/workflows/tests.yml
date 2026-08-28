@@ -43,6 +43,12 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
+          # v7 hat package-manager-cache standardmäßig an (im Log als
+          # `package-manager-cache: true` sichtbar). Hier ist nichts zu
+          # cachen — das Repo hat bewusst keine package.json — und sobald
+          # doch eine dazukäme, würde die Automatik ohne Lockfile über
+          # „Dependencies lock file is not found" stolpern. Also aus.
+          package-manager-cache: false
 
       # Getrennte Schritte, damit in der Job-Übersicht sofort sichtbar ist,
       # welche Ebene gebrochen ist: die Schutzschichten oder das Training.
@@ -62,6 +68,12 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
+          # v7 hat package-manager-cache standardmäßig an (im Log als
+          # `package-manager-cache: true` sichtbar). Hier ist nichts zu
+          # cachen — das Repo hat bewusst keine package.json — und sobald
+          # doch eine dazukäme, würde die Automatik ohne Lockfile über
+          # „Dependencies lock file is not found" stolpern. Also aus.
+          package-manager-cache: false
 
       # Das Repo hat bewusst keine package.json — Playwright wird nur für
       # diesen Job installiert, ohne dem Projekt eine Abhängigkeit zu geben.
