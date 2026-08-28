@@ -260,10 +260,10 @@ Belege aus dem Repro über die ausgeschnittenen Skript-Blöcke:
 `dashReset` setzt `netMaxBlend` auf 0 zurück und umgeht den Pfad damit — das
 war der Workaround, nicht der Fix.
 
-Gegen Rückfall abgesichert in [`tests/`](tests/): 19 Fälle in drei Dateien,
+Gegen Rückfall abgesichert in [`tests/`](tests/): 21 Fälle in vier Dateien,
 drei davon im echten Browser mit Web Worker. Am Stand vor dem Fix fallen
-16 davon durch — die drei verbleibenden prüfen bewusst unverändertes
-Verhalten und müssen auf beiden Ständen halten.
+16 davon durch — die übrigen prüfen bewusst unverändertes Verhalten und
+müssen auf beiden Ständen halten.
 
 **Fürs Auswerten von Spielständen:** `reproduktion.board` ist die Stellung
 **vor** dem letzten KI-Zug — es ist die Eingabe, mit der die KI gerechnet hat

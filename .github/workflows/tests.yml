@@ -34,7 +34,7 @@ permissions:
 
 jobs:
   node:
-    name: Node (Guards + Training)
+    name: Node (Guards, Training, Harness)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -57,6 +57,15 @@ jobs:
 
       - name: Trainings-Stabilität
         run: node tests/training-stability.js
+
+      # Der Harness selbst läuft NICHT als Messlauf mit (Wall-Clock, nicht
+      # reproduzierbar). Er war dadurch aber die einzige Datei im Repo, die
+      # kein Push je anfasste — und er greift auf Engine-Funktionen und
+      # policyNet-Interna zu, die sonst niemand berührt. Der Rauchtest misst
+      # nichts, er prüft in einer halben Sekunde nur, dass das Messwerkzeug
+      # noch anläuft.
+      - name: Harness-Rauchtest
+        run: node tests/harness-smoke.js
 
   browser:
     name: Browser (Worker + localStorage)
@@ -112,7 +121,7 @@ jobs:
             echo
             echo "| Ebene | Ergebnis |"
             echo "|---|---|"
-            echo "| Node — Guards + Training | $(sym "$NODE_ERGEBNIS") $NODE_ERGEBNIS |"
+            echo "| Node — Guards, Training, Harness | $(sym "$NODE_ERGEBNIS") $NODE_ERGEBNIS |"
             echo "| Browser — Worker + localStorage | $(sym "$BROWSER_ERGEBNIS") $BROWSER_ERGEBNIS |"
             echo
             echo "Details in [\`tests/README.md\`](tests/README.md)."
