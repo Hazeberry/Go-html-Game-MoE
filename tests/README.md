@@ -6,6 +6,7 @@ Regressionstests zum NaN-Bug in `mctsPUCT` ([#49](https://github.com/Hazeberry/G
 node tests/run.js                     # alles
 node tests/nan-guards.js              # nur die Schutzschichten (< 1 s)
 node tests/training-stability.js      # nur das Training (~20 s)
+node tests/harness-smoke.js           # nur der Harness-Rauchtest (< 1 s)
 node tests/browser-nan.js             # nur Ende-zu-Ende im Browser (~45 s)
 ```
 
@@ -50,6 +51,7 @@ niemand ausliefert.
 |---|---|---|
 | `nan-guards.js` | Logik im Prozess | `_mctsKids` bei NaN/Infinity, `mctsPUCT` mit vergifteter Wurzelliste, `forward`/`save`/`load`/`_backward`/`trainGame`-Schutz |
 | `training-stability.js` | Training | Regularisierungs-Parameter, Gradienten-Deckel, Max-Norm-Projektion, Advantage-Dämpfung, dazu der ursprüngliche Repro-Lauf |
+| `harness-smoke.js` | Messwerkzeug | läuft `ab-harness.js` einmal winzig durch — misst nichts, prüft nur, dass er noch anläuft |
 | `browser-nan.js` | echter Browser | Chromium, echter Web Worker, echtes `localStorage` — der Pfad, auf dem der Fehler gemeldet wurde |
 
 Der Browser-Test ist nicht redundant: die Node-Tests werten die Skript-Blöcke
@@ -63,6 +65,7 @@ den Worker und danach den synchronen Fallback.
 | Neue Guard-Logik — etwas fängt einen nicht-finiten oder entarteten Wert ab | `nan-guards.js` |
 | Trainingsdynamik oder Regularisierung — Gradienten, Normen, Dämpfung, Zerfall | `training-stability.js` |
 | Browser-spezifisches Verhalten oder `localStorage`-Interaktion | `browser-nan.js` |
+| Der Messrahmen selbst (`ab-harness.js`) läuft nicht mehr | `harness-smoke.js` |
 
 Die Trennung ist nicht kosmetisch, sie folgt den Kosten: `nan-guards.js`
 läuft in unter einer Sekunde und ist deshalb der Ort, an dem man beim
@@ -89,12 +92,46 @@ Ein Test, der auf der kaputten Version grün ist, prüft nichts. Gemessen gegen
 |---|---|---|
 | `nan-guards.js` | 2 von 11 bestanden | 11 von 11 |
 | `training-stability.js` | 0 von 5 | 5 von 5 |
+| `harness-smoke.js` | 2 von 2 | 2 von 2 |
 | `browser-nan.js` | 1 von 3 | 3 von 3 |
 
 Die grünen Fälle im alten Stand prüfen bewusst *unverändertes* Verhalten und
 sollen auf beiden Ständen halten: in `nan-guards.js` der Rang-Prior-Zweig und
 gleiche Scores, in `browser-nan.js` der gesunde Start ohne vergiftete
-Gewichte.
+Gewichte. `harness-smoke.js` ist grün auf beiden Ständen, weil er nichts über
+den NaN-Bug aussagt — er bewacht eine andere Lücke, siehe unten.
+
+## Warum der Harness einen eigenen Rauchtest hat
+
+`ab-harness.js` läuft bewusst nicht als Messlauf in der CI — Wall-Clock-Budget,
+nicht reproduzierbar, taugt nicht als Ja/Nein-Prüfung. Dadurch war er aber die
+einzige Datei im Repo, die kein Push je anfasste.
+
+Das ist keine Kosmetik. Harness und `tests/rahmen.js` schneiden beide die
+`<script>`-Blöcke aus `index.html`, aber mit **getrennten** Implementierungen —
+sie können auseinanderlaufen. Der Harness greift zusätzlich auf sechs
+Engine-Funktionen zu, die kein anderer Test berührt (`bensonClassify`,
+`evaluateBoard`, `evaluateMove`, `floodFill`, `quickEval`, `removeDeadGroups`),
+und auf neun `policyNet`-Interna, darunter `_netInp`, `_netHidden` und
+`_gameBuffer`.
+
+Gemessen an Negativproben:
+
+| Bruch | Rauchtest |
+|---|---|
+| Syntaxfehler in `ab-harness.js` | rot |
+| `bensonClassify` in `index.html` umbenannt | rot — `nan-guards.js` bleibt dabei **grün** |
+| Script-Block-Id in `index.html` umbenannt | rot |
+| nichts verändert | grün |
+
+Ohne diesen Test wäre so ein Bruch erst beim nächsten manuellen Messlauf
+aufgefallen: Wochen später, Ursache irgendwo in dreißig Commits. Dieselbe
+Fehlerklasse wie der ursprüngliche NaN-Bug — etwas läuft still kaputt, weil
+nichts hinschaut.
+
+Der Test bewertet bewusst **keine** Ergebnisse, nur den Exit-Code und die
+Struktur der Auswertung. Sonst wäre die Nichtreproduzierbarkeit wieder das
+Problem.
 
 ## Zum Repro-Lauf
 

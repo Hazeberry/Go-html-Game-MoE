@@ -8,7 +8,7 @@ const path = require('path');
 const {spawn} = require('child_process');
 
 const HTML = process.argv[2] ? [path.resolve(process.argv[2])] : [];
-const SUITEN = ['nan-guards.js', 'training-stability.js', 'browser-nan.js'];
+const SUITEN = ['nan-guards.js', 'training-stability.js', 'harness-smoke.js', 'browser-nan.js'];
 
 /* training-stability nimmt Partien/Züge VOR dem Pfad — deshalb die Defaults
    mitgeben, wenn ein Pfad durchgereicht wird. */
