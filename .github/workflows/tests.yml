@@ -1,0 +1,120 @@
+name: Tests
+
+# Regressionstests aus tests/. Läuft bei jedem Push und jedem Pull Request
+# auf main — im Gegensatz zum A/B-Harness, der bewusst nur manuell startet.
+#
+# Warum der Harness hier NICHT mitläuft: sein Zeitbudget ist Wall-Clock pro
+# Zug, die Simulationszahl hängt damit an der Runner-Last, und zwei Läufe mit
+# identischem Seed liefern nachweislich verschiedene Partien. Ein Messwerkzeug
+# ohne festes Ergebnis taugt nicht als Ja/Nein-Prüfung — es würde entweder
+# grundlos rot oder wäre so weit gelockert, dass es nichts mehr fängt. Die
+# Tests hier prüfen stattdessen Invarianten: finit, beschränkt, kein Absturz.
+#
+# Zwei Jobs, weil sie verschieden teuer sind. `node` braucht nichts außer Node
+# und ist in etwa einer halben Minute durch — das ist die Rückmeldung, auf die
+# man wartet. `browser` installiert erst Chromium und läuft deshalb getrennt,
+# damit ein Fehler im schnellen Teil nicht hinter der Browser-Installation
+# wartet.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Ein überholter Lauf auf demselben Branch wird abgebrochen: bei mehreren
+# Pushes hintereinander zählt nur der letzte Stand.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  node:
+    name: Node (Guards + Training)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          # v7 hat package-manager-cache standardmäßig an (im Log als
+          # `package-manager-cache: true` sichtbar). Hier ist nichts zu
+          # cachen — das Repo hat bewusst keine package.json — und sobald
+          # doch eine dazukäme, würde die Automatik ohne Lockfile über
+          # „Dependencies lock file is not found" stolpern. Also aus.
+          package-manager-cache: false
+
+      # Getrennte Schritte, damit in der Job-Übersicht sofort sichtbar ist,
+      # welche Ebene gebrochen ist: die Schutzschichten oder das Training.
+      - name: Schutzschichten
+        run: node tests/nan-guards.js
+
+      - name: Trainings-Stabilität
+        run: node tests/training-stability.js
+
+  browser:
+    name: Browser (Worker + localStorage)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          # v7 hat package-manager-cache standardmäßig an (im Log als
+          # `package-manager-cache: true` sichtbar). Hier ist nichts zu
+          # cachen — das Repo hat bewusst keine package.json — und sobald
+          # doch eine dazukäme, würde die Automatik ohne Lockfile über
+          # „Dependencies lock file is not found" stolpern. Also aus.
+          package-manager-cache: false
+
+      # Das Repo hat bewusst keine package.json — Playwright wird nur für
+      # diesen Job installiert, ohne dem Projekt eine Abhängigkeit zu geben.
+      # Version gepinnt, damit ein Chromium-Update den Lauf nicht ohne
+      # zugehörigen Commit verändert.
+      - name: Playwright + Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+
+      # REQUIRE_BROWSER=1 ist hier der eigentliche Punkt: ohne die Variable
+      # überspringt sich der Test, wenn er Chromium nicht findet, und der Lauf
+      # bliebe grün, ohne etwas geprüft zu haben. In CI muss das ein
+      # Fehlschlag sein.
+      - name: Ende-zu-Ende im Browser
+        env:
+          REQUIRE_BROWSER: '1'
+        run: node tests/browser-nan.js
+
+  ergebnis:
+    name: Zusammenfassung
+    runs-on: ubuntu-latest
+    needs: [node, browser]
+    if: always()
+    steps:
+      - name: In die Run-Übersicht schreiben
+        env:
+          NODE_ERGEBNIS: ${{ needs.node.result }}
+          BROWSER_ERGEBNIS: ${{ needs.browser.result }}
+        run: |
+          set -euo pipefail
+          sym() { case "$1" in success) echo '✅';; failure) echo '❌';; cancelled) echo '⚪';; *) echo '⚠️';; esac; }
+          {
+            echo "## Regressionstests"
+            echo
+            echo "| Ebene | Ergebnis |"
+            echo "|---|---|"
+            echo "| Node — Guards + Training | $(sym "$NODE_ERGEBNIS") $NODE_ERGEBNIS |"
+            echo "| Browser — Worker + localStorage | $(sym "$BROWSER_ERGEBNIS") $BROWSER_ERGEBNIS |"
+            echo
+            echo "Details in [\`tests/README.md\`](tests/README.md)."
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "$NODE_ERGEBNIS" = success ] && [ "$BROWSER_ERGEBNIS" = success ]

@@ -323,6 +323,7 @@ index.html                      Spiel und Engine, eine Datei
 ab-harness.js                   Messrahmen; Kopfkommentar = Versuchsprotokoll
 distillation/                   Überwachtes Training fürs Policy-Netz
 tests/                          Regressionstests (node tests/run.js)
+.github/workflows/tests.yml       Regressionstests bei jedem Push und PR
 .github/workflows/ab-harness.yml  Messläufe in CI, manuell startbar
 ```
 

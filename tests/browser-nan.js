@@ -35,15 +35,30 @@ function ladePlaywright() {
   } catch (e) { return null; }
 }
 
-/* Chromium ohne feste Versionsnummer suchen: Playwright legt es unter
-   chromium-<build> ab, und die Nummer ändert sich mit jedem Update. */
-function sucheChromium() {
-  const wurzel = process.env.PLAYWRIGHT_BROWSERS_PATH || '/opt/pw-browsers';
-  if (!fs.existsSync(wurzel)) return null;
-  for (const e of fs.readdirSync(wurzel)) {
-    if (!/^chromium-/.test(e)) continue;
-    const p = path.join(wurzel, e, 'chrome-linux', 'chrome');
-    if (fs.existsSync(p)) return p;
+/* Playwright weiß selbst, wohin es Chromium gelegt hat — danach fragen,
+   statt es zu suchen. Die vorherige Fassung durchsuchte
+   PLAYWRIGHT_BROWSERS_PATH mit Rückfall auf /opt/pw-browsers; auf einem
+   GitHub-Runner ist die Variable nicht gesetzt und Playwright installiert
+   nach ~/.cache/ms-playwright. Der Test hätte sich dort still übersprungen
+   — CI wäre grün gewesen, ohne irgendetwas zu prüfen. Der Verzeichnis-Scan
+   bleibt als Rückfall für den Fall, dass die Installation älter ist als das
+   installierte Paket. */
+function sucheChromium(playwright) {
+  if (playwright) {
+    try {
+      const p = playwright.chromium.executablePath();
+      if (p && fs.existsSync(p)) return p;
+    } catch (e) { /* Rückfall unten */ }
+  }
+  for (const wurzel of [process.env.PLAYWRIGHT_BROWSERS_PATH,
+                        path.join(os.homedir(), '.cache', 'ms-playwright'),
+                        '/opt/pw-browsers']) {
+    if (!wurzel || !fs.existsSync(wurzel)) continue;
+    for (const e of fs.readdirSync(wurzel)) {
+      if (!/^chromium-/.test(e)) continue;
+      const p = path.join(wurzel, e, 'chrome-linux', 'chrome');
+      if (fs.existsSync(p)) return p;
+    }
   }
   return null;
 }
@@ -148,12 +163,21 @@ async function spiele(browser, port, pnet, menschZuege) {
 }
 
 const playwright = ladePlaywright();
-const chromePfad = sucheChromium();
+const chromePfad = sucheChromium(playwright);
+/* In CI darf sich der Test nicht still überspringen: eine kaputte
+   Browser-Installation würde die Abdeckung lautlos halbieren und der Lauf
+   bliebe grün. REQUIRE_BROWSER=1 macht daraus einen Fehlschlag. */
+const PFLICHT = process.env.REQUIRE_BROWSER === '1';
 let browser = null, server = null, port = 0;
 
 async function vorbereiten() {
   if (browser) return true;
-  if (!playwright || !chromePfad) return false;
+  if (!playwright || !chromePfad) {
+    if (PFLICHT)
+      throw new Error(`REQUIRE_BROWSER=1, aber ${!playwright ? 'Playwright' : 'Chromium'} `
+        + 'ist nicht auffindbar — der Test darf sich hier nicht überspringen.');
+    return false;
+  }
   browser = await playwright.chromium.launch({executablePath: chromePfad});
   ({server, port} = await starteServer(HTML_PFAD));
   return true;
@@ -195,8 +219,10 @@ fall('vergiftete Gewichte (endlich, 1e20): forward() meldet ab', 1e20, 12, (st, 
 
 laufeTests('NaN-Schutz im echten Browser (Worker + localStorage)').then(ok => {
   if (!playwright || !chromePfad)
-    console.log(`\n  Übersprungen: ${!playwright ? 'Playwright nicht gefunden' : 'Chromium nicht gefunden'}.`
-      + '\n  Installation:  npm i -D playwright && npx playwright install chromium');
+    console.log(`\n  ${PFLICHT ? 'FEHLT' : 'Übersprungen'}: `
+      + `${!playwright ? 'Playwright' : 'Chromium'} nicht gefunden.`
+      + '\n  Installation:  npm i -D playwright && npx playwright install chromium'
+      + (PFLICHT ? '' : '\n  In CI erzwingt REQUIRE_BROWSER=1 stattdessen einen Fehlschlag.'));
   if (browser) browser.close();
   if (server) server.close();
   process.exit(ok ? 0 : 1);
