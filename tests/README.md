@@ -4,6 +4,7 @@ Regressionstests zum NaN-Bug in `mctsPUCT` ([#49](https://github.com/Hazeberry/G
 
 ```
 node tests/run.js                     # alles
+node tests/run.js --ohne-browser      # alles außer dem Browser-Test
 node tests/nan-guards.js              # nur die Schutzschichten (< 1 s)
 node tests/resign-criterion.js        # nur das Aufgabe-Kriterium (< 1 s)
 node tests/training-stability.js      # nur das Training (~20 s)
@@ -17,8 +18,15 @@ Playwright selbst überspringt und den Gesamtlauf grün lässt.
 ## In CI
 
 `.github/workflows/tests.yml` fährt die Tests bei jedem Push und jedem Pull
-Request auf `main`, in zwei Jobs: `node` (Guards + Training, keine
+Request auf `main`, in zwei Jobs: `node` (alle Suiten außer Browser, keine
 Abhängigkeiten, ~30 s) und `browser` (installiert Chromium, deshalb getrennt).
+
+Der Node-Job ruft `node tests/run.js --ohne-browser` auf — **einen** Befehl,
+nicht eine Liste von Einzelaufrufen. Das ist kein Stilentscheid: die frühere
+Fassung listete die Dateien im Workflow auf, und beim Hinzufügen von
+`resign-criterion.js` wurde die Liste dort nicht mitgepflegt. Der Job blieb
+grün und prüfte den neuen Test nicht. Die Suite-Liste lebt jetzt nur in
+`tests/run.js` und kann nicht mehr davon abdriften.
 Der A/B-Harness läuft dort bewusst **nicht** mit — sein Zeitbudget ist
 Wall-Clock, das Ergebnis also nicht reproduzierbar, und ein Messwerkzeug ohne
 festes Ergebnis taugt nicht als Ja/Nein-Prüfung.

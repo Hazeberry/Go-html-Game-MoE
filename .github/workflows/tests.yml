@@ -34,7 +34,7 @@ permissions:
 
 jobs:
   node:
-    name: Node (Guards, Training, Harness)
+    name: Node (alle Suiten außer Browser)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -50,22 +50,17 @@ jobs:
           # „Dependencies lock file is not found" stolpern. Also aus.
           package-manager-cache: false
 
-      # Getrennte Schritte, damit in der Job-Übersicht sofort sichtbar ist,
-      # welche Ebene gebrochen ist: die Schutzschichten oder das Training.
-      - name: Schutzschichten
-        run: node tests/nan-guards.js
-
-      - name: Trainings-Stabilität
-        run: node tests/training-stability.js
-
-      # Der Harness selbst läuft NICHT als Messlauf mit (Wall-Clock, nicht
-      # reproduzierbar). Er war dadurch aber die einzige Datei im Repo, die
-      # kein Push je anfasste — und er greift auf Engine-Funktionen und
-      # policyNet-Interna zu, die sonst niemand berührt. Der Rauchtest misst
-      # nichts, er prüft in einer halben Sekunde nur, dass das Messwerkzeug
-      # noch anläuft.
-      - name: Harness-Rauchtest
-        run: node tests/harness-smoke.js
+      # EIN Schritt über den Runner, nicht mehrere Einzelaufrufe. Die frühere
+      # Fassung listete die Dateien hier auf und driftete prompt: beim
+      # Hinzufügen von resign-criterion.js wurde die Liste nicht mitgepflegt,
+      # der Job blieb grün und prüfte den neuen Test nicht. Die Suite-Liste
+      # lebt jetzt nur in tests/run.js; --ohne-browser lässt genau den Teil
+      # weg, der einen eigenen Job mit Chromium hat.
+      #
+      # Der Harness läuft dabei nur als Rauchtest mit, nicht als Messlauf:
+      # sein Zeitbudget ist Wall-Clock und damit als Ja/Nein-Prüfung untauglich.
+      - name: Tests (ohne Browser)
+        run: node tests/run.js --ohne-browser
 
   browser:
     name: Browser (Worker + localStorage)
@@ -121,7 +116,7 @@ jobs:
             echo
             echo "| Ebene | Ergebnis |"
             echo "|---|---|"
-            echo "| Node — Guards, Training, Harness | $(sym "$NODE_ERGEBNIS") $NODE_ERGEBNIS |"
+            echo "| Node — alle Suiten außer Browser | $(sym "$NODE_ERGEBNIS") $NODE_ERGEBNIS |"
             echo "| Browser — Worker + localStorage | $(sym "$BROWSER_ERGEBNIS") $BROWSER_ERGEBNIS |"
             echo
             echo "Details in [\`tests/README.md\`](tests/README.md)."
