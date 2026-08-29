@@ -43,11 +43,21 @@ function ladeKI({htmlPfad = STANDARD_HTML, mitNetz = true, speicher = null} = {}
 
   let quelle = schneide(html, 'shared-go-logic') + '\n' + schneide(html, 'worker-ai');
   if (mitNetz) quelle += '\n' + schneide(html, 'policy-net');   /* MUSS nach worker-ai: der blendWeight-Getter liest PARAMS */
+  /* Namen einzeln und TOLERANT herausreichen: ein älterer index.html kennt
+     nicht jedes Symbol, und ein ReferenceError in dieser Zeile würde die
+     ganze Datei killen — auch Tests, die das fehlende Symbol nie anfassen.
+     Genau das ist beim Hinzufügen von gebietSagtVerloren einmal passiert.
+     Fehlende Namen kommen jetzt als undefined an; der Test, der sie braucht,
+     scheitert dann für sich allein und mit klarer Meldung. */
+  const namen = ['_mctsKids', 'mctsPUCT', 'getAIMove', 'getLegalMoves',
+                 'gebietSagtVerloren', 'estimateArea', 'evaluateBoard',
+                 'PARAMS', 'BOARD_SIZE', 'NEIGHBORS', 'idx', 'xOf', 'yOf'];
   quelle += `
-    ;globalThis.__test = {
-      mctsKids: _mctsKids, mctsPUCT, getAIMove, getLegalMoves,
-      PARAMS, BOARD_SIZE, NEIGHBORS, idx, xOf, yOf
-    };`;
+    ;globalThis.__test = {};
+    for (const _n of ${JSON.stringify(namen)}) {
+      try { globalThis.__test[_n === '_mctsKids' ? 'mctsKids' : _n] = eval(_n); }
+      catch (e) { globalThis.__test[_n === '_mctsKids' ? 'mctsKids' : _n] = undefined; }
+    }`;
   (0, eval)(quelle);
 
   const api = globalThis.__test;
