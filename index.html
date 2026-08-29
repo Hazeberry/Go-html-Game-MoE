@@ -522,6 +522,31 @@ globalThis.PARAMS = {
   endgameEmpty:      50,
   /* Eröffnung */
   openEdge3:         40,
+  /* Feinabstufung INNERHALB des openEdge3-Bands. Der Name sagt „dritte
+     Linie“, die Bedingung lautet aber `dte <= 4` — Linie 1 bis 5 bekommen
+     alle dieselben 40 Punkte. Innerhalb des Bands trägt der Positionsterm
+     damit nichts zur Rangfolge bei; die Abstufung entsteht erst über
+     openHoshiBonus, openCornerBonus und openNeighborBonus.
+
+     Gemessen wurde, ob das reicht. Dosis-Reihe über 65 Eröffnungsstellungen
+     (Zug 3-28) aus fünf Hard-Partien, Anteil Top-1 auf Linie 1-2:
+
+       Gewicht      0     5    10    20    40    80
+       Top-1      18 %  20 %  17 %  15 %  12 %  11 %
+       Ø Linie    3.37  3.26  3.23  3.37  3.31  3.34
+
+     Nulllinie ist die Verfügbarkeit: 39 % der legalen Züge liegen auf Linie
+     1-2 (136 der 361 Punkte). Bei Gewicht 0 meidet die Heuristik den Rand
+     also bereits deutlich — 18 % gegen 39 % — und die Dosis-Antwort ist über
+     eine 16-fache Steigerung schwach. Der Parameter bleibt deshalb auf 0:
+     ein dokumentierter Nullbefund, kein Regler mit bekanntem Nutzen.
+
+     Achtung bei Nachmessungen: ein Bucket „Zug 1-50“ misst evalOpening NICHT
+     isoliert. evalOpening wirkt nur bis etwa Zug 28 (openingMoves 20 plus
+     Blendzone), danach regiert evalMidgame. Der Rand-Anteil von 53 % in
+     Phase 51-150 gehört dorthin und ist für diesen Parameter konstruktions-
+     bedingt unerreichbar. */
+  openLineWeight:     0,
   openEdge5:         25,
   openCenter:         8,
   openHoshiBonus:    30,
@@ -966,11 +991,20 @@ function getLegalMoves(board, color, historyHashes, koPoint, hardDeadline) {
   return moves;
 }
 
+/* Linienabstufung für evalOpening, Index = dte (0-basiert, 0 = erste Linie).
+   Erste und zweite Linie sind in der Eröffnung schlecht, dritte und vierte
+   gut, fünfte neutral. Wirkt nur mit openLineWeight > 0. */
+const OPEN_LINIE = [-1, -0.5, 1, 1, 0];
+
 function evalOpening(board, i, color, mc) {
   let s = 0;
   const x = xOf(i), y = yOf(i);
   const dte = Math.min(x, y, SIZE-1-x, SIZE-1-y);
-  if (dte <= 4) s += PARAMS.openEdge3;
+  if (dte <= 4) {
+    s += PARAMS.openEdge3;
+    /* dte ist 0-basiert: 0 = erste Linie. Siehe openLineWeight. */
+    if (PARAMS.openLineWeight > 0) s += PARAMS.openLineWeight * OPEN_LINIE[dte];
+  }
   else if (x <= 4 || x >= 14 || y <= 4 || y >= 14) s += PARAMS.openEdge5;
   else s += PARAMS.openCenter;
   if (HOSHI_IDX.has(i) && mc < 15) s += PARAMS.openHoshiBonus;
