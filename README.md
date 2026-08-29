@@ -260,10 +260,73 @@ Belege aus dem Repro über die ausgeschnittenen Skript-Blöcke:
 `dashReset` setzt `netMaxBlend` auf 0 zurück und umgeht den Pfad damit — das
 war der Workaround, nicht der Fix.
 
-Gegen Rückfall abgesichert in [`tests/`](tests/): 21 Fälle in vier Dateien,
+Gegen Rückfall abgesichert in [`tests/`](tests/): 29 Fälle in fünf Dateien,
 drei davon im echten Browser mit Web Worker. Am Stand vor dem Fix fallen
 16 davon durch — die übrigen prüfen bewusst unverändertes Verhalten und
 müssen auf beiden Ständen halten.
+
+### Die KI gab in ausgeglichener Stellung auf
+
+Elf exportierte Partien vom 29.08. — vier auf „schwer", sieben auf „einfach",
+alle verloren. Die sieben Easy-Niederlagen sind echt: rund 100 Gebietspunkte
+Rückstand, ausgespielt bis zum Ende. Die vier Hard-Partien nicht.
+
+Dort gab die KI jedes Mal auf (`RE[B+R]`). Das Gebiet zum Zeitpunkt der
+Aufgabe, mit der Engine nachgerechnet und gegen `finalAreaScore` geprüft:
+
+| Partie | Gebiet KI | Mensch | mit Komi | Differenz |
+|---|---|---|---|---|
+| 197 Züge | 104 | 98 | 111,5 | **+13,5** |
+| 269 Züge | 139 | 150 | 146,5 | −3,5 |
+| 249 Züge | 125 | 138 | 132,5 | −5,5 |
+| 305 Züge | 170 | 173 | 177,5 | **+4,5** |
+
+In zwei von vier Partien gab sie aus einer Führung heraus auf. Die Aufgaben
+waren dabei intern korrekt — `Q ≤ −0,95`, die Schwelle war gerissen. Nur sagt
+Q nichts über den Spielstand: es kommt aus `tanh(evaluateBoard/200)`, und
+`evaluateBoard` wird vom Gefangenen-Term beherrscht. Die KI hatte 20–27 Steine
+verloren; der Term `(cap[eigen] − cap[fremd]) · 20` lag bei −380 bis −540 und
+machte **92–105 % der gesamten Bewertung** aus. Ohne ihn liegt `evaluateBoard`
+bei −35 bis +25, also ausgeglichen und in Übereinstimmung mit `estimateArea`.
+
+Strukturell doppelt gezählt: ein Stein auf dem Brett zählt in derselben
+Funktion `size·5 + libs·3`, also rund 5–8. Wird er gefangen, verschwindet er
+aus dieser Summe **und** schlägt zusätzlich mit 20 zu Buche.
+
+#### Das Gewicht zu senken hilft nicht — gemessen
+
+Naheliegend wäre, `captureWeight` kleiner zu setzen. Drei gepaarte A/B-Läufe
+zu je 40 Partien (Seed 2026, Sims/Zug zwischen A und B abgeglichen):
+
+| A | B | Siegrate A:B | B-Anteil | p | Aufgaben A:B | p |
+|---|---|---|---|---|---|---|
+| 20 | 5 | 19 : 21 | 52,5 % | 0,88 | 19 : 7 | 0,029 |
+| 20 | 10 | 16 : 24 | 60,0 % | 0,27 | 20 : 9 | 0,061 |
+| 20 | 0 | 15 : 25 | 62,5 % | 0,15 | **14 : 1** | **0,001** |
+
+Der Effekt auf die **Aufgabequote** ist stark und monoton, der auf die
+**Siegrate** in keiner Dosis signifikant — und nicht einmal monoton. Das
+Gewicht treibt also das Aufgabeverhalten, nicht die Spielstärke. `captureWeight`
+bleibt deshalb bei 20; es zu senken wäre ein Eingriff in die gesamte Suche für
+einen unbewiesenen Nutzen.
+
+Nebenbefund derselben Messung: die vielen Aufgaben kosten im Selbstspiel kaum
+Partien. Die KI gibt zu früh auf, aber meist in Stellungen, die sie ohnehin
+verloren hätte. Gegen einen Menschen kann das anders aussehen — der Harness
+misst KI gegen KI und sagt dazu nichts.
+
+#### Behoben wurde stattdessen das Kriterium
+
+`resignAreaMargin` (Default 30) verlangt, dass **auch** die Gebietsschätzung
+verloren sagt. `estimateArea` ist dafür kein neuer willkürlicher Maßstab: auf
+allen vier Stellungen liefert es exakt dasselbe wie `finalAreaScore`, also die
+Endabrechnung des Spiels. Die vier Rückstände lagen bei −6, +3, +11 und +13
+Punkten; ab Marge 14 wären alle vier verhindert, 30 lässt Luft. Bei echtem
+Rückstand wird weiterhin aufgegeben.
+
+Bewusste Unschärfe: Komi 7,5 fließt nicht ein — die Engine ist komi-blind, und
+den Worker dafür an den Zählmodus zu koppeln wäre der teurere Fehler. Weiß gibt
+dadurch um 7,5 Punkte zu früh auf, Schwarz ebenso viel zu spät.
 
 **Fürs Auswerten von Spielständen:** `reproduktion.board` ist die Stellung
 **vor** dem letzten KI-Zug — es ist die Eingabe, mit der die KI gerechnet hat

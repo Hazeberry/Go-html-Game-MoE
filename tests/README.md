@@ -4,7 +4,9 @@ Regressionstests zum NaN-Bug in `mctsPUCT` ([#49](https://github.com/Hazeberry/G
 
 ```
 node tests/run.js                     # alles
+node tests/run.js --ohne-browser      # alles außer dem Browser-Test
 node tests/nan-guards.js              # nur die Schutzschichten (< 1 s)
+node tests/resign-criterion.js        # nur das Aufgabe-Kriterium (< 1 s)
 node tests/training-stability.js      # nur das Training (~20 s)
 node tests/harness-smoke.js           # nur der Harness-Rauchtest (< 1 s)
 node tests/browser-nan.js             # nur Ende-zu-Ende im Browser (~45 s)
@@ -16,8 +18,15 @@ Playwright selbst überspringt und den Gesamtlauf grün lässt.
 ## In CI
 
 `.github/workflows/tests.yml` fährt die Tests bei jedem Push und jedem Pull
-Request auf `main`, in zwei Jobs: `node` (Guards + Training, keine
+Request auf `main`, in zwei Jobs: `node` (alle Suiten außer Browser, keine
 Abhängigkeiten, ~30 s) und `browser` (installiert Chromium, deshalb getrennt).
+
+Der Node-Job ruft `node tests/run.js --ohne-browser` auf — **einen** Befehl,
+nicht eine Liste von Einzelaufrufen. Das ist kein Stilentscheid: die frühere
+Fassung listete die Dateien im Workflow auf, und beim Hinzufügen von
+`resign-criterion.js` wurde die Liste dort nicht mitgepflegt. Der Job blieb
+grün und prüfte den neuen Test nicht. Die Suite-Liste lebt jetzt nur in
+`tests/run.js` und kann nicht mehr davon abdriften.
 Der A/B-Harness läuft dort bewusst **nicht** mit — sein Zeitbudget ist
 Wall-Clock, das Ergebnis also nicht reproduzierbar, und ein Messwerkzeug ohne
 festes Ergebnis taugt nicht als Ja/Nein-Prüfung.
@@ -50,6 +59,7 @@ niemand ausliefert.
 | Datei | Ebene | Inhalt |
 |---|---|---|
 | `nan-guards.js` | Logik im Prozess | `_mctsKids` bei NaN/Infinity, `mctsPUCT` mit vergifteter Wurzelliste, `forward`/`save`/`load`/`_backward`/`trainGame`-Schutz |
+| `resign-criterion.js` | Aufgabe | gibt die KI nur noch auf, wenn auch das Gebiet verloren sagt |
 | `training-stability.js` | Training | Regularisierungs-Parameter, Gradienten-Deckel, Max-Norm-Projektion, Advantage-Dämpfung, dazu der ursprüngliche Repro-Lauf |
 | `harness-smoke.js` | Messwerkzeug | läuft `ab-harness.js` einmal winzig durch — misst nichts, prüft nur, dass er noch anläuft |
 | `browser-nan.js` | echter Browser | Chromium, echter Web Worker, echtes `localStorage` — der Pfad, auf dem der Fehler gemeldet wurde |
@@ -66,6 +76,7 @@ den Worker und danach den synchronen Fallback.
 | Trainingsdynamik oder Regularisierung — Gradienten, Normen, Dämpfung, Zerfall | `training-stability.js` |
 | Browser-spezifisches Verhalten oder `localStorage`-Interaktion | `browser-nan.js` |
 | Der Messrahmen selbst (`ab-harness.js`) läuft nicht mehr | `harness-smoke.js` |
+| Wann die KI aufgibt | `resign-criterion.js` |
 
 Die Trennung ist nicht kosmetisch, sie folgt den Kosten: `nan-guards.js`
 läuft in unter einer Sekunde und ist deshalb der Ort, an dem man beim
@@ -91,6 +102,7 @@ Ein Test, der auf der kaputten Version grün ist, prüft nichts. Gemessen gegen
 | Datei | vor dem Fix | nach dem Fix |
 |---|---|---|
 | `nan-guards.js` | 2 von 11 bestanden | 11 von 11 |
+| `resign-criterion.js` | 1 von 8 | 8 von 8 |
 | `training-stability.js` | 0 von 5 | 5 von 5 |
 | `harness-smoke.js` | 2 von 2 | 2 von 2 |
 | `browser-nan.js` | 1 von 3 | 3 von 3 |

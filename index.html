@@ -779,6 +779,28 @@ globalThis.PARAMS = {
   /* Aufgabe: meldet die MCTS über mehrere KI-Züge hintereinander Q unter
      -resignQ, ist die Stellung entschieden — aufgeben statt Material
      spenden. minMoves verhindert Frühaufgabe auf verrauschtem Q. */
+  /* Gewicht eines gefangenen Steins in evaluateBoard. War fest 20 verdrahtet.
+     Herausgezogen, um es messbar zu machen — nicht, um es zu ändern: der
+     Default bleibt 20, das Verhalten also identisch.
+
+     Warum es einen Verdacht gibt: ein Stein auf dem Brett zählt in derselben
+     Funktion size*5 + libs*3, also rund 5-8. Wird er gefangen, verschwindet
+     er aus dieser Summe UND schlägt zusätzlich mit captureWeight zu Buche —
+     der Verlust wird zweimal gezählt, und der explizite Teil wiegt viermal
+     so viel wie ein lebender Stein.
+
+     Beobachtet an 4 verlorenen Hard-Partien vom 29.08.: die KI gab jedes Mal
+     auf (resignQ 0.95), obwohl das Gebiet ausgeglichen war — mit Komi +13,5 /
+     -3,5 / -5,5 / +4,5. Sie hatte 20-27 Steine verloren, der Gefangenen-Term
+     lag bei -380 bis -540 und machte 92-105 % der GESAMTEN Bewertung aus.
+     Ohne ihn liegt evaluateBoard bei -35 bis +25, also ausgeglichen, in
+     Übereinstimmung mit estimateArea. Über tanh(x/mctsValueScale) sättigt das
+     Q auf -0,96 bis -0,99 und reißt die Aufgabeschwelle.
+
+     Ob ein kleineres Gewicht STÄRKER spielt, ist damit nicht gezeigt — nur,
+     dass dieser Term die Skala beherrscht. Das gehört durch den A/B-Harness,
+     nicht in einen Schnellschuss. */
+  captureWeight:   20,
   resignEnabled:  1,
   /* 0.95 GEMESSEN gegen 0.997, 30 gepaarte Paare = 60 Partien, beide Seiten
      mctsValueScale=200 und resignEnabled=1: 29:31, Komi-0 exakt 30:30,
@@ -793,6 +815,30 @@ globalThis.PARAMS = {
      verloren. Der Befund lautet nicht "wirkungslos", sondern "rechtzeitiges
      Aufgeben kostet nichts". NICHT ERNEUT TESTEN. */
   resignQ:        0.95,
+  /* Zweites, unabhängiges Aufgabe-Kriterium: Gebietsrückstand in Punkten.
+     Aufgegeben wird nur noch, wenn Q UND die Gebietsschätzung verloren sagen.
+
+     Grund: Q kommt aus tanh(evaluateBoard/mctsValueScale), und evaluateBoard
+     wird vom Gefangenen-Term beherrscht — an vier verlorenen Hard-Partien vom
+     29.08. machte er 92-105 % der gesamten Bewertung aus. Die KI gab jedes Mal
+     auf, obwohl das Gebiet ausgeglichen war: Rückstand -6 (also VORN), +3, +11
+     und +13 Gebietspunkte. Eine Marge ab 14 verhindert alle vier; 30 lässt
+     Luft und gibt bei echtem Rückstand weiterhin auf (die verlorenen
+     Easy-Partien lagen rund 111 Punkte zurück).
+
+     estimateArea ist dafür der richtige Maßstab und kein neuer willkürlicher:
+     auf allen vier Stellungen liefert es exakt dasselbe wie finalAreaScore,
+     also die Endabrechnung des Spiels selbst (Default 'area', chinesisch).
+
+     Bekannte Unschärfe, bewusst in Kauf genommen: Komi 7,5 fließt NICHT ein
+     (die Engine ist komi-blind, KOMI lebt im Hauptskript). Weiß gibt dadurch
+     um 7,5 Punkte zu früh auf, Schwarz um ebenso viel zu spät. Bei Marge 30
+     ist das ein Viertel der Schwelle — spürbar, aber kein Grund, den Worker an
+     den Zählmodus zu koppeln. Ebenso zählt der Territory-Modus Gefangene, die
+     hier nicht eingehen.
+
+     Negativer Wert schaltet das Kriterium ab (Verhalten wie vor dem Fix). */
+  resignAreaMargin: 30,
   resignStreak:   5,
   resignMinMoves: 60,
   /* Strukturelle Aufgabe: so viele Züge in Folge, in denen JEDER legale Zug
@@ -1305,7 +1351,7 @@ function quickEval(board, i, color) {
 const _evalBoardSeen = new Int32Array(BOARD_SIZE);
 function evaluateBoard(board, color, captures) {
   const opp = color === 1 ? 2 : 1;
-  let s = ((captures[color]||0) - (captures[opp]||0)) * 20;
+  let s = ((captures[color]||0) - (captures[opp]||0)) * PARAMS.captureWeight;
   /* Benson-Ebene: beweisbar tote Gruppen zählen 0 statt Größe×5+Frei×3 —
      genau der Term, der im Spätspiel den Q-Kollaps produziert, wenn tote
      Klumpen als lebendiges Material gewertet werden. Gate über die Zahl
@@ -1685,6 +1731,19 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
           q: bm.N ? bm.W / bm.N : 0};
 }
 
+/* Sagt die Gebietsschätzung dasselbe wie Q — nämlich verloren?
+
+   Bewusst als eigene Funktion, nicht inline: so ist das Kriterium einzeln
+   testbar, ohne eine ganze Suche fahren zu müssen. */
+function gebietSagtVerloren(board, aiColor) {
+  const marge = PARAMS.resignAreaMargin;
+  if (marge < 0) return true;              /* Kriterium abgeschaltet */
+  const opp = aiColor === 1 ? 2 : 1;
+  /* Gefangene gehen NICHT ein: der Default-Zählmodus ist Area (chinesisch),
+     dort zählen Steine auf dem Brett plus umschlossenes Gebiet. */
+  return estimateArea(board, aiColor) < estimateArea(board, opp) - marge;
+}
+
 function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove) {
   _lastMoveIdx = (lastMove === undefined || lastMove === null) ? -1 : lastMove;
   const hs = new Set(histHashes);
@@ -1828,12 +1887,23 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
       if (r) {
         /* Aufgabe-Prüfung: Q ist aus KI-Sicht — anhaltend ≤ -resignQ heißt,
            selbst die beste gefundene Fortsetzung verliert praktisch sicher.
-           Die Serie lebt im Worker zwischen Zügen (wie _lastMsPerSim). */
-        if (PARAMS.resignEnabled >= 1 && mc >= PARAMS.resignMinMoves && r.q <= -PARAMS.resignQ) {
+           Die Serie lebt im Worker zwischen Zügen (wie _lastMsPerSim).
+
+           Q allein reicht dafür NICHT: es hängt an evaluateBoard, und das
+           wird vom Gefangenen-Term beherrscht. Vier gemessene Partien gaben
+           bei ausgeglichenem Gebiet auf, zwei davon aus einer Führung heraus.
+           Deshalb muss die Gebietsschätzung zustimmen — die Serie zählt jetzt
+           Züge, die nach BEIDEN Maßstäben hoffnungslos sind. Reihenfolge ist
+           Absicht: estimateArea läuft nur, wenn Q die Schwelle ohnehin reißt. */
+        if (PARAMS.resignEnabled >= 1 && mc >= PARAMS.resignMinMoves && r.q <= -PARAMS.resignQ
+            && gebietSagtVerloren(board, aiColor)) {
           _hopelessStreak++;
-          if (_hopelessStreak >= PARAMS.resignStreak)
+          if (_hopelessStreak >= PARAMS.resignStreak) {
+            const opp = aiColor === 1 ? 2 : 1;
             return {type:'resign', requestId:reqId,
-              info:`Q ${r.q.toFixed(2)} über ${_hopelessStreak} Züge in Folge`};
+              info:`Q ${r.q.toFixed(2)} über ${_hopelessStreak} Züge in Folge · Gebiet `
+                 + `${estimateArea(board, aiColor)}:${estimateArea(board, opp)}`};
+          }
         } else {
           _hopelessStreak = 0;
         }
