@@ -1323,6 +1323,7 @@ const driver = `
         gebietOhneKomi: r.area,
         pass: {S: r.passSt[1], W: r.passSt[2]},
         q50: {S: r.q50[1], W: r.q50[2]}, q75: {S: r.q75[1], W: r.q75[2]},
+        verlust: {A: r.verlust[aColor], B: r.verlust[aColor === 1 ? 2 : 1]},
         simsA: r.st[aColor].moves ? Math.round(r.st[aColor].sims / r.st[aColor].moves) : 0,
         simsB: r.st[aColor === 1 ? 2 : 1].moves
           ? Math.round(r.st[aColor === 1 ? 2 : 1].sims / r.st[aColor === 1 ? 2 : 1].moves) : 0,
