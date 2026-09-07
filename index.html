@@ -625,6 +625,22 @@ globalThis.PARAMS = {
   /* Mittelspiel */
   midCapBonus:      800,
   midLibBonus:       30,
+  /* Deckel für den Freiheitsterm. `lib` ist die Freiheitszahl der ENTSTEHENDEN
+     GRUPPE (floodFill nach dem Setzen), nicht die des Steins — ein Zug an eine
+     bestehende Kette erbt deren Freiheiten. Ungedeckelt belohnt der Term damit
+     „spiel, wo Platz ist", ohne zu fragen, ob der Platz etwas wert ist, und ab
+     Zug 20 ist der einzige unbestrittene Platz der Rand.
+
+     Gemessen per Ablation an 150 mid-dominierten Stellungen (Zug 20-78) aus
+     fünf Hard-Partien: midLibBonus auf 0 senkt den Anteil Top-1 auf Linie 1-2
+     von 60 % auf 17 % — mit Abstand der stärkste Einzeleffekt aller mid*-Terme.
+     Das Freiheits-Argmax liegt in 68 % der Stellungen auf Linie 1-2, exakt die
+     Rate, mit der die KI dort auch spielt. Verfügbarkeitsnulllinie: 39 %.
+
+     Default 99 ist wirkungslos (max. beobachtete Gruppenfreiheit 34) und damit
+     bitgenau das alte Verhalten. Die Idiomatik ist dieselbe wie bei
+     midExtBonus, das mit Math.min(ext, 12) schon deckelt. */
+  midLibCap:         99,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
   midRescueAtari:   350,
@@ -1056,7 +1072,7 @@ function evalMidgame(board, i, color, mc) {
   s += cap * PARAMS.midCapBonus;
   const own = floodFill(_evalScratch, i);
   const lib = own.liberties.length;
-  s += lib * PARAMS.midLibBonus;
+  s += Math.min(lib, PARAMS.midLibCap) * PARAMS.midLibBonus;
   if (!lib) s -= 10000;
   if (lib === 1 && !cap) s -= PARAMS.midAtariPenalty;
   if (lib === 2 && !cap) s -= PARAMS.mid2LibPenalty;
