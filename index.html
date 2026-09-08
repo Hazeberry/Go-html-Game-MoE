@@ -625,21 +625,41 @@ globalThis.PARAMS = {
   /* Mittelspiel */
   midCapBonus:      800,
   midLibBonus:       30,
-  /* Deckel für den Freiheitsterm. `lib` ist die Freiheitszahl der ENTSTEHENDEN
-     GRUPPE (floodFill nach dem Setzen), nicht die des Steins — ein Zug an eine
-     bestehende Kette erbt deren Freiheiten. Ungedeckelt belohnt der Term damit
-     „spiel, wo Platz ist", ohne zu fragen, ob der Platz etwas wert ist, und ab
-     Zug 20 ist der einzige unbestrittene Platz der Rand.
+  /* Deckel für den Freiheitsterm. GEMESSEN SCHÄDLICH — bitte nicht erneut
+     aktivieren, ohne den Befund unten zu widerlegen.
 
-     Gemessen per Ablation an 150 mid-dominierten Stellungen (Zug 20-78) aus
-     fünf Hard-Partien: midLibBonus auf 0 senkt den Anteil Top-1 auf Linie 1-2
-     von 60 % auf 17 % — mit Abstand der stärkste Einzeleffekt aller mid*-Terme.
-     Das Freiheits-Argmax liegt in 68 % der Stellungen auf Linie 1-2, exakt die
-     Rate, mit der die KI dort auch spielt. Verfügbarkeitsnulllinie: 39 %.
+     Ausgangsbefund (steht weiter): `lib` ist die Freiheitszahl der ENTSTEHENDEN
+     GRUPPE, nicht die des Steins — ein Zug an eine bestehende Kette erbt deren
+     Freiheiten. Ablation an 150 mid-dominierten Stellungen (Zug 20-78) aus fünf
+     Hard-Partien: midLibBonus auf 0 senkt den Anteil Top-1 auf Linie 1-2 von
+     60 % auf 17 %, der stärkste Einzeleffekt aller mid*-Terme. Das
+     Freiheits-Argmax liegt in 68 % der Stellungen auf Linie 1-2 — exakt die
+     Rate, mit der die KI dort spielt. Verfügbarkeitsnulllinie 39 %, Mensch 17 %.
 
-     Default 99 ist wirkungslos (max. beobachtete Gruppenfreiheit 34) und damit
-     bitgenau das alte Verhalten. Die Idiomatik ist dieselbe wie bei
-     midExtBonus, das mit Math.min(ext, 12) schon deckelt. */
+     Der Deckel als Therapie ist widerlegt. A/B gegen Default 99, 250 ms/Zug,
+     Farbwechsel, je eigener Kontrollarm:
+
+       midLibCap    12     8     6     4     gepoolt
+       Partien      15    14    13    14          56
+       Siegrate B  20 %  29 %  31 %  14 %        23 %
+
+     Exakter Binomialtest einseitig p = 3,7e-05. Simulationen pro Zug in jedem
+     Lauf gleich (kein Budget-Artefakt). Die gedeckelte Seite gibt 7-12 mal auf,
+     die Baseline 0-1 mal.
+
+     Entscheidend ist das Fehlen einer Dosis-Abstufung im Schaden: cap=12 beißt
+     nur bei 4,8 % der Kandidatenzüge und kostet trotzdem ~30 Punkte Siegrate.
+     Die seltenen Stellungen mit über zwölf Gruppenfreiheiten sind also die
+     entscheidenden — grosse Kämpfe, in denen der Unterschied zwischen 14 und 30
+     Freiheiten reale Information ist. Ein harter Schnitt löscht sie. Indikation
+     aus dem Verlust-Instrument (nur n=3, nicht belastbar): bei cap=12 verlor die
+     gedeckelte Seite 113 Steine gegen 36, und 12 Gruppen ab fünf Steinen gegen 1.
+
+     Der Term macht zwei Dinge zugleich — Randanreiz und Kampfbewertung. Wer das
+     Randspiel angehen will, braucht eine Form, die nur den ersten Teil dämpft;
+     ein Deckel trifft beide. Default 99 ist wirkungslos (max. beobachtete
+     Gruppenfreiheit 34) und über 817177 evaluateMove-Aufrufe bitgenau der alte
+     Stand. Der Parameter bleibt als dokumentierter Negativbefund stehen. */
   midLibCap:         99,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,

@@ -334,6 +334,52 @@ dadurch um 7,5 Punkte zu früh auf, Schwarz ebenso viel zu spät.
 `brett` zeigen dagegen die Stellung danach. Beide sind korrekt, aber sie
 liegen einen Zug auseinander.
 
+### Randspiel im Mittelspiel: Diagnose bestätigt, Therapie widerlegt
+
+Die KI spielt im Mittelspiel deutlich zu oft am Rand. Nach dominierendem
+Experten gebucketet (fünf Hard-Partien, alle `RE[B+R]`, also von der KI
+aufgegeben):
+
+| Experte | Stellungen | Zugbereich | verfügbar | Heuristik Top-1 | KI gespielt | Mensch |
+|---|---:|---:|---:|---:|---:|---:|
+| `evalOpening` | 45 | 2–18 | 39 % | 0 % | 0 % | 0 % |
+| `evalMidgame` | 150 | 20–78 | 39 % | 58 % | 68 % | 17 % |
+| `evalEndgame` | 476 | 80–326 | 42 % | 53 % | 42 % | 29 % |
+
+„Verfügbar" ist der Anteil der legalen Züge auf Linie 1-2 — die Nulllinie.
+Eröffnung und Endspiel sind unauffällig; die Lücke sitzt allein im Mittelspiel.
+
+**Warnung zur Methode:** Ein Bucket nach Zugnummer misst hier falsch. Bei
+`openingMoves 20` und `endgameMoves 80` spannt „Zug 51–150" über zwei Experten.
+Dieser Fehler ist in diesem Projekt zweimal passiert und hat jedes Mal eine
+falsche Zuordnung erzeugt. Nach Phasengewicht bucketen, nicht nach Zugnummer.
+
+`evalMidgame` hat keinen Positionsterm. Die Ablation aller `mid*`-Parameter
+zeigt `midLibBonus` als Treiber: auf 0 gesetzt fällt der Anteil Top-1 auf
+Linie 1-2 von 60 % auf 17 %. Ursache ist, dass `lib` die Freiheitszahl der
+entstehenden **Gruppe** ist — ein Zug an eine bestehende Kette erbt deren
+Freiheiten, und Freiheiten sind dort am billigsten, wo niemand widerspricht.
+
+#### Den Term zu deckeln hilft nicht — gemessen
+
+`midLibCap` deckelt `lib` wie `midExtBonus` es mit `Math.min(ext, 12)` tut.
+A/B gegen Default 99, je eigener Kontrollarm, 250 ms/Zug, Farbwechsel:
+
+| `midLibCap` | 12 | 8 | 6 | 4 | gepoolt |
+|---|---:|---:|---:|---:|---:|
+| Partien | 15 | 14 | 13 | 14 | 56 |
+| Siegrate des Deckels | 20 % | 29 % | 31 % | 14 % | **23 %** |
+
+Exakter Binomialtest einseitig p = 3,7 · 10⁻⁵; Simulationen pro Zug in jedem
+Lauf gleich. Der Schaden zeigt **keine Dosis-Abstufung**: `cap=12` greift nur
+bei 4,8 % der Kandidatenzüge und kostet trotzdem rund 30 Punkte Siegrate. Die
+seltenen Stellungen mit über zwölf Gruppenfreiheiten sind die entscheidenden —
+der Term trägt Randanreiz **und** Kampfbewertung, und ein harter Schnitt trifft
+beide. Der Parameter bleibt mit Default 99 als Negativbefund stehen.
+
+Offen bleibt eine Form, die nur den Randanreiz dämpft — etwa abnehmender
+Grenznutzen statt hartem Schnitt. Ungemessen.
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im
