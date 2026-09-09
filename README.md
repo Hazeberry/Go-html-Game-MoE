@@ -377,6 +377,26 @@ seltenen Stellungen mit über zwölf Gruppenfreiheiten sind die entscheidenden �
 der Term trägt Randanreiz **und** Kampfbewertung, und ein harter Schnitt trifft
 beide. Der Parameter bleibt mit Default 99 als Negativbefund stehen.
 
+Zwei Nachprüfungen, weil beide den Befund hätten kippen können:
+
+**Misst die Siegrate den Resign-Detektor?** 41 der 56 Partien endeten durch
+Aufgabe, 38 davon durch die gedeckelte Seite. Test über den mitgeschriebenen
+Gebietsstand bei Partieende: in **38 von 38** Fällen lag die aufgebende Seite
+tatsächlich hinten, im Mittel 76 Punkte. Die Aufgaben waren berechtigt, die
+Siegrate misst nicht den Detektor.
+
+**Der Schaden ist konzentriert, nicht flächig.** Nach Endart aufgeschlüsselt
+gewinnt der Deckel 3 von 41 Aufgabe-Partien, aber 10 von 15 ausgezählten
+(Ø Gebiet −1,0 Punkte). Das passt zum Mechanismus: eine sterbende Großgruppe
+entscheidet die Partie, oder sie tritt nicht auf. Nicht überlesen — diese
+Aufteilung selektiert auf das Ergebnis und ist bei n = 15 nicht signifikant.
+Sie belegt die Form des Versagens, nicht seine Abwesenheit.
+
+Der Default ist **999** und damit beweisbar neutral: Freiheiten sind
+verschiedene leere Punkte, also ≤ 361. Vorher stand 99 mit empirischer
+Begründung — eine konstruierte Kammkette hat 162 Freiheiten, dort hätte 99
+geschnitten.
+
 Offen bleibt eine Form, die nur den Randanreiz dämpft — etwa abnehmender
 Grenznutzen statt hartem Schnitt. Ungemessen.
 

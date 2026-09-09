@@ -657,10 +657,33 @@ globalThis.PARAMS = {
 
      Der Term macht zwei Dinge zugleich — Randanreiz und Kampfbewertung. Wer das
      Randspiel angehen will, braucht eine Form, die nur den ersten Teil dämpft;
-     ein Deckel trifft beide. Default 99 ist wirkungslos (max. beobachtete
-     Gruppenfreiheit 34) und über 817177 evaluateMove-Aufrufe bitgenau der alte
-     Stand. Der Parameter bleibt als dokumentierter Negativbefund stehen. */
-  midLibCap:         99,
+     ein Deckel trifft beide.
+
+     Zwei Nachprüfungen, die den Befund hätten kippen können. (a) 41 der 56
+     Partien endeten durch Aufgabe, 38 davon durch die gedeckelte Seite — die
+     Siegrate könnte also das Aufgabeverhalten messen statt der Spielstärke.
+     Gegen den mitgeschriebenen Gebietsstand geprüft: in 38 von 38 Fällen lag
+     die aufgebende Seite tatsächlich hinten, im Mittel 76 Punkte. (b) Nach
+     Endart aufgeschlüsselt gewinnt der Deckel 3 von 41 Aufgabe-Partien, aber
+     10 von 15 ausgezählten. Der Schaden ist also konzentriert, nicht flächig —
+     passend zum Mechanismus. Diese Aufteilung selektiert allerdings auf das
+     Ergebnis und ist bei n=15 nicht signifikant; sie zeigt die FORM des
+     Versagens, nicht dessen Abwesenheit.
+
+     Zum Default: 999 ist BEWEISBAR neutral, weil Freiheiten verschiedene leere
+     Punkte sind und damit <= 361. Vorher stand hier 99 mit der Begründung
+     "wirkungslos, max. beobachtete Gruppenfreiheit 34" — das war empirisch,
+     aber als Beweis formuliert. Konstruiertes Gegenbeispiel: eine Kammkette
+     (Zeile 0 voll, jede zweite Spalte nach unten) hat 199 Steine und 162
+     Freiheiten; bei 99 hätte der "neutrale" Default dort geschnitten. In echten
+     Partien tritt das nicht auf, aber ein Default soll nicht von dieser Annahme
+     abhängen. Der A/B-Kontrollarm lief mit 99 — bei einem Korpusmaximum von 34
+     ohne praktischen Unterschied, für die Selbstspielpartien allerdings nicht
+     nachgemessen.
+
+     Über 817177 evaluateMove-Aufrufe bitgenau der alte Stand. Der Parameter
+     bleibt als dokumentierter Negativbefund stehen. */
+  midLibCap:        999,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
   midRescueAtari:   350,
