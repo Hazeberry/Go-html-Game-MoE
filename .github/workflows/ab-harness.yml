@@ -195,9 +195,13 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # always(): Bei Timeout oder Abbruch ist wenigstens das Log noch da.
-      # Die JSON-Datei schreibt der Harness erst am Ende — ein abgebrochener
-      # Lauf liefert also nur das Log, und das ist die nützlichere Diagnose.
+      # always(): Bei Timeout oder Abbruch sind Log UND JSON noch da. Der
+      # Harness schreibt das JSON nach JEDER Partie neu (schreibeJson(false)),
+      # ein abgebrochener Lauf ist also auswertbar — nur das Aggregat fehlt,
+      # weil das erst am Laufende gedruckt wird. Hier stand vorher das
+      # Gegenteil ("JSON erst am Ende"); der Unterschied ist nicht
+      # akademisch, denn er entscheidet, ob man Teildaten eines
+      # abgebrochenen Laufs überhaupt ansieht.
       - name: Ergebnisse sichern
         if: always()
         uses: actions/upload-artifact@v7

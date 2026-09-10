@@ -701,6 +701,33 @@ globalThis.PARAMS = {
      Über 817177 evaluateMove-Aufrufe bitgenau der alte Stand. Der Parameter
      bleibt als dokumentierter Negativbefund stehen. */
   midLibCap:        999,
+  /* WEICHE Sättigung des Freiheitsterms — die Antwort auf das, woran der harte
+     Deckel gescheitert ist. midLibCap setzt den Grenznutzen oberhalb der
+     Schwelle auf EXAKT NULL: eine Gruppe mit 14 und eine mit 30 Freiheiten sind
+     unter cap=12 identisch bewertet, damit ist der Unterschied zwischen „atmet"
+     und „eingekesselt" unsichtbar. Gemessen kostete das 30 Punkte Siegrate und
+     verdoppelte den größten erlittenen Einzelschlag (9,4 → 17,7).
+
+     Die Form hier lässt den Grenznutzen fallen, aber nie auf null:
+
+       f(lib) = lib                                       für lib <= k
+       f(lib) = k + (lib - k) / (1 + (lib - k) / k)        für lib >  k
+
+     Unterhalb der Kniestelle k ist sie IDENTISCH zu heute — bewusst, denn der
+     taktische Bereich (typisch 3-6 Freiheiten) war nie das Problem. Oberhalb
+     wächst sie gegen 2k, der Grenznutzen bei Abstand d ist 1/(1 + d/k)²:
+     strikt positiv, aber fallend. Bei k=12 ist f(15) - f(14) = 0,69 — die
+     15. Freiheit bleibt also mehr wert als die 14., während der harte Deckel
+     dort 0 liefert. Genau diese Differenz ist der Unterschied zwischen
+     „gedämpfter Anreiz" und „blind".
+
+     Warum diese Form und nicht lib/(1 + lib/k): letztere skaliert auch den
+     unteren Bereich mit (bei lib=4, k=12 um 25 % nach unten) und mischt damit
+     zwei Effekte in einen Parameter — Dämpfung der Spitze UND Absenkung des
+     ganzen Terms. Ein A/B darüber wäre nicht interpretierbar.
+
+     0 = aus, exakt lib. Wirkung noch UNGEMESSEN. */
+  midLibSoft:          0,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
   midRescueAtari:   350,
@@ -1123,6 +1150,26 @@ function evalOpening(board, i, color, mc) {
   return s + Math.random() * 3;
 }
 
+/* Gewichtung der Gruppenfreiheiten für evalMidgame. Zwei Regler, beide
+   standardmäßig aus, in dieser Reihenfolge angewandt: weiche Sättigung
+   (midLibSoft, Kniestelle) und danach harter Deckel (midLibCap). Bei den
+   Defaults 0 und 999 gibt die Funktion lib unverändert zurück — bitgenau,
+   ohne Fließkomma-Umweg, weil der weiche Zweig gar nicht betreten wird.
+   Siehe die Kommentare an beiden Parametern für die Messlage. */
+function libGewicht(lib) {
+  const k = PARAMS.midLibSoft;
+  let v = lib;
+  if (k > 0 && lib > k) {
+    const d = lib - k;
+    v = k + d / (1 + d / k);
+  }
+  /* Math.min statt Ternär: bei einem nicht-finiten v gibt Math.min NaN
+     zurück, ein Ternär stillschweigend den Deckel. In diesem Repo ist das
+     kein akademischer Unterschied — die Herkunft dieses Branches ist ein
+     NaN, das genau so unsichtbar durch eine Vergleichskette gerutscht ist. */
+  return Math.min(v, PARAMS.midLibCap);
+}
+
 function evalMidgame(board, i, color, mc) {
   let s = 0;
   const opp = color === 1 ? 2 : 1;
@@ -1132,7 +1179,7 @@ function evalMidgame(board, i, color, mc) {
   s += cap * PARAMS.midCapBonus;
   const own = floodFill(_evalScratch, i);
   const lib = own.liberties.length;
-  s += Math.min(lib, PARAMS.midLibCap) * PARAMS.midLibBonus;
+  s += libGewicht(lib) * PARAMS.midLibBonus;
   if (!lib) s -= 10000;
   if (lib === 1 && !cap) s -= PARAMS.midAtariPenalty;
   if (lib === 2 && !cap) s -= PARAMS.mid2LibPenalty;
