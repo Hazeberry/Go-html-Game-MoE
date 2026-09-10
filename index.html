@@ -778,6 +778,60 @@ globalThis.PARAMS = {
      komprimieren. Der Freiheitsterm ist als Hebel damit strukturell
      unbrauchbar — was fehlt, ist ein eigener Positionsterm in evalMidgame. */
   midLibSoft:          0,
+  /* Linienabschlag fürs Mittelspiel — der entkoppelte Weg, nachdem drei
+     Eingriffe AM FREIHEITSTERM gescheitert sind (siehe midLibCap/midLibSoft).
+
+     Warum entkoppelt: der Randvorteil drückt sich über hohe Gruppenfreiheiten
+     aus, also komprimiert jeder Eingriff über midLibBonus zwangsläufig dessen
+     Spreizung — und genau die ist gemessen tragend (f(30)/f(4) = 7.50 in der
+     Basis und bei uniformer Absenkung, die harmlos war; 4.80 beim Knie, das
+     30 Punkte Siegrate kostete). Ein ADDITIVER Term lässt dieses Verhältnis
+     unberührt: er ist ein eigener Summand, kein Faktor auf lib.
+
+     Nicht aus der Spanne herleitbar: f(30)-f(4) ist 780 in der Basis, 520 beim
+     harmlosen und 456 beim schädlichen Eingriff — und bei lib=20 hat der
+     HARMLOSE mit 320 den kleineren Abstand als der schädliche mit 384. Die
+     absolute Spanne dreht dort das Vorzeichen und taugt nicht als Maßstab. Die
+     Größenordnung muss die Dosisreihe liefern, nicht eine Rechnung vorab.
+
+     Nur Strafe, kein Zentrumsbonus: ein Bonus wäre ein zweiter Effekt im
+     selben Parameter und machte die Dosisreihe mehrdeutig. Gemessen ist der
+     Rand-Überschuss (68 % gespielt gegen 39 % verfügbar, Mensch 17 %), also
+     wird genau der adressiert.
+
+     0 = aus.
+
+     GEMESSEN — erster Eingriff, der NICHT schadet. Vier Actions-Läufe, je 30
+     Partien, A = 0:
+
+       Gewicht   A : B    B-Rate   Ø größter erlittener Schlag A → B
+            20   12:18     60 %              11.8 → 10.6
+            40   16:14     47 %              12.7 → 12.3
+            60   12:18     60 %              13.1 → 10.9
+            80   12:18     60 %              19.1 → 10.1
+
+     Gepoolt 68:52 über 120 Partien, B-Rate 56.7 %, 95 %-CI (Clopper-Pearson)
+     47.3 bis 65.7 %. Sims/Zug je Lauf gleich.
+
+     Zwei Aussagen, streng getrennt:
+
+     (1) BELEGT: der Term kostet keine Spielstärke. Das CI schließt die
+         Größenordnung der drei gescheiterten Eingriffe klar aus — harter
+         Deckel 20 % (CI 7.7-38.6), weich k=6 und k=12 je 17 % (CI 5.6-34.7).
+         Der entkoppelte Weg ist damit als einziger gangbar. Zusätzlich sinkt
+         der Gruppenverlust in allen vier Läufen statt zu steigen, am
+         deutlichsten bei 80 (19.1 → 10.1) — das Gegenrisiko der Vorgänger
+         tritt hier nicht auf.
+
+     (2) NICHT BELEGT: ein Spielstärke-GEWINN. Das CI enthält 50 %, einseitig
+         p = 0.085, und es gibt keinen Dosis-Trend (60/47/60/60 ist flach, der
+         Ausreißer bei 40 spricht für Rauschen). Für einen echten 57-%-Effekt
+         bräuchte es rund 437 Partien; mit 120 ist die Frage offen.
+
+     Deshalb bleibt der Default 0. Ein Wert wird erst gesetzt, wenn ein
+     Gewinn belegt ist — nicht, weil ein Punktschätzer über 50 % liegt.
+     Bitgenau identisch zum Stand davor über 817177 evaluateMove-Aufrufe. */
+  midLineWeight:       0,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
   midRescueAtari:   350,
@@ -1206,6 +1260,13 @@ function evalOpening(board, i, color, mc) {
    Defaults 0 und 999 gibt die Funktion lib unverändert zurück — bitgenau,
    ohne Fließkomma-Umweg, weil der weiche Zweig gar nicht betreten wird.
    Siehe die Kommentare an beiden Parametern für die Messlage. */
+/* Linienabschlag für evalMidgame, Index = dte (0-basiert, 0 = erste Linie).
+   Erste Linie voll, zweite halb, ab der dritten neutral — dte reicht auf 19x19
+   bis 9 (Brettmitte). Wirkt nur mit midLineWeight > 0; die Abfrage steht vor
+   der Koordinatenrechnung, damit der Default nicht einmal xOf/yOf kostet.
+   evalMidgame läuft pro Kandidat und Zug. */
+const MID_LINIE = [-1, -0.5, 0, 0, 0, 0, 0, 0, 0, 0];
+
 function libGewicht(lib) {
   const k = PARAMS.midLibSoft;
   let v = lib;
@@ -1230,6 +1291,10 @@ function evalMidgame(board, i, color, mc) {
   const own = floodFill(_evalScratch, i);
   const lib = own.liberties.length;
   s += libGewicht(lib) * PARAMS.midLibBonus;
+  if (PARAMS.midLineWeight > 0) {
+    const x = xOf(i), y = yOf(i);
+    s += PARAMS.midLineWeight * MID_LINIE[Math.min(x, y, SIZE-1-x, SIZE-1-y)];
+  }
   if (!lib) s -= 10000;
   if (lib === 1 && !cap) s -= PARAMS.midAtariPenalty;
   if (lib === 2 && !cap) s -= PARAMS.mid2LibPenalty;

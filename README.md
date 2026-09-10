@@ -472,6 +472,40 @@ dämpft, komprimiert notwendig dessen Spreizung. Der Freiheitsterm ist als Hebel
 strukturell unbrauchbar. Was fehlt, ist ein eigener Positionsterm in
 `evalMidgame` — das Gegenstück zu `openLineWeight`. Ungemessen.
 
+### Der entkoppelte Positionsterm: erster Eingriff ohne Schaden
+
+Nach drei gescheiterten Eingriffen am Freiheitsterm ist `midLineWeight` additiv
+— ein eigener Summand, kein Faktor auf `lib`, sodass die tragende Spreizung
+`f(30)/f(4) = 7,50` unberührt bleibt. `MID_LINIE` bestraft die erste Linie
+voll, die zweite halb, ab der dritten neutral; kein Zentrumsbonus, damit die
+Dosisreihe eindeutig bleibt.
+
+Statischer Randanteil des Top-1 (Nulllinie 39 %, Mensch 17 %): 60 / 48 / 46 /
+34 / 5 / 1 % bei Gewicht 0 / 10 / 20 / 40 / 80 / 160 — monoton, ab 80 unter der
+menschlichen Rate.
+
+Vier Läufe à 30 Partien, A = 0:
+
+| Gewicht | A : B | B-Rate | Ø größter erlittener Schlag A → B |
+|---:|---:|---:|---:|
+| 20 | 12:18 | 60 % | 11,8 → 10,6 |
+| 40 | 16:14 | 47 % | 12,7 → 12,3 |
+| 60 | 12:18 | 60 % | 13,1 → 10,9 |
+| 80 | 12:18 | 60 % | 19,1 → 10,1 |
+
+Gepoolt **68:52 über 120 Partien, B-Rate 56,7 %**, 95 %-CI (Clopper-Pearson)
+**47,3 – 65,7 %**. Sims/Zug je Lauf gleich.
+
+**Belegt:** der Term kostet keine Spielstärke. Das CI schließt die
+Größenordnung der drei gescheiterten Eingriffe aus (harter Deckel 20 %, CI
+7,7–38,6; weich k=6 und k=12 je 17 %, CI 5,6–34,7). Der Gruppenverlust sinkt in
+allen vier Läufen statt zu steigen — das Gegenrisiko der Vorgänger tritt nicht
+auf.
+
+**Nicht belegt:** ein Spielstärke-Gewinn. Das CI enthält 50 %, einseitig
+p = 0,085, und es gibt keinen Dosis-Trend (60/47/60/60 ist flach). Für einen
+echten 57-%-Effekt bräuchte es rund 437 Partien. Der Default bleibt deshalb 0.
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im
