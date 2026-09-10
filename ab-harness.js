@@ -935,6 +935,13 @@ const driver = `
       1: {moves: 0, sims: 0, timeMs: 0, q: []},
       2: {moves: 0, sims: 0, timeMs: 0, q: []}
     };
+    /* Gruppenverluste je Farbe: groesster Einzelschlag, den DIESE Farbe
+       erlitten hat, plus die Zahl der Verluste ab 5 Steinen. Instrument fuer
+       die Frage, ob ein Eingriff am Freiheitsterm (midLibCap) dazu fuehrt,
+       dass eigene grosse Gruppen sterben — der Wert zusaetzlicher Freiheiten
+       im grossen Kampf ist genau das, was ein Deckel unterschaetzen koennte.
+       Verlierer eines Schlags ist immer die Gegenfarbe des Ziehenden. */
+    const verlust = {1: {max: 0, ab5: 0, summe: 0}, 2: {max: 0, ab5: 0, summe: 0}};
     const passSt = {
       1: {first: null, total: 0, benson: 0},
       2: {first: null, total: 0, benson: 0}
@@ -994,7 +1001,13 @@ const driver = `
         if (AB.netTrain && netFrisch && policyNet._netPriors)
           netBuf[color].push({inp: policyNet._netInp, probs: policyNet._netPriors,
                               hidden: policyNet._netHidden, moveIdx: i});
-        applyMove(board, color, res.x, res.y, ko, hist, caps);
+        const geschlagen = applyMove(board, color, res.x, res.y, ko, hist, caps);
+        if (geschlagen > 0) {
+          const v = verlust[color === 1 ? 2 : 1];
+          v.summe += geschlagen;
+          if (geschlagen > v.max) v.max = geschlagen;
+          if (geschlagen >= 5) v.ab5++;
+        }
         lastIdx = idx(res.x, res.y);
         passes = 0; mc++;
       }
@@ -1028,7 +1041,8 @@ const driver = `
             score, score0, st, anomalies, passSt, area,
             phaseSwitches: modState[1].phaseSwitches + modState[2].phaseSwitches,
             q50: {1: qAt(st[1].q, .5), 2: qAt(st[2].q, .5)},
-            q75: {1: qAt(st[1].q, .75), 2: qAt(st[2].q, .75)}};
+            q75: {1: qAt(st[1].q, .75), 2: qAt(st[2].q, .75)},
+            verlust};
   }
 
   /* Neutrale Eröffnung für gepaarte Partien: Default-Parameter,
@@ -1114,6 +1128,12 @@ const driver = `
       const s = r.st[col];
       agg[key].moves += s.moves; agg[key].sims += s.sims; agg[key].timeMs += s.timeMs;
     }
+    for (const [key, col] of [['A', aColor], ['B', bColor]]) {
+      const v = r.verlust[col];
+      agg.verlust[key].max.push(v.max);
+      agg.verlust[key].ab5 += v.ab5;
+      agg.verlust[key].summe += v.summe;
+    }
     agg.anomalies += r.anomalies;
     agg.phaseSwitches += r.phaseSwitches || 0;
     return {aWon, aWon0};
@@ -1135,6 +1155,9 @@ const driver = `
          nullsummig, deshalb genügt die A-Sicht — B ist das Negative. */
       phase: {q50: {A: [], B: []}, q75: {A: [], B: []},
               areaA: {M150: [], M200: [], M250: [], end: []}},
+      /* Gruppenverluste NACH KONFIGURATION, nicht nach Farbe — die Frage ist,
+         ob der Parameter das Sterben eigener Gruppen verursacht. */
+      verlust: {A: {max: [], ab5: 0, summe: 0}, B: {max: [], ab5: 0, summe: 0}},
       anomalies: 0
     };
   }
@@ -1164,6 +1187,9 @@ const driver = `
       + '   [n=' + agg.phase.areaA.end.length + ']');
     console.log('PHASE Q 50%/75% je Konfiguration:  A ' + fmt(mean(agg.phase.q50.A), 2) + ' / ' + fmt(mean(agg.phase.q75.A), 2)
       + '   B ' + fmt(mean(agg.phase.q50.B), 2) + ' / ' + fmt(mean(agg.phase.q75.B), 2));
+    console.log('GRUPPENVERLUST je Konfiguration (erlittene Schläge):  '
+      + 'A Ø größter ' + fmt(mean(agg.verlust.A.max), 1) + ' · ' + agg.verlust.A.ab5 + '× ab 5 Steinen · ' + agg.verlust.A.summe + ' gesamt'
+      + '   |   B Ø größter ' + fmt(mean(agg.verlust.B.max), 1) + ' · ' + agg.verlust.B.ab5 + '× ab 5 Steinen · ' + agg.verlust.B.summe + ' gesamt');
     console.log('PASS: erster Ø Zug S ' + fmt(mean(agg.passFirst[1]), 0) + ' / W ' + fmt(mean(agg.passFirst[2]), 0)
       + ' · gesamt S ' + agg.passTotal[1] + ' / W ' + agg.passTotal[2]
       + ' · Benson S ' + agg.passBenson[1] + ' / W ' + agg.passBenson[2]);
@@ -1297,6 +1323,7 @@ const driver = `
         gebietOhneKomi: r.area,
         pass: {S: r.passSt[1], W: r.passSt[2]},
         q50: {S: r.q50[1], W: r.q50[2]}, q75: {S: r.q75[1], W: r.q75[2]},
+        verlust: {A: r.verlust[aColor], B: r.verlust[aColor === 1 ? 2 : 1]},
         simsA: r.st[aColor].moves ? Math.round(r.st[aColor].sims / r.st[aColor].moves) : 0,
         simsB: r.st[aColor === 1 ? 2 : 1].moves
           ? Math.round(r.st[aColor === 1 ? 2 : 1].sims / r.st[aColor === 1 ? 2 : 1].moves) : 0,

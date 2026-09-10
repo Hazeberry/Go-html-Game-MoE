@@ -334,6 +334,144 @@ dadurch um 7,5 Punkte zu früh auf, Schwarz ebenso viel zu spät.
 `brett` zeigen dagegen die Stellung danach. Beide sind korrekt, aber sie
 liegen einen Zug auseinander.
 
+### Randspiel im Mittelspiel: Diagnose bestätigt, Therapie widerlegt
+
+Die KI spielt im Mittelspiel deutlich zu oft am Rand. Nach dominierendem
+Experten gebucketet (fünf Hard-Partien, alle `RE[B+R]`, also von der KI
+aufgegeben):
+
+| Experte | Stellungen | Zugbereich | verfügbar | Heuristik Top-1 | KI gespielt | Mensch |
+|---|---:|---:|---:|---:|---:|---:|
+| `evalOpening` | 45 | 2–18 | 39 % | 0 % | 0 % | 0 % |
+| `evalMidgame` | 150 | 20–78 | 39 % | 58 % | 68 % | 17 % |
+| `evalEndgame` | 476 | 80–326 | 42 % | 53 % | 42 % | 29 % |
+
+„Verfügbar" ist der Anteil der legalen Züge auf Linie 1-2 — die Nulllinie.
+Eröffnung und Endspiel sind unauffällig; die Lücke sitzt allein im Mittelspiel.
+
+**Warnung zur Methode:** Ein Bucket nach Zugnummer misst hier falsch. Bei
+`openingMoves 20` und `endgameMoves 80` spannt „Zug 51–150" über zwei Experten.
+Dieser Fehler ist in diesem Projekt zweimal passiert und hat jedes Mal eine
+falsche Zuordnung erzeugt. Nach Phasengewicht bucketen, nicht nach Zugnummer.
+
+`evalMidgame` hat keinen Positionsterm. Die Ablation aller `mid*`-Parameter
+zeigt `midLibBonus` als Treiber: auf 0 gesetzt fällt der Anteil Top-1 auf
+Linie 1-2 von 60 % auf 17 %. Ursache ist, dass `lib` die Freiheitszahl der
+entstehenden **Gruppe** ist — ein Zug an eine bestehende Kette erbt deren
+Freiheiten, und Freiheiten sind dort am billigsten, wo niemand widerspricht.
+
+#### Den Term zu deckeln hilft nicht — gemessen
+
+`midLibCap` deckelt `lib` wie `midExtBonus` es mit `Math.min(ext, 12)` tut.
+A/B gegen Default 99, je eigener Kontrollarm, 250 ms/Zug, Farbwechsel:
+
+| `midLibCap` | 12 | 8 | 6 | 4 | gepoolt |
+|---|---:|---:|---:|---:|---:|
+| Partien | 15 | 14 | 13 | 14 | 56 |
+| Siegrate des Deckels | 20 % | 29 % | 31 % | 14 % | **23 %** |
+
+Exakter Binomialtest einseitig p = 3,7 · 10⁻⁵; Simulationen pro Zug in jedem
+Lauf gleich. Der Schaden zeigt **keine Dosis-Abstufung**: `cap=12` greift nur
+bei 4,8 % der Kandidatenzüge und kostet trotzdem rund 30 Punkte Siegrate. Die
+seltenen Stellungen mit über zwölf Gruppenfreiheiten sind die entscheidenden —
+der Term trägt Randanreiz **und** Kampfbewertung, und ein harter Schnitt trifft
+beide. Der Parameter bleibt mit Default 99 als Negativbefund stehen.
+
+Zwei Nachprüfungen, weil beide den Befund hätten kippen können:
+
+**Misst die Siegrate den Resign-Detektor?** 41 der 56 Partien endeten durch
+Aufgabe, 38 davon durch die gedeckelte Seite. Test über den mitgeschriebenen
+Gebietsstand bei Partieende: in **38 von 38** Fällen lag die aufgebende Seite
+tatsächlich hinten, im Mittel 76 Punkte. Die Aufgaben waren berechtigt, die
+Siegrate misst nicht den Detektor.
+
+**Der Mechanismus, bestätigt.** Bestätigungslauf über GitHub Actions (Lauf 23,
+30 Partien, Seed 4711, A = 999 als beweisbar neutraler Kontrollarm, B = 12,
+547 gegen 546 Sims/Zug). Erlittene Schläge, gepaarter Vorzeichentest — beide
+Konfigurationen ziehen in derselben Partie:
+
+| erlittene Schläge | A (999) | B (12) | Faktor | p (einseitig) |
+|---|---:|---:|---:|---:|
+| Ø größter Einzelschlag | 9,4 | 17,7 | 1,88× | 3,1 · 10⁻² |
+| Ø Verluste ab 5 Steinen | 1,6 | 2,3 | 1,49× | 2,2 · 10⁻² |
+| Ø Steine gesamt | 23,7 | 38,7 | 1,63× | 2,6 · 10⁻³ |
+
+Die gedeckelte Seite verliert messbar größere Gruppen. Oberhalb des Deckels ist
+jede weitere Freiheit gratis, damit wird der Unterschied zwischen „atmet" und
+„eingekesselt" unsichtbar. Siegrate im selben Lauf 24:6 (20 %, p = 7,2 · 10⁻⁴)
+— identisch zur lokalen Messung bei `cap=12`, was zugleich zeigt, dass der
+Kontrollarm 99 gegen 999 praktisch keinen Unterschied machte.
+
+**Zurückgenommen:** aus 10 von 15 ausgezählten Partien war zunächst gelesen
+worden, der Schaden sei „konzentriert, nicht flächig". Lauf 23 liefert dort 2
+von 9, gepoolt 12 von 24 — eine Münze. Die Aussage war das Rauschen, das bei
+ihr selbst angemerkt war.
+
+Der Default ist **999** und damit beweisbar neutral: Freiheiten sind
+verschiedene leere Punkte, also ≤ 361. Vorher stand 99 mit empirischer
+Begründung — eine konstruierte Kammkette hat 162 Freiheiten, dort hätte 99
+geschnitten.
+
+#### Weiche Sättigung hilft auch nicht — und widerlegt die Erklärung
+
+Naheliegende Antwort auf den gescheiterten Deckel: nicht abschneiden, sondern
+dämpfen, damit der Grenznutzen fällt statt auf null zu springen. `midLibSoft`
+tut das über eine Kniestelle — unterhalb von k exakt `lib`, oberhalb
+`k + (lib−k)/(1+(lib−k)/k)`, Grenznutzen `1/(1+d/k)²`, fallend aber strikt
+positiv. Statischer Randanteil des Top-1 fällt monoton: 60 % bei k=0 auf 29 %
+bei k=6.
+
+Zwei Läufe à 30 Partien, A = aus:
+
+| Variante | Siegrate B | Ø größter Schlag A→B | p (Verlust) |
+|---|---:|---:|---:|
+| weich k=6 (Rand 29 %) | 5:25 = **17 %** | 7,0 → 16,0 (2,27×) | 3,0 · 10⁻⁵ |
+| weich k=12 (Rand 47 %) | 5:25 = **17 %** | 7,7 → 12,4 (1,61×) | 7,2 · 10⁻⁴ |
+| harter Deckel 12 (Referenz) | 6:24 = 20 % | 9,4 → 17,7 (1,88×) | 3,1 · 10⁻² |
+
+Siegrate-p je 1,6 · 10⁻⁴. Sims/Zug in beiden Läufen gleich.
+
+**Die Gradienten-Erklärung ist damit widerlegt.** Sie lautete: der harte Deckel
+scheitert, weil er den Grenznutzen auf exakt null setzt und die KI für Leben
+und Tod großer Gruppen blind macht. `k=12` hält den Grenznutzen bei 0,791 an
+der Stelle 13→14 und den Bereich 1–12 exakt — und verliert genauso, mit
+denselben vergrößerten Gruppenverlusten.
+
+#### Der Kontrolltest: nicht der Betrag, sondern die Spreizung
+
+`midLibBonus` gleichmäßig von 30 auf 20 (×0,67 — derselbe Faktor, den `k=12`
+bei `lib=30` erzeugt), 30 Partien: **17:13, B-Rate 43 %, zweiseitig p = 0,59**.
+Gruppenverlust 1,09–1,29× bei p ≥ 0,12. Nicht von Rauschen unterscheidbar.
+
+Eine gleichmäßige Absenkung desselben Terms um ein Drittel ist also harmlos,
+eine Kompression nur am oberen Ende kostet 30 Punkte. Beiträge zum Score
+(Gewicht × f(lib)):
+
+| lib | Basis 30×lib | uniform 20×lib | Knie k=12 (30×f) |
+|---:|---:|---:|---:|
+| 4 | 120 | 80 | 120 |
+| 12 | 360 | 240 | 360 |
+| 30 | 900 | 600 | **576** |
+| 34 | 1020 | 680 | 593 |
+
+Bei `lib=30` liegt der Knie-Beitrag mit 576 **unter** dem uniformen mit 600 —
+der schädliche Eingriff hat dort den kleineren Betrag. „Absoluter Betrag bei
+hohen Freiheitszahlen" ist damit als Erklärung ebenfalls widerlegt, und mit ihr
+die Lesart „lokales Optimum, jede Störung kostet": die uniforme Störung trifft
+jeden Zug, ist also größer, und kostet nichts.
+
+**Was übrig bleibt und von allen drei Läufen getragen wird: die Spreizung.**
+`f(30)/f(4)` ist 7,50 in der Basis, 7,50 bei uniformer Absenkung — und 4,80
+beim Knie. Die Rangfolge zwischen einem Zug mit vielen und einem mit wenigen
+Gruppenfreiheiten muss erhalten bleiben; das Gewicht dieser Rangfolge gegenüber
+anderen Termen darf sich ändern.
+
+Damit ist auch erklärt, warum drei Eingriffe scheitern mussten: der Randvorteil
+**ist** die hohe Freiheitszahl. Jeder Eingriff, der Randspiel über diesen Term
+dämpft, komprimiert notwendig dessen Spreizung. Der Freiheitsterm ist als Hebel
+strukturell unbrauchbar. Was fehlt, ist ein eigener Positionsterm in
+`evalMidgame` — das Gegenstück zu `openLineWeight`. Ungemessen.
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im

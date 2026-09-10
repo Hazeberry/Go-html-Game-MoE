@@ -522,6 +522,31 @@ globalThis.PARAMS = {
   endgameEmpty:      50,
   /* Eröffnung */
   openEdge3:         40,
+  /* Feinabstufung INNERHALB des openEdge3-Bands. Der Name sagt „dritte
+     Linie“, die Bedingung lautet aber `dte <= 4` — Linie 1 bis 5 bekommen
+     alle dieselben 40 Punkte. Innerhalb des Bands trägt der Positionsterm
+     damit nichts zur Rangfolge bei; die Abstufung entsteht erst über
+     openHoshiBonus, openCornerBonus und openNeighborBonus.
+
+     Gemessen wurde, ob das reicht. Dosis-Reihe über 65 Eröffnungsstellungen
+     (Zug 3-28) aus fünf Hard-Partien, Anteil Top-1 auf Linie 1-2:
+
+       Gewicht      0     5    10    20    40    80
+       Top-1      18 %  20 %  17 %  15 %  12 %  11 %
+       Ø Linie    3.37  3.26  3.23  3.37  3.31  3.34
+
+     Nulllinie ist die Verfügbarkeit: 39 % der legalen Züge liegen auf Linie
+     1-2 (136 der 361 Punkte). Bei Gewicht 0 meidet die Heuristik den Rand
+     also bereits deutlich — 18 % gegen 39 % — und die Dosis-Antwort ist über
+     eine 16-fache Steigerung schwach. Der Parameter bleibt deshalb auf 0:
+     ein dokumentierter Nullbefund, kein Regler mit bekanntem Nutzen.
+
+     Achtung bei Nachmessungen: ein Bucket „Zug 1-50“ misst evalOpening NICHT
+     isoliert. evalOpening wirkt nur bis etwa Zug 28 (openingMoves 20 plus
+     Blendzone), danach regiert evalMidgame. Der Rand-Anteil von 53 % in
+     Phase 51-150 gehört dorthin und ist für diesen Parameter konstruktions-
+     bedingt unerreichbar. */
+  openLineWeight:     0,
   openEdge5:         25,
   openCenter:         8,
   openHoshiBonus:    30,
@@ -600,6 +625,159 @@ globalThis.PARAMS = {
   /* Mittelspiel */
   midCapBonus:      800,
   midLibBonus:       30,
+  /* Deckel für den Freiheitsterm. GEMESSEN SCHÄDLICH — bitte nicht erneut
+     aktivieren, ohne den Befund unten zu widerlegen.
+
+     Ausgangsbefund (steht weiter): `lib` ist die Freiheitszahl der ENTSTEHENDEN
+     GRUPPE, nicht die des Steins — ein Zug an eine bestehende Kette erbt deren
+     Freiheiten. Ablation an 150 mid-dominierten Stellungen (Zug 20-78) aus fünf
+     Hard-Partien: midLibBonus auf 0 senkt den Anteil Top-1 auf Linie 1-2 von
+     60 % auf 17 %, der stärkste Einzeleffekt aller mid*-Terme. Das
+     Freiheits-Argmax liegt in 68 % der Stellungen auf Linie 1-2 — exakt die
+     Rate, mit der die KI dort spielt. Verfügbarkeitsnulllinie 39 %, Mensch 17 %.
+
+     Der Deckel als Therapie ist widerlegt. A/B gegen Default 99, 250 ms/Zug,
+     Farbwechsel, je eigener Kontrollarm:
+
+       midLibCap    12     8     6     4     gepoolt
+       Partien      15    14    13    14          56
+       Siegrate B  20 %  29 %  31 %  14 %        23 %
+
+     Exakter Binomialtest einseitig p = 3,7e-05. Simulationen pro Zug in jedem
+     Lauf gleich (kein Budget-Artefakt). Die gedeckelte Seite gibt 7-12 mal auf,
+     die Baseline 0-1 mal.
+
+     Entscheidend ist das Fehlen einer Dosis-Abstufung im Schaden: cap=12 beißt
+     nur bei 4,8 % der Kandidatenzüge und kostet trotzdem ~30 Punkte Siegrate.
+     Die seltenen Stellungen mit über zwölf Gruppenfreiheiten sind also die
+     entscheidenden — grosse Kämpfe, in denen der Unterschied zwischen 14 und 30
+     Freiheiten reale Information ist. Ein harter Schnitt löscht sie. Indikation
+     aus dem Verlust-Instrument (nur n=3, nicht belastbar): bei cap=12 verlor die
+     gedeckelte Seite 113 Steine gegen 36, und 12 Gruppen ab fünf Steinen gegen 1.
+
+     Der Term macht zwei Dinge zugleich — Randanreiz und Kampfbewertung. Wer das
+     Randspiel angehen will, braucht eine Form, die nur den ersten Teil dämpft;
+     ein Deckel trifft beide.
+
+     Nachprüfung 1: misst die Siegrate den Resign-Detektor? 41 der 56 Partien
+     endeten durch Aufgabe, 38 davon durch die gedeckelte Seite. Gegen den
+     mitgeschriebenen Gebietsstand geprüft: in 38 von 38 Fällen lag die
+     aufgebende Seite tatsächlich hinten, im Mittel 76 Punkte. Der Einwand
+     trifft nicht.
+
+     Nachprüfung 2: der MECHANISMUS, bestätigt. Bestätigungslauf über GitHub
+     Actions (Lauf 23, 30 Partien, Seed 4711, A = 999 als beweisbar neutraler
+     Kontrollarm, B = 12, 547 gegen 546 Sims/Zug):
+
+       erlittene Schläge      A (999)   B (12)   Faktor   Vorzeichentest
+       Ø größter Einzelschlag     9.4     17.7    1.88×   p = 3.1e-02
+       Ø Verluste ab 5 Steinen    1.6      2.3    1.49×   p = 2.2e-02
+       Ø Steine gesamt           23.7     38.7    1.63×   p = 2.6e-03
+
+     Der Vorzeichentest ist gepaart — beide Konfigurationen ziehen in derselben
+     Partie. Die gedeckelte Seite verliert also messbar größere Gruppen, genau
+     wie vermutet: oberhalb des Deckels ist jede weitere Freiheit gratis, und
+     der Unterschied zwischen "atmet" und "eingekesselt" wird unsichtbar.
+     Siegrate im selben Lauf 24:6 (20 %, p = 7.2e-04) — identisch zur lokalen
+     Messung bei cap=12, was zugleich zeigt, dass der Kontrollarm 99 gegen 999
+     praktisch keinen Unterschied machte.
+
+     ZURÜCKGENOMMEN: eine frühere Fassung las aus 10 von 15 ausgezählten
+     Partien, der Schaden sei "konzentriert, nicht flächig". Lauf 23 liefert
+     dort 2 von 9; gepoolt 12 von 24, also eine Münze. Die Aussage war das
+     Rauschen, das ich bei ihr selbst angemerkt hatte.
+
+     Zum Default: 999 ist BEWEISBAR neutral, weil Freiheiten verschiedene leere
+     Punkte sind und damit <= 361. Vorher stand hier 99 mit der Begründung
+     "wirkungslos, max. beobachtete Gruppenfreiheit 34" — das war empirisch,
+     aber als Beweis formuliert. Konstruiertes Gegenbeispiel: eine Kammkette
+     (Zeile 0 voll, jede zweite Spalte nach unten) hat 199 Steine und 162
+     Freiheiten; bei 99 hätte der "neutrale" Default dort geschnitten. In echten
+     Partien tritt das nicht auf, aber ein Default soll nicht von dieser Annahme
+     abhängen. Der A/B-Kontrollarm lief mit 99 — bei einem Korpusmaximum von 34
+     ohne praktischen Unterschied, für die Selbstspielpartien allerdings nicht
+     nachgemessen.
+
+     Über 817177 evaluateMove-Aufrufe bitgenau der alte Stand. Der Parameter
+     bleibt als dokumentierter Negativbefund stehen. */
+  midLibCap:        999,
+  /* WEICHE Sättigung des Freiheitsterms — die Antwort auf das, woran der harte
+     Deckel gescheitert ist. midLibCap setzt den Grenznutzen oberhalb der
+     Schwelle auf EXAKT NULL: eine Gruppe mit 14 und eine mit 30 Freiheiten sind
+     unter cap=12 identisch bewertet, damit ist der Unterschied zwischen „atmet"
+     und „eingekesselt" unsichtbar. Gemessen kostete das 30 Punkte Siegrate und
+     verdoppelte den größten erlittenen Einzelschlag (9,4 → 17,7).
+
+     Die Form hier lässt den Grenznutzen fallen, aber nie auf null:
+
+       f(lib) = lib                                       für lib <= k
+       f(lib) = k + (lib - k) / (1 + (lib - k) / k)        für lib >  k
+
+     Unterhalb der Kniestelle k ist sie IDENTISCH zu heute — bewusst, denn der
+     taktische Bereich (typisch 3-6 Freiheiten) war nie das Problem. Oberhalb
+     wächst sie gegen 2k, der Grenznutzen bei Abstand d ist 1/(1 + d/k)²:
+     strikt positiv, aber fallend. Bei k=12 ist f(15) - f(14) = 0,69 — die
+     15. Freiheit bleibt also mehr wert als die 14., während der harte Deckel
+     dort 0 liefert. Genau diese Differenz ist der Unterschied zwischen
+     „gedämpfter Anreiz" und „blind".
+
+     Warum diese Form und nicht lib/(1 + lib/k): letztere skaliert auch den
+     unteren Bereich mit (bei lib=4, k=12 um 25 % nach unten) und mischt damit
+     zwei Effekte in einen Parameter — Dämpfung der Spitze UND Absenkung des
+     ganzen Terms. Ein A/B darüber wäre nicht interpretierbar.
+
+     0 = aus, exakt lib.
+
+     GEMESSEN — SCHADET GENAUSO. Zwei Actions-Läufe, je 30 Partien, A = aus:
+
+       Variante                 Siegrate B      Ø größter Schlag A→B   p (Verlust)
+       weich k=6   (Rand 29 %)   5:25 = 17 %      7.0 → 16.0  (2.27×)   3.0e-05
+       weich k=12  (Rand 47 %)   5:25 = 17 %      7.7 → 12.4  (1.61×)   7.2e-04
+       harter Deckel 12 (Ref.)   6:24 = 20 %      9.4 → 17.7  (1.88×)   3.1e-02
+
+     Siegrate-p je 1.6e-04, Verlust-p aus dem gepaarten Vorzeichentest. Sims/Zug
+     in beiden Läufen gleich (575/574 bzw. 738/737).
+
+     DAMIT IST DIE GRADIENTEN-ERKLÄRUNG WIDERLEGT. Die Vermutung war, der harte
+     Deckel scheitere daran, dass er den Grenznutzen auf exakt null setzt und die
+     KI für Leben und Tod großer Gruppen blind macht. k=12 hält den Grenznutzen
+     bei 0.791 an der Stelle 13→14 und den Bereich 1-12 exakt — und verliert
+     genauso, mit denselben vergrößerten Gruppenverlusten. Der Gradient ist also
+     nicht die wirksame Größe.
+
+     Der Kontrolltest sagt, WAS die wirksame Größe ist: midLibBonus gleichmäßig
+     von 30 auf 20 (×0.67), 30 Partien → 17:13, B-Rate 43 %, zweiseitig p = 0.59.
+     Gruppenverlust 1.09-1.29× bei p >= 0.12. Also nicht unterscheidbar von
+     Rauschen. Eine gleichmäßige Absenkung DESSELBEN Terms um ein Drittel ist
+     harmlos, eine Kompression nur am oberen Ende kostet 30 Punkte.
+
+     Damit fällt auch die Erklärung über den absoluten Betrag. Beiträge zum
+     Score (Gewicht × f(lib)):
+
+       lib   Basis 30×lib   uniform 20×lib   Knie k=12 (30×f)
+         4            120               80                120
+        12            360              240                360
+        30            900              600                576
+        34           1020              680                593
+
+     Bei lib=30 liegt der Knie-Beitrag mit 576 UNTER dem uniformen mit 600 — der
+     schädliche Eingriff hat dort also den kleineren Betrag. Ebenso fällt die
+     Lesart „lokales Optimum, jede Störung kostet": die Störung durch die
+     uniforme Absenkung ist größer (sie trifft jeden Zug) und kostet nichts.
+
+     Was übrig bleibt und von allen drei Läufen getragen wird: die SPREIZUNG des
+     Terms über die Freiheitszahlen ist tragend, nicht sein Betrag und nicht
+     seine Ableitung. f(30)/f(4) ist 7.50 in der Basis, 7.50 bei uniformer
+     Absenkung — und 4.80 beim Knie. Die Rangfolge zwischen einem Zug mit vielen
+     und einem mit wenigen Gruppenfreiheiten muss erhalten bleiben; das Gewicht
+     dieser Rangfolge gegenüber anderen Termen darf sich ändern.
+
+     Konsequenz für das Randspiel, und der Grund, warum drei Eingriffe
+     gescheitert sind: der Randvorteil IST die hohe Freiheitszahl. Jeder
+     Eingriff, der Randspiel über diesen Term dämpft, muss dessen Spreizung
+     komprimieren. Der Freiheitsterm ist als Hebel damit strukturell
+     unbrauchbar — was fehlt, ist ein eigener Positionsterm in evalMidgame. */
+  midLibSoft:          0,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
   midRescueAtari:   350,
@@ -966,11 +1144,20 @@ function getLegalMoves(board, color, historyHashes, koPoint, hardDeadline) {
   return moves;
 }
 
+/* Linienabstufung für evalOpening, Index = dte (0-basiert, 0 = erste Linie).
+   Erste und zweite Linie sind in der Eröffnung schlecht, dritte und vierte
+   gut, fünfte neutral. Wirkt nur mit openLineWeight > 0. */
+const OPEN_LINIE = [-1, -0.5, 1, 1, 0];
+
 function evalOpening(board, i, color, mc) {
   let s = 0;
   const x = xOf(i), y = yOf(i);
   const dte = Math.min(x, y, SIZE-1-x, SIZE-1-y);
-  if (dte <= 4) s += PARAMS.openEdge3;
+  if (dte <= 4) {
+    s += PARAMS.openEdge3;
+    /* dte ist 0-basiert: 0 = erste Linie. Siehe openLineWeight. */
+    if (PARAMS.openLineWeight > 0) s += PARAMS.openLineWeight * OPEN_LINIE[dte];
+  }
   else if (x <= 4 || x >= 14 || y <= 4 || y >= 14) s += PARAMS.openEdge5;
   else s += PARAMS.openCenter;
   if (HOSHI_IDX.has(i) && mc < 15) s += PARAMS.openHoshiBonus;
@@ -1013,6 +1200,26 @@ function evalOpening(board, i, color, mc) {
   return s + Math.random() * 3;
 }
 
+/* Gewichtung der Gruppenfreiheiten für evalMidgame. Zwei Regler, beide
+   standardmäßig aus, in dieser Reihenfolge angewandt: weiche Sättigung
+   (midLibSoft, Kniestelle) und danach harter Deckel (midLibCap). Bei den
+   Defaults 0 und 999 gibt die Funktion lib unverändert zurück — bitgenau,
+   ohne Fließkomma-Umweg, weil der weiche Zweig gar nicht betreten wird.
+   Siehe die Kommentare an beiden Parametern für die Messlage. */
+function libGewicht(lib) {
+  const k = PARAMS.midLibSoft;
+  let v = lib;
+  if (k > 0 && lib > k) {
+    const d = lib - k;
+    v = k + d / (1 + d / k);
+  }
+  /* Math.min statt Ternär: bei einem nicht-finiten v gibt Math.min NaN
+     zurück, ein Ternär stillschweigend den Deckel. In diesem Repo ist das
+     kein akademischer Unterschied — die Herkunft dieses Branches ist ein
+     NaN, das genau so unsichtbar durch eine Vergleichskette gerutscht ist. */
+  return Math.min(v, PARAMS.midLibCap);
+}
+
 function evalMidgame(board, i, color, mc) {
   let s = 0;
   const opp = color === 1 ? 2 : 1;
@@ -1022,7 +1229,7 @@ function evalMidgame(board, i, color, mc) {
   s += cap * PARAMS.midCapBonus;
   const own = floodFill(_evalScratch, i);
   const lib = own.liberties.length;
-  s += lib * PARAMS.midLibBonus;
+  s += libGewicht(lib) * PARAMS.midLibBonus;
   if (!lib) s -= 10000;
   if (lib === 1 && !cap) s -= PARAMS.midAtariPenalty;
   if (lib === 2 && !cap) s -= PARAMS.mid2LibPenalty;
