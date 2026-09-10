@@ -799,7 +799,38 @@ globalThis.PARAMS = {
      Rand-Überschuss (68 % gespielt gegen 39 % verfügbar, Mensch 17 %), also
      wird genau der adressiert.
 
-     0 = aus. Wirkung UNGEMESSEN. */
+     0 = aus.
+
+     GEMESSEN — erster Eingriff, der NICHT schadet. Vier Actions-Läufe, je 30
+     Partien, A = 0:
+
+       Gewicht   A : B    B-Rate   Ø größter erlittener Schlag A → B
+            20   12:18     60 %              11.8 → 10.6
+            40   16:14     47 %              12.7 → 12.3
+            60   12:18     60 %              13.1 → 10.9
+            80   12:18     60 %              19.1 → 10.1
+
+     Gepoolt 68:52 über 120 Partien, B-Rate 56.7 %, 95 %-CI (Clopper-Pearson)
+     47.3 bis 65.7 %. Sims/Zug je Lauf gleich.
+
+     Zwei Aussagen, streng getrennt:
+
+     (1) BELEGT: der Term kostet keine Spielstärke. Das CI schließt die
+         Größenordnung der drei gescheiterten Eingriffe klar aus — harter
+         Deckel 20 % (CI 7.7-38.6), weich k=6 und k=12 je 17 % (CI 5.6-34.7).
+         Der entkoppelte Weg ist damit als einziger gangbar. Zusätzlich sinkt
+         der Gruppenverlust in allen vier Läufen statt zu steigen, am
+         deutlichsten bei 80 (19.1 → 10.1) — das Gegenrisiko der Vorgänger
+         tritt hier nicht auf.
+
+     (2) NICHT BELEGT: ein Spielstärke-GEWINN. Das CI enthält 50 %, einseitig
+         p = 0.085, und es gibt keinen Dosis-Trend (60/47/60/60 ist flach, der
+         Ausreißer bei 40 spricht für Rauschen). Für einen echten 57-%-Effekt
+         bräuchte es rund 437 Partien; mit 120 ist die Frage offen.
+
+     Deshalb bleibt der Default 0. Ein Wert wird erst gesetzt, wenn ein
+     Gewinn belegt ist — nicht, weil ein Punktschätzer über 50 % liegt.
+     Bitgenau identisch zum Stand davor über 817177 evaluateMove-Aufrufe. */
   midLineWeight:       0,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
