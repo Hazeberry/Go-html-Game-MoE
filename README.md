@@ -437,22 +437,40 @@ und Tod großer Gruppen blind macht. `k=12` hält den Grenznutzen bei 0,791 an
 der Stelle 13→14 und den Bereich 1–12 exakt — und verliert genauso, mit
 denselben vergrößerten Gruppenverlusten.
 
-Was übrig bleibt: der **absolute Betrag** des Terms bei hohen Freiheitszahlen
-trägt Information, und jede Kompression schadet, unabhängig von der Form.
-`midLibBonus × lib` ist nicht schief, sondern tragend. Der Term ist ein Proxy
-für „meine große Gruppe atmet", und dieser Proxy muss maßstäblich zu
-`midCapBonus` (800) bleiben.
+#### Der Kontrolltest: nicht der Betrag, sondern die Spreizung
 
-Nicht ausgeschlossen ist die Alternativlesart, dass die Konfiguration an einem
-lokalen Optimum sitzt und **jede** Störung eines tragenden Terms kostet — dann
-wäre nicht die hohe Freiheitszahl besonders, sondern nur die Empfindlichkeit.
-Unterscheidbar über eine gleichmäßige Absenkung von `midLibBonus` um denselben
-Faktor (30 → 20, ×0,67). Diese Messung läuft.
+`midLibBonus` gleichmäßig von 30 auf 20 (×0,67 — derselbe Faktor, den `k=12`
+bei `lib=30` erzeugt), 30 Partien: **17:13, B-Rate 43 %, zweiseitig p = 0,59**.
+Gruppenverlust 1,09–1,29× bei p ≥ 0,12. Nicht von Rauschen unterscheidbar.
 
-Praktische Konsequenz für das Randspiel: die Diagnose steht (`midLibBonus`
-treibt es, Argmax 68 %), aber drei Eingriffe sind gescheitert. Wer es angehen
-will, braucht einen Term, der Randspiel bestraft, ohne den Freiheitsterm
-anzufassen — nicht eine andere Form desselben Terms.
+Eine gleichmäßige Absenkung desselben Terms um ein Drittel ist also harmlos,
+eine Kompression nur am oberen Ende kostet 30 Punkte. Beiträge zum Score
+(Gewicht × f(lib)):
+
+| lib | Basis 30×lib | uniform 20×lib | Knie k=12 (30×f) |
+|---:|---:|---:|---:|
+| 4 | 120 | 80 | 120 |
+| 12 | 360 | 240 | 360 |
+| 30 | 900 | 600 | **576** |
+| 34 | 1020 | 680 | 593 |
+
+Bei `lib=30` liegt der Knie-Beitrag mit 576 **unter** dem uniformen mit 600 —
+der schädliche Eingriff hat dort den kleineren Betrag. „Absoluter Betrag bei
+hohen Freiheitszahlen" ist damit als Erklärung ebenfalls widerlegt, und mit ihr
+die Lesart „lokales Optimum, jede Störung kostet": die uniforme Störung trifft
+jeden Zug, ist also größer, und kostet nichts.
+
+**Was übrig bleibt und von allen drei Läufen getragen wird: die Spreizung.**
+`f(30)/f(4)` ist 7,50 in der Basis, 7,50 bei uniformer Absenkung — und 4,80
+beim Knie. Die Rangfolge zwischen einem Zug mit vielen und einem mit wenigen
+Gruppenfreiheiten muss erhalten bleiben; das Gewicht dieser Rangfolge gegenüber
+anderen Termen darf sich ändern.
+
+Damit ist auch erklärt, warum drei Eingriffe scheitern mussten: der Randvorteil
+**ist** die hohe Freiheitszahl. Jeder Eingriff, der Randspiel über diesen Term
+dämpft, komprimiert notwendig dessen Spreizung. Der Freiheitsterm ist als Hebel
+strukturell unbrauchbar. Was fehlt, ist ein eigener Positionsterm in
+`evalMidgame` — das Gegenstück zu `openLineWeight`. Ungemessen.
 
 ## Methodik
 

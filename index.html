@@ -745,17 +745,38 @@ globalThis.PARAMS = {
      genauso, mit denselben vergrößerten Gruppenverlusten. Der Gradient ist also
      nicht die wirksame Größe.
 
-     Was übrig bleibt: der ABSOLUTE Betrag des Terms bei hohen Freiheitszahlen
-     trägt Information, und jede Kompression schadet, unabhängig von der Form.
-     k=12 senkt f(30) von 30 auf 19.2 (×0.64), der harte Deckel auf 12 (×0.40) —
-     beide kosten rund 30 Punkte Siegrate. Der Term ist nicht schief, er ist
-     tragend.
+     Der Kontrolltest sagt, WAS die wirksame Größe ist: midLibBonus gleichmäßig
+     von 30 auf 20 (×0.67), 30 Partien → 17:13, B-Rate 43 %, zweiseitig p = 0.59.
+     Gruppenverlust 1.09-1.29× bei p >= 0.12. Also nicht unterscheidbar von
+     Rauschen. Eine gleichmäßige Absenkung DESSELBEN Terms um ein Drittel ist
+     harmlos, eine Kompression nur am oberen Ende kostet 30 Punkte.
 
-     Offene Alternativlesart, die das noch nicht ausschließt: die Konfiguration
-     könnte insgesamt an einem lokalen Optimum sitzen, sodass JEDE Störung eines
-     tragenden Terms kostet — dann wäre nicht die hohe Freiheitszahl besonders,
-     sondern nur die Empfindlichkeit. Unterscheidbar über eine gleichmäßige
-     Absenkung von midLibBonus um denselben Faktor (30 → 20, ×0.67). Läuft. */
+     Damit fällt auch die Erklärung über den absoluten Betrag. Beiträge zum
+     Score (Gewicht × f(lib)):
+
+       lib   Basis 30×lib   uniform 20×lib   Knie k=12 (30×f)
+         4            120               80                120
+        12            360              240                360
+        30            900              600                576
+        34           1020              680                593
+
+     Bei lib=30 liegt der Knie-Beitrag mit 576 UNTER dem uniformen mit 600 — der
+     schädliche Eingriff hat dort also den kleineren Betrag. Ebenso fällt die
+     Lesart „lokales Optimum, jede Störung kostet": die Störung durch die
+     uniforme Absenkung ist größer (sie trifft jeden Zug) und kostet nichts.
+
+     Was übrig bleibt und von allen drei Läufen getragen wird: die SPREIZUNG des
+     Terms über die Freiheitszahlen ist tragend, nicht sein Betrag und nicht
+     seine Ableitung. f(30)/f(4) ist 7.50 in der Basis, 7.50 bei uniformer
+     Absenkung — und 4.80 beim Knie. Die Rangfolge zwischen einem Zug mit vielen
+     und einem mit wenigen Gruppenfreiheiten muss erhalten bleiben; das Gewicht
+     dieser Rangfolge gegenüber anderen Termen darf sich ändern.
+
+     Konsequenz für das Randspiel, und der Grund, warum drei Eingriffe
+     gescheitert sind: der Randvorteil IST die hohe Freiheitszahl. Jeder
+     Eingriff, der Randspiel über diesen Term dämpft, muss dessen Spreizung
+     komprimieren. Der Freiheitsterm ist als Hebel damit strukturell
+     unbrauchbar — was fehlt, ist ein eigener Positionsterm in evalMidgame. */
   midLibSoft:          0,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
