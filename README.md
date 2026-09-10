@@ -412,8 +412,47 @@ verschiedene leere Punkte, also ≤ 361. Vorher stand 99 mit empirischer
 Begründung — eine konstruierte Kammkette hat 162 Freiheiten, dort hätte 99
 geschnitten.
 
-Offen bleibt eine Form, die nur den Randanreiz dämpft — etwa abnehmender
-Grenznutzen statt hartem Schnitt. Ungemessen.
+#### Weiche Sättigung hilft auch nicht — und widerlegt die Erklärung
+
+Naheliegende Antwort auf den gescheiterten Deckel: nicht abschneiden, sondern
+dämpfen, damit der Grenznutzen fällt statt auf null zu springen. `midLibSoft`
+tut das über eine Kniestelle — unterhalb von k exakt `lib`, oberhalb
+`k + (lib−k)/(1+(lib−k)/k)`, Grenznutzen `1/(1+d/k)²`, fallend aber strikt
+positiv. Statischer Randanteil des Top-1 fällt monoton: 60 % bei k=0 auf 29 %
+bei k=6.
+
+Zwei Läufe à 30 Partien, A = aus:
+
+| Variante | Siegrate B | Ø größter Schlag A→B | p (Verlust) |
+|---|---:|---:|---:|
+| weich k=6 (Rand 29 %) | 5:25 = **17 %** | 7,0 → 16,0 (2,27×) | 3,0 · 10⁻⁵ |
+| weich k=12 (Rand 47 %) | 5:25 = **17 %** | 7,7 → 12,4 (1,61×) | 7,2 · 10⁻⁴ |
+| harter Deckel 12 (Referenz) | 6:24 = 20 % | 9,4 → 17,7 (1,88×) | 3,1 · 10⁻² |
+
+Siegrate-p je 1,6 · 10⁻⁴. Sims/Zug in beiden Läufen gleich.
+
+**Die Gradienten-Erklärung ist damit widerlegt.** Sie lautete: der harte Deckel
+scheitert, weil er den Grenznutzen auf exakt null setzt und die KI für Leben
+und Tod großer Gruppen blind macht. `k=12` hält den Grenznutzen bei 0,791 an
+der Stelle 13→14 und den Bereich 1–12 exakt — und verliert genauso, mit
+denselben vergrößerten Gruppenverlusten.
+
+Was übrig bleibt: der **absolute Betrag** des Terms bei hohen Freiheitszahlen
+trägt Information, und jede Kompression schadet, unabhängig von der Form.
+`midLibBonus × lib` ist nicht schief, sondern tragend. Der Term ist ein Proxy
+für „meine große Gruppe atmet", und dieser Proxy muss maßstäblich zu
+`midCapBonus` (800) bleiben.
+
+Nicht ausgeschlossen ist die Alternativlesart, dass die Konfiguration an einem
+lokalen Optimum sitzt und **jede** Störung eines tragenden Terms kostet — dann
+wäre nicht die hohe Freiheitszahl besonders, sondern nur die Empfindlichkeit.
+Unterscheidbar über eine gleichmäßige Absenkung von `midLibBonus` um denselben
+Faktor (30 → 20, ×0,67). Diese Messung läuft.
+
+Praktische Konsequenz für das Randspiel: die Diagnose steht (`midLibBonus`
+treibt es, Argmax 68 %), aber drei Eingriffe sind gescheitert. Wer es angehen
+will, braucht einen Term, der Randspiel bestraft, ohne den Freiheitsterm
+anzufassen — nicht eine andere Form desselben Terms.
 
 ## Methodik
 

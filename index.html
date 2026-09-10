@@ -726,7 +726,36 @@ globalThis.PARAMS = {
      zwei Effekte in einen Parameter — Dämpfung der Spitze UND Absenkung des
      ganzen Terms. Ein A/B darüber wäre nicht interpretierbar.
 
-     0 = aus, exakt lib. Wirkung noch UNGEMESSEN. */
+     0 = aus, exakt lib.
+
+     GEMESSEN — SCHADET GENAUSO. Zwei Actions-Läufe, je 30 Partien, A = aus:
+
+       Variante                 Siegrate B      Ø größter Schlag A→B   p (Verlust)
+       weich k=6   (Rand 29 %)   5:25 = 17 %      7.0 → 16.0  (2.27×)   3.0e-05
+       weich k=12  (Rand 47 %)   5:25 = 17 %      7.7 → 12.4  (1.61×)   7.2e-04
+       harter Deckel 12 (Ref.)   6:24 = 20 %      9.4 → 17.7  (1.88×)   3.1e-02
+
+     Siegrate-p je 1.6e-04, Verlust-p aus dem gepaarten Vorzeichentest. Sims/Zug
+     in beiden Läufen gleich (575/574 bzw. 738/737).
+
+     DAMIT IST DIE GRADIENTEN-ERKLÄRUNG WIDERLEGT. Die Vermutung war, der harte
+     Deckel scheitere daran, dass er den Grenznutzen auf exakt null setzt und die
+     KI für Leben und Tod großer Gruppen blind macht. k=12 hält den Grenznutzen
+     bei 0.791 an der Stelle 13→14 und den Bereich 1-12 exakt — und verliert
+     genauso, mit denselben vergrößerten Gruppenverlusten. Der Gradient ist also
+     nicht die wirksame Größe.
+
+     Was übrig bleibt: der ABSOLUTE Betrag des Terms bei hohen Freiheitszahlen
+     trägt Information, und jede Kompression schadet, unabhängig von der Form.
+     k=12 senkt f(30) von 30 auf 19.2 (×0.64), der harte Deckel auf 12 (×0.40) —
+     beide kosten rund 30 Punkte Siegrate. Der Term ist nicht schief, er ist
+     tragend.
+
+     Offene Alternativlesart, die das noch nicht ausschließt: die Konfiguration
+     könnte insgesamt an einem lokalen Optimum sitzen, sodass JEDE Störung eines
+     tragenden Terms kostet — dann wäre nicht die hohe Freiheitszahl besonders,
+     sondern nur die Empfindlichkeit. Unterscheidbar über eine gleichmäßige
+     Absenkung von midLibBonus um denselben Faktor (30 → 20, ×0.67). Läuft. */
   midLibSoft:          0,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
