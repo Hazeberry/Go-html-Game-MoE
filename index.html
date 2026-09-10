@@ -659,16 +659,33 @@ globalThis.PARAMS = {
      Randspiel angehen will, braucht eine Form, die nur den ersten Teil dämpft;
      ein Deckel trifft beide.
 
-     Zwei Nachprüfungen, die den Befund hätten kippen können. (a) 41 der 56
-     Partien endeten durch Aufgabe, 38 davon durch die gedeckelte Seite — die
-     Siegrate könnte also das Aufgabeverhalten messen statt der Spielstärke.
-     Gegen den mitgeschriebenen Gebietsstand geprüft: in 38 von 38 Fällen lag
-     die aufgebende Seite tatsächlich hinten, im Mittel 76 Punkte. (b) Nach
-     Endart aufgeschlüsselt gewinnt der Deckel 3 von 41 Aufgabe-Partien, aber
-     10 von 15 ausgezählten. Der Schaden ist also konzentriert, nicht flächig —
-     passend zum Mechanismus. Diese Aufteilung selektiert allerdings auf das
-     Ergebnis und ist bei n=15 nicht signifikant; sie zeigt die FORM des
-     Versagens, nicht dessen Abwesenheit.
+     Nachprüfung 1: misst die Siegrate den Resign-Detektor? 41 der 56 Partien
+     endeten durch Aufgabe, 38 davon durch die gedeckelte Seite. Gegen den
+     mitgeschriebenen Gebietsstand geprüft: in 38 von 38 Fällen lag die
+     aufgebende Seite tatsächlich hinten, im Mittel 76 Punkte. Der Einwand
+     trifft nicht.
+
+     Nachprüfung 2: der MECHANISMUS, bestätigt. Bestätigungslauf über GitHub
+     Actions (Lauf 23, 30 Partien, Seed 4711, A = 999 als beweisbar neutraler
+     Kontrollarm, B = 12, 547 gegen 546 Sims/Zug):
+
+       erlittene Schläge      A (999)   B (12)   Faktor   Vorzeichentest
+       Ø größter Einzelschlag     9.4     17.7    1.88×   p = 3.1e-02
+       Ø Verluste ab 5 Steinen    1.6      2.3    1.49×   p = 2.2e-02
+       Ø Steine gesamt           23.7     38.7    1.63×   p = 2.6e-03
+
+     Der Vorzeichentest ist gepaart — beide Konfigurationen ziehen in derselben
+     Partie. Die gedeckelte Seite verliert also messbar größere Gruppen, genau
+     wie vermutet: oberhalb des Deckels ist jede weitere Freiheit gratis, und
+     der Unterschied zwischen "atmet" und "eingekesselt" wird unsichtbar.
+     Siegrate im selben Lauf 24:6 (20 %, p = 7.2e-04) — identisch zur lokalen
+     Messung bei cap=12, was zugleich zeigt, dass der Kontrollarm 99 gegen 999
+     praktisch keinen Unterschied machte.
+
+     ZURÜCKGENOMMEN: eine frühere Fassung las aus 10 von 15 ausgezählten
+     Partien, der Schaden sei "konzentriert, nicht flächig". Lauf 23 liefert
+     dort 2 von 9; gepoolt 12 von 24, also eine Münze. Die Aussage war das
+     Rauschen, das ich bei ihr selbst angemerkt hatte.
 
      Zum Default: 999 ist BEWEISBAR neutral, weil Freiheiten verschiedene leere
      Punkte sind und damit <= 361. Vorher stand hier 99 mit der Begründung

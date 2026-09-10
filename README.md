@@ -385,12 +385,27 @@ Gebietsstand bei Partieende: in **38 von 38** Fällen lag die aufgebende Seite
 tatsächlich hinten, im Mittel 76 Punkte. Die Aufgaben waren berechtigt, die
 Siegrate misst nicht den Detektor.
 
-**Der Schaden ist konzentriert, nicht flächig.** Nach Endart aufgeschlüsselt
-gewinnt der Deckel 3 von 41 Aufgabe-Partien, aber 10 von 15 ausgezählten
-(Ø Gebiet −1,0 Punkte). Das passt zum Mechanismus: eine sterbende Großgruppe
-entscheidet die Partie, oder sie tritt nicht auf. Nicht überlesen — diese
-Aufteilung selektiert auf das Ergebnis und ist bei n = 15 nicht signifikant.
-Sie belegt die Form des Versagens, nicht seine Abwesenheit.
+**Der Mechanismus, bestätigt.** Bestätigungslauf über GitHub Actions (Lauf 23,
+30 Partien, Seed 4711, A = 999 als beweisbar neutraler Kontrollarm, B = 12,
+547 gegen 546 Sims/Zug). Erlittene Schläge, gepaarter Vorzeichentest — beide
+Konfigurationen ziehen in derselben Partie:
+
+| erlittene Schläge | A (999) | B (12) | Faktor | p (einseitig) |
+|---|---:|---:|---:|---:|
+| Ø größter Einzelschlag | 9,4 | 17,7 | 1,88× | 3,1 · 10⁻² |
+| Ø Verluste ab 5 Steinen | 1,6 | 2,3 | 1,49× | 2,2 · 10⁻² |
+| Ø Steine gesamt | 23,7 | 38,7 | 1,63× | 2,6 · 10⁻³ |
+
+Die gedeckelte Seite verliert messbar größere Gruppen. Oberhalb des Deckels ist
+jede weitere Freiheit gratis, damit wird der Unterschied zwischen „atmet" und
+„eingekesselt" unsichtbar. Siegrate im selben Lauf 24:6 (20 %, p = 7,2 · 10⁻⁴)
+— identisch zur lokalen Messung bei `cap=12`, was zugleich zeigt, dass der
+Kontrollarm 99 gegen 999 praktisch keinen Unterschied machte.
+
+**Zurückgenommen:** aus 10 von 15 ausgezählten Partien war zunächst gelesen
+worden, der Schaden sei „konzentriert, nicht flächig". Lauf 23 liefert dort 2
+von 9, gepoolt 12 von 24 — eine Münze. Die Aussage war das Rauschen, das bei
+ihr selbst angemerkt war.
 
 Der Default ist **999** und damit beweisbar neutral: Freiheiten sind
 verschiedene leere Punkte, also ≤ 361. Vorher stand 99 mit empirischer
