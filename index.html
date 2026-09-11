@@ -1115,6 +1115,87 @@ globalThis.PARAMS = {
      nichts nachweislich gewonnen ist, bleibt Default 0. */
   deathDiscount:       0,
   deathDiscountSize:   6,
+  /* deathTransfer — die ÜBERTRAGUNG, zweite Hälfte des Sterbe-Abschlags.
+
+     Der reine Abschlag (deathDiscount) schließt nur ~20 % der gemessenen
+     610-Punkte-Lücke, weil er strukturell nur den EIGENWERT der Gruppe
+     entfernen kann (22×5 + 2×3 = 116). Die restlichen ~490 sind der
+     Gefangenen-Bonus, den der GEGNER beim Schlagen erhält: 22 Steine ×
+     captureWeight 20 = 440. Genau den bucht dieser Term.
+
+     Rechnung an der rekonstruierten Stellung, 22er-Kette mit 2 Freiheiten,
+     Rampenanteil 0.5, Dosis 1.00:
+       Abschlag allein   116 → 58     (−58)
+       + Übertragung      58 → −162   (−220 zusätzlich)
+     Zusammen −278 statt −58, also gut das Fünffache.
+
+     Die Rampe ist dieselbe wie beim Abschlag und trägt dieselbe Bedeutung:
+     wie sicher ist der Tod. Bei zwei Freiheiten also 0.5 — deshalb ist auch
+     mit Dosis 1.00 die Lücke nicht ganz geschlossen, und das ist Absicht.
+     Eine Gruppe mit zwei Freiheiten ist meistens, nicht immer tot.
+
+     GEMESSEN an der rekonstruierten Stellung vor Zug 274. Zielwert ist die
+     Bewertung mit tatsächlich geschlagener Kette (-532), Basis ist +78:
+
+       discount  transfer   eval(Weiß)   Rest-Lücke   geschlossen
+           1.00      0.00          -46          487         20 %
+           0.00      0.50         -157          375         39 %
+           0.00      1.00         -392          140         77 %
+           1.00      1.00         -516           17         97 %
+
+     Die Übertragung leistet also genau das, was der Abschlag strukturell
+     nicht konnte. Beide zusammen schließen die Lücke praktisch vollständig.
+
+     RISIKO passiver Tötung — GEPRÜFT UND ENTKRÄFTET. Die Befürchtung war,
+     dass die Engine das Stehenlassen einer zweifreiheitigen Gegnergruppe dem
+     Schlagen vorzieht, weil die Übertragung den Gewinn vorwegnimmt. Der
+     Anreiz schrumpft tatsächlich, kippt aber nicht: aus Schwarz-Sicht an
+     derselben Stellung, Stellung stehenlassen gegen Kette schlagen —
+
+       0.00 / 0.00   -78 → 532   Anreiz 610
+       1.00 / 0.00    46 → 598   Anreiz 552
+       0.00 / 1.00   392 → 782   Anreiz 390
+       1.00 / 1.00   516 → 848   Anreiz 332
+
+     Der Grund: die Übertragung hebt BEIDE Werte, weil sie die Gruppe in
+     beiden Fällen als verloren bucht. Die Differenz schrumpft auf gut die
+     Hälfte, das Vorzeichen bleibt. Schlagen ist immer besser.
+
+     KEIN Doppelzählen: wird die Gruppe wirklich geschlagen, verschwindet sie
+     vom Brett und captures[] steigt um size. Die Übertragung ist die
+     Vorwegnahme genau dieses Vorgangs, nicht eine zweite Buchung.
+
+     ECHTES RISIKO ist ein anderes, und es ist erheblich: die Übertragung ist
+     weit aggressiver als der Abschlag. Q-Verlauf derselben Partie aus
+     Weiß-Sicht, Abschlag+Übertragung je 1.00 gegen beide 0:
+
+       Zug    262    264    266    268    270    272    274
+       0/0   +0.24  +0.07  +0.15  +0.12  +0.22  +0.21  +0.24
+       1/1   -0.87  -0.90  -0.92  -0.95  -0.96  -0.97  -0.99
+
+     Bei resignQ 0.95 gibt die ehrliche Konfiguration rund um Zug 268 auf.
+     Hier lag Weiß tatsächlich ~44 Punkte hinten und verlor die Partie, die
+     Aufgabe wäre also berechtigt. Ob das allgemein gilt, muss der Harness
+     zeigen — Aufgabezahl und Rückstand bei Aufgabe sind dort instrumentiert.
+
+     Was die Übertragung NICHT leistet, entgegen der Erwartung: sie dreht die
+     Zugwahl bei Zug 272 nicht. Auch mit Q -0.97 spielt die Engine M14. Der
+     Grund ist nicht Blindheit, sondern dass Zug 272 gar kein Entscheidungs-
+     punkt mehr ist — ehrlich bewertet war die Partie schon bei Zug 262
+     verloren (Q -0.87), also sind bei 272 alle Äste gleich verloren. Die
+     Zugwahl ändert sich stattdessen FRÜHER: bei 264 (T11 → H5), 266
+     (N14 → K14) und 270 (M13 → L14). Damit ist auch die frühere Formulierung
+     korrigiert, Zug 272 sei die Stelle, an der der Fehler passiert.
+
+     Bekannte Inkonsistenz zur Benson-Ebene: eine beweisbar tote Kette wird
+     weiter oben mit 0 gewertet und erreicht diesen Code nie. Beweisbar tot
+     ist SICHERER als zwei Freiheiten, bekommt hier aber die MILDERE
+     Bewertung (0 statt negativ). Das ist ein Vorbefund am Benson-Zweig, den
+     dieser Term sichtbar macht; er wird hier nicht mitrepariert, damit die
+     Dosisreihe eindeutig bleibt.
+
+     Default 0. */
+  deathTransfer:       0,
   /* Benson-Zugfilter: todgeborene Züge (Stein wäre beweisbar tot) fliegen
      aus der Kandidatenliste; bleibt nichts übrig → passen. Beendet das
      endlose Steine-Füttern in gegnerisches pass-alive-Gebiet (beobachtet:
@@ -1781,12 +1862,21 @@ function evaluateBoard(board, color, captures) {
       }
     }
     let v = size * 5 + libs * 3;
-    /* Vor der Vorzeichenzuweisung, damit der Abschlag für eigene und fremde
-       Gruppen gleich gilt. Bei deathDiscount 0 wird der Zweig nicht betreten
-       und v bleibt bitgenau der alte Ausdruck. */
-    if (PARAMS.deathDiscount > 0 && libs < STERBE_RAMPE.length
-        && size >= PARAMS.deathDiscountSize) {
-      v *= 1 - PARAMS.deathDiscount * STERBE_RAMPE[libs];
+    /* Vor der Vorzeichenzuweisung, damit Abschlag und Übertragung für eigene
+       und fremde Gruppen gleich gelten. Bei deathDiscount 0 und
+       deathTransfer 0 wird kein Zweig betreten und v bleibt bitgenau der
+       alte Ausdruck. */
+    if (libs < STERBE_RAMPE.length && size >= PARAMS.deathDiscountSize) {
+      const anteil = STERBE_RAMPE[libs];
+      if (PARAMS.deathDiscount > 0) v *= 1 - PARAMS.deathDiscount * anteil;
+      /* Übertragung: die Gruppe gilt anteilig als bereits geschlagen, also
+         bekommt der Gegner die Gefangenen gutgeschrieben — dieselbe Größe,
+         die captures[] beim echten Schlagen bekäme. Das ist die Hälfte der
+         Bewertungslücke, die der reine Abschlag prinzipiell nicht erreicht.
+         Siehe den Kommentar an deathTransfer. */
+      if (PARAMS.deathTransfer > 0) {
+        v -= PARAMS.deathTransfer * anteil * size * PARAMS.captureWeight;
+      }
     }
     s += (c === color) ? v : -v;
   }
