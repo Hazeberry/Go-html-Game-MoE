@@ -1022,6 +1022,68 @@ globalThis.PARAMS = {
      früh gibt es keine pass-alive-Ketten, da wäre sie reiner Overhead. */
   bensonEval: 1,
   bensonEvalMaxEmpty: 160,
+  /* Sterbe-Abschlag auf große Gruppen mit wenigen Freiheiten.
+
+     Anlass, rekonstruiert und verifiziert: in einer verlorenen Hard-Partie
+     bewertete evaluateBoard eine 22-Steine-Gruppe mit zwei Freiheiten, die
+     nachweislich nicht mehr zu retten war (beide Rettungszüge lassen sie im
+     Atari), als vollwertiges Material — mit Gruppe +78, ohne Gruppe -532, also
+     610 Punkte Differenz auf der internen Skala. Q stand bei +0.22, während
+     Weiß rund 44 Gebietspunkte hinten lag.
+
+     Warum mehr Suche das nicht heilt, ebenfalls gemessen: von 275 auf 20000
+     Simulationen (70-fach) wählt die Engine unverändert denselben Zug mit
+     unverändertem Q. MCTS kann eine systematisch falsche Blattbewertung nicht
+     aussuchen — jeder Ast erbt die Annahme, die Gruppe lebe, also sind alle
+     Äste sich einig. Die Crisis-Heuristik feuerte dabei korrekt (Gewicht 0.80
+     bzw. 1.00 auf den Freiheiten); das Problem liegt nicht im Move-Ordering.
+
+     Die Benson-Ebene darüber greift hier nicht: sie beweist pass-alive, nicht
+     Tod. Eine Gruppe mit zwei Freiheiten ist nicht Benson-tot, sondern nur
+     praktisch verloren.
+
+     Der Abschlag ist eine HEURISTIK und kann irren: eine Gruppe im Atari kann
+     sich freischlagen oder anbinden, und evaluateBoard weiß nicht, wer am Zug
+     ist. Deshalb Default 0 und Messung, bevor irgendetwas gesetzt wird.
+
+     Wirkt symmetrisch auf beide Farben — vor der Vorzeichenzuweisung
+     angewandt. Sonst würde die Engine optimistisch übers Töten urteilen.
+
+     GEMESSEN an der rekonstruierten Stellung (alle acht im Log notierten
+     Schlagzahlen als Prüfsumme verifiziert, inklusive der 22 Steine):
+
+       deathDiscount   evaluateBoard(Weiß)   Abstand zum ehrlichen Wert (-532)
+                0.00                    78                              610
+                0.50                    16                              548
+                1.00                   -46                              487
+
+     Der Term wirkt in die richtige Richtung, schließt die Lücke aber nur zu
+     etwa 20 %. Der Grund ist strukturell und nicht durch eine höhere Dosis zu
+     beheben: der Abschlag kann höchstens den Eigenwert der Gruppe entfernen
+     (22×5 + 2×3 = 116 Punkte). Die restlichen ~490 Punkte sind der
+     Gefangenen-Bonus, den der Gegner beim Schlagen ERHÄLT — 22 Steine ×
+     captureWeight 20 = 440. Eine ehrliche Bewertung müsste die Gruppe also
+     ÜBERTRAGEN (aus dem eigenen Material entfernen UND dem Gegner als
+     Gefangene zuschreiben), nicht nur abschlagen.
+
+     Was der Term dennoch leistet: Q wird ehrlich. Bei Zug 274 geht Q von
+     +0.23 auf -0.35 (Dosis 1.00) — die Engine hört auf, sich die Stellung
+     schönzurechnen. Das betrifft das Aufgabeverhalten und, wichtiger, alle
+     künftigen Suchbäume, die sonst auf der Lüge aufbauen.
+
+     Was er NICHT leistet: er verhindert den Fehler nicht. Bei Zug 272, wo Weiß
+     die 22er-Kette mit drei Freiheiten erst zusammenschließt, spielt die Engine
+     bei Dosis 0.00, 0.50 und 1.00 unverändert M14. Der Abschlag auf drei
+     Freiheiten (ein Viertel von 119 Punkten, also ~30) ist gegen die übrigen
+     Terme zu klein, um die Zugwahl zu drehen.
+
+     Eingriffstiefe, gemessen: über 254 Stellungen der Partie und 4938 Gruppen
+     greift der Term bei 1.6 % (4× eine Freiheit, 47× zwei, 28× drei). Er ist
+     also chirurgisch und stört normales Spiel kaum.
+
+     Spielstärke UNGEMESSEN. Default 0. */
+  deathDiscount:       0,
+  deathDiscountSize:   6,
   /* Benson-Zugfilter: todgeborene Züge (Stein wäre beweisbar tot) fliegen
      aus der Kandidatenliste; bleibt nichts übrig → passen. Beendet das
      endlose Steine-Füttern in gegnerisches pass-alive-Gebiet (beobachtet:
@@ -1639,6 +1701,11 @@ function quickEval(board, i, color) {
    Aufruf!) jetzt ein einziger BFS-Durchlauf, der nur ZÄHLT: Gruppengröße
    direkt, Freiheiten dedupliziert über eine Epochen-Markierung pro Gruppe.
    Null Allokationen, identisches Ergebnis. */
+/* Sterbe-Rampe für deathDiscount, Index = Freiheiten der Gruppe. Index 0 ist
+   nur Absicherung (eine Gruppe ohne Freiheiten steht nie auf dem Brett), ab
+   vier Freiheiten kein Abschlag. Siehe den Kommentar an deathDiscount. */
+const STERBE_RAMPE = [1, 1, 0.5, 0.25];
+
 const _evalBoardSeen = new Int32Array(BOARD_SIZE);
 function evaluateBoard(board, color, captures) {
   const opp = color === 1 ? 2 : 1;
@@ -1682,7 +1749,14 @@ function evaluateBoard(board, color, captures) {
         }
       }
     }
-    const v = size * 5 + libs * 3;
+    let v = size * 5 + libs * 3;
+    /* Vor der Vorzeichenzuweisung, damit der Abschlag für eigene und fremde
+       Gruppen gleich gilt. Bei deathDiscount 0 wird der Zweig nicht betreten
+       und v bleibt bitgenau der alte Ausdruck. */
+    if (PARAMS.deathDiscount > 0 && libs < STERBE_RAMPE.length
+        && size >= PARAMS.deathDiscountSize) {
+      v *= 1 - PARAMS.deathDiscount * STERBE_RAMPE[libs];
+    }
     s += (c === color) ? v : -v;
   }
   return s;
