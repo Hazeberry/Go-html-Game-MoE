@@ -1283,9 +1283,16 @@ globalThis.PARAMS = {
      Farbbalance geprüft: A spielte 105× Schwarz und 105× Weiß, B gewinnt in
      beiden Rollen (70.5 % bzw. 60.0 %). Sims/Zug 570:571. Kein Confound.
 
-     Default trotzdem 0 — das Setzen eines Defaults ist eine Entscheidung des
-     Projektinhabers, nicht ein Nebenprodukt der Messung. Vorschlag steht. */
-  deathTransfer:       0,
+     DEFAULT 1.00, vom Projektinhaber nach Vorlage der 210-Partien-Messung
+     freigegeben. Damit ist dies der erste Parameter dieses Projekts, der
+     aufgrund eines belegten Spielstärkegewinns aktiv geschaltet wurde — alle
+     Vorgänger (captureWeight, openLineWeight, midLibCap, midLibSoft,
+     midLineWeight, deathDiscount) blieben auf ihrem neutralen Wert.
+
+     Abschaltbar durch deathTransfer 0; der Stand ist dann über 6554
+     evaluateBoard-Aufrufe bitgenau identisch zum Vorstand vor dieser
+     Änderung, geprüft beim Setzen des Defaults. */
+  deathTransfer:       1.0,
   /* Benson-Zugfilter: todgeborene Züge (Stein wäre beweisbar tot) fliegen
      aus der Kandidatenliste; bleibt nichts übrig → passen. Beendet das
      endlose Steine-Füttern in gegnerisches pass-alive-Gebiet (beobachtet:
