@@ -674,8 +674,19 @@ nicht das Endspiel.**
 Confounds geprüft: Farbbalance exakt 105:105, B gewinnt in beiden Rollen
 (70,5 % als Weiß-Gegner, 60,0 % als Schwarz-Gegner); Sims/Zug 570:571.
 
-Der Default steht weiterhin auf 0 — das ist eine Entscheidung des
-Projektinhabers, kein Nebenprodukt der Messung.
+#### Default gesetzt: `deathTransfer = 1,0`
+
+Nach Vorlage der 210-Partien-Messung vom Projektinhaber freigegeben. Damit ist
+dies **der erste Parameter dieses Projekts, der aufgrund eines belegten
+Spielstärkegewinns aktiv geschaltet wurde**. Alle Vorgänger — `captureWeight`,
+`openLineWeight`, `midLibCap`, `midLibSoft`, `midLineWeight`, `deathDiscount` —
+blieben auf ihrem neutralen Wert, weil die Messung den Gewinn nicht hergab.
+
+Abschaltbarkeit geprüft, nicht behauptet: mit `deathTransfer = 0` ist der Stand
+über 6554 `evaluateBoard`-Aufrufe **bitgenau identisch** zum Vorstand. Als
+Gegenprobe derselbe Vergleich ohne Erzwingen — 1758 Abweichungen, der Default
+wirkt also wirklich. Ein Test, der in beide Richtungen prüft, ist einer, dem man
+glauben kann; einer, der nur Gleichheit zeigt, könnte auch nur schlafen.
 
 ## Methodik
 
