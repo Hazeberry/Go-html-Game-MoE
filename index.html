@@ -1081,7 +1081,38 @@ globalThis.PARAMS = {
      greift der Term bei 1.6 % (4× eine Freiheit, 47× zwei, 28× drei). Er ist
      also chirurgisch und stört normales Spiel kaum.
 
-     Spielstärke UNGEMESSEN. Default 0. */
+     SPIELSTÄRKE GEMESSEN (Läufe 37-40, GitHub Actions, Commit d11b17d):
+     A = deathDiscount 0 gegen B = 0.25 / 0.50 / 0.75 / 1.00, je 30 Partien,
+     Seeds 8100-8103, 250 ms/Zug, maxmoves 400, Sims/Zug paritätisch 657:657.
+
+       Dosis   B-Siege   Rate     95-%-KI (Clopper-Pearson)   p (exakt)
+        0.25     17/30   56.7 %   37.4-74.5 %                   0.585
+        0.50     16/30   53.3 %   34.3-71.7 %                   0.856
+        0.75     15/30   50.0 %   31.3-68.7 %                   1.000
+        1.00     17/30   56.7 %   37.4-74.5 %                   0.585
+       gepoolt   65/120  54.2 %   44.8-63.3 %                   0.411
+
+     Kein Dosis-Trend, kein Effekt. Das Ergebnis ist ein NULLBEFUND auf der
+     Siegrate — aber ein nützlicher: die Ehrlichkeit kostet nichts.
+
+     Gegenprobe auf die vorab benannte Sorge, der Abschlag könne die Engine
+     beim Töten passiv machen (sie schreibt gegnerische Gruppen ab, statt sie
+     zu erledigen). Widerlegt: im direkten Duell ist der zugefügte Verlust der
+     einen Seite der erlittene der anderen, und B fügt MEHR zu als A.
+     Gepaart je Partie, n=120:
+
+       erlittener größter Einzelschlag   A 12.8  B 10.4   B besser 65:49  p=0.16
+       erlittener Gesamtverlust          A 32.1  B 29.1   B besser 68:50  p=0.12
+       erlittene Schläge ab 5 Steinen    A  1.85 B  1.91  B besser 48:49  p=1.00
+
+     Die Richtung stimmt durchweg (4 von 4 Dosen beim größten Einzelschlag),
+     die Stärke reicht bei n=120 nicht für Signifikanz. Aufgaben: A gibt 41×
+     auf, B 32×, bei ähnlichem Zug (329 vs. 334) und ähnlichem Rückstand
+     (57 vs. 52 Punkte) — kein Frühaufgabe-Schaden.
+
+     Fazit: der Term macht Q ehrlich, ohne Spielstärke zu kosten, und die
+     strukturelle Lücke bleibt (nur ~20 % geschlossen, siehe oben). Solange
+     nichts nachweislich gewonnen ist, bleibt Default 0. */
   deathDiscount:       0,
   deathDiscountSize:   6,
   /* Benson-Zugfilter: todgeborene Züge (Stein wäre beweisbar tot) fliegen

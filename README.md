@@ -531,6 +531,55 @@ Der Default bleibt 0. Die Frage abschließend zu entscheiden bräuchte rund
 1500 Partien für einen 54-%-Effekt; das steht in keinem Verhältnis zum
 erwarteten Nutzen.
 
+### Der Sterbe-Abschlag: Ehrlichkeit ist gratis, aber sie repariert nichts
+
+Ausgangspunkt waren zwei Partielogs, in denen große eigene Gruppen plötzlich
+starben. Die Autopsie (Zug 274 der rekonstruierten Partie, alle acht
+Schlagzahlen als Prüfsumme verifiziert) schloss Suchtiefe und Move-Ordering
+aus: von 275 auf 20 000 Simulationen wählt die Engine denselben Zug mit
+demselben Q, und die Crisis-Heuristik feuerte korrekt. Die Ursache liegt in
+`evaluateBoard`, die eine 22er-Kette mit zwei Freiheiten als vollwertiges
+Material zählt — mit Gruppe +78, ohne Gruppe −532.
+
+`deathDiscount` schlägt große Gruppen mit wenigen Freiheiten ab, symmetrisch
+für beide Farben, über eine Rampe 1 / 1 / 0,5 / 0,25 nach Freiheiten. Er greift
+über 254 Stellungen und 4938 Gruppen bei 1,6 % — chirurgisch.
+
+Vier Läufe à 30 Partien, A = 0, Sims/Zug paritätisch 657:657:
+
+| Dosis | B-Siege | B-Rate | 95 %-CI | p (exakt) |
+|---:|---:|---:|---:|---:|
+| 0,25 | 17/30 | 56,7 % | 37,4 – 74,5 % | 0,585 |
+| 0,50 | 16/30 | 53,3 % | 34,3 – 71,7 % | 0,856 |
+| 0,75 | 15/30 | 50,0 % | 31,3 – 68,7 % | 1,000 |
+| 1,00 | 17/30 | 56,7 % | 37,4 – 74,5 % | 0,585 |
+| **gepoolt** | **65/120** | **54,2 %** | **44,8 – 63,3 %** | **0,411** |
+
+Kein Dosis-Trend. Die vorab benannte Sorge — der Abschlag könne rettbare
+Gruppen abschreiben oder die Engine beim Töten passiv machen — tritt nicht ein.
+Im direkten Duell ist der zugefügte Verlust der einen Seite der erlittene der
+anderen, und B fügt *mehr* zu als A (gepaart, n = 120):
+
+| erlitten | A | B | Vorzeichentest |
+|---|---:|---:|---:|
+| größter Einzelschlag | 12,8 | 10,4 | 65:49, p = 0,16 |
+| Gesamtverlust | 32,1 | 29,1 | 68:50, p = 0,12 |
+| Schläge ab 5 Steinen | 1,85 | 1,91 | 48:49, p = 1,00 |
+
+Aufgaben: A gibt 41× auf, B 32×, bei ähnlichem Zug (329 vs. 334) und ähnlichem
+Rückstand (57 vs. 52 Punkte) — kein Frühaufgabe-Schaden.
+
+**Belegt:** der Term macht Q ehrlich (Zug 274: +0,23 → −0,35), ohne
+Spielstärke zu kosten. **Nicht belegt:** ein Gewinn.
+
+**Was er strukturell nicht kann**, und das ist der eigentliche Befund: der
+Abschlag schließt nur ~20 % der Bewertungslücke. Er kann höchstens den
+Eigenwert der Gruppe entfernen (22×5 + 2×3 = 116 Punkte). Die restlichen ~490
+sind der Gefangenen-Bonus, den der *Gegner* beim Schlagen erhält (22 Steine ×
+`captureWeight` 20 = 440). Eine ehrliche Bewertung müsste die Gruppe
+**übertragen**, nicht nur abschlagen. Entsprechend dreht der Term auch die
+Zugwahl bei Zug 272 nicht, wo der Fehler tatsächlich passiert. Default 0.
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im
