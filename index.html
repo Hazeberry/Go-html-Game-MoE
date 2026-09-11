@@ -1194,7 +1194,57 @@ globalThis.PARAMS = {
      dieser Term sichtbar macht; er wird hier nicht mitrepariert, damit die
      Dosisreihe eindeutig bleibt.
 
-     Default 0. */
+     SPIELSTÄRKE GEMESSEN (Läufe 41-44, GitHub Actions, Commit 176122f):
+     A = beide Terme 0 gegen B = deathTransfer 0.25 / 0.50 / 0.75 / 1.00 bei
+     deathDiscount 0, je 30 Partien, Seeds 8100-8103, Sims/Zug 582:583.
+
+       Dosis   B-Siege   Rate     95-%-KI        p (exakt)
+        0.25     16/30   53.3 %   34.3-71.7 %      0.856
+        0.50     15/30   50.0 %   31.3-68.7 %      1.000
+        0.75     19/30   63.3 %   43.9-80.1 %      0.200
+        1.00     21/30   70.0 %   50.6-85.3 %      0.043
+       gepoolt   71/120  59.2 %   49.8-68.0 %      0.055
+
+     Das ist das erste Ergebnis dieser Serie, das überhaupt in Richtung
+     Gewinn zeigt — aber es ist NICHT belegt, und zwar aus drei Gründen:
+     das gepoolte KI enthält 50 %; die 70 % bei Dosis 1.00 sind eine von
+     vier Dosen, Bonferroni-korrigiert p = 0.17; der Trendtest über die
+     Dosis (Cochran-Armitage) liefert z = 1.58, p = 0.11. Der Rauschboden
+     der README sagt, dass bei 120 Partien erst ab ~59 % etwas nachweisbar
+     ist — genau dort liegt dieser Wert, also auf der Kante.
+
+     Präzedenzfall in diesem Projekt: midLineWeight zeigte im ersten Lauf
+     60 % und fiel über 210 Partien auf 53 %. Dieselbe Form.
+
+     Was DEUTLICH besser belegt ist, und das ist der vorab benannte
+     Wirkmechanismus: der erlittene größte Einzelschlag sinkt von 14.2 auf
+     9.9 Steine, gepaart über 120 Partien 73:45, p = 0.013. Und er sinkt
+     dosisabhängig, im selben Muster wie die Siegrate:
+
+       Dosis   Ø größter erlitten A → B   Vorzeichen B:A   p
+        0.25          11.6 → 11.7              16:14     0.856
+        0.50          12.7 → 10.0              14:15     1.000
+        0.75          19.1 →  8.6              22:8      0.016
+        1.00          13.3 →  9.2              21:8      0.024
+
+     Die Engine verliert also messbar seltener große Gruppen, und genau ab
+     der Dosis, ab der auch die Siegrate steigt. Der Mechanismus ist damit
+     besser abgesichert als die Wirkung, die er erzeugen soll.
+
+     AUFGABEVERHALTEN — das vorab als Hauptrisiko benannte. Die Sorge war,
+     die Übertragung drücke Q so früh unter resignQ, dass rettbare Partien
+     abgeschrieben werden. Gegenteil gemessen:
+
+       A gibt 39× auf, Ø Zug 322, Ø Rückstand 48.7 Punkte
+       B gibt 25× auf, Ø Zug 323, Ø Rückstand 54.6 Punkte
+
+     B gibt SELTENER auf und bei GRÖSSEREM Rückstand. Der Grund ist
+     plausibel: B verliert seltener große Gruppen, gerät also seltener in
+     die Lage, in der Q kollabiert. Die frühe Q-Ehrlichkeit aus der
+     Einzelpartie-Analyse schlägt nicht in Frühaufgabe um.
+
+     Default bleibt 0, bis die Nachmessung auf Dosis 1.00 (Läufe 45-50,
+     Seeds 8200-8205) vorliegt. */
   deathTransfer:       0,
   /* Benson-Zugfilter: todgeborene Züge (Stein wäre beweisbar tot) fliegen
      aus der Kandidatenliste; bleibt nichts übrig → passen. Beendet das

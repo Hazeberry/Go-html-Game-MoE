@@ -577,8 +577,59 @@ Abschlag schließt nur ~20 % der Bewertungslücke. Er kann höchstens den
 Eigenwert der Gruppe entfernen (22×5 + 2×3 = 116 Punkte). Die restlichen ~490
 sind der Gefangenen-Bonus, den der *Gegner* beim Schlagen erhält (22 Steine ×
 `captureWeight` 20 = 440). Eine ehrliche Bewertung müsste die Gruppe
-**übertragen**, nicht nur abschlagen. Entsprechend dreht der Term auch die
-Zugwahl bei Zug 272 nicht, wo der Fehler tatsächlich passiert. Default 0.
+**übertragen**, nicht nur abschlagen. Default 0.
+
+### Die Übertragung: erster Hinweis auf einen echten Gewinn
+
+`deathTransfer` bucht den fehlenden Gefangenen-Bonus: die sterbende Gruppe
+gilt anteilig als bereits geschlagen, über dieselbe Freiheiten-Rampe. Das ist
+kein Gebietsterm — `evaluateBoard` benutzt `estimateArea` nicht, und die
+gemessene Lücke besteht aus Material und Gefangenen, nicht aus Gebiet.
+
+An der rekonstruierten Stellung vor Zug 274 (Zielwert −532, Basis +78):
+Abschlag 1,00 allein schließt 20 %, Übertragung 1,00 allein 77 %, beide
+zusammen **97 %**.
+
+Vier Läufe à 30 Partien, A = 0, `deathDiscount` = 0, Sims/Zug 582:583:
+
+| Dosis | B-Siege | B-Rate | 95 %-CI | p (exakt) |
+|---:|---:|---:|---:|---:|
+| 0,25 | 16/30 | 53,3 % | 34,3–71,7 % | 0,856 |
+| 0,50 | 15/30 | 50,0 % | 31,3–68,7 % | 1,000 |
+| 0,75 | 19/30 | 63,3 % | 43,9–80,1 % | 0,200 |
+| 1,00 | 21/30 | 70,0 % | 50,6–85,3 % | 0,043 |
+| **gepoolt** | **71/120** | **59,2 %** | **49,8–68,0 %** | **0,055** |
+
+**Nicht belegt.** Das gepoolte CI enthält 50 %; die 70 % bei Dosis 1,00 sind
+eine von vier Dosen (Bonferroni p = 0,17); der Trendtest über die Dosis gibt
+z = 1,58, p = 0,11. Der Rauschboden sagt, bei 120 Partien ist erst ab ~59 %
+etwas nachweisbar — der Wert liegt genau auf der Kante. Und `midLineWeight`
+zeigte im ersten Lauf 60 % und fiel über 210 Partien auf 53 %: dieselbe Form.
+
+**Besser belegt ist der Wirkmechanismus.** Der erlittene größte Einzelschlag
+sinkt von 14,2 auf 9,9 Steine, gepaart über 120 Partien 73:45, p = 0,013 —
+und zwar dosisabhängig, im selben Muster wie die Siegrate:
+
+| Dosis | Ø größter erlitten A → B | Vorzeichen B:A | p |
+|---:|---:|---:|---:|
+| 0,25 | 11,6 → 11,7 | 16:14 | 0,856 |
+| 0,50 | 12,7 → 10,0 | 14:15 | 1,000 |
+| 0,75 | 19,1 → 8,6 | 22:8 | 0,016 |
+| 1,00 | 13,3 → 9,2 | 21:8 | 0,024 |
+
+Die Engine verliert seltener große Gruppen, genau ab der Dosis, ab der auch
+die Siegrate steigt. Der Mechanismus ist damit besser abgesichert als die
+Wirkung, die er erzeugen soll.
+
+**Das vorab benannte Hauptrisiko tritt nicht ein.** Die Sorge war, die
+Übertragung drücke Q so früh unter `resignQ`, dass rettbare Partien
+abgeschrieben werden — in der Einzelpartie-Analyse fiel Q schon bei Zug 262
+auf −0,87 statt +0,24. Gemessen ergibt sich das Gegenteil: A gibt 39× auf
+(Ø Zug 322, Ø Rückstand 48,7 Punkte), B nur 25× (Ø Zug 323, Ø Rückstand
+54,6 Punkte). B gibt seltener und bei größerem Rückstand auf — plausibel,
+weil B seltener in die Lage gerät, in der Q kollabiert.
+
+Nachmessung auf Dosis 1,00 über 210 Partien läuft. Default bleibt 0.
 
 ## Methodik
 
