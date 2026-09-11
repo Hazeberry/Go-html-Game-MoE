@@ -688,6 +688,52 @@ Gegenprobe derselbe Vergleich ohne Erzwingen — 1758 Abweichungen, der Default
 wirkt also wirklich. Ein Test, der in beide Richtungen prüft, ist einer, dem man
 glauben kann; einer, der nur Gleichheit zeigt, könnte auch nur schlafen.
 
+#### Abschlag *plus* Übertragung: weitgehend redundant
+
+Letzte offene Frage der Serie: bringt `deathDiscount` auf der Übertragungs-Basis
+noch etwas? An der Einzelstellung schließen beide zusammen 97 % der Lücke statt
+77 %. A = `deathTransfer 1,0` + `deathDiscount 0` gegen B = beide auf 1,0,
+Sims/Zug 586:586.
+
+| | B : A | B-Rate | 95 %-CI | p |
+|---|---:|---:|---:|---:|
+| erster Durchgang (120 Partien) | 71:49 | 59,2 % | 49,8–68,0 % | 0,055 |
+| Nachmessung (180 Partien) | 97:83 | 53,9 % | 46,3–61,3 % | 0,33 |
+| **gepoolt (300 Partien)** | **168:132** | **56,0 %** | **50,2–61,7 %** | **0,043** |
+
+Das ist der `midLineWeight`-Verlauf, nicht der `deathTransfer`-Verlauf: die Rate
+**fällt** bei mehr Partien statt zu steigen. Beim Transfer ging sie von 59,2 auf
+65,2 % hoch, hier von 59,2 auf 53,9 % herunter.
+
+Beim Wirkmechanismus noch deutlicher. Erster Durchgang: erlittener größter
+Einzelschlag 13,11 → 9,75, gepaart 69:45, p = 0,031. Nachmessung: 12,49 → 11,98,
+93:83, **p = 0,50**. Über alle 300 Partien 12,74 → 11,09, 162:128, p = 0,053.
+Der Mechanismus-Effekt, der beim reinen Transfer bei p = 1,3 · 10⁻⁵ lag, ist
+hier nicht belegbar.
+
+**Befund: weitgehend redundant.** Ein kleiner Restnutzen ist nicht
+ausgeschlossen — gepoolt p = 0,043 —, aber die untere CI-Grenze liegt bei 50,2 %
+und der Effekt *schrumpft* mit wachsendem n. Das ist die Signatur von Rauschen,
+nicht die eines echten Effekts. Zum Vergleich: der Transfer lieferte bei nur 210
+Partien 65,2 % mit CI 58,4–71,7 %. Default bleibt 0.
+
+#### Der methodische Ertrag: „Prozent der Lücke geschlossen" ist keine Zielgröße
+
+Der Befund reicht über den Parameter hinaus. Die Serie hat eine 610-Punkte-Lücke
+in `evaluateBoard` freigelegt und drei Eingriffe daran gemessen:
+
+| Eingriff | Lücke geschlossen | Siegrate |
+|---|---:|---:|
+| `deathDiscount` allein | 20 % | 54,2 % (n = 120), nicht belegt |
+| `deathTransfer` allein | 77 % | **65,2 %** (n = 210), belegt |
+| beide zusammen | 97 % | 56,0 % (n = 300), im Rauschen |
+
+Die beiden Spalten laufen nicht parallel. Die letzten 20 Prozentpunkte der Lücke
+kosten nichts und bringen nichts. Die Lücke war nie linear in Spielstärke
+umrechenbar — sie war der Wegweiser zur richtigen Ursache, nicht das Maß des
+Erfolgs. Wer eine Bewertungsfunktion nach „wie nah am ehrlichen Wert" optimiert,
+optimiert eine Hilfsgröße.
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im
