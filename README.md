@@ -531,6 +531,152 @@ Der Default bleibt 0. Die Frage abschließend zu entscheiden bräuchte rund
 1500 Partien für einen 54-%-Effekt; das steht in keinem Verhältnis zum
 erwarteten Nutzen.
 
+### Der Sterbe-Abschlag: Ehrlichkeit ist gratis, aber sie repariert nichts
+
+Ausgangspunkt waren zwei Partielogs, in denen große eigene Gruppen plötzlich
+starben. Die Autopsie (Zug 274 der rekonstruierten Partie, alle acht
+Schlagzahlen als Prüfsumme verifiziert) schloss Suchtiefe und Move-Ordering
+aus: von 275 auf 20 000 Simulationen wählt die Engine denselben Zug mit
+demselben Q, und die Crisis-Heuristik feuerte korrekt. Die Ursache liegt in
+`evaluateBoard`, die eine 22er-Kette mit zwei Freiheiten als vollwertiges
+Material zählt — mit Gruppe +78, ohne Gruppe −532.
+
+`deathDiscount` schlägt große Gruppen mit wenigen Freiheiten ab, symmetrisch
+für beide Farben, über eine Rampe 1 / 1 / 0,5 / 0,25 nach Freiheiten. Er greift
+über 254 Stellungen und 4938 Gruppen bei 1,6 % — chirurgisch.
+
+Vier Läufe à 30 Partien, A = 0, Sims/Zug paritätisch 657:657:
+
+| Dosis | B-Siege | B-Rate | 95 %-CI | p (exakt) |
+|---:|---:|---:|---:|---:|
+| 0,25 | 17/30 | 56,7 % | 37,4 – 74,5 % | 0,585 |
+| 0,50 | 16/30 | 53,3 % | 34,3 – 71,7 % | 0,856 |
+| 0,75 | 15/30 | 50,0 % | 31,3 – 68,7 % | 1,000 |
+| 1,00 | 17/30 | 56,7 % | 37,4 – 74,5 % | 0,585 |
+| **gepoolt** | **65/120** | **54,2 %** | **44,8 – 63,3 %** | **0,411** |
+
+Kein Dosis-Trend. Die vorab benannte Sorge — der Abschlag könne rettbare
+Gruppen abschreiben oder die Engine beim Töten passiv machen — tritt nicht ein.
+Im direkten Duell ist der zugefügte Verlust der einen Seite der erlittene der
+anderen, und B fügt *mehr* zu als A (gepaart, n = 120):
+
+| erlitten | A | B | Vorzeichentest |
+|---|---:|---:|---:|
+| größter Einzelschlag | 12,8 | 10,4 | 65:49, p = 0,16 |
+| Gesamtverlust | 32,1 | 29,1 | 68:50, p = 0,12 |
+| Schläge ab 5 Steinen | 1,85 | 1,91 | 48:49, p = 1,00 |
+
+Aufgaben: A gibt 41× auf, B 32×, bei ähnlichem Zug (329 vs. 334) und ähnlichem
+Rückstand (57 vs. 52 Punkte) — kein Frühaufgabe-Schaden.
+
+**Belegt:** der Term macht Q ehrlich (Zug 274: +0,23 → −0,35), ohne
+Spielstärke zu kosten. **Nicht belegt:** ein Gewinn.
+
+**Was er strukturell nicht kann**, und das ist der eigentliche Befund: der
+Abschlag schließt nur ~20 % der Bewertungslücke. Er kann höchstens den
+Eigenwert der Gruppe entfernen (22×5 + 2×3 = 116 Punkte). Die restlichen ~490
+sind der Gefangenen-Bonus, den der *Gegner* beim Schlagen erhält (22 Steine ×
+`captureWeight` 20 = 440). Eine ehrliche Bewertung müsste die Gruppe
+**übertragen**, nicht nur abschlagen. Default 0.
+
+### Die Übertragung: erster Hinweis auf einen echten Gewinn
+
+`deathTransfer` bucht den fehlenden Gefangenen-Bonus: die sterbende Gruppe
+gilt anteilig als bereits geschlagen, über dieselbe Freiheiten-Rampe. Das ist
+kein Gebietsterm — `evaluateBoard` benutzt `estimateArea` nicht, und die
+gemessene Lücke besteht aus Material und Gefangenen, nicht aus Gebiet.
+
+An der rekonstruierten Stellung vor Zug 274 (Zielwert −532, Basis +78):
+Abschlag 1,00 allein schließt 20 %, Übertragung 1,00 allein 77 %, beide
+zusammen **97 %**.
+
+Vier Läufe à 30 Partien, A = 0, `deathDiscount` = 0, Sims/Zug 582:583:
+
+| Dosis | B-Siege | B-Rate | 95 %-CI | p (exakt) |
+|---:|---:|---:|---:|---:|
+| 0,25 | 16/30 | 53,3 % | 34,3–71,7 % | 0,856 |
+| 0,50 | 15/30 | 50,0 % | 31,3–68,7 % | 1,000 |
+| 0,75 | 19/30 | 63,3 % | 43,9–80,1 % | 0,200 |
+| 1,00 | 21/30 | 70,0 % | 50,6–85,3 % | 0,043 |
+| **gepoolt** | **71/120** | **59,2 %** | **49,8–68,0 %** | **0,055** |
+
+**Nicht belegt.** Das gepoolte CI enthält 50 %; die 70 % bei Dosis 1,00 sind
+eine von vier Dosen (Bonferroni p = 0,17); der Trendtest über die Dosis gibt
+z = 1,58, p = 0,11. Der Rauschboden sagt, bei 120 Partien ist erst ab ~59 %
+etwas nachweisbar — der Wert liegt genau auf der Kante. Und `midLineWeight`
+zeigte im ersten Lauf 60 % und fiel über 210 Partien auf 53 %: dieselbe Form.
+
+**Besser belegt ist der Wirkmechanismus.** Der erlittene größte Einzelschlag
+sinkt von 14,2 auf 9,9 Steine, gepaart über 120 Partien 73:45, p = 0,013 —
+und zwar dosisabhängig, im selben Muster wie die Siegrate:
+
+| Dosis | Ø größter erlitten A → B | Vorzeichen B:A | p |
+|---:|---:|---:|---:|
+| 0,25 | 11,6 → 11,7 | 16:14 | 0,856 |
+| 0,50 | 12,7 → 10,0 | 14:15 | 1,000 |
+| 0,75 | 19,1 → 8,6 | 22:8 | 0,016 |
+| 1,00 | 13,3 → 9,2 | 21:8 | 0,024 |
+
+Die Engine verliert seltener große Gruppen, genau ab der Dosis, ab der auch
+die Siegrate steigt. Der Mechanismus ist damit besser abgesichert als die
+Wirkung, die er erzeugen soll.
+
+**Das vorab benannte Hauptrisiko tritt nicht ein.** Die Sorge war, die
+Übertragung drücke Q so früh unter `resignQ`, dass rettbare Partien
+abgeschrieben werden — in der Einzelpartie-Analyse fiel Q schon bei Zug 262
+auf −0,87 statt +0,24. Gemessen ergibt sich das Gegenteil: A gibt 39× auf
+(Ø Zug 322, Ø Rückstand 48,7 Punkte), B nur 25× (Ø Zug 323, Ø Rückstand
+54,6 Punkte). B gibt seltener und bei größerem Rückstand auf — plausibel,
+weil B seltener in die Lage gerät, in der Q kollabiert.
+
+#### Nachmessung auf Dosis 1,00: 210 Partien, der Gewinn hält
+
+Sechs weitere Läufe (Seeds 8200–8205), gepoolt mit Lauf 44. Einzelergebnisse
+70 / 80 / 60 / 70 / 57 / 50 / 70 %. **Kein Lauf unter 50 %.**
+
+| | B : A | B-Rate | 95 %-CI | p (zweiseitig) |
+|---|---:|---:|---:|---:|
+| Dosis 1,00 (210 Partien) | 137:73 | **65,2 %** | **58,4 – 71,7 %** | 1,2 · 10⁻⁵ |
+| alle Dosen (300 Partien) | 187:113 | 62,3 % | 56,6 – 67,8 % | 2,3 · 10⁻⁵ |
+
+Die Regression zur Mitte, die `midLineWeight` entzaubert hat, tritt hier
+nicht ein — die Rate steigt sogar von 59 auf 65 %. Das Konfidenzintervall
+liegt vollständig über 50 %. **Das ist der erste belegte Spielstärkegewinn
+dieses Projekts.**
+
+Der Gruppenverlust folgt in allen drei Maßen, gepaart über 210 Partien:
+
+| erlitten | A | B | Vorzeichentest |
+|---|---:|---:|---:|
+| größter Einzelschlag | 12,9 | 10,3 | 130:68, p = 1,3 · 10⁻⁵ |
+| Gesamtverlust | 34,8 | 27,8 | 135:71, p = 9,7 · 10⁻⁶ |
+| Schläge ab 5 Steinen | 2,36 | 1,60 | 121:55, p = 7,2 · 10⁻⁷ |
+
+Aufgaben: A gibt 78× auf (Ø Zug 324, Ø Rückstand 50,6 Punkte), B nur 29×
+(Ø Zug 335, Ø Rückstand 60,8). Bemerkenswert, weil **A die optimistische
+Bewertung hat** und trotzdem fast dreimal so oft aufgibt — A steht wirklich
+häufiger verloren, es ist kein Schwellenartefakt.
+
+**Einschränkung, und sie gehört dazu:** der Effekt sitzt fast ganz in den
+durch Aufgabe entschiedenen Partien.
+
+| | B-Rate | 95 %-CI | p |
+|---|---:|---:|---:|
+| nur ausgezählte Partien (n = 103) | 57,3 % | 47,2 – 67,0 % | 0,17 |
+| nur Partien mit Aufgabe (n = 107) | 72,9 % | 63,4 – 81,0 % | 2,4 · 10⁻⁶ |
+
+Das passt zum Mechanismus, statt ihm zu widersprechen: der Term greift bei
+1,6 % der Gruppen, nämlich genau dann, wenn eine große Gruppe stirbt. Ruhige
+Partien zählt er aus wie vorher (Ø Endmarge −3,0 Punkte aus A-Sicht); Partien
+mit Katastrophe entscheidet er. **Der Term verhindert Desaster, er verbessert
+nicht das Endspiel.**
+
+Confounds geprüft: Farbbalance exakt 105:105, B gewinnt in beiden Rollen
+(70,5 % als Weiß-Gegner, 60,0 % als Schwarz-Gegner); Sims/Zug 570:571.
+
+Der Default steht weiterhin auf 0 — das ist eine Entscheidung des
+Projektinhabers, kein Nebenprodukt der Messung.
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im
