@@ -503,8 +503,33 @@ allen vier Läufen statt zu steigen — das Gegenrisiko der Vorgänger tritt nic
 auf.
 
 **Nicht belegt:** ein Spielstärke-Gewinn. Das CI enthält 50 %, einseitig
-p = 0,085, und es gibt keinen Dosis-Trend (60/47/60/60 ist flach). Für einen
-echten 57-%-Effekt bräuchte es rund 437 Partien. Der Default bleibt deshalb 0.
+p = 0,085, und es gibt keinen Dosis-Trend (60/47/60/60 ist flach).
+
+#### Nachmessung auf Dosis 60: 210 Partien, Gewinn bleibt unbelegt
+
+Sechs weitere Läufe (Seeds 7200–7205), gepoolt mit dem ersten Lauf dort.
+Einzelergebnisse 60 / 50 / 53 / 47 / 57 / 50 / 57 %:
+
+| | B : A | B-Rate | 95 %-CI | p (zweiseitig) |
+|---|---:|---:|---:|---:|
+| Dosis 60 (210 Partien) | 112:98 | 53,3 % | 46,3 – 60,2 % | 0,37 |
+| alle Dosen (300 Partien) | 162:138 | 54,0 % | 48,2 – 59,7 % | 0,18 |
+
+Die 60 % des ersten Laufs waren überwiegend Rauschen — genau die Regression
+zur Mitte, vor der bei der Einzelzahl gewarnt war. Ein Gewinn ist damit
+weiterhin **nicht belegt**.
+
+Was 300 Partien dagegen fest machen: **der Term schadet nicht.** Das
+Konfidenzintervall liegt vollständig oberhalb der drei gescheiterten Eingriffe
+(harter Deckel 20 %, CI 7,7–38,6; weich k=6 und k=12 je 17 %, CI 5,6–34,7).
+Der Gruppenverlust bleibt günstig: Ø größter Einzelschlag 12,4 → 10,5, B
+kleiner in 111 von 205 entschiedenen Paaren (einseitig p = 0,13 — ein Trend
+ohne Signifikanz, aber in keinem Fall die Verschlechterung, an der die
+Vorgänger gescheitert sind).
+
+Der Default bleibt 0. Die Frage abschließend zu entscheiden bräuchte rund
+1500 Partien für einen 54-%-Effekt; das steht in keinem Verhältnis zum
+erwarteten Nutzen.
 
 ## Methodik
 

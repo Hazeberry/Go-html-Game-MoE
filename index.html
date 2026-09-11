@@ -828,8 +828,27 @@ globalThis.PARAMS = {
          Ausreißer bei 40 spricht für Rauschen). Für einen echten 57-%-Effekt
          bräuchte es rund 437 Partien; mit 120 ist die Frage offen.
 
-     Deshalb bleibt der Default 0. Ein Wert wird erst gesetzt, wenn ein
-     Gewinn belegt ist — nicht, weil ein Punktschätzer über 50 % liegt.
+     NACHGEMESSEN auf Dosis 60, sechs weitere Läufe (Seeds 7200-7205). Gepoolt
+     mit dem ersten Lauf dort: 112:98 über 210 Partien, 53.3 %, 95 %-CI
+     46.3-60.2 %, zweiseitig p = 0.37. Einzelläufe 60/50/53/47/57/50/57 %.
+
+     Der GEWINN BLEIBT UNBELEGT, und die 60 % des ersten Laufs waren
+     überwiegend Rauschen — genau die Regression zur Mitte, vor der die
+     Einzelzahl gewarnt worden war. Über alle vier Dosen zusammen (300 Partien)
+     stehen 162:138, also 54.0 %, CI 48.2-59.7 %, p = 0.18.
+
+     Was 300 Partien dagegen FEST machen: der Term schadet nicht. Das CI liegt
+     vollständig oberhalb der drei gescheiterten Eingriffe (harter Deckel 20 %,
+     CI 7.7-38.6; weich k=6 und k=12 je 17 %, CI 5.6-34.7). Der Gruppenverlust
+     bleibt auf Dosis 60 ebenfalls günstig: Ø größter Einzelschlag 12.4 → 10.5,
+     B kleiner in 111 von 205 entschiedenen Paaren (einseitig p = 0.13, also
+     ein Trend ohne Signifikanz, aber in keinem Fall die Verschlechterung, an
+     der die Vorgänger gescheitert sind).
+
+     Deshalb bleibt der Default 0. Ein Wert wird erst gesetzt, wenn ein Gewinn
+     belegt ist — nicht, weil ein Punktschätzer über 50 % liegt. Wer die Frage
+     abschließen will, braucht rund 1500 Partien für einen 54-%-Effekt; das
+     steht in keinem Verhältnis zum erwarteten Nutzen.
      Bitgenau identisch zum Stand davor über 817177 evaluateMove-Aufrufe. */
   midLineWeight:       0,
   midAtariPenalty:  400,
