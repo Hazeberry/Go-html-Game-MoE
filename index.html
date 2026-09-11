@@ -1243,8 +1243,48 @@ globalThis.PARAMS = {
      die Lage, in der Q kollabiert. Die frühe Q-Ehrlichkeit aus der
      Einzelpartie-Analyse schlägt nicht in Frühaufgabe um.
 
-     Default bleibt 0, bis die Nachmessung auf Dosis 1.00 (Läufe 45-50,
-     Seeds 8200-8205) vorliegt. */
+     NACHMESSUNG auf Dosis 1.00, Läufe 45-50 (Seeds 8200-8205) gepoolt mit
+     Lauf 44 — 210 Partien. Die Regression zur Mitte, die midLineWeight
+     damals entzaubert hat, tritt NICHT ein; die Rate steigt sogar:
+
+       Lauf 44 70.0 % · 45 80.0 % · 46 60.0 % · 47 70.0 %
+       Lauf 48 56.7 % · 49 50.0 % · 50 70.0 %
+
+       DOSIS 1.00   137/210 = 65.2 %   KI 58.4-71.7 %   p = 1.2e-05
+       alle Dosen   187/300 = 62.3 %   KI 56.6-67.8 %   p = 2.3e-05
+
+     Kein Lauf unter 50 %. Das Konfidenzintervall liegt vollständig über
+     50 %. Das ist der erste BELEGTE Spielstärkegewinn dieses Projekts.
+
+     Gruppenverlust, gepaart über 210 Partien, alle drei Maße deutlich:
+
+       erlittener größter Einzelschlag   A 12.9  B 10.3   130:68   p=1.3e-05
+       erlittener Gesamtverlust          A 34.8  B 27.8   135:71   p=9.7e-06
+       erlittene Schläge ab 5 Steinen    A 2.36  B 1.60   121:55   p=7.2e-07
+
+     Aufgaben: A gibt 78× auf (Ø Zug 324, Ø Rückstand 50.6 Punkte), B nur
+     29× (Ø Zug 335, Ø Rückstand 60.8). Bemerkenswert, weil A die
+     OPTIMISTISCHE Bewertung hat und trotzdem fast dreimal so oft aufgibt —
+     A steht also wirklich häufiger verloren, das ist kein Schwellenartefakt.
+
+     EINSCHRÄNKUNG, und sie gehört dazu: der Effekt sitzt fast ganz in den
+     durch Aufgabe entschiedenen Partien.
+
+       nur ausgezählte Partien    59/103 = 57.3 %   KI 47.2-67.0   p = 0.17
+       nur Partien mit Aufgabe    78/107 = 72.9 %   KI 63.4-81.0   p = 2.4e-06
+
+     Das passt zum Mechanismus und ist kein Widerspruch: der Term greift bei
+     1.6 % der Gruppen, nämlich genau dann, wenn eine große Gruppe stirbt.
+     Ruhige Partien ohne Katastrophe zählt er aus wie vorher (57 %, nicht
+     signifikant, Ø Endmarge nur -3.0 Punkte aus A-Sicht). Partien MIT
+     Katastrophe entscheidet er. Der Term verhindert Desaster, er verbessert
+     nicht das Endspiel.
+
+     Farbbalance geprüft: A spielte 105× Schwarz und 105× Weiß, B gewinnt in
+     beiden Rollen (70.5 % bzw. 60.0 %). Sims/Zug 570:571. Kein Confound.
+
+     Default trotzdem 0 — das Setzen eines Defaults ist eine Entscheidung des
+     Projektinhabers, nicht ein Nebenprodukt der Messung. Vorschlag steht. */
   deathTransfer:       0,
   /* Benson-Zugfilter: todgeborene Züge (Stein wäre beweisbar tot) fliegen
      aus der Kandidatenliste; bleibt nichts übrig → passen. Beendet das

@@ -629,7 +629,53 @@ auf −0,87 statt +0,24. Gemessen ergibt sich das Gegenteil: A gibt 39× auf
 54,6 Punkte). B gibt seltener und bei größerem Rückstand auf — plausibel,
 weil B seltener in die Lage gerät, in der Q kollabiert.
 
-Nachmessung auf Dosis 1,00 über 210 Partien läuft. Default bleibt 0.
+#### Nachmessung auf Dosis 1,00: 210 Partien, der Gewinn hält
+
+Sechs weitere Läufe (Seeds 8200–8205), gepoolt mit Lauf 44. Einzelergebnisse
+70 / 80 / 60 / 70 / 57 / 50 / 70 %. **Kein Lauf unter 50 %.**
+
+| | B : A | B-Rate | 95 %-CI | p (zweiseitig) |
+|---|---:|---:|---:|---:|
+| Dosis 1,00 (210 Partien) | 137:73 | **65,2 %** | **58,4 – 71,7 %** | 1,2 · 10⁻⁵ |
+| alle Dosen (300 Partien) | 187:113 | 62,3 % | 56,6 – 67,8 % | 2,3 · 10⁻⁵ |
+
+Die Regression zur Mitte, die `midLineWeight` entzaubert hat, tritt hier
+nicht ein — die Rate steigt sogar von 59 auf 65 %. Das Konfidenzintervall
+liegt vollständig über 50 %. **Das ist der erste belegte Spielstärkegewinn
+dieses Projekts.**
+
+Der Gruppenverlust folgt in allen drei Maßen, gepaart über 210 Partien:
+
+| erlitten | A | B | Vorzeichentest |
+|---|---:|---:|---:|
+| größter Einzelschlag | 12,9 | 10,3 | 130:68, p = 1,3 · 10⁻⁵ |
+| Gesamtverlust | 34,8 | 27,8 | 135:71, p = 9,7 · 10⁻⁶ |
+| Schläge ab 5 Steinen | 2,36 | 1,60 | 121:55, p = 7,2 · 10⁻⁷ |
+
+Aufgaben: A gibt 78× auf (Ø Zug 324, Ø Rückstand 50,6 Punkte), B nur 29×
+(Ø Zug 335, Ø Rückstand 60,8). Bemerkenswert, weil **A die optimistische
+Bewertung hat** und trotzdem fast dreimal so oft aufgibt — A steht wirklich
+häufiger verloren, es ist kein Schwellenartefakt.
+
+**Einschränkung, und sie gehört dazu:** der Effekt sitzt fast ganz in den
+durch Aufgabe entschiedenen Partien.
+
+| | B-Rate | 95 %-CI | p |
+|---|---:|---:|---:|
+| nur ausgezählte Partien (n = 103) | 57,3 % | 47,2 – 67,0 % | 0,17 |
+| nur Partien mit Aufgabe (n = 107) | 72,9 % | 63,4 – 81,0 % | 2,4 · 10⁻⁶ |
+
+Das passt zum Mechanismus, statt ihm zu widersprechen: der Term greift bei
+1,6 % der Gruppen, nämlich genau dann, wenn eine große Gruppe stirbt. Ruhige
+Partien zählt er aus wie vorher (Ø Endmarge −3,0 Punkte aus A-Sicht); Partien
+mit Katastrophe entscheidet er. **Der Term verhindert Desaster, er verbessert
+nicht das Endspiel.**
+
+Confounds geprüft: Farbbalance exakt 105:105, B gewinnt in beiden Rollen
+(70,5 % als Weiß-Gegner, 60,0 % als Schwarz-Gegner); Sims/Zug 570:571.
+
+Der Default steht weiterhin auf 0 — das ist eine Entscheidung des
+Projektinhabers, kein Nebenprodukt der Messung.
 
 ## Methodik
 
