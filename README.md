@@ -825,6 +825,54 @@ addieren, ist ungemessen.
 
 Der Default steht auf 0. Vorschlag: 80.
 
+### Die Hungerzone: eine echte Fehlfunktion, deren Behebung nichts bringt
+
+Eine externe Messreihe (hard gegen easy, Zugzeit und Simulationen je Zug) legte
+eine Fehlfunktion im adaptiven Zeitbudget offen:
+
+| Zug | dt (ms) | Faktor | ms/Sim | Sims |
+|---:|---:|---:|---:|---:|
+| 0 | 1817 | 1,01 | 8,8 | **206** |
+| 160 | 1815 | **1,01** | 12,9 | 141 |
+| 206 | 1859 | **1,03** | 14,3 | **130** |
+| 320 | 3891 | 2,16 | 16,9 | 234 |
+| 360 | 4142 | 2,30 | 11,9 | **349** |
+
+Die Simulationszahl bricht über **Zug 136–238** auf 130 ein, während der
+Skalierungsfaktor dort noch bei 1,03 steht. Die Kompensation kommt eine Phase
+zu spät: bei Zug 320–360 gibt es Faktor 2,2–2,3 und ohnehin wieder 234–349
+Sims. Ursache ist eine Entkopplung — ausgelöst wird über die **Kandidatenzahl**
+(`adaptiveBudgetRefEmpty`, trotz des Namens nicht die freien Felder), teuer
+wird es durch **wachsende Gruppen**: `ms/Sim` steigt ab Zug 0 stetig von 8,8
+auf 14,4.
+
+`refEmpty` heraufzusetzen lässt die Skalierung früher einsetzen. A ist der
+ausgelieferte Default, die Budgets sind aus E[factor] über das gemessene
+Kandidatenprofil abgeleitet (1,326 / 1,478 / 1,642), nicht aus Zeitquotienten.
+
+| Arm | Skalierung ab | B-Siege | Rate | 95 %-CI | p (Bonferroni ×2) |
+|---|---:|---:|---:|---:|---:|
+| B1 `ref 220` @ 224 ms | Zug 137 | 60/120 | **50,0 %** | 40,7–59,3 % | 1,00 (1,00) |
+| B2 `ref 300` @ 202 ms | Zug 62 | 65/120 | 54,2 % | 44,8–63,3 % | 0,41 (0,82) |
+
+**Dass die Behandlung stattfand, ist belegt** — ohne diesen Nachweis wäre das
+Ergebnis nicht deutbar. Anteil der Züge mit Skalierungsfaktor > 1 ab Zug 20:
+A 43,6–45,1 % · B1 63,8–65,4 % · B2 87,1–87,5 %. Vorhergesagt aus dem Profil:
+45 / 62 / 83 %. Phasensplit spät/früh 1,58 → 1,85 → 1,95. Gepoolte Zeitparität
++0,53 % und +1,58 %, beide im Band. Sims paritätisch, Farbbalance 60:60.
+
+**Befund: die Fehlfunktion ist real, das Beheben bringt nichts Messbares.**
+`ref 220` setzt die Skalierung exakt am Beginn der Hungerzone an (Zug 137 gegen
+gemessene 136) und liefert exakt 50,0 %.
+
+**Einschränkung, vorab gerechnet:** 120 Partien je Dosis erlauben einen
+Nachweis erst ab 62,8 % (80 % Power). Ein kleiner Effekt bei B2 ist nicht
+ausgeschlossen; ausgeschlossen ist ein *großer*. Zum Vergleich: `deathTransfer`
+65,2 % über 210 Partien, `midLineWeight` 58,7 % über 300. Einen 54-%-Effekt
+aufzulösen bräuchte rund 1500 Partien.
+
+Der Default bleibt 150.
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im

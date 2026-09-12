@@ -1084,8 +1084,51 @@ globalThis.PARAMS = {
      keine Klippe an einer festen Schwelle. Skalierung folgt daher demselben
      Muster: linearer Anstieg ab adaptiveBudgetRefEmpty freien Feldern bis
      max. adaptiveBudgetMaxFactor bei komplett vollem Brett. */
+  /* KORREKTUR am Kommentar oben: der Parameter heißt emptyCount, IST aber
+     nicht die Zahl freier Felder. mctsPUCT ruft getAdaptiveTimeBudget mit
+     rootScored.length, also der Zahl der KANDIDATENZÜGE nach Zugerzeugung
+     und Benson-Filter. Das verschiebt den Arbeitspunkt erheblich und war der
+     Grund, warum eine erste Instrumentierung 37.5 % statt 7.4 % meldete.
+
+     GEMESSEN, Läufe 75-82 (Commit 957c2c9), beide Arme gegen den Default:
+
+       A  = refEmpty 150 @ 250 ms   (der ausgelieferte Wert)
+       B1 = refEmpty 220 @ 224 ms   60/120 = 50.0 %  KI 40.7-59.3  p = 1.00
+       B2 = refEmpty 300 @ 202 ms   65/120 = 54.2 %  KI 44.8-63.3  p = 0.41
+                                                        (Bonferroni x2: 0.82)
+
+     Die Budgets sind aus E[factor] über das gemessene Kandidatenprofil
+     abgeleitet (1.326 / 1.478 / 1.642), nicht aus Zeitquotienten. Gepoolte
+     Zeitparität +0.53 % und +1.58 %, beide im Band.
+
+     DASS DIE BEHANDLUNG STATTFAND, ist belegt — ohne diesen Nachweis wäre
+     das Ergebnis nicht deutbar. Anteil der Züge mit Skalierungsfaktor > 1
+     ab Zug 20:  A 43.6-45.1 %  ·  B1 63.8-65.4 %  ·  B2 87.1-87.5 %.
+     Vorhergesagt aus dem Profil: 45 / 62 / 83 %. Phasensplit spät/früh
+     A 1.58 → B1 1.85 → B2 1.95. Sims paritätisch, Farbbalance 60:60.
+
+     ANLASS war eine Fehlfunktion, die in einer externen Messreihe sichtbar
+     wurde: die Simulationszahl bricht über Zug 136-238 auf 130 ein (von 206
+     am Anfang), während der Skalierungsfaktor dort noch bei 1.03 steht. Die
+     Kompensation kommt eine Phase zu spät — bei Zug 320-360 gibt es Faktor
+     2.2-2.3 und ohnehin wieder 234-349 Sims. Ursache ist die Entkopplung:
+     ausgelöst wird über die Kandidatenzahl, teuer wird es durch wachsende
+     Gruppen (ms/Sim steigt ab Zug 0 stetig von 8.8 auf 14.4).
+
+     BEFUND: die Fehlfunktion ist real, das Beheben bringt nichts Messbares.
+     refEmpty 220 setzt die Skalierung exakt am Beginn der Hungerzone an
+     (Zug 137 gegen gemessene 136) und liefert exakt 50.0 %.
+
+     EINSCHRÄNKUNG, vorab gerechnet und nicht nachgeschoben: 120 Partien je
+     Dosis erlauben einen Nachweis erst ab 62.8 % (80 % Power). Ein kleiner
+     Effekt bei B2 ist damit nicht ausgeschlossen; ausgeschlossen ist ein
+     GROSSER. Zum Vergleich lieferten deathTransfer 65.2 % über 210 Partien
+     und midLineWeight 58.7 % über 300 — beide deutlich über dem, was hier
+     zu sehen ist. Einen 54-%-Effekt aufzulösen bräuchte rund 1500 Partien.
+
+     Default bleibt 150. */
   adaptiveBudgetEnabled:    1,
-  adaptiveBudgetRefEmpty: 150,    // ab hier beginnt die Zeitverlängerung (Fallback, s.u.)
+  adaptiveBudgetRefEmpty: 150,    // Kandidatenzahl (nicht freie Felder), s.o.
   adaptiveBudgetMaxFactor: 2.5,   // Obergrenze bei leerem Feld-Vorrat (0 frei)
   /* Feedback-Korrektur: freie-Felder-Schätzung traf in einer echten Partie
      mit viel Rand-/Eck-Gefecht nicht zu — bei 229 freien Feldern waren die
