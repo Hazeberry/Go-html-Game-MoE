@@ -734,6 +734,60 @@ umrechenbar — sie war der Wegweiser zur richtigen Ursache, nicht das Maß des
 Erfolgs. Wer eine Bewertungsfunktion nach „wie nah am ehrlichen Wert" optimiert,
 optimiert eine Hilfsgröße.
 
+### Randspiel als Ursache: die Struktur lässt sich ändern, die Stärke nicht
+
+Fünf Partien gegen einen Menschen (alle mit `deathTransfer 1,0`) legten eine
+Synthese nahe: die KI schlägt in fünf Partien **keine einzige** Gruppe ab 5
+Steinen, verliert aber neun — und fünf der neun sind Randgruppen mit 70–100 %
+ihrer Steine auf Linie 1–2. Es sind die späten, spielentscheidenden (Zug 213,
+249, 271, 313, 317, 345). In `3120944b` führt die KI bei Zug 325 mit 20,5
+Punkten, verliert bei Zug 345 eine 16er-Randkette und verliert mit 13,5.
+
+These: `deathTransfer` heilt die *Fehlbewertung* toter Gruppen,
+`midLineWeight` verhindert ihre *Entstehung*. Dafür kam die Randanteil-
+Telemetrie in den Harness.
+
+A = `deathTransfer 1,0` + `midLineWeight 0`, B = plus 40 bzw. 80, je 120
+Partien, Sims/Zug paritätisch.
+
+**Der Eingriff trifft die Struktur, zweifelsfrei:**
+
+| Dosis | Randanteil A → B | gepaart | p |
+|---:|---|---:|---:|
+| 40 | 38,2 % → 32,6 % | 83:37 | 3,2 · 10⁻⁵ |
+| 80 | 40,8 % → 30,1 % | 97:23 | 5,3 · 10⁻¹² |
+
+**Die Spielstärke folgt nicht:**
+
+| Dosis | B-Siege | Rate | 95 %-CI | p (Bonferroni ×2) |
+|---:|---:|---:|---:|---:|
+| 40 | 61/120 | 50,8 % | 41,6–60,1 % | 0,93 (1,00) |
+| 80 | 67/120 | 55,8 % | 46,5–64,9 % | 0,235 (0,47) |
+
+Auch das Zwischenglied trägt kaum: Gruppenverlust bei Dosis 80 nur
+11,78 → 10,79 (p = 0,16); Schläge ab 5 Steinen 2,23 → 1,77 (p = 0,043,
+Bonferroni 0,086). Der Vorteil sitzt zudem ganz in den Aufgabe-Partien — in
+den ausgezählten steht B bei 48,2 %.
+
+**Korrektur einer eigenen Aussage.** Der Rauchtest zur Telemetrie ergab für
+die Baseline 50,7 % und schien damit die 51,0 % aus den Menschpartien zu
+bestätigen — das wurde hier zunächst als Validierung der Diagnose verbucht.
+Zu stark: bei vollem Budget (250 ms, ~550 Sims/Zug) liegt die Baseline bei
+**38–41 %**, der Rauchtest lief mit 60 ms. Die Übereinstimmung hing am
+kleinen Budget.
+
+Das ist selbst ein Befund: **mehr Suche senkt das Randkriechen schon von
+allein** (60 ms: 50,7 % · 250 ms: 38–41 %). Ein Teil der Randneigung ist
+Symptom flacher Suche, nicht des Bewertungsterms. Dazu passt, dass die
+einzige Menschpartie mit sicher hohem Budget den niedrigsten Randanteil aller
+fünf hatte (33,3 %) und der klarste KI-Sieg war.
+
+Nachmessung auf Dosis 80 über 300 Partien läuft. Fällt die Rate Richtung
+50 %, ist der Randanteil als **Ursache entlastet**: die Beobachtung bliebe
+richtig, die kausale Deutung falsch — Randspiel wäre Begleitsymptom. Ein
+Eingriff, der eine Struktur nachweislich ändert, ohne die Spielstärke zu
+bewegen, ist der sauberste Weg, eine Ursachenvermutung zu widerlegen.
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im

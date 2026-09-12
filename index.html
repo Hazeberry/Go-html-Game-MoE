@@ -846,10 +846,51 @@ globalThis.PARAMS = {
      der die Vorgänger gescheitert sind).
 
      Deshalb bleibt der Default 0. Ein Wert wird erst gesetzt, wenn ein Gewinn
-     belegt ist — nicht, weil ein Punktschätzer über 50 % liegt. Wer die Frage
-     abschließen will, braucht rund 1500 Partien für einen 54-%-Effekt; das
-     steht in keinem Verhältnis zum erwarteten Nutzen.
-     Bitgenau identisch zum Stand davor über 817177 evaluateMove-Aufrufe. */
+     belegt ist — nicht, weil ein Punktschätzer über 50 % liegt.
+     Bitgenau identisch zum Stand davor über 817177 evaluateMove-Aufrufe.
+
+     ─────────────────────────────────────────────────────────────────────
+     ZWEITE MESSUNG, auf der deathTransfer-Basis (Läufe 61-68, Commit
+     6d250c4). Anlass war die Auswertung von fünf Partien gegen einen
+     Menschen: fünf von neun sterbenden KI-Gruppen waren Randgruppen
+     (70-100 % ihrer Steine auf Linie 1-2), und es waren die späten,
+     spielentscheidenden. These: Übertragung heilt die FEHLBEWERTUNG toter
+     Gruppen, midLineWeight verhindert ihre ENTSTEHUNG.
+
+     A = deathTransfer 1.0 + midLineWeight 0, B = plus 40 bzw. 80, je 120
+     Partien, Sims/Zug paritätisch (544:545 bis 555:555).
+
+     Der Eingriff TRIFFT DIE STRUKTUR, zweifelsfrei:
+
+       Dosis   Randanteil A → B      gepaart    p
+        40     38.2 % → 32.6 %       83:37      3.2e-05
+        80     40.8 % → 30.1 %       97:23      5.3e-12
+
+     Die SPIELSTÄRKE FOLGT NICHT:
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x2)
+        40     61/120     50.8 %   41.6-60.1 %    0.93  (1.00)
+        80     67/120     55.8 %   46.5-64.9 %    0.235 (0.47)
+
+     Auch das Zwischenglied der Kausalkette trägt kaum: Gruppenverlust bei
+     Dosis 80 nur 11.78 → 10.79 (66:50, p = 0.16), Schläge ab 5 Steinen
+     2.23 → 1.77 (65:43, p = 0.043, Bonferroni 0.086). Der Vorteil sitzt
+     zudem ganz in den Aufgabe-Partien — ausgezählt steht B bei 48.2 %.
+
+     KORREKTUR einer eigenen Aussage: der Rauchtest zur Telemetrie ergab für
+     die Baseline 50.7 % Randanteil und schien damit die 51.0 % aus den
+     Menschpartien zu bestätigen. Das war zu stark. Bei vollem Budget
+     (250 ms, ~550 Sims/Zug) liegt die Baseline bei 38-41 %; der Rauchtest
+     lief mit 60 ms. Die Übereinstimmung hing am kleinen Budget.
+
+     Das ist selbst ein Befund: MEHR SUCHE SENKT DAS RANDKRIECHEN SCHON VON
+     ALLEIN (60 ms: 50.7 % · 250 ms: 38-41 %). Ein Teil der Randneigung ist
+     Symptom flacher Suche, nicht des Bewertungsterms.
+
+     Nachmessung auf Dosis 80 über 300 Partien läuft (Seeds 8700-8705).
+     Fällt die Rate Richtung 50 %, ist der Randanteil als URSACHE entlastet:
+     die Beobachtung aus den Partien bliebe richtig, die kausale Deutung
+     falsch — Randspiel wäre Begleitsymptom, nicht Ursache. Default 0. */
   midLineWeight:       0,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
