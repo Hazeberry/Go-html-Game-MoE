@@ -681,6 +681,8 @@ dies **der erste Parameter dieses Projekts, der aufgrund eines belegten
 Spielstärkegewinns aktiv geschaltet wurde**. Alle Vorgänger — `captureWeight`,
 `openLineWeight`, `midLibCap`, `midLibSoft`, `midLineWeight`, `deathDiscount` —
 blieben auf ihrem neutralen Wert, weil die Messung den Gewinn nicht hergab.
+(`midLineWeight` ist später nachgezogen — siehe unten; zum Zeitpunkt dieser
+Freigabe stand es noch auf 0.)
 
 Abschaltbarkeit geprüft, nicht behauptet: mit `deathTransfer = 0` ist der Stand
 über 6554 `evaluateBoard`-Aufrufe **bitgenau identisch** zum Vorstand. Als
@@ -823,7 +825,55 @@ Was das nicht aufhebt: mehr Suche senkt den Randanteil ebenfalls (60 ms
 50,7 %, 250 ms 38–41 %). Beide Wege wirken auf dieselbe Schwäche; ob sie sich
 addieren, ist ungemessen.
 
-Der Default steht auf 0. Vorschlag: 80.
+#### Default gesetzt: `midLineWeight = 80`
+
+Vom Projektinhaber freigegeben. Damit ist dies der **zweite** Parameter des
+Projekts, der aufgrund eines belegten Spielstärkegewinns aktiv geschaltet
+wurde — und der erste, bei dem nicht nur die Wirkung, sondern auch die
+**Ursache** durchgemessen ist: bei `deathTransfer` steht die Siegrate allein,
+hier steht die Kette Randanteil → Gruppenverlust → Siegrate.
+
+**Abschaltbarkeit geprüft, beide Richtungen**, 28 802 `evalMidgame`-Aufrufe je
+Variante über 60 Stellungen von 10 bis 305 Steinen:
+
+| Richtung | Ergebnis |
+|---|---|
+| auf 0 zurückgesetzt | **bitgenau identisch** zum Vorstand, 0 Abweichungen |
+| auf dem Default 80 | Differenz **genau** der Linienabschlag, 0 Abweichungen |
+| | Linie 1: −80 · Linie 2: −40 · ab Linie 3: exakt 0 |
+| | wirksam auf 10 714 von 28 802 Zügen = 37,2 % |
+
+Die 37,2 % sind keine Eigenschaft des Parameters, sondern der Geometrie: auf
+19×19 liegen 136 der 361 Punkte auf Linie 1–2, also 37,7 %. Die Messung trifft
+den Erwartungswert — der Abschlag greift auf allen Randpunkten und auf keinem
+anderen.
+
+Zwei Dinge gingen beim ersten Anlauf der Probe schief und stehen deshalb hier.
+`evalMidgame` endet auf `s + Math.random() * 4`, einem Rauschterm zur
+Zugstreuung; ohne deterministisch gesetzten Generator vergleicht die Probe
+Rauschen statt Bewertung, und der erste Durchlauf meldete prompt 100 %
+Abweichung. Und Bit-Gleichheit ist nur ab Linie 3 die richtige Forderung: auf
+Linie 1–2 verschiebt der zusätzliche Summand die Rundung der Gleitkommasumme um
+ein ULP (größte beobachtete Abweichung 2,3 · 10⁻¹³). Dort Bit-Gleichheit zu
+verlangen hieße, Rundung für einen Fehler zu halten — der zweite Durchlauf
+meldete 1580 „Abweichungen", von denen keine eine war.
+
+**Was der Default nicht trägt**, ausdrücklich: alles Gemessene ist Selfplay. Der
+Anlass dieser ganzen Spur war gerade, dass ein Selfplay-Gewinn gegen einen
+Menschen verpuffen kann, wenn beide Seiten dieselbe Schwäche teilen — genau so
+war es bei `deathTransfer` (65 % im Selfplay, gegen einen Menschen
+unauffällig). Hier ist das Risiko geringer, weil der Term auf die *Entstehung*
+des Randkriechens zielt und der Mensch diese Struktur nicht hat (Randanteil
+20,7 % gegen 51,0 %). Geringer ist aber nicht gemessen; der Beleg gegen einen
+Menschen fehlt und wird nicht behauptet.
+
+**Vorbehalt für bestehende Installationen:** `dashSave` serialisiert das ganze
+`PARAMS`-Objekt, `dashLoad` schreibt jeden Schlüssel zurück. Wer im Dashboard je
+„Speichern" gedrückt hat, hat `midLineWeight: 0` in `localStorage`
+festgeschrieben und bekommt den neuen Default **nicht**, bis er „Zurücksetzen"
+drückt. Das ist Absicht der Speicherfunktion — eine gespeicherte Konfiguration
+soll nicht von einem Update überschrieben werden —, heißt aber: der neue Default
+wirkt nur für frische Profile und nach einem Reset.
 
 ### Die Hungerzone: eine echte Fehlfunktion, deren Behebung nichts bringt
 

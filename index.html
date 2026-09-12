@@ -925,9 +925,61 @@ globalThis.PARAMS = {
      50.7 %, 250 ms 38-41 %). Beide Wege wirken auf dieselbe Schwäche; ob sie
      sich addieren, ist ungemessen.
 
-     Default bleibt 0 — das Setzen ist eine Entscheidung des
-     Projektinhabers, nicht ein Nebenprodukt der Messung. Vorschlag: 80. */
-  midLineWeight:       0,
+     ─────────────────────────────────────────────────────────────────────
+     DEFAULT AUF 80 GESETZT (Entscheidung des Projektinhabers, nach der
+     Nachmessung). Zweiter Parameter im Projekt, der auf belegter
+     Spielstärke aktiviert wird — nach deathTransfer, und mit der besseren
+     Beweislage: bei deathTransfer ist die Wirkung gemessen, hier auch die
+     URSACHE, über die drei Glieder oben.
+
+     Was den Default trägt: 58.7 % über 300 Partien (p = 0.0032), die
+     Nachmessung allein 60.6 % auf disjunkten Seeds, monotone Dosis-Wirkung
+     40 → 50.8 % und 80 → 58.7 %, und der gesenkte Randanteil als
+     Mechanismus statt als Korrelat.
+
+     Was er NICHT trägt, ausdrücklich: alles Gemessene ist Selfplay. Der
+     Anlass dieser Spur war gerade, dass ein Selfplay-Gewinn gegen einen
+     Menschen verpuffen kann, wenn beide Seiten dieselbe Schwäche teilen —
+     so war es bei deathTransfer (65 % Selfplay, gegen einen Menschen
+     unauffällig). Hier ist das Risiko geringer, weil der Term auf die
+     ENTSTEHUNG des Randkriechens zielt und der Mensch diese Struktur nicht
+     hat (Randanteil 20.7 % gegen 51.0 %), aber geringer ist nicht gemessen.
+     Der Beleg gegen einen Menschen fehlt und wird auch nicht behauptet.
+
+     ABSCHALTBARKEIT geprüft, beide Richtungen, 28802 evalMidgame-Aufrufe je
+     Variante über 60 Stellungen von 10 bis 305 Steinen:
+
+       auf 0 zurückgesetzt   BITGLEICH zum Stand vor der Änderung, 0 Abweichungen
+       auf dem Default 80    Differenz GENAU der Linienabschlag, 0 Abweichungen
+                             dte 0: -80 · dte 1: -40 · dte ab 2: exakt 0
+                             wirksam auf 10714 von 28802 Zügen = 37.2 %
+
+     Die 37.2 % sind keine Eigenschaft des Parameters, sondern der Geometrie:
+     auf 19x19 liegen 136 der 361 Punkte auf Linie 1-2, also 37.7 %. Die
+     Messung trifft den Erwartungswert — der Abschlag greift auf allen
+     Randpunkten und auf keinem anderen.
+
+     Zur Messmethode zwei Dinge, die beim ersten Anlauf schiefgingen und
+     deshalb hier stehen: evalMidgame endet auf `s + Math.random() * 4`, ein
+     Rauschterm zur Zugstreuung. Ohne deterministisch gesetzten Generator
+     vergleicht die Probe Rauschen, nicht Bewertung — der erste Durchlauf
+     meldete 100 % Abweichung. Und ab dte 2 wird Bit-Gleichheit verlangt, auf
+     Linie 1-2 dagegen nur Toleranz (größte beobachtete Abweichung 2.3e-13):
+     ein zusätzlicher Summand verschiebt die Rundung einer Gleitkommasumme um
+     ein ULP. Bit-Gleichheit dort zu fordern hieße, Rundung für einen Fehler
+     zu halten.
+
+     Der Default beißt also, und er beißt ausschließlich dort, wo er soll.
+
+     VORBEHALT für bestehende Installationen: dashSave serialisiert das ganze
+     PARAMS-Objekt, dashLoad schreibt jeden Schlüssel zurück. Wer im
+     Dashboard je „Speichern" gedrückt hat, hat midLineWeight 0 in
+     localStorage festgeschrieben und bekommt den neuen Default NICHT — bis
+     er „Zurücksetzen" drückt. Das ist Absicht der Speicherfunktion (eine
+     gespeicherte Konfiguration soll nicht von einem Update überschrieben
+     werden), aber es heißt: der neue Default wirkt nur für frische Profile
+     und nach einem Reset. */
+  midLineWeight:      80,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
   midRescueAtari:   350,
