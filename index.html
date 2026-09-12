@@ -1547,8 +1547,17 @@ function getAdaptiveTimeBudget(emptyCount) {
 /* Diagnosezähler zu getAdaptiveTimeBudget. Nur lesen und zurücksetzen. */
 let _bodenGriff = 0;
 function leseBodenGriff(reset) { const v = _bodenGriff; if (reset) _bodenGriff = 0; return v; }
-let _letzterFaktor = 1, _letztesArgument = -1;
-function leseFaktor() { return {faktor: _letzterFaktor, arg: _letztesArgument}; }
+let _letzterFaktor = null, _letztesArgument = -1;
+/* Verbrauchend lesen. Sonst liefert ein Zug, der die Funktion gar nicht ruft
+   (Pass, Aufgabe, Pfade ohne MCTS), den Wert der VORIGEN Farbe zurueck — im
+   A/B wandert damit der Faktor des einen Arms in die Statistik des anderen.
+   Gemessen: Arm A meldete max 2.11 bei maxFactor 1.0, wo nur exakt 1 moeglich
+   ist. Null heisst "dieser Zug hat nicht skaliert" und wird nicht gezaehlt. */
+function leseFaktor() {
+  const v = {faktor: _letzterFaktor, arg: _letztesArgument};
+  _letzterFaktor = null; _letztesArgument = -1;
+  return v;
+}
 
 /* ── Globale Scratchpads (einmalig alloziert, nie GC'd) ──── */
 const _legalScratch   = new Uint8Array(BOARD_SIZE);

@@ -999,7 +999,8 @@ const driver = `
          in die schweren Stellungen geschoben. */
       st[color].zeiten.push(dt);
       if (leseBodenGriff(true) > 0) st[color].boden++;
-      { const f = leseFaktor(); st[color].faktoren.push(f.faktor); st[color].args.push(f.arg); }
+      { const f = leseFaktor();
+        if (f.faktor !== null) { st[color].faktoren.push(f.faktor); st[color].args.push(f.arg); } }
 
       ms.root = _mctsSavedRoot; ms.hope = _hopelessStreak; ms.dead = _allDeadStreak;
       ms.msProSim = _lastMsPerSim;
