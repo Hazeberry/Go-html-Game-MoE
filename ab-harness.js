@@ -1017,6 +1017,22 @@ const driver = `
       }
     }
 
+    /* RANDANTEIL der Endstellung je Farbe: Anteil der eigenen Steine auf
+       Linie 1 und 2. Instrument fuer die Randspiel-These — der Term
+       midLineWeight soll genau diese Zahl senken, und ohne sie waere nur
+       messbar OB ein Eingriff wirkt, nicht ob er die URSACHE trifft.
+       Gemessen auf dem ROHEN Endbrett, ohne Totsteinentfernung: gefragt ist,
+       wo die KI gebaut hat, nicht wie es ausgezaehlt wird.
+       Referenz aus vier Partien gegen einen Menschen: KI 51.0 %, Mensch
+       20.7 % — siehe den Randspiel-Abschnitt der README. */
+    const rand = {1: {steine: 0, linie12: 0}, 2: {steine: 0, linie12: 0}};
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      const c = board[i]; if (!c) continue;
+      rand[c].steine++;
+      const x = xOf(i), y = yOf(i);
+      if (Math.min(x, y, SIZE - 1 - x, SIZE - 1 - y) <= 1) rand[c].linie12++;
+    }
+
     const score  = finalScore(board, caps, AB.komi);
     const score0 = finalScore(board, caps, 0);
     let winner, winner0;
@@ -1042,7 +1058,7 @@ const driver = `
             phaseSwitches: modState[1].phaseSwitches + modState[2].phaseSwitches,
             q50: {1: qAt(st[1].q, .5), 2: qAt(st[2].q, .5)},
             q75: {1: qAt(st[1].q, .75), 2: qAt(st[2].q, .75)},
-            verlust};
+            verlust, rand};
   }
 
   /* Neutrale Eröffnung für gepaarte Partien: Default-Parameter,
@@ -1134,6 +1150,10 @@ const driver = `
       agg.verlust[key].ab5 += v.ab5;
       agg.verlust[key].summe += v.summe;
     }
+    for (const [key, col] of [['A', aColor], ['B', bColor]]) {
+      const d = r.rand[col];
+      if (d.steine) agg.rand[key].push(100 * d.linie12 / d.steine);
+    }
     agg.anomalies += r.anomalies;
     agg.phaseSwitches += r.phaseSwitches || 0;
     return {aWon, aWon0};
@@ -1158,6 +1178,10 @@ const driver = `
       /* Gruppenverluste NACH KONFIGURATION, nicht nach Farbe — die Frage ist,
          ob der Parameter das Sterben eigener Gruppen verursacht. */
       verlust: {A: {max: [], ab5: 0, summe: 0}, B: {max: [], ab5: 0, summe: 0}},
+      /* Randanteil NACH KONFIGURATION. Pro Partie ein Prozentwert je Seite,
+         damit der gepaarte Vergleich moeglich bleibt (beide Seiten spielen
+         dieselbe Partie) statt nur ein Gesamtmittel. */
+      rand: {A: [], B: []},
       anomalies: 0
     };
   }
@@ -1190,6 +1214,19 @@ const driver = `
     console.log('GRUPPENVERLUST je Konfiguration (erlittene Schläge):  '
       + 'A Ø größter ' + fmt(mean(agg.verlust.A.max), 1) + ' · ' + agg.verlust.A.ab5 + '× ab 5 Steinen · ' + agg.verlust.A.summe + ' gesamt'
       + '   |   B Ø größter ' + fmt(mean(agg.verlust.B.max), 1) + ' · ' + agg.verlust.B.ab5 + '× ab 5 Steinen · ' + agg.verlust.B.summe + ' gesamt');
+    {
+      /* Gepaarter Vergleich: in wie vielen Partien liegt B unter A. Das
+         Mittel allein verdeckt, ob der Effekt durchgaengig ist. */
+      let bKleiner = 0, aKleiner = 0;
+      for (let i = 0; i < agg.rand.A.length; i++) {
+        if (agg.rand.B[i] < agg.rand.A[i]) bKleiner++;
+        else if (agg.rand.B[i] > agg.rand.A[i]) aKleiner++;
+      }
+      console.log('RANDANTEIL Endstellung (Steine auf Linie 1-2):  '
+        + 'A ' + fmt(mean(agg.rand.A), 1) + ' %   |   B ' + fmt(mean(agg.rand.B), 1) + ' %'
+        + '   ·  B kleiner in ' + bKleiner + ':' + aKleiner + ' Partien'
+        + '   [Referenz: Mensch 20.7 %]');
+    }
     console.log('PASS: erster Ø Zug S ' + fmt(mean(agg.passFirst[1]), 0) + ' / W ' + fmt(mean(agg.passFirst[2]), 0)
       + ' · gesamt S ' + agg.passTotal[1] + ' / W ' + agg.passTotal[2]
       + ' · Benson S ' + agg.passBenson[1] + ' / W ' + agg.passBenson[2]);
@@ -1324,6 +1361,7 @@ const driver = `
         pass: {S: r.passSt[1], W: r.passSt[2]},
         q50: {S: r.q50[1], W: r.q50[2]}, q75: {S: r.q75[1], W: r.q75[2]},
         verlust: {A: r.verlust[aColor], B: r.verlust[aColor === 1 ? 2 : 1]},
+        rand: {A: r.rand[aColor], B: r.rand[aColor === 1 ? 2 : 1]},
         simsA: r.st[aColor].moves ? Math.round(r.st[aColor].sims / r.st[aColor].moves) : 0,
         simsB: r.st[aColor === 1 ? 2 : 1].moves
           ? Math.round(r.st[aColor === 1 ? 2 : 1].sims / r.st[aColor === 1 ? 2 : 1].moves) : 0,
