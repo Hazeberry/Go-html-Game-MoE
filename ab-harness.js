@@ -1076,6 +1076,18 @@ const driver = `
                  top10: summe ? 100 * top / summe : 0,
                  maxMs: sortiert[0],
                  bodenAnteil: 100 * st[c].boden / z.length,
+                 /* Phasensplit der Rechenzeit: Frueh- gegen Spaetspiel. Der
+                    Top10-Anteil sagt, ob es Spitzen gibt; das hier sagt, ob
+                    die Zeit systematisch nach hinten wandert. Je Farbe zieht
+                    ein Index i den Partiezug 2i bzw. 2i+1, deshalb die
+                    Halbierung der Grenzen. */
+                 phase: (() => {
+                   const frueh = z.slice(0, 50), spaet = z.slice(100);
+                   if (!frueh.length || !spaet.length) return null;
+                   const m = a => a.reduce((x, y) => x + y, 0) / a.length;
+                   const f = m(frueh), sp = m(spaet);
+                   return {frueh: f, spaet: sp, quot: f ? sp / f : null};
+                 })(),
                  /* Faktor-Waechter: Histogramm ueber die Zuege AB ZUG 20, plus
                     Anteil der Zuege mit Faktor > 1. Bleibt der bei 0, ist der
                     Hebel nicht verdrahtet und jede weitere Zahl wertlos. */
@@ -1228,6 +1240,7 @@ const driver = `
       agg.zeit[key].max.push(z.maxMs);
       agg.zeit[key].boden.push(z.bodenAnteil);
       if (z.faktor) agg.zeit[key].faktor.push(z.faktor);
+      if (z.phase) agg.zeit[key].phase.push(z.phase);
     }
     agg.anomalies += r.anomalies;
     agg.phaseSwitches += r.phaseSwitches || 0;
@@ -1259,8 +1272,8 @@ const driver = `
       rand: {A: [], B: []},
       /* Zeitverteilung nach Konfiguration: Gesamtzeit je Partie (muss bei
          Paritaet gleich sein) und Top10-Anteil (die eigentliche Messgroesse). */
-      zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: []},
-             B: {gesamt: [], top10: [], max: [], boden: [], faktor: []}},
+      zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: []},
+             B: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: []}},
       anomalies: 0
     };
   }
@@ -1318,6 +1331,16 @@ const driver = `
           + 'A ' + fmt(mean(A.top10), 1) + ' %   |   B ' + fmt(mean(B.top10), 1) + ' %'
           + '   ·  laengster Zug Ø A ' + fmt(mean(A.max), 0) + ' ms / B ' + fmt(mean(B.max), 0) + ' ms'
           + '   [gleichverteilt waeren 10 %]');
+        if (A.phase.length && B.phase.length) {
+          const m = (arr, k) => arr.reduce((a, x) => a + x[k], 0) / arr.length;
+          const fA = m(A.phase, 'frueh'), sA = m(A.phase, 'spaet');
+          const fB = m(B.phase, 'frueh'), sB = m(B.phase, 'spaet');
+          const qA = fA ? sA / fA : 0, qB = fB ? sB / fB : 0;
+          console.log('ZEIT Phasensplit (Ø ms/Zug, eigene Zuege 1-50 gegen ab 100):  '
+            + 'A frueh ' + fmt(fA, 0) + ' / spaet ' + fmt(sA, 0) + '  (Quotient ' + fmt(qA, 2) + ')'
+            + '   |   B frueh ' + fmt(fB, 0) + ' / spaet ' + fmt(sB, 0) + '  (Quotient ' + fmt(qB, 2) + ')'
+            + '   ·  Verschiebung ' + (qA ? fmt(100 * (qB / qA - 1), 0) : '?') + ' %');
+        }
         for (const [lbl, arr] of [['A', A.faktor], ['B', B.faktor]]) {
           if (!arr.length) continue;
           const eimer = [0, 0, 0, 0, 0];
