@@ -979,21 +979,13 @@ const driver = `
 
       /* GREIFT DER MIN-SIMS-BODEN UEBERHAUPT? Ohne diese Zaehlung waere ein
          Nullergebnis nicht deutbar: nicht geholfen, oder nie ausgeloest?
-         Gemessen mit der ECHTEN Engine-Funktion, einmal mit und einmal ohne
-         Boden — kein Nachbau der Formel. Der Boden greift genau dann, wenn
-         der letzte Zug weniger Simulationen schaffte als das Ziel. */
-      let bodenGriff = 0;
-      if (PARAMS.adaptiveBudgetEnabled >= 1 && PARAMS.adaptiveBudgetTargetMinSims > 0) {
-        let frei = 0;
-        for (let i = 0; i < BOARD_SIZE; i++) if (!board[i]) frei++;
-        const mit = getAdaptiveTimeBudget(frei);
-        const ziel = PARAMS.adaptiveBudgetTargetMinSims;
-        PARAMS.adaptiveBudgetTargetMinSims = 0;
-        const ohne = getAdaptiveTimeBudget(frei);
-        PARAMS.adaptiveBudgetTargetMinSims = ziel;
-        if (mit > ohne) bodenGriff = 1;
-      }
-      st[color].boden += bodenGriff;
+         Der Zaehler sitzt in getAdaptiveTimeBudget selbst. Eine frueere
+         Fassung rief die Funktion hier mit der Zahl der FREIEN FELDER auf und
+         verglich mit/ohne Boden — das war falsch: mctsPUCT uebergibt die Zahl
+         der KANDIDATENZUEGE. Die Nachbildung mass damit einen anderen
+         Arbeitspunkt als die Engine und lieferte 37,5 % statt des wahren
+         Werts. Jetzt wird dort gezaehlt, wo entschieden wird. */
+      leseBodenGriff(true);
 
       const t0 = Date.now();
       netFrisch = false;
@@ -1006,6 +998,7 @@ const driver = `
          gleich sein. Gefragt ist die Streuung: gleichmaessig verteilt gegen
          in die schweren Stellungen geschoben. */
       st[color].zeiten.push(dt);
+      if (leseBodenGriff(true) > 0) st[color].boden++;
 
       ms.root = _mctsSavedRoot; ms.hope = _hopelessStreak; ms.dead = _allDeadStreak;
       ms.msProSim = _lastMsPerSim;

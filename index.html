@@ -1520,10 +1520,23 @@ function getAdaptiveTimeBudget(emptyCount) {
   if (_lastMsPerSim !== null) {
     const neededForTarget = _lastMsPerSim * PARAMS.adaptiveBudgetTargetMinSims;
     const cap = PARAMS.aiTimeBudget * PARAMS.adaptiveBudgetMaxFactor;
-    budget = Math.max(budget, Math.min(neededForTarget, cap));
+    const erhoeht = Math.max(budget, Math.min(neededForTarget, cap));
+    /* Zähler, rein diagnostisch: hat der Min-Sims-Boden das Budget wirklich
+       angehoben? Ein A/B über die ZEITVERTEILUNG ist ohne diese Zahl nicht
+       deutbar — ein Nullergebnis könnte heißen "hilft nicht" oder "hat nie
+       gegriffen". Muss HIER stehen und nicht im Harness: der Aufrufer kennt
+       das Argument nicht, mit dem die Funktion tatsächlich gerufen wird
+       (mctsPUCT übergibt die Kandidatenzahl, nicht die freien Felder).
+       Verändert keinen Rückgabewert. */
+    if (erhoeht > budget) _bodenGriff++;
+    budget = erhoeht;
   }
   return Math.round(budget);
 }
+
+/* Diagnosezähler zu getAdaptiveTimeBudget. Nur lesen und zurücksetzen. */
+let _bodenGriff = 0;
+function leseBodenGriff(reset) { const v = _bodenGriff; if (reset) _bodenGriff = 0; return v; }
 
 /* ── Globale Scratchpads (einmalig alloziert, nie GC'd) ──── */
 const _legalScratch   = new Uint8Array(BOARD_SIZE);
