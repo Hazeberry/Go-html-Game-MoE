@@ -932,8 +932,8 @@ const driver = `
     const modState = {1: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null},
                       2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null}};
     const st = {
-      1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0},
-      2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0}
+      1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: []},
+      2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: []}
     };
     /* Gruppenverluste je Farbe: groesster Einzelschlag, den DIESE Farbe
        erlitten hat, plus die Zahl der Verluste ab 5 Steinen. Instrument fuer
@@ -999,6 +999,7 @@ const driver = `
          in die schweren Stellungen geschoben. */
       st[color].zeiten.push(dt);
       if (leseBodenGriff(true) > 0) st[color].boden++;
+      { const f = leseFaktor(); st[color].faktoren.push(f.faktor); st[color].args.push(f.arg); }
 
       ms.root = _mctsSavedRoot; ms.hope = _hopelessStreak; ms.dead = _allDeadStreak;
       ms.msProSim = _lastMsPerSim;
@@ -1074,7 +1075,28 @@ const driver = `
       zeit[c] = {gesamtMs: summe, zuege: z.length,
                  top10: summe ? 100 * top / summe : 0,
                  maxMs: sortiert[0],
-                 bodenAnteil: 100 * st[c].boden / z.length};
+                 bodenAnteil: 100 * st[c].boden / z.length,
+                 /* Faktor-Waechter: Histogramm ueber die Zuege AB ZUG 20, plus
+                    Anteil der Zuege mit Faktor > 1. Bleibt der bei 0, ist der
+                    Hebel nicht verdrahtet und jede weitere Zahl wertlos. */
+                 faktor: (() => {
+                   const f = st[c].faktoren.slice(10);   // je Farbe = ab Zug ~20
+                   if (!f.length) return null;
+                   const b = [0, 0, 0, 0, 0];
+                   for (const v of f) {
+                     if (v <= 1.0001) b[0]++;
+                     else if (v < 1.25) b[1]++;
+                     else if (v < 1.5) b[2]++;
+                     else if (v < 2.0) b[3]++;
+                     else b[4]++;
+                   }
+                   return {n: f.length, eimer: b,
+                           ueber1: 100 * (f.length - b[0]) / f.length,
+                           mittel: f.reduce((a, x) => a + x, 0) / f.length,
+                           max: Math.max(...f),
+                           argMin: Math.min(...st[c].args.slice(10)),
+                           argMax: Math.max(...st[c].args.slice(10))};
+                 })()};
     }
 
     const score  = finalScore(board, caps, AB.komi);
@@ -1205,6 +1227,7 @@ const driver = `
       agg.zeit[key].top10.push(z.top10);
       agg.zeit[key].max.push(z.maxMs);
       agg.zeit[key].boden.push(z.bodenAnteil);
+      if (z.faktor) agg.zeit[key].faktor.push(z.faktor);
     }
     agg.anomalies += r.anomalies;
     agg.phaseSwitches += r.phaseSwitches || 0;
@@ -1236,8 +1259,8 @@ const driver = `
       rand: {A: [], B: []},
       /* Zeitverteilung nach Konfiguration: Gesamtzeit je Partie (muss bei
          Paritaet gleich sein) und Top10-Anteil (die eigentliche Messgroesse). */
-      zeit: {A: {gesamt: [], top10: [], max: [], boden: []},
-             B: {gesamt: [], top10: [], max: [], boden: []}},
+      zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: []},
+             B: {gesamt: [], top10: [], max: [], boden: [], faktor: []}},
       anomalies: 0
     };
   }
@@ -1295,6 +1318,23 @@ const driver = `
           + 'A ' + fmt(mean(A.top10), 1) + ' %   |   B ' + fmt(mean(B.top10), 1) + ' %'
           + '   ·  laengster Zug Ø A ' + fmt(mean(A.max), 0) + ' ms / B ' + fmt(mean(B.max), 0) + ' ms'
           + '   [gleichverteilt waeren 10 %]');
+        for (const [lbl, arr] of [['A', A.faktor], ['B', B.faktor]]) {
+          if (!arr.length) continue;
+          const eimer = [0, 0, 0, 0, 0];
+          let n = 0, sum = 0, mx = 0, aMin = 1e9, aMax = -1;
+          for (const f of arr) {
+            for (let i = 0; i < 5; i++) eimer[i] += f.eimer[i];
+            n += f.n; sum += f.mittel * f.n; mx = Math.max(mx, f.max);
+            aMin = Math.min(aMin, f.argMin); aMax = Math.max(aMax, f.argMax);
+          }
+          const proz = eimer.map(e => (100 * e / n).toFixed(1) + ' %');
+          console.log('FAKTOR-WAECHTER ' + lbl + ' (ab Zug 20, n=' + n + ' Zuege):  '
+            + 'Ø ' + (sum / n).toFixed(3) + ' · max ' + mx.toFixed(2)
+            + ' · ueber 1 bei ' + (100 * (n - eimer[0]) / n).toFixed(1) + ' %'
+            + '   [=1: ' + proz[0] + ' · <1.25: ' + proz[1] + ' · <1.5: ' + proz[2]
+            + ' · <2.0: ' + proz[3] + ' · >=2.0: ' + proz[4] + ']'
+            + '   Argument (Kandidatenzahl) ' + aMin + '-' + aMax);
+        }
         const bA = mean(A.boden), bB = mean(B.boden);
         console.log('MIN-SIMS-BODEN griff bei:  A ' + fmt(bA, 1) + ' %   |   B ' + fmt(bB, 1) + ' % der Zuege'
           + (Math.max(bA, bB) < 1
