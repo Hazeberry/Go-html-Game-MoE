@@ -1111,8 +1111,46 @@ globalThis.PARAMS = {
      (57 vs. 52 Punkte) — kein Frühaufgabe-Schaden.
 
      Fazit: der Term macht Q ehrlich, ohne Spielstärke zu kosten, und die
-     strukturelle Lücke bleibt (nur ~20 % geschlossen, siehe oben). Solange
-     nichts nachweislich gewonnen ist, bleibt Default 0. */
+     strukturelle Lücke bleibt (nur ~20 % geschlossen, siehe oben).
+
+     ZWEITE MESSUNG, diesmal AUF der Übertragung (Läufe 51-60, Commit
+     83354bd): A = deathTransfer 1.0 + deathDiscount 0 gegen
+     B = deathTransfer 1.0 + deathDiscount 1.0, 300 Partien, Seeds
+     8300-8303 und 8400-8405, Sims/Zug 586:586.
+
+     Die Frage war nicht "wirkt der Abschlag", sondern ob er auf der
+     Übertragungs-Basis noch etwas beiträgt oder denselben Fehler nur
+     redundant abfängt. An der Einzelstellung schließen beide zusammen 97 %
+     der Lücke statt 77 %.
+
+       erster Durchgang (51-54)   71/120 = 59.2 %   KI 49.8-68.0   p = 0.055
+       Nachmessung      (55-60)   97/180 = 53.9 %   KI 46.3-61.3   p = 0.33
+       gepoolt          (51-60)  168/300 = 56.0 %   KI 50.2-61.7   p = 0.043
+
+     Das ist der midLineWeight-Verlauf, nicht der deathTransfer-Verlauf: die
+     Rate FÄLLT bei mehr Partien statt zu steigen. Beim Transfer ging sie von
+     59.2 auf 65.2 % hoch, hier von 59.2 auf 53.9 % herunter.
+
+     Noch deutlicher beim Wirkmechanismus. Im ersten Durchgang sank der
+     erlittene größte Einzelschlag 13.11 → 9.75, gepaart 69:45, p = 0.031.
+     In der Nachmessung: 12.49 → 11.98, gepaart 93:83, p = 0.50. Über alle
+     300 Partien 12.74 → 11.09, 162:128, p = 0.053. Der Mechanismus-Effekt,
+     der beim reinen Transfer bei p = 1.3e-05 lag, ist hier nicht belegbar.
+
+     BEFUND: weitgehend redundant. Ein kleiner Restnutzen ist nicht
+     ausgeschlossen — gepoolt p = 0.043 —, aber die untere KI-Grenze liegt
+     bei 50.2 %, und der Effekt SCHRUMPFT mit wachsendem n. Das ist die
+     Signatur von Rauschen, nicht die eines echten Effekts. Zum Vergleich:
+     der Transfer lieferte bei nur 210 Partien 65.2 % mit KI 58.4-71.7.
+
+     METHODISCHER BEFUND, der über diesen Parameter hinausgeht: "Prozent der
+     Bewertungslücke an der Einzelstellung geschlossen" ist als Zielgröße
+     UNBRAUCHBAR. Der Transfer schließt 77 % und bringt +15 Prozentpunkte
+     Siegrate. Die letzten 20 Prozentpunkte der Lücke draufzulegen bringt
+     nichts Nachweisbares. Die Lücke war nie linear in Spielstärke
+     umrechenbar; sie war nur der Wegweiser zur richtigen Ursache.
+
+     Default bleibt 0. */
   deathDiscount:       0,
   deathDiscountSize:   6,
   /* deathTransfer — die ÜBERTRAGUNG, zweite Hälfte des Sterbe-Abschlags.
