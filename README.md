@@ -734,6 +734,145 @@ umrechenbar — sie war der Wegweiser zur richtigen Ursache, nicht das Maß des
 Erfolgs. Wer eine Bewertungsfunktion nach „wie nah am ehrlichen Wert" optimiert,
 optimiert eine Hilfsgröße.
 
+### Randspiel als Ursache: die Struktur lässt sich ändern, die Stärke nicht
+
+Fünf Partien gegen einen Menschen (alle mit `deathTransfer 1,0`) legten eine
+Synthese nahe: die KI schlägt in fünf Partien **keine einzige** Gruppe ab 5
+Steinen, verliert aber neun — und fünf der neun sind Randgruppen mit 70–100 %
+ihrer Steine auf Linie 1–2. Es sind die späten, spielentscheidenden (Zug 213,
+249, 271, 313, 317, 345). In `3120944b` führt die KI bei Zug 325 mit 20,5
+Punkten, verliert bei Zug 345 eine 16er-Randkette und verliert mit 13,5.
+
+These: `deathTransfer` heilt die *Fehlbewertung* toter Gruppen,
+`midLineWeight` verhindert ihre *Entstehung*. Dafür kam die Randanteil-
+Telemetrie in den Harness.
+
+A = `deathTransfer 1,0` + `midLineWeight 0`, B = plus 40 bzw. 80, je 120
+Partien, Sims/Zug paritätisch.
+
+**Der Eingriff trifft die Struktur, zweifelsfrei:**
+
+| Dosis | Randanteil A → B | gepaart | p |
+|---:|---|---:|---:|
+| 40 | 38,2 % → 32,6 % | 83:37 | 3,2 · 10⁻⁵ |
+| 80 | 40,8 % → 30,1 % | 97:23 | 5,3 · 10⁻¹² |
+
+**Die Spielstärke folgt nicht:**
+
+| Dosis | B-Siege | Rate | 95 %-CI | p (Bonferroni ×2) |
+|---:|---:|---:|---:|---:|
+| 40 | 61/120 | 50,8 % | 41,6–60,1 % | 0,93 (1,00) |
+| 80 | 67/120 | 55,8 % | 46,5–64,9 % | 0,235 (0,47) |
+
+Auch das Zwischenglied trägt kaum: Gruppenverlust bei Dosis 80 nur
+11,78 → 10,79 (p = 0,16); Schläge ab 5 Steinen 2,23 → 1,77 (p = 0,043,
+Bonferroni 0,086). Der Vorteil sitzt zudem ganz in den Aufgabe-Partien — in
+den ausgezählten steht B bei 48,2 %.
+
+**Korrektur einer eigenen Aussage.** Der Rauchtest zur Telemetrie ergab für
+die Baseline 50,7 % und schien damit die 51,0 % aus den Menschpartien zu
+bestätigen — das wurde hier zunächst als Validierung der Diagnose verbucht.
+Zu stark: bei vollem Budget (250 ms, ~550 Sims/Zug) liegt die Baseline bei
+**38–41 %**, der Rauchtest lief mit 60 ms. Die Übereinstimmung hing am
+kleinen Budget.
+
+Das ist selbst ein Befund: **mehr Suche senkt das Randkriechen schon von
+allein** (60 ms: 50,7 % · 250 ms: 38–41 %). Ein Teil der Randneigung ist
+Symptom flacher Suche, nicht des Bewertungsterms. Dazu passt, dass die
+einzige Menschpartie mit sicher hohem Budget den niedrigsten Randanteil aller
+fünf hatte (33,3 %) und der klarste KI-Sieg war.
+
+#### Nachmessung auf Dosis 80: die Kette schließt sich
+
+Erwartet war Regression zur Mitte. Eingetreten ist das Gegenteil:
+
+| | B : A | B-Rate | 95 %-CI | p |
+|---|---:|---:|---:|---:|
+| erster Durchgang (120) | 67:53 | 55,8 % | 46,5–64,9 % | 0,235 |
+| Nachmessung (180) | 109:71 | **60,6 %** | **53,0–67,7 %** | 0,0057 |
+| gepoolt (300) | 176:124 | 58,7 % | 52,9–64,3 % | 0,0032 |
+
+Die unabhängige Zahl ist die **Nachmessung allein: 60,6 %**. Der gepoolte Wert
+enthält den ersten Durchgang, der gerade wegen seines Anscheins zur
+Nachmessung ausgewählt wurde, und ist dadurch leicht nach oben verzerrt. Beide
+liegen vollständig über 50 %.
+
+**Alle drei Glieder der Kausalkette sind belegt:**
+
+| Glied | A → B | gepaart | p |
+|---|---|---:|---:|
+| Randanteil | 41,5 % → 29,8 % | 245:55 | 8,8 · 10⁻³⁰ |
+| größter Einzelschlag | 13,19 → 10,69 | 180:111 | 6,2 · 10⁻⁵ |
+| Gesamtverlust | 35,53 → 29,36 | 179:119 | 6,1 · 10⁻⁴ |
+| Schläge ab 5 Steinen | 2,33 → 1,71 | 160:93 | 3,0 · 10⁻⁵ |
+| **Siegrate** | | **58,7 %** | **0,0032** |
+
+Die Dosis-Wirkung stützt die Kausalität zusätzlich: Gewicht 40 senkt den
+Randanteil um 5,6 Punkte und bringt 50,8 %; Gewicht 80 senkt ihn um 11,7
+Punkte und bringt 58,7 %. Aufgaben A 101× / B 66×. Sims 552:553,
+Farbbalance exakt 150:150.
+
+**Revidiert** wird damit die Einschätzung nach dem ersten Durchgang, die
+Synthese stehe schlecht. Sie war verfrüht: 120 Partien konnten zwischen
+55,8 % als Rauschen und als echtem Effekt nicht unterscheiden, und die
+Vermutung fiel auf die falsche Seite. Der Befund aus den Menschpartien —
+Randgruppen sterben, und sie entscheiden die Partien — ist nicht nur richtig
+beobachtet, sondern auch richtig kausal gedeutet.
+
+Was das nicht aufhebt: mehr Suche senkt den Randanteil ebenfalls (60 ms
+50,7 %, 250 ms 38–41 %). Beide Wege wirken auf dieselbe Schwäche; ob sie sich
+addieren, ist ungemessen.
+
+Der Default steht auf 0. Vorschlag: 80.
+
+### Die Hungerzone: eine echte Fehlfunktion, deren Behebung nichts bringt
+
+Eine externe Messreihe (hard gegen easy, Zugzeit und Simulationen je Zug) legte
+eine Fehlfunktion im adaptiven Zeitbudget offen:
+
+| Zug | dt (ms) | Faktor | ms/Sim | Sims |
+|---:|---:|---:|---:|---:|
+| 0 | 1817 | 1,01 | 8,8 | **206** |
+| 160 | 1815 | **1,01** | 12,9 | 141 |
+| 206 | 1859 | **1,03** | 14,3 | **130** |
+| 320 | 3891 | 2,16 | 16,9 | 234 |
+| 360 | 4142 | 2,30 | 11,9 | **349** |
+
+Die Simulationszahl bricht über **Zug 136–238** auf 130 ein, während der
+Skalierungsfaktor dort noch bei 1,03 steht. Die Kompensation kommt eine Phase
+zu spät: bei Zug 320–360 gibt es Faktor 2,2–2,3 und ohnehin wieder 234–349
+Sims. Ursache ist eine Entkopplung — ausgelöst wird über die **Kandidatenzahl**
+(`adaptiveBudgetRefEmpty`, trotz des Namens nicht die freien Felder), teuer
+wird es durch **wachsende Gruppen**: `ms/Sim` steigt ab Zug 0 stetig von 8,8
+auf 14,4.
+
+`refEmpty` heraufzusetzen lässt die Skalierung früher einsetzen. A ist der
+ausgelieferte Default, die Budgets sind aus E[factor] über das gemessene
+Kandidatenprofil abgeleitet (1,326 / 1,478 / 1,642), nicht aus Zeitquotienten.
+
+| Arm | Skalierung ab | B-Siege | Rate | 95 %-CI | p (Bonferroni ×2) |
+|---|---:|---:|---:|---:|---:|
+| B1 `ref 220` @ 224 ms | Zug 137 | 60/120 | **50,0 %** | 40,7–59,3 % | 1,00 (1,00) |
+| B2 `ref 300` @ 202 ms | Zug 62 | 65/120 | 54,2 % | 44,8–63,3 % | 0,41 (0,82) |
+
+**Dass die Behandlung stattfand, ist belegt** — ohne diesen Nachweis wäre das
+Ergebnis nicht deutbar. Anteil der Züge mit Skalierungsfaktor > 1 ab Zug 20:
+A 43,6–45,1 % · B1 63,8–65,4 % · B2 87,1–87,5 %. Vorhergesagt aus dem Profil:
+45 / 62 / 83 %. Phasensplit spät/früh 1,58 → 1,85 → 1,95. Gepoolte Zeitparität
++0,53 % und +1,58 %, beide im Band. Sims paritätisch, Farbbalance 60:60.
+
+**Befund: die Fehlfunktion ist real, das Beheben bringt nichts Messbares.**
+`ref 220` setzt die Skalierung exakt am Beginn der Hungerzone an (Zug 137 gegen
+gemessene 136) und liefert exakt 50,0 %.
+
+**Einschränkung, vorab gerechnet:** 120 Partien je Dosis erlauben einen
+Nachweis erst ab 62,8 % (80 % Power). Ein kleiner Effekt bei B2 ist nicht
+ausgeschlossen; ausgeschlossen ist ein *großer*. Zum Vergleich: `deathTransfer`
+65,2 % über 210 Partien, `midLineWeight` 58,7 % über 300. Einen 54-%-Effekt
+aufzulösen bräuchte rund 1500 Partien.
+
+Der Default bleibt 150.
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im

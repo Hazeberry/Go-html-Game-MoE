@@ -929,11 +929,11 @@ const driver = `
            konnte praktisch nicht regulär auslösen
        Jetzt: vor jedem Zug den Zustand der ziehenden Farbe einspielen,
        danach zurückschreiben — beide Farben verhalten sich wie im Spiel. */
-    const modState = {1: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0},
-                      2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0}};
+    const modState = {1: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null},
+                      2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null}};
     const st = {
-      1: {moves: 0, sims: 0, timeMs: 0, q: []},
-      2: {moves: 0, sims: 0, timeMs: 0, q: []}
+      1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: []},
+      2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: []}
     };
     /* Gruppenverluste je Farbe: groesster Einzelschlag, den DIESE Farbe
        erlitten hat, plus die Zahl der Verluste ab 5 Steinen. Instrument fuer
@@ -969,6 +969,23 @@ const driver = `
       if (ms.sig !== null && ms.sig !== sig) { ms.root = null; ms.phaseSwitches++; }
       ms.sig = sig;
       _mctsSavedRoot = ms.root; _hopelessStreak = ms.hope; _allDeadStreak = ms.dead;
+      /* _lastMsPerSim gehoert in dieselbe Liste wie die drei darueber: es ist
+         eine Modul-Variable, und der adaptive Zeitbudget-Zweig liest sie. Ohne
+         Trennung wuerde ein langsamer Zug der EINEN Konfiguration das Budget
+         der ANDEREN anheben — ein A/B ueber Zeitverteilung waere damit
+         wertlos. Bei adaptiveBudgetEnabled=0 (Default des Harness) ist der
+         Zweig tot und die Zeile wirkungslos. */
+      _lastMsPerSim = ms.msProSim;
+
+      /* GREIFT DER MIN-SIMS-BODEN UEBERHAUPT? Ohne diese Zaehlung waere ein
+         Nullergebnis nicht deutbar: nicht geholfen, oder nie ausgeloest?
+         Der Zaehler sitzt in getAdaptiveTimeBudget selbst. Eine frueere
+         Fassung rief die Funktion hier mit der Zahl der FREIEN FELDER auf und
+         verglich mit/ohne Boden — das war falsch: mctsPUCT uebergibt die Zahl
+         der KANDIDATENZUEGE. Die Nachbildung mass damit einen anderen
+         Arbeitspunkt als die Engine und lieferte 37,5 % statt des wahren
+         Werts. Jetzt wird dort gezaehlt, wo entschieden wird. */
+      leseBodenGriff(true);
 
       const t0 = Date.now();
       netFrisch = false;
@@ -976,8 +993,17 @@ const driver = `
                             mc, 'hard', 1, ko.point, lastIdx);
       const dt = Date.now() - t0;
       if (netFrisch && policyNet._netBlend > 0) netGeblendet++;
+      /* Zugzeiten sammeln. Bei einem Test ueber die VERTEILUNG der Rechenzeit
+         ist der Mittelwert allein nutzlos — er soll ja zwischen den Armen
+         gleich sein. Gefragt ist die Streuung: gleichmaessig verteilt gegen
+         in die schweren Stellungen geschoben. */
+      st[color].zeiten.push(dt);
+      if (leseBodenGriff(true) > 0) st[color].boden++;
+      { const f = leseFaktor();
+        if (f.faktor !== null) { st[color].faktoren.push(f.faktor); st[color].args.push(f.arg); } }
 
       ms.root = _mctsSavedRoot; ms.hope = _hopelessStreak; ms.dead = _allDeadStreak;
+      ms.msProSim = _lastMsPerSim;
       const s = st[color]; s.moves++; s.timeMs += dt;
 
       if (res.info) {
@@ -1017,6 +1043,75 @@ const driver = `
       }
     }
 
+    /* RANDANTEIL der Endstellung je Farbe: Anteil der eigenen Steine auf
+       Linie 1 und 2. Instrument fuer die Randspiel-These — der Term
+       midLineWeight soll genau diese Zahl senken, und ohne sie waere nur
+       messbar OB ein Eingriff wirkt, nicht ob er die URSACHE trifft.
+       Gemessen auf dem ROHEN Endbrett, ohne Totsteinentfernung: gefragt ist,
+       wo die KI gebaut hat, nicht wie es ausgezaehlt wird.
+       Referenz aus vier Partien gegen einen Menschen: KI 51.0 %, Mensch
+       20.7 % — siehe den Randspiel-Abschnitt der README. */
+    const rand = {1: {steine: 0, linie12: 0}, 2: {steine: 0, linie12: 0}};
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      const c = board[i]; if (!c) continue;
+      rand[c].steine++;
+      const x = xOf(i), y = yOf(i);
+      if (Math.min(x, y, SIZE - 1 - x, SIZE - 1 - y) <= 1) rand[c].linie12++;
+    }
+
+    /* ZEITVERTEILUNG je Farbe. Gesamtzeit sagt WIE VIEL gerechnet wurde,
+       der Top10-Anteil sagt WIE es verteilt war: welcher Anteil der
+       Gesamtzeit auf das langsamste Zehntel der Zuege entfaellt. Gleichverteilt
+       waeren das 10 %; je hoeher, desto staerker in die schweren Stellungen
+       geschoben. Genau die Groesse, um die es beim Test ueber Verteilung statt
+       Menge geht — der Mittelwert soll dort ja gerade gleich sein. */
+    const zeit = {1: null, 2: null};
+    for (const c of [1, 2]) {
+      const z = st[c].zeiten;
+      if (!z.length) continue;
+      const sortiert = [...z].sort((a, b) => b - a);
+      const k = Math.max(1, Math.round(z.length * 0.1));
+      const summe = z.reduce((a, b) => a + b, 0);
+      const top = sortiert.slice(0, k).reduce((a, b) => a + b, 0);
+      zeit[c] = {gesamtMs: summe, zuege: z.length,
+                 top10: summe ? 100 * top / summe : 0,
+                 maxMs: sortiert[0],
+                 bodenAnteil: 100 * st[c].boden / z.length,
+                 /* Phasensplit der Rechenzeit: Frueh- gegen Spaetspiel. Der
+                    Top10-Anteil sagt, ob es Spitzen gibt; das hier sagt, ob
+                    die Zeit systematisch nach hinten wandert. Je Farbe zieht
+                    ein Index i den Partiezug 2i bzw. 2i+1, deshalb die
+                    Halbierung der Grenzen. */
+                 phase: (() => {
+                   const frueh = z.slice(0, 50), spaet = z.slice(100);
+                   if (!frueh.length || !spaet.length) return null;
+                   const m = a => a.reduce((x, y) => x + y, 0) / a.length;
+                   const f = m(frueh), sp = m(spaet);
+                   return {frueh: f, spaet: sp, quot: f ? sp / f : null};
+                 })(),
+                 /* Faktor-Waechter: Histogramm ueber die Zuege AB ZUG 20, plus
+                    Anteil der Zuege mit Faktor > 1. Bleibt der bei 0, ist der
+                    Hebel nicht verdrahtet und jede weitere Zahl wertlos. */
+                 faktor: (() => {
+                   const f = st[c].faktoren.slice(10);   // je Farbe = ab Zug ~20
+                   if (!f.length) return null;
+                   const b = [0, 0, 0, 0, 0];
+                   for (const v of f) {
+                     if (v <= 1.0001) b[0]++;
+                     else if (v < 1.25) b[1]++;
+                     else if (v < 1.5) b[2]++;
+                     else if (v < 2.0) b[3]++;
+                     else b[4]++;
+                   }
+                   return {n: f.length, eimer: b,
+                           ueber1: 100 * (f.length - b[0]) / f.length,
+                           mittel: f.reduce((a, x) => a + x, 0) / f.length,
+                           max: Math.max(...f),
+                           argMin: Math.min(...st[c].args.slice(10)),
+                           argMax: Math.max(...st[c].args.slice(10))};
+                 })()};
+    }
+
     const score  = finalScore(board, caps, AB.komi);
     const score0 = finalScore(board, caps, 0);
     let winner, winner0;
@@ -1042,7 +1137,7 @@ const driver = `
             phaseSwitches: modState[1].phaseSwitches + modState[2].phaseSwitches,
             q50: {1: qAt(st[1].q, .5), 2: qAt(st[2].q, .5)},
             q75: {1: qAt(st[1].q, .75), 2: qAt(st[2].q, .75)},
-            verlust};
+            verlust, rand, zeit};
   }
 
   /* Neutrale Eröffnung für gepaarte Partien: Default-Parameter,
@@ -1134,6 +1229,20 @@ const driver = `
       agg.verlust[key].ab5 += v.ab5;
       agg.verlust[key].summe += v.summe;
     }
+    for (const [key, col] of [['A', aColor], ['B', bColor]]) {
+      const d = r.rand[col];
+      if (d.steine) agg.rand[key].push(100 * d.linie12 / d.steine);
+    }
+    for (const [key, col] of [['A', aColor], ['B', bColor]]) {
+      const z = r.zeit[col];
+      if (!z) continue;
+      agg.zeit[key].gesamt.push(z.gesamtMs / 1000);
+      agg.zeit[key].top10.push(z.top10);
+      agg.zeit[key].max.push(z.maxMs);
+      agg.zeit[key].boden.push(z.bodenAnteil);
+      if (z.faktor) agg.zeit[key].faktor.push(z.faktor);
+      if (z.phase) agg.zeit[key].phase.push(z.phase);
+    }
     agg.anomalies += r.anomalies;
     agg.phaseSwitches += r.phaseSwitches || 0;
     return {aWon, aWon0};
@@ -1158,6 +1267,14 @@ const driver = `
       /* Gruppenverluste NACH KONFIGURATION, nicht nach Farbe — die Frage ist,
          ob der Parameter das Sterben eigener Gruppen verursacht. */
       verlust: {A: {max: [], ab5: 0, summe: 0}, B: {max: [], ab5: 0, summe: 0}},
+      /* Randanteil NACH KONFIGURATION. Pro Partie ein Prozentwert je Seite,
+         damit der gepaarte Vergleich moeglich bleibt (beide Seiten spielen
+         dieselbe Partie) statt nur ein Gesamtmittel. */
+      rand: {A: [], B: []},
+      /* Zeitverteilung nach Konfiguration: Gesamtzeit je Partie (muss bei
+         Paritaet gleich sein) und Top10-Anteil (die eigentliche Messgroesse). */
+      zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: []},
+             B: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: []}},
       anomalies: 0
     };
   }
@@ -1190,6 +1307,65 @@ const driver = `
     console.log('GRUPPENVERLUST je Konfiguration (erlittene Schläge):  '
       + 'A Ø größter ' + fmt(mean(agg.verlust.A.max), 1) + ' · ' + agg.verlust.A.ab5 + '× ab 5 Steinen · ' + agg.verlust.A.summe + ' gesamt'
       + '   |   B Ø größter ' + fmt(mean(agg.verlust.B.max), 1) + ' · ' + agg.verlust.B.ab5 + '× ab 5 Steinen · ' + agg.verlust.B.summe + ' gesamt');
+    {
+      /* Gepaarter Vergleich: in wie vielen Partien liegt B unter A. Das
+         Mittel allein verdeckt, ob der Effekt durchgaengig ist. */
+      let bKleiner = 0, aKleiner = 0;
+      for (let i = 0; i < agg.rand.A.length; i++) {
+        if (agg.rand.B[i] < agg.rand.A[i]) bKleiner++;
+        else if (agg.rand.B[i] > agg.rand.A[i]) aKleiner++;
+      }
+      console.log('RANDANTEIL Endstellung (Steine auf Linie 1-2):  '
+        + 'A ' + fmt(mean(agg.rand.A), 1) + ' %   |   B ' + fmt(mean(agg.rand.B), 1) + ' %'
+        + '   ·  B kleiner in ' + bKleiner + ':' + aKleiner + ' Partien'
+        + '   [Referenz: Mensch 20.7 %]');
+    }
+    {
+      const A = agg.zeit.A, B = agg.zeit.B;
+      if (A.gesamt.length) {
+        const gA = mean(A.gesamt), gB = mean(B.gesamt);
+        const abw = gA ? 100 * (gB - gA) / gA : 0;
+        console.log('ZEIT gesamt je Partie:  A ' + fmt(gA, 1) + ' s   |   B ' + fmt(gB, 1) + ' s'
+          + '   ·  Abweichung ' + (abw >= 0 ? '+' : '') + fmt(abw, 1) + ' %'
+          + (Math.abs(abw) <= 2 ? '  [Paritaet]' : '  [KEINE PARITAET — Vergleich misst auch Rechenmenge]'));
+        console.log('ZEIT Verteilung (Anteil der Gesamtzeit auf dem langsamsten Zehntel der Zuege):  '
+          + 'A ' + fmt(mean(A.top10), 1) + ' %   |   B ' + fmt(mean(B.top10), 1) + ' %'
+          + '   ·  laengster Zug Ø A ' + fmt(mean(A.max), 0) + ' ms / B ' + fmt(mean(B.max), 0) + ' ms'
+          + '   [gleichverteilt waeren 10 %]');
+        if (A.phase.length && B.phase.length) {
+          const m = (arr, k) => arr.reduce((a, x) => a + x[k], 0) / arr.length;
+          const fA = m(A.phase, 'frueh'), sA = m(A.phase, 'spaet');
+          const fB = m(B.phase, 'frueh'), sB = m(B.phase, 'spaet');
+          const qA = fA ? sA / fA : 0, qB = fB ? sB / fB : 0;
+          console.log('ZEIT Phasensplit (Ø ms/Zug, eigene Zuege 1-50 gegen ab 100):  '
+            + 'A frueh ' + fmt(fA, 0) + ' / spaet ' + fmt(sA, 0) + '  (Quotient ' + fmt(qA, 2) + ')'
+            + '   |   B frueh ' + fmt(fB, 0) + ' / spaet ' + fmt(sB, 0) + '  (Quotient ' + fmt(qB, 2) + ')'
+            + '   ·  Verschiebung ' + (qA ? fmt(100 * (qB / qA - 1), 0) : '?') + ' %');
+        }
+        for (const [lbl, arr] of [['A', A.faktor], ['B', B.faktor]]) {
+          if (!arr.length) continue;
+          const eimer = [0, 0, 0, 0, 0];
+          let n = 0, sum = 0, mx = 0, aMin = 1e9, aMax = -1;
+          for (const f of arr) {
+            for (let i = 0; i < 5; i++) eimer[i] += f.eimer[i];
+            n += f.n; sum += f.mittel * f.n; mx = Math.max(mx, f.max);
+            aMin = Math.min(aMin, f.argMin); aMax = Math.max(aMax, f.argMax);
+          }
+          const proz = eimer.map(e => (100 * e / n).toFixed(1) + ' %');
+          console.log('FAKTOR-WAECHTER ' + lbl + ' (ab Zug 20, n=' + n + ' Zuege):  '
+            + 'Ø ' + (sum / n).toFixed(3) + ' · max ' + mx.toFixed(2)
+            + ' · ueber 1 bei ' + (100 * (n - eimer[0]) / n).toFixed(1) + ' %'
+            + '   [=1: ' + proz[0] + ' · <1.25: ' + proz[1] + ' · <1.5: ' + proz[2]
+            + ' · <2.0: ' + proz[3] + ' · >=2.0: ' + proz[4] + ']'
+            + '   Argument (Kandidatenzahl) ' + aMin + '-' + aMax);
+        }
+        const bA = mean(A.boden), bB = mean(B.boden);
+        console.log('MIN-SIMS-BODEN griff bei:  A ' + fmt(bA, 1) + ' %   |   B ' + fmt(bB, 1) + ' % der Zuege'
+          + (Math.max(bA, bB) < 1
+             ? '   — BEHANDLUNG FAND PRAKTISCH NICHT STATT, ein Nullergebnis waere bedeutungslos'
+             : ''));
+      }
+    }
     console.log('PASS: erster Ø Zug S ' + fmt(mean(agg.passFirst[1]), 0) + ' / W ' + fmt(mean(agg.passFirst[2]), 0)
       + ' · gesamt S ' + agg.passTotal[1] + ' / W ' + agg.passTotal[2]
       + ' · Benson S ' + agg.passBenson[1] + ' / W ' + agg.passBenson[2]);
@@ -1324,6 +1500,8 @@ const driver = `
         pass: {S: r.passSt[1], W: r.passSt[2]},
         q50: {S: r.q50[1], W: r.q50[2]}, q75: {S: r.q75[1], W: r.q75[2]},
         verlust: {A: r.verlust[aColor], B: r.verlust[aColor === 1 ? 2 : 1]},
+        rand: {A: r.rand[aColor], B: r.rand[aColor === 1 ? 2 : 1]},
+        zeit: {A: r.zeit[aColor], B: r.zeit[aColor === 1 ? 2 : 1]},
         simsA: r.st[aColor].moves ? Math.round(r.st[aColor].sims / r.st[aColor].moves) : 0,
         simsB: r.st[aColor === 1 ? 2 : 1].moves
           ? Math.round(r.st[aColor === 1 ? 2 : 1].sims / r.st[aColor === 1 ? 2 : 1].moves) : 0,

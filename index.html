@@ -846,10 +846,87 @@ globalThis.PARAMS = {
      der die Vorgänger gescheitert sind).
 
      Deshalb bleibt der Default 0. Ein Wert wird erst gesetzt, wenn ein Gewinn
-     belegt ist — nicht, weil ein Punktschätzer über 50 % liegt. Wer die Frage
-     abschließen will, braucht rund 1500 Partien für einen 54-%-Effekt; das
-     steht in keinem Verhältnis zum erwarteten Nutzen.
-     Bitgenau identisch zum Stand davor über 817177 evaluateMove-Aufrufe. */
+     belegt ist — nicht, weil ein Punktschätzer über 50 % liegt.
+     Bitgenau identisch zum Stand davor über 817177 evaluateMove-Aufrufe.
+
+     ─────────────────────────────────────────────────────────────────────
+     ZWEITE MESSUNG, auf der deathTransfer-Basis (Läufe 61-68, Commit
+     6d250c4). Anlass war die Auswertung von fünf Partien gegen einen
+     Menschen: fünf von neun sterbenden KI-Gruppen waren Randgruppen
+     (70-100 % ihrer Steine auf Linie 1-2), und es waren die späten,
+     spielentscheidenden. These: Übertragung heilt die FEHLBEWERTUNG toter
+     Gruppen, midLineWeight verhindert ihre ENTSTEHUNG.
+
+     A = deathTransfer 1.0 + midLineWeight 0, B = plus 40 bzw. 80, je 120
+     Partien, Sims/Zug paritätisch (544:545 bis 555:555).
+
+     Der Eingriff TRIFFT DIE STRUKTUR, zweifelsfrei:
+
+       Dosis   Randanteil A → B      gepaart    p
+        40     38.2 % → 32.6 %       83:37      3.2e-05
+        80     40.8 % → 30.1 %       97:23      5.3e-12
+
+     Die SPIELSTÄRKE FOLGT NICHT:
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x2)
+        40     61/120     50.8 %   41.6-60.1 %    0.93  (1.00)
+        80     67/120     55.8 %   46.5-64.9 %    0.235 (0.47)
+
+     Auch das Zwischenglied der Kausalkette trägt kaum: Gruppenverlust bei
+     Dosis 80 nur 11.78 → 10.79 (66:50, p = 0.16), Schläge ab 5 Steinen
+     2.23 → 1.77 (65:43, p = 0.043, Bonferroni 0.086). Der Vorteil sitzt
+     zudem ganz in den Aufgabe-Partien — ausgezählt steht B bei 48.2 %.
+
+     KORREKTUR einer eigenen Aussage: der Rauchtest zur Telemetrie ergab für
+     die Baseline 50.7 % Randanteil und schien damit die 51.0 % aus den
+     Menschpartien zu bestätigen. Das war zu stark. Bei vollem Budget
+     (250 ms, ~550 Sims/Zug) liegt die Baseline bei 38-41 %; der Rauchtest
+     lief mit 60 ms. Die Übereinstimmung hing am kleinen Budget.
+
+     Das ist selbst ein Befund: MEHR SUCHE SENKT DAS RANDKRIECHEN SCHON VON
+     ALLEIN (60 ms: 50.7 % · 250 ms: 38-41 %). Ein Teil der Randneigung ist
+     Symptom flacher Suche, nicht des Bewertungsterms.
+
+     NACHMESSUNG auf Dosis 80, Läufe 69-74 (Seeds 8700-8705). Die Erwartung
+     war Regression zur Mitte; eingetreten ist das Gegenteil:
+
+       erster Durchgang (65-68)   67/120 = 55.8 %   KI 46.5-64.9   p = 0.235
+       Nachmessung      (69-74)  109/180 = 60.6 %   KI 53.0-67.7   p = 0.0057
+       gepoolt          (65-74)  176/300 = 58.7 %   KI 52.9-64.3   p = 0.0032
+
+     Die unabhängige Zahl ist die NACHMESSUNG ALLEIN: 60.6 %. Der gepoolte
+     Wert enthält den ersten Durchgang, der ja gerade wegen seines Anscheins
+     zur Nachmessung ausgewählt wurde — er ist dadurch leicht nach oben
+     verzerrt. Beide liegen vollständig über 50 %, das Ergebnis hängt also
+     nicht an dieser Feinheit.
+
+     Damit ist die KAUSALKETTE GESCHLOSSEN, alle drei Glieder belegt:
+
+       Randanteil        41.5 % → 29.8 %   245:55    p = 8.8e-30
+       größter Schlag    13.19  → 10.69    180:111   p = 6.2e-05
+       Gesamtverlust     35.53  → 29.36    179:119   p = 6.1e-04
+       Schläge ab 5      2.33   → 1.71     160:93    p = 3.0e-05
+       Siegrate                  58.7 %              p = 0.0032
+
+     Dosis-Wirkung stützt die Kausalität zusätzlich: Gewicht 40 senkt den
+     Randanteil um 5.6 Punkte und bringt 50.8 %, Gewicht 80 senkt ihn um
+     11.7 Punkte und bringt 58.7 %. Aufgaben: A 101×, B 66×.
+
+     Confounds geprüft: Sims/Zug 552:553, Farbbalance exakt 150:150.
+
+     REVIDIERT wird damit die Einschätzung nach dem ersten Durchgang, die
+     Synthese stehe schlecht. Sie war verfrüht: 120 Partien konnten zwischen
+     55.8 % als Rauschen und als echtem Effekt nicht unterscheiden, und die
+     Vermutung fiel auf die falsche Seite. Der Befund aus den Partien gegen
+     einen Menschen — Randgruppen sterben, und sie entscheiden die Partien —
+     ist nicht nur richtig beobachtet, sondern auch richtig kausal gedeutet.
+
+     Was das NICHT aufhebt: mehr Suche senkt den Randanteil ebenfalls (60 ms
+     50.7 %, 250 ms 38-41 %). Beide Wege wirken auf dieselbe Schwäche; ob sie
+     sich addieren, ist ungemessen.
+
+     Default bleibt 0 — das Setzen ist eine Entscheidung des
+     Projektinhabers, nicht ein Nebenprodukt der Messung. Vorschlag: 80. */
   midLineWeight:       0,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
@@ -1007,8 +1084,51 @@ globalThis.PARAMS = {
      keine Klippe an einer festen Schwelle. Skalierung folgt daher demselben
      Muster: linearer Anstieg ab adaptiveBudgetRefEmpty freien Feldern bis
      max. adaptiveBudgetMaxFactor bei komplett vollem Brett. */
+  /* KORREKTUR am Kommentar oben: der Parameter heißt emptyCount, IST aber
+     nicht die Zahl freier Felder. mctsPUCT ruft getAdaptiveTimeBudget mit
+     rootScored.length, also der Zahl der KANDIDATENZÜGE nach Zugerzeugung
+     und Benson-Filter. Das verschiebt den Arbeitspunkt erheblich und war der
+     Grund, warum eine erste Instrumentierung 37.5 % statt 7.4 % meldete.
+
+     GEMESSEN, Läufe 75-82 (Commit 957c2c9), beide Arme gegen den Default:
+
+       A  = refEmpty 150 @ 250 ms   (der ausgelieferte Wert)
+       B1 = refEmpty 220 @ 224 ms   60/120 = 50.0 %  KI 40.7-59.3  p = 1.00
+       B2 = refEmpty 300 @ 202 ms   65/120 = 54.2 %  KI 44.8-63.3  p = 0.41
+                                                        (Bonferroni x2: 0.82)
+
+     Die Budgets sind aus E[factor] über das gemessene Kandidatenprofil
+     abgeleitet (1.326 / 1.478 / 1.642), nicht aus Zeitquotienten. Gepoolte
+     Zeitparität +0.53 % und +1.58 %, beide im Band.
+
+     DASS DIE BEHANDLUNG STATTFAND, ist belegt — ohne diesen Nachweis wäre
+     das Ergebnis nicht deutbar. Anteil der Züge mit Skalierungsfaktor > 1
+     ab Zug 20:  A 43.6-45.1 %  ·  B1 63.8-65.4 %  ·  B2 87.1-87.5 %.
+     Vorhergesagt aus dem Profil: 45 / 62 / 83 %. Phasensplit spät/früh
+     A 1.58 → B1 1.85 → B2 1.95. Sims paritätisch, Farbbalance 60:60.
+
+     ANLASS war eine Fehlfunktion, die in einer externen Messreihe sichtbar
+     wurde: die Simulationszahl bricht über Zug 136-238 auf 130 ein (von 206
+     am Anfang), während der Skalierungsfaktor dort noch bei 1.03 steht. Die
+     Kompensation kommt eine Phase zu spät — bei Zug 320-360 gibt es Faktor
+     2.2-2.3 und ohnehin wieder 234-349 Sims. Ursache ist die Entkopplung:
+     ausgelöst wird über die Kandidatenzahl, teuer wird es durch wachsende
+     Gruppen (ms/Sim steigt ab Zug 0 stetig von 8.8 auf 14.4).
+
+     BEFUND: die Fehlfunktion ist real, das Beheben bringt nichts Messbares.
+     refEmpty 220 setzt die Skalierung exakt am Beginn der Hungerzone an
+     (Zug 137 gegen gemessene 136) und liefert exakt 50.0 %.
+
+     EINSCHRÄNKUNG, vorab gerechnet und nicht nachgeschoben: 120 Partien je
+     Dosis erlauben einen Nachweis erst ab 62.8 % (80 % Power). Ein kleiner
+     Effekt bei B2 ist damit nicht ausgeschlossen; ausgeschlossen ist ein
+     GROSSER. Zum Vergleich lieferten deathTransfer 65.2 % über 210 Partien
+     und midLineWeight 58.7 % über 300 — beide deutlich über dem, was hier
+     zu sehen ist. Einen 54-%-Effekt aufzulösen bräuchte rund 1500 Partien.
+
+     Default bleibt 150. */
   adaptiveBudgetEnabled:    1,
-  adaptiveBudgetRefEmpty: 150,    // ab hier beginnt die Zeitverlängerung (Fallback, s.u.)
+  adaptiveBudgetRefEmpty: 150,    // Kandidatenzahl (nicht freie Felder), s.o.
   adaptiveBudgetMaxFactor: 2.5,   // Obergrenze bei leerem Feld-Vorrat (0 frei)
   /* Feedback-Korrektur: freie-Felder-Schätzung traf in einer echten Partie
      mit viel Rand-/Eck-Gefecht nicht zu — bei 229 freien Feldern waren die
@@ -1431,11 +1551,21 @@ function getAdaptiveTimeBudget(emptyCount) {
   if (PARAMS.adaptiveBudgetEnabled < 1) return PARAMS.aiTimeBudget;
   const ref = PARAMS.adaptiveBudgetRefEmpty;
   let budget = PARAMS.aiTimeBudget;
+  let _faktor = 1;
   if (emptyCount < ref) {
     const t = 1 - Math.max(0, emptyCount) / ref;              // 0 bei ref, →1 bei leer
     const factor = 1 + t * (PARAMS.adaptiveBudgetMaxFactor - 1);
     budget = PARAMS.aiTimeBudget * factor;
+    _faktor = factor;
   }
+  /* Diagnose: Skalierungsfaktor und sein Argument festhalten. Ein A/B über
+     maxFactor ist ohne diese Zahl nicht deutbar — bliebe der Faktor konstant
+     1, wäre Arm B in Wahrheit identisch zu Arm A und ein Nullergebnis hätte
+     nichts mit dem Hebel zu tun. Das Argument wird mitgeführt, weil es NICHT
+     die Zahl der freien Felder ist: mctsPUCT übergibt rootScored.length, also
+     die Kandidatenzahl. Verändert keinen Rückgabewert. */
+  _letzterFaktor = _faktor;
+  _letztesArgument = emptyCount;
   /* Feedback: falls die letzte Simulation langsamer war als die freie-
      Felder-Schätzung erwarten ließ, direkt nachkorrigieren — das greift
      unabhängig davon, WAS die Verlangsamung verursacht (Randkampf,
@@ -1443,9 +1573,33 @@ function getAdaptiveTimeBudget(emptyCount) {
   if (_lastMsPerSim !== null) {
     const neededForTarget = _lastMsPerSim * PARAMS.adaptiveBudgetTargetMinSims;
     const cap = PARAMS.aiTimeBudget * PARAMS.adaptiveBudgetMaxFactor;
-    budget = Math.max(budget, Math.min(neededForTarget, cap));
+    const erhoeht = Math.max(budget, Math.min(neededForTarget, cap));
+    /* Zähler, rein diagnostisch: hat der Min-Sims-Boden das Budget wirklich
+       angehoben? Ein A/B über die ZEITVERTEILUNG ist ohne diese Zahl nicht
+       deutbar — ein Nullergebnis könnte heißen "hilft nicht" oder "hat nie
+       gegriffen". Muss HIER stehen und nicht im Harness: der Aufrufer kennt
+       das Argument nicht, mit dem die Funktion tatsächlich gerufen wird
+       (mctsPUCT übergibt die Kandidatenzahl, nicht die freien Felder).
+       Verändert keinen Rückgabewert. */
+    if (erhoeht > budget) _bodenGriff++;
+    budget = erhoeht;
   }
   return Math.round(budget);
+}
+
+/* Diagnosezähler zu getAdaptiveTimeBudget. Nur lesen und zurücksetzen. */
+let _bodenGriff = 0;
+function leseBodenGriff(reset) { const v = _bodenGriff; if (reset) _bodenGriff = 0; return v; }
+let _letzterFaktor = null, _letztesArgument = -1;
+/* Verbrauchend lesen. Sonst liefert ein Zug, der die Funktion gar nicht ruft
+   (Pass, Aufgabe, Pfade ohne MCTS), den Wert der VORIGEN Farbe zurueck — im
+   A/B wandert damit der Faktor des einen Arms in die Statistik des anderen.
+   Gemessen: Arm A meldete max 2.11 bei maxFactor 1.0, wo nur exakt 1 moeglich
+   ist. Null heisst "dieser Zug hat nicht skaliert" und wird nicht gezaehlt. */
+function leseFaktor() {
+  const v = {faktor: _letzterFaktor, arg: _letztesArgument};
+  _letzterFaktor = null; _letztesArgument = -1;
+  return v;
 }
 
 /* ── Globale Scratchpads (einmalig alloziert, nie GC'd) ──── */
