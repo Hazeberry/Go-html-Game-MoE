@@ -929,11 +929,11 @@ const driver = `
            konnte praktisch nicht regulär auslösen
        Jetzt: vor jedem Zug den Zustand der ziehenden Farbe einspielen,
        danach zurückschreiben — beide Farben verhalten sich wie im Spiel. */
-    const modState = {1: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0},
-                      2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0}};
+    const modState = {1: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null},
+                      2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null}};
     const st = {
-      1: {moves: 0, sims: 0, timeMs: 0, q: []},
-      2: {moves: 0, sims: 0, timeMs: 0, q: []}
+      1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0},
+      2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0}
     };
     /* Gruppenverluste je Farbe: groesster Einzelschlag, den DIESE Farbe
        erlitten hat, plus die Zahl der Verluste ab 5 Steinen. Instrument fuer
@@ -969,6 +969,31 @@ const driver = `
       if (ms.sig !== null && ms.sig !== sig) { ms.root = null; ms.phaseSwitches++; }
       ms.sig = sig;
       _mctsSavedRoot = ms.root; _hopelessStreak = ms.hope; _allDeadStreak = ms.dead;
+      /* _lastMsPerSim gehoert in dieselbe Liste wie die drei darueber: es ist
+         eine Modul-Variable, und der adaptive Zeitbudget-Zweig liest sie. Ohne
+         Trennung wuerde ein langsamer Zug der EINEN Konfiguration das Budget
+         der ANDEREN anheben — ein A/B ueber Zeitverteilung waere damit
+         wertlos. Bei adaptiveBudgetEnabled=0 (Default des Harness) ist der
+         Zweig tot und die Zeile wirkungslos. */
+      _lastMsPerSim = ms.msProSim;
+
+      /* GREIFT DER MIN-SIMS-BODEN UEBERHAUPT? Ohne diese Zaehlung waere ein
+         Nullergebnis nicht deutbar: nicht geholfen, oder nie ausgeloest?
+         Gemessen mit der ECHTEN Engine-Funktion, einmal mit und einmal ohne
+         Boden — kein Nachbau der Formel. Der Boden greift genau dann, wenn
+         der letzte Zug weniger Simulationen schaffte als das Ziel. */
+      let bodenGriff = 0;
+      if (PARAMS.adaptiveBudgetEnabled >= 1 && PARAMS.adaptiveBudgetTargetMinSims > 0) {
+        let frei = 0;
+        for (let i = 0; i < BOARD_SIZE; i++) if (!board[i]) frei++;
+        const mit = getAdaptiveTimeBudget(frei);
+        const ziel = PARAMS.adaptiveBudgetTargetMinSims;
+        PARAMS.adaptiveBudgetTargetMinSims = 0;
+        const ohne = getAdaptiveTimeBudget(frei);
+        PARAMS.adaptiveBudgetTargetMinSims = ziel;
+        if (mit > ohne) bodenGriff = 1;
+      }
+      st[color].boden += bodenGriff;
 
       const t0 = Date.now();
       netFrisch = false;
@@ -976,8 +1001,14 @@ const driver = `
                             mc, 'hard', 1, ko.point, lastIdx);
       const dt = Date.now() - t0;
       if (netFrisch && policyNet._netBlend > 0) netGeblendet++;
+      /* Zugzeiten sammeln. Bei einem Test ueber die VERTEILUNG der Rechenzeit
+         ist der Mittelwert allein nutzlos — er soll ja zwischen den Armen
+         gleich sein. Gefragt ist die Streuung: gleichmaessig verteilt gegen
+         in die schweren Stellungen geschoben. */
+      st[color].zeiten.push(dt);
 
       ms.root = _mctsSavedRoot; ms.hope = _hopelessStreak; ms.dead = _allDeadStreak;
+      ms.msProSim = _lastMsPerSim;
       const s = st[color]; s.moves++; s.timeMs += dt;
 
       if (res.info) {
@@ -1033,6 +1064,26 @@ const driver = `
       if (Math.min(x, y, SIZE - 1 - x, SIZE - 1 - y) <= 1) rand[c].linie12++;
     }
 
+    /* ZEITVERTEILUNG je Farbe. Gesamtzeit sagt WIE VIEL gerechnet wurde,
+       der Top10-Anteil sagt WIE es verteilt war: welcher Anteil der
+       Gesamtzeit auf das langsamste Zehntel der Zuege entfaellt. Gleichverteilt
+       waeren das 10 %; je hoeher, desto staerker in die schweren Stellungen
+       geschoben. Genau die Groesse, um die es beim Test ueber Verteilung statt
+       Menge geht — der Mittelwert soll dort ja gerade gleich sein. */
+    const zeit = {1: null, 2: null};
+    for (const c of [1, 2]) {
+      const z = st[c].zeiten;
+      if (!z.length) continue;
+      const sortiert = [...z].sort((a, b) => b - a);
+      const k = Math.max(1, Math.round(z.length * 0.1));
+      const summe = z.reduce((a, b) => a + b, 0);
+      const top = sortiert.slice(0, k).reduce((a, b) => a + b, 0);
+      zeit[c] = {gesamtMs: summe, zuege: z.length,
+                 top10: summe ? 100 * top / summe : 0,
+                 maxMs: sortiert[0],
+                 bodenAnteil: 100 * st[c].boden / z.length};
+    }
+
     const score  = finalScore(board, caps, AB.komi);
     const score0 = finalScore(board, caps, 0);
     let winner, winner0;
@@ -1058,7 +1109,7 @@ const driver = `
             phaseSwitches: modState[1].phaseSwitches + modState[2].phaseSwitches,
             q50: {1: qAt(st[1].q, .5), 2: qAt(st[2].q, .5)},
             q75: {1: qAt(st[1].q, .75), 2: qAt(st[2].q, .75)},
-            verlust, rand};
+            verlust, rand, zeit};
   }
 
   /* Neutrale Eröffnung für gepaarte Partien: Default-Parameter,
@@ -1154,6 +1205,14 @@ const driver = `
       const d = r.rand[col];
       if (d.steine) agg.rand[key].push(100 * d.linie12 / d.steine);
     }
+    for (const [key, col] of [['A', aColor], ['B', bColor]]) {
+      const z = r.zeit[col];
+      if (!z) continue;
+      agg.zeit[key].gesamt.push(z.gesamtMs / 1000);
+      agg.zeit[key].top10.push(z.top10);
+      agg.zeit[key].max.push(z.maxMs);
+      agg.zeit[key].boden.push(z.bodenAnteil);
+    }
     agg.anomalies += r.anomalies;
     agg.phaseSwitches += r.phaseSwitches || 0;
     return {aWon, aWon0};
@@ -1182,6 +1241,10 @@ const driver = `
          damit der gepaarte Vergleich moeglich bleibt (beide Seiten spielen
          dieselbe Partie) statt nur ein Gesamtmittel. */
       rand: {A: [], B: []},
+      /* Zeitverteilung nach Konfiguration: Gesamtzeit je Partie (muss bei
+         Paritaet gleich sein) und Top10-Anteil (die eigentliche Messgroesse). */
+      zeit: {A: {gesamt: [], top10: [], max: [], boden: []},
+             B: {gesamt: [], top10: [], max: [], boden: []}},
       anomalies: 0
     };
   }
@@ -1226,6 +1289,25 @@ const driver = `
         + 'A ' + fmt(mean(agg.rand.A), 1) + ' %   |   B ' + fmt(mean(agg.rand.B), 1) + ' %'
         + '   ·  B kleiner in ' + bKleiner + ':' + aKleiner + ' Partien'
         + '   [Referenz: Mensch 20.7 %]');
+    }
+    {
+      const A = agg.zeit.A, B = agg.zeit.B;
+      if (A.gesamt.length) {
+        const gA = mean(A.gesamt), gB = mean(B.gesamt);
+        const abw = gA ? 100 * (gB - gA) / gA : 0;
+        console.log('ZEIT gesamt je Partie:  A ' + fmt(gA, 1) + ' s   |   B ' + fmt(gB, 1) + ' s'
+          + '   ·  Abweichung ' + (abw >= 0 ? '+' : '') + fmt(abw, 1) + ' %'
+          + (Math.abs(abw) <= 2 ? '  [Paritaet]' : '  [KEINE PARITAET — Vergleich misst auch Rechenmenge]'));
+        console.log('ZEIT Verteilung (Anteil der Gesamtzeit auf dem langsamsten Zehntel der Zuege):  '
+          + 'A ' + fmt(mean(A.top10), 1) + ' %   |   B ' + fmt(mean(B.top10), 1) + ' %'
+          + '   ·  laengster Zug Ø A ' + fmt(mean(A.max), 0) + ' ms / B ' + fmt(mean(B.max), 0) + ' ms'
+          + '   [gleichverteilt waeren 10 %]');
+        const bA = mean(A.boden), bB = mean(B.boden);
+        console.log('MIN-SIMS-BODEN griff bei:  A ' + fmt(bA, 1) + ' %   |   B ' + fmt(bB, 1) + ' % der Zuege'
+          + (Math.max(bA, bB) < 1
+             ? '   — BEHANDLUNG FAND PRAKTISCH NICHT STATT, ein Nullergebnis waere bedeutungslos'
+             : ''));
+      }
     }
     console.log('PASS: erster Ø Zug S ' + fmt(mean(agg.passFirst[1]), 0) + ' / W ' + fmt(mean(agg.passFirst[2]), 0)
       + ' · gesamt S ' + agg.passTotal[1] + ' / W ' + agg.passTotal[2]
@@ -1362,6 +1444,7 @@ const driver = `
         q50: {S: r.q50[1], W: r.q50[2]}, q75: {S: r.q75[1], W: r.q75[2]},
         verlust: {A: r.verlust[aColor], B: r.verlust[aColor === 1 ? 2 : 1]},
         rand: {A: r.rand[aColor], B: r.rand[aColor === 1 ? 2 : 1]},
+        zeit: {A: r.zeit[aColor], B: r.zeit[aColor === 1 ? 2 : 1]},
         simsA: r.st[aColor].moves ? Math.round(r.st[aColor].sims / r.st[aColor].moves) : 0,
         simsB: r.st[aColor === 1 ? 2 : 1].moves
           ? Math.round(r.st[aColor === 1 ? 2 : 1].sims / r.st[aColor === 1 ? 2 : 1].moves) : 0,
