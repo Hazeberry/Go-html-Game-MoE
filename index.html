@@ -887,10 +887,46 @@ globalThis.PARAMS = {
      ALLEIN (60 ms: 50.7 % · 250 ms: 38-41 %). Ein Teil der Randneigung ist
      Symptom flacher Suche, nicht des Bewertungsterms.
 
-     Nachmessung auf Dosis 80 über 300 Partien läuft (Seeds 8700-8705).
-     Fällt die Rate Richtung 50 %, ist der Randanteil als URSACHE entlastet:
-     die Beobachtung aus den Partien bliebe richtig, die kausale Deutung
-     falsch — Randspiel wäre Begleitsymptom, nicht Ursache. Default 0. */
+     NACHMESSUNG auf Dosis 80, Läufe 69-74 (Seeds 8700-8705). Die Erwartung
+     war Regression zur Mitte; eingetreten ist das Gegenteil:
+
+       erster Durchgang (65-68)   67/120 = 55.8 %   KI 46.5-64.9   p = 0.235
+       Nachmessung      (69-74)  109/180 = 60.6 %   KI 53.0-67.7   p = 0.0057
+       gepoolt          (65-74)  176/300 = 58.7 %   KI 52.9-64.3   p = 0.0032
+
+     Die unabhängige Zahl ist die NACHMESSUNG ALLEIN: 60.6 %. Der gepoolte
+     Wert enthält den ersten Durchgang, der ja gerade wegen seines Anscheins
+     zur Nachmessung ausgewählt wurde — er ist dadurch leicht nach oben
+     verzerrt. Beide liegen vollständig über 50 %, das Ergebnis hängt also
+     nicht an dieser Feinheit.
+
+     Damit ist die KAUSALKETTE GESCHLOSSEN, alle drei Glieder belegt:
+
+       Randanteil        41.5 % → 29.8 %   245:55    p = 8.8e-30
+       größter Schlag    13.19  → 10.69    180:111   p = 6.2e-05
+       Gesamtverlust     35.53  → 29.36    179:119   p = 6.1e-04
+       Schläge ab 5      2.33   → 1.71     160:93    p = 3.0e-05
+       Siegrate                  58.7 %              p = 0.0032
+
+     Dosis-Wirkung stützt die Kausalität zusätzlich: Gewicht 40 senkt den
+     Randanteil um 5.6 Punkte und bringt 50.8 %, Gewicht 80 senkt ihn um
+     11.7 Punkte und bringt 58.7 %. Aufgaben: A 101×, B 66×.
+
+     Confounds geprüft: Sims/Zug 552:553, Farbbalance exakt 150:150.
+
+     REVIDIERT wird damit die Einschätzung nach dem ersten Durchgang, die
+     Synthese stehe schlecht. Sie war verfrüht: 120 Partien konnten zwischen
+     55.8 % als Rauschen und als echtem Effekt nicht unterscheiden, und die
+     Vermutung fiel auf die falsche Seite. Der Befund aus den Partien gegen
+     einen Menschen — Randgruppen sterben, und sie entscheiden die Partien —
+     ist nicht nur richtig beobachtet, sondern auch richtig kausal gedeutet.
+
+     Was das NICHT aufhebt: mehr Suche senkt den Randanteil ebenfalls (60 ms
+     50.7 %, 250 ms 38-41 %). Beide Wege wirken auf dieselbe Schwäche; ob sie
+     sich addieren, ist ungemessen.
+
+     Default bleibt 0 — das Setzen ist eine Entscheidung des
+     Projektinhabers, nicht ein Nebenprodukt der Messung. Vorschlag: 80. */
   midLineWeight:       0,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
