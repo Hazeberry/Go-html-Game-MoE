@@ -1069,7 +1069,52 @@ globalThis.PARAMS = {
      vorab. Zur Einordnung, was ein Wert bei einer 38er-Gruppe bedeutet:
      0.05 -> Strafe 1140, 0.1 -> 1880, 0.25 -> 4100 (gegen 400 heute).
 
-     Default 0, bis der Harness eine Aussage erlaubt. */
+     ─────────────────────────────────────────────────────────────────────
+     GEMESSEN, Läufe 83-88, drei Dosen zu je 120 Partien (360 gesamt):
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x3)
+        0.05    65/120   54.2 %   44.8-63.3 %     0.41 (1.00)
+        0.1     57/120   47.5 %   38.3-56.8 %     0.65 (1.00)
+        0.25    57/120   47.5 %   38.3-56.8 %     0.65 (1.00)
+       gepoolt 179/360   49.7 %   44.4-55.0 %     0.96
+
+     KEIN Spielstärkegewinn, und kein Dosis-Trend — die Punktschätzer
+     FALLEN mit der Dosis. Der Eingriff ist verdrahtet und aktiv: der
+     Wächter zählt in Arm A 0.00 Aufrufe je Zug und in Arm B 2.54 bis 3.15,
+     mit größten berührten Gruppen von 37 bis 100 Steinen. Ein Nullergebnis
+     mangels Auslösung ist damit ausgeschlossen.
+
+     Auch die Mechanismus-Metrik trägt nicht. Gepoolt über alle 360 Partien
+     sinkt der Ø größte erlittene Schlag von 12.05 auf 11.65 (-3.3 %),
+     Schläge ab 5 Steinen 806 -> 800, Gesamtverlust 12079 -> 11845.
+
+     WORAN DIE SCHEINBARE DOSIS-WIRKUNG LAG — der eigentliche Befund dieses
+     Laufs. Je Dosis sah der Gruppenverlust so aus: 0.05 -> -13.5 %,
+     0.1 -> -2.1 %, 0.25 -> +7.0 %. Das sieht nach einer sauberen, wenn auch
+     unerwünschten Dosis-Wirkung aus. Es ist keine: die Kontrollarme selbst
+     streuen zwischen 11.3 und 13.3 (18 %), und die gemessene Verbesserung
+     korreliert mit dem Wert des KONTROLLARMS zu r = -0.90. Je schlechter A
+     zufällig ausfiel, desto größer die scheinbare Wirkung von B — und die
+     Dosis 0.05 hat zufällig die beiden schlechtesten Kontrollarme erwischt
+     (13.3 und 12.7). Regression zur Mitte, nicht Dosis-Wirkung.
+
+     Dass jeder Lauf seinen eigenen Kontrollarm trägt, schützt gegen
+     Verzerrung, nicht gegen diese Täuschung: bei drei Dosen zu je zwei
+     Läufen ist die Zuordnung guter und schlechter Kontrollarme zu den Dosen
+     selbst zufällig. Wer nur die Dosiszeile liest, sieht ein Muster, das
+     nicht da ist. Die Prüfung dagegen ist billig — Streuung der
+     Kontrollarme neben die Effektgröße legen — und gehört ab jetzt zu
+     jeder Dosisreihe.
+
+     FAZIT: die Lücke im Bewerter ist real und bleibt dokumentiert, ihre
+     Behebung auf diesem Weg bringt nichts Messbares. Das ist der dritte
+     Fall dieser Art in diesem Projekt (Min-Sims-Boden, Hungerzone, jetzt
+     die Atari-Skalierung). Power-Vorbehalt, vorab benannt: 120 Partien je
+     Dosis lösen erst ab rund 63 % auf; ausgeschlossen ist ein großer
+     Effekt, nicht jeder.
+
+     Default bleibt 0. Der Parameter bleibt im Code, weil die Messung ihn
+     belegt und weil er abschaltbar geprüft ist — nicht, weil er wirkt. */
   atariSizeWeight:    0,
   endOppAtari:       80,
   /* Tsumego */

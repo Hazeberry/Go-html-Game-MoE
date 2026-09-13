@@ -940,7 +940,49 @@ Rauchtest über 4 Partien: Arm A (Gewicht 0) **0,00** Aufrufe je Zug, Arm B
 (0,1) **1,98**, größte berührte Gruppe 17 Steine. Ein Arm ohne Aufrufe wäre
 nicht verdrahtet, und ein Nullergebnis dort bedeutungslos.
 
-Default 0, bis der Harness eine Aussage erlaubt.
+#### Gemessen: die Lücke ist real, ihre Behebung bringt nichts
+
+Läufe 83–88, drei Dosen zu je 120 Partien:
+
+| Dosis | B-Siege | Rate | 95 %-CI | p (Bonferroni ×3) |
+|---:|---:|---:|---:|---:|
+| 0,05 | 65/120 | 54,2 % | 44,8–63,3 % | 0,41 (1,00) |
+| 0,1 | 57/120 | 47,5 % | 38,3–56,8 % | 0,65 (1,00) |
+| 0,25 | 57/120 | 47,5 % | 38,3–56,8 % | 0,65 (1,00) |
+| **gepoolt** | **179/360** | **49,7 %** | 44,4–55,0 % | 0,96 |
+
+Kein Gewinn, kein Dosis-Trend — die Punktschätzer *fallen* mit der Dosis. Der
+Eingriff ist dabei nachweislich aktiv: der Wächter zählt in Arm A 0,00 Aufrufe
+je Zug, in Arm B 2,54 bis 3,15, mit größten berührten Gruppen von 37 bis 100
+Steinen. Auch die Mechanismus-Metrik trägt nicht: Ø größter erlittener Schlag
+12,05 → 11,65 (−3,3 %), Schläge ab 5 Steinen 806 → 800, Gesamtverlust
+12 079 → 11 845.
+
+**Der eigentliche Befund dieses Laufs ist methodisch.** Je Dosis sah der
+Gruppenverlust so aus: 0,05 → −13,5 %, 0,1 → −2,1 %, 0,25 → +7,0 %. Das liest
+sich wie eine saubere, wenn auch unerwünschte Dosis-Wirkung. Es ist keine:
+
+| | |
+|---|---|
+| Streuung der **Kontrollarme** allein | 11,3 bis 13,3 (18 %) |
+| Korrelation Kontrollarm ↔ gemessene „Verbesserung" | **r = −0,90** |
+
+Je schlechter der Kontrollarm zufällig ausfiel, desto größer die scheinbare
+Wirkung — und die Dosis 0,05 hat zufällig die beiden schlechtesten erwischt
+(13,3 und 12,7). Das ist Regression zur Mitte, nicht Dosis-Wirkung. Dass jeder
+Lauf seinen eigenen Kontrollarm trägt, schützt gegen *Verzerrung*, nicht gegen
+diese Täuschung: bei drei Dosen zu je zwei Läufen ist die Zuordnung guter und
+schlechter Kontrollarme zu den Dosen selbst zufällig. Die Gegenprüfung ist
+billig — die Streuung der Kontrollarme neben die Effektgröße legen — und
+gehört ab jetzt zu jeder Dosisreihe.
+
+Damit ist dies der **dritte** Eingriff dieser Art: ein real belegter Defekt,
+dessen Behebung messbar nichts bringt (Min-Sims-Boden, Hungerzone, jetzt die
+Atari-Skalierung). Power-Vorbehalt, vorab benannt: 120 Partien je Dosis lösen
+erst ab rund 63 % auf.
+
+Der Default bleibt 0. Der Parameter bleibt im Code, weil die Messung ihn
+belegt und weil er abschaltbar geprüft ist — nicht, weil er wirkt.
 
 ### Die Hungerzone: eine echte Fehlfunktion, deren Behebung nichts bringt
 
