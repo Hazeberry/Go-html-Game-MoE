@@ -932,8 +932,10 @@ const driver = `
     const modState = {1: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null},
                       2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null}};
     const st = {
-      1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: []},
-      2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: []}
+      1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
+          atRufe: 0, atGross: 0, atMax: 0},
+      2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
+          atRufe: 0, atGross: 0, atMax: 0}
     };
     /* Gruppenverluste je Farbe: groesster Einzelschlag, den DIESE Farbe
        erlitten hat, plus die Zahl der Verluste ab 5 Steinen. Instrument fuer
@@ -987,6 +989,14 @@ const driver = `
          Werts. Jetzt wird dort gezaehlt, wo entschieden wird. */
       leseBodenGriff(true);
 
+      /* GREIFT DIE ATARI-SKALIERUNG? Derselbe Grund wie beim Boden: ein
+         Nullergebnis ist nur deutbar, wenn feststeht, dass der Eingriff
+         ueberhaupt stattfand. Vor dem Zug zuruecksetzen und danach lesen
+         haelt die Zahlen der beiden Arme getrennt — sonst buchte die eine
+         Farbe der anderen ihre Aufrufe zu, wie es der Faktor-Waechter
+         schon einmal getan hat. */
+      leseAtariWaechter(true);
+
       const t0 = Date.now();
       netFrisch = false;
       const res = getAIMove(board, color, Array.from(hist), {...caps},
@@ -999,6 +1009,9 @@ const driver = `
          in die schweren Stellungen geschoben. */
       st[color].zeiten.push(dt);
       if (leseBodenGriff(true) > 0) st[color].boden++;
+      { const aw = leseAtariWaechter(true);
+        st[color].atRufe += aw.rufe; st[color].atGross += aw.gross;
+        if (aw.maxGroesse > st[color].atMax) st[color].atMax = aw.maxGroesse; }
       { const f = leseFaktor();
         if (f.faktor !== null) { st[color].faktoren.push(f.faktor); st[color].args.push(f.arg); } }
 
@@ -1077,6 +1090,13 @@ const driver = `
                  top10: summe ? 100 * top / summe : 0,
                  maxMs: sortiert[0],
                  bodenAnteil: 100 * st[c].boden / z.length,
+                 /* Atari-Waechter je Partie: Aufrufe der Skalierung pro Zug,
+                    Anteil davon an Gruppen ab 6 Steinen, groesste beruehrte
+                    Gruppe. Bleiben die Aufrufe 0, ist der Hebel nicht
+                    verdrahtet und ein Nullergebnis bedeutungslos. */
+                 atariProZug: st[c].atRufe / z.length,
+                 atariGrossAnteil: st[c].atRufe ? 100 * st[c].atGross / st[c].atRufe : 0,
+                 atariMaxGroesse: st[c].atMax,
                  /* Phasensplit der Rechenzeit: Frueh- gegen Spaetspiel. Der
                     Top10-Anteil sagt, ob es Spitzen gibt; das hier sagt, ob
                     die Zeit systematisch nach hinten wandert. Je Farbe zieht
@@ -1240,6 +1260,9 @@ const driver = `
       agg.zeit[key].top10.push(z.top10);
       agg.zeit[key].max.push(z.maxMs);
       agg.zeit[key].boden.push(z.bodenAnteil);
+      agg.zeit[key].atari.push(z.atariProZug);
+      agg.zeit[key].atariGross.push(z.atariGrossAnteil);
+      agg.zeit[key].atariMax.push(z.atariMaxGroesse);
       if (z.faktor) agg.zeit[key].faktor.push(z.faktor);
       if (z.phase) agg.zeit[key].phase.push(z.phase);
     }
@@ -1273,8 +1296,10 @@ const driver = `
       rand: {A: [], B: []},
       /* Zeitverteilung nach Konfiguration: Gesamtzeit je Partie (muss bei
          Paritaet gleich sein) und Top10-Anteil (die eigentliche Messgroesse). */
-      zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: []},
-             B: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: []}},
+      zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
+                 atari: [], atariGross: [], atariMax: []},
+             B: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
+                 atari: [], atariGross: [], atariMax: []}},
       anomalies: 0
     };
   }
@@ -1364,6 +1389,18 @@ const driver = `
           + (Math.max(bA, bB) < 1
              ? '   — BEHANDLUNG FAND PRAKTISCH NICHT STATT, ein Nullergebnis waere bedeutungslos'
              : ''));
+        const aA = mean(A.atari), aB = mean(B.atari);
+        const mxA = Math.max(0, ...A.atariMax), mxB = Math.max(0, ...B.atariMax);
+        console.log('ATARI-WAECHTER: Skalierung je Zug  A ' + fmt(aA, 2) + '   |   B ' + fmt(aB, 2)
+          + '  ·  davon Gruppen ab 6 Steinen  A ' + fmt(mean(A.atariGross), 1) + ' %   |   B ' + fmt(mean(B.atariGross), 1) + ' %'
+          + '  ·  groesste Gruppe  A ' + mxA + '   |   B ' + mxB);
+        /* Getrennte Zeilen statt eines Umbruchs im String: der Treiber ist ein
+           Template-Literal, ein Backslash-n darin wird schon aussen aufgeloest
+           und zerreisst den Einzelanfuehrungs-String. */
+        if (Math.max(aA, aB) === 0)
+          console.log('                — NICHT VERDRAHTET: die Skalierung wurde in keinem Arm ausgeloest');
+        else if (mxB <= 1)
+          console.log('                — SKALIERT NICHTS: groesste beruehrte Gruppe ist 1 Stein, der Faktor bleibt 1');
       }
     }
     console.log('PASS: erster Ø Zug S ' + fmt(mean(agg.passFirst[1]), 0) + ' / W ' + fmt(mean(agg.passFirst[2]), 0)

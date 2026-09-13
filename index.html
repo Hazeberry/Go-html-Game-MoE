@@ -247,6 +247,32 @@ function countLiberties(board, startIdx, cap) {
   return libs;
 }
 
+/* Gruppengröße ohne Allokation, nach demselben Muster wie countLiberties.
+   Gebraucht von der größenskalierten Atari-Strafe: dort steht schon fest,
+   dass die Gruppe im Atari ist, gefragt ist nur noch WIE VIEL auf dem Spiel
+   steht. Ein eigener Lauf statt einer Rückgabe aus countLiberties, weil der
+   Abbruch bei `cap` dort den Gruppen-Walk gerade NICHT zu Ende führt — eine
+   dort mitgezählte Größe wäre je nach cap falsch und stillschweigend falsch.
+   Der Lauf kostet nur auf dem Atari-Pfad, und nur wenn die Skalierung an
+   ist; siehe _atariGewicht. */
+function countGroupSize(board, startIdx) {
+  const color = board[startIdx];
+  const epoch = _nextFfEpoch();
+  let head = 0, tail = 0;
+  _groupQueue[tail++] = startIdx;
+  _ffVisited[startIdx] = epoch;
+  while (head < tail) {
+    const i = _groupQueue[head++];
+    for (const n of NEIGHBORS[i]) {
+      if (_ffVisited[n] === epoch) continue;
+      _ffVisited[n] = epoch;          /* auch Fremdfelder markieren, sonst */
+      if (board[n] !== color) continue; /* prüft man sie je Nachbarstein neu */
+      _groupQueue[tail++] = n;
+    }
+  }
+  return tail;
+}
+
 /* Entfernt eine als tot ERKANNTE Gruppe (0 Freiheiten, vom Aufrufer
    geprüft). board[g]=0 dient dabei selbst als Besucht-Marker. */
 function _removeDeadGroup(board, startIdx) {
@@ -998,6 +1024,53 @@ globalThis.PARAMS = {
   endAreaGain:       30,
   endCapBonus:       18,
   endAtariPenalty:  400,
+  /* Größenskalierung der Selbst-Atari-Strafe, für midAtariPenalty UND
+     endAtariPenalty: Strafe = Basis * (1 + atariSizeWeight * (Größe - 1)).
+     0 = aus, dann ist der Faktor exakt 1 und der Gruppen-Walk entfällt.
+
+     ANLASS — gemessen an einer echten Partie gegen einen Menschen
+     (13.09., 407 Züge, KI als Weiß). Die KI hatte in der linken unteren
+     Ecke eine Gruppe mit über 30 Zügen lang konstant vier Freiheiten
+     (B2, A1, E3, E1). Schwarz passte neunmal in Folge. Die KI zog in der
+     Zeit zehnmal, alle auf Rand-Abstand 0 oder 1, keiner an der Gruppe.
+     Dann setzte sie sich in drei Zügen selbst matt:
+
+       Zug 394  E3   Gruppe 35 -> 36   Freiheiten 4 -> 3   evalEndgame  +0.2
+       Zug 396  A1   Gruppe 36 -> 37   Freiheiten 3 -> 2   evalEndgame  +0.3
+       Zug 398  E1   Gruppe 37 -> 38   Freiheiten 2 -> 1   evalEndgame  -399.7
+       Zug 399  Schwarz B2: 38 Steine geschlagen, Gebiet -13 -> -52.
+
+     Die Zahlen sind an genau diesen Stellungen gemessen, der Rauschterm
+     über 400 Aufrufe ausgemittelt. Zwei Befunde stecken darin:
+
+     (1) Freiheitsverlust OBERHALB von Atari kostet nichts. Das bleibt
+         hier unangetastet — ein eigener Freiheitsterm wäre ein zweiter
+         Eingriff und machte die Dosisreihe mehrdeutig.
+     (2) Die Atari-Strafe ist FLACH. 38 Steine im Atari kosten dieselben
+         400 wie ein einzelner Stein. In Area-Wertung kostet der Verlust
+         38 Gebietspunkte plus 38 Gefangene; in Einheiten von endAreaGain
+         (30) wären das rund 2280. Das ist der Punkt, den dieser Parameter
+         angreift.
+
+     NICHT BELEGT: dass diese Lücke den Zug in jener Partie VERURSACHT hat.
+     Mit kaltem Suchbaum und 2000 ms passt die Engine in derselben Stellung,
+     statt E3 zu spielen — in alter wie neuer Konfiguration. Der Unterschied
+     kann an Tree-Reuse, Budget oder Zughistorie liegen und ist ungeklärt.
+     Belegt ist die Lücke im Bewerter, nicht ihre Wirkung im Spiel. Genau
+     dafür ist der A/B-Harness da.
+
+     MULTIPLIKATIV, nicht additiv: Mittelspiel und Endspiel rechnen auf
+     verschiedenen Skalen (midCapBonus 800 gegen endCapBonus 18), eine
+     additive Konstante je Stein hätte in beiden eine andere Bedeutung und
+     bräuchte zwei Parameter — also zwei Dosisachsen. Der Faktor ist
+     skalenfrei und lässt eine Dosisreihe zu.
+
+     Die Größenordnung soll die Dosisreihe liefern, nicht eine Rechnung
+     vorab. Zur Einordnung, was ein Wert bei einer 38er-Gruppe bedeutet:
+     0.05 -> Strafe 1140, 0.1 -> 1880, 0.25 -> 4100 (gegen 400 heute).
+
+     Default 0, bis der Harness eine Aussage erlaubt. */
+  atariSizeWeight:    0,
   endOppAtari:       80,
   /* Tsumego */
   tsumegoCapBonus:  1200,
@@ -1815,6 +1888,38 @@ function libGewicht(lib) {
   return Math.min(v, PARAMS.midLibCap);
 }
 
+/* Faktor für die Selbst-Atari-Strafe. Bei ausgeschalteter Skalierung wird
+   exakt 1 zurückgegeben und KEIN Gruppen-Walk ausgelöst — x * 1 ist für jede
+   endliche Gleitkommazahl bitgleich x, der Default-Pfad ist also weder
+   verhaltens- noch laufzeitseitig berührt.
+
+   `groesse` wird übergeben, wo sie beim Aufrufer schon vorliegt (evalMidgame
+   hat sie aus floodFill), sonst selbst gelaufen. Ein Aufrufer, der sie hat,
+   soll sie nicht zweimal bezahlen — und die Zählung soll trotzdem an EINER
+   Stelle sitzen, nicht in zwei Zweigen nebenher. */
+let _atariRufe = 0, _atariGross = 0, _atariMaxGroesse = 0;
+
+function _atariGewicht(board, i, groesse) {
+  const w = PARAMS.atariSizeWeight;
+  if (w <= 0) return 1;
+  const n = (groesse === undefined) ? countGroupSize(board, i) : groesse;
+  _atariRufe++;
+  if (n >= 6) _atariGross++;
+  if (n > _atariMaxGroesse) _atariMaxGroesse = n;
+  return 1 + w * (n - 1);
+}
+
+/* Wächter für den A/B-Harness: greift die Skalierung überhaupt, und an wie
+   großen Gruppen? Ein Arm, in dem _atariRufe 0 bleibt, ist nicht verdrahtet;
+   einer, in dem die größte Gruppe 1 ist, skaliert nichts. Verbrauchend zu
+   lesen wäre hier falsch — anders als beim Faktor-Wächter ist das ein
+   Summenzähler über viele Züge, kein Zustand eines einzelnen Zuges. */
+function leseAtariWaechter(reset) {
+  const v = {rufe: _atariRufe, gross: _atariGross, maxGroesse: _atariMaxGroesse};
+  if (reset) { _atariRufe = 0; _atariGross = 0; _atariMaxGroesse = 0; }
+  return v;
+}
+
 function evalMidgame(board, i, color, mc) {
   let s = 0;
   const opp = color === 1 ? 2 : 1;
@@ -1830,7 +1935,9 @@ function evalMidgame(board, i, color, mc) {
     s += PARAMS.midLineWeight * MID_LINIE[Math.min(x, y, SIZE-1-x, SIZE-1-y)];
   }
   if (!lib) s -= 10000;
-  if (lib === 1 && !cap) s -= PARAMS.midAtariPenalty;
+  /* Mittelspiel braucht keinen zweiten Walk: own.group liegt aus dem
+     floodFill oben bereits vor und wird durchgereicht. */
+  if (lib === 1 && !cap) s -= PARAMS.midAtariPenalty * _atariGewicht(null, 0, own.group.length);
   if (lib === 2 && !cap) s -= PARAMS.mid2LibPenalty;
   let on = 0;
   for (const n of NEIGHBORS[i]) {
@@ -1944,7 +2051,7 @@ function evalEndgame(board, i, color, mc) {
   const oppLoss = oppBefore  - oppAfter;
   let s = (myGain + oppLoss) * PARAMS.endAreaGain;
   s += cap * PARAMS.endCapBonus;
-  if (lib === 1 && cap === 0) s -= PARAMS.endAtariPenalty;
+  if (lib === 1 && cap === 0) s -= PARAMS.endAtariPenalty * _atariGewicht(_evalScratch, i);
   for (const n of NEIGHBORS[i]) {
     if (board[n] === opp && countLiberties(board, n, 2) === 1) s += PARAMS.endOppAtari;
   }
@@ -4505,6 +4612,8 @@ globalThis.policyNet = new PolicyNet();
          tip:'Klein halten! Tote Steine werden beim Scoring automatisch entfernt. ↑ = KI schlägt sie lieber selbst → Spiel dauert viel länger'},
         {key:'endAtariPenalty', label:'Selbst-Atari ✗',   step:50,  min:0,   max:2000,
          tip:'Sicherheitsstrafe. Nicht ändern.',  warn:true},
+        {key:'atariSizeWeight', label:'Atari × Größe',     step:0.05, min:0,  max:1,
+         tip:'0 = aus (flache Strafe). Höher = große Gruppen im Atari kosten mehr. Wirkt auf Mittel- UND Endspiel. Ungemessen.'},
         {key:'endOppAtari',     label:'Gegner Atari',      step:10,  min:0,   max:500,
          tip:'↑ = mehr Sente-Spiel und Druck im Endspiel'},
       ]

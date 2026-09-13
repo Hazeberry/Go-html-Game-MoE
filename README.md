@@ -875,6 +875,73 @@ drückt. Das ist Absicht der Speicherfunktion — eine gespeicherte Konfiguratio
 soll nicht von einem Update überschrieben werden —, heißt aber: der neue Default
 wirkt nur für frische Profile und nach einem Reset.
 
+### Die KI erstickt ihre eigene Gruppe: `atariSizeWeight`
+
+Zwei Partien gegen einen Menschen (13.09., KI als Weiß) brachten einen Befund
+anderer Art als die bisherigen. In der zweiten, über 407 Züge, hatte die KI in
+der linken unteren Ecke eine Gruppe mit **über 30 Zügen lang konstant vier
+Freiheiten** (B2, A1, E3, E1). Schwarz passte neunmal in Folge. Die KI zog in
+dieser Zeit zehnmal — F19, G19, J19, M19, L19, O19, A15, S3, T2, S1, **alle auf
+Rand-Abstand 0 oder 1**, keiner an der Gruppe. Dann setzte sie sich in drei
+Zügen selbst matt:
+
+| Zug | Weiß spielt | Gruppe | Freiheiten | `evalEndgame` |
+|---:|---|---:|---|---:|
+| 394 | E3 | 35 → 36 | 4 → 3 | **+0,2** |
+| 396 | A1 | 36 → 37 | 3 → 2 | **+0,3** |
+| 398 | E1 | 37 → 38 | 2 → 1 | −399,7 |
+| 399 | *Schwarz B2* | — | — | **38 geschlagen** |
+
+Der Gebietsstand fiel dadurch von −13 auf −52. Die Bewertungen sind an genau
+diesen Stellungen gemessen, der Rauschterm über 400 Aufrufe ausgemittelt.
+
+Zwei Lücken stecken darin. **Freiheitsverlust oberhalb von Atari kostet
+nichts** — der Bewerter kennt nur `if (lib === 1 && cap === 0)`. Und die
+**Atari-Strafe ist flach**: 38 Steine kosten dieselben 400 wie ein einzelner
+Stein. In Area-Wertung kostet der Verlust 38 Gebietspunkte plus 38 Gefangene,
+in Einheiten von `endAreaGain` also rund 2280.
+
+`atariSizeWeight` greift die zweite an: `Strafe = Basis × (1 + w × (Größe − 1))`,
+für Mittel- und Endspiel gemeinsam. Multiplikativ, weil die beiden Evaluatoren
+auf verschiedenen Skalen rechnen (`midCapBonus` 800 gegen `endCapBonus` 18) —
+eine additive Konstante je Stein bräuchte zwei Parameter und damit zwei
+Dosisachsen. Der Freiheitsterm oberhalb von Atari bleibt bewusst unangetastet:
+ein zweiter Eingriff machte die Dosisreihe mehrdeutig.
+
+An der echten Stellung, für E1 mit einer 38er-Gruppe:
+
+| `atariSizeWeight` | Strafe |
+|---:|---:|
+| 0 (Default) | −400 |
+| 0,05 | −1140 |
+| 0,1 | −1880 |
+| 0,25 | −4100 |
+
+Ein Einzelstein im Atari bleibt bei jedem Gewicht unverändert bei −400, weil
+der Faktor bei Größe 1 exakt 1 ist.
+
+**Was nicht belegt ist:** dass diese Lücke den Zug in jener Partie *verursacht*
+hat. Mit kaltem Suchbaum und 2000 ms passt die Engine in derselben Stellung,
+statt E3 zu spielen — in alter wie neuer Konfiguration. Der Unterschied kann an
+Tree-Reuse, Budget oder Zughistorie liegen und ist ungeklärt. Belegt ist die
+Lücke im Bewerter, nicht ihre Wirkung im Spiel.
+
+**Geprüft, drei Richtungen.** `countGroupSize` — eine allokationsfreie
+Primitive nach dem Muster von `countLiberties` — stimmt über 5253
+Gruppenabfragen exakt mit `floodFill` überein. Mit Gewicht 0 sind
+`evalMidgame` und `evalEndgame` über 36 748 Aufrufpaare **bitgleich** zum
+Vorstand, bei identischem Zufallsverbrauch. Mit Gewicht 0,1 ändert sich die
+Bewertung um **genau** den vorhergesagten Betrag und nur auf Zügen mit
+Selbst-Atari (2,69 % der geprüften Züge), größte Abweichung 1,1 · 10⁻¹³.
+
+Ein eigener Wächter im Harness zählt, wo die Entscheidung fällt: Aufrufe der
+Skalierung je Zug, Anteil an Gruppen ab 6 Steinen, größte berührte Gruppe.
+Rauchtest über 4 Partien: Arm A (Gewicht 0) **0,00** Aufrufe je Zug, Arm B
+(0,1) **1,98**, größte berührte Gruppe 17 Steine. Ein Arm ohne Aufrufe wäre
+nicht verdrahtet, und ein Nullergebnis dort bedeutungslos.
+
+Default 0, bis der Harness eine Aussage erlaubt.
+
 ### Die Hungerzone: eine echte Fehlfunktion, deren Behebung nichts bringt
 
 Eine externe Messreihe (hard gegen easy, Zugzeit und Simulationen je Zug) legte
