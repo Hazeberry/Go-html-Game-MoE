@@ -933,9 +933,9 @@ const driver = `
                       2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null}};
     const st = {
       1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
-          atRufe: 0, atGross: 0, atMax: 0},
+          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0},
       2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
-          atRufe: 0, atGross: 0, atMax: 0}
+          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0}
     };
     /* Gruppenverluste je Farbe: groesster Einzelschlag, den DIESE Farbe
        erlitten hat, plus die Zahl der Verluste ab 5 Steinen. Instrument fuer
@@ -996,6 +996,8 @@ const driver = `
          Farbe der anderen ihre Aufrufe zu, wie es der Faktor-Waechter
          schon einmal getan hat. */
       leseAtariWaechter(true);
+      leseDruckWaechter(true);
+      leseDeckelWaechter(true);
 
       const t0 = Date.now();
       netFrisch = false;
@@ -1012,6 +1014,11 @@ const driver = `
       { const aw = leseAtariWaechter(true);
         st[color].atRufe += aw.rufe; st[color].atGross += aw.gross;
         if (aw.maxGroesse > st[color].atMax) st[color].atMax = aw.maxGroesse; }
+      { const dw = leseDruckWaechter(true);
+        st[color].drRufe += dw.rufe; st[color].drGross += dw.gross;
+        if (dw.maxGroesse > st[color].drMax) st[color].drMax = dw.maxGroesse; }
+      { const kw = leseDeckelWaechter(true);
+        st[color].dkRufe += kw.rufe; st[color].dkGriff += kw.griff; }
       { const f = leseFaktor();
         if (f.faktor !== null) { st[color].faktoren.push(f.faktor); st[color].args.push(f.arg); } }
 
@@ -1097,6 +1104,14 @@ const driver = `
                  atariProZug: st[c].atRufe / z.length,
                  atariGrossAnteil: st[c].atRufe ? 100 * st[c].atGross / st[c].atRufe : 0,
                  atariMaxGroesse: st[c].atMax,
+                 /* Freiheitsdruck und Gefangenen-Deckel, je eigener Waechter:
+                    die drei Terme greifen an verschiedenen Stellen, eine
+                    gemeinsame Zaehlung koennte nicht sagen, welcher feuerte. */
+                 druckProZug: st[c].drRufe / z.length,
+                 druckGrossAnteil: st[c].drRufe ? 100 * st[c].drGross / st[c].drRufe : 0,
+                 druckMaxGroesse: st[c].drMax,
+                 deckelAnteil: st[c].dkRufe ? 100 * st[c].dkGriff / st[c].dkRufe : 0,
+                 deckelRufe: st[c].dkRufe,
                  /* Phasensplit der Rechenzeit: Frueh- gegen Spaetspiel. Der
                     Top10-Anteil sagt, ob es Spitzen gibt; das hier sagt, ob
                     die Zeit systematisch nach hinten wandert. Je Farbe zieht
@@ -1263,6 +1278,11 @@ const driver = `
       agg.zeit[key].atari.push(z.atariProZug);
       agg.zeit[key].atariGross.push(z.atariGrossAnteil);
       agg.zeit[key].atariMax.push(z.atariMaxGroesse);
+      agg.zeit[key].druck.push(z.druckProZug);
+      agg.zeit[key].druckGross.push(z.druckGrossAnteil);
+      agg.zeit[key].druckMax.push(z.druckMaxGroesse);
+      agg.zeit[key].deckel.push(z.deckelAnteil);
+      agg.zeit[key].deckelRufe.push(z.deckelRufe);
       if (z.faktor) agg.zeit[key].faktor.push(z.faktor);
       if (z.phase) agg.zeit[key].phase.push(z.phase);
     }
@@ -1297,9 +1317,9 @@ const driver = `
       /* Zeitverteilung nach Konfiguration: Gesamtzeit je Partie (muss bei
          Paritaet gleich sein) und Top10-Anteil (die eigentliche Messgroesse). */
       zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
-                 atari: [], atariGross: [], atariMax: []},
+                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: []},
              B: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
-                 atari: [], atariGross: [], atariMax: []}},
+                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: []}},
       anomalies: 0
     };
   }
@@ -1401,6 +1421,23 @@ const driver = `
           console.log('                — NICHT VERDRAHTET: die Skalierung wurde in keinem Arm ausgeloest');
         else if (mxB <= 1)
           console.log('                — SKALIERT NICHTS: groesste beruehrte Gruppe ist 1 Stein, der Faktor bleibt 1');
+
+        const dA = mean(A.druck), dB = mean(B.druck);
+        const dmA = Math.max(0, ...A.druckMax), dmB = Math.max(0, ...B.druckMax);
+        console.log('DRUCK-WAECHTER: Freiheitsdruck je Zug  A ' + fmt(dA, 2) + '   |   B ' + fmt(dB, 2)
+          + '  ·  davon Gruppen ab 6 Steinen  A ' + fmt(mean(A.druckGross), 1) + ' %   |   B ' + fmt(mean(B.druckGross), 1) + ' %'
+          + '  ·  groesste Gruppe  A ' + dmA + '   |   B ' + dmB);
+        if (Math.max(dA, dB) === 0)
+          console.log('                — NICHT VERDRAHTET: der Freiheitsdruck wurde in keinem Arm ausgeloest');
+
+        const kA = mean(A.deckel), kB = mean(B.deckel);
+        const krA = mean(A.deckelRufe), krB = mean(B.deckelRufe);
+        console.log('DECKEL-WAECHTER: Gefangenen-Deckel schnitt bei  A ' + fmt(kA, 1) + ' %   |   B ' + fmt(kB, 1)
+          + ' % der Bewertungen   ·  Bewertungen mit aktivem Deckel je Zug  A ' + fmt(krA, 0) + '   |   B ' + fmt(krB, 0));
+        if (Math.max(krA, krB) === 0)
+          console.log('                — NICHT VERDRAHTET: in keinem Arm war ein Deckel gesetzt');
+        else if (Math.max(kA, kB) < 1)
+          console.log('                — DECKEL ZU HOCH: er schnitt praktisch nie, ein Nullergebnis waere bedeutungslos');
       }
     }
     console.log('PASS: erster Ø Zug S ' + fmt(mean(agg.passFirst[1]), 0) + ' / W ' + fmt(mean(agg.passFirst[2]), 0)

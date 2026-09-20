@@ -1117,6 +1117,35 @@ globalThis.PARAMS = {
      belegt und weil er abschaltbar geprüft ist — nicht, weil er wirkt. */
   atariSizeWeight:    0,
   endOppAtari:       80,
+  /* Freiheitsdruck oberhalb von Atari, nur evalEndgame.
+     Strafe = endLibPressure * Gruppengroesse / Freiheiten, für 2 und 3
+     Freiheiten; ab 4 null. 0 = aus, dann bleibt auch der Freiheits-Deckel
+     von countLiberties bei 2 und es wird kein Gruppen-Walk ausgeloest.
+
+     ANLASS — dieselbe Partie wie bei atariSizeWeight (13.09., 407 Zuege).
+     Die Atari-Strafe springt erst bei genau EINER Freiheit; der Weg dorthin
+     war gratis, an den drei realen Zuegen gemessen:
+
+       Zug 394  E3   Gruppe 35 -> 36   Freiheiten 4 -> 3   evalEndgame  +0.2
+       Zug 396  A1   Gruppe 36 -> 37   Freiheiten 3 -> 2   evalEndgame  +0.3
+       Zug 398  E1   Gruppe 37 -> 38   Freiheiten 2 -> 1   evalEndgame  -399.7
+
+     Die ersten beiden Zuege sind der eigentliche Fehler; beim dritten ist es
+     zu spaet. atariSizeWeight hat nur den dritten teurer gemacht und im A/B
+     nichts gebracht (360 Partien, 49.7 %) — dieser Term greift die beiden
+     davor an.
+
+     Das Mittelspiel hat mit mid2LibPenalty bereits eine 2-Freiheiten-Strafe,
+     das Endspiel hatte gar keine. Anders als dort ist dieser Term
+     groessenabhaengig, weil genau das der Befund war: was auf dem Spiel
+     steht, mal wie nah es daran ist.
+
+     Zur Einordnung bei einer 38er-Gruppe: Gewicht 5 -> Strafe 95 bei zwei
+     Freiheiten und 63 bei dreien, Gewicht 15 -> 285 / 190, Gewicht 40 ->
+     760 / 507. Zum Vergleich die Atari-Strafe bei einer Freiheit: 400.
+
+     Default 0, bis der Harness eine Aussage erlaubt. */
+  endLibPressure:     0,
   /* Tsumego */
   tsumegoCapBonus:  1200,
   tsumegoAtariSet:   500,
@@ -1651,6 +1680,46 @@ globalThis.PARAMS = {
      dass dieser Term die Skala beherrscht. Das gehört durch den A/B-Harness,
      nicht in einen Schnellschuss. */
   captureWeight:   20,
+  /* Deckel auf den Beitrag des Gefangenen-Terms zu evaluateBoard, in
+     Bewertungspunkten. 0 = aus (unbegrenzt, bisheriges Verhalten).
+
+     ANLASS — zwei Partien gegen einen Menschen (12./13.09.). Q kommt aus
+     tanh(evaluateBoard / mctsValueScale), und sobald der Gefangenen-Term
+     gross genug ist, beherrscht er die Summe und tanh saettigt. Gemessen:
+
+       Partie 1   erster gesaettigter Zug 208, Gebietsstand dort  -4
+       Partie 2   erster gesaettigter Zug 260, Gebietsstand dort +10 (vorn!)
+       in beiden  25 von 29 bzw. 67 von 71 gesaettigten Zuegen hatten einen
+                  Rueckstand KLEINER als die Aufgabe-Marge
+
+     Im gesaettigten Bereich sagt der Gefangenen-Term allein das gemessene Q
+     voraus — mittlerer Abstand 0.008 bzw. 0.019. Und die Korrelation von Q
+     mit dem Gebietsstand faellt von 0.62 (ungesaettigt) auf 0.31.
+
+     Rechnerisch genuegen 19 Gefangene Rueckstand, um |Q| ueber die
+     Aufgabeschwelle 0.95 zu heben, unabhaengig vom Gebiet — 5.3 % der
+     Brettpunkte. Die Empfindlichkeit bricht dabei zusammen: bei einem Term
+     von -180 bewegen 100 Bewertungspunkte das Q um 0.243, bei -480 nur noch
+     um 0.016, also 15-fach weniger.
+
+     Gedeckelt statt Gewicht gesenkt: captureWeight steuert, wie attraktiv
+     ein Schlag IST, der Deckel nur, wie weit der aufgelaufene
+     Gefangenen-SALDO die Skala beherrschen darf. Ein kleineres Gewicht
+     aendert beides zugleich und machte die Messung mehrdeutig.
+
+     Was ein Wert bedeutet, wenn der Gefangenen-Term allein wirkt:
+     200 -> |Q| hoechstens 0.76, 300 -> 0.905, 400 -> 0.964.
+
+     ERWARTETE NEBENWIRKUNG, mitzumessen: die Aufgabeschwelle. |Q| >= 0.95
+     verlangt |evaluateBoard| >= 366. Unter einem Deckel von 200 oder 300
+     kann der Gefangenen-Term sie allein nicht mehr reissen, die Stellung
+     muss auch positionell verloren sein. Das ist der Zweck — es verschiebt
+     aber die Aufgabehaeufigkeit, und die Zeile "Aufgaben S/W: Q" im Harness
+     ist deshalb Teil des Ergebnisses, nicht Beiwerk. Das zweite
+     Aufgabe-Kriterium (Gebietsmarge) bleibt unberuehrt.
+
+     Default 0, bis der Harness eine Aussage erlaubt. */
+  captureCap:       0,
   resignEnabled:  1,
   /* 0.95 GEMESSEN gegen 0.997, 30 gepaarte Paare = 60 Partien, beide Seiten
      mctsValueScale=200 und resignEnabled=1: 29:31, Komi-0 exakt 30:30,
@@ -1943,6 +2012,7 @@ function libGewicht(lib) {
    soll sie nicht zweimal bezahlen — und die Zählung soll trotzdem an EINER
    Stelle sitzen, nicht in zwei Zweigen nebenher. */
 let _atariRufe = 0, _atariGross = 0, _atariMaxGroesse = 0;
+let _druckRufe = 0, _druckGross = 0, _druckMaxGroesse = 0;
 
 function _atariGewicht(board, i, groesse) {
   const w = PARAMS.atariSizeWeight;
@@ -1962,6 +2032,15 @@ function _atariGewicht(board, i, groesse) {
 function leseAtariWaechter(reset) {
   const v = {rufe: _atariRufe, gross: _atariGross, maxGroesse: _atariMaxGroesse};
   if (reset) { _atariRufe = 0; _atariGross = 0; _atariMaxGroesse = 0; }
+  return v;
+}
+
+/* Derselbe Waechter fuer den Freiheitsdruck. Getrennt gefuehrt, weil die
+   beiden Terme an verschiedenen Freiheitszahlen greifen und eine gemeinsame
+   Zaehlung nicht sagen koennte, welcher von beiden gefeuert hat. */
+function leseDruckWaechter(reset) {
+  const v = {rufe: _druckRufe, gross: _druckGross, maxGroesse: _druckMaxGroesse};
+  if (reset) { _druckRufe = 0; _druckGross = 0; _druckMaxGroesse = 0; }
   return v;
 }
 
@@ -2088,7 +2167,11 @@ function evalEndgame(board, i, color, mc) {
   _evalScratch.set(board);
   _evalScratch[i] = color;
   const cap = removeDeadGroups(_evalScratch, opp, i);
-  const lib = countLiberties(_evalScratch, i, 2);
+  /* Der Deckel bleibt bei 2, solange der Freiheitsterm aus ist: countLiberties
+     bricht beim Deckel ab, ein hoeherer kostet also Laufzeit. Bei lib 0 und 1
+     liefern beide Deckel denselben Wert, die bestehenden Vergleiche unten
+     sind davon nicht beruehrt. */
+  const lib = countLiberties(_evalScratch, i, PARAMS.endLibPressure > 0 ? 4 : 2);
   if (lib === 0 && cap === 0) return -10000 + Math.random();
   const areaAfter = estimateArea(_evalScratch, color);
   const oppAfter  = estimateArea(_evalScratch, opp);
@@ -2097,6 +2180,16 @@ function evalEndgame(board, i, color, mc) {
   let s = (myGain + oppLoss) * PARAMS.endAreaGain;
   s += cap * PARAMS.endCapBonus;
   if (lib === 1 && cap === 0) s -= PARAMS.endAtariPenalty * _atariGewicht(_evalScratch, i);
+  /* Freiheitsdruck oberhalb von Atari. Die Atari-Strafe oben springt erst bei
+     genau einer Freiheit; der Weg dorthin war bis hierher gratis. Der Term
+     ist proportional zur Gruppengroesse geteilt durch die Freiheiten: was auf
+     dem Spiel steht, mal wie nah es daran ist. Ab vier Freiheiten null. */
+  if (PARAMS.endLibPressure > 0 && cap === 0 && lib >= 2 && lib <= 3) {
+    const n = countGroupSize(_evalScratch, i);
+    _druckRufe++; if (n >= 6) _druckGross++;
+    if (n > _druckMaxGroesse) _druckMaxGroesse = n;
+    s -= PARAMS.endLibPressure * n / lib;
+  }
   for (const n of NEIGHBORS[i]) {
     if (board[n] === opp && countLiberties(board, n, 2) === 1) s += PARAMS.endOppAtari;
   }
@@ -2311,10 +2404,29 @@ function quickEval(board, i, color) {
    vier Freiheiten kein Abschlag. Siehe den Kommentar an deathDiscount. */
 const STERBE_RAMPE = [1, 1, 0.5, 0.25];
 
+let _deckelRufe = 0, _deckelGriff = 0;
+/* Waechter fuer den Gefangenen-Deckel: wie oft wurde evaluateBoard mit
+   eingeschaltetem Deckel gerufen, und wie oft hat er tatsaechlich
+   zugeschnitten. Bleibt der Anteil bei 0, ist der Deckel zu hoch gesetzt
+   und ein Nullergebnis bedeutungslos. */
+function leseDeckelWaechter(reset) {
+  const v = {rufe: _deckelRufe, griff: _deckelGriff};
+  if (reset) { _deckelRufe = 0; _deckelGriff = 0; }
+  return v;
+}
+
 const _evalBoardSeen = new Int32Array(BOARD_SIZE);
 function evaluateBoard(board, color, captures) {
   const opp = color === 1 ? 2 : 1;
-  let s = ((captures[color]||0) - (captures[opp]||0)) * PARAMS.captureWeight;
+  let gefangen = ((captures[color]||0) - (captures[opp]||0)) * PARAMS.captureWeight;
+  /* Deckel gegen die Q-Saettigung. 0 = aus, dann steht hier bitgenau der alte
+     Ausdruck und es wird nichts gerechnet. Siehe den Kommentar an captureCap. */
+  if (PARAMS.captureCap > 0) {
+    if (gefangen >  PARAMS.captureCap) { gefangen =  PARAMS.captureCap; _deckelGriff++; }
+    else if (gefangen < -PARAMS.captureCap) { gefangen = -PARAMS.captureCap; _deckelGriff++; }
+    _deckelRufe++;
+  }
+  let s = gefangen;
   /* Benson-Ebene: beweisbar tote Gruppen zählen 0 statt Größe×5+Frei×3 —
      genau der Term, der im Spätspiel den Q-Kollaps produziert, wenn tote
      Klumpen als lebendiges Material gewertet werden. Gate über die Zahl
@@ -4661,6 +4773,8 @@ globalThis.policyNet = new PolicyNet();
          tip:'0 = aus (flache Strafe). Höher = große Gruppen im Atari kosten mehr. Wirkt auf Mittel- UND Endspiel. Ungemessen.'},
         {key:'endOppAtari',     label:'Gegner Atari',      step:10,  min:0,   max:500,
          tip:'↑ = mehr Sente-Spiel und Druck im Endspiel'},
+        {key:'endLibPressure',  label:'Freiheitsdruck',    step:5,   min:0,   max:100,
+         tip:'0 = aus. Strafe für eigene Gruppen mit 2–3 Freiheiten, proportional zur Größe. Ungemessen.'},
       ]
     },
     {
@@ -4727,6 +4841,8 @@ globalThis.policyNet = new PolicyNet();
          tip:'Chebyshev-Radius um den letzten Gegnerzug, linear abfallend'},
         {key:'bensonMoveFilter', label:'Benson-Filter', step:1, min:0, max:1,
          tip:'1 = todgeborene Züge (beweisbar toter Stein) fliegen aus der Kandidatenliste; nur Pass bleibt, wenn nichts übrig ist'},
+        {key:'captureCap', label:'Gefangenen-Deckel', step:50, min:0, max:1000,
+         tip:'0 = aus. Begrenzt, wie weit der Gefangenen-Saldo die Bewertung beherrschen darf — gegen die Q-Sättigung. Verschiebt auch die Aufgabeschwelle. Ungemessen.'},
         {key:'resignQ', label:'Aufgabe-Q', step:0.01, min:0.5, max:1, float:true,
          tip:'Q-Schwelle (aus KI-Sicht negativ) für die Aufgabe-Serie'},
         {key:'resignStreak', label:'Aufgabe-Serie', step:1, min:2, max:20,
