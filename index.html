@@ -1185,9 +1185,61 @@ globalThis.PARAMS = {
      Nebenwirkung, mitgemessen: Aufgabe-Siege A:B 23:22 / 23:29 / 26:41.
      Mit der Dosis gewinnt B häufiger durch Aufgabe des Gegners.
 
-     Default bleibt 0. Eine Nachmessung auf Dosis 40 mit disjunkten Seeds
-     läuft; ihr Wert ist die unabhängige Zahl, der gepoolte nicht — die
-     Dosis wurde ja gerade wegen ihres Anscheins ausgewählt. */
+     ─────────────────────────────────────────────────────────────────────
+     NACHMESSUNG auf Dosis 40, Läufe 101-103, Seeds 9800-9802, disjunkt zu
+     9620/9621. Erwartet war Regression zur Mitte; eingetreten ist das
+     Gegenteil, und zwar deutlich:
+
+                                B : A    Rate     95-%-KI      p
+       erster Durchgang (120)   68:52   56.7 %   47.3-65.7   0.17
+       NACHMESSUNG     (180)  123:57   68.3 %   61.0-75.1   9.7e-07
+       gepoolt         (300)  191:109  63.7 %   57.9-69.1   2.6e-06
+
+     Die unabhängige Zahl ist die NACHMESSUNG ALLEIN: 68.3 %. Der gepoolte
+     Wert enthält den ersten Durchgang, der wegen seines Anscheins zur
+     Nachmessung ausgewählt wurde, und ist dadurch verzerrt. Einzelläufe der
+     Nachmessung 42:18 · 39:21 · 42:18 — kein Ausreißer trägt das Ergebnis.
+
+     Die Mechanismus-Metrik trägt mit, in derselben Größenordnung:
+
+       Ø größter erlittener Schlag   12.23 -> 9.30   (-24.0 %), B besser 3/3
+       Schläge ab 5 Steinen            378 ->  298
+       Gesamtverlust                  6073 -> 4685   (-22.9 %)
+
+     WARUM DAS DIESMAL KEINE REGRESSION ZUR MITTE IST — die Prüfung, an der
+     atariSizeWeight und der erste endLibPressure-Durchgang gescheitert sind:
+
+       Streuung der Kontrollarme   erster Durchgang  9.3 bis 15.6   (68 %)
+                                   Nachmessung      11.9 bis 12.8   ( 8 %)
+
+     Im ersten Durchgang war die Streuung der Kontrollarme so groß wie der
+     gesuchte Effekt, hier ist sie ein Drittel davon. Ein Effekt von -24 %
+     kann aus einer 8-Prozent-Streuung nicht entstehen. Die Korrelation
+     Kontrollarm/Verbesserung liegt zwar bei r = -0.81, aber über drei
+     Punkte mit 8 % Spannweite ist das eine Zahl ohne Aussage — sie
+     beschreibt Rauschen, nicht den Effekt.
+
+     Confounds geprüft: Sims 622:622, 619:618, 890:888. Zeit -0.6/-0.8/-0.8 %,
+     also wenn überhaupt zu Bs Ungunsten. Komi-0-Wertung 40:20, 36:24, 38:22 —
+     gleiche Richtung, kein Komi-Artefakt. Wächter A 0.00 Aufrufe je Zug,
+     B 42.0-43.2.
+
+     CODE-IDENTITÄT geprüft, weil die beiden Durchgänge auf verschiedenen
+     Commits liefen (613c2cc und 8d5cf05): der Diff ist reiner Kommentar, und
+     über 48552 Bewertungspaare aus evalEndgame und evalTsumego liefern beide
+     Stände bitgleiche Werte. Der Vergleich ist gültig.
+
+     OFFEN BLEIBT: die beiden Durchgänge unterscheiden sich mit p = 0.040
+     voneinander. Das ist mit Zufall vereinbar, aber es heißt, dass die
+     wahre Rate eher im Bereich 57-75 % liegt als genau bei 68 %.
+
+     Damit ist dies nach midLineWeight der zweite Eingriff mit belegtem
+     Spielstärkegewinn — und der erste, der einen BEWERTUNGSFEHLER behebt
+     statt einer Gewohnheit. Die vier Vorgänger dieser Art (Min-Sims-Boden,
+     Hungerzone, atariSizeWeight, captureCap) waren allesamt wirkungslos.
+
+     Default bleibt 0: das Setzen ist eine Entscheidung des Projektinhabers,
+     nicht ein Nebenprodukt der Messung. Vorschlag: 40. */
   endLibPressure:     0,
   /* Tsumego */
   tsumegoCapBonus:  1200,

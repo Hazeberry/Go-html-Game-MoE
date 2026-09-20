@@ -1026,8 +1026,53 @@ Was die sechs Läufe dennoch zeigen, und was `r90` nicht allein erklärt, ist di
 B hat in keinem Lauf eine Katastrophenserie. Das ist genau das, was ein
 Freiheitsdruck tun sollte: nicht den Schnitt senken, sondern den Schwanz
 abschneiden. Belegt ist es damit nicht — sechs Läufe sind für eine
-Varianzaussage wenig. Eine Nachmessung auf Dosis 40 mit disjunkten Seeds
-läuft; ihr Wert ist die unabhängige Zahl, der gepoolte nicht.
+Varianzaussage wenig.
+
+#### Nachmessung auf Dosis 40: der erste belegte Bewertungsfix
+
+Erwartet war Regression zur Mitte. Eingetreten ist das Gegenteil.
+
+| | B : A | Rate | 95 %-CI | p |
+|---|---:|---:|---:|---:|
+| erster Durchgang (120) | 68:52 | 56,7 % | 47,3–65,7 % | 0,17 |
+| **Nachmessung (180)** | **123:57** | **68,3 %** | **61,0–75,1 %** | **9,7 · 10⁻⁷** |
+| gepoolt (300) | 191:109 | 63,7 % | 57,9–69,1 % | 2,6 · 10⁻⁶ |
+
+Die unabhängige Zahl ist die **Nachmessung allein**; der gepoolte Wert enthält
+den Durchgang, der wegen seines Anscheins zur Nachmessung ausgewählt wurde.
+Einzelläufe 42:18 · 39:21 · 42:18 — kein Ausreißer trägt das Ergebnis. Die
+Mechanismus-Metrik trägt mit: Ø größter erlittener Schlag 12,23 → 9,30
+(−24,0 %, B besser in 3/3), Schläge ab 5 Steinen 378 → 298, Gesamtverlust
+6073 → 4685.
+
+**Warum das diesmal keine Regression zur Mitte ist** — die Prüfung, an der
+`atariSizeWeight` und der erste Durchgang gescheitert sind:
+
+| | Streuung der Kontrollarme |
+|---|---|
+| erster Durchgang | 9,3 bis 15,6 — **68 %** |
+| Nachmessung | 11,9 bis 12,8 — **8 %** |
+
+Im ersten Durchgang war die Streuung der Kontrollarme so groß wie der gesuchte
+Effekt; hier ist sie ein Drittel davon. Ein Effekt von −24 % kann aus einer
+8-Prozent-Streuung nicht entstehen. Die Korrelation liegt zwar wieder bei
+r = −0,81, aber über drei Punkte mit 8 % Spannweite beschreibt sie Rauschen,
+nicht den Effekt.
+
+Confounds geprüft: Sims 622:622, 619:618, 890:888; Zeit −0,6/−0,8/−0,8 %, also
+wenn überhaupt zu Bs Ungunsten; Komi-0-Wertung in gleicher Richtung.
+**Code-Identität geprüft**, weil die Durchgänge auf verschiedenen Commits
+liefen: der Diff ist reiner Kommentar, und über 48 552 Bewertungspaare liefern
+beide Stände bitgleiche Werte.
+
+Offen bleibt, dass die beiden Durchgänge sich mit p = 0,040 unterscheiden. Das
+ist mit Zufall vereinbar, heißt aber: die wahre Rate liegt eher im Bereich
+57–75 % als genau bei 68 %.
+
+Damit ist dies nach `midLineWeight` der **zweite Eingriff mit belegtem
+Spielstärkegewinn** — und der erste, der einen *Bewertungsfehler* behebt statt
+einer Gewohnheit. Die vier Vorgänger dieser Art waren allesamt wirkungslos.
+Der Default steht auf 0; Vorschlag: 40.
 
 ### Die Q-Sättigung deckeln: `captureCap`
 
