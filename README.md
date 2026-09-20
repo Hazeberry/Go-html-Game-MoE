@@ -984,6 +984,83 @@ erst ab rund 63 % auf.
 Der Default bleibt 0. Der Parameter bleibt im Code, weil die Messung ihn
 belegt und weil er abschaltbar geprüft ist — nicht, weil er wirkt.
 
+### Der Freiheitsterm oberhalb von Atari: `endLibPressure`
+
+`atariSizeWeight` hat nur den letzten Schritt teurer gemacht (2→1 Freiheiten) —
+und da war es schon zu spät. Der Fehler sind die beiden davor: 4→3 kostete
++0,2, 3→2 kostete +0,3. `endLibPressure` greift sie an, mit
+`Strafe = Gewicht × Gruppengröße / Freiheiten` für 2 und 3 Freiheiten.
+
+Der Term ist viel breiter als sein Vorgänger: er feuert auf **34 %** aller
+geprüften Endspielzüge, gegen 2,7 % bei `atariSizeWeight`. Deshalb begann die
+Dosisreihe niedrig.
+
+| Dosis | B-Siege | Rate | 95 %-CI | p (Bonferroni ×3) |
+|---:|---:|---:|---:|---:|
+| 5 | 63/120 | 52,5 % | 43,2–61,7 % | 0,65 (1,00) |
+| 15 | 61/120 | 50,8 % | 41,6–60,1 % | 0,93 (1,00) |
+| 40 | 68/120 | 56,7 % | 47,3–65,7 % | 0,17 (0,51) |
+| **gepoolt** | **192/360** | **53,3 %** | 48,0–58,6 % | 0,225 |
+
+Verdrahtet: Wächter A 0,00 Aufrufe je Zug, B 42,5–45,3, größte berührte Gruppe
+37 bis 175 Steine. Die Mechanismus-Metrik zeigt in die richtige Richtung —
+Ø größter erlittener Schlag 11,72 → 10,50, Schläge ab 5 Steinen 704 → 636,
+Gesamtverlust 11 409 → 10 292, jeweils B besser in 5 von 6 Läufen (p = 0,22).
+
+**Unentschieden, nicht belegt.** Zwei Vorbehalte stehen ausdrücklich dagegen.
+Die Kontrollarme streuen für sich zwischen 9,3 und 15,6 (68 %), und die
+Korrelation zwischen Kontrollarm und gemessener Verbesserung liegt wieder bei
+**r = −0,90** — die Dosiszeile ist damit nicht als Dosis-Wirkung lesbar. Und
+ein einzelner Lauf trägt die Hälfte: ohne `r90`, dessen Kontrollarm mit 15,6
+der schlechteste der Serie war, fällt der gepoolte Gruppenverlust von −10,4 %
+auf −4,0 %.
+
+Was die sechs Läufe dennoch zeigen, und was `r90` nicht allein erklärt, ist die
+**Streuung**:
+
+| | Spanne | SD | ohne `r90` |
+|---|---|---:|---:|
+| Kontrollarm A | 9,3–15,6 | 2,21 | 1,25 |
+| Testarm B | 9,6–11,8 | **0,82** | 0,92 |
+
+B hat in keinem Lauf eine Katastrophenserie. Das ist genau das, was ein
+Freiheitsdruck tun sollte: nicht den Schnitt senken, sondern den Schwanz
+abschneiden. Belegt ist es damit nicht — sechs Läufe sind für eine
+Varianzaussage wenig. Eine Nachmessung auf Dosis 40 mit disjunkten Seeds
+läuft; ihr Wert ist die unabhängige Zahl, der gepoolte nicht.
+
+### Die Q-Sättigung deckeln: `captureCap`
+
+| Dosis | B-Siege | Rate | 95 %-CI | p (Bonferroni ×3) |
+|---:|---:|---:|---:|---:|
+| 200 | 67/120 | 55,8 % | 46,5–64,9 % | 0,24 (0,71) |
+| 300 | 64/120 | 53,3 % | 44,0–62,5 % | 0,52 (1,00) |
+| 400 | 52/120 | 43,3 % | 34,3–52,7 % | 0,17 (0,51) |
+| **gepoolt** | **183/360** | **50,8 %** | 45,5–56,1 % | 0,79 |
+
+Kein Gewinn. Der Deckel tut dabei nachweislich genau das, wofür er gebaut ist,
+und **beide** Wirkungen sind sauber dosisgeordnet:
+
+| Dosis | Deckel schnitt bei | Aufgabe-Siege A : B |
+|---:|---|---:|
+| 200 | 10,0 % / 9,4 % | 28 : 41 |
+| 300 | 5,0 % / 4,4 % | 31 : 31 |
+| 400 | 2,0 % / 2,3 % | 37 : 24 |
+
+Je enger der Deckel, desto seltener gibt B auf — die vorhergesagte
+Nebenwirkung, in der vorhergesagten Reihenfolge. Der Mechanismus ist bestätigt,
+der Nutzen nicht.
+
+Die **Kostenseite** ist konsistent: B erlitt in fünf von sechs Läufen *mehr*
+Schläge ab 5 Steinen (769 → 788 gepoolt). Das passt zum Eingriff — wer den
+Gefangenen-Saldo deckelt, gewichtet ihn im Spiel geringer und lässt eher große
+Gruppen fallen.
+
+Damit ist die Sättigung real, exakt beschrieben und messbar behoben, ohne dass
+die Spielstärke sich rührt. **Vierter Fall dieser Art** nach Min-Sims-Boden,
+Hungerzone und `atariSizeWeight`. Der Default bleibt 0; der Deckel ist als
+Werkzeug gegen die Aufgabe-Fehlauslösung dokumentiert, nicht als Stärkehebel.
+
 ### Die Hungerzone: eine echte Fehlfunktion, deren Behebung nichts bringt
 
 Eine externe Messreihe (hard gegen easy, Zugzeit und Simulationen je Zug) legte

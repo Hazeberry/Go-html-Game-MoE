@@ -1144,7 +1144,50 @@ globalThis.PARAMS = {
      Freiheiten und 63 bei dreien, Gewicht 15 -> 285 / 190, Gewicht 40 ->
      760 / 507. Zum Vergleich die Atari-Strafe bei einer Freiheit: 400.
 
-     Default 0, bis der Harness eine Aussage erlaubt. */
+     ─────────────────────────────────────────────────────────────────────
+     GEMESSEN, Läufe 89-94, drei Dosen zu je 120 Partien:
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x3)
+         5      63/120   52.5 %   43.2-61.7 %     0.65 (1.00)
+        15      61/120   50.8 %   41.6-60.1 %     0.93 (1.00)
+        40      68/120   56.7 %   47.3-65.7 %     0.17 (0.51)
+       gepoolt 192/360   53.3 %   48.0-58.6 %     0.225
+
+     Verdrahtet: Wächter A 0.00 Aufrufe je Zug, B 42.5 bis 45.3, größte
+     berührte Gruppe 37 bis 175 Steine. Sims und Zeit paritätisch.
+
+     Die Mechanismus-Metrik zeigt in die richtige Richtung, gepaart je Lauf:
+
+       Ø größter erlittener Schlag   11.72 -> 10.50   B kleiner in 4/6  p 0.69
+       Schläge ab 5 Steinen            704 ->   636   B kleiner in 5/6  p 0.22
+       Gesamtverlust                 11409 -> 10292   B kleiner in 5/6  p 0.22
+
+     UNENTSCHIEDEN, nicht belegt. Kein einziger Test erreicht Signifikanz,
+     und zwei Vorbehalte stehen ausdrücklich dagegen:
+
+     (1) Die Kontrollarme streuen für sich zwischen 9.3 und 15.6 — 68 %.
+         Die Korrelation zwischen Kontrollarm und gemessener Verbesserung
+         liegt bei r = -0.90, genau wie bei atariSizeWeight. Die Dosiszeile
+         (-13.7 % / +1.9 % / -17.7 %) ist deshalb NICHT als Dosis-Wirkung
+         lesbar.
+     (2) Ein einzelner Lauf trägt die Hälfte des Effekts. Ohne r90, dessen
+         Kontrollarm mit 15.6 der schlechteste der Serie war, fällt der
+         gepoolte Gruppenverlust von -10.4 % auf -4.0 %.
+
+     Was die sechs Läufe dennoch zeigen und was r90 nicht allein erklärt:
+     die STREUUNG. Der Kontrollarm reicht von 9.3 bis 15.6 (SD 2.21), der
+     Testarm nur von 9.6 bis 11.8 (SD 0.82) — ohne r90 immer noch 1.25
+     gegen 0.92. B hat in keinem Lauf eine Katastrophenpartie-Serie. Das
+     ist genau das, was ein Freiheitsdruck tun sollte: nicht den Schnitt
+     senken, sondern den Schwanz abschneiden. Belegt ist es damit nicht,
+     n = 6 Läufe sind für eine Varianzaussage wenig.
+
+     Nebenwirkung, mitgemessen: Aufgabe-Siege A:B 23:22 / 23:29 / 26:41.
+     Mit der Dosis gewinnt B häufiger durch Aufgabe des Gegners.
+
+     Default bleibt 0. Eine Nachmessung auf Dosis 40 mit disjunkten Seeds
+     läuft; ihr Wert ist die unabhängige Zahl, der gepoolte nicht — die
+     Dosis wurde ja gerade wegen ihres Anscheins ausgewählt. */
   endLibPressure:     0,
   /* Tsumego */
   tsumegoCapBonus:  1200,
@@ -1718,7 +1761,42 @@ globalThis.PARAMS = {
      ist deshalb Teil des Ergebnisses, nicht Beiwerk. Das zweite
      Aufgabe-Kriterium (Gebietsmarge) bleibt unberuehrt.
 
-     Default 0, bis der Harness eine Aussage erlaubt. */
+     ─────────────────────────────────────────────────────────────────────
+     GEMESSEN, Läufe 95-100, drei Dosen zu je 120 Partien:
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x3)
+       200      67/120   55.8 %   46.5-64.9 %     0.24 (0.71)
+       300      64/120   53.3 %   44.0-62.5 %     0.52 (1.00)
+       400      52/120   43.3 %   34.3-52.7 %     0.17 (0.51)
+       gepoolt 183/360   50.8 %   45.5-56.1 %     0.79
+
+     KEIN Spielstärkegewinn. Der Deckel tut dabei nachweislich genau das,
+     wofür er gebaut ist — beide Wirkungen sind sauber dosisgeordnet:
+
+       Dosis   Deckel schnitt bei       Aufgabe-Siege A : B
+       200     10.0 % / 9.4 %                28 : 41
+       300      5.0 % / 4.4 %                31 : 31
+       400      2.0 % / 2.3 %                37 : 24
+
+     Je enger der Deckel, desto seltener gibt B auf — die vorhergesagte
+     Nebenwirkung, in der Reihenfolge, in der sie vorhergesagt war. Der
+     Mechanismus ist damit bestätigt, der Nutzen nicht.
+
+     Die KOSTENSEITE ist dafür konsistent: B erlitt in FÜNF von sechs
+     Läufen MEHR Schläge ab 5 Steinen (769 -> 788 gepoolt, Vorzeichentest
+     p = 0.22). Das passt zum Eingriff: wer den Gefangenen-Saldo deckelt,
+     gewichtet ihn im Spiel geringer und lässt eher große Gruppen fallen.
+     Der gepoolte Ø größte Schlag sinkt zwar (12.22 -> 11.57), aber nur in
+     3 von 6 Läufen, und die Kontrollarme korrelieren auch hier mit der
+     scheinbaren Verbesserung (r = -0.83).
+
+     FAZIT: die Saettigung ist real und exakt beschrieben, der Deckel
+     behebt sie messbar, und die Spielstärke bleibt unberührt. Vierter Fall
+     dieser Art nach Min-Sims-Boden, Hungerzone und atariSizeWeight.
+
+     Default bleibt 0. NICHT ERNEUT TESTEN, solange die Frage
+     "Spielstärke" lautet — der Deckel ist als Werkzeug gegen die
+     Aufgabe-Fehlauslösung dokumentiert, nicht als Stärkehebel. */
   captureCap:       0,
   resignEnabled:  1,
   /* 0.95 GEMESSEN gegen 0.997, 30 gepaarte Paare = 60 Partien, beide Seiten
