@@ -933,9 +933,9 @@ const driver = `
                       2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null, krisenDauer: null}};
     const st = {
       1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
-          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0},
+          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0},
       2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
-          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0}
+          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0}
     };
     /* Gruppenverluste je Farbe: groesster Einzelschlag, den DIESE Farbe
        erlitten hat, plus die Zahl der Verluste ab 5 Steinen. Instrument fuer
@@ -1004,6 +1004,7 @@ const driver = `
       leseDruckWaechter(true);
       leseDeckelWaechter(true);
       leseSunkWaechter(true);
+      leseAugenWaechter(true);
 
       const t0 = Date.now();
       netFrisch = false;
@@ -1028,6 +1029,8 @@ const driver = `
       { const sw = leseSunkWaechter(true);
         st[color].skRufe += sw.rufe; st[color].skGriff += sw.griff;
         if (sw.maxDauer > st[color].skMax) st[color].skMax = sw.maxDauer; }
+      { const aw = leseAugenWaechter(true);
+        st[color].agRufe += aw.rufe; st[color].agOffen += aw.offen; }
       { const f = leseFaktor();
         if (f.faktor !== null) { st[color].faktoren.push(f.faktor); st[color].args.push(f.arg); } }
 
@@ -1125,6 +1128,8 @@ const driver = `
                  sunkAnteil: st[c].skRufe ? 100 * st[c].skGriff / st[c].skRufe : 0,
                  sunkRufe: st[c].skRufe,
                  sunkMaxDauer: st[c].skMax,
+                 augenOffenAnteil: st[c].agRufe ? 100 * st[c].agOffen / st[c].agRufe : 0,
+                 augenRufe: st[c].agRufe,
                  /* Phasensplit der Rechenzeit: Frueh- gegen Spaetspiel. Der
                     Top10-Anteil sagt, ob es Spitzen gibt; das hier sagt, ob
                     die Zeit systematisch nach hinten wandert. Je Farbe zieht
@@ -1299,6 +1304,8 @@ const driver = `
       agg.zeit[key].sunk.push(z.sunkAnteil);
       agg.zeit[key].sunkRufe.push(z.sunkRufe);
       agg.zeit[key].sunkMax.push(z.sunkMaxDauer);
+      agg.zeit[key].augen.push(z.augenOffenAnteil);
+      agg.zeit[key].augenRufe.push(z.augenRufe);
       if (z.faktor) agg.zeit[key].faktor.push(z.faktor);
       if (z.phase) agg.zeit[key].phase.push(z.phase);
     }
@@ -1333,9 +1340,9 @@ const driver = `
       /* Zeitverteilung nach Konfiguration: Gesamtzeit je Partie (muss bei
          Paritaet gleich sein) und Top10-Anteil (die eigentliche Messgroesse). */
       zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
-                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: []},
+                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: []},
              B: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
-                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: []}},
+                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: []}},
       anomalies: 0
     };
   }
@@ -1464,6 +1471,15 @@ const driver = `
           console.log('                — NICHT VERDRAHTET: in keinem Arm war der Malus gesetzt');
         else if (Math.max(sA, sB) < 1)
           console.log('                — SERIE ZU LANG: der Malus griff praktisch nie, ein Nullergebnis waere bedeutungslos');
+
+        const gA2 = mean(A.augen), gB2 = mean(B.augen);
+        const grA = mean(A.augenRufe), grB = mean(B.augenRufe);
+        console.log('AUGEN-WAECHTER: offene Punkte unter den gezaehlten Augen  A ' + fmt(gA2, 1) + ' %   |   B ' + fmt(gB2, 1) + ' %'
+          + '   ·  gezaehlte Augenpunkte je Zug  A ' + fmt(grA, 0) + '   |   B ' + fmt(grB, 0));
+        if (Math.max(grA, grB) === 0)
+          console.log('                — NICHT VERDRAHTET: in keinem Arm war der Abschlag gesetzt');
+        else if (Math.max(gA2, gB2) < 1)
+          console.log('                — NICHTS ABZUWERTEN: praktisch kein gezaehlter Augenpunkt ist offen');
       }
     }
     console.log('PASS: erster Ø Zug S ' + fmt(mean(agg.passFirst[1]), 0) + ' / W ' + fmt(mean(agg.passFirst[2]), 0)
