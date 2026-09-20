@@ -247,6 +247,32 @@ function countLiberties(board, startIdx, cap) {
   return libs;
 }
 
+/* Gruppengröße ohne Allokation, nach demselben Muster wie countLiberties.
+   Gebraucht von der größenskalierten Atari-Strafe: dort steht schon fest,
+   dass die Gruppe im Atari ist, gefragt ist nur noch WIE VIEL auf dem Spiel
+   steht. Ein eigener Lauf statt einer Rückgabe aus countLiberties, weil der
+   Abbruch bei `cap` dort den Gruppen-Walk gerade NICHT zu Ende führt — eine
+   dort mitgezählte Größe wäre je nach cap falsch und stillschweigend falsch.
+   Der Lauf kostet nur auf dem Atari-Pfad, und nur wenn die Skalierung an
+   ist; siehe _atariGewicht. */
+function countGroupSize(board, startIdx) {
+  const color = board[startIdx];
+  const epoch = _nextFfEpoch();
+  let head = 0, tail = 0;
+  _groupQueue[tail++] = startIdx;
+  _ffVisited[startIdx] = epoch;
+  while (head < tail) {
+    const i = _groupQueue[head++];
+    for (const n of NEIGHBORS[i]) {
+      if (_ffVisited[n] === epoch) continue;
+      _ffVisited[n] = epoch;          /* auch Fremdfelder markieren, sonst */
+      if (board[n] !== color) continue; /* prüft man sie je Nachbarstein neu */
+      _groupQueue[tail++] = n;
+    }
+  }
+  return tail;
+}
+
 /* Entfernt eine als tot ERKANNTE Gruppe (0 Freiheiten, vom Aufrufer
    geprüft). board[g]=0 dient dabei selbst als Besucht-Marker. */
 function _removeDeadGroup(board, startIdx) {
@@ -925,9 +951,61 @@ globalThis.PARAMS = {
      50.7 %, 250 ms 38-41 %). Beide Wege wirken auf dieselbe Schwäche; ob sie
      sich addieren, ist ungemessen.
 
-     Default bleibt 0 — das Setzen ist eine Entscheidung des
-     Projektinhabers, nicht ein Nebenprodukt der Messung. Vorschlag: 80. */
-  midLineWeight:       0,
+     ─────────────────────────────────────────────────────────────────────
+     DEFAULT AUF 80 GESETZT (Entscheidung des Projektinhabers, nach der
+     Nachmessung). Zweiter Parameter im Projekt, der auf belegter
+     Spielstärke aktiviert wird — nach deathTransfer, und mit der besseren
+     Beweislage: bei deathTransfer ist die Wirkung gemessen, hier auch die
+     URSACHE, über die drei Glieder oben.
+
+     Was den Default trägt: 58.7 % über 300 Partien (p = 0.0032), die
+     Nachmessung allein 60.6 % auf disjunkten Seeds, monotone Dosis-Wirkung
+     40 → 50.8 % und 80 → 58.7 %, und der gesenkte Randanteil als
+     Mechanismus statt als Korrelat.
+
+     Was er NICHT trägt, ausdrücklich: alles Gemessene ist Selfplay. Der
+     Anlass dieser Spur war gerade, dass ein Selfplay-Gewinn gegen einen
+     Menschen verpuffen kann, wenn beide Seiten dieselbe Schwäche teilen —
+     so war es bei deathTransfer (65 % Selfplay, gegen einen Menschen
+     unauffällig). Hier ist das Risiko geringer, weil der Term auf die
+     ENTSTEHUNG des Randkriechens zielt und der Mensch diese Struktur nicht
+     hat (Randanteil 20.7 % gegen 51.0 %), aber geringer ist nicht gemessen.
+     Der Beleg gegen einen Menschen fehlt und wird auch nicht behauptet.
+
+     ABSCHALTBARKEIT geprüft, beide Richtungen, 28802 evalMidgame-Aufrufe je
+     Variante über 60 Stellungen von 10 bis 305 Steinen:
+
+       auf 0 zurückgesetzt   BITGLEICH zum Stand vor der Änderung, 0 Abweichungen
+       auf dem Default 80    Differenz GENAU der Linienabschlag, 0 Abweichungen
+                             dte 0: -80 · dte 1: -40 · dte ab 2: exakt 0
+                             wirksam auf 10714 von 28802 Zügen = 37.2 %
+
+     Die 37.2 % sind keine Eigenschaft des Parameters, sondern der Geometrie:
+     auf 19x19 liegen 136 der 361 Punkte auf Linie 1-2, also 37.7 %. Die
+     Messung trifft den Erwartungswert — der Abschlag greift auf allen
+     Randpunkten und auf keinem anderen.
+
+     Zur Messmethode zwei Dinge, die beim ersten Anlauf schiefgingen und
+     deshalb hier stehen: evalMidgame endet auf `s + Math.random() * 4`, ein
+     Rauschterm zur Zugstreuung. Ohne deterministisch gesetzten Generator
+     vergleicht die Probe Rauschen, nicht Bewertung — der erste Durchlauf
+     meldete 100 % Abweichung. Und ab dte 2 wird Bit-Gleichheit verlangt, auf
+     Linie 1-2 dagegen nur Toleranz (größte beobachtete Abweichung 2.3e-13):
+     ein zusätzlicher Summand verschiebt die Rundung einer Gleitkommasumme um
+     ein ULP. Bit-Gleichheit dort zu fordern hieße, Rundung für einen Fehler
+     zu halten.
+
+     Der Default beißt also, und er beißt ausschließlich dort, wo er soll.
+
+     VORBEHALT für bestehende Installationen: dashSave serialisiert das ganze
+     PARAMS-Objekt, dashLoad schreibt jeden Schlüssel zurück. Wer im
+     Dashboard je „Speichern" gedrückt hat, hat midLineWeight 0 in
+     localStorage festgeschrieben und bekommt den neuen Default NICHT — bis
+     er „Zurücksetzen" drückt. Das ist Absicht der Speicherfunktion (eine
+     gespeicherte Konfiguration soll nicht von einem Update überschrieben
+     werden), aber es heißt: der neue Default wirkt nur für frische Profile
+     und nach einem Reset. */
+  midLineWeight:      80,
   midAtariPenalty:  400,
   mid2LibPenalty:    60,
   midRescueAtari:   350,
@@ -946,7 +1024,245 @@ globalThis.PARAMS = {
   endAreaGain:       30,
   endCapBonus:       18,
   endAtariPenalty:  400,
+  /* Größenskalierung der Selbst-Atari-Strafe, für midAtariPenalty UND
+     endAtariPenalty: Strafe = Basis * (1 + atariSizeWeight * (Größe - 1)).
+     0 = aus, dann ist der Faktor exakt 1 und der Gruppen-Walk entfällt.
+
+     ANLASS — gemessen an einer echten Partie gegen einen Menschen
+     (13.09., 407 Züge, KI als Weiß). Die KI hatte in der linken unteren
+     Ecke eine Gruppe mit über 30 Zügen lang konstant vier Freiheiten
+     (B2, A1, E3, E1). Schwarz passte neunmal in Folge. Die KI zog in der
+     Zeit zehnmal, alle auf Rand-Abstand 0 oder 1, keiner an der Gruppe.
+     Dann setzte sie sich in drei Zügen selbst matt:
+
+       Zug 394  E3   Gruppe 35 -> 36   Freiheiten 4 -> 3   evalEndgame  +0.2
+       Zug 396  A1   Gruppe 36 -> 37   Freiheiten 3 -> 2   evalEndgame  +0.3
+       Zug 398  E1   Gruppe 37 -> 38   Freiheiten 2 -> 1   evalEndgame  -399.7
+       Zug 399  Schwarz B2: 38 Steine geschlagen, Gebiet -13 -> -52.
+
+     Die Zahlen sind an genau diesen Stellungen gemessen, der Rauschterm
+     über 400 Aufrufe ausgemittelt. Zwei Befunde stecken darin:
+
+     (1) Freiheitsverlust OBERHALB von Atari kostet nichts. Das bleibt
+         hier unangetastet — ein eigener Freiheitsterm wäre ein zweiter
+         Eingriff und machte die Dosisreihe mehrdeutig.
+     (2) Die Atari-Strafe ist FLACH. 38 Steine im Atari kosten dieselben
+         400 wie ein einzelner Stein. In Area-Wertung kostet der Verlust
+         38 Gebietspunkte plus 38 Gefangene; in Einheiten von endAreaGain
+         (30) wären das rund 2280. Das ist der Punkt, den dieser Parameter
+         angreift.
+
+     NICHT BELEGT: dass diese Lücke den Zug in jener Partie VERURSACHT hat.
+     Mit kaltem Suchbaum und 2000 ms passt die Engine in derselben Stellung,
+     statt E3 zu spielen — in alter wie neuer Konfiguration. Der Unterschied
+     kann an Tree-Reuse, Budget oder Zughistorie liegen und ist ungeklärt.
+     Belegt ist die Lücke im Bewerter, nicht ihre Wirkung im Spiel. Genau
+     dafür ist der A/B-Harness da.
+
+     MULTIPLIKATIV, nicht additiv: Mittelspiel und Endspiel rechnen auf
+     verschiedenen Skalen (midCapBonus 800 gegen endCapBonus 18), eine
+     additive Konstante je Stein hätte in beiden eine andere Bedeutung und
+     bräuchte zwei Parameter — also zwei Dosisachsen. Der Faktor ist
+     skalenfrei und lässt eine Dosisreihe zu.
+
+     Die Größenordnung soll die Dosisreihe liefern, nicht eine Rechnung
+     vorab. Zur Einordnung, was ein Wert bei einer 38er-Gruppe bedeutet:
+     0.05 -> Strafe 1140, 0.1 -> 1880, 0.25 -> 4100 (gegen 400 heute).
+
+     ─────────────────────────────────────────────────────────────────────
+     GEMESSEN, Läufe 83-88, drei Dosen zu je 120 Partien (360 gesamt):
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x3)
+        0.05    65/120   54.2 %   44.8-63.3 %     0.41 (1.00)
+        0.1     57/120   47.5 %   38.3-56.8 %     0.65 (1.00)
+        0.25    57/120   47.5 %   38.3-56.8 %     0.65 (1.00)
+       gepoolt 179/360   49.7 %   44.4-55.0 %     0.96
+
+     KEIN Spielstärkegewinn, und kein Dosis-Trend — die Punktschätzer
+     FALLEN mit der Dosis. Der Eingriff ist verdrahtet und aktiv: der
+     Wächter zählt in Arm A 0.00 Aufrufe je Zug und in Arm B 2.54 bis 3.15,
+     mit größten berührten Gruppen von 37 bis 100 Steinen. Ein Nullergebnis
+     mangels Auslösung ist damit ausgeschlossen.
+
+     Auch die Mechanismus-Metrik trägt nicht. Gepoolt über alle 360 Partien
+     sinkt der Ø größte erlittene Schlag von 12.05 auf 11.65 (-3.3 %),
+     Schläge ab 5 Steinen 806 -> 800, Gesamtverlust 12079 -> 11845.
+
+     WORAN DIE SCHEINBARE DOSIS-WIRKUNG LAG — der eigentliche Befund dieses
+     Laufs. Je Dosis sah der Gruppenverlust so aus: 0.05 -> -13.5 %,
+     0.1 -> -2.1 %, 0.25 -> +7.0 %. Das sieht nach einer sauberen, wenn auch
+     unerwünschten Dosis-Wirkung aus. Es ist keine: die Kontrollarme selbst
+     streuen zwischen 11.3 und 13.3 (18 %), und die gemessene Verbesserung
+     korreliert mit dem Wert des KONTROLLARMS zu r = -0.90. Je schlechter A
+     zufällig ausfiel, desto größer die scheinbare Wirkung von B — und die
+     Dosis 0.05 hat zufällig die beiden schlechtesten Kontrollarme erwischt
+     (13.3 und 12.7). Regression zur Mitte, nicht Dosis-Wirkung.
+
+     Dass jeder Lauf seinen eigenen Kontrollarm trägt, schützt gegen
+     Verzerrung, nicht gegen diese Täuschung: bei drei Dosen zu je zwei
+     Läufen ist die Zuordnung guter und schlechter Kontrollarme zu den Dosen
+     selbst zufällig. Wer nur die Dosiszeile liest, sieht ein Muster, das
+     nicht da ist. Die Prüfung dagegen ist billig — Streuung der
+     Kontrollarme neben die Effektgröße legen — und gehört ab jetzt zu
+     jeder Dosisreihe.
+
+     FAZIT: die Lücke im Bewerter ist real und bleibt dokumentiert, ihre
+     Behebung auf diesem Weg bringt nichts Messbares. Das ist der dritte
+     Fall dieser Art in diesem Projekt (Min-Sims-Boden, Hungerzone, jetzt
+     die Atari-Skalierung). Power-Vorbehalt, vorab benannt: 120 Partien je
+     Dosis lösen erst ab rund 63 % auf; ausgeschlossen ist ein großer
+     Effekt, nicht jeder.
+
+     Default bleibt 0. Der Parameter bleibt im Code, weil die Messung ihn
+     belegt und weil er abschaltbar geprüft ist — nicht, weil er wirkt. */
+  atariSizeWeight:    0,
   endOppAtari:       80,
+  /* Freiheitsdruck oberhalb von Atari, nur evalEndgame.
+     Strafe = endLibPressure * Gruppengroesse / Freiheiten, für 2 und 3
+     Freiheiten; ab 4 null. 0 = aus, dann bleibt auch der Freiheits-Deckel
+     von countLiberties bei 2 und es wird kein Gruppen-Walk ausgeloest.
+
+     ANLASS — dieselbe Partie wie bei atariSizeWeight (13.09., 407 Zuege).
+     Die Atari-Strafe springt erst bei genau EINER Freiheit; der Weg dorthin
+     war gratis, an den drei realen Zuegen gemessen:
+
+       Zug 394  E3   Gruppe 35 -> 36   Freiheiten 4 -> 3   evalEndgame  +0.2
+       Zug 396  A1   Gruppe 36 -> 37   Freiheiten 3 -> 2   evalEndgame  +0.3
+       Zug 398  E1   Gruppe 37 -> 38   Freiheiten 2 -> 1   evalEndgame  -399.7
+
+     Die ersten beiden Zuege sind der eigentliche Fehler; beim dritten ist es
+     zu spaet. atariSizeWeight hat nur den dritten teurer gemacht und im A/B
+     nichts gebracht (360 Partien, 49.7 %) — dieser Term greift die beiden
+     davor an.
+
+     Das Mittelspiel hat mit mid2LibPenalty bereits eine 2-Freiheiten-Strafe,
+     das Endspiel hatte gar keine. Anders als dort ist dieser Term
+     groessenabhaengig, weil genau das der Befund war: was auf dem Spiel
+     steht, mal wie nah es daran ist.
+
+     Zur Einordnung bei einer 38er-Gruppe: Gewicht 5 -> Strafe 95 bei zwei
+     Freiheiten und 63 bei dreien, Gewicht 15 -> 285 / 190, Gewicht 40 ->
+     760 / 507. Zum Vergleich die Atari-Strafe bei einer Freiheit: 400.
+
+     ─────────────────────────────────────────────────────────────────────
+     GEMESSEN, Läufe 89-94, drei Dosen zu je 120 Partien:
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x3)
+         5      63/120   52.5 %   43.2-61.7 %     0.65 (1.00)
+        15      61/120   50.8 %   41.6-60.1 %     0.93 (1.00)
+        40      68/120   56.7 %   47.3-65.7 %     0.17 (0.51)
+       gepoolt 192/360   53.3 %   48.0-58.6 %     0.225
+
+     Verdrahtet: Wächter A 0.00 Aufrufe je Zug, B 42.5 bis 45.3, größte
+     berührte Gruppe 37 bis 175 Steine. Sims und Zeit paritätisch.
+
+     Die Mechanismus-Metrik zeigt in die richtige Richtung, gepaart je Lauf:
+
+       Ø größter erlittener Schlag   11.72 -> 10.50   B kleiner in 4/6  p 0.69
+       Schläge ab 5 Steinen            704 ->   636   B kleiner in 5/6  p 0.22
+       Gesamtverlust                 11409 -> 10292   B kleiner in 5/6  p 0.22
+
+     UNENTSCHIEDEN, nicht belegt. Kein einziger Test erreicht Signifikanz,
+     und zwei Vorbehalte stehen ausdrücklich dagegen:
+
+     (1) Die Kontrollarme streuen für sich zwischen 9.3 und 15.6 — 68 %.
+         Die Korrelation zwischen Kontrollarm und gemessener Verbesserung
+         liegt bei r = -0.90, genau wie bei atariSizeWeight. Die Dosiszeile
+         (-13.7 % / +1.9 % / -17.7 %) ist deshalb NICHT als Dosis-Wirkung
+         lesbar.
+     (2) Ein einzelner Lauf trägt die Hälfte des Effekts. Ohne r90, dessen
+         Kontrollarm mit 15.6 der schlechteste der Serie war, fällt der
+         gepoolte Gruppenverlust von -10.4 % auf -4.0 %.
+
+     Was die sechs Läufe dennoch zeigen und was r90 nicht allein erklärt:
+     die STREUUNG. Der Kontrollarm reicht von 9.3 bis 15.6 (SD 2.21), der
+     Testarm nur von 9.6 bis 11.8 (SD 0.82) — ohne r90 immer noch 1.25
+     gegen 0.92. B hat in keinem Lauf eine Katastrophenpartie-Serie. Das
+     ist genau das, was ein Freiheitsdruck tun sollte: nicht den Schnitt
+     senken, sondern den Schwanz abschneiden. Belegt ist es damit nicht,
+     n = 6 Läufe sind für eine Varianzaussage wenig.
+
+     Nebenwirkung, mitgemessen: Aufgabe-Siege A:B 23:22 / 23:29 / 26:41.
+     Mit der Dosis gewinnt B häufiger durch Aufgabe des Gegners.
+
+     ─────────────────────────────────────────────────────────────────────
+     NACHMESSUNG auf Dosis 40, Läufe 101-103, Seeds 9800-9802, disjunkt zu
+     9620/9621. Erwartet war Regression zur Mitte; eingetreten ist das
+     Gegenteil, und zwar deutlich:
+
+                                B : A    Rate     95-%-KI      p
+       erster Durchgang (120)   68:52   56.7 %   47.3-65.7   0.17
+       NACHMESSUNG     (180)  123:57   68.3 %   61.0-75.1   9.7e-07
+       gepoolt         (300)  191:109  63.7 %   57.9-69.1   2.6e-06
+
+     Die unabhängige Zahl ist die NACHMESSUNG ALLEIN: 68.3 %. Der gepoolte
+     Wert enthält den ersten Durchgang, der wegen seines Anscheins zur
+     Nachmessung ausgewählt wurde, und ist dadurch verzerrt. Einzelläufe der
+     Nachmessung 42:18 · 39:21 · 42:18 — kein Ausreißer trägt das Ergebnis.
+
+     Die Mechanismus-Metrik trägt mit, in derselben Größenordnung:
+
+       Ø größter erlittener Schlag   12.23 -> 9.30   (-24.0 %), B besser 3/3
+       Schläge ab 5 Steinen            378 ->  298
+       Gesamtverlust                  6073 -> 4685   (-22.9 %)
+
+     WARUM DAS DIESMAL KEINE REGRESSION ZUR MITTE IST — die Prüfung, an der
+     atariSizeWeight und der erste endLibPressure-Durchgang gescheitert sind:
+
+       Streuung der Kontrollarme   erster Durchgang  9.3 bis 15.6   (68 %)
+                                   Nachmessung      11.9 bis 12.8   ( 8 %)
+
+     Im ersten Durchgang war die Streuung der Kontrollarme so groß wie der
+     gesuchte Effekt, hier ist sie ein Drittel davon. Ein Effekt von -24 %
+     kann aus einer 8-Prozent-Streuung nicht entstehen. Die Korrelation
+     Kontrollarm/Verbesserung liegt zwar bei r = -0.81, aber über drei
+     Punkte mit 8 % Spannweite ist das eine Zahl ohne Aussage — sie
+     beschreibt Rauschen, nicht den Effekt.
+
+     Confounds geprüft: Sims 622:622, 619:618, 890:888. Zeit -0.6/-0.8/-0.8 %,
+     also wenn überhaupt zu Bs Ungunsten. Komi-0-Wertung 40:20, 36:24, 38:22 —
+     gleiche Richtung, kein Komi-Artefakt. Wächter A 0.00 Aufrufe je Zug,
+     B 42.0-43.2.
+
+     CODE-IDENTITÄT geprüft, weil die beiden Durchgänge auf verschiedenen
+     Commits liefen (613c2cc und 8d5cf05): der Diff ist reiner Kommentar, und
+     über 48552 Bewertungspaare aus evalEndgame und evalTsumego liefern beide
+     Stände bitgleiche Werte. Der Vergleich ist gültig.
+
+     OFFEN BLEIBT: die beiden Durchgänge unterscheiden sich mit p = 0.040
+     voneinander. Das ist mit Zufall vereinbar, aber es heißt, dass die
+     wahre Rate eher im Bereich 57-75 % liegt als genau bei 68 %.
+
+     Damit ist dies nach midLineWeight der zweite Eingriff mit belegtem
+     Spielstärkegewinn — und der erste, der einen BEWERTUNGSFEHLER behebt
+     statt einer Gewohnheit. Die vier Vorgänger dieser Art (Min-Sims-Boden,
+     Hungerzone, atariSizeWeight, captureCap) waren allesamt wirkungslos.
+
+     ─────────────────────────────────────────────────────────────────────
+     DEFAULT AUF 40 GESETZT (Entscheidung des Projektinhabers). Dritter
+     Parameter des Projekts, der auf belegter Spielstärke aktiviert wird,
+     nach deathTransfer und midLineWeight — und der mit der stärksten
+     Beweislage: 68.3 % über 180 Partien auf disjunkten Seeds, p = 9.7e-07.
+
+     ABSCHALTBARKEIT geprüft, beide Richtungen, 18228 evalEndgame-Aufrufe je
+     Variante über 40 Stellungen von 20 bis 332 Steinen:
+
+       auf 0 zurückgesetzt   BITGLEICH zum Stand vor der Änderung
+       auf dem Default 40    Änderung GENAU Gewicht * Größe / Freiheiten,
+                             und nur auf Zügen mit 2 oder 3 Freiheiten
+
+     LAUFZEIT: mit dem Default wechselt der Freiheits-Deckel in
+     countLiberties von 2 auf 4, und countGroupSize läuft auf dem Atari-Pfad
+     mit. Gemessen kostet das nichts — in den drei Nachmessungsläufen lag die
+     Gesamtzeit je Partie bei -0.6/-0.8/-0.8 %, also wenn überhaupt zu Gunsten
+     des Testarms, bei gleicher Simulationszahl (622:622, 619:618, 890:888).
+
+     VORBEHALT für bestehende Installationen, wie bei midLineWeight: dashSave
+     serialisiert das ganze PARAMS-Objekt, dashLoad schreibt jeden Schlüssel
+     zurück. Wer im Dashboard je „Speichern" gedrückt hat, hat
+     endLibPressure 0 in localStorage festgeschrieben und bekommt den neuen
+     Default NICHT — bis er „Zurücksetzen" drückt. */
+  endLibPressure:    40,
   /* Tsumego */
   tsumegoCapBonus:  1200,
   tsumegoAtariSet:   500,
@@ -959,9 +1275,159 @@ globalThis.PARAMS = {
   tsumego2LibPenalty: 60,
   tsumegoEyeBonus:  100,
   tsumegoEyeMax:    300,
+  /* Abschlag je fehlendem Nachbarn an einem gezaehlten Augenpunkt. 0 = aus,
+     dann steht in evalTsumego bitgenau der alte Ausdruck.
+
+     GEMESSEN am bestehenden Augen-Term. Die Schwelle minOwn verlangt Ecke 1,
+     Linie 1 zwei, sonst drei eigene Nachbarn — bei 2, 3 bzw. 4 vorhandenen
+     Nachbarn darf also in JEDEM Fall genau einer leer sein:
+
+       Punkt         Nachb. eigen leer verlangt gezaehlt? wirklich Auge?
+       B1  (Linie 1)    3     2    1      2       ja      nein, B2 leer
+       G10 (Mitte)      4     3    1      3       ja      nein, G9 leer
+       A1  (Ecke)       2     1    1      1       ja      nein, B1 leer
+
+     Ein Punkt, durch den der Gegner noch hineinlaufen kann, ist damit volle
+     100 wert. Mehr als ein Nachbar kann nie fehlen, die Schwellen lassen nur
+     einen zu — die Dosis sagt deshalb genau: was ist ein OFFENER Augenpunkt
+     noch wert. 30 -> 70, 60 -> 40, 100 -> 0, also die strenge Regel.
+
+     Der Ueberzaehler ist NICHT randspezifisch, sondern ueberall gleich
+     nachsichtig; als Erklaerung fuer die Randschwaeche taugt er nicht. Was er
+     erklaeren koennte, ist Zaehigkeit an aussichtslosen Gruppen: wer drei
+     offene Punkte als drei Augen verbucht, sieht eine Gruppe als fast
+     lebendig, die es nicht ist — und der Deckel tsumegoEyeMax ist bei genau
+     drei Punkten erreicht.
+
+     Bei 0 gekappt statt negativ: ein "Auge" soll hoechstens wertlos sein,
+     nicht zur Strafe werden, sonst haengt am selben Knopf ein zweiter Effekt.
+
+     ─────────────────────────────────────────────────────────────────────
+     GEMESSEN, Läufe 110-115, drei Dosen zu je 120 Partien:
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x3)
+        30      64/120   53.3 %   44.0-62.5 %     0.52 (1.00)
+        60      62/120   51.7 %   42.4-60.9 %     0.78 (1.00)
+       100      54/120   45.0 %   35.9-54.3 %     0.32 (0.95)
+       gepoolt 180/360   50.0 %   44.7-55.3 %     1.00
+
+     Exakt 50.0 %, kein Dosis-Trend. Der Gruppenverlust sinkt um 4.0 %, aber
+     die Kontrollarme streuen für sich um 21 % — die Zahl trägt nicht.
+
+     DER ÜBERZÄHLER IST BESTÄTIGT, und zwar im vollen Spielbetrieb: über
+     alle sechs Läufe sind im Mittel 25.1 % der gezählten Augenpunkte offen
+     (Einzelläufe 22.9 bis 26.5 %), bei rund 800 gezählten Augenpunkten je
+     Zug. Jeder vierte Punkt, den der Bewerter "potenzielles Auge" nennt,
+     ist einer, durch den der Gegner noch hineinlaufen kann. Der Defekt ist
+     real und groß — seine Behebung ändert nichts.
+
+     WIDERLEGT WIRD DAMIT EINE EIGENE ERKLÄRUNG. Nach fünf Nullergebnissen
+     und dem einen Treffer (endLibPressure) hatte ich vermutet, der
+     Unterschied liege in der REICHWEITE: endLibPressure greift auf 34 % der
+     Endspielzüge, atariSizeWeight nur auf 2.7 %. Dieser Term greift auf
+     rund 25 % und bringt exakt nichts. Die Reichweite ist es also nicht.
+
+     Was als struktureller Unterschied übrig bleibt: evalTsumego wird nur
+     über getCrisisWeight eingeblendet, also ausschließlich auf den
+     Freiheiten einer Gruppe, die BEREITS in der Krise ist. Dasselbe gilt
+     für tsumegoSunkCost. atariSizeWeight preist Atari, also den Moment, in
+     dem es zu spät ist. endLibPressure ist der einzige Eingriff der Serie,
+     der auf gewöhnlichen Zügen wirkt, bevor eine Gruppe in Not ist. Das
+     ist eine Hypothese, keine Messung — aber sie ist die einzige, die nach
+     diesem Lauf noch steht.
+
+     Default bleibt 0. */
+  tsumegoEyeOpenPenalty: 0,
   tsumegoNakade:      0.5,
   tsumegoWeaken:    300,
   tsumegoSafetyMul:   0.2,
+  /* Versenkte Kosten: Malus auf jede weitere Rettung einer Gruppe, die seit
+     tsumegoSunkStreak Zügen ununterbrochen in derselben Großgruppen-Krise
+     steckt. 0 = aus. Wirkt nur in evalTsumego, also nur auf den Freiheiten
+     einer Krisengruppe — genau dort, wo Rettungszüge bewertet werden.
+
+     IDEE des Projektinhabers: "wird schon zum dritten Mal in Folge gerettet,
+     hat aber immer noch keine zwei Augen in Sicht → eher aufgeben als weiter
+     reinstecken."
+
+     KORREKTUR EINER PRÄMISSE, die dabei mitgeliefert wurde: evalTsumego
+     bewertet NICHT nur unmittelbare Freiheiten und Fänge. Es hat einen
+     Augenform-Term — potenzielle Augenpunkte der eigenen Gruppe, je 100
+     (tsumegoEyeBonus), gedeckelt bei 300, plus evalNakade. Der Term existiert
+     also; er ist nur nachsichtig, siehe unten.
+
+     GEMESSEN am bestehenden Augen-Term, weil die Frage im selben Atemzug kam.
+     Die Regel verlangt an einem leeren Nachbarpunkt der Gruppe: keine
+     Gegner-Nachbarn und mindestens so viele eigene wie minOwn — Ecke 1,
+     Linie 1 zwei, sonst drei. Da ein Randpunkt drei und ein Mittelpunkt vier
+     Nachbarn hat, darf in JEDEM Fall genau einer leer sein:
+
+       Punkt         Nachb. eigen leer verlangt gezählt? wirklich Auge?
+       B1  (Linie 1)    3     2    1      2       ja      nein, B2 leer
+       G10 (Mitte)      4     3    1      3       ja      nein, G9 leer
+       A1  (Ecke)       2     1    1      1       ja      nein, B1 leer
+
+     Ein Punkt, durch den der Gegner noch hineinlaufen kann, zählt also als
+     potenzielles Auge und ist 100 wert. Das ist ein echter Überzähler —
+     aber er ist NICHT randspezifisch, sondern überall gleich nachsichtig.
+     Als Erklärung für die Randschwäche taugt er damit nicht, und er wird
+     hier bewusst NICHT mitgeändert: zwei Eingriffe in einem Lauf machten die
+     Dosisreihe mehrdeutig.
+
+     UMSETZUNG. Die Dauer wird je BRETTPUNKT gezählt, nicht je Gruppe: eine
+     Gruppen-ID über Züge hinweg wäre fragil, weil Gruppen wachsen und
+     verschmelzen. Eine gewachsene Gruppe erbt die Zähler ihrer alten Steine,
+     und "wie lange schon in der Krise" ist das Maximum über ihre Steine.
+     Fortgeschrieben wird einmal pro ECHTEM Zug — innerhalb einer Suche
+     triggert dieselbe Bedingung tausendfach, "dritter Zug in Folge" wäre
+     dort bedeutungslos.
+
+     Als Krise gelten genau die beiden Lagen, die buildCrisisMap als
+     Großgruppen-Krise behandelt: zwei Freiheiten ab crisisLargeSize, drei
+     Freiheiten ab crisisDragonSize. Atari bleibt draußen — das ist akut,
+     nicht chronisch.
+
+     ─────────────────────────────────────────────────────────────────────
+     GEMESSEN, Läufe 104-109, drei Dosen zu je 120 Partien:
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x3)
+       100      56/120   46.7 %   37.5-56.0 %     0.52 (1.00)
+       300      65/120   54.2 %   44.8-63.3 %     0.41 (1.00)
+       700      57/120   47.5 %   38.3-56.8 %     0.65 (1.00)
+       gepoolt 178/360   49.4 %   44.2-54.7 %     0.87
+
+     KEIN Spielstärkegewinn, kein Dosis-Trend. Der Eingriff ist verdrahtet
+     und greift kräftig: Wächter A 0.0 %, B 24.6 bis 30.6 % aller
+     Tsumego-Bewertungen.
+
+     DER MECHANISMUS ARBEITET, und zwar dosisgeordnet. Wie oft der B-Arm
+     die PARTIE aufgab, je Dosis: 34 -> 30 -> 26. Je teurer die Rettung,
+     desto seltener muss B aufgeben — genau die erwartete Kette: Gruppe
+     früher fallenlassen, weniger Material verlieren, länger im Spiel
+     bleiben. Nur zahlt sich das nicht in Siegen aus.
+
+     UNABHÄNGIGER BEFUND aus dem Wächter, unabhängig vom Parameter: die
+     längste ununterbrochene Krisendauer einer Gruppe lag je Lauf bei 48 bis
+     76 ZÜGEN. Es gibt also tatsächlich Gruppen, die über siebzig Züge
+     gefüttert werden, ohne herauszukommen. Die Beobachtung, die diesen
+     Parameter veranlasst hat, ist damit bestätigt — nur ihre Behandlung
+     ändert nichts.
+
+     WARUM DIE GRUPPENVERLUST-ZAHL HIER NICHT ZÄHLT. Gepoolt sinkt der
+     Ø größte erlittene Schlag von 13.18 auf 11.67 (-11.5 %), B besser in
+     4 von 6 Läufen. Das sieht gut aus und ist trotzdem nicht belastbar:
+     die Kontrollarme streuen für sich zwischen 11.1 und 16.1 (45 %), und
+     die Korrelation Kontrollarm/Verbesserung liegt bei r = -0.92. Zum
+     Vergleich die Nachmessung von endLibPressure, wo derselbe Test bestand:
+     dort streuten die Kontrollarme um 8 % bei einem Effekt von -24 %. Hier
+     ist die Streuung größer als der Effekt.
+
+     Default bleibt 0. */
+  tsumegoSunkCost:      0,
+  /* Wie viele Züge in Folge, bevor der Malus greift. Bleibt in der ersten
+     Kampagne FEST auf 3 (der genannten Vorgabe), damit nur ein Parameter
+     variiert und die Dosisreihe eindeutig bleibt. */
+  tsumegoSunkStreak:    3,
   /* Krisen-Karte */
   crisisAtari:      100,
   crisisLarge2Lib:   80,
@@ -1481,6 +1947,81 @@ globalThis.PARAMS = {
      dass dieser Term die Skala beherrscht. Das gehört durch den A/B-Harness,
      nicht in einen Schnellschuss. */
   captureWeight:   20,
+  /* Deckel auf den Beitrag des Gefangenen-Terms zu evaluateBoard, in
+     Bewertungspunkten. 0 = aus (unbegrenzt, bisheriges Verhalten).
+
+     ANLASS — zwei Partien gegen einen Menschen (12./13.09.). Q kommt aus
+     tanh(evaluateBoard / mctsValueScale), und sobald der Gefangenen-Term
+     gross genug ist, beherrscht er die Summe und tanh saettigt. Gemessen:
+
+       Partie 1   erster gesaettigter Zug 208, Gebietsstand dort  -4
+       Partie 2   erster gesaettigter Zug 260, Gebietsstand dort +10 (vorn!)
+       in beiden  25 von 29 bzw. 67 von 71 gesaettigten Zuegen hatten einen
+                  Rueckstand KLEINER als die Aufgabe-Marge
+
+     Im gesaettigten Bereich sagt der Gefangenen-Term allein das gemessene Q
+     voraus — mittlerer Abstand 0.008 bzw. 0.019. Und die Korrelation von Q
+     mit dem Gebietsstand faellt von 0.62 (ungesaettigt) auf 0.31.
+
+     Rechnerisch genuegen 19 Gefangene Rueckstand, um |Q| ueber die
+     Aufgabeschwelle 0.95 zu heben, unabhaengig vom Gebiet — 5.3 % der
+     Brettpunkte. Die Empfindlichkeit bricht dabei zusammen: bei einem Term
+     von -180 bewegen 100 Bewertungspunkte das Q um 0.243, bei -480 nur noch
+     um 0.016, also 15-fach weniger.
+
+     Gedeckelt statt Gewicht gesenkt: captureWeight steuert, wie attraktiv
+     ein Schlag IST, der Deckel nur, wie weit der aufgelaufene
+     Gefangenen-SALDO die Skala beherrschen darf. Ein kleineres Gewicht
+     aendert beides zugleich und machte die Messung mehrdeutig.
+
+     Was ein Wert bedeutet, wenn der Gefangenen-Term allein wirkt:
+     200 -> |Q| hoechstens 0.76, 300 -> 0.905, 400 -> 0.964.
+
+     ERWARTETE NEBENWIRKUNG, mitzumessen: die Aufgabeschwelle. |Q| >= 0.95
+     verlangt |evaluateBoard| >= 366. Unter einem Deckel von 200 oder 300
+     kann der Gefangenen-Term sie allein nicht mehr reissen, die Stellung
+     muss auch positionell verloren sein. Das ist der Zweck — es verschiebt
+     aber die Aufgabehaeufigkeit, und die Zeile "Aufgaben S/W: Q" im Harness
+     ist deshalb Teil des Ergebnisses, nicht Beiwerk. Das zweite
+     Aufgabe-Kriterium (Gebietsmarge) bleibt unberuehrt.
+
+     ─────────────────────────────────────────────────────────────────────
+     GEMESSEN, Läufe 95-100, drei Dosen zu je 120 Partien:
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x3)
+       200      67/120   55.8 %   46.5-64.9 %     0.24 (0.71)
+       300      64/120   53.3 %   44.0-62.5 %     0.52 (1.00)
+       400      52/120   43.3 %   34.3-52.7 %     0.17 (0.51)
+       gepoolt 183/360   50.8 %   45.5-56.1 %     0.79
+
+     KEIN Spielstärkegewinn. Der Deckel tut dabei nachweislich genau das,
+     wofür er gebaut ist — beide Wirkungen sind sauber dosisgeordnet:
+
+       Dosis   Deckel schnitt bei       Aufgabe-Siege A : B
+       200     10.0 % / 9.4 %                28 : 41
+       300      5.0 % / 4.4 %                31 : 31
+       400      2.0 % / 2.3 %                37 : 24
+
+     Je enger der Deckel, desto seltener gibt B auf — die vorhergesagte
+     Nebenwirkung, in der Reihenfolge, in der sie vorhergesagt war. Der
+     Mechanismus ist damit bestätigt, der Nutzen nicht.
+
+     Die KOSTENSEITE ist dafür konsistent: B erlitt in FÜNF von sechs
+     Läufen MEHR Schläge ab 5 Steinen (769 -> 788 gepoolt, Vorzeichentest
+     p = 0.22). Das passt zum Eingriff: wer den Gefangenen-Saldo deckelt,
+     gewichtet ihn im Spiel geringer und lässt eher große Gruppen fallen.
+     Der gepoolte Ø größte Schlag sinkt zwar (12.22 -> 11.57), aber nur in
+     3 von 6 Läufen, und die Kontrollarme korrelieren auch hier mit der
+     scheinbaren Verbesserung (r = -0.83).
+
+     FAZIT: die Saettigung ist real und exakt beschrieben, der Deckel
+     behebt sie messbar, und die Spielstärke bleibt unberührt. Vierter Fall
+     dieser Art nach Min-Sims-Boden, Hungerzone und atariSizeWeight.
+
+     Default bleibt 0. NICHT ERNEUT TESTEN, solange die Frage
+     "Spielstärke" lautet — der Deckel ist als Werkzeug gegen die
+     Aufgabe-Fehlauslösung dokumentiert, nicht als Stärkehebel. */
+  captureCap:       0,
   resignEnabled:  1,
   /* 0.95 GEMESSEN gegen 0.997, 30 gepaarte Paare = 60 Partien, beide Seiten
      mctsValueScale=200 und resignEnabled=1: 29:31, Komi-0 exakt 30:30,
@@ -1763,6 +2304,48 @@ function libGewicht(lib) {
   return Math.min(v, PARAMS.midLibCap);
 }
 
+/* Faktor für die Selbst-Atari-Strafe. Bei ausgeschalteter Skalierung wird
+   exakt 1 zurückgegeben und KEIN Gruppen-Walk ausgelöst — x * 1 ist für jede
+   endliche Gleitkommazahl bitgleich x, der Default-Pfad ist also weder
+   verhaltens- noch laufzeitseitig berührt.
+
+   `groesse` wird übergeben, wo sie beim Aufrufer schon vorliegt (evalMidgame
+   hat sie aus floodFill), sonst selbst gelaufen. Ein Aufrufer, der sie hat,
+   soll sie nicht zweimal bezahlen — und die Zählung soll trotzdem an EINER
+   Stelle sitzen, nicht in zwei Zweigen nebenher. */
+let _atariRufe = 0, _atariGross = 0, _atariMaxGroesse = 0;
+let _druckRufe = 0, _druckGross = 0, _druckMaxGroesse = 0;
+
+function _atariGewicht(board, i, groesse) {
+  const w = PARAMS.atariSizeWeight;
+  if (w <= 0) return 1;
+  const n = (groesse === undefined) ? countGroupSize(board, i) : groesse;
+  _atariRufe++;
+  if (n >= 6) _atariGross++;
+  if (n > _atariMaxGroesse) _atariMaxGroesse = n;
+  return 1 + w * (n - 1);
+}
+
+/* Wächter für den A/B-Harness: greift die Skalierung überhaupt, und an wie
+   großen Gruppen? Ein Arm, in dem _atariRufe 0 bleibt, ist nicht verdrahtet;
+   einer, in dem die größte Gruppe 1 ist, skaliert nichts. Verbrauchend zu
+   lesen wäre hier falsch — anders als beim Faktor-Wächter ist das ein
+   Summenzähler über viele Züge, kein Zustand eines einzelnen Zuges. */
+function leseAtariWaechter(reset) {
+  const v = {rufe: _atariRufe, gross: _atariGross, maxGroesse: _atariMaxGroesse};
+  if (reset) { _atariRufe = 0; _atariGross = 0; _atariMaxGroesse = 0; }
+  return v;
+}
+
+/* Derselbe Waechter fuer den Freiheitsdruck. Getrennt gefuehrt, weil die
+   beiden Terme an verschiedenen Freiheitszahlen greifen und eine gemeinsame
+   Zaehlung nicht sagen koennte, welcher von beiden gefeuert hat. */
+function leseDruckWaechter(reset) {
+  const v = {rufe: _druckRufe, gross: _druckGross, maxGroesse: _druckMaxGroesse};
+  if (reset) { _druckRufe = 0; _druckGross = 0; _druckMaxGroesse = 0; }
+  return v;
+}
+
 function evalMidgame(board, i, color, mc) {
   let s = 0;
   const opp = color === 1 ? 2 : 1;
@@ -1778,7 +2361,9 @@ function evalMidgame(board, i, color, mc) {
     s += PARAMS.midLineWeight * MID_LINIE[Math.min(x, y, SIZE-1-x, SIZE-1-y)];
   }
   if (!lib) s -= 10000;
-  if (lib === 1 && !cap) s -= PARAMS.midAtariPenalty;
+  /* Mittelspiel braucht keinen zweiten Walk: own.group liegt aus dem
+     floodFill oben bereits vor und wird durchgereicht. */
+  if (lib === 1 && !cap) s -= PARAMS.midAtariPenalty * _atariGewicht(null, 0, own.group.length);
   if (lib === 2 && !cap) s -= PARAMS.mid2LibPenalty;
   let on = 0;
   for (const n of NEIGHBORS[i]) {
@@ -1884,7 +2469,11 @@ function evalEndgame(board, i, color, mc) {
   _evalScratch.set(board);
   _evalScratch[i] = color;
   const cap = removeDeadGroups(_evalScratch, opp, i);
-  const lib = countLiberties(_evalScratch, i, 2);
+  /* Der Deckel bleibt bei 2, solange der Freiheitsterm aus ist: countLiberties
+     bricht beim Deckel ab, ein hoeherer kostet also Laufzeit. Bei lib 0 und 1
+     liefern beide Deckel denselben Wert, die bestehenden Vergleiche unten
+     sind davon nicht beruehrt. */
+  const lib = countLiberties(_evalScratch, i, PARAMS.endLibPressure > 0 ? 4 : 2);
   if (lib === 0 && cap === 0) return -10000 + Math.random();
   const areaAfter = estimateArea(_evalScratch, color);
   const oppAfter  = estimateArea(_evalScratch, opp);
@@ -1892,7 +2481,17 @@ function evalEndgame(board, i, color, mc) {
   const oppLoss = oppBefore  - oppAfter;
   let s = (myGain + oppLoss) * PARAMS.endAreaGain;
   s += cap * PARAMS.endCapBonus;
-  if (lib === 1 && cap === 0) s -= PARAMS.endAtariPenalty;
+  if (lib === 1 && cap === 0) s -= PARAMS.endAtariPenalty * _atariGewicht(_evalScratch, i);
+  /* Freiheitsdruck oberhalb von Atari. Die Atari-Strafe oben springt erst bei
+     genau einer Freiheit; der Weg dorthin war bis hierher gratis. Der Term
+     ist proportional zur Gruppengroesse geteilt durch die Freiheiten: was auf
+     dem Spiel steht, mal wie nah es daran ist. Ab vier Freiheiten null. */
+  if (PARAMS.endLibPressure > 0 && cap === 0 && lib >= 2 && lib <= 3) {
+    const n = countGroupSize(_evalScratch, i);
+    _druckRufe++; if (n >= 6) _druckGross++;
+    if (n > _druckMaxGroesse) _druckMaxGroesse = n;
+    s -= PARAMS.endLibPressure * n / lib;
+  }
   for (const n of NEIGHBORS[i]) {
     if (board[n] === opp && countLiberties(board, n, 2) === 1) s += PARAMS.endOppAtari;
   }
@@ -1923,6 +2522,72 @@ function buildCrisisMap(board, color) {
       for (const lib of liberties) if (target[lib] < w) target[lib] = w;
     }
   }
+}
+
+/* Wie lange steckt die Gruppe, zu der ein Punkt gehört, schon in der
+   Krise? Zähler JE BRETTPUNKT, nicht je Gruppe: eine Gruppe wächst, schrumpft
+   und verschmilzt, eine Gruppen-ID über Züge hinweg wäre entweder fragil
+   (kleinster Index wandert beim Verschmelzen) oder teuer. Der Punktzähler
+   überlebt beides — eine wachsende Gruppe erbt die hohen Zähler ihrer alten
+   Steine, und "wie lange schon in der Krise" ist dann das Maximum über ihre
+   Steine.
+
+   Fortgeschrieben wird EINMAL PRO ECHTEM ZUG auf dem echten Brett, nicht in
+   der Suche: innerhalb einer Suche triggert dieselbe Bedingung tausendfach,
+   "dritter Zug in Folge" wäre dort bedeutungslos. */
+const _krisenDauer = new Uint8Array(BOARD_SIZE);
+/* Eigene Scratch-Felder statt eines geliehenen: _evalBoardSeen gehoert
+   evaluateBoard, und geteilte Scratch-Puffer sind in diesem Repo schon
+   dreimal die Ursache stiller Fehler gewesen. Einmal je Zug allokieren
+   waere ebenfalls billig, aber dann haette der Zaehler eine andere
+   Lebensdauer als die Funktion, die ihn fuellt. */
+const _krisenFlag = new Uint8Array(BOARD_SIZE);
+const _krisenGesehen = new Uint8Array(BOARD_SIZE);
+
+function aktualisiereKrisenDauer(board, color) {
+  const inKrise = _krisenFlag;
+  inKrise.fill(0);
+  const gesehen = _krisenGesehen;
+  gesehen.fill(0);
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    if (board[i] !== color || gesehen[i]) continue;
+    const {group, liberties} = floodFill(board, i);
+    for (const g of group) gesehen[g] = 1;
+    /* Genau die beiden Bedingungen, die buildCrisisMap als GROSSGRUPPEN-Krise
+       behandelt. Atari (eine Freiheit) bleibt bewusst draussen: das ist eine
+       akute Lage, keine chronische — der Term hier zielt auf "wird zum
+       dritten Mal gerettet und hat immer noch keine Form". */
+    const k = (liberties.length === 2 && group.length >= PARAMS.crisisLargeSize)
+           || (liberties.length === 3 && group.length >= PARAMS.crisisDragonSize);
+    if (k) for (const g of group) inKrise[g] = 1;
+  }
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    if (inKrise[i]) { if (_krisenDauer[i] < 255) _krisenDauer[i]++; }
+    else _krisenDauer[i] = 0;
+  }
+}
+
+/* Fuer den A/B-Harness: die beiden Arme spielen abwechselnd, der Zaehler ist
+   Zustand EINER Partie einer Farbe und muss zwischen ihnen getauscht werden —
+   sonst leckt er wie der Faktor-Waechter und _lastMsPerSim vor ihm. */
+function leseKrisenDauer() { return _krisenDauer.slice(); }
+function setzeKrisenDauer(a) { if (a) _krisenDauer.set(a); else _krisenDauer.fill(0); }
+
+let _augenRufe = 0, _augenOffen = 0;
+/* Waechter: wie viele der gezaehlten Augenpunkte sind offen, also solche, die
+   der Ueberzaehler faelschlich mitnimmt. Bleibt der Anteil bei 0, gibt es
+   nichts abzuwerten und ein Nullergebnis waere bedeutungslos. */
+function leseAugenWaechter(reset) {
+  const v = {rufe: _augenRufe, offen: _augenOffen};
+  if (reset) { _augenRufe = 0; _augenOffen = 0; }
+  return v;
+}
+
+let _sunkRufe = 0, _sunkGriff = 0, _sunkMaxDauer = 0;
+function leseSunkWaechter(reset) {
+  const v = {rufe: _sunkRufe, griff: _sunkGriff, maxDauer: _sunkMaxDauer};
+  if (reset) { _sunkRufe = 0; _sunkGriff = 0; _sunkMaxDauer = 0; }
+  return v;
 }
 
 function getCrisisWeight(i) {
@@ -2001,7 +2666,27 @@ function evalTsumego(board, i, color, mc) {
       const edge   = nx===0||nx===SIZE-1||ny===0||ny===SIZE-1;
       const corner = (nx===0||nx===SIZE-1)&&(ny===0||ny===SIZE-1);
       const minOwn = corner ? 1 : edge ? 2 : 3;
-      if (potEye && ownAdj >= minOwn) eyeBonus += PARAMS.tsumegoEyeBonus;
+      if (potEye && ownAdj >= minOwn) {
+        /* Offene Punkte abwerten. Die Schwelle minOwn laesst ueberall genau
+           einen leeren Nachbarn zu (Rand 2 von 3, Mitte 3 von 4, Ecke 1 von
+           2) — ein Punkt, durch den der Gegner noch hineinlaufen kann, zaehlt
+           also voll. tsumegoEyeOpenPenalty zieht je fehlendem Nachbarn ab;
+           bei 0 steht hier bitgenau der alte Ausdruck. Mehr als ein Nachbar
+           kann nie fehlen, die Schwellen lassen nur einen zu — die Dosis sagt
+           damit genau: was ist ein OFFENER Augenpunkt noch wert. */
+        if (PARAMS.tsumegoEyeOpenPenalty > 0) {
+          const offen = NEIGHBORS[n].length - ownAdj;
+          _augenRufe++;
+          if (offen > 0) {
+            _augenOffen++;
+            const w = PARAMS.tsumegoEyeBonus - PARAMS.tsumegoEyeOpenPenalty * offen;
+            /* Bei 0 gekappt statt negativ: ein "Auge" soll hoechstens
+               wertlos sein, nicht zur Strafe werden — sonst haengt am selben
+               Knopf ein zweiter Effekt und die Dosisreihe waere mehrdeutig. */
+            if (w > 0) eyeBonus += w;
+          } else eyeBonus += PARAMS.tsumegoEyeBonus;
+        } else eyeBonus += PARAMS.tsumegoEyeBonus;
+      }
     }
   }
   s += Math.min(eyeBonus, PARAMS.tsumegoEyeMax);
@@ -2011,6 +2696,17 @@ function evalTsumego(board, i, color, mc) {
     const before = countLiberties(board, n, 2);
     const after  = countLiberties(_tsumegoScratch, n, 2);
     if (after === 1 && before > 1) s -= PARAMS.tsumegoWeaken;
+  }
+  /* Versenkte Kosten: steckt diese Gruppe seit mehreren Zuegen in derselben
+     Krise, ohne herauszukommen, wird jede weitere Rettung teurer. Das Maximum
+     ueber die Steine, weil eine gewachsene Gruppe die Dauer ihrer alten
+     Steine erbt. */
+  if (PARAMS.tsumegoSunkCost > 0) {
+    let dauer = 0;
+    for (const g of own.group) if (_krisenDauer[g] > dauer) dauer = _krisenDauer[g];
+    _sunkRufe++;
+    if (dauer > _sunkMaxDauer) _sunkMaxDauer = dauer;
+    if (dauer >= PARAMS.tsumegoSunkStreak) { s -= PARAMS.tsumegoSunkCost; _sunkGriff++; }
   }
   return s * safetyMul + Math.random() * 3;
 }
@@ -2107,10 +2803,29 @@ function quickEval(board, i, color) {
    vier Freiheiten kein Abschlag. Siehe den Kommentar an deathDiscount. */
 const STERBE_RAMPE = [1, 1, 0.5, 0.25];
 
+let _deckelRufe = 0, _deckelGriff = 0;
+/* Waechter fuer den Gefangenen-Deckel: wie oft wurde evaluateBoard mit
+   eingeschaltetem Deckel gerufen, und wie oft hat er tatsaechlich
+   zugeschnitten. Bleibt der Anteil bei 0, ist der Deckel zu hoch gesetzt
+   und ein Nullergebnis bedeutungslos. */
+function leseDeckelWaechter(reset) {
+  const v = {rufe: _deckelRufe, griff: _deckelGriff};
+  if (reset) { _deckelRufe = 0; _deckelGriff = 0; }
+  return v;
+}
+
 const _evalBoardSeen = new Int32Array(BOARD_SIZE);
 function evaluateBoard(board, color, captures) {
   const opp = color === 1 ? 2 : 1;
-  let s = ((captures[color]||0) - (captures[opp]||0)) * PARAMS.captureWeight;
+  let gefangen = ((captures[color]||0) - (captures[opp]||0)) * PARAMS.captureWeight;
+  /* Deckel gegen die Q-Saettigung. 0 = aus, dann steht hier bitgenau der alte
+     Ausdruck und es wird nichts gerechnet. Siehe den Kommentar an captureCap. */
+  if (PARAMS.captureCap > 0) {
+    if (gefangen >  PARAMS.captureCap) { gefangen =  PARAMS.captureCap; _deckelGriff++; }
+    else if (gefangen < -PARAMS.captureCap) { gefangen = -PARAMS.captureCap; _deckelGriff++; }
+    _deckelRufe++;
+  }
+  let s = gefangen;
   /* Benson-Ebene: beweisbar tote Gruppen zählen 0 statt Größe×5+Frei×3 —
      genau der Term, der im Spätspiel den Q-Kollaps produziert, wenn tote
      Klumpen als lebendiges Material gewertet werden. Gate über die Zahl
@@ -2558,6 +3273,9 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
   }
   const empty = legal.length;
   buildCrisisMap(board, aiColor);
+  /* Nach der Krisenkarte und VOR der Bewertung: die Kandidaten sollen die
+     Dauer dieses Zuges sehen, nicht die des vorigen. */
+  if (PARAMS.tsumegoSunkCost > 0) aktualisiereKrisenDauer(board, aiColor);
   primeAreaCache(board, aiColor);
   const scored = legal.map(m => ({m, score: evaluateMove(board, m.idx, aiColor, mc, empty)}));
   scored.sort((a,b) => b.score - a.score);
@@ -4453,8 +5171,12 @@ globalThis.policyNet = new PolicyNet();
          tip:'Klein halten! Tote Steine werden beim Scoring automatisch entfernt. ↑ = KI schlägt sie lieber selbst → Spiel dauert viel länger'},
         {key:'endAtariPenalty', label:'Selbst-Atari ✗',   step:50,  min:0,   max:2000,
          tip:'Sicherheitsstrafe. Nicht ändern.',  warn:true},
+        {key:'atariSizeWeight', label:'Atari × Größe',     step:0.05, min:0,  max:1,
+         tip:'0 = aus (flache Strafe). Höher = große Gruppen im Atari kosten mehr. Wirkt auf Mittel- UND Endspiel. Ungemessen.'},
         {key:'endOppAtari',     label:'Gegner Atari',      step:10,  min:0,   max:500,
          tip:'↑ = mehr Sente-Spiel und Druck im Endspiel'},
+        {key:'endLibPressure',  label:'Freiheitsdruck',    step:5,   min:0,   max:100,
+         tip:'0 = aus. Strafe für eigene Gruppen mit 2–3 Freiheiten, proportional zur Größe. Ungemessen.'},
       ]
     },
     {
@@ -4463,6 +5185,12 @@ globalThis.policyNet = new PolicyNet();
       params:[
         {key:'tsumegoCapBonus',   label:'Schlag Bonus',     step:100, min:0,   max:5000,
          tip:'↑ = gieriger nach Captures in Lebens/Tod-Situationen'},
+        {key:'tsumegoEyeOpenPenalty', label:'Offenes Auge ✗', step:10, min:0, max:200,
+         tip:'0 = aus. Abschlag für Augenpunkte, die noch einen leeren Nachbarn haben. 100 = offene Punkte zählen gar nicht mehr. Ungemessen.'},
+        {key:'tsumegoSunkCost',   label:'Versenkte Kosten', step:50,  min:0,   max:3000,
+         tip:'0 = aus. Malus auf weitere Rettungen einer Gruppe, die seit mehreren Zügen ohne Fortschritt in der Krise steckt. Ungemessen.'},
+        {key:'tsumegoSunkStreak', label:'Rettungs-Serie',   step:1,   min:1,   max:10,
+         tip:'So viele Züge in Folge in derselben Großgruppen-Krise, bevor der Malus greift'},
         {key:'tsumegoAtariSet',   label:'Atari setzen',     step:50,  min:0,   max:3000,
          tip:'↑ = mehr Druck-Spiel und Verfolgung'},
         {key:'tsumegoRescue3',    label:'Retten → 3+Lib',   step:50,  min:0,   max:3000,
@@ -4521,6 +5249,8 @@ globalThis.policyNet = new PolicyNet();
          tip:'Chebyshev-Radius um den letzten Gegnerzug, linear abfallend'},
         {key:'bensonMoveFilter', label:'Benson-Filter', step:1, min:0, max:1,
          tip:'1 = todgeborene Züge (beweisbar toter Stein) fliegen aus der Kandidatenliste; nur Pass bleibt, wenn nichts übrig ist'},
+        {key:'captureCap', label:'Gefangenen-Deckel', step:50, min:0, max:1000,
+         tip:'0 = aus. Begrenzt, wie weit der Gefangenen-Saldo die Bewertung beherrschen darf — gegen die Q-Sättigung. Verschiebt auch die Aufgabeschwelle. Ungemessen.'},
         {key:'resignQ', label:'Aufgabe-Q', step:0.01, min:0.5, max:1, float:true,
          tip:'Q-Schwelle (aus KI-Sicht negativ) für die Aufgabe-Serie'},
         {key:'resignStreak', label:'Aufgabe-Serie', step:1, min:2, max:20,

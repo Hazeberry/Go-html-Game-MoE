@@ -681,6 +681,8 @@ dies **der erste Parameter dieses Projekts, der aufgrund eines belegten
 Spielstärkegewinns aktiv geschaltet wurde**. Alle Vorgänger — `captureWeight`,
 `openLineWeight`, `midLibCap`, `midLibSoft`, `midLineWeight`, `deathDiscount` —
 blieben auf ihrem neutralen Wert, weil die Messung den Gewinn nicht hergab.
+(`midLineWeight` ist später nachgezogen — siehe unten; zum Zeitpunkt dieser
+Freigabe stand es noch auf 0.)
 
 Abschaltbarkeit geprüft, nicht behauptet: mit `deathTransfer = 0` ist der Stand
 über 6554 `evaluateBoard`-Aufrufe **bitgenau identisch** zum Vorstand. Als
@@ -823,7 +825,386 @@ Was das nicht aufhebt: mehr Suche senkt den Randanteil ebenfalls (60 ms
 50,7 %, 250 ms 38–41 %). Beide Wege wirken auf dieselbe Schwäche; ob sie sich
 addieren, ist ungemessen.
 
-Der Default steht auf 0. Vorschlag: 80.
+#### Default gesetzt: `midLineWeight = 80`
+
+Vom Projektinhaber freigegeben. Damit ist dies der **zweite** Parameter des
+Projekts, der aufgrund eines belegten Spielstärkegewinns aktiv geschaltet
+wurde — und der erste, bei dem nicht nur die Wirkung, sondern auch die
+**Ursache** durchgemessen ist: bei `deathTransfer` steht die Siegrate allein,
+hier steht die Kette Randanteil → Gruppenverlust → Siegrate.
+
+**Abschaltbarkeit geprüft, beide Richtungen**, 28 802 `evalMidgame`-Aufrufe je
+Variante über 60 Stellungen von 10 bis 305 Steinen:
+
+| Richtung | Ergebnis |
+|---|---|
+| auf 0 zurückgesetzt | **bitgenau identisch** zum Vorstand, 0 Abweichungen |
+| auf dem Default 80 | Differenz **genau** der Linienabschlag, 0 Abweichungen |
+| | Linie 1: −80 · Linie 2: −40 · ab Linie 3: exakt 0 |
+| | wirksam auf 10 714 von 28 802 Zügen = 37,2 % |
+
+Die 37,2 % sind keine Eigenschaft des Parameters, sondern der Geometrie: auf
+19×19 liegen 136 der 361 Punkte auf Linie 1–2, also 37,7 %. Die Messung trifft
+den Erwartungswert — der Abschlag greift auf allen Randpunkten und auf keinem
+anderen.
+
+Zwei Dinge gingen beim ersten Anlauf der Probe schief und stehen deshalb hier.
+`evalMidgame` endet auf `s + Math.random() * 4`, einem Rauschterm zur
+Zugstreuung; ohne deterministisch gesetzten Generator vergleicht die Probe
+Rauschen statt Bewertung, und der erste Durchlauf meldete prompt 100 %
+Abweichung. Und Bit-Gleichheit ist nur ab Linie 3 die richtige Forderung: auf
+Linie 1–2 verschiebt der zusätzliche Summand die Rundung der Gleitkommasumme um
+ein ULP (größte beobachtete Abweichung 2,3 · 10⁻¹³). Dort Bit-Gleichheit zu
+verlangen hieße, Rundung für einen Fehler zu halten — der zweite Durchlauf
+meldete 1580 „Abweichungen", von denen keine eine war.
+
+**Was der Default nicht trägt**, ausdrücklich: alles Gemessene ist Selfplay. Der
+Anlass dieser ganzen Spur war gerade, dass ein Selfplay-Gewinn gegen einen
+Menschen verpuffen kann, wenn beide Seiten dieselbe Schwäche teilen — genau so
+war es bei `deathTransfer` (65 % im Selfplay, gegen einen Menschen
+unauffällig). Hier ist das Risiko geringer, weil der Term auf die *Entstehung*
+des Randkriechens zielt und der Mensch diese Struktur nicht hat (Randanteil
+20,7 % gegen 51,0 %). Geringer ist aber nicht gemessen; der Beleg gegen einen
+Menschen fehlt und wird nicht behauptet.
+
+**Vorbehalt für bestehende Installationen:** `dashSave` serialisiert das ganze
+`PARAMS`-Objekt, `dashLoad` schreibt jeden Schlüssel zurück. Wer im Dashboard je
+„Speichern" gedrückt hat, hat `midLineWeight: 0` in `localStorage`
+festgeschrieben und bekommt den neuen Default **nicht**, bis er „Zurücksetzen"
+drückt. Das ist Absicht der Speicherfunktion — eine gespeicherte Konfiguration
+soll nicht von einem Update überschrieben werden —, heißt aber: der neue Default
+wirkt nur für frische Profile und nach einem Reset.
+
+### Die KI erstickt ihre eigene Gruppe: `atariSizeWeight`
+
+Zwei Partien gegen einen Menschen (13.09., KI als Weiß) brachten einen Befund
+anderer Art als die bisherigen. In der zweiten, über 407 Züge, hatte die KI in
+der linken unteren Ecke eine Gruppe mit **über 30 Zügen lang konstant vier
+Freiheiten** (B2, A1, E3, E1). Schwarz passte neunmal in Folge. Die KI zog in
+dieser Zeit zehnmal — F19, G19, J19, M19, L19, O19, A15, S3, T2, S1, **alle auf
+Rand-Abstand 0 oder 1**, keiner an der Gruppe. Dann setzte sie sich in drei
+Zügen selbst matt:
+
+| Zug | Weiß spielt | Gruppe | Freiheiten | `evalEndgame` |
+|---:|---|---:|---|---:|
+| 394 | E3 | 35 → 36 | 4 → 3 | **+0,2** |
+| 396 | A1 | 36 → 37 | 3 → 2 | **+0,3** |
+| 398 | E1 | 37 → 38 | 2 → 1 | −399,7 |
+| 399 | *Schwarz B2* | — | — | **38 geschlagen** |
+
+Der Gebietsstand fiel dadurch von −13 auf −52. Die Bewertungen sind an genau
+diesen Stellungen gemessen, der Rauschterm über 400 Aufrufe ausgemittelt.
+
+Zwei Lücken stecken darin. **Freiheitsverlust oberhalb von Atari kostet
+nichts** — der Bewerter kennt nur `if (lib === 1 && cap === 0)`. Und die
+**Atari-Strafe ist flach**: 38 Steine kosten dieselben 400 wie ein einzelner
+Stein. In Area-Wertung kostet der Verlust 38 Gebietspunkte plus 38 Gefangene,
+in Einheiten von `endAreaGain` also rund 2280.
+
+`atariSizeWeight` greift die zweite an: `Strafe = Basis × (1 + w × (Größe − 1))`,
+für Mittel- und Endspiel gemeinsam. Multiplikativ, weil die beiden Evaluatoren
+auf verschiedenen Skalen rechnen (`midCapBonus` 800 gegen `endCapBonus` 18) —
+eine additive Konstante je Stein bräuchte zwei Parameter und damit zwei
+Dosisachsen. Der Freiheitsterm oberhalb von Atari bleibt bewusst unangetastet:
+ein zweiter Eingriff machte die Dosisreihe mehrdeutig.
+
+An der echten Stellung, für E1 mit einer 38er-Gruppe:
+
+| `atariSizeWeight` | Strafe |
+|---:|---:|
+| 0 (Default) | −400 |
+| 0,05 | −1140 |
+| 0,1 | −1880 |
+| 0,25 | −4100 |
+
+Ein Einzelstein im Atari bleibt bei jedem Gewicht unverändert bei −400, weil
+der Faktor bei Größe 1 exakt 1 ist.
+
+**Was nicht belegt ist:** dass diese Lücke den Zug in jener Partie *verursacht*
+hat. Mit kaltem Suchbaum und 2000 ms passt die Engine in derselben Stellung,
+statt E3 zu spielen — in alter wie neuer Konfiguration. Der Unterschied kann an
+Tree-Reuse, Budget oder Zughistorie liegen und ist ungeklärt. Belegt ist die
+Lücke im Bewerter, nicht ihre Wirkung im Spiel.
+
+**Geprüft, drei Richtungen.** `countGroupSize` — eine allokationsfreie
+Primitive nach dem Muster von `countLiberties` — stimmt über 5253
+Gruppenabfragen exakt mit `floodFill` überein. Mit Gewicht 0 sind
+`evalMidgame` und `evalEndgame` über 36 748 Aufrufpaare **bitgleich** zum
+Vorstand, bei identischem Zufallsverbrauch. Mit Gewicht 0,1 ändert sich die
+Bewertung um **genau** den vorhergesagten Betrag und nur auf Zügen mit
+Selbst-Atari (2,69 % der geprüften Züge), größte Abweichung 1,1 · 10⁻¹³.
+
+Ein eigener Wächter im Harness zählt, wo die Entscheidung fällt: Aufrufe der
+Skalierung je Zug, Anteil an Gruppen ab 6 Steinen, größte berührte Gruppe.
+Rauchtest über 4 Partien: Arm A (Gewicht 0) **0,00** Aufrufe je Zug, Arm B
+(0,1) **1,98**, größte berührte Gruppe 17 Steine. Ein Arm ohne Aufrufe wäre
+nicht verdrahtet, und ein Nullergebnis dort bedeutungslos.
+
+#### Gemessen: die Lücke ist real, ihre Behebung bringt nichts
+
+Läufe 83–88, drei Dosen zu je 120 Partien:
+
+| Dosis | B-Siege | Rate | 95 %-CI | p (Bonferroni ×3) |
+|---:|---:|---:|---:|---:|
+| 0,05 | 65/120 | 54,2 % | 44,8–63,3 % | 0,41 (1,00) |
+| 0,1 | 57/120 | 47,5 % | 38,3–56,8 % | 0,65 (1,00) |
+| 0,25 | 57/120 | 47,5 % | 38,3–56,8 % | 0,65 (1,00) |
+| **gepoolt** | **179/360** | **49,7 %** | 44,4–55,0 % | 0,96 |
+
+Kein Gewinn, kein Dosis-Trend — die Punktschätzer *fallen* mit der Dosis. Der
+Eingriff ist dabei nachweislich aktiv: der Wächter zählt in Arm A 0,00 Aufrufe
+je Zug, in Arm B 2,54 bis 3,15, mit größten berührten Gruppen von 37 bis 100
+Steinen. Auch die Mechanismus-Metrik trägt nicht: Ø größter erlittener Schlag
+12,05 → 11,65 (−3,3 %), Schläge ab 5 Steinen 806 → 800, Gesamtverlust
+12 079 → 11 845.
+
+**Der eigentliche Befund dieses Laufs ist methodisch.** Je Dosis sah der
+Gruppenverlust so aus: 0,05 → −13,5 %, 0,1 → −2,1 %, 0,25 → +7,0 %. Das liest
+sich wie eine saubere, wenn auch unerwünschte Dosis-Wirkung. Es ist keine:
+
+| | |
+|---|---|
+| Streuung der **Kontrollarme** allein | 11,3 bis 13,3 (18 %) |
+| Korrelation Kontrollarm ↔ gemessene „Verbesserung" | **r = −0,90** |
+
+Je schlechter der Kontrollarm zufällig ausfiel, desto größer die scheinbare
+Wirkung — und die Dosis 0,05 hat zufällig die beiden schlechtesten erwischt
+(13,3 und 12,7). Das ist Regression zur Mitte, nicht Dosis-Wirkung. Dass jeder
+Lauf seinen eigenen Kontrollarm trägt, schützt gegen *Verzerrung*, nicht gegen
+diese Täuschung: bei drei Dosen zu je zwei Läufen ist die Zuordnung guter und
+schlechter Kontrollarme zu den Dosen selbst zufällig. Die Gegenprüfung ist
+billig — die Streuung der Kontrollarme neben die Effektgröße legen — und
+gehört ab jetzt zu jeder Dosisreihe.
+
+Damit ist dies der **dritte** Eingriff dieser Art: ein real belegter Defekt,
+dessen Behebung messbar nichts bringt (Min-Sims-Boden, Hungerzone, jetzt die
+Atari-Skalierung). Power-Vorbehalt, vorab benannt: 120 Partien je Dosis lösen
+erst ab rund 63 % auf.
+
+Der Default bleibt 0. Der Parameter bleibt im Code, weil die Messung ihn
+belegt und weil er abschaltbar geprüft ist — nicht, weil er wirkt.
+
+### Der Freiheitsterm oberhalb von Atari: `endLibPressure`
+
+`atariSizeWeight` hat nur den letzten Schritt teurer gemacht (2→1 Freiheiten) —
+und da war es schon zu spät. Der Fehler sind die beiden davor: 4→3 kostete
++0,2, 3→2 kostete +0,3. `endLibPressure` greift sie an, mit
+`Strafe = Gewicht × Gruppengröße / Freiheiten` für 2 und 3 Freiheiten.
+
+Der Term ist viel breiter als sein Vorgänger: er feuert auf **34 %** aller
+geprüften Endspielzüge, gegen 2,7 % bei `atariSizeWeight`. Deshalb begann die
+Dosisreihe niedrig.
+
+| Dosis | B-Siege | Rate | 95 %-CI | p (Bonferroni ×3) |
+|---:|---:|---:|---:|---:|
+| 5 | 63/120 | 52,5 % | 43,2–61,7 % | 0,65 (1,00) |
+| 15 | 61/120 | 50,8 % | 41,6–60,1 % | 0,93 (1,00) |
+| 40 | 68/120 | 56,7 % | 47,3–65,7 % | 0,17 (0,51) |
+| **gepoolt** | **192/360** | **53,3 %** | 48,0–58,6 % | 0,225 |
+
+Verdrahtet: Wächter A 0,00 Aufrufe je Zug, B 42,5–45,3, größte berührte Gruppe
+37 bis 175 Steine. Die Mechanismus-Metrik zeigt in die richtige Richtung —
+Ø größter erlittener Schlag 11,72 → 10,50, Schläge ab 5 Steinen 704 → 636,
+Gesamtverlust 11 409 → 10 292, jeweils B besser in 5 von 6 Läufen (p = 0,22).
+
+**Unentschieden, nicht belegt.** Zwei Vorbehalte stehen ausdrücklich dagegen.
+Die Kontrollarme streuen für sich zwischen 9,3 und 15,6 (68 %), und die
+Korrelation zwischen Kontrollarm und gemessener Verbesserung liegt wieder bei
+**r = −0,90** — die Dosiszeile ist damit nicht als Dosis-Wirkung lesbar. Und
+ein einzelner Lauf trägt die Hälfte: ohne `r90`, dessen Kontrollarm mit 15,6
+der schlechteste der Serie war, fällt der gepoolte Gruppenverlust von −10,4 %
+auf −4,0 %.
+
+Was die sechs Läufe dennoch zeigen, und was `r90` nicht allein erklärt, ist die
+**Streuung**:
+
+| | Spanne | SD | ohne `r90` |
+|---|---|---:|---:|
+| Kontrollarm A | 9,3–15,6 | 2,21 | 1,25 |
+| Testarm B | 9,6–11,8 | **0,82** | 0,92 |
+
+B hat in keinem Lauf eine Katastrophenserie. Das ist genau das, was ein
+Freiheitsdruck tun sollte: nicht den Schnitt senken, sondern den Schwanz
+abschneiden. Belegt ist es damit nicht — sechs Läufe sind für eine
+Varianzaussage wenig.
+
+#### Nachmessung auf Dosis 40: der erste belegte Bewertungsfix
+
+Erwartet war Regression zur Mitte. Eingetreten ist das Gegenteil.
+
+| | B : A | Rate | 95 %-CI | p |
+|---|---:|---:|---:|---:|
+| erster Durchgang (120) | 68:52 | 56,7 % | 47,3–65,7 % | 0,17 |
+| **Nachmessung (180)** | **123:57** | **68,3 %** | **61,0–75,1 %** | **9,7 · 10⁻⁷** |
+| gepoolt (300) | 191:109 | 63,7 % | 57,9–69,1 % | 2,6 · 10⁻⁶ |
+
+Die unabhängige Zahl ist die **Nachmessung allein**; der gepoolte Wert enthält
+den Durchgang, der wegen seines Anscheins zur Nachmessung ausgewählt wurde.
+Einzelläufe 42:18 · 39:21 · 42:18 — kein Ausreißer trägt das Ergebnis. Die
+Mechanismus-Metrik trägt mit: Ø größter erlittener Schlag 12,23 → 9,30
+(−24,0 %, B besser in 3/3), Schläge ab 5 Steinen 378 → 298, Gesamtverlust
+6073 → 4685.
+
+**Warum das diesmal keine Regression zur Mitte ist** — die Prüfung, an der
+`atariSizeWeight` und der erste Durchgang gescheitert sind:
+
+| | Streuung der Kontrollarme |
+|---|---|
+| erster Durchgang | 9,3 bis 15,6 — **68 %** |
+| Nachmessung | 11,9 bis 12,8 — **8 %** |
+
+Im ersten Durchgang war die Streuung der Kontrollarme so groß wie der gesuchte
+Effekt; hier ist sie ein Drittel davon. Ein Effekt von −24 % kann aus einer
+8-Prozent-Streuung nicht entstehen. Die Korrelation liegt zwar wieder bei
+r = −0,81, aber über drei Punkte mit 8 % Spannweite beschreibt sie Rauschen,
+nicht den Effekt.
+
+Confounds geprüft: Sims 622:622, 619:618, 890:888; Zeit −0,6/−0,8/−0,8 %, also
+wenn überhaupt zu Bs Ungunsten; Komi-0-Wertung in gleicher Richtung.
+**Code-Identität geprüft**, weil die Durchgänge auf verschiedenen Commits
+liefen: der Diff ist reiner Kommentar, und über 48 552 Bewertungspaare liefern
+beide Stände bitgleiche Werte.
+
+Offen bleibt, dass die beiden Durchgänge sich mit p = 0,040 unterscheiden. Das
+ist mit Zufall vereinbar, heißt aber: die wahre Rate liegt eher im Bereich
+57–75 % als genau bei 68 %.
+
+Damit ist dies nach `midLineWeight` der **zweite Eingriff mit belegtem
+Spielstärkegewinn** — und der erste, der einen *Bewertungsfehler* behebt statt
+einer Gewohnheit. Die vier Vorgänger dieser Art waren allesamt wirkungslos.
+
+#### Default gesetzt: `endLibPressure = 40`
+
+Vom Projektinhaber freigegeben. **Dritter Parameter des Projekts, der auf
+belegter Spielstärke aktiviert wird** — nach `deathTransfer` und
+`midLineWeight`, und der mit der stärksten Beweislage.
+
+Abschaltbarkeit geprüft, beide Richtungen, 18 228 `evalEndgame`-Aufrufe je
+Variante über 40 Stellungen von 20 bis 332 Steinen:
+
+| Richtung | Ergebnis |
+|---|---|
+| auf 0 zurückgesetzt | **bitgleich** zum Vorstand, gleicher Zufallsverbrauch |
+| auf dem Default 40 | Änderung **genau** Gewicht × Größe / Freiheiten, nur auf Zügen mit 2–3 Freiheiten |
+
+Im Harness gegengeprüft, mit vertauschten Rollen: Arm A (Default) 43,02
+Aufrufe je Zug, Arm B (erzwungen 0) 0,00.
+
+**Laufzeit:** mit dem Default wechselt der Freiheits-Deckel in
+`countLiberties` von 2 auf 4, und `countGroupSize` läuft auf dem Atari-Pfad
+mit. Gemessen kostet das nichts — in den drei Nachmessungsläufen lag die
+Gesamtzeit je Partie bei −0,6/−0,8/−0,8 % bei gleicher Simulationszahl.
+
+**Vorbehalt für bestehende Installationen**, wie bei `midLineWeight`:
+`dashSave` serialisiert das ganze `PARAMS`-Objekt, `dashLoad` schreibt jeden
+Schlüssel zurück. Wer im Dashboard je „Speichern" gedrückt hat, hat
+`endLibPressure: 0` in `localStorage` festgeschrieben und bekommt den neuen
+Default **nicht** — bis er „Zurücksetzen" drückt.
+
+### Der Augen-Überzähler: `tsumegoEyeOpenPenalty`
+
+| Dosis | B-Siege | Rate | p (Bonferroni ×3) |
+|---:|---:|---:|---:|
+| 30 | 64/120 | 53,3 % | 0,52 (1,00) |
+| 60 | 62/120 | 51,7 % | 0,78 (1,00) |
+| 100 | 54/120 | 45,0 % | 0,32 (0,95) |
+| **gepoolt** | **180/360** | **50,0 %** | 1,00 |
+
+Exakt 50,0 %, kein Dosis-Trend. Der Gruppenverlust sinkt um 4,0 %, aber die
+Kontrollarme streuen für sich um 21 % — die Zahl trägt nicht.
+
+**Der Überzähler ist bestätigt**, im vollen Spielbetrieb: über alle sechs Läufe
+sind im Mittel **25,1 %** der gezählten Augenpunkte offen (22,9 bis 26,5 %), bei
+rund 800 gezählten Augenpunkten je Zug. Jeder vierte Punkt, den der Bewerter
+„potenzielles Auge" nennt, ist einer, durch den der Gegner noch hineinlaufen
+kann. Der Defekt ist real und groß — seine Behebung ändert nichts.
+
+**Widerlegt wird damit eine eigene Erklärung.** Nach fünf Nullergebnissen und
+dem einen Treffer hatte ich vermutet, der Unterschied liege in der
+*Reichweite*: `endLibPressure` greift auf 34 % der Endspielzüge,
+`atariSizeWeight` nur auf 2,7 %. Dieser Term greift auf rund 25 % und bringt
+exakt nichts. Die Reichweite ist es nicht.
+
+Was als struktureller Unterschied übrig bleibt: `evalTsumego` wird nur über
+`getCrisisWeight` eingeblendet, also ausschließlich auf den Freiheiten einer
+Gruppe, die **bereits** in der Krise ist — dasselbe gilt für `tsumegoSunkCost`.
+`atariSizeWeight` preist Atari, den Moment, in dem es zu spät ist.
+`endLibPressure` ist der einzige Eingriff der Serie, der auf gewöhnlichen Zügen
+wirkt, *bevor* eine Gruppe in Not ist. Das ist eine Hypothese, keine Messung —
+aber die einzige, die nach diesem Lauf noch steht.
+
+### Versenkte Kosten: `tsumegoSunkCost`
+
+Eine Gruppe, die zum dritten Mal in Folge gerettet wird und immer noch keine
+Form hat, soll eher fallengelassen als weiter gefüttert werden.
+
+| Dosis | B-Siege | Rate | p (Bonferroni ×3) |
+|---:|---:|---:|---:|
+| 100 | 56/120 | 46,7 % | 0,52 (1,00) |
+| 300 | 65/120 | 54,2 % | 0,41 (1,00) |
+| 700 | 57/120 | 47,5 % | 0,65 (1,00) |
+| **gepoolt** | **178/360** | **49,4 %** | 0,87 |
+
+Kein Gewinn, kein Dosis-Trend. Der Eingriff greift dabei kräftig: Wächter
+A 0,0 %, B **24,6–30,6 %** aller Tsumego-Bewertungen.
+
+**Der Mechanismus arbeitet, dosisgeordnet.** Wie oft der B-Arm die Partie
+aufgab, je Dosis: **34 → 30 → 26**. Je teurer die Rettung, desto seltener muss
+B aufgeben — genau die erwartete Kette: Gruppe früher fallenlassen, weniger
+Material verlieren, länger im Spiel bleiben. Nur zahlt es sich nicht in Siegen
+aus.
+
+**Ein Befund unabhängig vom Parameter:** die längste ununterbrochene
+Krisendauer einer Gruppe lag je Lauf bei **48 bis 76 Zügen**. Es gibt also
+tatsächlich Gruppen, die über siebzig Züge gefüttert werden, ohne
+herauszukommen. Die Beobachtung, die den Parameter veranlasst hat, ist
+bestätigt — nur ihre Behandlung ändert nichts.
+
+**Warum die Gruppenverlust-Zahl hier nicht zählt.** Gepoolt sinkt der Ø größte
+erlittene Schlag von 13,18 auf 11,67 (−11,5 %), B besser in 4 von 6 Läufen.
+Sieht gut aus, ist aber nicht belastbar:
+
+| | Streuung der Kontrollarme | Effekt | r |
+|---|---|---:|---:|
+| `tsumegoSunkCost` | 11,1–16,1 — **45 %** | −11,5 % | −0,92 |
+| `endLibPressure` (Nachmessung) | 11,9–12,8 — **8 %** | −24,0 % | −0,81 |
+
+Hier ist die Streuung der Kontrollarme größer als der Effekt, dort ein Drittel
+davon. Derselbe Test, zwei Ausgänge — und genau dafür ist er da.
+
+Der Default bleibt 0.
+
+### Die Q-Sättigung deckeln: `captureCap`
+
+| Dosis | B-Siege | Rate | 95 %-CI | p (Bonferroni ×3) |
+|---:|---:|---:|---:|---:|
+| 200 | 67/120 | 55,8 % | 46,5–64,9 % | 0,24 (0,71) |
+| 300 | 64/120 | 53,3 % | 44,0–62,5 % | 0,52 (1,00) |
+| 400 | 52/120 | 43,3 % | 34,3–52,7 % | 0,17 (0,51) |
+| **gepoolt** | **183/360** | **50,8 %** | 45,5–56,1 % | 0,79 |
+
+Kein Gewinn. Der Deckel tut dabei nachweislich genau das, wofür er gebaut ist,
+und **beide** Wirkungen sind sauber dosisgeordnet:
+
+| Dosis | Deckel schnitt bei | Aufgabe-Siege A : B |
+|---:|---|---:|
+| 200 | 10,0 % / 9,4 % | 28 : 41 |
+| 300 | 5,0 % / 4,4 % | 31 : 31 |
+| 400 | 2,0 % / 2,3 % | 37 : 24 |
+
+Je enger der Deckel, desto seltener gibt B auf — die vorhergesagte
+Nebenwirkung, in der vorhergesagten Reihenfolge. Der Mechanismus ist bestätigt,
+der Nutzen nicht.
+
+Die **Kostenseite** ist konsistent: B erlitt in fünf von sechs Läufen *mehr*
+Schläge ab 5 Steinen (769 → 788 gepoolt). Das passt zum Eingriff — wer den
+Gefangenen-Saldo deckelt, gewichtet ihn im Spiel geringer und lässt eher große
+Gruppen fallen.
+
+Damit ist die Sättigung real, exakt beschrieben und messbar behoben, ohne dass
+die Spielstärke sich rührt. **Vierter Fall dieser Art** nach Min-Sims-Boden,
+Hungerzone und `atariSizeWeight`. Der Default bleibt 0; der Deckel ist als
+Werkzeug gegen die Aufgabe-Fehlauslösung dokumentiert, nicht als Stärkehebel.
 
 ### Die Hungerzone: eine echte Fehlfunktion, deren Behebung nichts bringt
 

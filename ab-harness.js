@@ -929,11 +929,13 @@ const driver = `
            konnte praktisch nicht regulär auslösen
        Jetzt: vor jedem Zug den Zustand der ziehenden Farbe einspielen,
        danach zurückschreiben — beide Farben verhalten sich wie im Spiel. */
-    const modState = {1: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null},
-                      2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null}};
+    const modState = {1: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null, krisenDauer: null},
+                      2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null, krisenDauer: null}};
     const st = {
-      1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: []},
-      2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: []}
+      1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
+          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0},
+      2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
+          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0}
     };
     /* Gruppenverluste je Farbe: groesster Einzelschlag, den DIESE Farbe
        erlitten hat, plus die Zahl der Verluste ab 5 Steinen. Instrument fuer
@@ -976,6 +978,11 @@ const driver = `
          wertlos. Bei adaptiveBudgetEnabled=0 (Default des Harness) ist der
          Zweig tot und die Zeile wirkungslos. */
       _lastMsPerSim = ms.msProSim;
+      /* _krisenDauer zaehlt, wie lange eine Gruppe schon in der Krise steckt —
+         Zustand EINER Farbe in EINER Partie. Ohne diesen Tausch truege der
+         eine Arm die Krisenhistorie des anderen, dieselbe Fehlerklasse wie
+         beim Faktor-Waechter und bei _lastMsPerSim. */
+      setzeKrisenDauer(ms.krisenDauer);
 
       /* GREIFT DER MIN-SIMS-BODEN UEBERHAUPT? Ohne diese Zaehlung waere ein
          Nullergebnis nicht deutbar: nicht geholfen, oder nie ausgeloest?
@@ -986,6 +993,18 @@ const driver = `
          Arbeitspunkt als die Engine und lieferte 37,5 % statt des wahren
          Werts. Jetzt wird dort gezaehlt, wo entschieden wird. */
       leseBodenGriff(true);
+
+      /* GREIFT DIE ATARI-SKALIERUNG? Derselbe Grund wie beim Boden: ein
+         Nullergebnis ist nur deutbar, wenn feststeht, dass der Eingriff
+         ueberhaupt stattfand. Vor dem Zug zuruecksetzen und danach lesen
+         haelt die Zahlen der beiden Arme getrennt — sonst buchte die eine
+         Farbe der anderen ihre Aufrufe zu, wie es der Faktor-Waechter
+         schon einmal getan hat. */
+      leseAtariWaechter(true);
+      leseDruckWaechter(true);
+      leseDeckelWaechter(true);
+      leseSunkWaechter(true);
+      leseAugenWaechter(true);
 
       const t0 = Date.now();
       netFrisch = false;
@@ -999,11 +1018,25 @@ const driver = `
          in die schweren Stellungen geschoben. */
       st[color].zeiten.push(dt);
       if (leseBodenGriff(true) > 0) st[color].boden++;
+      { const aw = leseAtariWaechter(true);
+        st[color].atRufe += aw.rufe; st[color].atGross += aw.gross;
+        if (aw.maxGroesse > st[color].atMax) st[color].atMax = aw.maxGroesse; }
+      { const dw = leseDruckWaechter(true);
+        st[color].drRufe += dw.rufe; st[color].drGross += dw.gross;
+        if (dw.maxGroesse > st[color].drMax) st[color].drMax = dw.maxGroesse; }
+      { const kw = leseDeckelWaechter(true);
+        st[color].dkRufe += kw.rufe; st[color].dkGriff += kw.griff; }
+      { const sw = leseSunkWaechter(true);
+        st[color].skRufe += sw.rufe; st[color].skGriff += sw.griff;
+        if (sw.maxDauer > st[color].skMax) st[color].skMax = sw.maxDauer; }
+      { const aw = leseAugenWaechter(true);
+        st[color].agRufe += aw.rufe; st[color].agOffen += aw.offen; }
       { const f = leseFaktor();
         if (f.faktor !== null) { st[color].faktoren.push(f.faktor); st[color].args.push(f.arg); } }
 
       ms.root = _mctsSavedRoot; ms.hope = _hopelessStreak; ms.dead = _allDeadStreak;
       ms.msProSim = _lastMsPerSim;
+      ms.krisenDauer = leseKrisenDauer();
       const s = st[color]; s.moves++; s.timeMs += dt;
 
       if (res.info) {
@@ -1077,6 +1110,26 @@ const driver = `
                  top10: summe ? 100 * top / summe : 0,
                  maxMs: sortiert[0],
                  bodenAnteil: 100 * st[c].boden / z.length,
+                 /* Atari-Waechter je Partie: Aufrufe der Skalierung pro Zug,
+                    Anteil davon an Gruppen ab 6 Steinen, groesste beruehrte
+                    Gruppe. Bleiben die Aufrufe 0, ist der Hebel nicht
+                    verdrahtet und ein Nullergebnis bedeutungslos. */
+                 atariProZug: st[c].atRufe / z.length,
+                 atariGrossAnteil: st[c].atRufe ? 100 * st[c].atGross / st[c].atRufe : 0,
+                 atariMaxGroesse: st[c].atMax,
+                 /* Freiheitsdruck und Gefangenen-Deckel, je eigener Waechter:
+                    die drei Terme greifen an verschiedenen Stellen, eine
+                    gemeinsame Zaehlung koennte nicht sagen, welcher feuerte. */
+                 druckProZug: st[c].drRufe / z.length,
+                 druckGrossAnteil: st[c].drRufe ? 100 * st[c].drGross / st[c].drRufe : 0,
+                 druckMaxGroesse: st[c].drMax,
+                 deckelAnteil: st[c].dkRufe ? 100 * st[c].dkGriff / st[c].dkRufe : 0,
+                 deckelRufe: st[c].dkRufe,
+                 sunkAnteil: st[c].skRufe ? 100 * st[c].skGriff / st[c].skRufe : 0,
+                 sunkRufe: st[c].skRufe,
+                 sunkMaxDauer: st[c].skMax,
+                 augenOffenAnteil: st[c].agRufe ? 100 * st[c].agOffen / st[c].agRufe : 0,
+                 augenRufe: st[c].agRufe,
                  /* Phasensplit der Rechenzeit: Frueh- gegen Spaetspiel. Der
                     Top10-Anteil sagt, ob es Spitzen gibt; das hier sagt, ob
                     die Zeit systematisch nach hinten wandert. Je Farbe zieht
@@ -1240,6 +1293,19 @@ const driver = `
       agg.zeit[key].top10.push(z.top10);
       agg.zeit[key].max.push(z.maxMs);
       agg.zeit[key].boden.push(z.bodenAnteil);
+      agg.zeit[key].atari.push(z.atariProZug);
+      agg.zeit[key].atariGross.push(z.atariGrossAnteil);
+      agg.zeit[key].atariMax.push(z.atariMaxGroesse);
+      agg.zeit[key].druck.push(z.druckProZug);
+      agg.zeit[key].druckGross.push(z.druckGrossAnteil);
+      agg.zeit[key].druckMax.push(z.druckMaxGroesse);
+      agg.zeit[key].deckel.push(z.deckelAnteil);
+      agg.zeit[key].deckelRufe.push(z.deckelRufe);
+      agg.zeit[key].sunk.push(z.sunkAnteil);
+      agg.zeit[key].sunkRufe.push(z.sunkRufe);
+      agg.zeit[key].sunkMax.push(z.sunkMaxDauer);
+      agg.zeit[key].augen.push(z.augenOffenAnteil);
+      agg.zeit[key].augenRufe.push(z.augenRufe);
       if (z.faktor) agg.zeit[key].faktor.push(z.faktor);
       if (z.phase) agg.zeit[key].phase.push(z.phase);
     }
@@ -1273,8 +1339,10 @@ const driver = `
       rand: {A: [], B: []},
       /* Zeitverteilung nach Konfiguration: Gesamtzeit je Partie (muss bei
          Paritaet gleich sein) und Top10-Anteil (die eigentliche Messgroesse). */
-      zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: []},
-             B: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: []}},
+      zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
+                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: []},
+             B: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
+                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: []}},
       anomalies: 0
     };
   }
@@ -1364,6 +1432,54 @@ const driver = `
           + (Math.max(bA, bB) < 1
              ? '   — BEHANDLUNG FAND PRAKTISCH NICHT STATT, ein Nullergebnis waere bedeutungslos'
              : ''));
+        const aA = mean(A.atari), aB = mean(B.atari);
+        const mxA = Math.max(0, ...A.atariMax), mxB = Math.max(0, ...B.atariMax);
+        console.log('ATARI-WAECHTER: Skalierung je Zug  A ' + fmt(aA, 2) + '   |   B ' + fmt(aB, 2)
+          + '  ·  davon Gruppen ab 6 Steinen  A ' + fmt(mean(A.atariGross), 1) + ' %   |   B ' + fmt(mean(B.atariGross), 1) + ' %'
+          + '  ·  groesste Gruppe  A ' + mxA + '   |   B ' + mxB);
+        /* Getrennte Zeilen statt eines Umbruchs im String: der Treiber ist ein
+           Template-Literal, ein Backslash-n darin wird schon aussen aufgeloest
+           und zerreisst den Einzelanfuehrungs-String. */
+        if (Math.max(aA, aB) === 0)
+          console.log('                — NICHT VERDRAHTET: die Skalierung wurde in keinem Arm ausgeloest');
+        else if (mxB <= 1)
+          console.log('                — SKALIERT NICHTS: groesste beruehrte Gruppe ist 1 Stein, der Faktor bleibt 1');
+
+        const dA = mean(A.druck), dB = mean(B.druck);
+        const dmA = Math.max(0, ...A.druckMax), dmB = Math.max(0, ...B.druckMax);
+        console.log('DRUCK-WAECHTER: Freiheitsdruck je Zug  A ' + fmt(dA, 2) + '   |   B ' + fmt(dB, 2)
+          + '  ·  davon Gruppen ab 6 Steinen  A ' + fmt(mean(A.druckGross), 1) + ' %   |   B ' + fmt(mean(B.druckGross), 1) + ' %'
+          + '  ·  groesste Gruppe  A ' + dmA + '   |   B ' + dmB);
+        if (Math.max(dA, dB) === 0)
+          console.log('                — NICHT VERDRAHTET: der Freiheitsdruck wurde in keinem Arm ausgeloest');
+
+        const kA = mean(A.deckel), kB = mean(B.deckel);
+        const krA = mean(A.deckelRufe), krB = mean(B.deckelRufe);
+        console.log('DECKEL-WAECHTER: Gefangenen-Deckel schnitt bei  A ' + fmt(kA, 1) + ' %   |   B ' + fmt(kB, 1)
+          + ' % der Bewertungen   ·  Bewertungen mit aktivem Deckel je Zug  A ' + fmt(krA, 0) + '   |   B ' + fmt(krB, 0));
+        if (Math.max(krA, krB) === 0)
+          console.log('                — NICHT VERDRAHTET: in keinem Arm war ein Deckel gesetzt');
+        else if (Math.max(kA, kB) < 1)
+          console.log('                — DECKEL ZU HOCH: er schnitt praktisch nie, ein Nullergebnis waere bedeutungslos');
+
+        const sA = mean(A.sunk), sB = mean(B.sunk);
+        const srA = mean(A.sunkRufe), srB = mean(B.sunkRufe);
+        const smA = Math.max(0, ...A.sunkMax), smB = Math.max(0, ...B.sunkMax);
+        console.log('SUNK-WAECHTER: Malus griff bei  A ' + fmt(sA, 1) + ' %   |   B ' + fmt(sB, 1)
+          + ' % der Tsumego-Bewertungen   ·  laengste Krisendauer  A ' + smA + '   |   B ' + smB + ' Zuege');
+        if (Math.max(srA, srB) === 0)
+          console.log('                — NICHT VERDRAHTET: in keinem Arm war der Malus gesetzt');
+        else if (Math.max(sA, sB) < 1)
+          console.log('                — SERIE ZU LANG: der Malus griff praktisch nie, ein Nullergebnis waere bedeutungslos');
+
+        const gA2 = mean(A.augen), gB2 = mean(B.augen);
+        const grA = mean(A.augenRufe), grB = mean(B.augenRufe);
+        console.log('AUGEN-WAECHTER: offene Punkte unter den gezaehlten Augen  A ' + fmt(gA2, 1) + ' %   |   B ' + fmt(gB2, 1) + ' %'
+          + '   ·  gezaehlte Augenpunkte je Zug  A ' + fmt(grA, 0) + '   |   B ' + fmt(grB, 0));
+        if (Math.max(grA, grB) === 0)
+          console.log('                — NICHT VERDRAHTET: in keinem Arm war der Abschlag gesetzt');
+        else if (Math.max(gA2, gB2) < 1)
+          console.log('                — NICHTS ABZUWERTEN: praktisch kein gezaehlter Augenpunkt ist offen');
       }
     }
     console.log('PASS: erster Ø Zug S ' + fmt(mean(agg.passFirst[1]), 0) + ' / W ' + fmt(mean(agg.passFirst[2]), 0)
