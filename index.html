@@ -1280,7 +1280,41 @@ globalThis.PARAMS = {
      Bei 0 gekappt statt negativ: ein "Auge" soll hoechstens wertlos sein,
      nicht zur Strafe werden, sonst haengt am selben Knopf ein zweiter Effekt.
 
-     Default 0, bis der Harness eine Aussage erlaubt. */
+     ─────────────────────────────────────────────────────────────────────
+     GEMESSEN, Läufe 110-115, drei Dosen zu je 120 Partien:
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x3)
+        30      64/120   53.3 %   44.0-62.5 %     0.52 (1.00)
+        60      62/120   51.7 %   42.4-60.9 %     0.78 (1.00)
+       100      54/120   45.0 %   35.9-54.3 %     0.32 (0.95)
+       gepoolt 180/360   50.0 %   44.7-55.3 %     1.00
+
+     Exakt 50.0 %, kein Dosis-Trend. Der Gruppenverlust sinkt um 4.0 %, aber
+     die Kontrollarme streuen für sich um 21 % — die Zahl trägt nicht.
+
+     DER ÜBERZÄHLER IST BESTÄTIGT, und zwar im vollen Spielbetrieb: über
+     alle sechs Läufe sind im Mittel 25.1 % der gezählten Augenpunkte offen
+     (Einzelläufe 22.9 bis 26.5 %), bei rund 800 gezählten Augenpunkten je
+     Zug. Jeder vierte Punkt, den der Bewerter "potenzielles Auge" nennt,
+     ist einer, durch den der Gegner noch hineinlaufen kann. Der Defekt ist
+     real und groß — seine Behebung ändert nichts.
+
+     WIDERLEGT WIRD DAMIT EINE EIGENE ERKLÄRUNG. Nach fünf Nullergebnissen
+     und dem einen Treffer (endLibPressure) hatte ich vermutet, der
+     Unterschied liege in der REICHWEITE: endLibPressure greift auf 34 % der
+     Endspielzüge, atariSizeWeight nur auf 2.7 %. Dieser Term greift auf
+     rund 25 % und bringt exakt nichts. Die Reichweite ist es also nicht.
+
+     Was als struktureller Unterschied übrig bleibt: evalTsumego wird nur
+     über getCrisisWeight eingeblendet, also ausschließlich auf den
+     Freiheiten einer Gruppe, die BEREITS in der Krise ist. Dasselbe gilt
+     für tsumegoSunkCost. atariSizeWeight preist Atari, also den Moment, in
+     dem es zu spät ist. endLibPressure ist der einzige Eingriff der Serie,
+     der auf gewöhnlichen Zügen wirkt, bevor eine Gruppe in Not ist. Das
+     ist eine Hypothese, keine Messung — aber sie ist die einzige, die nach
+     diesem Lauf noch steht.
+
+     Default bleibt 0. */
   tsumegoEyeOpenPenalty: 0,
   tsumegoNakade:      0.5,
   tsumegoWeaken:    300,

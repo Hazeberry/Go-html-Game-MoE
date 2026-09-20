@@ -1074,6 +1074,38 @@ Spielstärkegewinn** — und der erste, der einen *Bewertungsfehler* behebt stat
 einer Gewohnheit. Die vier Vorgänger dieser Art waren allesamt wirkungslos.
 Der Default steht auf 0; Vorschlag: 40.
 
+### Der Augen-Überzähler: `tsumegoEyeOpenPenalty`
+
+| Dosis | B-Siege | Rate | p (Bonferroni ×3) |
+|---:|---:|---:|---:|
+| 30 | 64/120 | 53,3 % | 0,52 (1,00) |
+| 60 | 62/120 | 51,7 % | 0,78 (1,00) |
+| 100 | 54/120 | 45,0 % | 0,32 (0,95) |
+| **gepoolt** | **180/360** | **50,0 %** | 1,00 |
+
+Exakt 50,0 %, kein Dosis-Trend. Der Gruppenverlust sinkt um 4,0 %, aber die
+Kontrollarme streuen für sich um 21 % — die Zahl trägt nicht.
+
+**Der Überzähler ist bestätigt**, im vollen Spielbetrieb: über alle sechs Läufe
+sind im Mittel **25,1 %** der gezählten Augenpunkte offen (22,9 bis 26,5 %), bei
+rund 800 gezählten Augenpunkten je Zug. Jeder vierte Punkt, den der Bewerter
+„potenzielles Auge" nennt, ist einer, durch den der Gegner noch hineinlaufen
+kann. Der Defekt ist real und groß — seine Behebung ändert nichts.
+
+**Widerlegt wird damit eine eigene Erklärung.** Nach fünf Nullergebnissen und
+dem einen Treffer hatte ich vermutet, der Unterschied liege in der
+*Reichweite*: `endLibPressure` greift auf 34 % der Endspielzüge,
+`atariSizeWeight` nur auf 2,7 %. Dieser Term greift auf rund 25 % und bringt
+exakt nichts. Die Reichweite ist es nicht.
+
+Was als struktureller Unterschied übrig bleibt: `evalTsumego` wird nur über
+`getCrisisWeight` eingeblendet, also ausschließlich auf den Freiheiten einer
+Gruppe, die **bereits** in der Krise ist — dasselbe gilt für `tsumegoSunkCost`.
+`atariSizeWeight` preist Atari, den Moment, in dem es zu spät ist.
+`endLibPressure` ist der einzige Eingriff der Serie, der auf gewöhnlichen Zügen
+wirkt, *bevor* eine Gruppe in Not ist. Das ist eine Hypothese, keine Messung —
+aber die einzige, die nach diesem Lauf noch steht.
+
 ### Versenkte Kosten: `tsumegoSunkCost`
 
 Eine Gruppe, die zum dritten Mal in Folge gerettet wird und immer noch keine
