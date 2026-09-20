@@ -1204,6 +1204,58 @@ globalThis.PARAMS = {
   tsumegoNakade:      0.5,
   tsumegoWeaken:    300,
   tsumegoSafetyMul:   0.2,
+  /* Versenkte Kosten: Malus auf jede weitere Rettung einer Gruppe, die seit
+     tsumegoSunkStreak Zügen ununterbrochen in derselben Großgruppen-Krise
+     steckt. 0 = aus. Wirkt nur in evalTsumego, also nur auf den Freiheiten
+     einer Krisengruppe — genau dort, wo Rettungszüge bewertet werden.
+
+     IDEE des Projektinhabers: "wird schon zum dritten Mal in Folge gerettet,
+     hat aber immer noch keine zwei Augen in Sicht → eher aufgeben als weiter
+     reinstecken."
+
+     KORREKTUR EINER PRÄMISSE, die dabei mitgeliefert wurde: evalTsumego
+     bewertet NICHT nur unmittelbare Freiheiten und Fänge. Es hat einen
+     Augenform-Term — potenzielle Augenpunkte der eigenen Gruppe, je 100
+     (tsumegoEyeBonus), gedeckelt bei 300, plus evalNakade. Der Term existiert
+     also; er ist nur nachsichtig, siehe unten.
+
+     GEMESSEN am bestehenden Augen-Term, weil die Frage im selben Atemzug kam.
+     Die Regel verlangt an einem leeren Nachbarpunkt der Gruppe: keine
+     Gegner-Nachbarn und mindestens so viele eigene wie minOwn — Ecke 1,
+     Linie 1 zwei, sonst drei. Da ein Randpunkt drei und ein Mittelpunkt vier
+     Nachbarn hat, darf in JEDEM Fall genau einer leer sein:
+
+       Punkt         Nachb. eigen leer verlangt gezählt? wirklich Auge?
+       B1  (Linie 1)    3     2    1      2       ja      nein, B2 leer
+       G10 (Mitte)      4     3    1      3       ja      nein, G9 leer
+       A1  (Ecke)       2     1    1      1       ja      nein, B1 leer
+
+     Ein Punkt, durch den der Gegner noch hineinlaufen kann, zählt also als
+     potenzielles Auge und ist 100 wert. Das ist ein echter Überzähler —
+     aber er ist NICHT randspezifisch, sondern überall gleich nachsichtig.
+     Als Erklärung für die Randschwäche taugt er damit nicht, und er wird
+     hier bewusst NICHT mitgeändert: zwei Eingriffe in einem Lauf machten die
+     Dosisreihe mehrdeutig.
+
+     UMSETZUNG. Die Dauer wird je BRETTPUNKT gezählt, nicht je Gruppe: eine
+     Gruppen-ID über Züge hinweg wäre fragil, weil Gruppen wachsen und
+     verschmelzen. Eine gewachsene Gruppe erbt die Zähler ihrer alten Steine,
+     und "wie lange schon in der Krise" ist das Maximum über ihre Steine.
+     Fortgeschrieben wird einmal pro ECHTEM Zug — innerhalb einer Suche
+     triggert dieselbe Bedingung tausendfach, "dritter Zug in Folge" wäre
+     dort bedeutungslos.
+
+     Als Krise gelten genau die beiden Lagen, die buildCrisisMap als
+     Großgruppen-Krise behandelt: zwei Freiheiten ab crisisLargeSize, drei
+     Freiheiten ab crisisDragonSize. Atari bleibt draußen — das ist akut,
+     nicht chronisch.
+
+     Default 0, bis der Harness eine Aussage erlaubt. */
+  tsumegoSunkCost:      0,
+  /* Wie viele Züge in Folge, bevor der Malus greift. Bleibt in der ersten
+     Kampagne FEST auf 3 (der genannten Vorgabe), damit nur ein Parameter
+     variiert und die Dosisreihe eindeutig bleibt. */
+  tsumegoSunkStreak:    3,
   /* Krisen-Karte */
   crisisAtari:      100,
   crisisLarge2Lib:   80,
@@ -2300,6 +2352,62 @@ function buildCrisisMap(board, color) {
   }
 }
 
+/* Wie lange steckt die Gruppe, zu der ein Punkt gehört, schon in der
+   Krise? Zähler JE BRETTPUNKT, nicht je Gruppe: eine Gruppe wächst, schrumpft
+   und verschmilzt, eine Gruppen-ID über Züge hinweg wäre entweder fragil
+   (kleinster Index wandert beim Verschmelzen) oder teuer. Der Punktzähler
+   überlebt beides — eine wachsende Gruppe erbt die hohen Zähler ihrer alten
+   Steine, und "wie lange schon in der Krise" ist dann das Maximum über ihre
+   Steine.
+
+   Fortgeschrieben wird EINMAL PRO ECHTEM ZUG auf dem echten Brett, nicht in
+   der Suche: innerhalb einer Suche triggert dieselbe Bedingung tausendfach,
+   "dritter Zug in Folge" wäre dort bedeutungslos. */
+const _krisenDauer = new Uint8Array(BOARD_SIZE);
+/* Eigene Scratch-Felder statt eines geliehenen: _evalBoardSeen gehoert
+   evaluateBoard, und geteilte Scratch-Puffer sind in diesem Repo schon
+   dreimal die Ursache stiller Fehler gewesen. Einmal je Zug allokieren
+   waere ebenfalls billig, aber dann haette der Zaehler eine andere
+   Lebensdauer als die Funktion, die ihn fuellt. */
+const _krisenFlag = new Uint8Array(BOARD_SIZE);
+const _krisenGesehen = new Uint8Array(BOARD_SIZE);
+
+function aktualisiereKrisenDauer(board, color) {
+  const inKrise = _krisenFlag;
+  inKrise.fill(0);
+  const gesehen = _krisenGesehen;
+  gesehen.fill(0);
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    if (board[i] !== color || gesehen[i]) continue;
+    const {group, liberties} = floodFill(board, i);
+    for (const g of group) gesehen[g] = 1;
+    /* Genau die beiden Bedingungen, die buildCrisisMap als GROSSGRUPPEN-Krise
+       behandelt. Atari (eine Freiheit) bleibt bewusst draussen: das ist eine
+       akute Lage, keine chronische — der Term hier zielt auf "wird zum
+       dritten Mal gerettet und hat immer noch keine Form". */
+    const k = (liberties.length === 2 && group.length >= PARAMS.crisisLargeSize)
+           || (liberties.length === 3 && group.length >= PARAMS.crisisDragonSize);
+    if (k) for (const g of group) inKrise[g] = 1;
+  }
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    if (inKrise[i]) { if (_krisenDauer[i] < 255) _krisenDauer[i]++; }
+    else _krisenDauer[i] = 0;
+  }
+}
+
+/* Fuer den A/B-Harness: die beiden Arme spielen abwechselnd, der Zaehler ist
+   Zustand EINER Partie einer Farbe und muss zwischen ihnen getauscht werden —
+   sonst leckt er wie der Faktor-Waechter und _lastMsPerSim vor ihm. */
+function leseKrisenDauer() { return _krisenDauer.slice(); }
+function setzeKrisenDauer(a) { if (a) _krisenDauer.set(a); else _krisenDauer.fill(0); }
+
+let _sunkRufe = 0, _sunkGriff = 0, _sunkMaxDauer = 0;
+function leseSunkWaechter(reset) {
+  const v = {rufe: _sunkRufe, griff: _sunkGriff, maxDauer: _sunkMaxDauer};
+  if (reset) { _sunkRufe = 0; _sunkGriff = 0; _sunkMaxDauer = 0; }
+  return v;
+}
+
 function getCrisisWeight(i) {
   return Math.max(_crisisOwn[i], _crisisOpp[i]) / 100;
 }
@@ -2386,6 +2494,17 @@ function evalTsumego(board, i, color, mc) {
     const before = countLiberties(board, n, 2);
     const after  = countLiberties(_tsumegoScratch, n, 2);
     if (after === 1 && before > 1) s -= PARAMS.tsumegoWeaken;
+  }
+  /* Versenkte Kosten: steckt diese Gruppe seit mehreren Zuegen in derselben
+     Krise, ohne herauszukommen, wird jede weitere Rettung teurer. Das Maximum
+     ueber die Steine, weil eine gewachsene Gruppe die Dauer ihrer alten
+     Steine erbt. */
+  if (PARAMS.tsumegoSunkCost > 0) {
+    let dauer = 0;
+    for (const g of own.group) if (_krisenDauer[g] > dauer) dauer = _krisenDauer[g];
+    _sunkRufe++;
+    if (dauer > _sunkMaxDauer) _sunkMaxDauer = dauer;
+    if (dauer >= PARAMS.tsumegoSunkStreak) { s -= PARAMS.tsumegoSunkCost; _sunkGriff++; }
   }
   return s * safetyMul + Math.random() * 3;
 }
@@ -2952,6 +3071,9 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
   }
   const empty = legal.length;
   buildCrisisMap(board, aiColor);
+  /* Nach der Krisenkarte und VOR der Bewertung: die Kandidaten sollen die
+     Dauer dieses Zuges sehen, nicht die des vorigen. */
+  if (PARAMS.tsumegoSunkCost > 0) aktualisiereKrisenDauer(board, aiColor);
   primeAreaCache(board, aiColor);
   const scored = legal.map(m => ({m, score: evaluateMove(board, m.idx, aiColor, mc, empty)}));
   scored.sort((a,b) => b.score - a.score);
@@ -4861,6 +4983,10 @@ globalThis.policyNet = new PolicyNet();
       params:[
         {key:'tsumegoCapBonus',   label:'Schlag Bonus',     step:100, min:0,   max:5000,
          tip:'↑ = gieriger nach Captures in Lebens/Tod-Situationen'},
+        {key:'tsumegoSunkCost',   label:'Versenkte Kosten', step:50,  min:0,   max:3000,
+         tip:'0 = aus. Malus auf weitere Rettungen einer Gruppe, die seit mehreren Zügen ohne Fortschritt in der Krise steckt. Ungemessen.'},
+        {key:'tsumegoSunkStreak', label:'Rettungs-Serie',   step:1,   min:1,   max:10,
+         tip:'So viele Züge in Folge in derselben Großgruppen-Krise, bevor der Malus greift'},
         {key:'tsumegoAtariSet',   label:'Atari setzen',     step:50,  min:0,   max:3000,
          tip:'↑ = mehr Druck-Spiel und Verfolgung'},
         {key:'tsumegoRescue3',    label:'Retten → 3+Lib',   step:50,  min:0,   max:3000,
