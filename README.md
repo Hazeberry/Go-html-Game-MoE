@@ -1201,10 +1201,110 @@ Schläge ab 5 Steinen (769 → 788 gepoolt). Das passt zum Eingriff — wer den
 Gefangenen-Saldo deckelt, gewichtet ihn im Spiel geringer und lässt eher große
 Gruppen fallen.
 
-Damit ist die Sättigung real, exakt beschrieben und messbar behoben, ohne dass
-die Spielstärke sich rührt. **Vierter Fall dieser Art** nach Min-Sims-Boden,
-Hungerzone und `atariSizeWeight`. Der Default bleibt 0; der Deckel ist als
-Werkzeug gegen die Aufgabe-Fehlauslösung dokumentiert, nicht als Stärkehebel.
+Der Default bleibt 0.
+
+#### Korrektur (20.09.): der Anlass war ein Messfehler
+
+Dieser Parameter wurde gebaut, weil ich in zwei Partien gegen einen Menschen
+berichtet hatte, das Q sättige, während die Stellung noch ausgeglichen sei —
+in einem Fall sogar „Weiß liegt mit +10 vorn". Diese Gebietsstände stammten
+aus `estimateArea`. **Dieser Maßstab zählt zum Tode verurteilte, aber noch
+stehende Gruppen als lebendiges Material.** Mit der echten Schlussauswertung
+(`resolveLifeAndDeath` + `finalAreaScore`) an denselben Stellen:
+
+| | mein Maßstab | wahr |
+|---|---:|---:|
+| Partie 1, Zug 208 | −4 | **−54** |
+| Partie 2, Zug 260 | **+10** | **−16** |
+| Partie 3, Zug 250 | 0 | **−36** |
+
+Das Q hatte recht, der Maßstab nicht. Die Sättigung kam nicht daher, dass das
+Wertsignal die Stellung verliert, sondern daher, dass die Stellung verloren
+*war*. Damit fällt die Deutung, die den Parameter veranlasst hat — und ebenso
+die Korrelationszahlen (0,62 ungesättigt gegen 0,31 gesättigt), die gegen
+denselben schiefen Maßstab gerechnet sind.
+
+Das erklärt rückwirkend das Nullergebnis: hier wurde ein Problem behandelt,
+das größtenteils ein eigener Messfehler war. Die 360 Partien sind nicht
+verloren — sie zeigen, dass der Deckel nichts bringt, und jetzt ist auch klar,
+warum.
+
+**Was bestehen bleibt** ist die Arithmetik: 19 Gefangene Rückstand genügen, um
+`tanh` in den flachen Bereich zu schieben, und die Empfindlichkeit bricht dabei
+15-fach ein. Das ist eine Rechnung, keine Messung, und sie stimmt weiter — nur
+war sie in diesen Partien kein Fehlalarm.
+
+**Nicht nachgemessen und deshalb offen:** die vier Partien vom 29.08., auf die
+sich der Kommentar an `captureWeight` und die Einführung von
+`resignAreaMargin` stützen. Auch dort wurde gegen `estimateArea` verglichen.
+
+Die Zählung der wirkungslosen Eingriffe bleibt davon unberührt — `captureCap`
+ist einer, nur aus einem anderen Grund als angenommen.
+
+### Praxistest der drei Defaults, und ein Werkzeug, dem ich nicht mehr traue
+
+Erste Partie gegen einen Menschen mit `deathTransfer 1,0`, `midLineWeight 80`
+und `endLibPressure 40` gleichzeitig aktiv (20.09., 335 Züge, KI als Weiß,
+Aufgabe). Nachgespielt mit 0 Abweichungen zum Protokoll und 0 Feldunterschieden
+zum gelieferten Endbrett.
+
+**Der Randanteil ist gefallen, zum ersten Mal außerhalb der bisherigen
+Spanne:**
+
+| | KI | Mensch |
+|---|---:|---:|
+| drei Partien ohne `midLineWeight` | 51,0 / 51,3 / 52,6 % | 20,7 / 18,9 / 22,0 % |
+| **diese Partie** | **39,7 %** | 28,5 % |
+
+Der erste Hinweis, dass ein im Selfplay gemessener Parameter sich gegen einen
+Menschen überträgt. Vorbehalt: der Mensch spielte hier selbst randnäher, der
+Abstand ist also von rund 30 auf 11 Punkte geschrumpft und nicht nur die KI hat
+sich bewegt. Und es ist eine Partie.
+
+#### `estimateArea` taugt nicht als Maßstab für „wer liegt vorn"
+
+Der wichtigere Befund dieser Partie ist methodisch, und er korrigiert meine
+eigene Auswertung aus drei Partien. Ich hatte dreimal berichtet, das Q sättige,
+während die Stellung noch ausgeglichen sei. Gemessen war das mit
+`estimateArea` — und dieser Maßstab zählt zum Tode verurteilte, aber noch
+stehende Gruppen als lebendiges Material.
+
+Mit der echten Schlussauswertung (`resolveLifeAndDeath` + `finalAreaScore`)
+sieht der Verlauf dieser Partie so aus:
+
+| Zug | `estimateArea` | wahr | Q |
+|---:|---:|---:|---:|
+| 125 | +11 | +6 | −0,25 |
+| 150 | +9 | −10 | +0,01 |
+| 200 | −5 | **−47** | −0,80 |
+| 250 | 0 | **−36** | −0,98 |
+| 300 | −4 | −28 | −1,00 |
+
+Die Partie kippte zwischen Zug 125 und 200, nicht im Endspiel, wie der rohe
+Maßstab nahelegte. Die Aufgabe bei Zug 335 erfolgte bei einem wahren Rückstand
+von −65 und war eher zu spät als zu früh.
+
+**Regel für künftige Auswertungen:** „Wer liegt vorn" wird mit
+`resolveLifeAndDeath` + `finalAreaScore` beantwortet, nicht mit
+`estimateArea`. Der rohe Maßstab ist für die Engine als schnelle Heuristik
+gedacht, nicht als Schiedsrichter in der Analyse. Wo er trotzdem auftaucht,
+gilt: er begünstigt systematisch die Seite mit den todgeweihten Gruppen.
+
+Die Folgen stehen bei [`captureCap`](#die-q-sättigung-deckeln-capturecap).
+
+#### Ein zweiter Irrtum, rechtzeitig bemerkt
+
+Zwei Zugpaare im Endspiel sahen nach einem Snapback aus: Zug 316 (Weiß schlägt
+1, verliert 6) und 326 (Weiß schlägt 1, verliert 11). Dazu gibt es eine
+passende Codestelle — die Selbst-Atari-Strafe ist in allen drei Bewertern an
+`cap === 0` gebunden, ein schlagender Zug ist also ausgenommen, und
+`evalTsumego` belohnt ihn zusätzlich mit `tsumegoCapBonus` 1200. Gemessen
+bekommen die beiden Züge +188 bzw. +2021.
+
+Nur standen beide Weiß-Gruppen **schon vor dem Zug im Atari**, mit der
+Schlagstelle als einziger Freiheit. Es war jeweils ein verlorenes
+Schlagrennen, kein Fehler; Weiß verlor einen Stein mehr als beim Nichtstun.
+Die Codestelle ist real, aber diese Partie belegt nicht, dass sie etwas kostet.
 
 ### Die Hungerzone: eine echte Fehlfunktion, deren Behebung nichts bringt
 

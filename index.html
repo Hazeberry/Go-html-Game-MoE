@@ -1943,6 +1943,17 @@ globalThis.PARAMS = {
      Übereinstimmung mit estimateArea. Über tanh(x/mctsValueScale) sättigt das
      Q auf -0,96 bis -0,99 und reißt die Aufgabeschwelle.
 
+     VORBEHALT, nachgetragen am 20.09.: das "ausgeglichen" steht hier gegen
+     estimateArea, und dieser Maßstab zählt zum Tode verurteilte, aber noch
+     stehende Gruppen als lebendiges Material. An drei anderen Partien war er
+     dadurch um 36 bis 50 Punkte zu günstig für die verlierende Seite — siehe
+     die Korrektur bei captureCap. Die vier Partien vom 29.08. sind NICHT
+     nachgemessen; es kann also sein, dass die Stellungen gar nicht
+     ausgeglichen waren und der Gefangenen-Term schlicht recht hatte. Wer
+     diesen Parameter anfasst, prüft das zuerst mit resolveLifeAndDeath +
+     finalAreaScore nach. Dasselbe gilt für die Einführung von
+     resignAreaMargin, die sich auf dieselben vier Partien stützt.
+
      Ob ein kleineres Gewicht STÄRKER spielt, ist damit nicht gezeigt — nur,
      dass dieser Term die Skala beherrscht. Das gehört durch den A/B-Harness,
      nicht in einen Schnellschuss. */
@@ -1950,18 +1961,59 @@ globalThis.PARAMS = {
   /* Deckel auf den Beitrag des Gefangenen-Terms zu evaluateBoard, in
      Bewertungspunkten. 0 = aus (unbegrenzt, bisheriges Verhalten).
 
-     ANLASS — zwei Partien gegen einen Menschen (12./13.09.). Q kommt aus
+     ╔═══════════════════════════════════════════════════════════════════╗
+     ║ KORREKTUR (20.09.): DER ANLASS UNTEN WAR EIN MESSFEHLER.          ║
+     ║ Die Gebietsstaende stammten aus estimateArea. Dieser Massstab     ║
+     ║ zaehlt zum Tode verurteilte, aber noch stehende Gruppen als       ║
+     ║ lebendiges Material. Mit der echten Schlussauswertung             ║
+     ║ (resolveLifeAndDeath + finalAreaScore) an denselben Stellen:      ║
+     ║                                                                   ║
+     ║                     estimateArea (roh)    wahr                    ║
+     ║   Partie 1, Zug 208          -4           -54                     ║
+     ║   Partie 2, Zug 260         +10           -16                     ║
+     ║   Partie 3, Zug 250           0           -36                     ║
+     ║                                                                   ║
+     ║ Das Q hatte also recht, der Massstab nicht. Die Saettigung kam    ║
+     ║ nicht daher, dass das Wertsignal die Stellung verliert, sondern   ║
+     ║ daher, dass die Stellung verloren WAR. Damit faellt die Deutung,  ║
+     ║ die diesen Parameter veranlasst hat — und ebenso die              ║
+     ║ Korrelationszahlen 0.62/0.31, die gegen denselben schiefen        ║
+     ║ Massstab gerechnet sind.                                          ║
+     ║                                                                   ║
+     ║ Das erklaert rueckwirkend das Nullergebnis der Dosisreihe: hier   ║
+     ║ wurde ein Problem behandelt, das groesstenteils ein eigener       ║
+     ║ Messfehler war. Die 360 Partien sind nicht verloren — sie zeigen, ║
+     ║ dass der Deckel nichts bringt, und jetzt ist auch klar, warum.    ║
+     ║                                                                   ║
+     ║ Was bestehen bleibt: die ARITHMETIK unten (19 Gefangene           ║
+     ║ Rueckstand genuegen fuer die Saettigung, die Empfindlichkeit      ║
+     ║ bricht 15-fach ein). Das ist eine Rechnung, keine Messung, und    ║
+     ║ sie stimmt weiter — nur war sie in diesen Partien kein Fehlalarm. ║
+     ║                                                                   ║
+     ║ NICHT NACHGEMESSEN und deshalb offen: die vier Partien vom        ║
+     ║ 29.08., auf die sich der Kommentar an captureWeight und die       ║
+     ║ Einfuehrung von resignAreaMargin stuetzen. Auch dort wurde gegen  ║
+     ║ estimateArea verglichen. Wer daran weiterarbeitet, prueft das     ║
+     ║ zuerst nach.                                                      ║
+     ╚═══════════════════════════════════════════════════════════════════╝
+
+     ANLASS (in der urspruenglichen Fassung, siehe Korrektur oben) — zwei
+     Partien gegen einen Menschen (12./13.09.). Q kommt aus
      tanh(evaluateBoard / mctsValueScale), und sobald der Gefangenen-Term
      gross genug ist, beherrscht er die Summe und tanh saettigt. Gemessen:
 
-       Partie 1   erster gesaettigter Zug 208, Gebietsstand dort  -4
-       Partie 2   erster gesaettigter Zug 260, Gebietsstand dort +10 (vorn!)
+       Partie 1   erster gesaettigter Zug 208, Gebietsstand dort  -4  [falsch]
+       Partie 2   erster gesaettigter Zug 260, Gebietsstand dort +10  [falsch]
        in beiden  25 von 29 bzw. 67 von 71 gesaettigten Zuegen hatten einen
-                  Rueckstand KLEINER als die Aufgabe-Marge
+                  Rueckstand KLEINER als die Aufgabe-Marge  [gegen denselben
+                  schiefen Massstab gerechnet, also ebenfalls hinfaellig]
 
      Im gesaettigten Bereich sagt der Gefangenen-Term allein das gemessene Q
-     voraus — mittlerer Abstand 0.008 bzw. 0.019. Und die Korrelation von Q
-     mit dem Gebietsstand faellt von 0.62 (ungesaettigt) auf 0.31.
+     voraus — mittlerer Abstand 0.008 bzw. 0.019. Das bleibt richtig: es ist
+     ein Abgleich zweier Groessen der Engine, nicht mit estimateArea. In
+     Partie 3 liegt derselbe Abstand allerdings bei 0.072, dort trug der
+     Positionsterm merklich mit — der Gefangenen-Term ist also nicht immer
+     der alleinige Treiber.
 
      Rechnerisch genuegen 19 Gefangene Rueckstand, um |Q| ueber die
      Aufgabeschwelle 0.95 zu heben, unabhaengig vom Gebiet — 5.3 % der
@@ -2014,9 +2066,11 @@ globalThis.PARAMS = {
      3 von 6 Läufen, und die Kontrollarme korrelieren auch hier mit der
      scheinbaren Verbesserung (r = -0.83).
 
-     FAZIT: die Saettigung ist real und exakt beschrieben, der Deckel
-     behebt sie messbar, und die Spielstärke bleibt unberührt. Vierter Fall
-     dieser Art nach Min-Sims-Boden, Hungerzone und atariSizeWeight.
+     FAZIT (20.09. revidiert): der Deckel behebt messbar, was er beheben
+     soll, und die Spielstärke bleibt unberührt. Der Grund dafür ist
+     inzwischen bekannt und steht in der Korrektur oben: die Sättigung war
+     in den beobachteten Partien kein Fehlalarm, sondern eine zutreffende
+     Lageeinschätzung. Es gab hier nichts zu gewinnen.
 
      Default bleibt 0. NICHT ERNEUT TESTEN, solange die Frage
      "Spielstärke" lautet — der Deckel ist als Werkzeug gegen die
