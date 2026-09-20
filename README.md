@@ -1074,6 +1074,47 @@ Spielstärkegewinn** — und der erste, der einen *Bewertungsfehler* behebt stat
 einer Gewohnheit. Die vier Vorgänger dieser Art waren allesamt wirkungslos.
 Der Default steht auf 0; Vorschlag: 40.
 
+### Versenkte Kosten: `tsumegoSunkCost`
+
+Eine Gruppe, die zum dritten Mal in Folge gerettet wird und immer noch keine
+Form hat, soll eher fallengelassen als weiter gefüttert werden.
+
+| Dosis | B-Siege | Rate | p (Bonferroni ×3) |
+|---:|---:|---:|---:|
+| 100 | 56/120 | 46,7 % | 0,52 (1,00) |
+| 300 | 65/120 | 54,2 % | 0,41 (1,00) |
+| 700 | 57/120 | 47,5 % | 0,65 (1,00) |
+| **gepoolt** | **178/360** | **49,4 %** | 0,87 |
+
+Kein Gewinn, kein Dosis-Trend. Der Eingriff greift dabei kräftig: Wächter
+A 0,0 %, B **24,6–30,6 %** aller Tsumego-Bewertungen.
+
+**Der Mechanismus arbeitet, dosisgeordnet.** Wie oft der B-Arm die Partie
+aufgab, je Dosis: **34 → 30 → 26**. Je teurer die Rettung, desto seltener muss
+B aufgeben — genau die erwartete Kette: Gruppe früher fallenlassen, weniger
+Material verlieren, länger im Spiel bleiben. Nur zahlt es sich nicht in Siegen
+aus.
+
+**Ein Befund unabhängig vom Parameter:** die längste ununterbrochene
+Krisendauer einer Gruppe lag je Lauf bei **48 bis 76 Zügen**. Es gibt also
+tatsächlich Gruppen, die über siebzig Züge gefüttert werden, ohne
+herauszukommen. Die Beobachtung, die den Parameter veranlasst hat, ist
+bestätigt — nur ihre Behandlung ändert nichts.
+
+**Warum die Gruppenverlust-Zahl hier nicht zählt.** Gepoolt sinkt der Ø größte
+erlittene Schlag von 13,18 auf 11,67 (−11,5 %), B besser in 4 von 6 Läufen.
+Sieht gut aus, ist aber nicht belastbar:
+
+| | Streuung der Kontrollarme | Effekt | r |
+|---|---|---:|---:|
+| `tsumegoSunkCost` | 11,1–16,1 — **45 %** | −11,5 % | −0,92 |
+| `endLibPressure` (Nachmessung) | 11,9–12,8 — **8 %** | −24,0 % | −0,81 |
+
+Hier ist die Streuung der Kontrollarme größer als der Effekt, dort ein Drittel
+davon. Derselbe Test, zwei Ausgänge — und genau dafür ist er da.
+
+Der Default bleibt 0.
+
 ### Die Q-Sättigung deckeln: `captureCap`
 
 | Dosis | B-Siege | Rate | 95 %-CI | p (Bonferroni ×3) |

@@ -1331,7 +1331,42 @@ globalThis.PARAMS = {
      Freiheiten ab crisisDragonSize. Atari bleibt draußen — das ist akut,
      nicht chronisch.
 
-     Default 0, bis der Harness eine Aussage erlaubt. */
+     ─────────────────────────────────────────────────────────────────────
+     GEMESSEN, Läufe 104-109, drei Dosen zu je 120 Partien:
+
+       Dosis   B-Siege    Rate     95-%-KI        p (Bonferroni x3)
+       100      56/120   46.7 %   37.5-56.0 %     0.52 (1.00)
+       300      65/120   54.2 %   44.8-63.3 %     0.41 (1.00)
+       700      57/120   47.5 %   38.3-56.8 %     0.65 (1.00)
+       gepoolt 178/360   49.4 %   44.2-54.7 %     0.87
+
+     KEIN Spielstärkegewinn, kein Dosis-Trend. Der Eingriff ist verdrahtet
+     und greift kräftig: Wächter A 0.0 %, B 24.6 bis 30.6 % aller
+     Tsumego-Bewertungen.
+
+     DER MECHANISMUS ARBEITET, und zwar dosisgeordnet. Wie oft der B-Arm
+     die PARTIE aufgab, je Dosis: 34 -> 30 -> 26. Je teurer die Rettung,
+     desto seltener muss B aufgeben — genau die erwartete Kette: Gruppe
+     früher fallenlassen, weniger Material verlieren, länger im Spiel
+     bleiben. Nur zahlt sich das nicht in Siegen aus.
+
+     UNABHÄNGIGER BEFUND aus dem Wächter, unabhängig vom Parameter: die
+     längste ununterbrochene Krisendauer einer Gruppe lag je Lauf bei 48 bis
+     76 ZÜGEN. Es gibt also tatsächlich Gruppen, die über siebzig Züge
+     gefüttert werden, ohne herauszukommen. Die Beobachtung, die diesen
+     Parameter veranlasst hat, ist damit bestätigt — nur ihre Behandlung
+     ändert nichts.
+
+     WARUM DIE GRUPPENVERLUST-ZAHL HIER NICHT ZÄHLT. Gepoolt sinkt der
+     Ø größte erlittene Schlag von 13.18 auf 11.67 (-11.5 %), B besser in
+     4 von 6 Läufen. Das sieht gut aus und ist trotzdem nicht belastbar:
+     die Kontrollarme streuen für sich zwischen 11.1 und 16.1 (45 %), und
+     die Korrelation Kontrollarm/Verbesserung liegt bei r = -0.92. Zum
+     Vergleich die Nachmessung von endLibPressure, wo derselbe Test bestand:
+     dort streuten die Kontrollarme um 8 % bei einem Effekt von -24 %. Hier
+     ist die Streuung größer als der Effekt.
+
+     Default bleibt 0. */
   tsumegoSunkCost:      0,
   /* Wie viele Züge in Folge, bevor der Malus greift. Bleibt in der ersten
      Kampagne FEST auf 3 (der genannten Vorgabe), damit nur ein Parameter
