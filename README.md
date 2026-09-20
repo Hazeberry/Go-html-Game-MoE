@@ -1072,7 +1072,34 @@ ist mit Zufall vereinbar, heißt aber: die wahre Rate liegt eher im Bereich
 Damit ist dies nach `midLineWeight` der **zweite Eingriff mit belegtem
 Spielstärkegewinn** — und der erste, der einen *Bewertungsfehler* behebt statt
 einer Gewohnheit. Die vier Vorgänger dieser Art waren allesamt wirkungslos.
-Der Default steht auf 0; Vorschlag: 40.
+
+#### Default gesetzt: `endLibPressure = 40`
+
+Vom Projektinhaber freigegeben. **Dritter Parameter des Projekts, der auf
+belegter Spielstärke aktiviert wird** — nach `deathTransfer` und
+`midLineWeight`, und der mit der stärksten Beweislage.
+
+Abschaltbarkeit geprüft, beide Richtungen, 18 228 `evalEndgame`-Aufrufe je
+Variante über 40 Stellungen von 20 bis 332 Steinen:
+
+| Richtung | Ergebnis |
+|---|---|
+| auf 0 zurückgesetzt | **bitgleich** zum Vorstand, gleicher Zufallsverbrauch |
+| auf dem Default 40 | Änderung **genau** Gewicht × Größe / Freiheiten, nur auf Zügen mit 2–3 Freiheiten |
+
+Im Harness gegengeprüft, mit vertauschten Rollen: Arm A (Default) 43,02
+Aufrufe je Zug, Arm B (erzwungen 0) 0,00.
+
+**Laufzeit:** mit dem Default wechselt der Freiheits-Deckel in
+`countLiberties` von 2 auf 4, und `countGroupSize` läuft auf dem Atari-Pfad
+mit. Gemessen kostet das nichts — in den drei Nachmessungsläufen lag die
+Gesamtzeit je Partie bei −0,6/−0,8/−0,8 % bei gleicher Simulationszahl.
+
+**Vorbehalt für bestehende Installationen**, wie bei `midLineWeight`:
+`dashSave` serialisiert das ganze `PARAMS`-Objekt, `dashLoad` schreibt jeden
+Schlüssel zurück. Wer im Dashboard je „Speichern" gedrückt hat, hat
+`endLibPressure: 0` in `localStorage` festgeschrieben und bekommt den neuen
+Default **nicht** — bis er „Zurücksetzen" drückt.
 
 ### Der Augen-Überzähler: `tsumegoEyeOpenPenalty`
 

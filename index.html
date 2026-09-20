@@ -1238,9 +1238,31 @@ globalThis.PARAMS = {
      statt einer Gewohnheit. Die vier Vorgänger dieser Art (Min-Sims-Boden,
      Hungerzone, atariSizeWeight, captureCap) waren allesamt wirkungslos.
 
-     Default bleibt 0: das Setzen ist eine Entscheidung des Projektinhabers,
-     nicht ein Nebenprodukt der Messung. Vorschlag: 40. */
-  endLibPressure:     0,
+     ─────────────────────────────────────────────────────────────────────
+     DEFAULT AUF 40 GESETZT (Entscheidung des Projektinhabers). Dritter
+     Parameter des Projekts, der auf belegter Spielstärke aktiviert wird,
+     nach deathTransfer und midLineWeight — und der mit der stärksten
+     Beweislage: 68.3 % über 180 Partien auf disjunkten Seeds, p = 9.7e-07.
+
+     ABSCHALTBARKEIT geprüft, beide Richtungen, 18228 evalEndgame-Aufrufe je
+     Variante über 40 Stellungen von 20 bis 332 Steinen:
+
+       auf 0 zurückgesetzt   BITGLEICH zum Stand vor der Änderung
+       auf dem Default 40    Änderung GENAU Gewicht * Größe / Freiheiten,
+                             und nur auf Zügen mit 2 oder 3 Freiheiten
+
+     LAUFZEIT: mit dem Default wechselt der Freiheits-Deckel in
+     countLiberties von 2 auf 4, und countGroupSize läuft auf dem Atari-Pfad
+     mit. Gemessen kostet das nichts — in den drei Nachmessungsläufen lag die
+     Gesamtzeit je Partie bei -0.6/-0.8/-0.8 %, also wenn überhaupt zu Gunsten
+     des Testarms, bei gleicher Simulationszahl (622:622, 619:618, 890:888).
+
+     VORBEHALT für bestehende Installationen, wie bei midLineWeight: dashSave
+     serialisiert das ganze PARAMS-Objekt, dashLoad schreibt jeden Schlüssel
+     zurück. Wer im Dashboard je „Speichern" gedrückt hat, hat
+     endLibPressure 0 in localStorage festgeschrieben und bekommt den neuen
+     Default NICHT — bis er „Zurücksetzen" drückt. */
+  endLibPressure:    40,
   /* Tsumego */
   tsumegoCapBonus:  1200,
   tsumegoAtariSet:   500,
