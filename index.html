@@ -1934,6 +1934,30 @@ globalThis.PARAMS = {
      Nur Zaehler, kein Einfluss aufs Spiel: der Abzug wird in eine Konstante
      gehoben und unveraendert subtrahiert. */
   transferTelemetrie:    0,
+  /* GEMESSEN (21.09., 360 Partien, A = deathTransfer 1,0 gegen 0,5/0,75/1,5):
+     Die Ueberkompensation liegt bei 38,0 % ueber 10,8 Mio Gruppen -- die
+     erste Ablesung aus zwei Partien (56 %) lag um die Haelfte daneben.
+
+     Und sie ist eine TREPPE, kein Anstieg. Die Bedingung
+     dT * RAMPE[libs] * size * captureWeight > size*5 + libs*3 ergibt mit
+     RAMPE [1, 1, 0.5, 0.25], captureWeight 20 und deathDiscountSize 6:
+
+       dT 0,5    nur libs=1                ->   3,9 %
+       dT 0,75   libs=1 + libs=2           ->  38,5 %
+       dT 1,0    libs=1 + libs=2 (gleich!) ->  38,0 %
+       dT 1,5    alle drei Klassen         -> 100,0 %
+
+     0,75 und 1,0 treffen DIESELBE Gruppenmenge. Zwischen ihnen zu justieren
+     kann an der Ueberkompensation nichts aendern -- die Stellschraube ist
+     die Rampe, nicht die Dosis.
+
+     WICHTIGER: die Vermutung, die diese Messung ausgeloest hat, ist
+     widerlegt. Der Verdacht war, eine ueberkompensierte Gruppe zaehle
+     negativ und die Engine bewerte dadurch zu schlecht. Der Arm mit 100 %
+     Ueberkompensation schnitt am BESTEN ab (58,3 %, p = 0,082), und
+     gepaart je Partie erleidet er die kleinsten Einzelschlaege. Ein Deckel,
+     der den Abzug auf den Gruppenwert begrenzt, haette also genau das
+     weggenommen, was der beste Arm am meisten tut. Nicht bauen. */
   /* Benson-Zugfilter: todgeborene Züge (Stein wäre beweisbar tot) fliegen
      aus der Kandidatenliste; bleibt nichts übrig → passen. Beendet das
      endlose Steine-Füttern in gegnerisches pass-alive-Gebiet (beobachtet:

@@ -1641,6 +1641,101 @@ Bei ausgeschalteter Telemetrie zählt der Wächter 0 Rufe und 0 Gruppen; bei
 eingeschalteter 8000 Rufe und 7716 Gruppen. Neutral bei 0, und er beißt
 nachweislich.
 
+#### Die Dosisreihe: die Ueberkompensation ist kein Schaden
+
+360 Partien, A = `deathTransfer 1,0` (Default) gegen drei Dosen, je zwei
+Läufe auf disjunkten Seeds, Telemetrie in **beiden** Armen. Der gemessene
+Aufschlag der Zähler ist nicht von null zu unterscheiden (−1,1 % über 40 000
+Aufrufe, also Rauschen), der Vergleich bleibt fair.
+
+**Vorab festgehalten, bevor Rechenzeit floss:** primärer Endpunkt ist die
+Ueberkompensationsquote, nicht die Siegrate. Bei 120 Partien je Dosis ist erst
+ab 60 % etwas nachweisbar, und eine *Teildosis* gegen 1,0 muss kleiner
+ausfallen als die 65,2 %, die 0 gegen 1,0 geliefert hat. Ein Nullergebnis bei
+der Siegrate war also erwartet.
+
+##### Die 56 % waren zu hoch — und es ist eine Treppe, kein Anstieg
+
+Über **10,8 Millionen** Gruppen im 1,0-Arm: **38,0 %**, nicht 56 %. Die
+Ablesung aus zwei Partien lag um die Hälfte daneben.
+
+| `deathTransfer` | überkompensiert | Gruppen |
+|---:|---:|---:|
+| 0,5 | **3,9 %** | 4,33 Mio |
+| 0,75 | 38,5 % | 3,22 Mio |
+| **1,0 (Default)** | **38,0 %** | 10,79 Mio |
+| 1,5 | **100,0 %** | 3,27 Mio |
+
+Dass 0,75 und 1,0 praktisch gleich liegen, ist kein Zufall. Die Bedingung
+`dT · RAMPE[libs] · size · captureWeight > size·5 + libs·3` ist mit
+`STERBE_RAMPE = [1, 1, 0,5, 0,25]`, `captureWeight 20` und
+`deathDiscountSize 6` reine Arithmetik:
+
+| `dT` | libs 1 | libs 2 | libs 3 | ergibt |
+|---:|---|---|---|---|
+| 0,5 | alle | nie | nie | 3,9 % |
+| 0,75 | alle | alle | nie | 38,5 % |
+| 1,0 | alle | alle | nie | 38,0 % |
+| 1,5 | alle | alle | alle | 100 % |
+
+**0,75 und 1,0 treffen dieselbe Gruppenmenge.** Zwischen diesen beiden Werten
+zu justieren kann die Ueberkompensation gar nicht verändern — die Stellschraube
+ist die Rampe, nicht die Dosis.
+
+##### Die Vermutung, die diese Kampagne ausgelöst hat, ist widerlegt
+
+Der Verdacht war: wenn der Abzug den Gruppenwert übersteigt, zählt die Gruppe
+negativ, obwohl sie noch steht — die Engine würde Stellungen zu schlecht
+bewerten. **Der Arm mit 100 % Ueberkompensation hat am besten abgeschnitten,
+nicht am schlechtesten.**
+
+| B-Dosis | A : B | B-Anteil | 95 %-KI | p |
+|---:|---|---:|---|---:|
+| 0,5 | 64 : 56 | 46,7 % | [37,5; 56,0] | 0,523 |
+| 0,75 | 69 : 51 | 42,5 % | [33,5; 51,9] | 0,120 |
+| 1,5 | 50 : 70 | **58,3 %** | [49,0; 67,3] | 0,082 |
+
+Keine Dosis signifikant (Bonferroni-Schwelle 0,0167). Die Richtung ist aber
+über alle Messungen dieselbe: **mehr Übertragung ist besser, weniger ist
+schlechter.**
+
+##### Der Mechanismus ist deutlicher als die Siegrate — wie schon 2025
+
+Gepaart **je Partie** gerechnet, nicht über Lauf-Mittelwerte: A und B spielen
+dieselbe Partie gegeneinander, der Vergleich ist von Natur aus gepaart.
+
+| B-Dosis | größter erlittener Einzelschlag | p | Gruppenverlust | p |
+|---:|---:|---:|---:|---:|
+| 0,5 | **+1,25** (B schlechter) | 0,035 | +0,19 | 0,714 |
+| 0,75 | **+1,78** (B schlechter) | 0,031 | **+2,07** | 0,034 |
+| 1,5 | −1,59 (B besser) | 0,223 | −2,17 | 0,195 |
+
+Alle vier Vorzeichen zeigen in dieselbe Richtung. Die Übertragung zu
+**senken** verschlechtert den Mechanismus messbar; sie zu **erhöhen** zeigt
+denselben Trend nach oben, ohne die Schwelle zu reißen.
+
+**Methodischer Punkt, der hier zählt:** der Kontrollarm A streut über die sechs
+Läufe um 15 % (Gruppenverlust) bzw. 24 % (größter Schlag) — in der
+Größenordnung des Effekts. Das entwertet die Tabelle oben aber **nicht**: die
+Kontrollarm-Prüfung trifft Vergleiche *zwischen* Läufen, und diese Rechnung
+ist *innerhalb* eines Laufs gepaart. Wo sie greift — bei der Siegrate je
+Dosis — habe ich sie angewandt.
+
+##### Was bleibt
+
+**Default bleibt 1,0.** Die Messung gibt keine Änderung her: 1,5 zeigt in
+jeder einzelnen Kennzahl in dieselbe Richtung, aber 58,3 % bei p = 0,082
+liegt unter der vorab festgelegten Nachweisschwelle von 60 %.
+
+Was die Kampagne **entschieden** hat, ist etwas anderes und war ihr Zweck: die
+Ueberkompensation ist kein Schaden. Damit fällt der Anlass, einen Deckel zu
+bauen, der den Abzug auf den Gruppenwert begrenzt — er hätte genau das
+weggenommen, was der beste Arm am meisten tut.
+
+Offen und billig zu klären: hält der 1,5-Trend? Bei 240 Partien je Dosis läge
+dieselbe Rate bei p = 0,012 und damit unter der Bonferroni-Schwelle. Das ist
+eine Verdopplung der Partienzahl, kein neuer Apparat.
+
 #### Zwei Fehler, die dabei aufgefallen sind
 
 **Der Harness-Rauchtest hat einen Namenskonflikt gefangen:** meine lokale
