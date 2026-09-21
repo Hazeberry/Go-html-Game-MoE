@@ -356,10 +356,10 @@ verschweigt, ob eine Zeile oder tausende betroffen sind.
 
 | Datei | Aufgabe |
 |---|---|
-| `netzcheck.sh` | Sagt, **welcher** Host in der Allowlist fehlt — und ob es überhaupt die Allowlist ist. Die Shards liegen auf einem CDN, nicht auf `huggingface.co`: wer nur den Metadaten-Host freigibt, scheitert erst beim Download. Proxy-Ablehnung, fehlendes CA-Bundle und toter DNS scheitern alle gleich lautlos, brauchen aber drei verschiedene Reparaturen; darum wird curls Begründung mit ausgegeben. |
+| `netzcheck.sh` | Sagt, **welche** Hosts in der Allowlist fehlen — alle auf einmal, nicht nacheinander — und ob es überhaupt die Allowlist ist. Weil eine laufende Session ihre Policy behält, kostet jeder einzeln nachgetragene Host eine weitere Session. Die Shards liegen auf einem CDN, nicht auf `huggingface.co`: wer nur den Metadaten-Host freigibt, scheitert erst beim Download. Proxy-Ablehnung, fehlendes CA-Bundle und toter DNS scheitern alle gleich lautlos, brauchen aber drei verschiedene Reparaturen; darum wird curls Begründung mit ausgegeben. |
 | `features.py` | `boardToInput` in numpy. Die riskanteste Stelle der Kette. |
 | `dump_boards.js` + `features_check.py` | Vergleicht `features.py` elementweise mit der JS-Fassung. Zuletzt: 8 Bretter vom leeren Brett bis Zug 330, mit und ohne Ko, **0 Abweichungen**. |
-| `decode.py` | KataGo-Shards lesen. `pruefen` verifiziert die Kanalbelegung, `bauen` schreibt `daten.npz`. |
+| `decode.py` | KataGo-Shards lesen. `pruefen` verifiziert die Kanalbelegung, **`selbsttest` verifiziert `pruefen` selbst** (ohne Netz), `bauen` schreibt `daten.npz`. |
 | `train.py` | Kreuzentropie auf den gespielten Zug, Export als `go_pnet`-JSON. |
 | `export_check.js` + `export_check.py` | Vergleicht die Priors aus numpy und JS nach dem Export. Zuletzt: max. **1.9e-9**, argmax 8/8 gleich. |
 | `collect.js` + `json2npz.py` | Ersatzdaten aus unserem eigenen Selbstspiel — um die Kette ohne KataGo zu testen. |
