@@ -1943,16 +1943,30 @@ globalThis.PARAMS = {
      Übereinstimmung mit estimateArea. Über tanh(x/mctsValueScale) sättigt das
      Q auf -0,96 bis -0,99 und reißt die Aufgabeschwelle.
 
-     VORBEHALT, nachgetragen am 20.09.: das "ausgeglichen" steht hier gegen
-     estimateArea, und dieser Maßstab zählt zum Tode verurteilte, aber noch
-     stehende Gruppen als lebendiges Material. An drei anderen Partien war er
-     dadurch um 36 bis 50 Punkte zu günstig für die verlierende Seite — siehe
-     die Korrektur bei captureCap. Die vier Partien vom 29.08. sind NICHT
-     nachgemessen; es kann also sein, dass die Stellungen gar nicht
-     ausgeglichen waren und der Gefangenen-Term schlicht recht hatte. Wer
-     diesen Parameter anfasst, prüft das zuerst mit resolveLifeAndDeath +
-     finalAreaScore nach. Dasselbe gilt für die Einführung von
-     resignAreaMargin, die sich auf dieselben vier Partien stützt.
+     KORREKTUR, nachgemessen am 21.09.: das "ausgeglichen" oben steht gegen
+     estimateArea [roh], und dieser Massstab zaehlt zum Tode verurteilte, aber
+     noch stehende Gruppen als lebendiges Material. Die damalige Gegenprobe
+     "in Uebereinstimmung mit finalAreaScore" war keine: das Skript enthielt
+     eine Nachbildung von finalAreaScore OHNE resolveLifeAndDeath, also mit
+     demselben blinden Fleck.
+
+     Dieselben vier Stellungen, in drei Lesarten (Sicht der KI, mit Komi):
+
+                    [roh]    [benson]      [voll]
+       197 Zuege   +13,5    +13,5 ( 0)   -14,5 ( 8)
+       249 Zuege    -5,5     -5,5 ( 0)   -44,5 (14)
+       269 Zuege    -3,5     -3,5 ( 0)   -56,5 (21)
+       305 Zuege    +4,5    -19,5 ( 5)   -19,5 ( 6)
+
+     Der Gefangenen-Term hatte also recht, nicht ich. Bei 305 ist das
+     BEWIESEN: fuenf weisse Steine sind Benson-tot, allein sie zu entfernen
+     kippt +4,5 auf -19,5. Bei 197 traegt nur die Endstellungs-Heuristik, und
+     die ist bei Zug 197 mit Vorsicht zu lesen — deshalb die Spanne.
+
+     Was dadurch NICHT hinfaellig wird: die Arithmetik. Der Gefangenen-Term
+     beherrscht die Skala weiterhin, und die Doppelzaehlung unten steht auch
+     weiter. Nur war das in diesen Partien kein Fehlalarm, sondern ein
+     Wertsignal, das die Lage richtig einschaetzte.
 
      Ob ein kleineres Gewicht STÄRKER spielt, ist damit nicht gezeigt — nur,
      dass dieser Term die Skala beherrscht. Das gehört durch den A/B-Harness,
@@ -1990,11 +2004,11 @@ globalThis.PARAMS = {
      ║ bricht 15-fach ein). Das ist eine Rechnung, keine Messung, und    ║
      ║ sie stimmt weiter — nur war sie in diesen Partien kein Fehlalarm. ║
      ║                                                                   ║
-     ║ NICHT NACHGEMESSEN und deshalb offen: die vier Partien vom        ║
-     ║ 29.08., auf die sich der Kommentar an captureWeight und die       ║
-     ║ Einfuehrung von resignAreaMargin stuetzen. Auch dort wurde gegen  ║
-     ║ estimateArea verglichen. Wer daran weiterarbeitet, prueft das     ║
-     ║ zuerst nach.                                                      ║
+     ║ NACHGEMESSEN am 21.09.: die vier Partien vom 29.08., auf die     ║
+     ║ sich der Kommentar an captureWeight und die Einfuehrung von      ║
+     ║ resignAreaMargin stuetzen, sind ebenfalls betroffen. Die KI lag  ║
+     ║ in allen vier Faellen zurueck, nicht vorn. Einzelheiten stehen   ║
+     ║ an den beiden Parametern selbst.                                 ║
      ╚═══════════════════════════════════════════════════════════════════╝
 
      ANLASS (in der urspruenglichen Fassung, siehe Korrektur oben) — zwei
@@ -2097,13 +2111,48 @@ globalThis.PARAMS = {
      wird vom Gefangenen-Term beherrscht — an vier verlorenen Hard-Partien vom
      29.08. machte er 92-105 % der gesamten Bewertung aus. Die KI gab jedes Mal
      auf, obwohl das Gebiet ausgeglichen war: Rückstand -6 (also VORN), +3, +11
-     und +13 Gebietspunkte. Eine Marge ab 14 verhindert alle vier; 30 lässt
+     und +13 Gebietspunkte [roh -- siehe Korrektur unten]. Eine Marge ab 14
+     verhindert alle vier; 30 lässt
      Luft und gibt bei echtem Rückstand weiterhin auf (die verlorenen
      Easy-Partien lagen rund 111 Punkte zurück).
 
      estimateArea ist dafür der richtige Maßstab und kein neuer willkürlicher:
      auf allen vier Stellungen liefert es exakt dasselbe wie finalAreaScore,
      also die Endabrechnung des Spiels selbst (Default 'area', chinesisch).
+
+     ╔═══════════════════════════════════════════════════════════════════╗
+     ║ KORREKTUR (21.09.): DER ABSATZ DIREKT DARUEBER IST FALSCH, UND    ║
+     ║ ER TRAEGT DIE GANZE BEGRUENDUNG.                                  ║
+     ║                                                                   ║
+     ║ Verglichen wurde nicht gegen finalAreaScore, sondern gegen eine   ║
+     ║ Nachbildung davon OHNE resolveLifeAndDeath -- also gegen einen    ║
+     ║ Massstab mit demselben blinden Fleck wie estimateArea. Gegen die  ║
+     ║ echte Endabrechnung weichen alle vier Stellungen ab:              ║
+     ║                                                                   ║
+     ║                  [roh]    [benson]      [voll]                    ║
+     ║    197 Zuege    +13,5    +13,5 ( 0)   -14,5 ( 8)                  ║
+     ║    249 Zuege     -5,5     -5,5 ( 0)   -44,5 (14)                  ║
+     ║    269 Zuege     -3,5     -3,5 ( 0)   -56,5 (21)                  ║
+     ║    305 Zuege     +4,5    -19,5 ( 5)   -19,5 ( 6)                  ║
+     ║                                                                   ║
+     ║ Die vier Aufgaben waren also KEINE Fehlalarme. Die KI lag         ║
+     ║ zurueck, in dreien unter jeder Lesart, bei 305 Benson-beweisbar.  ║
+     ║ Damit faellt der Anlass fuer diesen Parameter.                    ║
+     ║                                                                   ║
+     ║ Schlimmer: gemessen am heutigen Default blockiert Marge 30 ALLE   ║
+     ║ VIER dieser Aufgaben -- also genau die, die richtig waren. Der    ║
+     ║ Parameter unterdrueckt, wofuer er gebaut wurde.                   ║
+     ║                                                                   ║
+     ║ Was weiter traegt: bei den sieben Easy-Niederlagen sind roher     ║
+     ║ und echter Massstab identisch (kein einziger toter Stein), die    ║
+     ║ Rueckstaende liegen bei 47 bis 153 Punkten, und Marge 30 laesst   ║
+     ║ dort jede Aufgabe zu. Das Kriterium schadet nicht ueberall.       ║
+     ║                                                                   ║
+     ║ DEFAULT ABSICHTLICH UNVERAENDERT: ob die Marge weg soll, ist      ║
+     ║ eine Frage der Spielstaerke und gehoert durch den A/B-Harness,    ║
+     ║ nicht in einen Schnellschuss -- dieselbe Regel, die captureWeight ║
+     ║ bei 20 gehalten hat. Wer das misst, faengt hier an.               ║
+     ╚═══════════════════════════════════════════════════════════════════╝
 
      Bekannte Unschärfe, bewusst in Kauf genommen: Komi 7,5 fließt NICHT ein
      (die Engine ist komi-blind, KOMI lebt im Hauptskript). Weiß gibt dadurch
@@ -3280,6 +3329,11 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
    Bewusst als eigene Funktion, nicht inline: so ist das Kriterium einzeln
    testbar, ohne eine ganze Suche fahren zu müssen. */
 function gebietSagtVerloren(board, aiColor) {
+  /* Massstab: [roh] -- estimateArea, ohne Totsteinbereinigung. Das ist hier
+     eine bewusste Wahl (pro Zug bezahlbar), aber es bedeutet, dass das
+     Kriterium die Seite mit den todgeweihten Gruppen systematisch zu gut
+     sieht. Der Anlass, aus dem dieser Parameter entstand, war genau dieser
+     Fehler -- siehe den Kasten an resignAreaMargin. */
   const marge = PARAMS.resignAreaMargin;
   if (marge < 0) return true;              /* Kriterium abgeschaltet */
   const opp = aiColor === 1 ? 2 : 1;

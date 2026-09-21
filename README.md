@@ -265,7 +265,12 @@ drei davon im echten Browser mit Web Worker. Am Stand vor dem Fix fallen
 16 davon durch — die übrigen prüfen bewusst unverändertes Verhalten und
 müssen auf beiden Ständen halten.
 
-### Die KI gab in ausgeglichener Stellung auf
+### Die KI gab in ausgeglichener Stellung auf — widerlegt am 21.09.
+
+> **Dieser Abschnitt stand zehn Monate lang falsch hier.** Die Stellungen
+> waren nicht ausgeglichen; die KI lag in allen vier Fällen zurück. Die
+> ursprüngliche Fassung bleibt stehen, die Korrektur folgt darunter — sonst
+> ist nicht nachvollziehbar, was behauptet und was widerrufen wurde.
 
 Elf exportierte Partien vom 29.08. — vier auf „schwer", sieben auf „einfach",
 alle verloren. Die sieben Easy-Niederlagen sind echt: rund 100 Gebietspunkte
@@ -293,6 +298,60 @@ Strukturell doppelt gezählt: ein Stein auf dem Brett zählt in derselben
 Funktion `size·5 + libs·3`, also rund 5–8. Wird er gefangen, verschwindet er
 aus dieser Summe **und** schlägt zusätzlich mit 20 zu Buche.
 
+#### Die Korrektur (21.09.): die Gegenprobe war blind
+
+Nach der [`estimateArea`-Korrektur](#estimatearea-taugt-nicht-als-maßstab-für-wer-liegt-vorn)
+blieb hier offen, ob diese vier Partien betroffen sind. Sie sind es.
+
+Der Satz oben — „mit der Engine nachgerechnet und gegen `finalAreaScore`
+geprüft" — klingt nach einer unabhängigen Gegenprobe. Das Skript von damals
+zeigt, dass es keine war: es enthält eine eigene Nachbildung von
+`finalAreaScore`, die Steine und umschlossenes Gebiet zählt, **aber
+`resolveLifeAndDeath` nie aufruft**. Sie hat also denselben blinden Fleck wie
+`estimateArea`. Die Spalte „gleich? ja" bestätigte nur, dass zwei Maßstäbe mit
+demselben Fehler denselben Wert liefern.
+
+Nachgemessen mit drei Lesarten derselben Stellung — aus Sicht der KI (Weiß),
+Komi eingerechnet, negativ heißt Rückstand:
+
+| Partie | roh (= der alte Maßstab) | nur Benson-**bewiesen** tot | volle Schlussauswertung |
+|---|---:|---:|---:|
+| 197 Züge | **+13,5** | +13,5 (0 Steine) | −14,5 (8) |
+| 249 Züge | −5,5 | −5,5 (0) | −44,5 (14) |
+| 269 Züge | −3,5 | −3,5 (0) | −56,5 (21) |
+| 305 Züge | **+4,5** | **−19,5 (5)** | −19,5 (6) |
+
+Die mittlere Spalte entfernt nur, was nach Benson **beweisbar** tot ist — keine
+Heuristik, kein Ermessen. Die rechte nutzt zusätzlich die Augen/Freiheiten-
+Heuristik, die für die Schlussstellung gedacht ist.
+
+Der Vorwurf lautete: „in zwei von vier Partien gab sie aus einer Führung heraus
+auf". Gemeint waren die Partien mit 197 und 305 Zügen. Beide fallen:
+
+* **305 Züge — beweisbar.** Fünf weiße Steine sind Benson-tot. Allein sie zu
+  entfernen kippt +4,5 auf −19,5. Hier braucht es keine Heuristik.
+* **197 Züge — nur unter der Endstellungs-Lesart.** Benson beweist hier nichts;
+  die acht toten Steine sind samt und sonders Heuristik-Urteile. Das „+13,5"
+  übersteht also die exakte Prüfung.
+
+**Vorbehalt, der hier wirklich zählt:** diese Partien endeten durch Aufgabe,
+nicht durch zweimaliges Passen. `resolveLifeAndDeath` ist für die
+Schlussstellung gebaut; bei Zug 197 kann die Heuristik Gruppen totsagen, die
+noch laufen könnten. Die beiden Maßstäbe sind **gegenläufig verzerrt** — der
+rohe zugunsten dessen, der todgeweihte Gruppen hält, der volle zulasten dessen,
+der schwache, aber kämpfende Gruppen hält. Die Wahrheit liegt dazwischen.
+Deshalb die Spanne statt einer Zahl, und deshalb die Benson-Spalte.
+
+Was die Spanne in jedem Fall hergibt: in **keiner** der vier Partien ist die
+Lesart „die KI liegt komfortabel vorn" haltbar, und in dreien lag sie unter
+jeder Lesart zurück. Die Aufgaben waren nicht die Fehlalarme, für die ich sie
+gehalten habe.
+
+Auffällig ist noch, wem die toten Steine gehören: 8:0, 12:2, 20:1 und 5:1 zu
+Lasten von Weiß — verstreute Einzelsteine tief in Schwarz' Gebiet. Das ist das
+Bild einer KI, die Steine ins gegnerische Gebiet streut, nicht das einer, die
+knapp vorn liegt.
+
 #### Das Gewicht zu senken hilft nicht — gemessen
 
 Naheliegend wäre, `captureWeight` kleiner zu setzen. Drei gepaarte A/B-Läufe
@@ -315,7 +374,7 @@ Partien. Die KI gibt zu früh auf, aber meist in Stellungen, die sie ohnehin
 verloren hätte. Gegen einen Menschen kann das anders aussehen — der Harness
 misst KI gegen KI und sagt dazu nichts.
 
-#### Behoben wurde stattdessen das Kriterium
+#### Behoben wurde stattdessen das Kriterium — auf falscher Grundlage
 
 `resignAreaMargin` (Default 30) verlangt, dass **auch** die Gebietsschätzung
 verloren sagt. `estimateArea` ist dafür kein neuer willkürlicher Maßstab: auf
@@ -327,6 +386,28 @@ Rückstand wird weiterhin aufgegeben.
 Bewusste Unschärfe: Komi 7,5 fließt nicht ein — die Engine ist komi-blind, und
 den Worker dafür an den Zählmodus zu koppeln wäre der teurere Fehler. Weiß gibt
 dadurch um 7,5 Punkte zu früh auf, Schwarz ebenso viel zu spät.
+
+> **Korrektur (21.09.).** Der Satz „liefert exakt dasselbe wie
+> `finalAreaScore`" ist der tragende Teil dieser Begründung, und er ist falsch.
+> Verglichen wurde gegen eine Nachbildung ohne `resolveLifeAndDeath` (siehe
+> [oben](#die-korrektur-2109-die-gegenprobe-war-blind)). Gegen die echte
+> Endabrechnung weichen alle vier Stellungen ab, um 6 bis 53 Punkte.
+>
+> Damit fällt der Anlass: die vier Aufgaben waren keine Fehlalarme. Gemessen
+> am heutigen Default **blockiert Marge 30 alle vier** — also genau die
+> Aufgaben, die richtig waren. Der Parameter unterdrückt, wofür er gebaut
+> wurde.
+>
+> Die Gegenprobe, die weiterhin trägt: bei den sieben Easy-Niederlagen sind
+> roher und echter Maßstab identisch (kein einziger toter Stein), die
+> Rückstände liegen bei 47 bis 153 Punkten, und Marge 30 lässt dort jede
+> Aufgabe zu. Das Kriterium schadet also nicht überall — es stützt sich nur
+> auf einen Befund, den es nicht gibt.
+>
+> **Nicht geändert.** Ob die Marge weg soll, ist eine Frage der Spielstärke und
+> gehört durch den A/B-Harness, nicht in einen Schnellschuss — dieselbe Regel,
+> die `captureWeight` bei 20 gehalten hat. Der Default bleibt 30, bis das
+> gemessen ist.
 
 **Fürs Auswerten von Spielständen:** `reproduktion.board` ist die Stellung
 **vor** dem letzten KI-Zug — es ist die Eingabe, mit der die KI gerechnet hat
@@ -1234,9 +1315,12 @@ warum.
 15-fach ein. Das ist eine Rechnung, keine Messung, und sie stimmt weiter — nur
 war sie in diesen Partien kein Fehlalarm.
 
-**Nicht nachgemessen und deshalb offen:** die vier Partien vom 29.08., auf die
-sich der Kommentar an `captureWeight` und die Einführung von
-`resignAreaMargin` stützen. Auch dort wurde gegen `estimateArea` verglichen.
+**Inzwischen nachgemessen (21.09.):** die vier Partien vom 29.08., auf die sich
+der Kommentar an `captureWeight` und die Einführung von `resignAreaMargin`
+stützen, sind betroffen — die dortige „Gegenprobe gegen `finalAreaScore`" lief
+ohne `resolveLifeAndDeath` und hatte denselben blinden Fleck. Ergebnis und
+Folgen stehen bei
+[Die Korrektur (21.09.)](#die-korrektur-2109-die-gegenprobe-war-blind).
 
 Die Zählung der wirkungslosen Eingriffe bleibt davon unberührt — `captureCap`
 ist einer, nur aus einem anderen Grund als angenommen.
@@ -1291,6 +1375,39 @@ gedacht, nicht als Schiedsrichter in der Analyse. Wo er trotzdem auftaucht,
 gilt: er begünstigt systematisch die Seite mit den todgeweihten Gruppen.
 
 Die Folgen stehen bei [`captureCap`](#die-q-sättigung-deckeln-capturecap).
+
+#### Konvention: jede Partie-Auswertung nennt ihren Maßstab
+
+Die Regel allein hätte den Fehler nicht verhindert. Er ist entstanden, weil
+nirgends stand, womit gemessen wurde — und die eine Stelle, an der es
+dranstand („gegen `finalAreaScore` geprüft"), war eine Nachbildung ohne
+`resolveLifeAndDeath`. Es hat zehn Monate gedauert, das zu bemerken, und das
+Nachbessern war jedes Mal teurer als das Hinschreiben gewesen wäre.
+
+**Ab jetzt nennt jede Partie-Auswertung — in der README, im Commit und im
+Code-Kommentar — den Maßstab beim Namen**, in einer der drei Formen:
+
+| Form | bedeutet | wann |
+|---|---|---|
+| `[roh]` | `estimateArea`, ohne Totsteinbereinigung | nur für Engine-interne Fragen, nie für „wer liegt vorn" |
+| `[benson]` | nur Benson-**bewiesen** Totes entfernt | wenn es belastbar sein muss |
+| `[voll]` | `resolveLifeAndDeath` + `finalAreaScore` | Schlussstellungen, Standardfall |
+
+Zwei Zusatzregeln, beide aus einem eigenen Fehler:
+
+1. **Eine Gegenprobe zählt nur, wenn sie einen anderen blinden Fleck hat.**
+   `finalAreaScore` ohne `resolveLifeAndDeath` gegen `estimateArea` zu
+   stellen ist keine — beide zählen tote Gruppen mit. Wer gegenprüft, sagt
+   dazu, worin sich die beiden Verfahren unterscheiden.
+2. **Auf Nicht-Schlussstellungen wird eine Spanne angegeben, keine Zahl.**
+   `[roh]` und `[voll]` sind gegenläufig verzerrt; bei einer Aufgabe im
+   Mittelspiel liegt die Wahrheit dazwischen, und `[benson]` sagt, wie viel
+   davon beweisbar ist.
+
+Das ist die dritte Regel dieser Art, nach der
+[Kontrollarm-Prüfung](#die-ki-erstickt-ihre-eigene-gruppe-atarisizeweight) und
+dem Maßstab selbst. Alle drei kosten beim Schreiben eine Zeile und haben beim
+Nicht-Schreiben Monate gekostet.
 
 #### Ein zweiter Irrtum, rechtzeitig bemerkt
 
