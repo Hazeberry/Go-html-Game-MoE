@@ -933,9 +933,9 @@ const driver = `
                       2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null, krisenDauer: null}};
     const st = {
       1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
-          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0, afRufe: 0, afBlock: 0, afMax: 0},
+          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0, afRufe: 0, afBlock: 0, afMax: 0, trRufe: 0, trGruppen: 0, trSumme: 0, trMax: 0, trUeber: 0, trCap: 0, trGesamt: 0},
       2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
-          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0, afRufe: 0, afBlock: 0, afMax: 0}
+          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0, afRufe: 0, afBlock: 0, afMax: 0, trRufe: 0, trGruppen: 0, trSumme: 0, trMax: 0, trUeber: 0, trCap: 0, trGesamt: 0}
     };
     /* Gruppenverluste je Farbe: groesster Einzelschlag, den DIESE Farbe
        erlitten hat, plus die Zahl der Verluste ab 5 Steinen. Instrument fuer
@@ -1006,6 +1006,7 @@ const driver = `
       leseSunkWaechter(true);
       leseAugenWaechter(true);
       leseAufgabeWaechter(true);
+      leseTransferWaechter(true);
 
       const t0 = Date.now();
       netFrisch = false;
@@ -1039,6 +1040,14 @@ const driver = `
       { const fw = leseAufgabeWaechter(true);
         st[color].afRufe += fw.qRufe; st[color].afBlock += fw.block;
         if (fw.maxLuecke > st[color].afMax) st[color].afMax = fw.maxLuecke; }
+      /* TRANSFER-WAECHTER: greift nur bei transferTelemetrie > 0. ueber zaehlt
+         die Gruppen, deren Abzug groesser war als ihr eigener Wert -- die
+         zaehlen danach negativ, obwohl sie noch auf dem Brett stehen. */
+      { const tw = leseTransferWaechter(true);
+        st[color].trRufe += tw.rufe; st[color].trGruppen += tw.gruppen;
+        st[color].trSumme += tw.summe; st[color].trUeber += tw.ueber;
+        st[color].trCap += tw.capAbs; st[color].trGesamt += tw.gesamtAbs;
+        if (tw.max > st[color].trMax) st[color].trMax = tw.max; }
       { const f = leseFaktor();
         if (f.faktor !== null) { st[color].faktoren.push(f.faktor); st[color].args.push(f.arg); } }
 
@@ -1142,6 +1151,19 @@ const driver = `
                  aufgabeBlockAnteil: st[c].afRufe ? 100 * st[c].afBlock / st[c].afRufe : 0,
                  aufgabeBlock: st[c].afBlock,
                  aufgabeMaxLuecke: st[c].afMax,
+                 transferRufe: st[c].trRufe,
+                 transferGruppen: st[c].trGruppen,
+                 transferUeber: st[c].trUeber,
+                 /* je 1000 Bewertungen, nicht je Bewertung: die Uebertragung
+                    greift selten genug, dass eine Rate je Ruf auf zwei
+                    Nachkommastellen zu 0.00 wird und wie "greift nie"
+                    aussieht. Genau so hat diese Zeile im ersten Rauchtest
+                    gelogen. */
+                 transferGruppenPro1000: st[c].trRufe ? 1000 * st[c].trGruppen / st[c].trRufe : 0,
+                 transferUeberAnteil: st[c].trGruppen ? 100 * st[c].trUeber / st[c].trGruppen : 0,
+                 transferAbzugSchnitt: st[c].trGruppen ? st[c].trSumme / st[c].trGruppen : 0,
+                 transferMaxAbzug: st[c].trMax,
+                 capAnteil: st[c].trGesamt ? 100 * st[c].trCap / st[c].trGesamt : 0,
                  /* Phasensplit der Rechenzeit: Frueh- gegen Spaetspiel. Der
                     Top10-Anteil sagt, ob es Spitzen gibt; das hier sagt, ob
                     die Zeit systematisch nach hinten wandert. Je Farbe zieht
@@ -1322,6 +1344,14 @@ const driver = `
       agg.zeit[key].aufgabeBlock.push(z.aufgabeBlockAnteil);
       agg.zeit[key].aufgabeBlockN.push(z.aufgabeBlock);
       agg.zeit[key].aufgabeMax.push(z.aufgabeMaxLuecke);
+      agg.zeit[key].trRufe.push(z.transferRufe);
+      agg.zeit[key].trGruppen.push(z.transferGruppenPro1000);
+      agg.zeit[key].trGruppenAbs.push(z.transferGruppen);
+      agg.zeit[key].trUeberAbs.push(z.transferUeber);
+      agg.zeit[key].trUeber.push(z.transferUeberAnteil);
+      agg.zeit[key].trAbzug.push(z.transferAbzugSchnitt);
+      agg.zeit[key].trMax.push(z.transferMaxAbzug);
+      agg.zeit[key].capAnteil.push(z.capAnteil);
       if (z.faktor) agg.zeit[key].faktor.push(z.faktor);
       if (z.phase) agg.zeit[key].phase.push(z.phase);
     }
@@ -1356,9 +1386,9 @@ const driver = `
       /* Zeitverteilung nach Konfiguration: Gesamtzeit je Partie (muss bei
          Paritaet gleich sein) und Top10-Anteil (die eigentliche Messgroesse). */
       zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
-                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: [], aufgabeQ: [], aufgabeBlock: [], aufgabeBlockN: [], aufgabeMax: []},
+                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: [], aufgabeQ: [], aufgabeBlock: [], aufgabeBlockN: [], aufgabeMax: [], trRufe: [], trGruppen: [], trGruppenAbs: [], trUeberAbs: [], trUeber: [], trAbzug: [], trMax: [], capAnteil: []},
              B: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
-                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: [], aufgabeQ: [], aufgabeBlock: [], aufgabeBlockN: [], aufgabeMax: []}},
+                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: [], aufgabeQ: [], aufgabeBlock: [], aufgabeBlockN: [], aufgabeMax: [], trRufe: [], trGruppen: [], trGruppenAbs: [], trUeberAbs: [], trUeber: [], trAbzug: [], trMax: [], capAnteil: []}},
       anomalies: 0
     };
   }
@@ -1513,6 +1543,31 @@ const driver = `
           + ' (' + fmt(fqB ? 100 * fbB / fqB : 0, 1) + ' %)');
         console.log('                  groesster blockierter Rueckstand  A ' + flA
           + '   |   B ' + flB + ' Punkte [roh]');
+
+        /* TRANSFER-WAECHTER. Die interessante Zahl ist ueber: Gruppen, deren
+           Uebertragungsabzug groesser war als ihr eigener Wert. Die zaehlen
+           danach negativ, obwohl sie noch auf dem Brett stehen -- wenn das
+           haeufig vorkommt, bewertet die Engine Stellungen schlechter als
+           sie sind. */
+        const trRufA = summe(A.trRufe), trRufB = summe(B.trRufe);
+        const trGrA = mean(A.trGruppen), trGrB = mean(B.trGruppen);
+        const trUbA = mean(A.trUeber), trUbB = mean(B.trUeber);
+        const trAbA = mean(A.trAbzug), trAbB = mean(B.trAbzug);
+        const trMxA = Math.max(0, ...A.trMax), trMxB = Math.max(0, ...B.trMax);
+        const trCaA = mean(A.capAnteil), trCaB = mean(B.capAnteil);
+        const trGaA = summe(A.trGruppenAbs), trGaB = summe(B.trGruppenAbs);
+        console.log('TRANSFER-WAECHTER: Uebertragung griff  A ' + trGaA + '   |   B ' + trGaB
+          + ' mal   \u00b7  je 1000 Bewertungen  A ' + fmt(trGrA, 1) + '   |   B ' + fmt(trGrB, 1));
+        console.log('                   davon ueberkompensiert  A ' + fmt(trUbA, 1) + ' %'
+          + '   |   B ' + fmt(trUbB, 1) + ' %'
+          + '   \u00b7  Abzug \u00d8  A ' + fmt(trAbA, 0) + '   |   B ' + fmt(trAbB, 0)
+          + '   ·  max  A ' + fmt(trMxA, 0) + '   |   B ' + fmt(trMxB, 0));
+        console.log('                   Gefangenen-Anteil an der Bewertung  A ' + fmt(trCaA, 1)
+          + ' %   |   B ' + fmt(trCaB, 1) + ' %');
+        if (Math.max(trRufA, trRufB) === 0)
+          console.log('                \u2014 NICHT VERDRAHTET: transferTelemetrie war in keinem Arm gesetzt');
+        else if (Math.max(trGaA, trGaB) === 0)
+          console.log('                \u2014 UEBERTRAGUNG GREIFT NIE: deathTransfer 0 oder keine Gruppe erreicht die Rampe');
         if (Math.max(fqA, fqB) === 0)
           console.log('                — NICHT VERDRAHTET: Q hat in keinem Arm je die Aufgabeschwelle gerissen');
         else if (Math.max(fbA, fbB) === 0)

@@ -260,7 +260,7 @@ Belege aus dem Repro über die ausgeschnittenen Skript-Blöcke:
 `dashReset` setzt `netMaxBlend` auf 0 zurück und umgeht den Pfad damit — das
 war der Workaround, nicht der Fix.
 
-Gegen Rückfall abgesichert in [`tests/`](tests/): 29 Fälle in fünf Dateien,
+Gegen Rückfall abgesichert in [`tests/`](tests/): 36 Fälle in sechs Dateien,
 drei davon im echten Browser mit Web Worker. Am Stand vor dem Fix fallen
 16 davon durch — die übrigen prüfen bewusst unverändertes Verhalten und
 müssen auf beiden Ständen halten.
@@ -1574,6 +1574,62 @@ bewirkt der Parameter heute. Das Gegenteil von dem, wofür er gebaut wurde.
 noch bringen könnte, steht oben: 612 Partien je Dosis für einen Effekt, dessen
 Obergrenze bei 8 Punkten liegt. Das ist teuer für eine Frage, die keine
 Stärkefrage ist.
+
+### Transfer-Wächter: was `deathTransfer` wirklich anrichtet
+
+`deathTransfer` zieht einer sterbenden Gruppe anteilig ihren Wert ab und
+schreibt ihn dem Gegner als Gefangene gut. Der Parameter steht seit Ende
+August auf 1,0 — aber niemand konnte sehen, wie oft er greift und wie groß
+der Abzug ausfällt. Der Wächter macht das sichtbar.
+
+**Hinter einem Schalter, und das ist der Punkt.** `evaluateBoard` läuft einmal
+je Simulation, bei ~500 Sims/Zug also hunderte Male pro Zug — es ist die
+heißeste Funktion der Engine. `transferTelemetrie` steht deshalb auf **0**;
+dann wird kein zusätzlicher Zweig betreten und die Zähler kosten nichts.
+
+Gemessen wird, je Farbe getrennt:
+
+| Kennzahl | Frage |
+|---|---|
+| Rufe, Gruppen, je 1000 Bewertungen | greift die Übertragung überhaupt? |
+| Abzug Ø und Maximum | wie hart trifft sie eine einzelne Gruppe? |
+| **überkompensiert** | wie oft ist der Abzug **größer als der Gruppenwert**? |
+| Gefangenen-Anteil | wie sehr beherrscht der Gefangenen-Term die Bewertung? |
+
+Die dritte Zeile ist die interessante: übersteigt der Abzug den Gruppenwert,
+zählt die Gruppe danach **negativ**, obwohl sie noch auf dem Brett steht.
+
+**Erste Ablesung, zwei Partien, ausdrücklich kein Befund:** 4973 Eingriffe,
+204,7 je 1000 Bewertungen, mittlerer Abzug 96, größter 820 — und **56 %
+überkompensiert**. Das ist eine Stichprobe von zwei Partien auf einem
+nicht reproduzierbaren Harness; ob die Quote hält und ob sie schadet, ist
+offen. Sie wäre eine Dosisreihe wert.
+
+**Bit-Identität in beide Richtungen**, über 8000 Bewertungen auf zufälligen
+Brettern, verglichen gegen den Stand vor dem Eingriff und bitgenau (nicht
+„ungefähr", `Object.is` trennt auch −0 von 0):
+
+| | Abweichungen |
+|---|---:|
+| alt gegen neu, Telemetrie **aus** | **0** |
+| alt gegen neu, Telemetrie **an** | **0** |
+
+Bei ausgeschalteter Telemetrie zählt der Wächter 0 Rufe und 0 Gruppen; bei
+eingeschalteter 8000 Rufe und 7716 Gruppen. Neutral bei 0, und er beißt
+nachweislich.
+
+#### Zwei Fehler, die dabei aufgefallen sind
+
+**Der Harness-Rauchtest hat einen Namenskonflikt gefangen:** meine lokale
+Variable `mxA` gab es in dem Ausgabeblock schon. Syntaxfehler, der jeden
+Messlauf getötet hätte — bemerkt, bevor Rechenzeit verbrannt war.
+
+**Die erste Fassung der Ausgabe hat gelogen.** Sie zeigte „Gruppen je
+Bewertung **0.00**" direkt neben „50 % überkompensiert, Abzug Ø 30". Die
+Rate war so klein, dass sie auf zwei Nachkommastellen verschwand — ein Leser
+schließt daraus „greift nie" und deutet jedes Nullergebnis falsch. Jetzt
+stehen dort absolute Zahlen plus eine Rate je 1000. Ein Wächter, der eine
+missverständliche Zahl meldet, ist schlimmer als keiner: man glaubt ihm.
 
 ## Methodik
 
