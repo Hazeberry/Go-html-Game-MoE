@@ -1917,6 +1917,26 @@ globalThis.PARAMS = {
      evaluateBoard-Aufrufe bitgenau identisch zum Vorstand vor dieser
      Änderung, geprüft beim Setzen des Defaults. */
   deathTransfer:       1.0,
+  /* IN BEIDE RICHTUNGEN VERMESSEN, 840 Partien (21.09.).
+     Gegen 0 belegt: 65,2 % ueber 210 Partien, der bestbelegte Parameter des
+     Projekts. Gegen oben und unten jetzt ebenfalls:
+
+       0,5   46,7 %   Mechanismus messbar schlechter (p = 0,035)
+       0,75  42,5 %   Mechanismus messbar schlechter (p = 0,031)
+       1,5   48,6 %   ueber 360 Partien, also 50 %
+       2,0   51,3 %   ueber 240 Partien
+
+     Die erste Ablesung fuer 1,5 lag bei 58,3 % (n = 120) und war RAUSCHEN --
+     sie war das Maximum aus drei Dosen und regredierte in der Nachmessung
+     auf 43,8 %. Vorab als Hauptrisiko protokolliert, genau so eingetreten.
+
+     Bei 2,0 sind die erlittenen Einzelschlaege messbar kleiner (-1,60,
+     p = 0,016), ohne dass die Siegrate folgt. Dritter Fall desselben
+     Musters nach deathDiscount und Abschlag-plus-Uebertragung: ein
+     verbesserter Mechanismus ist keine Zielgroesse.
+
+     Wer hier drehen will, braucht einen neuen Grund -- nicht eine neue
+     Dosis. */
   /* Telemetrie fuer die Uebertragung. 0 = aus (Default), dann wird in
      evaluateBoard KEIN zusaetzlicher Zweig betreten und die Zaehler kosten
      nichts. Bewusst geschaltet statt immer an: evaluateBoard laeuft einmal

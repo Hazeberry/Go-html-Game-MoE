@@ -1736,6 +1736,82 @@ Offen und billig zu klären: hält der 1,5-Trend? Bei 240 Partien je Dosis läge
 dieselbe Rate bei p = 0,012 und damit unter der Bonferroni-Schwelle. Das ist
 eine Verdopplung der Partienzahl, kein neuer Apparat.
 
+#### Nachgemessen: der 1,5-Trend war Rauschen
+
+480 Partien, 240 je Dosis, A = 1,0 gegen 1,5 und 2,0, vier disjunkte Seeds je
+Dosis. **Vorab festgehalten** war: Regression zur Mitte ist hier die
+Hauptgefahr, weil die 58,3 % das Maximum aus drei Dosen waren und
+nachträglich für die Nachmessung ausgewählt wurden. Eine Rate deutlich unter
+58 % heißt, die erste Ablesung war Rauschen.
+
+Genau das ist eingetreten — und die Rate ist nicht auf 50 % regrediert,
+sondern darunter:
+
+| Dosis | erste Kampagne (n=120) | **Nachmessung (n=240)** | 95 %-KI | p |
+|---:|---:|---:|---|---:|
+| 1,5 | 58,3 % | **43,8 %** | [37,4; 50,3] | 0,061 |
+| 2,0 | — | **51,3 %** | [44,7; 57,7] | 0,747 |
+
+Keine Dosis reißt die vorab gesetzte Bonferroni-Schwelle von 0,025. Und es
+gibt **keine Dosisordnung**: 43,8 % bei 1,5, 51,3 % bei 2,0 — nicht monoton,
+dieselbe Signatur wie bei `atariSizeWeight`.
+
+Beide Ablesungen für 1,5 zusammen: **48,6 %** über 360 Partien, KI
+[43,3; 53,9], p = 0,635. Das ist 50 %.
+
+Die beiden Kampagnen unterscheiden sich dabei stärker als Zufall allein
+erwarten ließe (Fisher exakt, p = 0,008). **Das ist kein Hinweis darauf, dass
+sich etwas geändert hätte** — beide Läufe benutzen denselben Code. Ein
+ausgewähltes Maximum gegen eine unausgewählte Wiederholung zu testen zeigt
+häufiger einen Unterschied als der Zufall: das *ist* die Regression zur Mitte.
+Der kleine p-Wert misst, wie weit die erste Ablesung oben lag.
+
+##### Der Mechanismus bei 2,0 — und warum er trotzdem nichts ändert
+
+Gepaart je Partie:
+
+| Dosis | größter erlittener Schlag | p | Gruppenverlust | p |
+|---:|---:|---:|---:|---:|
+| 1,5 | −0,25 | 0,793 | +1,00 | 0,148 |
+| 2,0 | **−1,60** | **0,016** | −1,47 | 0,059 |
+
+Bei 2,0 erleidet der Arm messbar kleinere Einzelschläge. Mit vier
+Mechanismus-Tests liegt die korrigierte Schwelle allerdings bei 0,0125, und
+0,016 reißt sie nicht — knapp, aber nicht darunter. **Vor allem übersetzt
+sich der Gewinn nicht: die Siegrate bei 2,0 ist 51,3 %.**
+
+Das ist zum dritten Mal dasselbe Muster in diesem Projekt: `deathDiscount`
+schloss 20 % der Lücke ohne Spielstärke, Abschlag plus Übertragung 97 % ohne
+Spielstärke, und jetzt senkt 2,0 die erlittenen Schläge ohne Spielstärke. Die
+Notiz von damals gilt unverändert: **ein verbesserter Mechanismus ist keine
+Zielgröße.**
+
+##### Kontrollarm: diesmal die größere Warnung
+
+Arm A ist in allen acht Läufen identisch konfiguriert und streut trotzdem um
+**28 %** (Gruppenverlust 18,93–25,10) bzw. **31 %** (größter Schlag
+7,30–9,95) — deutlich mehr als die 15/24 % der ersten Kampagne und größer
+als jeder gesuchte Effekt. Vergleiche *zwischen* Läufen tragen hier nichts.
+Die Mechanismus-Tabelle oben überlebt das, weil sie *innerhalb* eines Laufs
+gepaart rechnet; die Siegraten sind gepoolt über vier Seeds je Dosis, was die
+Streuung mittelt, aber nicht wegzaubert.
+
+##### Ergebnis
+
+**`deathTransfer` bleibt bei 1,0.** Weder 1,5 noch 2,0 zeigen einen
+Spielstärkegewinn; 1,5 liegt über 360 Partien bei 48,6 %, also auf 50 %.
+
+Der Wert 1,0 ist damit nicht nur der bestbelegte des Projekts (65,2 % gegen 0
+über 210 Partien), sondern auch gegen beide Richtungen abgesichert: senken
+verschlechtert den Mechanismus messbar, erhöhen bringt nichts.
+
+Was die zwei Kampagnen zusammen gekostet haben: 840 Partien für ein
+Nullergebnis und einen Widerruf. Was sie eingebracht haben: der Parameter ist
+jetzt in beide Richtungen vermessen, die Überkompensation ist als
+Nicht-Problem erledigt, und die Vorab-Festlegung hat funktioniert — die
+Regression zur Mitte stand als Hauptrisiko im Protokoll, bevor die Zahlen da
+waren, und ist genau so eingetreten.
+
 #### Zwei Fehler, die dabei aufgefallen sind
 
 **Der Harness-Rauchtest hat einen Namenskonflikt gefangen:** meine lokale
