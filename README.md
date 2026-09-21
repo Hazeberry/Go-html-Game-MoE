@@ -265,7 +265,12 @@ drei davon im echten Browser mit Web Worker. Am Stand vor dem Fix fallen
 16 davon durch — die übrigen prüfen bewusst unverändertes Verhalten und
 müssen auf beiden Ständen halten.
 
-### Die KI gab in ausgeglichener Stellung auf
+### Die KI gab in ausgeglichener Stellung auf — widerlegt am 21.09.
+
+> **Dieser Abschnitt stand zehn Monate lang falsch hier.** Die Stellungen
+> waren nicht ausgeglichen; die KI lag in allen vier Fällen zurück. Die
+> ursprüngliche Fassung bleibt stehen, die Korrektur folgt darunter — sonst
+> ist nicht nachvollziehbar, was behauptet und was widerrufen wurde.
 
 Elf exportierte Partien vom 29.08. — vier auf „schwer", sieben auf „einfach",
 alle verloren. Die sieben Easy-Niederlagen sind echt: rund 100 Gebietspunkte
@@ -293,6 +298,60 @@ Strukturell doppelt gezählt: ein Stein auf dem Brett zählt in derselben
 Funktion `size·5 + libs·3`, also rund 5–8. Wird er gefangen, verschwindet er
 aus dieser Summe **und** schlägt zusätzlich mit 20 zu Buche.
 
+#### Die Korrektur (21.09.): die Gegenprobe war blind
+
+Nach der [`estimateArea`-Korrektur](#estimatearea-taugt-nicht-als-maßstab-für-wer-liegt-vorn)
+blieb hier offen, ob diese vier Partien betroffen sind. Sie sind es.
+
+Der Satz oben — „mit der Engine nachgerechnet und gegen `finalAreaScore`
+geprüft" — klingt nach einer unabhängigen Gegenprobe. Das Skript von damals
+zeigt, dass es keine war: es enthält eine eigene Nachbildung von
+`finalAreaScore`, die Steine und umschlossenes Gebiet zählt, **aber
+`resolveLifeAndDeath` nie aufruft**. Sie hat also denselben blinden Fleck wie
+`estimateArea`. Die Spalte „gleich? ja" bestätigte nur, dass zwei Maßstäbe mit
+demselben Fehler denselben Wert liefern.
+
+Nachgemessen mit drei Lesarten derselben Stellung — aus Sicht der KI (Weiß),
+Komi eingerechnet, negativ heißt Rückstand:
+
+| Partie | roh (= der alte Maßstab) | nur Benson-**bewiesen** tot | volle Schlussauswertung |
+|---|---:|---:|---:|
+| 197 Züge | **+13,5** | +13,5 (0 Steine) | −14,5 (8) |
+| 249 Züge | −5,5 | −5,5 (0) | −44,5 (14) |
+| 269 Züge | −3,5 | −3,5 (0) | −56,5 (21) |
+| 305 Züge | **+4,5** | **−19,5 (5)** | −19,5 (6) |
+
+Die mittlere Spalte entfernt nur, was nach Benson **beweisbar** tot ist — keine
+Heuristik, kein Ermessen. Die rechte nutzt zusätzlich die Augen/Freiheiten-
+Heuristik, die für die Schlussstellung gedacht ist.
+
+Der Vorwurf lautete: „in zwei von vier Partien gab sie aus einer Führung heraus
+auf". Gemeint waren die Partien mit 197 und 305 Zügen. Beide fallen:
+
+* **305 Züge — beweisbar.** Fünf weiße Steine sind Benson-tot. Allein sie zu
+  entfernen kippt +4,5 auf −19,5. Hier braucht es keine Heuristik.
+* **197 Züge — nur unter der Endstellungs-Lesart.** Benson beweist hier nichts;
+  die acht toten Steine sind samt und sonders Heuristik-Urteile. Das „+13,5"
+  übersteht also die exakte Prüfung.
+
+**Vorbehalt, der hier wirklich zählt:** diese Partien endeten durch Aufgabe,
+nicht durch zweimaliges Passen. `resolveLifeAndDeath` ist für die
+Schlussstellung gebaut; bei Zug 197 kann die Heuristik Gruppen totsagen, die
+noch laufen könnten. Die beiden Maßstäbe sind **gegenläufig verzerrt** — der
+rohe zugunsten dessen, der todgeweihte Gruppen hält, der volle zulasten dessen,
+der schwache, aber kämpfende Gruppen hält. Die Wahrheit liegt dazwischen.
+Deshalb die Spanne statt einer Zahl, und deshalb die Benson-Spalte.
+
+Was die Spanne in jedem Fall hergibt: in **keiner** der vier Partien ist die
+Lesart „die KI liegt komfortabel vorn" haltbar, und in dreien lag sie unter
+jeder Lesart zurück. Die Aufgaben waren nicht die Fehlalarme, für die ich sie
+gehalten habe.
+
+Auffällig ist noch, wem die toten Steine gehören: 8:0, 12:2, 20:1 und 5:1 zu
+Lasten von Weiß — verstreute Einzelsteine tief in Schwarz' Gebiet. Das ist das
+Bild einer KI, die Steine ins gegnerische Gebiet streut, nicht das einer, die
+knapp vorn liegt.
+
 #### Das Gewicht zu senken hilft nicht — gemessen
 
 Naheliegend wäre, `captureWeight` kleiner zu setzen. Drei gepaarte A/B-Läufe
@@ -315,7 +374,7 @@ Partien. Die KI gibt zu früh auf, aber meist in Stellungen, die sie ohnehin
 verloren hätte. Gegen einen Menschen kann das anders aussehen — der Harness
 misst KI gegen KI und sagt dazu nichts.
 
-#### Behoben wurde stattdessen das Kriterium
+#### Behoben wurde stattdessen das Kriterium — auf falscher Grundlage
 
 `resignAreaMargin` (Default 30) verlangt, dass **auch** die Gebietsschätzung
 verloren sagt. `estimateArea` ist dafür kein neuer willkürlicher Maßstab: auf
@@ -327,6 +386,28 @@ Rückstand wird weiterhin aufgegeben.
 Bewusste Unschärfe: Komi 7,5 fließt nicht ein — die Engine ist komi-blind, und
 den Worker dafür an den Zählmodus zu koppeln wäre der teurere Fehler. Weiß gibt
 dadurch um 7,5 Punkte zu früh auf, Schwarz ebenso viel zu spät.
+
+> **Korrektur (21.09.).** Der Satz „liefert exakt dasselbe wie
+> `finalAreaScore`" ist der tragende Teil dieser Begründung, und er ist falsch.
+> Verglichen wurde gegen eine Nachbildung ohne `resolveLifeAndDeath` (siehe
+> [oben](#die-korrektur-2109-die-gegenprobe-war-blind)). Gegen die echte
+> Endabrechnung weichen alle vier Stellungen ab, um 6 bis 53 Punkte.
+>
+> Damit fällt der Anlass: die vier Aufgaben waren keine Fehlalarme. Gemessen
+> am heutigen Default **blockiert Marge 30 alle vier** — also genau die
+> Aufgaben, die richtig waren. Der Parameter unterdrückt, wofür er gebaut
+> wurde.
+>
+> Die Gegenprobe, die weiterhin trägt: bei den sieben Easy-Niederlagen sind
+> roher und echter Maßstab identisch (kein einziger toter Stein), die
+> Rückstände liegen bei 47 bis 153 Punkten, und Marge 30 lässt dort jede
+> Aufgabe zu. Das Kriterium schadet also nicht überall — es stützt sich nur
+> auf einen Befund, den es nicht gibt.
+>
+> **Nicht geändert.** Ob die Marge weg soll, ist eine Frage der Spielstärke und
+> gehört durch den A/B-Harness, nicht in einen Schnellschuss — dieselbe Regel,
+> die `captureWeight` bei 20 gehalten hat. Der Default bleibt 30, bis das
+> gemessen ist.
 
 **Fürs Auswerten von Spielständen:** `reproduktion.board` ist die Stellung
 **vor** dem letzten KI-Zug — es ist die Eingabe, mit der die KI gerechnet hat
@@ -1234,9 +1315,12 @@ warum.
 15-fach ein. Das ist eine Rechnung, keine Messung, und sie stimmt weiter — nur
 war sie in diesen Partien kein Fehlalarm.
 
-**Nicht nachgemessen und deshalb offen:** die vier Partien vom 29.08., auf die
-sich der Kommentar an `captureWeight` und die Einführung von
-`resignAreaMargin` stützen. Auch dort wurde gegen `estimateArea` verglichen.
+**Inzwischen nachgemessen (21.09.):** die vier Partien vom 29.08., auf die sich
+der Kommentar an `captureWeight` und die Einführung von `resignAreaMargin`
+stützen, sind betroffen — die dortige „Gegenprobe gegen `finalAreaScore`" lief
+ohne `resolveLifeAndDeath` und hatte denselben blinden Fleck. Ergebnis und
+Folgen stehen bei
+[Die Korrektur (21.09.)](#die-korrektur-2109-die-gegenprobe-war-blind).
 
 Die Zählung der wirkungslosen Eingriffe bleibt davon unberührt — `captureCap`
 ist einer, nur aus einem anderen Grund als angenommen.
@@ -1291,6 +1375,39 @@ gedacht, nicht als Schiedsrichter in der Analyse. Wo er trotzdem auftaucht,
 gilt: er begünstigt systematisch die Seite mit den todgeweihten Gruppen.
 
 Die Folgen stehen bei [`captureCap`](#die-q-sättigung-deckeln-capturecap).
+
+#### Konvention: jede Partie-Auswertung nennt ihren Maßstab
+
+Die Regel allein hätte den Fehler nicht verhindert. Er ist entstanden, weil
+nirgends stand, womit gemessen wurde — und die eine Stelle, an der es
+dranstand („gegen `finalAreaScore` geprüft"), war eine Nachbildung ohne
+`resolveLifeAndDeath`. Es hat zehn Monate gedauert, das zu bemerken, und das
+Nachbessern war jedes Mal teurer als das Hinschreiben gewesen wäre.
+
+**Ab jetzt nennt jede Partie-Auswertung — in der README, im Commit und im
+Code-Kommentar — den Maßstab beim Namen**, in einer der drei Formen:
+
+| Form | bedeutet | wann |
+|---|---|---|
+| `[roh]` | `estimateArea`, ohne Totsteinbereinigung | nur für Engine-interne Fragen, nie für „wer liegt vorn" |
+| `[benson]` | nur Benson-**bewiesen** Totes entfernt | wenn es belastbar sein muss |
+| `[voll]` | `resolveLifeAndDeath` + `finalAreaScore` | Schlussstellungen, Standardfall |
+
+Zwei Zusatzregeln, beide aus einem eigenen Fehler:
+
+1. **Eine Gegenprobe zählt nur, wenn sie einen anderen blinden Fleck hat.**
+   `finalAreaScore` ohne `resolveLifeAndDeath` gegen `estimateArea` zu
+   stellen ist keine — beide zählen tote Gruppen mit. Wer gegenprüft, sagt
+   dazu, worin sich die beiden Verfahren unterscheiden.
+2. **Auf Nicht-Schlussstellungen wird eine Spanne angegeben, keine Zahl.**
+   `[roh]` und `[voll]` sind gegenläufig verzerrt; bei einer Aufgabe im
+   Mittelspiel liegt die Wahrheit dazwischen, und `[benson]` sagt, wie viel
+   davon beweisbar ist.
+
+Das ist die dritte Regel dieser Art, nach der
+[Kontrollarm-Prüfung](#die-ki-erstickt-ihre-eigene-gruppe-atarisizeweight) und
+dem Maßstab selbst. Alle drei kosten beim Schreiben eine Zeile und haben beim
+Nicht-Schreiben Monate gekostet.
 
 #### Ein zweiter Irrtum, rechtzeitig bemerkt
 
@@ -1353,6 +1470,110 @@ ausgeschlossen; ausgeschlossen ist ein *großer*. Zum Vergleich: `deathTransfer`
 aufzulösen bräuchte rund 1500 Partien.
 
 Der Default bleibt 150.
+
+### `resignAreaMargin`: stark wirksam, ohne messbare Folge
+
+Der Parameter, dessen Begründung die
+[Nachmessung der vier Partien](#die-korrektur-2109-die-gegenprobe-war-blind)
+widerlegt hat. 160 Partien, A = 30 (heutiger Default) gegen vier Dosen, je
+40 Partien auf disjunkten Seeds.
+
+**Der Arm beißt, und er ist saubere Dosisordnung.** Der neue Aufgabe-Wächter
+zählt, wie oft Q die Aufgabeschwelle riss und wie oft das Gebietskriterium die
+Aufgabe dann abfing:
+
+| Lauf | B-Dosis | A fängt ab | B fängt ab | größter blockierter Rückstand B | B gab auf |
+|---|---|---:|---:|---:|---:|
+| 116 | aus (−1) | 83,3 % | **0,0 %** | 0 | 15× |
+| 117 | 0 | 77,8 % | 6,7 % | 0 | 11× |
+| 118 | 15 | 70,2 % | 58,2 % | 15 | 11× |
+| 119 | 60 | 84,9 % | **93,4 %** | 60 | 2× |
+
+Der größte blockierte Rückstand ist **exakt die Dosis** — der Parameter tut
+genau das, was auf der Packung steht. Bei Marge 30 fängt er vier von fünf
+Aufgaben ab, die Q auslösen will.
+
+**Auf die Siegrate schlägt davon nichts durch:**
+
+| B-Dosis | A : B | B-Anteil | 95 %-KI | p |
+|---|---|---:|---|---:|
+| aus (−1) | 21 : 19 | 47,5 % | [31,5; 63,9] | 0,875 |
+| 0 | 22 : 18 | 45,0 % | [29,3; 61,5] | 0,636 |
+| 15 | 20 : 20 | 50,0 % | [33,8; 66,2] | 1,000 |
+| 60 | 26 : 14 | 35,0 % | [20,6; 51,7] | 0,081 |
+| **gepoolt** | **89 : 71** | **44,4 %** | **[36,5; 52,4]** | **0,179** |
+
+Keine Dosis signifikant (kleinstes p = 0,081 gegen eine Bonferroni-Schwelle von
+0,0125), das gepoolte KI schließt 50 % ein, und die Werte sind **nicht
+dosisgeordnet** — 47,5 / 45,0 / 50,0 / 35,0 %. Derselbe Befund wie bei
+`atariSizeWeight`.
+
+Der Kontrollarm ist diesmal unauffällig: A ist in allen vier Läufen identisch
+konfiguriert, und seine unabhängigen Kennzahlen streuen nur um 11 %
+(Gruppenverlust 24,1–26,8, Randanteil 33,9–36,0 %). Die Siegrate taugt hier
+übrigens **nicht** als Kontrollarm-Maß: sie ist innerhalb eines Laufs
+nullsummig, A ist per Konstruktion 100 % minus B.
+
+#### Warum das Nullergebnis diesmal vorhersagbar war
+
+Ich hatte vorab das Gegenteil vermutet: eine Aufgabe ist eine sofortige
+Niederlage, wer seltener aufgibt kann nur gewinnen oder gleichziehen, also
+müsste die hohe Marge dominieren. **Das war falsch, und die Zahlen zeigen
+warum.** Weiterspielen wandelt eine Aufgabe-Niederlage meistens in eine
+Zähl-Niederlage um — nur manchmal in einen Sieg. Gemessen an der Kreuzung
+„Marge hat in dieser Partie eine Aufgabe abgefangen" gegen den Ausgang:
+
+| | Partien mit Block | davon gewonnen |
+|---|---:|---:|
+| A (Marge 30) | 58 | 8 (13,8 %) |
+| B (alle Dosen) | 37 | 6 (16,2 %) |
+| **zusammen** | **95** | **14 (14,7 %)** |
+
+Rund jede siebte abgefangene Aufgabe wird noch gewonnen. Hochgerechnet auf die
+20 Partien je Lauf, die überhaupt per Aufgabe endeten, ist die **Obergrenze des
+Effekts 3,2 Partien je 40 = 8,1 Prozentpunkte** — und das ist großzügig
+gerechnet. Um 8,1 Punkte mit 80 % Macht nachzuweisen, bräuchte es rund **612
+Partien je Dosis**; diese Kampagne hatte 40. Das 95 %-KI ist hier ±16 Punkte
+breit.
+
+Die Kampagne war also **unterdimensioniert, und zwar von der Bauart her**: der
+Mechanismus kann gar nicht mehr als ein Achtel der Aufgabepartien bewegen.
+Diese Zahl hätte ich vor dem Start ausrechnen können, nicht danach.
+
+Die 14,7 % sind dabei eine **Obergrenze**, keine Rettungsquote: die
+Aufgabe-Serie verlangt fünf qualifizierende Züge in Folge. Ein einzelner Block
+bricht die Serie, aber ob sie ohne ihn je fünf erreicht hätte, sagt die
+Messung nicht.
+
+#### Eine Zahl, die ich nachgeprüft und nicht erklärt habe
+
+In Lauf 119 sinken die Gesamtaufgaben von rund 20 auf 6. Der größere Teil ist
+der Mechanismus: B fängt 93,4 % seiner Aufgaben ab, es bleiben fast nur noch
+A-Aufgaben übrig, und 4 + 2 ergibt genau die 6. Aber auch **A** gab dort
+seltener auf — 4-mal gegen 6/8/11 in den anderen Läufen, bei identischer
+Konfiguration. Poisson-Streuung bei diesen Zahlen ist ±2,7; alle vier Werte
+liegen innerhalb von 1,5 sd. Das Zug-Limit ist es nicht: **keine einzige
+Partie** erreichte die 600 Züge. Also Rauschen, und kein Anlass, dafür einen
+Mechanismus zu erfinden.
+
+#### Was die Messung entscheidet und was nicht
+
+Sie kann **nicht** sagen, ob die Marge weg soll. Sie sagt zwei Dinge:
+
+1. Der Anlass ist widerlegt — die vier Aufgaben waren richtig.
+2. Die Marge kostet **keine messbare Spielstärke**, in keiner Dosis. Sie zu
+   entfernen kostet ebenfalls keine.
+
+Damit ist die Frage keine Messfrage mehr, sondern eine Geschmacksfrage: soll
+die KI bei 30 Punkten Rückstand `[roh]` — und `[roh]` unterschätzt den
+Rückstand systematisch — aufgeben oder auspielen? Gegen einen Menschen ist das
+Auspielen einer verlorenen Partie eher Ärgernis als Dienst, und genau das
+bewirkt der Parameter heute. Das Gegenteil von dem, wofür er gebaut wurde.
+
+**Der Default bleibt 30**, bis das entschieden ist. Was eine größere Kampagne
+noch bringen könnte, steht oben: 612 Partien je Dosis für einen Effekt, dessen
+Obergrenze bei 8 Punkten liegt. Das ist teuer für eine Frage, die keine
+Stärkefrage ist.
 
 ## Methodik
 

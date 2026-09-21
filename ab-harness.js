@@ -933,9 +933,9 @@ const driver = `
                       2: {root: null, hope: 0, dead: 0, sig: null, phaseSwitches: 0, msProSim: null, krisenDauer: null}};
     const st = {
       1: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
-          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0},
+          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0, afRufe: 0, afBlock: 0, afMax: 0},
       2: {moves: 0, sims: 0, timeMs: 0, q: [], zeiten: [], boden: 0, faktoren: [], args: [],
-          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0}
+          atRufe: 0, atGross: 0, atMax: 0, drRufe: 0, drGross: 0, drMax: 0, dkRufe: 0, dkGriff: 0, skRufe: 0, skGriff: 0, skMax: 0, agRufe: 0, agOffen: 0, afRufe: 0, afBlock: 0, afMax: 0}
     };
     /* Gruppenverluste je Farbe: groesster Einzelschlag, den DIESE Farbe
        erlitten hat, plus die Zahl der Verluste ab 5 Steinen. Instrument fuer
@@ -1005,6 +1005,7 @@ const driver = `
       leseDeckelWaechter(true);
       leseSunkWaechter(true);
       leseAugenWaechter(true);
+      leseAufgabeWaechter(true);
 
       const t0 = Date.now();
       netFrisch = false;
@@ -1031,6 +1032,13 @@ const driver = `
         if (sw.maxDauer > st[color].skMax) st[color].skMax = sw.maxDauer; }
       { const aw = leseAugenWaechter(true);
         st[color].agRufe += aw.rufe; st[color].agOffen += aw.offen; }
+      /* AUFGABE-WAECHTER: qRufe zaehlt die Zuege, in denen Q die Schwelle
+         gerissen hat; block die Teilmenge davon, in der das Gebietskriterium
+         die Aufgabe verhindert hat. Fuer eine resignAreaMargin-Dosisreihe ist
+         block die einzige Zahl, die sagt, ob der Arm ueberhaupt beisst. */
+      { const fw = leseAufgabeWaechter(true);
+        st[color].afRufe += fw.qRufe; st[color].afBlock += fw.block;
+        if (fw.maxLuecke > st[color].afMax) st[color].afMax = fw.maxLuecke; }
       { const f = leseFaktor();
         if (f.faktor !== null) { st[color].faktoren.push(f.faktor); st[color].args.push(f.arg); } }
 
@@ -1130,6 +1138,10 @@ const driver = `
                  sunkMaxDauer: st[c].skMax,
                  augenOffenAnteil: st[c].agRufe ? 100 * st[c].agOffen / st[c].agRufe : 0,
                  augenRufe: st[c].agRufe,
+                 aufgabeQRufe: st[c].afRufe,
+                 aufgabeBlockAnteil: st[c].afRufe ? 100 * st[c].afBlock / st[c].afRufe : 0,
+                 aufgabeBlock: st[c].afBlock,
+                 aufgabeMaxLuecke: st[c].afMax,
                  /* Phasensplit der Rechenzeit: Frueh- gegen Spaetspiel. Der
                     Top10-Anteil sagt, ob es Spitzen gibt; das hier sagt, ob
                     die Zeit systematisch nach hinten wandert. Je Farbe zieht
@@ -1306,6 +1318,10 @@ const driver = `
       agg.zeit[key].sunkMax.push(z.sunkMaxDauer);
       agg.zeit[key].augen.push(z.augenOffenAnteil);
       agg.zeit[key].augenRufe.push(z.augenRufe);
+      agg.zeit[key].aufgabeQ.push(z.aufgabeQRufe);
+      agg.zeit[key].aufgabeBlock.push(z.aufgabeBlockAnteil);
+      agg.zeit[key].aufgabeBlockN.push(z.aufgabeBlock);
+      agg.zeit[key].aufgabeMax.push(z.aufgabeMaxLuecke);
       if (z.faktor) agg.zeit[key].faktor.push(z.faktor);
       if (z.phase) agg.zeit[key].phase.push(z.phase);
     }
@@ -1340,9 +1356,9 @@ const driver = `
       /* Zeitverteilung nach Konfiguration: Gesamtzeit je Partie (muss bei
          Paritaet gleich sein) und Top10-Anteil (die eigentliche Messgroesse). */
       zeit: {A: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
-                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: []},
+                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: [], aufgabeQ: [], aufgabeBlock: [], aufgabeBlockN: [], aufgabeMax: []},
              B: {gesamt: [], top10: [], max: [], boden: [], faktor: [], phase: [],
-                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: []}},
+                 atari: [], atariGross: [], atariMax: [], druck: [], druckGross: [], druckMax: [], deckel: [], deckelRufe: [], sunk: [], sunkRufe: [], sunkMax: [], augen: [], augenRufe: [], aufgabeQ: [], aufgabeBlock: [], aufgabeBlockN: [], aufgabeMax: []}},
       anomalies: 0
     };
   }
@@ -1480,6 +1496,28 @@ const driver = `
           console.log('                — NICHT VERDRAHTET: in keinem Arm war der Abschlag gesetzt');
         else if (Math.max(gA2, gB2) < 1)
           console.log('                — NICHTS ABZUWERTEN: praktisch kein gezaehlter Augenpunkt ist offen');
+
+        /* AUFGABE-WAECHTER. Die entscheidende Zahl fuer eine
+           resignAreaMargin-Dosisreihe: qRufe sind die Zuege, in denen Q die
+           Schwelle gerissen hat, block der Anteil davon, den das
+           Gebietskriterium abgefangen hat. Ist block in beiden Armen 0, hat
+           die Marge nie eingegriffen und jedes Ergebnis der Dosisreihe misst
+           etwas anderes als den Parameter. */
+        const summe = a => a.reduce((x, y) => x + y, 0);
+        const fqA = summe(A.aufgabeQ), fqB = summe(B.aufgabeQ);
+        const fbA = summe(A.aufgabeBlockN), fbB = summe(B.aufgabeBlockN);
+        const flA = Math.max(0, ...A.aufgabeMax), flB = Math.max(0, ...B.aufgabeMax);
+        console.log('AUFGABE-WAECHTER: Q riss die Aufgabeschwelle  A ' + fqA + '   |   B ' + fqB + ' mal');
+        console.log('                  davon vom Gebiet blockiert  A ' + fbA
+          + ' (' + fmt(fqA ? 100 * fbA / fqA : 0, 1) + ' %)   |   B ' + fbB
+          + ' (' + fmt(fqB ? 100 * fbB / fqB : 0, 1) + ' %)');
+        console.log('                  groesster blockierter Rueckstand  A ' + flA
+          + '   |   B ' + flB + ' Punkte [roh]');
+        if (Math.max(fqA, fqB) === 0)
+          console.log('                — NICHT VERDRAHTET: Q hat in keinem Arm je die Aufgabeschwelle gerissen');
+        else if (Math.max(fbA, fbB) === 0)
+          console.log('                — MARGE WIRKUNGSLOS: sie hat keine einzige Aufgabe blockiert, '
+            + 'ein Unterschied zwischen den Armen kaeme nicht von ihr');
       }
     }
     console.log('PASS: erster Ø Zug S ' + fmt(mean(agg.passFirst[1]), 0) + ' / W ' + fmt(mean(agg.passFirst[2]), 0)
