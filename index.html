@@ -3328,6 +3328,20 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
 
    Bewusst als eigene Funktion, nicht inline: so ist das Kriterium einzeln
    testbar, ohne eine ganze Suche fahren zu müssen. */
+/* Waechter fuer die resignAreaMargin-Dosisreihe: wie oft hat Q die Schwelle
+   gerissen, und wie oft hat AUSGERECHNET das Gebietskriterium die Aufgabe
+   dann blockiert? Ohne diese zweite Zahl ist eine Dosisreihe wertlos -- sie
+   misst sonst einen Arm, der vielleicht nie greift. Reine Zaehler, kein
+   Einfluss aufs Spiel. */
+let _aufgabeQRufe = 0, _aufgabeGebietBlock = 0, _aufgabeMaxLuecke = 0;
+
+function leseAufgabeWaechter(reset) {
+  const v = {qRufe: _aufgabeQRufe, block: _aufgabeGebietBlock,
+             maxLuecke: _aufgabeMaxLuecke};
+  if (reset) { _aufgabeQRufe = 0; _aufgabeGebietBlock = 0; _aufgabeMaxLuecke = 0; }
+  return v;
+}
+
 function gebietSagtVerloren(board, aiColor) {
   /* Massstab: [roh] -- estimateArea, ohne Totsteinbereinigung. Das ist hier
      eine bewusste Wahl (pro Zug bezahlbar), aber es bedeutet, dass das
@@ -3335,11 +3349,23 @@ function gebietSagtVerloren(board, aiColor) {
      sieht. Der Anlass, aus dem dieser Parameter entstand, war genau dieser
      Fehler -- siehe den Kasten an resignAreaMargin. */
   const marge = PARAMS.resignAreaMargin;
+  /* VOR dem Kurzschluss zaehlen: sonst meldet ausgerechnet der
+     abgeschaltete Arm 0 Rufe und saehe wie "nicht verdrahtet" aus. */
+  _aufgabeQRufe++;
   if (marge < 0) return true;              /* Kriterium abgeschaltet */
   const opp = aiColor === 1 ? 2 : 1;
   /* Gefangene gehen NICHT ein: der Default-Zählmodus ist Area (chinesisch),
      dort zählen Steine auf dem Brett plus umschlossenes Gebiet. */
-  return estimateArea(board, aiColor) < estimateArea(board, opp) - marge;
+  const eigen = estimateArea(board, aiColor), fremd = estimateArea(board, opp);
+  const verloren = eigen < fremd - marge;
+  /* Aufgerufen wird nur, wenn Q die Schwelle schon gerissen hat -- die
+     Reihenfolge im && ist Absicht. Jeder Ruf ist also ein Q-Ruf. */
+  if (!verloren) {
+    _aufgabeGebietBlock++;
+    const luecke = fremd - eigen;          /* > 0 heisst: KI liegt zurueck */
+    if (luecke > _aufgabeMaxLuecke) _aufgabeMaxLuecke = luecke;
+  }
+  return verloren;
 }
 
 function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove) {
