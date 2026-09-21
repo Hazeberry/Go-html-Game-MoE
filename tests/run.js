@@ -21,8 +21,8 @@ const OHNE_BROWSER = argv.includes('--ohne-browser');
 const pfad = argv.find(a => !a.startsWith('--'));
 const HTML = pfad ? [path.resolve(pfad)] : [];
 
-const ALLE = ['nan-guards.js', 'resign-criterion.js', 'training-stability.js',
-              'harness-smoke.js', 'browser-nan.js'];
+const ALLE = ['nan-guards.js', 'resign-criterion.js', 'transfer-telemetry.js',
+              'training-stability.js', 'harness-smoke.js', 'browser-nan.js'];
 const SUITEN = OHNE_BROWSER ? ALLE.filter(s => s !== 'browser-nan.js') : ALLE;
 
 /* training-stability nimmt Partien/Züge VOR dem Pfad — deshalb die Defaults
