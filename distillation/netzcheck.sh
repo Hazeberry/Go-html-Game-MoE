@@ -94,6 +94,9 @@ if [ -n "$FEHLEN" ]; then
   echo "Danach eine FRISCHE Session starten — ein laufender Container behaelt"
   echo "die Policy, mit der er gestartet ist. Einzeln nachtragen kostet je"
   echo "Host eine weitere Session."
+  echo
+  echo "Ohne Netz laesst sich immerhin pruefen, ob die Pruefung Zaehne hat:"
+  echo "  python3 decode.py selbsttest"
   exit 1
 fi
 
