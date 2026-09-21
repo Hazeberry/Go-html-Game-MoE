@@ -2162,13 +2162,23 @@ globalThis.PARAMS = {
      ║ Aufgabe. Fuer einen Nachweis braeuchte es ~612 Partien je         ║
      ║ Dosis; diese Kampagne hatte 40.                                   ║
      ║                                                                   ║
-     ║ DEFAULT UNVERAENDERT BEI 30. Die Frage ist damit keine            ║
-     ║ Messfrage mehr, sondern eine Geschmacksfrage: soll die KI         ║
-     ║ bei 30 Punkten Rueckstand [roh] aufgeben oder auspielen?          ║
-     ║ Gegen einen Menschen ist das Auspielen einer verlorenen           ║
-     ║ Partie eher Aergernis als Dienst -- genau das bewirkt der         ║
-     ║ Parameter heute, das Gegenteil von dem, wofuer er gebaut          ║
-     ║ wurde.                                                            ║
+     ║ ENTSCHEIDUNG (21.09.): ABGESCHALTET, Default jetzt -1.            ║
+     ║                                                                   ║
+     ║ Die Messung konnte das nicht entscheiden -- beide Wege kosten     ║
+     ║ gleich viel Spielstaerke, naemlich keine. Entschieden hat der     ║
+     ║ Anlass: der ist widerlegt. Der Parameter wurde gebaut, um vier    ║
+     ║ Fehlaufgaben zu verhindern, und diese vier Aufgaben waren         ║
+     ║ richtig. Was bleibt, ist ein Kriterium, das die KI bei bis zu     ║
+     ║ 30 Punkten Rueckstand [roh] weiterspielen laesst -- und [roh]     ║
+     ║ unterschaetzt den Rueckstand systematisch. Gegen einen            ║
+     ║ Menschen ist das Auspielen einer verlorenen Partie eher           ║
+     ║ Aergernis als Dienst.                                             ║
+     ║                                                                   ║
+     ║ Damit gilt wieder: Q allein entscheidet ueber die Aufgabe, wie    ║
+     ║ vor dem vermeintlichen Fix. Wer das Kriterium zurueckholen        ║
+     ║ will, setzt einen Wert >= 0; die Mechanik steht unveraendert      ║
+     ║ in gebietSagtVerloren und ist durch den Aufgabe-Waechter          ║
+     ║ messbar.                                                          ║
      ╚═══════════════════════════════════════════════════════════════════╝
 
      Bekannte Unschärfe, bewusst in Kauf genommen: Komi 7,5 fließt NICHT ein
@@ -2179,7 +2189,7 @@ globalThis.PARAMS = {
      hier nicht eingehen.
 
      Negativer Wert schaltet das Kriterium ab (Verhalten wie vor dem Fix). */
-  resignAreaMargin: 30,
+  resignAreaMargin: -1,   /* abgeschaltet, siehe Kasten oben */
   resignStreak:   5,
   resignMinMoves: 60,
   /* Strukturelle Aufgabe: so viele Züge in Folge, in denen JEDER legale Zug
