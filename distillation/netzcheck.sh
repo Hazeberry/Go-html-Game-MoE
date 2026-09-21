@@ -1,9 +1,19 @@
 #!/bin/sh
-# Sagt genau, WELCHER Host in der Allowlist fehlt — statt nur "geht nicht".
+# Sagt genau, WELCHE Hosts in der Allowlist fehlen — statt nur "geht nicht",
+# und statt nur den ersten zu nennen.
 # Die Shards liegen nicht auf huggingface.co selbst: der resolve-Pfad
 # antwortet mit einer Weiterleitung auf ein CDN, und dieser zweite Host
 # braucht die Freigabe genauso. Wer nur huggingface.co freigibt, sieht die
 # Metadaten und scheitert erst beim Download.
+#
+# Warum Schritt 0 ALLE bekannten Hosts auf einmal prueft: eine laufende
+# Session behaelt die Policy, mit der sie gestartet ist. Wer die Hosts
+# nacheinander entdeckt — erst huggingface.co, dann das CDN aus der
+# Weiterleitung — bezahlt jeden einzelnen mit einer weiteren Session.
+# Schritt 0 bricht deshalb NICHT beim ersten Fehlschlag ab, sondern gibt die
+# vollstaendige Liste aus. Die Schritte 1 bis 3 bleiben trotzdem: sie finden
+# einen Host, der hier noch nicht bekannt ist, und pruefen den echten
+# Download statt nur die Erreichbarkeit.
 #
 # Ein Fehlschlag heisst nicht automatisch "Policy". Ein abgelehnter Proxy,
 # ein fehlendes CA-Bundle und ein toter DNS scheitern alle gleich lautlos,
@@ -62,6 +72,32 @@ pruefe() {
   return 0
 }
 
+# Metadaten-Host, Kurzform, und die Auslieferungswege, die der Hub heute
+# benutzt (klassisches CDN und Xet). Welcher davon zum Zug kommt, entscheidet
+# der Hub zur Laufzeit — freigegeben sein muessen sie deshalb alle.
+# us.aws.cdn.hf.co steht hier, weil der einzige vollstaendige Durchlauf
+# dieser Kette die Shards genau von dort geladen hat (siehe README,
+# Zeile "0. Netz"). Er fehlte in der urspruenglichen Liste.
+HOSTS="huggingface.co hf.co cdn-lfs.huggingface.co cdn-lfs-us-1.hf.co
+       transfer.xethub.hf.co cas-bridge.xethub.hf.co us.aws.cdn.hf.co"
+
+echo "0) Bekannte Hosts, alle auf einmal"
+FEHLEN=""
+for h in $HOSTS; do
+  pruefe "https://$h/" "$h" || FEHLEN="$FEHLEN $h"
+done
+if [ -n "$FEHLEN" ]; then
+  echo
+  echo "Diese Hosts fehlen in der Allowlist. ALLE auf einmal eintragen:"
+  for h in $FEHLEN; do echo "  $h"; done
+  echo
+  echo "Danach eine FRISCHE Session starten — ein laufender Container behaelt"
+  echo "die Policy, mit der er gestartet ist. Einzeln nachtragen kostet je"
+  echo "Host eine weitere Session."
+  exit 1
+fi
+
+echo
 echo "1) API-Host"
 pruefe "https://huggingface.co/api/datasets/$REPO" "huggingface.co" || {
   echo

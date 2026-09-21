@@ -12,10 +12,11 @@ durch".
 ## Reihenfolge
 
 ```bash
-sh netzcheck.sh                       # 0. Ist der Datenhost erreichbar?
+sh netzcheck.sh                       # 0. Sind die Datenhosts erreichbar?
 node dump_boards.js && python3 features_check.py
                                       # 1. numpy-Merkmale == JS-boardToInput?
-python3 decode.py pruefen             # 2. Stimmt KataGos Kanalbelegung?
+python3 decode.py selbsttest          # 2a. Hat die Pruefung ueberhaupt Zaehne?
+python3 decode.py pruefen             # 2b. Stimmt KataGos Kanalbelegung?
 python3 decode.py bauen               # 3. Shards -> daten.npz
 python3 train.py daten.npz gewichte.json --epochen 40 --lr 0.5
                                       # 4. Trainieren, Export im Browser-Format
@@ -29,13 +30,33 @@ node ../ab-harness.js --paired 30 --net gewichte.json \
 Schritt 6 ist der einzige, der über Einbauen entscheidet. Alles davor stellt
 nur sicher, dass ein Nullergebnis dort auch wirklich etwas bedeutet.
 
+### Und wer prüft die Prüfung?
+
+Ein „0 Abweichungen" sieht genau so aus wie eine Prüfung, die grundsätzlich
+nichts findet. `decode.py selbsttest` baut deshalb zwei Shards im V7-Format
+selbst: einen sauberen, bei dem die Prüfung schweigen muss, und einen mit
+vertauschten x/y-Koordinaten in Kanal 3, bei dem sie anschlagen muss.
+
+Die Freiheiten des Testshards entstehen über **Union-Find**, `pruefen` rechnet
+mit Flutfüllung — hätten beide denselben Fehler, zeigte die Gegenrechnung nur
+auf sich selbst. Der Selbsttest braucht kein Netz und keine echten Daten.
+
+Zuletzt gelaufen: sauberer Shard ohne Befund, verdorbener mit **45 von 45
+möglichen** Abweichungen erkannt. (Die übrigen Zeilen haben keinen Stein in
+Atari; sie sind unter Vertauschung mit sich selbst identisch und können
+nichts zeigen.)
+
+Was der Selbsttest **nicht** beantwortet: ob KataGos Kanäle wirklich so belegt
+sind wie oben notiert. Das kann nur ein echter Shard. Er beantwortet die Frage
+davor — schlägt die Gegenrechnung überhaupt an, wenn die Belegung falsch ist.
+
 ## Was die Kette gemessen hat
 
 Ein vollständiger Durchlauf, jeder Schritt einzeln geprüft:
 
 | Schritt | Ergebnis |
 |---|---|
-| 0. Netz | Daten liegen auf `us.aws.cdn.hf.co`, nicht auf `huggingface.co` |
+| 0. Netz | Daten liegen auf `us.aws.cdn.hf.co`, nicht auf `huggingface.co`. `netzcheck.sh` prüft seit dem Zusammenführen **alle sieben bekannten Hosts auf einmal** statt sie nacheinander zu entdecken — eine laufende Session behält ihre Policy, jeder einzeln nachgetragene Host kostet eine weitere. |
 | 1. Merkmale | 8 Bretter, **0 Abweichungen** numpy gegen JS |
 | 2. Kanäle | 400 Stellungen Freiheiten nachgerechnet, **0 Abweichungen**; Kanal 9 zu 100 % gegnerisch |
 | 3. Daten | 61 363 Zeilen aus vier val-Shards, 3 wegen besetztem Ziel verworfen |
