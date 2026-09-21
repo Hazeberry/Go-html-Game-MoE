@@ -1917,6 +1917,23 @@ globalThis.PARAMS = {
      evaluateBoard-Aufrufe bitgenau identisch zum Vorstand vor dieser
      Änderung, geprüft beim Setzen des Defaults. */
   deathTransfer:       1.0,
+  /* Telemetrie fuer die Uebertragung. 0 = aus (Default), dann wird in
+     evaluateBoard KEIN zusaetzlicher Zweig betreten und die Zaehler kosten
+     nichts. Bewusst geschaltet statt immer an: evaluateBoard laeuft einmal
+     je Simulation, bei ~500 Sims/Zug also hunderte Male pro Zug -- das ist
+     die heisseste Funktion der Engine, und ein Zaehler im Gruppenloop
+     bezahlt jede Partie mit.
+
+     Gemessen wird, was bisher niemand sehen konnte: wie oft die
+     Uebertragung ueberhaupt greift, wie gross der Abzug je Gruppe ist,
+     wie oft er GROESSER ausfaellt als der Gruppenwert selbst
+     (Ueberkompensation -- die Gruppe zaehlt dann negativ, obwohl sie noch
+     auf dem Brett steht), und welchen Anteil der Gefangenen-Term an der
+     Gesamtbewertung hat.
+
+     Nur Zaehler, kein Einfluss aufs Spiel: der Abzug wird in eine Konstante
+     gehoben und unveraendert subtrahiert. */
+  transferTelemetrie:    0,
   /* Benson-Zugfilter: todgeborene Züge (Stein wäre beweisbar tot) fliegen
      aus der Kandidatenliste; bleibt nichts übrig → passen. Beendet das
      endlose Steine-Füttern in gegnerisches pass-alive-Gebiet (beobachtet:
@@ -2935,6 +2952,30 @@ function leseDeckelWaechter(reset) {
 }
 
 const _evalBoardSeen = new Int32Array(BOARD_SIZE);
+
+/* TRANSFER-WAECHTER. Zaehlt, was die Uebertragung (deathTransfer) in
+   evaluateBoard tatsaechlich anrichtet. Alle Zaehler werden nur beschrieben,
+   wenn PARAMS.transferTelemetrie > 0 ist.
+
+   capAbs/gesamtAbs werden als Betragssummen gefuehrt, nicht als Verhaeltnis
+   je Aufruf: |s| kann beliebig nahe an 0 liegen, ein Quotient je Aufruf
+   explodiert dort und der Mittelwert waere Muell. Die Summe der Betraege
+   ist stabil und beantwortet dieselbe Frage -- wie viel des Bewertungs-
+   betrags kommt aus dem Gefangenen-Term. */
+let _trRufe = 0, _trGruppen = 0, _trSumme = 0, _trMax = 0, _trUeber = 0;
+let _trEigen = 0, _trFremd = 0, _trCapAbs = 0, _trGesamtAbs = 0;
+
+function leseTransferWaechter(reset) {
+  const v = {rufe: _trRufe, gruppen: _trGruppen, summe: _trSumme, max: _trMax,
+             ueber: _trUeber, eigen: _trEigen, fremd: _trFremd,
+             capAbs: _trCapAbs, gesamtAbs: _trGesamtAbs};
+  if (reset) {
+    _trRufe = 0; _trGruppen = 0; _trSumme = 0; _trMax = 0; _trUeber = 0;
+    _trEigen = 0; _trFremd = 0; _trCapAbs = 0; _trGesamtAbs = 0;
+  }
+  return v;
+}
+
 function evaluateBoard(board, color, captures) {
   const opp = color === 1 ? 2 : 1;
   let gefangen = ((captures[color]||0) - (captures[opp]||0)) * PARAMS.captureWeight;
@@ -2999,10 +3040,33 @@ function evaluateBoard(board, color, captures) {
          Bewertungslücke, die der reine Abschlag prinzipiell nicht erreicht.
          Siehe den Kommentar an deathTransfer. */
       if (PARAMS.deathTransfer > 0) {
-        v -= PARAMS.deathTransfer * anteil * size * PARAMS.captureWeight;
+        /* In eine Konstante gehoben, damit der Waechter denselben Wert
+           sieht, der abgezogen wird -- derselbe Ausdruck, dieselbe
+           Reihenfolge, also bitgenau dasselbe Ergebnis wie vorher. */
+        const _dt = PARAMS.deathTransfer * anteil * size * PARAMS.captureWeight;
+        if (PARAMS.transferTelemetrie > 0) {
+          _trGruppen++;
+          _trSumme += _dt;
+          if (_dt > _trMax) _trMax = _dt;
+          /* Ueberkompensation: der Abzug uebersteigt den Gruppenwert, die
+             Gruppe zaehlt danach NEGATIV, obwohl sie noch auf dem Brett
+             steht. Vor dem Abzug pruefen, sonst misst man sich selbst. */
+          if (_dt > v) _trUeber++;
+          if (c === color) _trEigen += _dt; else _trFremd += _dt;
+        }
+        v -= _dt;
       }
     }
     s += (c === color) ? v : -v;
+  }
+  if (PARAMS.transferTelemetrie > 0) {
+    _trRufe++;
+    /* gefangen ist der Wert, der WIRKLICH in s eingeht -- also nach dem
+       captureCap-Deckel, falls einer gesetzt ist. Den Rohwert zu zaehlen
+       waere die ehrlichere Klage, aber die falsche Antwort auf die Frage
+       "wie sehr beherrscht der Term die Bewertung". */
+    _trCapAbs += Math.abs(gefangen);
+    _trGesamtAbs += Math.abs(s);
   }
   return s;
 }
