@@ -1471,6 +1471,110 @@ aufzulösen bräuchte rund 1500 Partien.
 
 Der Default bleibt 150.
 
+### `resignAreaMargin`: stark wirksam, ohne messbare Folge
+
+Der Parameter, dessen Begründung die
+[Nachmessung der vier Partien](#die-korrektur-2109-die-gegenprobe-war-blind)
+widerlegt hat. 160 Partien, A = 30 (heutiger Default) gegen vier Dosen, je
+40 Partien auf disjunkten Seeds.
+
+**Der Arm beißt, und er ist saubere Dosisordnung.** Der neue Aufgabe-Wächter
+zählt, wie oft Q die Aufgabeschwelle riss und wie oft das Gebietskriterium die
+Aufgabe dann abfing:
+
+| Lauf | B-Dosis | A fängt ab | B fängt ab | größter blockierter Rückstand B | B gab auf |
+|---|---|---:|---:|---:|---:|
+| 116 | aus (−1) | 83,3 % | **0,0 %** | 0 | 15× |
+| 117 | 0 | 77,8 % | 6,7 % | 0 | 11× |
+| 118 | 15 | 70,2 % | 58,2 % | 15 | 11× |
+| 119 | 60 | 84,9 % | **93,4 %** | 60 | 2× |
+
+Der größte blockierte Rückstand ist **exakt die Dosis** — der Parameter tut
+genau das, was auf der Packung steht. Bei Marge 30 fängt er vier von fünf
+Aufgaben ab, die Q auslösen will.
+
+**Auf die Siegrate schlägt davon nichts durch:**
+
+| B-Dosis | A : B | B-Anteil | 95 %-KI | p |
+|---|---|---:|---|---:|
+| aus (−1) | 21 : 19 | 47,5 % | [31,5; 63,9] | 0,875 |
+| 0 | 22 : 18 | 45,0 % | [29,3; 61,5] | 0,636 |
+| 15 | 20 : 20 | 50,0 % | [33,8; 66,2] | 1,000 |
+| 60 | 26 : 14 | 35,0 % | [20,6; 51,7] | 0,081 |
+| **gepoolt** | **89 : 71** | **44,4 %** | **[36,5; 52,4]** | **0,179** |
+
+Keine Dosis signifikant (kleinstes p = 0,081 gegen eine Bonferroni-Schwelle von
+0,0125), das gepoolte KI schließt 50 % ein, und die Werte sind **nicht
+dosisgeordnet** — 47,5 / 45,0 / 50,0 / 35,0 %. Derselbe Befund wie bei
+`atariSizeWeight`.
+
+Der Kontrollarm ist diesmal unauffällig: A ist in allen vier Läufen identisch
+konfiguriert, und seine unabhängigen Kennzahlen streuen nur um 11 %
+(Gruppenverlust 24,1–26,8, Randanteil 33,9–36,0 %). Die Siegrate taugt hier
+übrigens **nicht** als Kontrollarm-Maß: sie ist innerhalb eines Laufs
+nullsummig, A ist per Konstruktion 100 % minus B.
+
+#### Warum das Nullergebnis diesmal vorhersagbar war
+
+Ich hatte vorab das Gegenteil vermutet: eine Aufgabe ist eine sofortige
+Niederlage, wer seltener aufgibt kann nur gewinnen oder gleichziehen, also
+müsste die hohe Marge dominieren. **Das war falsch, und die Zahlen zeigen
+warum.** Weiterspielen wandelt eine Aufgabe-Niederlage meistens in eine
+Zähl-Niederlage um — nur manchmal in einen Sieg. Gemessen an der Kreuzung
+„Marge hat in dieser Partie eine Aufgabe abgefangen" gegen den Ausgang:
+
+| | Partien mit Block | davon gewonnen |
+|---|---:|---:|
+| A (Marge 30) | 58 | 8 (13,8 %) |
+| B (alle Dosen) | 37 | 6 (16,2 %) |
+| **zusammen** | **95** | **14 (14,7 %)** |
+
+Rund jede siebte abgefangene Aufgabe wird noch gewonnen. Hochgerechnet auf die
+20 Partien je Lauf, die überhaupt per Aufgabe endeten, ist die **Obergrenze des
+Effekts 3,2 Partien je 40 = 8,1 Prozentpunkte** — und das ist großzügig
+gerechnet. Um 8,1 Punkte mit 80 % Macht nachzuweisen, bräuchte es rund **612
+Partien je Dosis**; diese Kampagne hatte 40. Das 95 %-KI ist hier ±16 Punkte
+breit.
+
+Die Kampagne war also **unterdimensioniert, und zwar von der Bauart her**: der
+Mechanismus kann gar nicht mehr als ein Achtel der Aufgabepartien bewegen.
+Diese Zahl hätte ich vor dem Start ausrechnen können, nicht danach.
+
+Die 14,7 % sind dabei eine **Obergrenze**, keine Rettungsquote: die
+Aufgabe-Serie verlangt fünf qualifizierende Züge in Folge. Ein einzelner Block
+bricht die Serie, aber ob sie ohne ihn je fünf erreicht hätte, sagt die
+Messung nicht.
+
+#### Eine Zahl, die ich nachgeprüft und nicht erklärt habe
+
+In Lauf 119 sinken die Gesamtaufgaben von rund 20 auf 6. Der größere Teil ist
+der Mechanismus: B fängt 93,4 % seiner Aufgaben ab, es bleiben fast nur noch
+A-Aufgaben übrig, und 4 + 2 ergibt genau die 6. Aber auch **A** gab dort
+seltener auf — 4-mal gegen 6/8/11 in den anderen Läufen, bei identischer
+Konfiguration. Poisson-Streuung bei diesen Zahlen ist ±2,7; alle vier Werte
+liegen innerhalb von 1,5 sd. Das Zug-Limit ist es nicht: **keine einzige
+Partie** erreichte die 600 Züge. Also Rauschen, und kein Anlass, dafür einen
+Mechanismus zu erfinden.
+
+#### Was die Messung entscheidet und was nicht
+
+Sie kann **nicht** sagen, ob die Marge weg soll. Sie sagt zwei Dinge:
+
+1. Der Anlass ist widerlegt — die vier Aufgaben waren richtig.
+2. Die Marge kostet **keine messbare Spielstärke**, in keiner Dosis. Sie zu
+   entfernen kostet ebenfalls keine.
+
+Damit ist die Frage keine Messfrage mehr, sondern eine Geschmacksfrage: soll
+die KI bei 30 Punkten Rückstand `[roh]` — und `[roh]` unterschätzt den
+Rückstand systematisch — aufgeben oder auspielen? Gegen einen Menschen ist das
+Auspielen einer verlorenen Partie eher Ärgernis als Dienst, und genau das
+bewirkt der Parameter heute. Das Gegenteil von dem, wofür er gebaut wurde.
+
+**Der Default bleibt 30**, bis das entschieden ist. Was eine größere Kampagne
+noch bringen könnte, steht oben: 612 Partien je Dosis für einen Effekt, dessen
+Obergrenze bei 8 Punkten liegt. Das ist teuer für eine Frage, die keine
+Stärkefrage ist.
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im

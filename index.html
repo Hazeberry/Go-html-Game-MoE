@@ -2148,10 +2148,27 @@ globalThis.PARAMS = {
      ║ Rueckstaende liegen bei 47 bis 153 Punkten, und Marge 30 laesst   ║
      ║ dort jede Aufgabe zu. Das Kriterium schadet nicht ueberall.       ║
      ║                                                                   ║
-     ║ DEFAULT ABSICHTLICH UNVERAENDERT: ob die Marge weg soll, ist      ║
-     ║ eine Frage der Spielstaerke und gehoert durch den A/B-Harness,    ║
-     ║ nicht in einen Schnellschuss -- dieselbe Regel, die captureWeight ║
-     ║ bei 20 gehalten hat. Wer das misst, faengt hier an.               ║
+     ║ GEMESSEN (21.09., 160 Partien, A=30 gegen aus/0/15/60):           ║
+     ║   Siegrate B  47,5 / 45,0 / 50,0 / 35,0 %, gepoolt 44,4 %         ║
+     ║               KI [36,5; 52,4], p = 0,179, keine Dosisordnung      ║
+     ║   Der Arm beisst: bei Marge 30 faengt er 70-85 % der              ║
+     ║   Aufgaben ab, die Q ausloesen will, und der groesste             ║
+     ║   blockierte Rueckstand ist exakt die Dosis.                      ║
+     ║                                                                   ║
+     ║ Die Marge kostet also KEINE messbare Spielstaerke -- sie zu       ║
+     ║ entfernen ebenfalls nicht. Obergrenze des Effekts: 8,1            ║
+     ║ Prozentpunkte, denn nur jede siebte abgefangene Aufgabe wird      ║
+     ║ noch gewonnen und nur die Haelfte der Partien endet per           ║
+     ║ Aufgabe. Fuer einen Nachweis braeuchte es ~612 Partien je         ║
+     ║ Dosis; diese Kampagne hatte 40.                                   ║
+     ║                                                                   ║
+     ║ DEFAULT UNVERAENDERT BEI 30. Die Frage ist damit keine            ║
+     ║ Messfrage mehr, sondern eine Geschmacksfrage: soll die KI         ║
+     ║ bei 30 Punkten Rueckstand [roh] aufgeben oder auspielen?          ║
+     ║ Gegen einen Menschen ist das Auspielen einer verlorenen           ║
+     ║ Partie eher Aergernis als Dienst -- genau das bewirkt der         ║
+     ║ Parameter heute, das Gegenteil von dem, wofuer er gebaut          ║
+     ║ wurde.                                                            ║
      ╚═══════════════════════════════════════════════════════════════════╝
 
      Bekannte Unschärfe, bewusst in Kauf genommen: Komi 7,5 fließt NICHT ein
