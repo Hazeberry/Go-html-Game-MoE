@@ -1,17 +1,30 @@
-/* Aufgabe-Kriterium: gibt die KI nur noch auf, wenn sie wirklich verliert?
+/* Aufgabe-Kriterium: die Mechanik von gebietSagtVerloren — und dass sie im
+   Auslieferungszustand ABGESCHALTET ist.
 
-   Vorgeschichte: an vier Hard-Partien vom 29.08. gab die KI jedes Mal auf
-   (RE[B+R]), obwohl das Gebiet ausgeglichen war — Rückstand −6 (sie lag also
-   VORN), +3, +11 und +13 Gebietspunkte. Die Aufgaben waren intern konsistent
-   (Q ≤ −0,95), aber Q hängt an evaluateBoard, und das wird vom Gefangenen-Term
-   beherrscht: er machte 92–105 % der gesamten Bewertung aus.
+   Vorgeschichte, samt Widerruf: an vier Hard-Partien vom 29.08. gab die KI
+   jedes Mal auf (RE[B+R]). Gemessen mit estimateArea sah das Gebiet
+   ausgeglichen aus — Rückstand −6 (sie läge also VORN), +3, +11 und +13
+   Punkte —, und daraufhin bekam die Aufgabe ein zweites Kriterium.
 
-   Gemessen wurde auch die Alternative — captureWeight kleiner setzen. Über
-   drei A/B-Läufe zu je 40 Partien senkt das die Aufgabequote stark und
-   signifikant (bei Gewicht 0: 14 Aufgaben gegen 1, p ≈ 0,001), die Siegrate
-   aber nicht (52,5 % / 60,0 % / 62,5 %, alle im Rauschen). Deshalb bleibt
-   captureWeight bei 20 und stattdessen bekommt die AUFGABE ein zweites,
-   unabhängiges Kriterium.
+   Am 21.09. wurde das widerlegt. Der Maßstab war falsch: estimateArea zählt
+   todgeweihte, aber noch stehende Gruppen als lebendiges Material, und die
+   damalige "Gegenprobe gegen finalAreaScore" war eine Nachbildung OHNE
+   resolveLifeAndDeath, also derselbe blinde Fleck. Mit der echten
+   Schlussauswertung lag die KI in allen vier Partien zurück, um 14,5 bis
+   56,5 Punkte; bei der 305-Züge-Partie Benson-beweisbar. Die vier Aufgaben
+   waren also RICHTIG, und der Anlass für das Kriterium existiert nicht.
+
+   Die Dosisreihe (160 Partien) zeigte danach: das Kriterium greift hart
+   (bei Marge 30 fängt es 70–85 % der Aufgaben ab), kostet aber keine
+   messbare Spielstärke — und es zu entfernen ebenfalls nicht. Entschieden
+   hat deshalb der widerlegte Anlass, nicht die Messung.
+
+   DAHER: resignAreaMargin steht auf -1, das Kriterium ist aus. Die Mechanik
+   bleibt vollständig geprüft, damit sie beim Zurückholen funktioniert —
+   jeder Verhaltenstest setzt die Marge dazu aber EXPLIZIT, statt sich auf
+   den Default zu verlassen. Genau diese Kopplung an den Default hat beim
+   Abschalten vier Tests umgeworfen, die gar keine Aussage über den Default
+   treffen wollten.
 
    Aufruf:  node tests/resign-criterion.js [pfad/zur/index.html] */
 'use strict';
@@ -41,31 +54,63 @@ test('Die Brett-Konstruktion liefert die erwarteten Flächen', () => {
   pruefeGleich(rueckstand(brett(7, 9)), 38, 'zwei Reihen mehr → 38 Punkte');
 });
 
-test('Die vier gemessenen Fehlaufgaben liegen unter der Marge', () => {
-  /* Reine Arithmetik, aber genau die Zusicherung, um die es geht: wer
-     resignAreaMargin unter 14 senkt, holt sich diese vier Fälle zurück. */
+test('Das Kriterium ist im Auslieferungszustand abgeschaltet', () => {
+  /* Der eigentliche Vertrag seit dem 21.09.: ueber die Aufgabe entscheidet
+     wieder Q allein. Ein Wert >= 0 waere eine Verhaltensaenderung und muss
+     hier auffallen. */
+  pruefe(PARAMS.resignAreaMargin < 0,
+    `resignAreaMargin muss negativ (aus) sein, ist ${PARAMS.resignAreaMargin}`);
+  /* Und zwar wirksam, nicht nur als Zahl: auch bei haushohem Vorsprung darf
+     das Kriterium die Aufgabe nicht mehr blockieren. */
+  pruefeGleich(gebietSagtVerloren(brett(12, 3), 2), true, 'aus → blockiert nie');
+  pruefeGleich(gebietSagtVerloren(brett(8, 8), 2),  true, 'aus → blockiert nie');
+});
+
+test('Die vier Partien vom 29.08. haetten das Kriterium ausgeloest', () => {
+  /* Reine Arithmetik, aber sie haelt den Grund der Abschaltung fest: mit
+     der alten Marge 30 waeren ALLE VIER Aufgaben blockiert worden -- und
+     nachgemessen waren sie richtig. Die Zahlen sind die rohen Rueckstaende
+     [roh]; der wahre Rueckstand lag bei 22 bis 64 Punkten. */
+  const MARGE_ALT = 30;
   for (const r of [-6, 3, 11, 13])
-    pruefe(r < PARAMS.resignAreaMargin,
-      `Rückstand ${r} muss unter der Marge ${PARAMS.resignAreaMargin} liegen`);
+    pruefe(r < MARGE_ALT,
+      `Rueckstand ${r} [roh] laege unter der alten Marge ${MARGE_ALT}`);
 });
 
-test('Ausgeglichenes Gebiet blockiert die Aufgabe', () => {
-  pruefeGleich(gebietSagtVerloren(brett(8, 8), 2), false, 'ausgeglichen → keine Aufgabe');
+/* Ab hier wird das EINGESCHALTETE Kriterium geprueft. Die Marge wird dafuer
+   explizit gesetzt und danach zurueckgestellt -- diese Tests treffen keine
+   Aussage ueber den Default, und sie sollen auch nicht mitkippen, wenn er
+   sich aendert. */
+const MARGE = 30;
+function mitMarge(fn) {
+  const alt = PARAMS.resignAreaMargin;
+  PARAMS.resignAreaMargin = MARGE;
+  try { fn(); } finally { PARAMS.resignAreaMargin = alt; }
+}
+
+test('Eingeschaltet: ausgeglichenes Gebiet blockiert die Aufgabe', () => {
+  mitMarge(() => {
+    pruefeGleich(gebietSagtVerloren(brett(8, 8), 2), false, 'ausgeglichen → keine Aufgabe');
+  });
 });
 
-test('Rückstand unterhalb der Marge blockiert die Aufgabe', () => {
-  const b = brett(8, 9);
-  pruefe(rueckstand(b) < PARAMS.resignAreaMargin, 'Testfall liegt unter der Marge');
-  pruefeGleich(gebietSagtVerloren(b, 2), false, `Rückstand ${rueckstand(b)} → keine Aufgabe`);
+test('Eingeschaltet: Rückstand unterhalb der Marge blockiert die Aufgabe', () => {
+  mitMarge(() => {
+    const b = brett(8, 9);
+    pruefe(rueckstand(b) < MARGE, 'Testfall liegt unter der Marge');
+    pruefeGleich(gebietSagtVerloren(b, 2), false, `Rückstand ${rueckstand(b)} → keine Aufgabe`);
+  });
 });
 
-test('Klarer Rückstand erlaubt die Aufgabe weiterhin', () => {
+test('Eingeschaltet: klarer Rückstand erlaubt die Aufgabe weiterhin', () => {
   /* Das Kriterium soll die Aufgabe nicht abschaffen, nur eichen. */
-  for (const [w, s] of [[7, 9], [6, 9], [3, 12]]) {
-    const b = brett(w, s);
-    pruefe(rueckstand(b) > PARAMS.resignAreaMargin, `Testfall ${rueckstand(b)} liegt über der Marge`);
-    pruefeGleich(gebietSagtVerloren(b, 2), true, `Rückstand ${rueckstand(b)} → Aufgabe erlaubt`);
-  }
+  mitMarge(() => {
+    for (const [w, sr] of [[7, 9], [6, 9], [3, 12]]) {
+      const b = brett(w, sr);
+      pruefe(rueckstand(b) > MARGE, `Testfall ${rueckstand(b)} liegt über der Marge`);
+      pruefeGleich(gebietSagtVerloren(b, 2), true, `Rückstand ${rueckstand(b)} → Aufgabe erlaubt`);
+    }
+  });
 });
 
 test('Die Marge trennt genau dort, wo sie soll', () => {
@@ -95,10 +140,12 @@ test('Negative Marge stellt das alte Verhalten wieder her', () => {
   } finally { PARAMS.resignAreaMargin = alt; }
 });
 
-test('Das Kriterium gilt für beide Farben', () => {
-  const b = brett(3, 12);            /* Weiß weit hinten */
-  pruefeGleich(gebietSagtVerloren(b, 2), true,  'Weiß liegt zurück → Aufgabe erlaubt');
-  pruefeGleich(gebietSagtVerloren(b, 1), false, 'Schwarz liegt vorn → keine Aufgabe');
+test('Eingeschaltet: das Kriterium gilt für beide Farben', () => {
+  mitMarge(() => {
+    const b = brett(3, 12);            /* Weiß weit hinten */
+    pruefeGleich(gebietSagtVerloren(b, 2), true,  'Weiß liegt zurück → Aufgabe erlaubt');
+    pruefeGleich(gebietSagtVerloren(b, 1), false, 'Schwarz liegt vorn → keine Aufgabe');
+  });
 });
 
 laufeTests('Aufgabe-Kriterium (Gebiet als zweite Instanz)')

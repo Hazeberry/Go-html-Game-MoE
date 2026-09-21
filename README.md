@@ -260,7 +260,7 @@ Belege aus dem Repro über die ausgeschnittenen Skript-Blöcke:
 `dashReset` setzt `netMaxBlend` auf 0 zurück und umgeht den Pfad damit — das
 war der Workaround, nicht der Fix.
 
-Gegen Rückfall abgesichert in [`tests/`](tests/): 36 Fälle in sechs Dateien,
+Gegen Rückfall abgesichert in [`tests/`](tests/): 37 Fälle in sechs Dateien,
 drei davon im echten Browser mit Web Worker. Am Stand vor dem Fix fallen
 16 davon durch — die übrigen prüfen bewusst unverändertes Verhalten und
 müssen auf beiden Ständen halten.
@@ -376,7 +376,8 @@ misst KI gegen KI und sagt dazu nichts.
 
 #### Behoben wurde stattdessen das Kriterium — auf falscher Grundlage
 
-`resignAreaMargin` (Default 30) verlangt, dass **auch** die Gebietsschätzung
+`resignAreaMargin` (damaliger Default 30, heute `-1` — siehe Korrektur unten)
+verlangte, dass **auch** die Gebietsschätzung
 verloren sagt. `estimateArea` ist dafür kein neuer willkürlicher Maßstab: auf
 allen vier Stellungen liefert es exakt dasselbe wie `finalAreaScore`, also die
 Endabrechnung des Spiels. Die vier Rückstände lagen bei −6, +3, +11 und +13
@@ -404,10 +405,12 @@ dadurch um 7,5 Punkte zu früh auf, Schwarz ebenso viel zu spät.
 > Aufgabe zu. Das Kriterium schadet also nicht überall — es stützt sich nur
 > auf einen Befund, den es nicht gibt.
 >
-> **Nicht geändert.** Ob die Marge weg soll, ist eine Frage der Spielstärke und
-> gehört durch den A/B-Harness, nicht in einen Schnellschuss — dieselbe Regel,
-> die `captureWeight` bei 20 gehalten hat. Der Default bleibt 30, bis das
-> gemessen ist.
+> **Gemessen und abgeschaltet (21.09.).** Die Dosisreihe steht
+> [weiter unten](#resignareamargin-stark-wirksam-ohne-messbare-folge): der
+> Parameter greift hart, kostet aber keine messbare Spielstärke — und ihn zu
+> entfernen ebenfalls nicht. Entschieden hat deshalb nicht die Messung, sondern
+> der widerlegte Anlass. **Default jetzt `-1`, das Kriterium ist aus;** Q allein
+> entscheidet wieder über die Aufgabe.
 
 **Fürs Auswerten von Spielständen:** `reproduktion.board` ist die Stellung
 **vor** dem letzten KI-Zug — es ist die Eingabe, mit der die KI gerechnet hat
@@ -1570,10 +1573,30 @@ Rückstand systematisch — aufgeben oder auspielen? Gegen einen Menschen ist da
 Auspielen einer verlorenen Partie eher Ärgernis als Dienst, und genau das
 bewirkt der Parameter heute. Das Gegenteil von dem, wofür er gebaut wurde.
 
-**Der Default bleibt 30**, bis das entschieden ist. Was eine größere Kampagne
-noch bringen könnte, steht oben: 612 Partien je Dosis für einen Effekt, dessen
-Obergrenze bei 8 Punkten liegt. Das ist teuer für eine Frage, die keine
-Stärkefrage ist.
+#### Entschieden: abgeschaltet
+
+**Der Default steht jetzt auf `-1`, das Kriterium ist aus.** Q allein
+entscheidet wieder über die Aufgabe, wie vor dem vermeintlichen Fix.
+
+Den Ausschlag gab nicht die Messung — die sagt bei beiden Wegen dasselbe —,
+sondern der widerlegte Anlass. Ein Parameter, der gegen vier Fehlaufgaben
+gebaut wurde, die keine waren, hat keine Grundlage mehr. Was ohne diese
+Grundlage übrig bleibt, ist ein Kriterium, das die KI bei bis zu 30 Punkten
+Rückstand `[roh]` weiterspielen lässt, wobei `[roh]` den Rückstand systematisch
+unterschätzt.
+
+Eine größere Kampagne hätte daran nichts geändert: 612 Partien je Dosis für
+einen Effekt, dessen Obergrenze bei 8 Punkten liegt — teuer für eine Frage,
+die keine Stärkefrage ist.
+
+Die Mechanik bleibt unverändert in `gebietSagtVerloren` stehen und ist durch
+den Aufgabe-Wächter messbar. Wer das Kriterium zurückholen will, setzt einen
+Wert ≥ 0.
+
+**Nebenwirkung, die man kennen muss:** wer eine Dashboard-Konfiguration
+gespeichert hat, trägt darin weiterhin die 30 — `dashSave`/`dashLoad`
+serialisieren das gesamte `PARAMS`-Objekt. Erst „Zurücksetzen" holt den neuen
+Default.
 
 ### Transfer-Wächter: was `deathTransfer` wirklich anrichtet
 
