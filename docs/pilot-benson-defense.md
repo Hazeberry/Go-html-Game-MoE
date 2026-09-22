@@ -238,3 +238,228 @@ Jede Aussage über eine Stellung nennt ihren Maßstab:
 Für „wer liegt vorn" gilt `[voll]`, nie `estimateArea`. Bei nicht-finalen
 Stellungen wird eine Spanne genannt, keine Zahl. Eine Gegenprobe zählt nur,
 wenn sie einen **anderen** blinden Fleck hat als die geprüfte Größe.
+
+---
+
+# Nachtrag vom 22.09.2026: Ergebnisse des Piloten und Festlegung der Reihe
+
+Die Abschnitte 1 bis 8 bleiben unverändert stehen — sie waren vor den Daten
+geschrieben und sollen so nachlesbar bleiben. Was dieser Nachtrag festlegt,
+wurde **nach** dem Piloten entschieden und ist als solches gekennzeichnet.
+
+## 9. Der Pilotlauf
+
+40 Partien, Arm A gegen sich selbst, `mctsFixedSims=120`, Seed 20260922,
+17,3 Minuten. Rohdump unter dem Schema aus §5.
+
+### 9.1 Abbruchkriterium (§4.2)
+
+```
+params_hash über alle 40 Partien: einheitlich  e91c72317fdf0140…
+verschiedene Endstellungen:       40 von 40
+Simulationen je Zug:              120 (fest)
+Partien am Zug-Limit 400:         1
+
+Wiederholung mit demselben Seed, 5 Partien:
+  params_hash, final_board_hash, Sieger, alle Zugereignisse identisch
+```
+
+**Einschränkung:** wiederholt wurden 5 der 40 Partien, nicht alle. Der
+Harness spielt sequenziell aus einem Zufallsstrom; ein Auseinanderlaufen
+hätte bei Partie 1 begonnen. Streng nach §4.2 wäre es der ganze Lauf.
+
+### 9.2 Die vier Fragen aus §4.1
+
+| Frage | Antwort |
+|---|---|
+| eigene Gruppe wird benson-tot | **40 von 40 Partien**, Ø 12,1 Steine, erstmals um Zug 147 |
+| Sägezahn | 1,44 Rettungen je Farb-Partie, 0,78 davon zurückgedrückt; 18,8 % ohne |
+| Tor geht auf | **40 von 40**, ab Zug ~206; 38,4 % aller Züge, davon 33,8 % mit toter Kette |
+| Streuung | 333 Züge je Partie (SD 33); größter Einzelschlag Ø 13,6 Steine (SD 7,8) |
+
+Das Ereignis ist **nicht selten**: `bensonDeathTransfer` greift in jedem
+dritten Zug. Die in §3.3 befürchtete Seltenheit tritt nicht ein; die offene
+Frage ist allein, ob der Eingriff nützt.
+
+## 10. Endpunktwahl — nach Pilotdaten entschieden
+
+Diese Auswahl wurde **nach** Sichtung der Pilotdaten getroffen. Das ist für
+die Sekundäranalysen unkritisch, für den primären Endpunkt aber eine
+Einschränkung der Vorab-Registrierung, die hier offen stehen muss.
+
+### 10.1 Die Definitionen
+
+Vom Auftraggeber geliefert, hier wörtlich zitiert (Farbe verallgemeinert):
+
+> **V1:** Ein V1-Ereignis liegt vor, wenn ein Zug nach seiner Ausführung die
+> Zahl der Freiheiten einer zusammenhängenden Gruppe um ≥1 erhöht und diese
+> Gruppe vor dem Zug bereits benson-tot war.
+>
+> **V2:** Ein V2-Ereignis liegt vor, wenn ein Zug nach seiner Ausführung die
+> Zahl der Freiheiten einer zusammenhängenden Gruppe um ≥1 erhöht und
+> 1. die Gruppe vor dem Zug noch nicht benson-tot war und
+> 2. die Gruppe später benson-tot wird, ohne dass zuvor ein Stein dieser
+>    Gruppe geschlagen wird.
+
+Die Definitionen stammen nicht aus diesem Repository und nicht aus dem
+Pilotlauf; sie wurden zugeliefert. Keine der vier hier betrachteten Größen
+braucht eine Änderung am Rohformat — alle sind aus §5 ableitbar.
+
+### 10.2 V1 ist strukturell unmessbar
+
+```
+V1 über 40 Partien:  Ø 0,00   in 80 von 80 Farb-Partien   SD 0,00
+```
+
+Kein empirischer Nullbefund, sondern ein struktureller. Um die Freiheiten
+einer bereits benson-toten Gruppe zu erhöhen, muss man entweder daneben
+spielen oder eine angrenzende gegnerische Kette schlagen. Beides ist zu:
+
+```
+Freie Nachbarpunkte eigener benson-toter Gruppen: 6000
+  legal (ohne Filter):                       5904  (98,4 %)
+  vom Benson-Zugfilter als totgeboren markiert: 6000  (100,0 %)
+```
+
+`bensonMoveFilter` (Default an) entfernt **jeden** dieser Punkte aus der
+Kandidatenliste, und die bordernden gegnerischen Ketten sind per Benson
+pass-alive, also unschlagbar. Der Filter ist in allen Armen identisch und
+wird von `bensonDeathTransfer` nicht berührt. V1 hat damit in jedem Arm
+Varianz null: kein MDE, kein möglicher Effekt.
+
+**V1 entfällt als Endpunkt.** Nicht als Befund — dass die Engine eine
+bewiesen tote Gruppe nicht verteidigen *kann*, gehört zum Bild.
+
+### 10.3 Die messbaren Kandidaten
+
+Alle Zahlen aus dem Piloten, MDE bei α = 0,025 zweiseitig, Power 80 %,
+Partie als Einheit, gepaart.
+
+| Größe | Ø je Farb-Partie | SD der Differenz | MDE n=240 | MDE n=360 | mit Sieg assoziiert |
+|---|---|---|---|---|---|
+| **V2** | 1,91 | 3,23 | **0,64** | **0,52** | nicht geprüft |
+| D1 (Züge unter eigenem totem Bestand) | 55,01 | 44,86 | 8,93 | 7,29 | t = 0,54 |
+| verlustMax (größter erlittener Einzelschlag) | 9,50 | 10,76 | 2,14 | 1,75 | **t = −4,66** |
+| R1 (Rettungen großer Gruppen ≤3 → ≥4) | 1,44 | — | — | — | t = 1,11 |
+
+`V2` ist **nicht** identisch mit `R1`: R1 zählt Rettungen großer Gruppen von
+≤3 auf ≥4 Freiheiten, V2 jede Freiheitserhöhung an einer Gruppe, die später
+ohne Steinverlust benson-tot wird.
+
+`D1` misst **Dauer unter totem Bestand**, keine Verteidigung. Der Zähler
+pausiert, wenn die tote Gruppe geschlagen wird, ist also auch nicht
+„Spieldauer nach dem ersten Benson-Tod".
+
+Nur `verlustMax` ist mit dem Partieausgang assoziiert (t = −4,66): wer
+verliert, verliert am größten Einzelschlag Ø 6,75 Steine mehr.
+
+### 10.4 Warum V2 primär wird
+
+`bensonDeathTransfer` wirkt im Moment eines V2-Zuges nicht — die Gruppe ist
+dann noch nicht benson-tot. Er wirkt über die **Vorausschau**: MCTS bewertet
+Blätter mit `evaluateBoard`; führt eine Linie in eine Stellung, in der die
+Gruppe benson-tot ist, bucht der Parameter dort `−size × captureWeight`
+statt 0. Genau darüber kann die Suche den Tod vorher sehen und die
+Investition unterlassen.
+
+Das ist eine Herleitung aus dem Code, keine Messung. Der A/A-Pilot kann sie
+nicht prüfen.
+
+**Die Vorausschau ist armabhängig**, und das ist für die Auslegung der Tests
+entscheidend:
+
+```
+WANN passieren V2-Ereignisse?   n = 153
+  Zugnummer:     10 % 103   Median 182   90 % 265
+  freie Felder:  10 % 257   Median 183   90 % 107
+
+  Tor (<=160 freie Felder) zum Zeitpunkt bereits offen: 39,9 %
+```
+
+Arm B (`bensonEvalMaxEmpty=160`) kann nur bei **39,9 %** der V2-Gelegenheiten
+überhaupt vorausschauen, Arm E (361) bei 100 %. Der Test **A–B misst eine
+verdünnte Version des Effekts, B–E die volle.** Ein schwaches A–B darf
+deshalb nicht als „wirkt nicht" gelesen werden.
+
+### 10.5 Nullbefund zum Encerclement-Term
+
+Geprüft wurde, ob Einschließung (Anteil gegnerischer und Rand-Nachbarpunkte
+einer Gruppe) den Benson-Tod mit Vorlauf anzeigt — die Größe, die ein
+eigener Einschließungs-Term bräuchte.
+
+```
+4887 Beobachtungen, große noch lebende Gruppen, 20 Partien
+
+roh, Vorlauf 40 Zuege:
+  stirbt  Einschliessung 76,3 % gegen 34,5 %   Freiheiten 3,3 gegen 33,5
+
+nach Freiheitsband geschichtet, Vorlauf 40 Zuege:
+  Freiheiten      n     stirbt        Einschliessung stirbt / ueberlebt
+  <= 3          395    108 (27,3 %)         78,4 % gegen  79,2 %
+  4-7          1070     48 ( 4,5 %)         71,5 % gegen  62,4 %
+  8-15          330      0 ( 0,0 %)              — gegen  33,8 %
+  >= 16        3092      0 ( 0,0 %)              — gegen  21,2 %
+```
+
+Der starke Rohkontrast ist fast vollständig ein Freiheitseffekt. **Innerhalb
+eines Freiheitsbands trennt die Einschließung nichts** (78,4 % gegen 79,2 %
+bei ≤3 Freiheiten). Keine einzige Gruppe mit ≥8 Freiheiten stirbt innerhalb
+von 40 Zügen, in 3422 Beobachtungen.
+
+Die Freiheitszahl ist die trennende Größe, und `STERBE_RAMPE` liest sie
+bereits. **Nach diesen Daten ist ein eigener Encerclement-Term nicht
+begründbar.** Nicht widerlegt: eine A/A-Konfiguration über 20 Partien ist
+schmal, und „Anteil gegnerischer Nachbarpunkte" ist nur eine mögliche
+Fassung von Einschließung. Wer den Term dennoch bauen will, braucht zuerst
+eine Fassung, die dieses Schichtungsbild besteht.
+
+## 11. Festlegung der Reihe
+
+| | |
+|---|---|
+| **Arme** | A (`160/0`), B (`160/1`), E (`361/1`) — `bensonEvalMaxEmpty`/`bensonDeathTransfer` |
+| **Vergleiche** | A–B und B–E, je eine eigene Partienserie |
+| **n** | 360 Partien je Vergleich, 720 insgesamt |
+| **Einheit** | die Partie; beide Arme spielen dieselbe Partie, also gepaart |
+| **Primär** | V2, gepaarter t-Test auf der Differenz je Partie |
+| **Multiplizität** | Bonferroni über zwei Tests, α = 0,025 je Test |
+| **Sekundär** | `verlustMax`, `D1`, Siegrate — nach Farbe stratifiziert, ohne Anspruch |
+| **Sims** | `mctsFixedSims=120` in allen Armen |
+| **Laufzeit** | 26 s je Partie gemessen → ≈ 5,2 h |
+
+### 11.1 Paarung
+
+Die Beobachtungen sind konstruktionsbedingt gepaart: beide Arme spielen
+dieselbe Partie. Im Piloten ist die Korrelation der beiden Seiten
+**negativ** (r = −0,235 bei `verlustMax`) — die Paarung bringt also nichts
+ein. Sie ist trotzdem verbindlich, denn ein ungepaarter Test unterstellt
+Unabhängigkeit, die nicht besteht, und behauptet damit mehr Präzision als
+vorhanden:
+
+```
+SE der Mittelwertsdifferenz, verlustMax, n = 240
+  gepaart (korrekt):       10,76 / √240 = 0,695
+  ungepaart (unzulässig):  √2·7,27/√240 = 0,664
+```
+
+### 11.2 Farbe
+
+Im A/A-Piloten, in dem beide Seiten dieselbe Engine sind:
+
+```
+Schwarz verliert im groessten Schlag  Ø  7,38 Steine
+Weiss   verliert im groessten Schlag  Ø 11,63 Steine
+Differenz -4,25   t = -2,50 bei n = 40
+```
+
+Der Farbeffekt ist doppelt so groß wie der MDE bei n = 240. Der Harness
+wechselt die Farben partieweise, was ihn im Armvergleich aufhebt; die
+Auswertung trennt trotzdem nach Farbe, sonst misst eine ungerade Partienzahl
+die Farbe statt den Parameter.
+
+### 11.3 Was diese Reihe nicht beantwortet
+
+Ob `bensonDeathTransfer` die Spielstärke hebt. Der MDE der Siegrate liegt
+bei 8,1 Prozentpunkten (n = 360, α = 0,025) — über allem, was in diesem
+Projekt je an Effekt gemessen wurde. Die Siegrate läuft als Kontrollgröße
+mit, nicht als Nachweis.
