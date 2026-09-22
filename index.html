@@ -1458,6 +1458,24 @@ globalThis.PARAMS = {
   mctsRootChildren:  16,
   mctsChildren:       8,
   mctsRolloutDepth:  24,
+  /* Feste Simulationszahl je Zug statt Zeitbudget. 0 = aus, dann entscheidet
+     wie bisher aiTimeBudget/getAdaptiveTimeBudget.
+
+     Nur fuer Messungen. Mit einem Zeitbudget ist die Suche NICHT
+     reproduzierbar: die Zahl der Simulationen haengt an der Maschinenlast,
+     also verbraucht derselbe Seed unterschiedlich viele Zufallszahlen und die
+     Partien laufen auseinander. Gemessen mit ab-harness.js, --seed 2026,
+     zweimal dieselbe Konfiguration: einmal 2:0, einmal 1:1.
+
+     Damit war jede Identitaetskontrolle unmoeglich -- also genau die
+     Kontrolle, mit der ein Dosisreihen-Arm belegt, dass er die unveraenderte
+     Engine spielt. Mit festen Sims stimmen zwei Laeufe Zug fuer Zug ueberein.
+
+     Im Spielbetrieb bleibt 0 richtig: ein Mensch wartet Sekunden, keine
+     Simulationen, und auf langsamen Geraeten wuerde eine feste Zahl die
+     Bedenkzeit unkontrolliert dehnen. Wirkt nur im MCTS-Zweig (useMCTS >= 1);
+     der alte Kandidaten-Pfad behaelt sein Zeitbudget. */
+  mctsFixedSims:      0,
   /* Robustheitsparameter, KEINE Wertebereichs-Skalierung — trotz des Namens.
      v = tanh(evaluateBoard / scale) staucht große Beträge; das dämpft einzelne
      Ausreißer-Rollouts, bevor sie den Knotenmittelwert dominieren (Winsorizing).
@@ -3334,8 +3352,22 @@ function _tryReuseSubtree(savedBoard, aiColor, savedNode, currentBoard) {
 function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
   const _simStart = Date.now();
   _mctsNonFinite = 0;
+  /* Feste Simulationszahl statt Zeitbudget. Mit einem Zeitbudget haengt die
+     Zahl der Simulationen an der Maschinenlast — derselbe Seed verbraucht
+     dann unterschiedlich viele Zufallszahlen und die Partien laufen
+     auseinander. Gemessen: zwei Laeufe von ab-harness.js mit --seed 2026 und
+     identischer Konfiguration endeten 2:0 und 1:1. Die Hilfe des Harness
+     behauptete dabei "identischer Seed erzeugt identische Zuege".
+
+     Mit mctsFixedSims > 0 faellt jede Zeitabhaengigkeit aus der Suche: beide
+     Deadlines gehen auf Infinity, die Schleife zaehlt Simulationen. Damit
+     wird ein A/A-Lauf Zug fuer Zug reproduzierbar, und ein A/B-Lauf misst
+     den Parameter statt der Maschinenlast.
+
+     Bei 0 unveraendert: dieselbe deadline, dasselbe Limit 20000. */
+  const festeSims = PARAMS.mctsFixedSims | 0;
   const timeBudget = getAdaptiveTimeBudget(rootScored.length);
-  const deadline = _simStart + timeBudget;
+  const deadline = festeSims > 0 ? Infinity : _simStart + timeBudget;
   /* Sicherheitsbremse: getLegalMoves/floodFill werden auf dichten Spätspiel-
      Brettern mit großen zusammenhängenden Gruppen erheblich teurer (beobachtet:
      86% weniger Sims über 156 Züge in einer echten Partie, da jeder Kandidat
@@ -3344,7 +3376,7 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
      Simulation konnte dadurch die Zeit weit überschreiten, bevor die Prüfung
      überhaupt griff. hardDeadline begrenzt eine einzelne Simulation hart,
      unabhängig davon wie teuer floodFill auf dem aktuellen Brett gerade ist. */
-  const hardDeadline = deadline + timeBudget;
+  const hardDeadline = festeSims > 0 ? Infinity : deadline + timeBudget;
   const scale = PARAMS.mctsValueScale, c = PARAMS.puctC;
   const rave = PARAMS.raveEnabled >= 1, raveK = PARAMS.raveK;
 
@@ -3380,7 +3412,8 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
   if (!root.kids.length) return null;
 
   let sims = 0;
-  while (Date.now() < deadline && sims < 20000) {
+  const simLimit = festeSims > 0 ? festeSims : 20000;
+  while (Date.now() < deadline && sims < simLimit) {
     sims++;
     _mctsScratch.set(board);
     const cap = {1: captures[1]||0, 2: captures[2]||0};
