@@ -463,3 +463,121 @@ Ob `bensonDeathTransfer` die Spielstärke hebt. Der MDE der Siegrate liegt
 bei 8,1 Prozentpunkten (n = 360, α = 0,025) — über allem, was in diesem
 Projekt je an Effekt gemessen wurde. Die Siegrate läuft als Kontrollgröße
 mit, nicht als Nachweis.
+
+---
+
+# Nachtrag vom 22.09.2026, zweiter Teil: Ergebnis der Reihe
+
+## 12. Die Reihe ist gelaufen
+
+720 Partien nach §11, zwei Vergleiche zu je 360, getrennte Seeds
+(20260923 und 20260924), `mctsFixedSims=120`, je 153 bzw. 152 Minuten.
+Beide Läufe parallel auf vier Kernen — zulässig, weil `mctsFixedSims` die
+Zeitabhängigkeit aus der Suche genommen hat und CPU-Konkurrenz die Partien
+nicht mehr verändern kann.
+
+`params_hash` je Lauf einheitlich, 360 verschiedene Endstellungen je Lauf.
+
+### 12.1 Primärer Endpunkt V2
+
+| | A (160/0) | B (160/1) | Differenz | t | p |
+|---|---|---|---|---|---|
+| **A–B** | 1,850 | 1,147 | **−0,703** | −5,570 | **< 0,0001** |
+
+| | B (160/1) | E (361/1) | Differenz | t | p |
+|---|---|---|---|---|---|
+| **B–E** | 1,306 | 1,567 | +0,261 | 2,190 | 0,0285 |
+
+**Test A–B schlägt an** (α = 0,025), und der Effekt ist größer als der vorab
+berechnete MDE von 0,52. Mit eingeschaltetem Übertrag investiert die Engine
+38 % weniger Züge in Gruppen, die später bewiesen sterben.
+
+**Test B–E verfehlt die Schwelle** — und zeigt in die Gegenrichtung.
+
+### 12.2 Die Vorhersage aus §10.4 ist nicht eingetreten
+
+§10.4 leitete aus dem Code her, Arm E müsse **stärker** senken als Arm B,
+weil er 100 % statt 39,9 % der V2-Gelegenheiten vorausschauen kann. Gemessen
+ist das Gegenteil, knapp unter der Signifikanzschwelle.
+
+Die Herleitung war nicht falsch im Mechanismus — sie war unvollständig. Ein
+weiter geöffnetes Tor bewertet auch **gegnerische** tote Gruppen früher, und
+was daraus für die Zugwahl folgt, wurde nicht durchdacht. Die Vorhersage
+gilt als nicht bestätigt.
+
+### 12.3 Gelegenheit gegen Investition — ein Konstruktionsfehler der Spec
+
+V2 ist eine absolute Zahl. Fällt sie, kann das zwei Ursachen haben: weniger
+Fehlinvestition, oder schlicht weniger sterbende Gruppen. Beides tritt ein:
+
+```
+A gegen B:  tote Gruppen  5,35 → 4,64  (t = −4,82)
+            tote Steine  12,85 → 9,59  (t = −5,78)
+
+B gegen E:  tote Gruppen  4,78 → 5,19  (t = +3,01)
+            tote Steine   9,50 → 10,79 (t = +2,95)
+```
+
+Eine Rate wäre der saubere Endpunkt gewesen. Das war beim Schreiben von §11
+nicht gesehen. **Nachträglich** — also explorativ, nicht vorab registriert —
+auf die Gelegenheiten normiert:
+
+```
+V2 je toter Gruppe
+
+A gegen B:  0,346 → 0,247   Differenz −0,1108   t = −4,081   p < 0,0001
+                            95%-KI [−0,1640, −0,0576]   345 Partien
+
+B gegen E:  0,273 → 0,302   Differenz +0,0374   t =  1,422   p = 0,1550
+                            95%-KI [−0,0141, +0,0890]   349 Partien
+```
+
+**Der Effekt in A–B überlebt die Normierung.** Es sind nicht nur weniger
+Gelegenheiten; die Rate selbst fällt um 29 %. Ein neuer Lauf ist dafür nicht
+nötig gewesen — beide Größen liegen je Partie im Rohdump.
+
+### 12.4 Sekundär, ohne Anspruch
+
+```
+                 A gegen B                    B gegen E
+verlustMax    8,29 → 7,50   p = 0,075      6,96 → 6,75   p = 0,718
+D1           62,33 → 53,55  p = 0,0001    67,83 → 59,53  p = 0,0001
+Siegrate      B 51,7 %  (±5,2)  n. s.      E 46,4 %  (±5,2)  n. s.
+Aufgaben      A 115  B 124                 B 103  E 122
+```
+
+Die **Siegrate bewegt sich in keinem der beiden Tests**. `verlustMax` — die
+einzige im Piloten mit dem Partieausgang assoziierte Größe (t = −4,66) —
+sinkt um 0,79 Steine und verfehlt die Schwelle.
+
+### 12.5 Was daraus folgt
+
+**Der Mechanismus wirkt, nachweisbar.** Mit `bensonDeathTransfer = 1`
+verliert die Engine **3,3 Steine je Partie weniger** an bewiesen tote
+Gruppen (t = −5,78), verbringt **9 Züge weniger** unter totem Bestand
+(t = −3,88) und investiert **29 % seltener** in eine Gruppe, die stirbt
+(t = −4,08). Das ist der größte gemessene Effekt dieser Serie.
+
+**Ein Spielstärkegewinn ist nicht belegt.** Die Siegrate liegt in beiden
+Tests innerhalb des Rauschens, wie bei `deathDiscount`, `tsumegoSunkCost`,
+`tsumegoEyeOpenPenalty`, `openLineWeight` und `atariSizeWeight` zuvor.
+
+**Der Default bleibt deshalb 0.** Nach den Maßstäben dieses Projekts trägt
+ein Wirknachweis ohne Stärkebeleg keine Default-Änderung — dieselbe
+Entscheidung wie bei `endLibPressure`, wo der Wirknachweis ebenfalls klar
+und der Stärkeeffekt ebenfalls offen war.
+
+**Das weitere Öffnen des Tors bringt nichts.** `bensonEvalMaxEmpty` bleibt
+auf 160; die Dosisreihe darüber ist damit beantwortet und braucht keine
+Fortsetzung.
+
+### 12.6 Einschränkungen
+
+- Der primäre Endpunkt vermengt Gelegenheit und Investition (§12.3). Die
+  Normierung, die das trennt, ist **nachträglich** gewählt.
+- Die Endpunktwahl selbst erfolgte nach Sichtung der Pilotdaten (§10).
+- Die §10.4-Vorhersage zur Vorausschau ist nicht eingetreten; der
+  Mechanismus ist damit schlechter verstanden, als §10.4 nahelegt.
+- Beide Läufe nutzen dieselbe Engine auf beiden Seiten mit nur diesem einen
+  Parameterunterschied. Übertragbarkeit auf das Spiel gegen Menschen ist
+  nicht geprüft.
