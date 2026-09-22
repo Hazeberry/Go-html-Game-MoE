@@ -55,6 +55,11 @@
                        alten Skala in die neue hinein.
      --seed <n>        Zufalls-Seed (reproduzierbar)
      --json <pfad>     Rohdaten als JSON (alle Instrumente unten)
+     --roh <pfad>      Zugweiser Rohdump als JSON Lines, eine Zeile je
+                       Partie, geschrieben direkt nach deren Ende. Enthält
+                       params_hash und final_board_hash; Schema und Zweck
+                       stehen in docs/pilot-benson-defense.md, §5.
+                       Wer dieses Format ändert, ändert zuerst dort.
      --net <pfad>      Gewichte für das PolicyNet. Inhalt ist exakt der
                        String, den der Browser unter localStorage
                        'go_pnet' ablegt (im Dashboard gespeichert oder
@@ -727,7 +732,7 @@ function parseArgs(argv) {
     html: './index.html', games: 4, paired: 0, opening: 20, obudget: 100,
     budget: 250, maxMoves: 400, komi: 7.5,
     A: {spec: '', plain: {}, steps: {}}, B: {spec: '', plain: {}, steps: {}},
-    seed: null, json: null, net: null, netGames: 0, netTrain: null
+    seed: null, json: null, roh: null, net: null, netGames: 0, netTrain: null
   };
   /* Konfiguration = feste Werte plus optionale Phasenstufen (k@N=v).
      Ergebnisform: {spec, plain:{k:v}, steps:{k:[[abZug,wert],...]}} */
@@ -767,6 +772,7 @@ function parseArgs(argv) {
       case '--B': a.B = kv(v); i++; break;
       case '--seed': a.seed = parseInt(v, 10); i++; break;
       case '--json': a.json = v; i++; break;
+      case '--roh':  a.roh  = v; i++; break;
       case '--net': a.net = v; i++; break;
       case '--netgames': a.netGames = parseInt(v, 10); i++; break;
       case '--nettrain': a.netTrain = v; i++; break;
@@ -912,6 +918,96 @@ const driver = `
     return out;
   }
 
+  /* ═══ Rohdump nach docs/pilot-benson-defense.md, §5 ═══════════════
+     Alle Groessen der Stellung werden HIER neu gerechnet, nicht aus den
+     Waechtern gelesen: die summieren ueber alle evaluateBoard-Aufrufe der
+     Suche (Tausende je Zug), gefragt ist aber die Buchung der Stellung
+     selbst. Siehe §5.2, letzter Absatz. */
+  const _krypto = require('crypto');
+  const _sha = buf => _krypto.createHash('sha256').update(buf).digest('hex');
+
+  /* Kanonischer JSON-Text: Schluessel sortiert, damit derselbe
+     Parametersatz immer denselben Hash traegt — unabhaengig davon, in
+     welcher Reihenfolge --A/--B geschrieben wurden. */
+  function _kanonisch(o) {
+    if (o === null || typeof o !== 'object') return JSON.stringify(o);
+    if (Array.isArray(o)) return '[' + o.map(_kanonisch).join(',') + ']';
+    return '{' + Object.keys(o).sort().map(k =>
+      JSON.stringify(k) + ':' + _kanonisch(o[k])).join(',') + '}';
+  }
+
+  /* §5.3: die EFFEKTIVEN Parameter beider Arme, also nach Anwendung von
+     --A/--B auf PARAMS_DEFAULT, plus die Harness-Einstellungen, die das
+     Spiel beeinflussen. Der Seed steht bewusst NICHT darin: derselbe
+     Parametersatz soll ueber Seeds hinweg denselben Hash tragen. */
+  function _paramsHash() {
+    const eff = cfg => Object.assign({}, PARAMS_DEFAULT,
+      {aiTimeBudget: AB.budget, adaptiveBudgetEnabled: 0}, cfgAt(cfg, 0));
+    return _sha(_kanonisch({A: eff(AB.A), B: eff(AB.B),
+      budget: AB.budget, maxMoves: AB.maxMoves, komi: AB.komi,
+      modus: AB.paired > 0 ? 'paired' : 'standard', opening: AB.opening}));
+  }
+  function _brettHash(board) {
+    return _sha(Buffer.from(board.buffer, board.byteOffset, BOARD_SIZE));
+  }
+
+  /* Gruppen einer Farbe: Groesse und Freiheiten. Eigene Schleife statt
+     floodFill je Stein, damit der Dump nicht teurer wird als die Suche. */
+  function _gruppen(board, color) {
+    const gesehen = new Uint8Array(BOARD_SIZE);
+    const out = [];
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      if (board[i] !== color || gesehen[i]) continue;
+      const stapel = [i]; gesehen[i] = 1;
+      let groesse = 0;
+      const frei = new Set();
+      while (stapel.length) {
+        const g = stapel.pop(); groesse++;
+        for (const n of NEIGHBORS[g]) {
+          if (board[n] === 0) frei.add(n);
+          else if (board[n] === color && !gesehen[n]) { gesehen[n] = 1; stapel.push(n); }
+        }
+      }
+      out.push({groesse, frei: frei.size});
+    }
+    return out;
+  }
+
+  /* §5.2: dieselbe Formel, die evaluateBoard fuer den Uebertrag benutzt. */
+  function _transfer(gruppen) {
+    let summe = 0;
+    for (const g of gruppen) {
+      if (g.frei >= STERBE_RAMPE.length || g.groesse < PARAMS.deathDiscountSize) continue;
+      summe += PARAMS.deathTransfer * STERBE_RAMPE[g.frei] * g.groesse * PARAMS.captureWeight;
+    }
+    return summe;
+  }
+
+  function _zugEreignis(board, color, res, sims, q, geschlagen) {
+    const opp = color === 1 ? 2 : 1;
+    let frei = 0;
+    for (let i = 0; i < BOARD_SIZE; i++) if (!board[i]) frei++;
+    const ep = bensonClassify(board);
+    let totEigen = 0, totFremd = 0;
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      if (!board[i] || _bnDead[i] !== ep) continue;
+      if (board[i] === color) totEigen++; else totFremd++;
+    }
+    const eigen = _gruppen(board, color), fremd = _gruppen(board, opp);
+    const gross = eigen.filter(g => g.groesse >= PARAMS.deathDiscountSize);
+    let minFrei = null;
+    for (const g of gross) if (minFrei === null || g.frei < minFrei) minFrei = g.frei;
+    return {
+      zug: null, farbe: color === 1 ? 'S' : 'W',
+      idx: (res && res.type === 'stone') ? idx(res.x, res.y) : -1,
+      sims, q, frei, tor: frei <= PARAMS.bensonEvalMaxEmpty,
+      totEigen, totFremd,
+      grossGruppen: gross.length, minFreiGross: minFrei,
+      transferEigen: _transfer(eigen), transferFremd: _transfer(fremd),
+      geschlagen
+    };
+  }
+
   function playGame(cfgBlack, cfgWhite, startState) {
     const board = startState ? cloneBoard(startState.board) : createBoard();
     const caps = startState ? {1: startState.caps[1], 2: startState.caps[2]} : {1: 0, 2: 0};
@@ -953,6 +1049,10 @@ const driver = `
        im grossen Kampf ist genau das, was ein Deckel unterschaetzen koennte.
        Verlierer eines Schlags ist immer die Gegenfarbe des Ziehenden. */
     const verlust = {1: {max: 0, ab5: 0, summe: 0}, 2: {max: 0, ab5: 0, summe: 0}};
+    /* Rohdump nach docs/pilot-benson-defense.md, §5.2. Leer, solange --roh
+       nicht gesetzt ist: die Analyse je Zug kostet ein bensonClassify und
+       zwei Gruppenlaeufe, das soll ein normaler A/B-Lauf nicht zahlen. */
+    const ereignisse = [];
     const passSt = {
       1: {first: null, total: 0, benson: 0},
       2: {first: null, total: 0, benson: 0}
@@ -1065,10 +1165,16 @@ const driver = `
       ms.krisenDauer = leseKrisenDauer();
       const s = st[color]; s.moves++; s.timeMs += dt;
 
+      let zugSims = null, zugQ = null;
       if (res.info) {
         const m = SIMS_RE.exec(res.info);
-        if (m) { s.sims += +m[1]; s.q.push(+m[2]); }
+        if (m) { s.sims += +m[1]; s.q.push(+m[2]); zugSims = +m[1]; zugQ = +m[2]; }
       }
+      /* VOR dem Anwenden des Zuges: alle Groessen in §5.2 beziehen sich auf
+         die Stellung, in der die KI entschieden hat. Nur geschlagen gehoert
+         zum Zug selbst und wird unten nachgetragen. */
+      const ereignis = AB.roh ? _zugEreignis(board, color, res, zugSims, zugQ, 0) : null;
+      if (ereignis) { ereignis.zug = mc + 1; ereignisse.push(ereignis); }
 
       if (res.type === 'resign') { resignedBy = color; resignInfo = res.info || null; break; }
       if (res.type === 'pass') {
@@ -1087,6 +1193,7 @@ const driver = `
           netBuf[color].push({inp: policyNet._netInp, probs: policyNet._netPriors,
                               hidden: policyNet._netHidden, moveIdx: i});
         const geschlagen = applyMove(board, color, res.x, res.y, ko, hist, caps);
+        if (ereignis) ereignis.geschlagen = geschlagen;
         if (geschlagen > 0) {
           const v = verlust[color === 1 ? 2 : 1];
           v.summe += geschlagen;
@@ -1233,7 +1340,9 @@ const driver = `
             phaseSwitches: modState[1].phaseSwitches + modState[2].phaseSwitches,
             q50: {1: qAt(st[1].q, .5), 2: qAt(st[2].q, .5)},
             q75: {1: qAt(st[1].q, .75), 2: qAt(st[2].q, .75)},
-            verlust, rand, zeit};
+            verlust, rand, zeit, ereignisse,
+            gefangene: {S: caps[1], W: caps[2]},
+            brettHash: AB.roh ? _brettHash(board) : null};
   }
 
   /* Neutrale Eröffnung für gepaarte Partien: Default-Parameter,
@@ -1650,6 +1759,19 @@ const driver = `
     require('fs').writeFileSync(AB.json, JSON.stringify(raw, null, 1));
   };
 
+  /* JSON Lines nach docs/pilot-benson-defense.md, §5.1: eine Zeile je Partie,
+     angehaengt direkt nach deren Ende. Stirbt der Lauf, bleiben die fertigen
+     Partien lesbar — anders als bei einem JSON-Dokument, das erst am Schluss
+     schliessbar waere. */
+  let _rohHash = null;
+  const schreibeRoh = satz => {
+    if (!AB.roh) return;
+    if (_rohHash === null) _rohHash = _paramsHash();
+    require('fs').appendFileSync(AB.roh,
+      JSON.stringify(Object.assign({typ: 'partie', seed: AB.seed,
+                                    params_hash: _rohHash}, satz)) + '\\n');
+  };
+
   if (AB.paired > 0) {
     /* ═══ Paar-Modus ═══ */
     console.log('Modus: ' + AB.paired + ' Paare · Eröffnung ' + AB.opening
@@ -1726,6 +1848,16 @@ const driver = `
         dauerMin: Math.round(mins * 100) / 100
       });
       schreibeJson(false);
+      schreibeRoh({
+        nr: g + 1,
+        armSchwarz: aIsBlack ? 'A' : 'B', armWeiss: aIsBlack ? 'B' : 'A',
+        final_board_hash: r.brettHash,
+        sieger: r.winner === 1 ? 'S' : 'W',
+        zuege: r.moves,
+        gefangene: r.gefangene,
+        aufgabe: r.resignedBy ? (r.resignedBy === 1 ? 'S' : 'W') : null,
+        ereignisse: r.ereignisse
+      });
       console.log('Partie ' + (g + 1) + '/' + AB.games + ': A=' + (aIsBlack ? 'Schwarz' : 'Weiß')
         + ' → ' + (w.aWon ? 'A' : 'B') + ' (' + (r.winner === 1 ? 'S' : 'W') + ')'
         + (r.resignedBy ? ' Aufgabe' : ' ' + r.score.b + ' : ' + r.score.w.toFixed(1))
@@ -1749,7 +1881,7 @@ const AB_CONFIG = {
   A: args.A, B: args.B,
   games: args.games, paired: args.paired, opening: args.opening,
   openingBudget: args.obudget, budget: args.budget, maxMoves: args.maxMoves,
-  komi: args.komi, seed: args.seed, json: args.json,
+  komi: args.komi, seed: args.seed, json: args.json, roh: args.roh,
   net: args.net, netGames: args.netGames, netTrain: args.netTrain
 };
 
