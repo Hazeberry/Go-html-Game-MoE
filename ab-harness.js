@@ -29,11 +29,20 @@
      --opening <n>     Eröffnungszüge je Paar (Default: 20)
      --obudget <ms>    Budget für Eröffnungszüge (Default: 100)
      --budget <ms>     Zeitbudget pro Zug, fest (Default: 250)
+                       ACHTUNG, das ist eine ZEIT: wie viele Simulationen
+                       darin liegen, hängt an der Maschinenlast. Derselbe
+                       Seed verbraucht dann unterschiedlich viele
+                       Zufallszahlen, und zwei Läufe laufen auseinander.
+                       Gemessen: --seed 2026, zweimal dieselbe
+                       Konfiguration, einmal 2:0 und einmal 1:1.
+                       Für reproduzierbare Läufe stattdessen
+                       --A mctsFixedSims=N --B mctsFixedSims=N setzen;
+                       dann ist alles außer der Stoppuhr Zeichen für
+                       Zeichen gleich.
      --maxmoves <n>    Zug-Limit pro Partie (Default: 400)
      --komi <f>        Komi für die Wertung (Default: 7.5).
                        Hinweis: Die Engine selbst ist komi-blind —
-                       identischer Seed erzeugt identische Züge,
-                       --komi ändert NUR die Abrechnung.
+                       --komi ändert NUR die Abrechnung, nie einen Zug.
      --A k=v,k=v       PARAMS für Konfiguration A (Baseline)
      --B k=v,k=v       PARAMS für Konfiguration B (Kandidat)
                        Phasenabhängig: k@N=v setzt k AB Zug N. Beispiel
