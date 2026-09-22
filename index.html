@@ -1608,6 +1608,36 @@ globalThis.PARAMS = {
      früh gibt es keine pass-alive-Ketten, da wäre sie reiner Overhead. */
   bensonEval: 1,
   bensonEvalMaxEmpty: 160,
+  /* Uebertragung fuer den BEWIESENEN Tod -- dasselbe, was deathTransfer bei
+     blosser Freiheitsnot anteilig tut, nur mit anteil = 1.
+
+     Anlass ist eine gemessene Nicht-Monotonie. Eine Kette im Atari wird ueber
+     deathTransfer mit voller Groesse belastet; dieselbe Kette als unbedingt
+     tot BEWIESEN kostet bisher gar nichts, weil der Zweig oben vor dem
+     Transfer-Block abbiegt. Die staerkste verfuegbare Evidenz erzeugt also
+     die schwaechste Buchung.
+
+     Gemessen an einer echten Partie (211 Zuege, 18 weisse Steine fallen bei
+     Zug 195), evaluateBoard aus Weiss' Sicht, Tor testweise geoeffnet:
+
+       Zug   Gruppe            heute   mit Tor, ohne Uebertrag
+       185   18 St., 3 Frei      55            38
+       191   18 St., 1 Frei    -188           +71     <- tot und im Atari
+       194   18 St., 1 Frei    -199           +68
+       195   geschlagen        -345          -345
+
+     Zug 191: die Gruppe ist benson-tot UND im Atari. Ohne Uebertrag bucht die
+     geoeffnete Benson-Ebene +71 statt -188 -- der Beweis macht die Lage
+     BESSER. Genau das schliesst dieser Parameter.
+
+     Material bleibt bei 0 (die Zeile oben), der Uebertrag kommt zusaetzlich:
+     eine tote Gruppe ist kein Material, aber sie ist Gefangene des Gegners.
+     Beides zugleich waere Doppelzaehlung in die andere Richtung.
+
+     Default 0: NICHT GEMESSEN. Der Defekt ist belegt, die Wirkung auf die
+     Spielstaerke nicht -- in diesem Projekt sind fuenf solcher Terme nach
+     Dosisreihen bei 0 geblieben. Erst messen, dann anschalten. */
+  bensonDeathTransfer: 0,
   /* Sterbe-Abschlag auf große Gruppen mit wenigen Freiheiten.
 
      Anlass, rekonstruiert und verifiziert: in einer verlorenen Hard-Partie
@@ -3056,13 +3086,24 @@ function evaluateBoard(board, color, captures) {
   for (let i = 0; i < BOARD_SIZE; i++) {
     const c = board[i]; if (!c || _evalBoardSeen[i] === seenEpoch) continue;
     if (bEpoch >= 0 && _bnDead[i] === bEpoch) {
-      /* ganze Kette beweisbar tot → zählt 0; nur als gesehen markieren */
-      let head = 0, tail = 0;
+      /* Ganze Kette beweisbar tot → zählt als Material 0; nur als gesehen
+         markieren. Die Größe wird dabei mitgezählt, weil bensonDeathTransfer
+         sie braucht — ohne den Parameter kostet das nur das Hochzählen. */
+      let head = 0, tail = 0, groesse = 0;
       _groupQueue[tail++] = i; _evalBoardSeen[i] = seenEpoch;
       while (head < tail) {
-        const g = _groupQueue[head++];
+        const g = _groupQueue[head++]; groesse++;
         for (const n of NEIGHBORS[g])
           if (board[n] === c && _evalBoardSeen[n] !== seenEpoch) { _evalBoardSeen[n] = seenEpoch; _groupQueue[tail++] = n; }
+      }
+      /* Übertragung für den BEWIESENEN Tod. Siehe den Kommentar an
+         bensonDeathTransfer: ohne ihn bekommt die stärkste Evidenz die
+         schwächste Buchung. Bei 0 wird s nicht angefasst — bitgenau der
+         Zustand vor dieser Änderung, deshalb steht die Prüfung vor der
+         Arithmetik und nicht in ihr. */
+      if (PARAMS.bensonDeathTransfer > 0) {
+        const _bt = PARAMS.bensonDeathTransfer * groesse * PARAMS.captureWeight;
+        s += (c === color) ? -_bt : _bt;
       }
       continue;
     }
