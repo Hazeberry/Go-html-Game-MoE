@@ -88,16 +88,33 @@ for h in $HOSTS; do
 done
 if [ -n "$FEHLEN" ]; then
   echo
-  echo "Diese Hosts fehlen in der Allowlist. ALLE auf einmal eintragen:"
+  echo "Nicht erreichbar:"
   for h in $FEHLEN; do echo "  $h"; done
   echo
-  echo "Danach eine FRISCHE Session starten — ein laufender Container behaelt"
-  echo "die Policy, mit der er gestartet ist. Einzeln nachtragen kostet je"
-  echo "Host eine weitere Session."
-  echo
-  echo "Ohne Netz laesst sich immerhin pruefen, ob die Pruefung Zaehne hat:"
-  echo "  python3 decode.py selbsttest"
-  exit 1
+  # KEIN Abbruch. Welcher Auslieferungshost benutzt wird, entscheidet der Hub
+  # zur Laufzeit, und die Liste oben enthaelt auch Alt-Hosts, die heute gar
+  # nicht mehr auf dem Weg liegen. Ein gesperrter Alt-Host ist kein Grund,
+  # die Kette anzuhalten -- ob der Download wirklich geht, entscheiden die
+  # Schritte 2 und 3, nicht diese Liste.
+  # (Genau das hat der erste Entwurf falsch gemacht: er brach bei
+  #  cdn-lfs.huggingface.co ab, obwohl der Download ueber us.aws.cdn.hf.co
+  #  einwandfrei lief.)
+  case " $FEHLEN " in
+    *" huggingface.co "*)
+      echo "Darunter ist der METADATEN-Host. Ohne ihn geht nichts weiter."
+      echo "In die Allowlist eintragen — am besten gleich alle oben genannten,"
+      echo "denn ein laufender Container behaelt seine Policy und jeder"
+      echo "einzeln nachgetragene Host kostet eine weitere Session."
+      echo
+      echo "Ohne Netz laesst sich immerhin pruefen, ob die Pruefung Zaehne hat:"
+      echo "  python3 decode.py selbsttest"
+      exit 1 ;;
+    *)
+      echo "Der Metadaten-Host ist erreichbar. Weiter — ob der Download"
+      echo "tatsaechlich geht, zeigen die Schritte 2 und 3. Nur falls die"
+      echo "scheitern, gehoeren die Hosts oben in die Allowlist (dann alle"
+      echo "auf einmal, und danach eine FRISCHE Session)." ;;
+  esac
 fi
 
 echo
