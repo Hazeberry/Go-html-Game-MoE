@@ -139,6 +139,21 @@ test('Ohne --roh entsteht keine Datei und nichts wird gerechnet', () => {
   pruefe(!fs.existsSync(d), 'ohne --roh darf keine Dumpdatei entstehen');
 });
 
+test('--roh zusammen mit --paired bricht ab, statt stillschweigend nichts zu schreiben', () => {
+  /* Der Rohdump ist nur im Standardmodus verdrahtet. Früher lief ein Paarlauf
+     mit --roh einfach durch und hinterließ keine Datei und keine Meldung. */
+  const d = path.join(TMP, 'paar.jsonl');
+  let code = 0, fehler = '';
+  try {
+    execFileSync(process.execPath, [HARNESS, '--html', STANDARD_HTML,
+      '--paired', '1', '--maxmoves', '10', '--seed', '7', '--roh', d],
+      {stdio: ['ignore', 'ignore', 'pipe']});
+  } catch (e) { code = e.status; fehler = String(e.stderr || ''); }
+  pruefeGleich(code, 2, 'Exit-Code bei --roh mit --paired');
+  pruefe(fehler.includes('--roh und --paired'), `Meldung fehlt oder unklar: ${fehler}`);
+  pruefe(!fs.existsSync(d), 'es darf keine Dumpdatei entstehen');
+});
+
 if (require.main === module)
   laufeTests('Rohdump des Harness (--roh)').then(ok => {
     try { fs.rmSync(TMP, {recursive: true, force: true}); } catch (e) { /* egal */ }
