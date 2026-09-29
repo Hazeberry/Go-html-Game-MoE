@@ -1879,8 +1879,12 @@ der Beweis die Lage sogar **besser** (+71 statt −188). `bensonDeathTransfer`
 (Default 0) schließt das, und der Sprung beim Schlagen schrumpft von 400
 Punkten auf 3.
 
-Gemessen in 720 Partien nach vorab registrierter Planung
-([`docs/pilot-benson-defense.md`](docs/pilot-benson-defense.md)):
+Gemessen nach vorab registrierter Planung
+([`docs/pilot-benson-defense.md`](docs/pilot-benson-defense.md)): zwei
+Vergleiche zu je **360 Partien**, getrennte Seeds, primär die Zahl der Züge
+in Gruppen, die später bewiesen sterben (V2), gepaart, Bonferroni α = 0,025.
+
+Erster Vergleich, Übertrag an oder aus:
 
 | | A (160/0) | B (160/1) | t | p |
 |---|---|---|---|---|
@@ -1890,16 +1894,48 @@ Gemessen in 720 Partien nach vorab registrierter Planung
 | Züge unter totem Bestand | 62,33 | 53,55 | −3,88 | 0,0001 |
 | **Siegrate** | | **51,7 %** | | **n. s.** |
 
-Der größte gemessene Effekt dieser Serie — und wieder ohne Stärkegewinn. Der
-Default bleibt deshalb 0, dieselbe Entscheidung wie bei `endLibPressure`.
+Zweiter Vergleich, das Tor weiter öffnen — `bensonEvalMaxEmpty` von 160 auf
+361, also Benson-Analyse in **jeder** Stellung statt erst im Spätspiel:
+
+| | B (160/1) | E (361/1) | t | p |
+|---|---|---|---|---|
+| Züge in später sterbende Gruppen (V2) | 1,306 | 1,567 | +2,19 | 0,0285 |
+| dieselben, je toter Gruppe | 0,273 | 0,302 | +1,42 | 0,155 |
+| Siegrate | | 46,4 % | | n. s. |
+
+**Das Tor weiter zu öffnen hilft nicht.** E verfehlt die Schwelle und der
+Punktschätzer zeigt in die **Gegen**richtung — weniger Verschwendung war
+vorhergesagt, gemessen ist mehr. „Schlechter" ist damit nicht belegt, „besser"
+aber sicher nicht: die Vorhersage, Arm E müsse wegen voller Vorausschau
+stärker senken, ist nicht eingetreten. `bensonEvalMaxEmpty` bleibt auf 160,
+und die naheliegende Fortsetzung „dann eben das Tor aufreißen" ist damit
+beantwortet, bevor sie jemand bezahlt.
+
+Innerhalb der Benson-Kette ist das der größte gemessene Effekt — projektweit
+**nicht**: `deathTransfer` (65,2 %), `endLibPressure` (63,7 %) und
+`midLineWeight` (58,7 %) haben belegte Siegraten, dieser Eingriff hat keine.
+Er bewegt den Mechanismus stärker als jeder andere und die Partie gar nicht.
+Der Default bleibt deshalb 0, dieselbe Entscheidung wie bei `endLibPressure`.
+
+**Bit-Identität**, gegen Referenzwerte vom Stand vor dem Eingriff
+(Commit `0b80584`), über `Object.is`, in drei Richtungen: Regler auf 0,
+Tor geschlossen, Benson-Ebene ganz aus. Dazu der Gegenbeweis, dass er beißt —
+bei offenem Tor verschiebt er den Wert um genau die Summe über alle toten
+Ketten, im Test unabhängig nachgerechnet statt aus `evaluateBoard` abgelesen.
+
+Diese Prüfung ist **schmaler** als bei den übrigen Termen: vier Stellungen aus
+einer echten Partie statt Tausender Zufallsbretter. Sie trägt trotzdem, weil
+die Neutralität bei 0 nicht statistisch ist, sondern **strukturell** — die
+Abfrage steht vor der Arithmetik, bei 0 wird `s` nicht angefasst.
 
 Drei Dinge fielen dabei nebenbei an, die eigenständig zählen. **Der Harness
 war nicht reproduzierbar** — behoben mit `mctsFixedSims`, siehe „Bekannte
 Grenzen". **Ein Endpunkt war unmessbar, nicht null:** Züge, die eine bereits
 benson-tote Gruppe verteidigen, kommen in 80 von 80 Farb-Partien nicht vor —
 weil `bensonMoveFilter` 6000 von 6000 der dafür nötigen Punkte aus der
-Kandidatenliste entfernt und die bordernden Ketten per Benson unschlagbar
-sind. Und **ein Einschließungs-Term ist nicht begründbar:** der starke
+Kandidatenliste entfernt. Der zweite Weg — die einschließende Kette schlagen —
+ist per Konstruktion zu; die Herleitung steht in
+[`docs/pilot-benson-defense.md`](docs/pilot-benson-defense.md) §10.2. Und **ein Einschließungs-Term ist nicht begründbar:** der starke
 Rohkontrast (76 % gegen 34 %) ist fast vollständig ein Freiheitseffekt; nach
 Freiheitsband geschichtet trennt Einschließung nichts (78,4 % gegen 79,2 %),
 und von 3422 Gruppen mit mindestens acht Freiheiten stirbt keine einzige

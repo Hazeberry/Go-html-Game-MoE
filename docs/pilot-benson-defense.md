@@ -321,11 +321,30 @@ Freie Nachbarpunkte eigener benson-toter Gruppen: 6000
   vom Benson-Zugfilter als totgeboren markiert: 6000  (100,0 %)
 ```
 
-`bensonMoveFilter` (Default an) entfernt **jeden** dieser Punkte aus der
-Kandidatenliste, und die bordernden gegnerischen Ketten sind per Benson
-pass-alive, also unschlagbar. Der Filter ist in allen Armen identisch und
-wird von `bensonDeathTransfer` nicht berührt. V1 hat damit in jedem Arm
-Varianz null: kein MDE, kein möglicher Effekt.
+Der erste Weg ist **gemessen** zu: `bensonMoveFilter` (Default an) entfernt
+jeden dieser Punkte aus der Kandidatenliste.
+
+Der zweite Weg ist **per Konstruktion** zu, und das ist eine Herleitung aus
+dem Code, keine Messung — deshalb hier ausgeschrieben statt behauptet.
+`_bensonForColor` stempelt `_bnDead[i]` nur unter dieser Bedingung
+(`index.html`, Ergebnis-Schleife am Ende der Funktion):
+
+```js
+if (regionAlive[r] && regionSmall[r] && borderChains[r].length) {
+  if (board[i] === opp) _bnDead[i] = epoch;
+```
+
+`regionAlive[r]` heißt: **alle** Randketten dieser Region haben den
+Pass-alive-Test überstanden. Pass-alive ist bei Benson genau die Eigenschaft
+„kann nicht gefangen werden, auch wenn der Besitzer für immer passt". Eine
+Kette, die eine benson-tote Gruppe einschließt, ist damit definitionsgemäß
+unschlagbar — sonst wäre die Gruppe nicht als tot gestempelt worden. Die
+Aussage ist also keine zusätzliche Behauptung über die Stellung, sondern eine
+Umformulierung der Bedingung, unter der `_bnDead` überhaupt gesetzt wird.
+
+Der Filter ist in allen Armen identisch und wird von `bensonDeathTransfer`
+nicht berührt. V1 hat damit in jedem Arm Varianz null: kein MDE, kein
+möglicher Effekt.
 
 **V1 entfällt als Endpunkt.** Nicht als Befund — dass die Engine eine
 bewiesen tote Gruppe nicht verteidigen *kann*, gehört zum Bild.
