@@ -38,7 +38,11 @@
                        Für reproduzierbare Läufe stattdessen
                        --A mctsFixedSims=N --B mctsFixedSims=N setzen;
                        dann ist alles außer der Stoppuhr Zeichen für
-                       Zeichen gleich.
+                       Zeichen gleich — aber NUR im Standardmodus. Im
+                       Paarmodus spielt die gemeinsame Eröffnung
+                       (--opening/--obudget) mit Default-Parametern und
+                       Zeitbudget; dort laufen Läufe trotz gleichem Seed
+                       auseinander (gemessen: drei Läufe, drei Ergebnisse).
      --maxmoves <n>    Zug-Limit pro Partie (Default: 400)
      --komi <f>        Komi für die Wertung (Default: 7.5).
                        Hinweis: Die Engine selbst ist komi-blind —
@@ -60,6 +64,8 @@
                        params_hash und final_board_hash; Schema und Zweck
                        stehen in docs/pilot-benson-defense.md, §5.
                        Wer dieses Format ändert, ändert zuerst dort.
+                       Nur im Standardmodus; mit --paired bricht der
+                       Harness ab.
      --net <pfad>      Gewichte für das PolicyNet. Inhalt ist exakt der
                        String, den der Browser unter localStorage
                        'go_pnet' ablegt (im Dashboard gespeichert oder
@@ -1888,6 +1894,15 @@ const AB_CONFIG = {
 if (args.netTrain && args.paired > 0) {
   console.error('--nettrain und --paired schließen sich aus: das Netz änderte sich '
     + 'zwischen den Partien eines Paares, der A/B-Vergleich wäre hinfällig.');
+  process.exit(2);
+}
+/* Der Rohdump ist nur im Standardmodus verdrahtet. Ohne diesen Abbruch liefe
+   ein Paarlauf stundenlang durch und schriebe keine einzige Zeile — eine
+   stille Lücke, die aussieht wie ein Lauf ohne Ereignisse. */
+if (args.roh && args.paired > 0) {
+  console.error('--roh und --paired schließen sich aus: der Rohdump ist nur im '
+    + 'Standardmodus (--games) verdrahtet, ein Paarlauf schriebe nichts. '
+    + 'Siehe docs/pilot-benson-defense.md, §5.');
   process.exit(2);
 }
 

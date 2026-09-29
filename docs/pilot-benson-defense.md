@@ -672,3 +672,73 @@ Die Dosisreihe über `bensonEvalMaxEmpty` ist beantwortet: 160 bleibt.
    die Obergrenze bei 14,7 % der Züge, weil `mctsChildren = 8` Antworten
    expandiert werden und die gespielte selten darunter ist. Eine
    wiederverwendete Wurzel trägt zudem 8 statt 16 Kandidaten.
+
+---
+
+# Errata vom 29.09.2026
+
+Nach Durchsicht gegen Code, Partie und die übrigen Abschnitte des README.
+Nach der Regel am Kopf dieses Dokuments werden die betroffenen Stellen
+**nicht** geändert, sondern hier berichtigt. Jede Berichtigung ist
+nachgerechnet oder gegen ihre Quelle geprüft; neu gemessen wurde nichts
+außer den beiden kurzen Harness-Prüfungen unter E7.
+
+**E1 — §2, „der Sprung beim Schlagen schrumpft von 400 Punkten auf 3".**
+Falsch zusammengezogen. Aus der mitgelieferten Partie nachgerechnet
+(`evaluateBoard` hat kein Rauschen, die Werte sind exakt):
+
+```
+Sprung beim Schlagen, Zug 194 -> 195
+  Tor zu (heute)              -199 -> -345   Sprung 146
+  Tor offen, ohne Uebertrag     68 -> -345   Sprung 413
+  Tor offen, mit Uebertrag    -292 -> -345   Sprung  53
+
+mit Uebertrag, Benson-Beweis (Zug 185) gegen nach dem Schlagen (Zug 195):
+                              -342 -> -345   Differenz 3
+```
+
+Die „3" ist richtig, aber eine andere Aussage: mit Übertrag steht die
+Bewertung schon beim Beweis dort, wo sie nach dem Schlagen landet. Der
+Sprung beim Schlagen selbst schrumpft von 413 auf 53.
+
+**E2 — §11.3, „MDE der Siegrate 8,1 pp — über allem, was in diesem Projekt je
+an Effekt gemessen wurde".** Falsch. Im README belegt sind `deathTransfer`
++15,2 pp, `endLibPressure` +13,7 pp und `midLineWeight` +8,7 pp (gepoolt;
+die unabhängige Nachmessung allein +10,6 pp). Richtig wäre: der MDE liegt im
+Bereich der bisher kleinsten belegten Stärkeeffekte.
+
+**E3 — §12.2, „knapp unter der Signifikanzschwelle".** Liest sich wie
+„signifikant" und meint das Gegenteil. Richtig: p = 0,0285, knapp **über**
+der korrigierten Schwelle von 0,025 — nicht signifikant.
+
+**E4 — §12.5, „dieselbe Entscheidung wie bei `endLibPressure`, wo der
+Wirknachweis ebenfalls klar und der Stärkeeffekt ebenfalls offen war".**
+Falsch. `endLibPressure` hat eine belegte Siegrate (63,7 %, p = 2,6·10⁻⁶)
+und steht deshalb auf Default 40. Der passende Vergleichsfall ist
+`tsumegoEyeOpenPenalty`: Defekt belegt, Behebung ohne Stärkeeffekt,
+Default 0.
+
+**E5 — §12.5 und Schlussstand, „Der Mechanismus wirkt, nachweisbar" und „Die
+Wirkung ist belegt".** Zu stark. Beide Vergleiche sind Erstläufe, keiner
+wurde mit frischem Seed wiederholt. Nach der Methodik-Regel des README
+(„Erstlauf ist Hypothese, nicht Beleg") ist A–B eine starke, vorab
+registrierte Hypothese, kein Beleg. Außerdem wurde V2 nie auf einen
+Zusammenhang mit dem Partieausgang geprüft (§10.3: „nicht geprüft").
+
+**E6 — §12.5 und Schlussstand, „die Dosisreihe über `bensonEvalMaxEmpty` ist
+beantwortet".** Zu stark. Getestet sind nur 160 und 361; die in §7 geplanten
+Zwischenwerte 200 und 250 wurden nie gefahren. Belegt ist: 361 hilft nicht.
+Eine Dosis-Wirkungs-Kurve ist das nicht.
+
+**E7 — §13 und README, Reproduzierbarkeit.** Gilt nur im Standardmodus
+(`--games`). Im Paarmodus spielt `makeOpening` die gemeinsame Eröffnung mit
+`PARAMS_DEFAULT` und Zeitbudget, `mctsFixedSims` erreicht sie nicht.
+Gemessen: drei Paar-Läufe mit gleichem Seed und festen Sims ergaben drei
+verschiedene Ergebnisse. Die Parallel-Aussage aus §13 ist dagegen jetzt
+gemessen und hält: ein Lauf allein und zwei gleichzeitig lieferten identische
+`final_board_hash`. Außerdem schrieb `--roh` im Paarmodus stillschweigend
+nichts; der Harness bricht diese Kombination jetzt mit einer Meldung ab.
+
+**E8 — Schlussstand Punkt 2, „27 % der Top-16".** Gemessen an 18 Stellungen
+(Züge 160–194) einer einzigen Partie, nicht allgemein. Als Richtung
+brauchbar, als Zahl nicht übertragbar.

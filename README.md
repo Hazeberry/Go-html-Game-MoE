@@ -58,6 +58,11 @@ nichts zu installieren.
   ist eine Identitätskontrolle über `params_hash` und `final_board_hash`
   möglich, und erst damit dürfen zwei Messläufe parallel auf einer Maschine
   laufen, ohne sich zu verändern.
+
+  Das gilt **nur im Standardmodus** (`--games`). Im Paarmodus spielt die
+  gemeinsame Eröffnung weiter mit `PARAMS_DEFAULT` und Zeitbudget; dort laufen
+  zwei Läufe trotz gleichem Seed auseinander — gemessen: drei Läufe, drei
+  verschiedene Ergebnisse.
 - **Das Policy-Netz lernt, aber zu wenig, um zu helfen.** Ein kleines
   Dense-Netz (3971→128→361) kann Wurzelzüge mitgewichten. Bis August 2026 war
   es doppelt tot: im Messrahmen gar nicht vorhanden, und im Spiel in einem
@@ -147,8 +152,8 @@ Eröffnung, danach werden die Farben getauscht. Paare, in denen der Sieger
 wechselt, tragen den Parametereffekt; Paare, in denen dieselbe Farbe zweimal
 gewinnt, den Farbeffekt. Das trennt beides bei einem Bruchteil der Partienzahl.
 
-**Reproduzierbar** wird ein Lauf erst mit fester Simulationszahl — siehe die
-Zeitsteuerung unter „Bekannte Grenzen":
+**Reproduzierbar** wird ein Lauf erst mit fester Simulationszahl, und nur im
+Standardmodus — siehe die Zeitsteuerung unter „Bekannte Grenzen":
 
 ```bash
 node ab-harness.js --games 40 --seed 20260922 \
@@ -159,7 +164,9 @@ node ab-harness.js --games 40 --seed 20260922 \
 angehängt direkt nach deren Ende — ein abgebrochener Lauf kostet damit nur die
 laufende Partie. Jede Zeile trägt `params_hash` und `final_board_hash`; sind
 beide bei einer Wiederholung gleich, hat der Lauf dieselben Partien gespielt.
-Schema und Zweck stehen in
+`--roh` gibt es nur im Standardmodus; zusammen mit `--paired` bricht der
+Harness mit einer Meldung ab, statt stundenlang zu spielen und nichts zu
+schreiben. Schema und Zweck stehen in
 [`docs/pilot-benson-defense.md`](docs/pilot-benson-defense.md) §5.
 
 Phasenabhängige Parameter für Mechanismus-Tests:
@@ -846,7 +853,7 @@ umrechenbar — sie war der Wegweiser zur richtigen Ursache, nicht das Maß des
 Erfolgs. Wer eine Bewertungsfunktion nach „wie nah am ehrlichen Wert" optimiert,
 optimiert eine Hilfsgröße.
 
-### Randspiel als Ursache: die Struktur lässt sich ändern, die Stärke nicht
+### Randspiel als Ursache: erst verworfen, in der Nachmessung belegt
 
 Fünf Partien gegen einen Menschen (alle mit `deathTransfer 1,0`) legten eine
 Synthese nahe: die KI schlägt in fünf Partien **keine einzige** Gruppe ab 5
@@ -1851,18 +1858,19 @@ schließt daraus „greift nie" und deutet jedes Nullergebnis falsch. Jetzt
 stehen dort absolute Zahlen plus eine Rate je 1000. Ein Wächter, der eine
 missverständliche Zahl meldet, ist schlimmer als keiner: man glaubt ihm.
 
-### Der Benson-Übertrag: der größte gemessene Effekt, und wieder keine Stärke
+### Der Benson-Übertrag: bewegt den Mechanismus, nicht die Partie
 
 Eine echte Partie vom 22.09. verliert bei Zug 195 achtzehn weiße Steine am
 Stück. Die Rekonstruktion widerlegte zuerst die naheliegende Vermutung: die
 Kandidatenliste war **nicht** schuld. Zwischen Zug 160 und 184 stand der Zug,
 der die Freiheiten der bedrohten Gruppe am stärksten hebt, achtmal auf Rang 1
-oder 3, und die KI spielte ihn jedes Mal — über 200 Ziehungen geprüft, weil
-`evaluateMove` rauscht.
+oder 3, und jedes dieser acht Male spielte die KI ihn. Die sieben Rang-1-Fälle
+blieben es über 200 Ziehungen, obwohl `evaluateMove` rauscht.
 
 Schuld war die Bewertung, und zwar auf eine Art, die man nur sieht, wenn man
-sie über den ganzen Kampf aufträgt: `evaluateBoard` **stieg** durch den
-gesamten Verfall und erreichte bei Zug 184 ihren Höchstwert — einen Zug,
+sie über den ganzen Kampf aufträgt: die Spitzen von `evaluateBoard` **stiegen**
+durch den gesamten Verfall (108 bei Zug 152, 153 bei Zug 184), dazwischen fiel
+der Wert immer wieder auf 42 bis 59. Der Höchstwert fiel auf Zug 184 — einen Zug,
 bevor Benson die Gruppe für unbedingt tot erklärt. Die Einschließung wuchs
 derweil von 8 auf 24 gegnerische Steine an der Gruppe. Dafür gibt es keinen
 Term. Was die Bewertung stattdessen sah, war eine Stufenfunktion auf
@@ -1876,13 +1884,17 @@ Transfer-Block ab. Eine Kette im Atari kostete damit `size × captureWeight`,
 dieselbe Kette als unbedingt tot bewiesen kostete nichts. Die stärkste
 verfügbare Evidenz erzeugte die schwächste Buchung; bei geöffnetem Tor machte
 der Beweis die Lage sogar **besser** (+71 statt −188). `bensonDeathTransfer`
-(Default 0) schließt das, und der Sprung beim Schlagen schrumpft von 400
-Punkten auf 3.
+(Default 0) schließt das. Mit Übertrag steht die Bewertung schon beim
+Benson-Beweis (Zug 185: −342) dort, wo sie nach dem Schlagen landet (Zug 195:
+−345). Beim Schlagen selbst springt sie bei offenem Tor ohne Übertrag um 413
+Punkte, mit Übertrag um 53.
 
 Gemessen nach vorab registrierter Planung
 ([`docs/pilot-benson-defense.md`](docs/pilot-benson-defense.md)): zwei
 Vergleiche zu je **360 Partien**, getrennte Seeds, primär die Zahl der Züge
 in Gruppen, die später bewiesen sterben (V2), gepaart, Bonferroni α = 0,025.
+Jeder Vergleich ist ein **Erstlauf**; wiederholt mit frischem Seed wurde
+keiner.
 
 Erster Vergleich, Übertrag an oder aus:
 
@@ -1890,7 +1902,7 @@ Erster Vergleich, Übertrag an oder aus:
 |---|---|---|---|---|
 | Züge in später sterbende Gruppen (V2) | 1,850 | 1,147 | −5,57 | < 0,0001 |
 | dieselben, je toter Gruppe | 0,346 | 0,247 | −4,08 | < 0,0001 |
-| tote Steine je Partie | 12,85 | 9,59 | −5,78 | — |
+| tote Steine je Partie | 12,85 | 9,59 | −5,78 | < 0,0001 |
 | Züge unter totem Bestand | 62,33 | 53,55 | −3,88 | 0,0001 |
 | **Siegrate** | | **51,7 %** | | **n. s.** |
 
@@ -1903,19 +1915,28 @@ Zweiter Vergleich, das Tor weiter öffnen — `bensonEvalMaxEmpty` von 160 auf
 | dieselben, je toter Gruppe | 0,273 | 0,302 | +1,42 | 0,155 |
 | Siegrate | | 46,4 % | | n. s. |
 
-**Das Tor weiter zu öffnen hilft nicht.** E verfehlt die Schwelle und der
-Punktschätzer zeigt in die **Gegen**richtung — weniger Verschwendung war
-vorhergesagt, gemessen ist mehr. „Schlechter" ist damit nicht belegt, „besser"
-aber sicher nicht: die Vorhersage, Arm E müsse wegen voller Vorausschau
-stärker senken, ist nicht eingetreten. `bensonEvalMaxEmpty` bleibt auf 160,
-und die naheliegende Fortsetzung „dann eben das Tor aufreißen" ist damit
-beantwortet, bevor sie jemand bezahlt.
+**Das Tor weiter zu öffnen hilft nicht.** Vorhergesagt war das Gegenteil:
+mit offenem Tor bewertet die Suche schon in ihren Blättern Stellungen mit
+benson-toter Gruppe, sollte den Tod also früher sehen und seltener in
+Gruppen investieren, die später sterben. Gemessen ist die Gegenrichtung — nominal p = 0,0285, also unter
+0,05, aber über der korrigierten Schwelle von 0,025; auf die Zahl toter
+Gruppen normiert nicht signifikant (p = 0,155). Weder Nutzen noch Schaden ist
+damit belegt. Getestet sind nur zwei Werte, 160 und 361 — eine
+Dosis-Wirkungs-Kurve ist das nicht. Für „dann eben das Tor aufreißen" spricht
+nichts; `bensonEvalMaxEmpty` bleibt auf 160.
 
-Innerhalb der Benson-Kette ist das der größte gemessene Effekt — projektweit
-**nicht**: `deathTransfer` (65,2 %), `endLibPressure` (63,7 %) und
-`midLineWeight` (58,7 %) haben belegte Siegraten, dieser Eingriff hat keine.
-Er bewegt den Mechanismus stärker als jeder andere und die Partie gar nicht.
-Der Default bleibt deshalb 0, dieselbe Entscheidung wie bei `endLibPressure`.
+Projektweit ist das **kein** großer Befund: `deathTransfer` (65,2 %),
+`endLibPressure` (63,7 %) und `midLineWeight` (58,7 %) haben belegte
+Siegraten, dieser Eingriff hat keine. Der Default bleibt deshalb 0 — dieselbe
+Lage wie beim Augen-Überzähler (`tsumegoEyeOpenPenalty`): Defekt belegt,
+Behebung ohne Stärkeeffekt.
+
+Drei Einschränkungen gehören zum Befund. Als Erstlauf ist A–B nach der
+Methodik-Regel unten eine starke Hypothese, kein Beleg. V2 wurde nie auf
+einen Zusammenhang mit dem Partieausgang geprüft — von den im Piloten
+geprüften Größen hing nur der größte erlittene Einzelschlag damit zusammen.
+Und Arm B sieht seiner Tor-Grenze wegen nur 39,9 % der V2-Gelegenheiten
+überhaupt voraus, A–B misst also eine verdünnte Wirkung.
 
 **Bit-Identität**, gegen Referenzwerte vom Stand vor dem Eingriff
 (Commit `0b80584`), über `Object.is`, in drei Richtungen: Regler auf 0,
@@ -1923,19 +1944,21 @@ Tor geschlossen, Benson-Ebene ganz aus. Dazu der Gegenbeweis, dass er beißt —
 bei offenem Tor verschiebt er den Wert um genau die Summe über alle toten
 Ketten, im Test unabhängig nachgerechnet statt aus `evaluateBoard` abgelesen.
 
-Diese Prüfung ist **schmaler** als bei den übrigen Termen: vier Stellungen aus
-einer echten Partie statt Tausender Zufallsbretter. Sie trägt trotzdem, weil
-die Neutralität bei 0 nicht statistisch ist, sondern **strukturell** — die
-Abfrage steht vor der Arithmetik, bei 0 wird `s` nicht angefasst.
+Diese Prüfung ist **schmaler** als bei den übrigen Termen: gemessen ist die
+Identität an vier Stellungen aus einer echten Partie, nicht an Tausenden
+Zufallsbrettern. Dass sie für jede Stellung gilt, ist aus dem Code **gelesen**,
+nicht gemessen — die Abfrage steht vor der Arithmetik, bei 0 wird `s` nicht
+angefasst.
 
 Drei Dinge fielen dabei nebenbei an, die eigenständig zählen. **Der Harness
-war nicht reproduzierbar** — behoben mit `mctsFixedSims`, siehe „Bekannte
-Grenzen". **Ein Endpunkt war unmessbar, nicht null:** Züge, die eine bereits
-benson-tote Gruppe verteidigen, kommen in 80 von 80 Farb-Partien nicht vor —
+war nicht reproduzierbar** — behoben mit `mctsFixedSims` für den
+Standardmodus, siehe „Bekannte Grenzen". **Ein Endpunkt war unmessbar, nicht
+null:** Züge, die eine bereits benson-tote Gruppe verteidigen, kommen in 80 von 80 Farb-Partien nicht vor —
 weil `bensonMoveFilter` 6000 von 6000 der dafür nötigen Punkte aus der
 Kandidatenliste entfernt. Der zweite Weg — die einschließende Kette schlagen —
 ist per Konstruktion zu; die Herleitung steht in
-[`docs/pilot-benson-defense.md`](docs/pilot-benson-defense.md) §10.2. Und **ein Einschließungs-Term ist nicht begründbar:** der starke
+[`docs/pilot-benson-defense.md`](docs/pilot-benson-defense.md) §10.2. Und **ein
+Einschließungs-Term ist nicht begründbar:** der starke
 Rohkontrast (76 % gegen 34 %) ist fast vollständig ein Freiheitseffekt; nach
 Freiheitsband geschichtet trennt Einschließung nichts (78,4 % gegen 79,2 %),
 und von 3422 Gruppen mit mindestens acht Freiheiten stirbt keine einzige
@@ -1999,9 +2022,11 @@ tests/stellungen/               echte Partien als Testvorlage (SGF)
 .github/workflows/ab-harness.yml  Messläufe in CI, manuell startbar
 ```
 
-[`tests/`](tests/) prüft die NaN-Schutzschichten und die Trainings-Stabilität —
-ohne `node_modules`, gegen dieselben `<script>`-Blöcke, die ausgeliefert
-werden. Ein Test gegen eine Kopie prüft irgendwann etwas, das niemand
+[`tests/`](tests/) umfasst neun Suiten: NaN-Schutzschichten,
+Aufgabekriterium, Transfer-Wächter, Benson-Übertrag, feste Simulationszahl,
+Rohdump, Trainings-Stabilität, einen Rauchtest des Harness und einen
+Browser-Test — ohne `node_modules`, gegen dieselben `<script>`-Blöcke, die
+ausgeliefert werden. Ein Test gegen eine Kopie prüft irgendwann etwas, das niemand
 ausliefert. Der Browser-Test braucht zusätzlich Playwright und überspringt
 sich ohne es.
 
