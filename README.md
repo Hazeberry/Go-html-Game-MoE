@@ -7,6 +7,7 @@ läuft als Monte-Carlo-Baumsuche in einem Web Worker.
 Der zweite Teil des Projekts ist ein Messrahmen. Jede Aussage über die
 Spielstärke in diesem README stammt aus gepaarten Selbstspiel-Läufen mit
 Signifikanztest, nicht aus dem Eindruck beim Spielen.
+https://hazeberry.github.io/Go-html-Game-MoE/
 
 ## Spielen
 
