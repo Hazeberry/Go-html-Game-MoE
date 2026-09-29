@@ -581,3 +581,75 @@ Fortsetzung.
 - Beide Läufe nutzen dieselbe Engine auf beiden Seiten mit nur diesem einen
   Parameterunterschied. Übertragbarkeit auf das Spiel gegen Menschen ist
   nicht geprüft.
+
+## 13. Reproduktion
+
+Die Rohdumps dieser Läufe sind **nicht** archiviert — sie lagen in einem
+flüchtigen Arbeitsverzeichnis und sind mit dessen Container verschwunden.
+Das ist verkraftbar, weil `mctsFixedSims` sie reproduzierbar macht: gleicher
+Commit, gleiche Parameter, gleicher Seed ergeben Zug für Zug dieselben
+Partien. Nicht die Daten mussten aufgehoben werden, sondern das Rezept.
+
+Referenzstand: **Commit `217d714`** (`docs/pilot-benson-defense.md` §1–12).
+Ein anderer Stand von `index.html` erzeugt andere Partien, auch bei gleichem
+Seed — das ist beabsichtigt und der Grund, warum der Commit dazugehört.
+
+```bash
+# Pilot, 40 Partien Arm A gegen sich selbst   (§9)
+node ab-harness.js --games 40 --seed 20260922 \
+  --A mctsFixedSims=120 --B mctsFixedSims=120 \
+  --roh pilot-a.jsonl --json pilot-a.json
+
+# Vergleich A–B, 360 Partien                  (§12.1)
+node ab-harness.js --games 360 --seed 20260923 \
+  --A mctsFixedSims=120,bensonEvalMaxEmpty=160,bensonDeathTransfer=0 \
+  --B mctsFixedSims=120,bensonEvalMaxEmpty=160,bensonDeathTransfer=1 \
+  --roh reihe-ab.jsonl --json reihe-ab.json
+
+# Vergleich B–E, 360 Partien                  (§12.1)
+node ab-harness.js --games 360 --seed 20260924 \
+  --A mctsFixedSims=120,bensonEvalMaxEmpty=160,bensonDeathTransfer=1 \
+  --B mctsFixedSims=120,bensonEvalMaxEmpty=361,bensonDeathTransfer=1 \
+  --roh reihe-be.jsonl --json reihe-be.json
+```
+
+Laufzeit: Pilot 17 min, jede Reihe rund 153 min. Beide Reihen dürfen
+**parallel** laufen — mit fester Simulationszahl verändert CPU-Konkurrenz die
+Partien nicht mehr. Auf vier Kernen sind das rund 2,6 statt 5,2 Stunden.
+
+Prüfung vor der Auswertung: `params_hash` muss über alle Partien eines Laufs
+einheitlich sein, und eine Wiederholung muss dieselben `final_board_hash`
+liefern (§4.2). Stimmt das nicht, stimmt der Commit nicht.
+
+Die abgeleiteten Größen — V2, D1, `verlustMax`, tote Gruppen, tote Steine,
+`capture_events`, `move_of_verlustMax` — sind sämtlich aus dem Schema in §5
+berechenbar. Keine davon braucht eine Formatänderung; das war beim Entwurf
+von §5 geprüft und hat sich über vier nachträglich hinzugekommene Fragen
+bewährt.
+
+---
+
+# Schlussstand
+
+Der Defekt aus §2 ist repariert und mit `bensonDeathTransfer` abschaltbar
+hinterlegt, Default 0. Die Wirkung ist belegt (§12.5), ein Stärkegewinn nicht.
+Die Dosisreihe über `bensonEvalMaxEmpty` ist beantwortet: 160 bleibt.
+
+**Was offen bleibt**, in der Reihenfolge, in der ich es angehen würde:
+
+1. **Die Blindheit während des Laufkampfs** (§2, letzter Absatz). Zwischen
+   „drei Freiheiten" und „Benson-Beweis" hat die Bewertung nichts. Der
+   naheliegende Kandidat — ein Einschließungs-Term — ist nach §10.5 nicht
+   begründbar, weil Einschließung innerhalb eines Freiheitsbands nichts
+   trennt. Wer es erneut versucht, braucht zuerst eine Fassung von
+   „Einschließung", die dieses Schichtungsbild besteht.
+2. **Die Wurzel-Kandidaten sind ein Los.** Zwei unabhängige Ziehungen auf
+   demselben Brett teilen nur 27 % der Top-16 — `evaluateMove` rauscht in
+   jedem Phasen-Experten (`+rnd*3`, `*4`, `*0.5`, `*3`). Die Frage ist nicht
+   „sind 16 genug", sondern „bei 27 % Stabilität entscheidet der Zufall,
+   welche 16". Mit `mctsFixedSims` ist das sauber messbar, ein Netz braucht
+   es nicht.
+3. **Der Tree-Reuse greift fast nie.** Gegen einen Menschen gemessen liegt
+   die Obergrenze bei 14,7 % der Züge, weil `mctsChildren = 8` Antworten
+   expandiert werden und die gespielte selten darunter ist. Eine
+   wiederverwendete Wurzel trägt zudem 8 statt 16 Kandidaten.

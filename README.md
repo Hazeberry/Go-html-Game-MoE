@@ -45,8 +45,19 @@ nichts zu installieren.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl
-  der Simulationen pro Zug und damit die Spielstärke. Ein fester Seed macht
-  Läufe deshalb **nicht** reproduzierbar.
+  der Simulationen pro Zug und damit die Spielstärke. Im Spielbetrieb ist das
+  richtig so — ein Mensch wartet Sekunden, keine Simulationen.
+
+  Für **Messungen** war es ein Loch: weil die Simulationszahl an der
+  Maschinenlast hing, verbrauchte derselbe Seed unterschiedlich viele
+  Zufallszahlen und die Partien liefen auseinander. Zwei Läufe mit
+  `--seed 2026` und identischer Konfiguration endeten 2:0 und 1:1 — während
+  die Hilfe des Harness wörtlich „identischer Seed erzeugt identische Züge"
+  versprach. `PARAMS.mctsFixedSims` (Default 0) nimmt die Zeit aus der Suche;
+  darüber ist alles außer der Stoppuhr Zeichen für Zeichen gleich. Erst damit
+  ist eine Identitätskontrolle über `params_hash` und `final_board_hash`
+  möglich, und erst damit dürfen zwei Messläufe parallel auf einer Maschine
+  laufen, ohne sich zu verändern.
 - **Das Policy-Netz lernt, aber zu wenig, um zu helfen.** Ein kleines
   Dense-Netz (3971→128→361) kann Wurzelzüge mitgewichten. Bis August 2026 war
   es doppelt tot: im Messrahmen gar nicht vorhanden, und im Spiel in einem
@@ -135,6 +146,21 @@ node ab-harness.js --paired 30 --seed 2026 --budget 250 \
 Eröffnung, danach werden die Farben getauscht. Paare, in denen der Sieger
 wechselt, tragen den Parametereffekt; Paare, in denen dieselbe Farbe zweimal
 gewinnt, den Farbeffekt. Das trennt beides bei einem Bruchteil der Partienzahl.
+
+**Reproduzierbar** wird ein Lauf erst mit fester Simulationszahl — siehe die
+Zeitsteuerung unter „Bekannte Grenzen":
+
+```bash
+node ab-harness.js --games 40 --seed 20260922 \
+  --A mctsFixedSims=120 --B mctsFixedSims=120 --roh roh.jsonl
+```
+
+`--roh` schreibt einen zugweisen Rohdump als JSON Lines, eine Zeile je Partie,
+angehängt direkt nach deren Ende — ein abgebrochener Lauf kostet damit nur die
+laufende Partie. Jede Zeile trägt `params_hash` und `final_board_hash`; sind
+beide bei einer Wiederholung gleich, hat der Lauf dieselben Partien gespielt.
+Schema und Zweck stehen in
+[`docs/pilot-benson-defense.md`](docs/pilot-benson-defense.md) §5.
 
 Phasenabhängige Parameter für Mechanismus-Tests:
 
@@ -1825,6 +1851,60 @@ schließt daraus „greift nie" und deutet jedes Nullergebnis falsch. Jetzt
 stehen dort absolute Zahlen plus eine Rate je 1000. Ein Wächter, der eine
 missverständliche Zahl meldet, ist schlimmer als keiner: man glaubt ihm.
 
+### Der Benson-Übertrag: der größte gemessene Effekt, und wieder keine Stärke
+
+Eine echte Partie vom 22.09. verliert bei Zug 195 achtzehn weiße Steine am
+Stück. Die Rekonstruktion widerlegte zuerst die naheliegende Vermutung: die
+Kandidatenliste war **nicht** schuld. Zwischen Zug 160 und 184 stand der Zug,
+der die Freiheiten der bedrohten Gruppe am stärksten hebt, achtmal auf Rang 1
+oder 3, und die KI spielte ihn jedes Mal — über 200 Ziehungen geprüft, weil
+`evaluateMove` rauscht.
+
+Schuld war die Bewertung, und zwar auf eine Art, die man nur sieht, wenn man
+sie über den ganzen Kampf aufträgt: `evaluateBoard` **stieg** durch den
+gesamten Verfall und erreichte bei Zug 184 ihren Höchstwert — einen Zug,
+bevor Benson die Gruppe für unbedingt tot erklärt. Die Einschließung wuchs
+derweil von 8 auf 24 gegnerische Steine an der Gruppe. Dafür gibt es keinen
+Term. Was die Bewertung stattdessen sah, war eine Stufenfunktion auf
+Freiheiten: drei Freiheiten kosten `0,25 × 18 × 20 = 90` Punkte, vier
+Freiheiten **null**. Jede Rettung um eine Freiheit war +90 wert, der Gegner
+nahm sie mit einem Zug zurück. Achtmal.
+
+Darunter lag ein konkreter Defekt. Der Benson-Zweig in `evaluateBoard` bucht
+eine bewiesen tote Kette als Material 0 — und bog dabei **vor** dem
+Transfer-Block ab. Eine Kette im Atari kostete damit `size × captureWeight`,
+dieselbe Kette als unbedingt tot bewiesen kostete nichts. Die stärkste
+verfügbare Evidenz erzeugte die schwächste Buchung; bei geöffnetem Tor machte
+der Beweis die Lage sogar **besser** (+71 statt −188). `bensonDeathTransfer`
+(Default 0) schließt das, und der Sprung beim Schlagen schrumpft von 400
+Punkten auf 3.
+
+Gemessen in 720 Partien nach vorab registrierter Planung
+([`docs/pilot-benson-defense.md`](docs/pilot-benson-defense.md)):
+
+| | A (160/0) | B (160/1) | t | p |
+|---|---|---|---|---|
+| Züge in später sterbende Gruppen (V2) | 1,850 | 1,147 | −5,57 | < 0,0001 |
+| dieselben, je toter Gruppe | 0,346 | 0,247 | −4,08 | < 0,0001 |
+| tote Steine je Partie | 12,85 | 9,59 | −5,78 | — |
+| Züge unter totem Bestand | 62,33 | 53,55 | −3,88 | 0,0001 |
+| **Siegrate** | | **51,7 %** | | **n. s.** |
+
+Der größte gemessene Effekt dieser Serie — und wieder ohne Stärkegewinn. Der
+Default bleibt deshalb 0, dieselbe Entscheidung wie bei `endLibPressure`.
+
+Drei Dinge fielen dabei nebenbei an, die eigenständig zählen. **Der Harness
+war nicht reproduzierbar** — behoben mit `mctsFixedSims`, siehe „Bekannte
+Grenzen". **Ein Endpunkt war unmessbar, nicht null:** Züge, die eine bereits
+benson-tote Gruppe verteidigen, kommen in 80 von 80 Farb-Partien nicht vor —
+weil `bensonMoveFilter` 6000 von 6000 der dafür nötigen Punkte aus der
+Kandidatenliste entfernt und die bordernden Ketten per Benson unschlagbar
+sind. Und **ein Einschließungs-Term ist nicht begründbar:** der starke
+Rohkontrast (76 % gegen 34 %) ist fast vollständig ein Freiheitseffekt; nach
+Freiheitsband geschichtet trennt Einschließung nichts (78,4 % gegen 79,2 %),
+und von 3422 Gruppen mit mindestens acht Freiheiten stirbt keine einzige
+binnen 40 Zügen.
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im
@@ -1876,7 +1956,9 @@ fallen zweimal an.
 index.html                      Spiel und Engine, eine Datei
 ab-harness.js                   Messrahmen; Kopfkommentar = Versuchsprotokoll
 distillation/                   Überwachtes Training fürs Policy-Netz
+docs/                           Versuchsprotokolle, die zu lang für den README sind
 tests/                          Regressionstests (node tests/run.js)
+tests/stellungen/               echte Partien als Testvorlage (SGF)
 .github/workflows/tests.yml       Regressionstests bei jedem Push und PR
 .github/workflows/ab-harness.yml  Messläufe in CI, manuell startbar
 ```
@@ -1886,6 +1968,18 @@ ohne `node_modules`, gegen dieselben `<script>`-Blöcke, die ausgeliefert
 werden. Ein Test gegen eine Kopie prüft irgendwann etwas, das niemand
 ausliefert. Der Browser-Test braucht zusätzlich Playwright und überspringt
 sich ohne es.
+
+[`docs/`](docs/) nimmt auf, was den README sprengen würde: eine vorab
+registrierte Versuchsplanung samt Ergebnis, mit Abschnitten, die vor den Daten
+geschrieben wurden und nachher nur als **Nachtrag** ergänzt, nie korrigiert
+werden. Sonst ist die Vorab-Registrierung wertlos.
+
+[`tests/stellungen/`](tests/stellungen/) enthält echte Partien als
+Testvorlage. Die Stellungen werden zur Laufzeit aus der SGF abgespielt, mit
+`removeDeadGroups` und `idx` **aus `index.html`** — keine handgeschriebenen
+361er-Arrays, die stillschweigend verrotten könnten. Ein Testfall belegt das
+Replay gegen den Gefangenen-Zähler, den die App selbst anzeigt, bevor sich ein
+anderer darauf beruft.
 
 [`distillation/`](distillation/) enthält die Kette, um dem Policy-Netz starke
 Züge beizubringen, statt es aus Selbstspiel lernen zu lassen — samt der
