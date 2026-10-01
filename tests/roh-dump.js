@@ -158,6 +158,16 @@ test('auswertung/wurzel-gleichstand.js rekonstruiert die Wurzelliste aus dem Dum
   pruefeGleich(PARAMS.endgameMoves, vorher, 'endgameMoves nach der Messung');
 });
 
+test('auswertung/hashliste.js erkennt denselben Lauf und eine Abweichung', () => {
+  const {liste, pruefe: pruefeListe} = require('../auswertung/hashliste.js');
+  const P = ersterLauf();
+  const L = liste(P, 'test');
+  pruefeGleich(pruefeListe(P, L).length, 0, 'Abweichungen gegen die eigene Liste');
+  const anders = JSON.parse(JSON.stringify(L));
+  anders.final_board_hash[1] = '0'.repeat(64);
+  pruefeGleich(pruefeListe(P, anders).length, 1, 'eine geänderte Partie muss auffallen');
+});
+
 test('params_hash hängt an den Parametern, nicht am Seed', () => {
   /* §5.3: derselbe Parametersatz soll über Seeds hinweg denselben Hash
      tragen — sonst könnte man nicht prüfen, ob zwei Läufe dieselbe
