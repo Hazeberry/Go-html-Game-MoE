@@ -2024,10 +2024,10 @@ tests/stellungen/               echte Partien als Testvorlage (SGF)
 .github/workflows/ab-harness.yml  Messläufe in CI, manuell startbar
 ```
 
-[`tests/`](tests/) umfasst neun Suiten: NaN-Schutzschichten,
+[`tests/`](tests/) umfasst zehn Suiten: NaN-Schutzschichten,
 Aufgabekriterium, Transfer-Wächter, Benson-Übertrag, feste Simulationszahl,
-Rohdump, Trainings-Stabilität, einen Rauchtest des Harness und einen
-Browser-Test — ohne `node_modules`, gegen dieselben `<script>`-Blöcke, die
+Rohdump, Einflusskarte, Trainings-Stabilität, einen Rauchtest des Harness und
+einen Browser-Test — ohne `node_modules`, gegen dieselben `<script>`-Blöcke, die
 ausgeliefert werden. Ein Test gegen eine Kopie prüft irgendwann etwas, das niemand
 ausliefert. Der Browser-Test braucht zusätzlich Playwright und überspringt
 sich ohne es.

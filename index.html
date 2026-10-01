@@ -1566,8 +1566,10 @@ globalThis.PARAMS = {
      berechnet. Anlass: evaluateBoard und die Zugexperten sehen kein Gebiet;
      estimateArea zaehlt nur vollstaendig umschlossene Regionen und ist im
      Mittelspiel nicht angeschlossen. Ein Rahmen mit einer einzigen Luecke
-     zaehlt dort 0 Felder (gemessen: 47 statt 169), der Einfluss sieht ihn
-     weiter (231).
+     zaehlt dort nur noch seine Steine (gemessen: 47 statt 169). Die
+     Einflusskarte sieht ihn weiter, aber anders: als Band um die Steine,
+     nicht als gefuelltes Gebiet -- 69 der 121 Innenfelder, dazu 115 Felder
+     ausserhalb des Rings. Die beiden Zahlen sind deshalb nicht vergleichbar.
        influenceInvade  Bonus fuer Zuege in der Einflusszone des GEGNERS
                         (Reduktion/Invasion)
        influenceOwn     Abzug fuer Zuege in der eigenen Zone (Selbstauffuellen)
@@ -2736,9 +2738,10 @@ function primeInfluenceCache(board) {
       let pos = 0, neg = 0;
       for (const n of NEIGHBORS[i]) { const q = z[n]; if (q > 0) pos++; else if (q < 0) neg++; }
       const v = z[i];
-      w[i] = (v > 0 && neg === 0) ? v + pos
-           : (v < 0 && pos === 0) ? v - neg
-           : (v === 0)            ? pos - neg : v;
+      /* Bouzy: wachsen darf nur, wer keinen Nachbarn der Gegenfarbe hat.
+         Ein leeres Feld zwischen beiden Farben bleibt 0 -- umstritten. */
+      w[i] = (v >= 0 && neg === 0) ? v + pos
+           : (v <= 0 && pos === 0) ? v - neg : v;
     }
     const t = z; z = w; w = t;
   }

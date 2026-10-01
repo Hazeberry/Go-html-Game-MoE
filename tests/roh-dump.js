@@ -124,6 +124,19 @@ test('auswertung/benson-reihe.js liest den Dump und rechnet je Partie', () => {
   pruefe(text.includes('params_hash einheitlich: ja'), 'Hash-Prüfung fehlt in der Ausgabe');
 });
 
+test('auswertung/einfluss.js liest den Dump und ordnet jeden Zug einer Zone zu', () => {
+  ersterLauf();
+  const {zonen} = require('../auswertung/einfluss.js');
+  for (const p of ersterLauf()) {
+    const z = zonen(p);
+    const zuege = p.ereignisse.filter(e => e.idx >= 0);
+    for (const f of ['S', 'W']) {
+      const n = z[f].gegner + z[f].eigen + z[f].neutral;
+      pruefeGleich(n, zuege.filter(e => e.farbe === f).length, `Züge von ${f} mit Zone`);
+    }
+  }
+});
+
 test('params_hash hängt an den Parametern, nicht am Seed', () => {
   /* §5.3: derselbe Parametersatz soll über Seeds hinweg denselben Hash
      tragen — sonst könnte man nicht prüfen, ob zwei Läufe dieselbe

@@ -18,7 +18,7 @@ const {ladeKI, test, pruefe, pruefeGleich, laufeTests} = require('./rahmen');
 
 const KI = ladeKI({htmlPfad: process.argv[2] || undefined, mitNetz: false});
 const {PARAMS, BOARD_SIZE, idx, estimateArea, evaluateMove,
-       primeInfluenceCache, influenceZone} = KI;
+       primeInfluenceCache, influenceZone, NEIGHBORS, removeDeadGroups} = KI;
 
 const leer = () => new Uint8Array(BOARD_SIZE);
 
@@ -130,6 +130,58 @@ test('influenceOwn senkt Züge in der eigenen Zone', () => {
   const basis = wert(0, 0);
   pruefeGleich(basis - wert(0, 100), 100, 'Abzug in der eigenen Zone');
   pruefeGleich(wert(100, 0), basis, 'influenceInvade wirkt nicht in der eigenen Zone');
+});
+
+/* Unabhängige Nachrechnung nach Bouzy (wie GNU Go): bei der Dilatation
+   wächst ein Feld nur, wenn es keinen Nachbarn der Gegenfarbe hat. Ein
+   leeres Feld zwischen beiden Farben bleibt 0. Bewusst ohne Code aus
+   index.html geschrieben. */
+function bouzyReferenz(board) {
+  let z = new Int32Array(BOARD_SIZE), w = new Int32Array(BOARD_SIZE);
+  for (let i = 0; i < BOARD_SIZE; i++) z[i] = board[i] === 1 ? 128 : board[i] === 2 ? -128 : 0;
+  for (let k = 0; k < 5; k++) {
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      let p = 0, n = 0;
+      for (const j of NEIGHBORS[i]) { if (z[j] > 0) p++; else if (z[j] < 0) n++; }
+      const v = z[i];
+      w[i] = (v >= 0 && n === 0) ? v + p : (v <= 0 && p === 0) ? v - n : v;
+    }
+    [z, w] = [w, z];
+  }
+  for (let k = 0; k < 21; k++) {
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      let np = 0, nn = 0;
+      for (const j of NEIGHBORS[i]) { if (z[j] <= 0) np++; if (z[j] >= 0) nn++; }
+      const v = z[i];
+      w[i] = v > 0 ? Math.max(0, v - np) : v < 0 ? Math.min(0, v + nn) : 0;
+    }
+    [z, w] = [w, z];
+  }
+  return z;
+}
+
+test('Karte stimmt an echten Partiestellungen Feld für Feld mit Bouzy überein', () => {
+  /* Die erste Fassung ließ ein leeres Feld zwischen beiden Farben in
+     Richtung der Mehrheit wachsen (pos − neg). An konstruierten Stellungen
+     schleift die Erosion das wieder weg; an echten Partien blieben 1 bis 3
+     Felder je Stellung falsch zugeordnet. Deshalb hier echte Stellungen. */
+  const fs = require('fs'), path = require('path');
+  const txt = fs.readFileSync(path.join(__dirname, 'stellungen', 'laufkampf-211.sgf'), 'utf8');
+  const re = /;([BW])\[([a-s]{0,2})\]/g; const zs = []; let m;
+  while ((m = re.exec(txt))) zs.push({f: m[1] === 'B' ? 1 : 2,
+    i: m[2] ? idx(m[2].charCodeAt(0) - 97, m[2].charCodeAt(1) - 97) : -1});
+  for (const bis of [40, 80, 120, 160, 200]) {
+    const b = leer();
+    for (let t = 0; t < bis; t++) {
+      const z = zs[t]; if (z.i < 0) continue;
+      b[z.i] = z.f; removeDeadGroups(b, z.f === 1 ? 2 : 1, z.i);
+    }
+    primeInfluenceCache(b);
+    const ref = bouzyReferenz(b);
+    let abw = 0;
+    for (let i = 0; i < BOARD_SIZE; i++) if (influenceZone(i, 1) !== Math.sign(ref[i]) + 0) abw++;
+    pruefeGleich(abw, 0, `abweichende Felder nach Zug ${bis}`);
+  }
 });
 
 laufeTests('Einflusskarte').then(ok => process.exit(ok ? 0 : 1));
