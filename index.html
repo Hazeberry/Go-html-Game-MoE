@@ -1562,6 +1562,22 @@ globalThis.PARAMS = {
      Default 0 = altes Verhalten, bis der A/B-Harness eine Aussage erlaubt. */
   localityBonus:     0,
   localityRadius:    4,
+  /* Einflusskarte (Bouzy-Dilatation/-Erosion), einmal pro Zug an der Wurzel
+     berechnet. Anlass: evaluateBoard und die Zugexperten sehen kein Gebiet;
+     estimateArea zaehlt nur vollstaendig umschlossene Regionen und ist im
+     Mittelspiel nicht angeschlossen. Ein Rahmen mit einer einzigen Luecke
+     zaehlt dort nur noch seine Steine (gemessen: 47 statt 169). Die
+     Einflusskarte sieht ihn weiter, aber anders: als Band um die Steine,
+     nicht als gefuelltes Gebiet -- 69 der 121 Innenfelder, dazu 115 Felder
+     ausserhalb des Rings. Die beiden Zahlen sind deshalb nicht vergleichbar.
+       influenceInvade  Bonus fuer Zuege in der Einflusszone des GEGNERS
+                        (Reduktion/Invasion)
+       influenceOwn     Abzug fuer Zuege in der eigenen Zone (Selbstauffuellen)
+     Beide additiv wie localityBonus -- dieselbe Skalenwarnung gilt: Eroeffnung
+     (~40-95) und Mittelspiel (~Hunderte) haben verschiedene Skalen. Ungemessen.
+     Default 0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
+  influenceInvade:   0,
+  influenceOwn:      0,
   /* Adaptives Zeitbudget (Tin/GLM-Vorschlag, stufenlos statt Sprungfunktion).
      Reale Partie zeigte 86% Sim-Rückgang über 156 Züge (317→43) durch
      wachsende floodFill-Kosten auf großen Gruppen — kontinuierlicher Verfall,
@@ -2696,6 +2712,61 @@ function primeAreaCache(board, color) {
   _areaCacheValid = true;
 }
 
+/* ── Einflusskarte (Bouzy) ───────────────────────────────────────────────
+   Jeder Stein startet mit +-128 (Schwarz positiv, Weiss negativ, in ABSOLUTEN
+   Farben, damit dieselbe Karte fuer beide Seiten taugt). INFLUENCE_DILATE
+   Dilatationen lassen den Einfluss auf die Nachbarfelder ausstrahlen, danach
+   nimmt INFLUENCE_ERODE Erosionen den schwachen Rand wieder weg. Was uebrig
+   bleibt, ist die Zone, in der eine Farbe klar vorne liegt; 0 = umstritten
+   oder neutral. Werte 5/21 sind die klassischen aus der Literatur fuer 19x19,
+   fuer diese Engine NICHT abgestimmt.
+
+   Kosten: (5 + 21) Durchlaeufe ueber 361 Felder mit je bis zu 4 Nachbarn, also
+   grob 40 000 Schritte -- einmal pro Zug an der Wurzel vertretbar, pro
+   Simulation nicht. Deshalb nur ueber primeInfluenceCache, nie aus
+   evaluateBoard. Keine Allokation: zwei feste Puffer, die sich abwechseln. */
+const INFLUENCE_DILATE = 5, INFLUENCE_ERODE = 21;
+const _infA = new Int32Array(BOARD_SIZE), _infB = new Int32Array(BOARD_SIZE);
+let _infMap = _infA, _infValid = false;
+
+function primeInfluenceCache(board) {
+  let z = _infA, w = _infB;
+  for (let i = 0; i < BOARD_SIZE; i++)
+    z[i] = board[i] === 1 ? 128 : board[i] === 2 ? -128 : 0;
+  for (let k = 0; k < INFLUENCE_DILATE; k++) {
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      let pos = 0, neg = 0;
+      for (const n of NEIGHBORS[i]) { const q = z[n]; if (q > 0) pos++; else if (q < 0) neg++; }
+      const v = z[i];
+      /* Bouzy: wachsen darf nur, wer keinen Nachbarn der Gegenfarbe hat.
+         Ein leeres Feld zwischen beiden Farben bleibt 0 -- umstritten. */
+      w[i] = (v >= 0 && neg === 0) ? v + pos
+           : (v <= 0 && pos === 0) ? v - neg : v;
+    }
+    const t = z; z = w; w = t;
+  }
+  for (let k = 0; k < INFLUENCE_ERODE; k++) {
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      let nichtPos = 0, nichtNeg = 0;
+      for (const n of NEIGHBORS[i]) { const q = z[n]; if (q <= 0) nichtPos++; if (q >= 0) nichtNeg++; }
+      const v = z[i];
+      w[i] = v > 0 ? Math.max(0, v - nichtPos) : v < 0 ? Math.min(0, v + nichtNeg) : 0;
+    }
+    const t = z; z = w; w = t;
+  }
+  _infMap = z;
+  _infValid = true;
+}
+
+/* +1 = Feld liegt in der eigenen Zone von `color`, -1 = in der des Gegners,
+   0 = umstritten/neutral (oder keine Karte). */
+function influenceZone(i, color) {
+  if (!_infValid) return 0;
+  const v = _infMap[i];
+  if (v === 0) return 0;
+  return ((v > 0) === (color === 1)) ? 1 : -1;
+}
+
 function evalEndgame(board, i, color, mc) {
   const opp = color === 1 ? 2 : 1;
   let areaBefore, oppBefore;
@@ -3005,6 +3076,15 @@ function evaluateMove(board, i, color, mc, emptyFields) {
     const d = Math.max(Math.abs(xOf(i) - xOf(_lastMoveIdx)),
                        Math.abs(yOf(i) - yOf(_lastMoveIdx)));
     if (d <= R) sPhase += PARAMS.localityBonus * (1 - d / (R + 1));
+  }
+  /* Einflusszone: Reduktion im Gebiet des Gegners belohnen, Auffuellen der
+     eigenen Zone bestrafen. Wie der Lokalitaetsbonus VOR dem Crisis-Blend,
+     damit Taktik ihn ueberstimmen darf. Bei beiden Gewichten 0 wird kein
+     Zweig betreten -- bitgenau der alte Wert. */
+  if ((PARAMS.influenceInvade > 0 || PARAMS.influenceOwn > 0) && _infValid) {
+    const zone = influenceZone(i, color);
+    if (zone < 0) sPhase += PARAMS.influenceInvade;
+    else if (zone > 0) sPhase -= PARAMS.influenceOwn;
   }
   const wCrisis = getCrisisWeight(i);
   if (wCrisis === 0) return sPhase;
@@ -3620,6 +3700,7 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
      Dauer dieses Zuges sehen, nicht die des vorigen. */
   if (PARAMS.tsumegoSunkCost > 0) aktualisiereKrisenDauer(board, aiColor);
   primeAreaCache(board, aiColor);
+  if (PARAMS.influenceInvade > 0 || PARAMS.influenceOwn > 0) primeInfluenceCache(board);
   const scored = legal.map(m => ({m, score: evaluateMove(board, m.idx, aiColor, mc, empty)}));
   scored.sort((a,b) => b.score - a.score);
   /* PolicyNet: Priors berechnen + Score blenden (nur Hard-KI).
@@ -3683,6 +3764,11 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
     (mc > 120 && best < PARAMS.passMinMc120)  ||
     (best < PARAMS.passMinMc150 && mc > 150);
 
+  /* Die Einflusskarte ist farbneutral und die Stellung bis hierher
+     unveraendert: der Pass-Check unten bewertet die Gegnerzuege mit derselben
+     Karte. Wer nicht in den Pass-Check geht, braucht sie nicht mehr. */
+  if (!wantsToPass) _infValid = false;
+
   if (wantsToPass) {
     let ownInAtari = false;
     for (let k = 0; k < BOARD_SIZE; k++) {
@@ -3703,6 +3789,7 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
       if (sc > oppBest) oppBest = sc;
     }
     _areaCacheValid = false;
+    _infValid = false;
     buildCrisisMap(board, aiColor);
     const opponentGainsAlot = oppBest > PASS_GAIN_THRESHOLD;
     if (!ownInAtari && !opponentGainsAlot) {
@@ -5590,6 +5677,10 @@ globalThis.policyNet = new PolicyNet();
          tip:'⭐ EXPERIMENTELL. Bonus für Züge nahe dem letzten Gegnerzug. Gemessen: bis 200 wirkungslos, ab 400 nur noch reaktiv. Default 0 = aus. Braucht A/B-Test.'},
         {key:'localityRadius', label:'Lokal-Radius', step:1, min:1, max:9,
          tip:'Chebyshev-Radius um den letzten Gegnerzug, linear abfallend'},
+        {key:'influenceInvade', label:'Einfluss: Invasion', step:50, min:0, max:600,
+         tip:'EXPERIMENTELL. Bonus für Züge in der Einflusszone des Gegners (Bouzy-Karte, einmal pro Zug). Sieht auch Rahmen mit Lücken, die estimateArea nicht zählt. Default 0 = aus. Ungemessen, braucht A/B-Test.'},
+        {key:'influenceOwn', label:'Einfluss: eigene Zone', step:50, min:0, max:600,
+         tip:'EXPERIMENTELL. Abzug für Züge in der eigenen Einflusszone (nicht das eigene Gebiet auffüllen). Default 0 = aus. Ungemessen.'},
         {key:'bensonMoveFilter', label:'Benson-Filter', step:1, min:0, max:1,
          tip:'1 = todgeborene Züge (beweisbar toter Stein) fliegen aus der Kandidatenliste; nur Pass bleibt, wenn nichts übrig ist'},
         {key:'captureCap', label:'Gefangenen-Deckel', step:50, min:0, max:1000,

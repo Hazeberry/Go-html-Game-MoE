@@ -1,0 +1,142 @@
+# Einflusskarte (Bouzy): vorab festgelegte Messung
+
+**Status: festgelegt am 01.10.2026, vor dem ersten Lauf.** Was nach einem
+Lauf hinzukommt, steht als Nachtrag darunter; die Abschnitte 1–7 werden
+danach nicht mehr geändert. Dieselbe Regel wie in
+[`pilot-benson-defense.md`](pilot-benson-defense.md).
+
+Auswertung: [`auswertung/einfluss.js`](../auswertung/einfluss.js).
+
+---
+
+## 1. Anlass
+
+`evaluateBoard` und die Zugexperten sehen kein Gebiet. `estimateArea` zählt
+nur vollständig umschlossene Regionen und ist im Mittelspiel nicht
+angeschlossen; ein Rahmen mit einer einzigen Lücke zählt dort nur noch seine
+Steine (47 statt 169). Die Einflusskarte nach Bouzy (5 Dilatationen,
+21 Erosionen) sieht ihn trotzdem — als Band um die Steine, nicht als
+gefülltes Gebiet: 69 der 121 Innenfelder, dazu 115 Felder außerhalb.
+
+Zwei Gewichte wirken in `evaluateMove`, vor dem Krisen-Blend:
+
+| Parameter | Wirkung |
+|---|---|
+| `influenceInvade` | Bonus für Züge in der Zone des **Gegners** (Reduktion, Invasion) |
+| `influenceOwn` | Abzug für Züge in der **eigenen** Zone (nicht das eigene Gebiet auffüllen) |
+
+Default beider: 0. Dann wird die Karte nicht berechnet und kein Zweig
+betreten; die Engine spielt bitgleich wie vorher.
+
+## 2. Stand des Codes
+
+Die erste Fassung (`b65715e`) ließ bei der Dilatation ein leeres Feld
+zwischen beiden Farben in Richtung der Mehrheit wachsen (`pos − neg`). Bei
+Bouzy bleibt es 0 — umstritten. An konstruierten Stellungen schleift die
+Erosion das wieder weg; an echten Partiestellungen blieben 1 bis 3 Felder je
+Stellung falsch zugeordnet, stets als Zone statt als neutral. Behoben, und
+`tests/influence.js` vergleicht die Karte jetzt an fünf Stellungen der
+mitgelieferten Partie Feld für Feld mit einer unabhängigen Nachrechnung.
+Gemessen wird ausschließlich mit der behobenen Fassung.
+
+## 3. Skala — woran sich die Dosis orientiert
+
+Zugwerte von `evaluateMove` an der mitgelieferten Partie
+(`tests/stellungen/laufkampf-211.sgf`), absteigend sortiert:
+
+```
+Zug     #1    #16    #40   Median
+ 20    215    191    161      143
+ 40    930    816    280      255
+ 80    995    965    963      153
+120    610    610     30       30
+160    610    610     30       30
+200    610    610     60       30
+```
+
+Zwischen Rang 1 und Rang 16 liegen bis Zug 80 nur 24 bis 114 Punkte. Ab Zug
+120 teilen sich mindestens 16 Kandidaten den Wert 610, dahinter fällt es auf
+30 bis 60. Ein Gewicht von **50** sortiert also die vorderen Kandidaten um,
+**150** stark; keines der beiden hebt ab Zug 120 einen Zug von unterhalb des
+Plateaus hinein. Das sind die beiden Dosen des Piloten.
+
+In Partien der Engine gegen sich selbst liegt die Grenze bei Platz 16 meist
+mitten in einem Gleichstand. Gemessen an jeder 20. Stellung der ersten zehn
+Partien des Kontrolllaufs aus `pilot-benson-defense.md` §14.1, ohne Rauschen
+gerechnet: in 144 von 161 Stellungen reichen gleich bewertete Züge über
+Platz 16 hinweg, im Median 58 Züge, am häufigsten beim Wert 30 — dem
+Grundwert des Endspiel-Experten (`endAreaGain` × ein Feld, weil
+`estimateArea` offenes Gebiet nicht sieht). Welche davon an die Wurzel
+kommen, entscheidet heute das Rauschen. Jedes Gewicht über 0 entscheidet
+diese Gleichstände stattdessen nach Zone; auch die kleine Dosis wirkt also
+nicht nur am Rand.
+
+## 4. Arme
+
+| Arm | Parameter |
+|---|---|
+| A | Default (`influenceInvade = influenceOwn = 0`) |
+| B(X) | `influenceInvade = X`, `influenceOwn = X` |
+
+Beide mit `mctsFixedSims=120`, Standardmodus mit Farbwechsel. Beide Gewichte
+laufen gemeinsam mit derselben Dosis: das hält den Versuch bei einem Regler.
+Welcher der beiden Terme wirkt, beantwortet dieser Plan deshalb nicht.
+
+## 5. Pilot
+
+```bash
+node ab-harness.js --games 40 --seed 20261002 \
+  --A mctsFixedSims=120 \
+  --B mctsFixedSims=120,influenceInvade=50,influenceOwn=50 \
+  --roh einfluss-50.jsonl --json einfluss-50.json
+
+node ab-harness.js --games 40 --seed 20261003 \
+  --A mctsFixedSims=120 \
+  --B mctsFixedSims=120,influenceInvade=150,influenceOwn=150 \
+  --roh einfluss-150.jsonl --json einfluss-150.json
+```
+
+Der Pilot misst den **Mechanismus** (Anteil der Züge in Gegner- und eigener
+Zone je Arm) und dient bei der Siegrate nur als Schadensprüfung. Eine
+Stärkeaussage trifft er nicht.
+
+**Dosiswahl, vorab festgelegt:** Die Hauptreihe läuft mit X = 150, wenn in
+dessen Pilot
+
+1. B mindestens 12 von 40 Partien gewinnt — weniger wäre bei einer
+   gleichstarken Engine nur mit p = 0,003 zu erwarten — und
+2. der gepoolte Anteil der Züge in der Gegnerzone bei B höher liegt als bei A.
+
+Sonst mit X = 50 unter denselben zwei Bedingungen. Erfüllt keine Dosis
+beide, entfällt die Hauptreihe und der Pilot wird als Ergebnis berichtet.
+
+## 6. Hauptreihe
+
+```bash
+node ab-harness.js --games 360 --seed 20261004 \
+  --A mctsFixedSims=120 \
+  --B mctsFixedSims=120,influenceInvade=X,influenceOwn=X \
+  --roh einfluss-haupt.jsonl --json einfluss-haupt.json
+```
+
+**Primär:** Siegrate von B, zweiseitig gegen 50 %, α = 0,05,
+Normalapproximation. Kleinster nachweisbarer Effekt bei 80 % Power:
+±7,4 Prozentpunkte.
+
+| Ergebnis | Lesart |
+|---|---|
+| B > 50 %, p < 0,05 | B spielt stärker — als Erstlauf eine Hypothese; vor einer Default-Änderung zu wiederholen |
+| p ≥ 0,05 | kein Stärkeeffekt in dieser Größe nachweisbar |
+| B < 50 %, p < 0,05 | B spielt schwächer |
+
+**Sekundär, ohne Anspruch:** Zonenanteile je Arm (gepaart je Partie),
+Aufgaben, Partielänge.
+
+## 7. Was dieser Plan nicht beantwortet
+
+- Welcher der beiden Terme wirkt (§4).
+- Andere Dosen als die gewählte, und ob 5/21 für diese Engine die richtigen
+  Bouzy-Werte sind.
+- Was der Term in der Browser-Partie mit Zeitbudget statt fester
+  Simulationszahl kostet. Die Karte wird einmal je Zug an der Wurzel
+  berechnet (rund 40 000 Schritte), nicht je Simulation.
