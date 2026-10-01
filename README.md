@@ -2017,6 +2017,7 @@ index.html                      Spiel und Engine, eine Datei
 ab-harness.js                   Messrahmen; Kopfkommentar = Versuchsprotokoll
 distillation/                   Überwachtes Training fürs Policy-Netz
 docs/                           Versuchsprotokolle, die zu lang für den README sind
+auswertung/                     Auswertung der Rohdumps (--roh), Rechenweg der Protokolle
 tests/                          Regressionstests (node tests/run.js)
 tests/stellungen/               echte Partien als Testvorlage (SGF)
 .github/workflows/tests.yml       Regressionstests bei jedem Push und PR
