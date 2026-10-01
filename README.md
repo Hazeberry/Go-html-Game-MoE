@@ -1965,6 +1965,36 @@ Freiheitsband geschichtet trennt Einschließung nichts (78,4 % gegen 79,2 %),
 und von 3422 Gruppen mit mindestens acht Freiheiten stirbt keine einzige
 binnen 40 Zügen.
 
+### Die Wurzel-Kandidaten sind ein Los — an Gleichständen, nicht am Rauschen
+
+MCTS prüft an der Wurzel nur die besten 16 Züge nach `evaluateMove`. Zwei
+Ziehungen auf demselben Brett teilen davon im Mittel nur 51 %. Die naheliegende
+Erklärung war das Rauschen der Phasen-Experten (`+rnd*3`, `*4`, `*0,5`, `*3`).
+Sie stimmt nicht: Wird `Math.random` während der Bewertung auf ein Millionstel
+skaliert, sodass es nur noch Gleichstände bricht, bleibt die Überlappung bei
+51,5 % — genau dem Wert, den ein reines Los an Gleichständen erwarten lässt.
+
+| Experte | Zugbereich | Gleichstand an Platz 16 | gelost von 16 | gespielter Zug aus dem Los |
+|---|---|---:|---:|---:|
+| Eröffnung | bis Zug 19 | 100 % | 5,0 | 0 % |
+| Mittelspiel | Zug 20–79 | 80 % | 4,5 | 0 % |
+| **Endspiel** | **ab Zug 80** | **99 %** | **13,2** | **37 %** |
+
+Ab Zug 80 bewertet der Endspiel-Experte allein (`endgameMoves`), und für ihn
+kostet jeder ruhige Zug in offenem Gelände dasselbe: `estimateArea` zählt nur
+umschlossene Regionen, der Zug ändert sie um genau seinen eigenen Stein, eins
+mal `endAreaGain` ist **30** — der häufigste Wert an der Grenze. Über alle
+Stellungen teilen sich im Median 45 Züge den Wert an Platz 16, und nur zwei
+stehen darüber. Mehr als jeder dritte Endspielzug, den die Engine spielt, kam
+nur per Los überhaupt in die Suche. Weniger Rauschen würde daran nichts
+ändern; gar keins wäre schlechter, dann entschiede der Feldindex.
+
+Ob das Los Spielstärke kostet, ist damit nicht gemessen. Die Rekonstruktion ist
+geprüft: ohne Tree-Reuse liegt jeder gespielte Zug in der nachgebauten Liste.
+Mit Reuse liegen 15 % der Züge darunter — sie stammen aus wiederverwendeten
+Teilbäumen, deren Kinder `quickEval` gewählt hat. Methode und Zahlen:
+[`docs/wurzel-gleichstand.md`](docs/wurzel-gleichstand.md).
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im
