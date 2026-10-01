@@ -25,7 +25,10 @@
    der einfache Ko-Punkt wird aus dem letzten Einzelschlag rekonstruiert.
 
    Aufruf:
-     node auswertung/wurzel-gleichstand.js <dump.jsonl> [--partien N] [--abstand K] */
+     node auswertung/wurzel-gleichstand.js <dump.jsonl> [--partien N] [--abstand K]
+                                           [--A k=v,... --B k=v,...]
+   Mit --A/--B wird jede Stellung mit den Parametern des Arms bewertet, der
+   dort am Zug war, und das Ergebnis zusätzlich je Arm berichtet. */
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -69,7 +72,16 @@ function bewerte(board, farbe, mc, ko, zufall) {
 const spitze = sc => new Set(sc.slice(0, K).map(x => x.i));
 const ueberlappung = (a, b) => { let o = 0; for (const x of a) if (b.has(x)) o++; return o / Math.min(K, a.size); };
 
-function messen(datei, {partien = 40, abstand = 20} = {}) {
+/* PARAMS für die Dauer von fn setzen und exakt zurückgeben. */
+function mitParams(werte, fn) {
+  const alt = {};
+  for (const k of Object.keys(werte)) { alt[k] = E.PARAMS[k]; E.PARAMS[k] = werte[k]; }
+  try { return fn(); } finally { for (const k of Object.keys(alt)) E.PARAMS[k] = alt[k]; }
+}
+
+/* armParams = {A: {...}, B: {...}}: jede Stellung wird mit den Parametern
+   des Arms bewertet, der dort am Zug ist — so, wie er sie im Lauf sah. */
+function messen(datei, {partien = 40, abstand = 20, armParams = null} = {}) {
   const P = fs.readFileSync(datei, 'utf8').trim().split('\n').slice(0, partien).map(z => JSON.parse(z));
   const zeilen = [];
   let seed = 1;
@@ -78,7 +90,8 @@ function messen(datei, {partien = 40, abstand = 20} = {}) {
     let ko = null;
     p.ereignisse.forEach((e, t) => {
       const farbe = e.farbe === 'S' ? 1 : 2;
-      if (t > 0 && t % abstand === 0) {
+      const arm = farbe === 1 ? p.armSchwarz : p.armWeiss;
+      if (t > 0 && t % abstand === 0) mitParams(armParams ? armParams[arm] || {} : {}, () => {
         const roh = bewerte(b, farbe, t, ko, () => 0);
         if (roh && roh.length > K) {
           const s1 = seed++, s2 = seed++;
@@ -109,11 +122,11 @@ function messen(datei, {partien = 40, abstand = 20} = {}) {
           const experte = pw.wEnd >= pw.wMid && pw.wEnd >= pw.wOpen ? 'Endspiel'
                         : pw.wMid >= pw.wOpen ? 'Mittelspiel' : 'Eröffnung';
           zeilen.push({partie: p.nr, zug: t, kandidaten: roh.length, wert: v, ueber, gleich, experte,
-                       minAbstand, gespielt,
+                       minAbstand, gespielt, arm,
                        voll: ueberlappung(spitze(voll1), spitze(voll2)),
                        fein: ueberlappung(spitze(fein1), spitze(fein2))});
         }
-      }
+      });
       if (e.idx >= 0) {
         b[e.idx] = farbe;
         const cap = E.removeDeadGroups(b, farbe === 1 ? 2 : 1, e.idx);
@@ -128,7 +141,7 @@ function messen(datei, {partien = 40, abstand = 20} = {}) {
   return zeilen;
 }
 
-function bericht(zeilen) {
+function bericht(zeilen, proArm = false) {
   const L = [], log = s => L.push(s);
   const mit = a => a.reduce((x, y) => x + y, 0) / (a.length || 1);
   const proz = x => (100 * x).toFixed(1) + ' %';
@@ -182,6 +195,18 @@ function bericht(zeilen) {
       + `   nur Gleichstand ${proz(mit(t.map(z => z.fein))).padStart(7)}`
       + `   gespielt aus Los ${proz(t.filter(z => z.gespielt === 'los').length / t.length).padStart(7)}`);
   }
+  if (proArm) {
+    log('');
+    log('nach Arm (jede Stellung mit den Parametern des Arms bewertet, der am Zug war)');
+    for (const a of ['A', 'B']) {
+      const t = zeilen.filter(z => z.arm === a);
+      if (!t.length) continue;
+      const e = t.filter(z => z.experte === 'Endspiel');
+      log(`  ${a}: ${String(t.length).padStart(5)} Stellungen   Endspiel-Experte ${proz(e.length / t.length).padStart(7)}`
+        + `   Losplätze Ø ${mit(t.map(lospl)).toFixed(1).padStart(4)}`
+        + `   gespielt aus Los ${proz(t.filter(z => z.gespielt === 'los').length / t.length).padStart(7)}`);
+    }
+  }
   return L.join('\n');
 }
 
@@ -195,8 +220,12 @@ if (require.main === module) {
   for (let i = 1; i < a.length; i++) {
     if (a[i] === '--partien') opt.partien = +a[++i];
     else if (a[i] === '--abstand') opt.abstand = +a[++i];
+    else if (a[i] === '--A' || a[i] === '--B') {
+      opt.armParams = opt.armParams || {A: {}, B: {}};
+      for (const kv of a[++i].split(',')) { const [k, v] = kv.split('='); opt.armParams[a[i - 1].slice(2)][k] = +v; }
+    }
   }
-  console.log(bericht(messen(a[0], opt)));
+  console.log(bericht(messen(a[0], opt), !!opt.armParams));
 }
 
-module.exports = {messen, bericht, bewerte};
+module.exports = {messen, bericht, bewerte, PARAMS: E.PARAMS};

@@ -147,6 +147,15 @@ test('auswertung/wurzel-gleichstand.js rekonstruiert die Wurzelliste aus dem Dum
     pruefe(r.voll >= 0 && r.voll <= 1 && r.fein >= 0 && r.fein <= 1, 'Überlappung außerhalb [0, 1]');
     pruefe(r.ueber + r.gleich >= 16 || r.kandidaten <= 16, 'Platz 16 liegt nicht in ueber + gleich');
   }
+  /* Je Arm mit eigenen Parametern: jede Zeile trägt ihren Arm, und PARAMS
+     sind danach unverändert. */
+  const {PARAMS} = require('../auswertung/wurzel-gleichstand.js');
+  const vorher = PARAMS.endgameMoves;
+  const za = messen(path.join(TMP, 'a.jsonl'), {partien: 2, abstand: 5,
+    armParams: {A: {}, B: {endgameMoves: 150}}});
+  pruefe(za.every(r => r.arm === 'A' || r.arm === 'B'), 'Zeile ohne Arm');
+  pruefeGleich(za.length, z.length, 'gleich viele Stellungen mit und ohne Armparameter');
+  pruefeGleich(PARAMS.endgameMoves, vorher, 'endgameMoves nach der Messung');
 });
 
 test('params_hash hängt an den Parametern, nicht am Seed', () => {
