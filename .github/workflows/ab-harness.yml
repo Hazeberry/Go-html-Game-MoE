@@ -4,12 +4,19 @@ name: A/B-Harness
 # Laufzeit direkt aus index.html extrahiert — gemessen wird also exakt der
 # Stand, der auf GitHub Pages läuft, ohne Code-Duplikat.
 #
-# Zur Reproduzierbarkeit — gemessen, nicht vermutet: Der Seed macht Läufe
-# NICHT reproduzierbar. Das Budget ist Wall-Clock pro Zug, die Zahl der
+# Zur Reproduzierbarkeit — gemessen, nicht vermutet: Der Seed allein macht
+# Läufe NICHT reproduzierbar. Das Budget ist Wall-Clock pro Zug, die Zahl der
 # Simulationen pro Zug hängt also an der Maschinenlast. Zwei Läufe mit
 # identischem Seed UND identischer Konfiguration liefern nachweislich
 # verschiedene Partien (lokal verifiziert). Der Seed fixiert nur den
 # Zufallsstrom, nicht, an welcher Stelle er verbraucht wird.
+#
+# Reproduzierbar wird ein Lauf mit mctsFixedSims=N in params_a UND params_b,
+# und nur im Standardmodus (paired = 0): dann zählt die Suche Simulationen
+# statt Millisekunden, und derselbe Seed liefert Zug für Zug dieselben
+# Partien (docs/pilot-benson-defense.md, §13). Im gepaarten Modus spielt die
+# gemeinsame Eröffnung weiter mit Zeitbudget; dort laufen Läufe trotz
+# gleichem Seed auseinander (Errata E7).
 #
 # Für A/B ist das Rauschen, keine Verzerrung: es trifft A und B gleich.
 # Es erhöht aber die Varianz — Grund, warum die Partienzahl zählt und
@@ -26,7 +33,7 @@ on:
         required: true
         default: '20'
       seed:
-        description: 'Zufalls-Seed. Fixiert den Zufallsstrom, macht Läufe aber NICHT reproduzierbar (Zeitbudget, s. Kopfkommentar)'
+        description: 'Zufalls-Seed. Reproduzierbar nur zusammen mit mctsFixedSims=N in params_a und params_b, im Standardmodus (s. Kopfkommentar)'
         required: true
         default: '2026'
       paired:
@@ -116,7 +123,8 @@ jobs:
 
       # Hosted Runner teilen sich Hardware mit fremden Jobs — die Leistung
       # schwankt zwischen Läufen. Da das Zeitbudget fest ist, schlägt das
-      # direkt auf Sims/Zug durch und damit auf die Züge selbst. Ohne diesen
+      # direkt auf Sims/Zug durch und damit auf die Züge selbst (außer mit
+      # mctsFixedSims, dann zählt die Suche Simulationen). Ohne diesen
       # Kontext lässt sich hinterher nicht entscheiden, ob ein Unterschied in
       # der Siegrate von der Konfiguration kam oder vom Runner.
       - name: Runner-Kontext
