@@ -52,6 +52,7 @@ function ladeKI({htmlPfad = STANDARD_HTML, mitNetz = true, speicher = null} = {}
   const namen = ['_mctsKids', 'mctsPUCT', 'getAIMove', 'getLegalMoves',
                  'gebietSagtVerloren', 'estimateArea', 'evaluateBoard',
                  'evaluateMove', 'primeInfluenceCache', 'influenceZone',
+                 'primeAreaCache', 'buildCrisisMap', '_bnBornDead', 'phaseWeights',
                  'leseTransferWaechter', 'removeDeadGroups', 'bensonClassify',
                  '_bnDead', 'floodFill',
                  'PARAMS', 'BOARD_SIZE', 'NEIGHBORS', 'idx', 'xOf', 'yOf'];
