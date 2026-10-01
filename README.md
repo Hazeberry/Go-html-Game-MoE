@@ -7,6 +7,7 @@ läuft als Monte-Carlo-Baumsuche in einem Web Worker.
 Der zweite Teil des Projekts ist ein Messrahmen. Jede Aussage über die
 Spielstärke in diesem README stammt aus gepaarten Selbstspiel-Läufen mit
 Signifikanztest, nicht aus dem Eindruck beim Spielen.
+https://hazeberry.github.io/Go-html-Game-MoE/
 
 ## Spielen
 
@@ -2016,6 +2017,7 @@ index.html                      Spiel und Engine, eine Datei
 ab-harness.js                   Messrahmen; Kopfkommentar = Versuchsprotokoll
 distillation/                   Überwachtes Training fürs Policy-Netz
 docs/                           Versuchsprotokolle, die zu lang für den README sind
+auswertung/                     Auswertung der Rohdumps (--roh), Rechenweg der Protokolle
 tests/                          Regressionstests (node tests/run.js)
 tests/stellungen/               echte Partien als Testvorlage (SGF)
 .github/workflows/tests.yml       Regressionstests bei jedem Push und PR

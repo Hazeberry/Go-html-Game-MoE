@@ -110,6 +110,20 @@ test('Abbruchkriterium §4.2: gleicher Seed, gleiche Hashes', () => {
   }
 });
 
+test('auswertung/benson-reihe.js liest den Dump und rechnet je Partie', () => {
+  /* Der Rechenweg hinter §12 und §14 ging einmal verloren. Dieser Fall hält
+     fest, dass das Werkzeug zum Format passt, das der Harness schreibt. */
+  ersterLauf();
+  const {auswerten} = require('../auswertung/benson-reihe.js');
+  const {zeilen, text} = auswerten(path.join(TMP, 'a.jsonl'));
+  pruefeGleich(zeilen.length, 2, 'Partien in der Auswertung');
+  for (const z of zeilen)
+    for (const arm of ['A', 'B'])
+      for (const k of ['v2', 'gruppen', 'steine', 'verlustMax', 'd1'])
+        pruefe(Number.isInteger(z[arm][k]) && z[arm][k] >= 0, `${arm}.${k} = ${z[arm][k]}`);
+  pruefe(text.includes('params_hash einheitlich: ja'), 'Hash-Prüfung fehlt in der Ausgabe');
+});
+
 test('params_hash hängt an den Parametern, nicht am Seed', () => {
   /* §5.3: derselbe Parametersatz soll über Seeds hinweg denselben Hash
      tragen — sonst könnte man nicht prüfen, ob zwei Läufe dieselbe

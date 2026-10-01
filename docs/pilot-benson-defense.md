@@ -742,3 +742,95 @@ nichts; der Harness bricht diese Kombination jetzt mit einer Meldung ab.
 **E8 — Schlussstand Punkt 2, „27 % der Top-16".** Gemessen an 18 Stellungen
 (Züge 160–194) einer einzigen Partie, nicht allgemein. Als Richtung
 brauchbar, als Zahl nicht übertragbar.
+
+---
+
+# Nachtrag vom 01.10.2026: Wiederholung A–B, vorab festgelegt
+
+Anlass sind E5 und §10.3. Der A–B-Befund ist ein Erstlauf, und ob V2
+überhaupt mit dem Partieausgang zusammenhängt, wurde nie geprüft. Beides
+lässt sich mit **einem** neuen Lauf klären. Dieser Abschnitt steht vor dem
+Lauf im Repository; was danach hinzukommt, ist ein weiterer Nachtrag.
+
+## 14. Wiederholung
+
+### 14.1 Erst das Werkzeug prüfen
+
+Die Skripte hinter §12 sind verloren (§13). Der Rechenweg liegt jetzt als
+`auswertung/benson-reihe.js` im Repository, zusammengeführt aus den damaligen
+Skripten, die im Gesprächsprotokoll erhalten waren.
+
+Ob er stimmt, zeigt ein Wiederholungslauf mit dem **alten** Seed 20260923
+und dem Befehl aus §13. `index.html` ist auf `main` seit `217d714`
+unverändert (`git diff 217d714 main -- index.html` ist leer); `ab-harness.js`
+hat nur Hilfetext und die `--paired`-Sperre aus E7 bekommen. Der Lauf muss
+deshalb diese Zahlen aus §12 exakt wieder ergeben:
+
+```
+V2 absolut          A 1,850   B 1,147   Differenz −0,703   t = −5,570
+V2 je Gruppe        gepoolt 0,346 → 0,247   gepaart −0,1108   t = −4,081   345 Partien
+tote Gruppen        5,35 → 4,64
+tote Steine        12,85 → 9,59
+verlustMax          8,29 → 7,50
+D1                 62,33 → 53,55
+Siegrate B         51,7 %
+Aufgaben           A 115   B 124
+```
+
+Weicht eine Zahl ab, wird §14.2 nicht ausgewertet, bis die Ursache geklärt
+ist — dann stimmt entweder das Werkzeug nicht oder die Reproduzierbarkeit.
+
+### 14.2 Der neue Lauf
+
+```bash
+node ab-harness.js --games 360 --seed 20261001 \
+  --A mctsFixedSims=120,bensonEvalMaxEmpty=160,bensonDeathTransfer=0 \
+  --B mctsFixedSims=120,bensonEvalMaxEmpty=160,bensonDeathTransfer=1 \
+  --roh replik-ab.jsonl --json replik-ab.json
+```
+
+**Primär:** V2 je toter Gruppe, gepaart über die Partien, in denen beide
+Arme mindestens eine tote Gruppe haben, zweiseitig, α = 0,05. Das ist die
+Normierung aus §12.3, dort nachträglich gewählt, hier vorab — sie trennt
+Investition von Gelegenheit, was die absolute Zahl nicht tut.
+
+| Ergebnis | Lesart |
+|---|---|
+| Differenz < 0, p < 0,05 | **repliziert** |
+| p ≥ 0,05 | nicht repliziert |
+| Differenz > 0, p < 0,05 | widersprochen |
+
+Power, aus der Streuung in §12.3 (SD der Differenz 0,504, n ≈ 345):
+für den damaligen Effekt (−0,111) rund 98 %, für die Hälfte davon rund
+53 %. Erstläufe überschätzen ihren Effekt eher; ein „nicht repliziert"
+bei halbem Effekt ist also möglich und wäre keine Widerlegung.
+
+**Sekundär, ohne Anspruch:** V2 absolut, tote Gruppen, tote Steine, D1,
+`verlustMax`, Siegrate, Aufgaben.
+
+### 14.3 Hängt V2 am Ausgang?
+
+Auf dem **neuen** Lauf, alle 360 Partien, beide Arme gemeinsam: je Partie
+die V2-Rate (V2 je toter Gruppe) des Verlierers minus die des Gewinners,
+über die Partien, in denen beide mindestens eine tote Gruppe haben.
+Zweiseitig, α = 0,05. Erwartung: positiv — wer verliert, investiert öfter
+in Gruppen, die sterben.
+
+Das ist ein Zusammenhang, keine Ursache. Wer verliert, hat auch mehr tote
+Gruppen; die Normierung nimmt die Zahl heraus, nicht die Richtung des
+Einflusses. Ein positiver Befund heißt: V2 misst etwas, das mit Verlieren
+einhergeht. Ein Nullbefund heißt: der Mechanismus, den `bensonDeathTransfer`
+bewegt, hat mit dem Ausgang nichts Messbares zu tun — und das würde
+erklären, warum die Siegrate sich nicht bewegt.
+
+Zur Einordnung laufen V2 absolut, tote Gruppen und `verlustMax` in derselben
+Form mit; `verlustMax` ist die Größe, deren Zusammenhang aus dem Piloten
+bekannt ist (§10.3), und dient als Gegenprobe, dass der Vergleich
+überhaupt etwas findet, wo etwas ist.
+
+### 14.4 Was aufgehoben wird
+
+Das Auswertewerkzeug im Repository, und je Lauf eine kleine Liste unter
+`docs/daten/`: `params_hash`, je Partie `final_board_hash` und Sieger. Damit
+lässt sich jede spätere Wiederholung Partie für Partie gegen diesen Lauf
+prüfen, ohne die Rohdumps aufzubewahren.
