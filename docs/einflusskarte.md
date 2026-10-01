@@ -140,3 +140,51 @@ Aufgaben, Partielänge.
 - Was der Term in der Browser-Partie mit Zeitbudget statt fester
   Simulationszahl kostet. Die Karte wird einmal je Zug an der Wurzel
   berechnet (rund 40 000 Schritte), nicht je Simulation.
+
+---
+
+# Nachtrag vom 01.10.2026: Pilot und Dosiswahl
+
+Geschrieben nach dem Piloten und **vor** jedem Ergebnis der Hauptreihe.
+
+## 8. Pilot
+
+Beide Läufe nach §5, je 40 Partien, Commit `a34fe3f` (Merge von #79),
+ausgewertet mit `auswertung/einfluss.js`:
+
+```
+                 Züge in der Gegnerzone   Züge in der eigenen Zone   Siege B           Aufgaben A / B
+A gegen B(50)    5,1 % → 10,0 %           9,3 % → 6,6 %              18 von 40 (45 %)  14 / 22
+A gegen B(150)   4,3 % → 10,4 %           9,0 % → 5,2 %              14 von 40 (35 %)   9 / 21
+
+gepaart je Partie, B − A:
+  B(50)    Gegnerzone +5,27 pp (t = 9,42)    eigene Zone −2,90 pp (t = −4,35)
+  B(150)   Gegnerzone +6,57 pp (t = 10,56)   eigene Zone −3,87 pp (t = −7,48)
+```
+
+Der Mechanismus greift in beiden Dosen: der Anteil der Züge in der Zone des
+Gegners verdoppelt sich, der in der eigenen Zone sinkt. Damit ist die
+Methodik-Regel des README erfüllt — ein späteres Nullergebnis der Siegrate
+wäre keines, bei dem der Parameter gar nicht wirkte.
+
+Die Siegrate ist im Piloten nur Schadensprüfung. Bei 40 Partien liegt das
+95 %-Band bei ±15,5 Prozentpunkten; 35 % (p = 0,058) und 45 % (p = 0,53)
+sind beide damit vereinbar, dass B gleich stark spielt. Auffällig, aber nicht
+geprüft: B gibt in beiden Piloten öfter auf (22 gegen 14, 21 gegen 9).
+
+## 9. Dosiswahl nach §5
+
+Für X = 150 sind beide Bedingungen erfüllt: B gewinnt 14 von 40 (Schwelle:
+mindestens 12), und der Anteil der Züge in der Gegnerzone liegt bei B höher
+(10,4 % gegen 4,3 %). **Die Hauptreihe läuft mit X = 150.**
+
+Dass der Pilot bei 150 eher nach Schaden aussieht als bei 50, ändert die Wahl
+nicht. Die Regel war vor den Daten festgelegt und sollte nur deutlichen
+Schaden ausschließen; nach den Daten umzusteuern hieße, sie wertlos zu
+machen. Spielt B(150) schwächer, zeigt das die Hauptreihe — auch das ist eine
+Antwort.
+
+## 10. Ausführung
+
+Hauptreihe gestartet am 01.10.2026 um 20:18 UTC auf Commit `a34fe3f`, Befehl
+aus §6 mit X = 150, Seed 20261004.
