@@ -137,6 +137,18 @@ test('auswertung/einfluss.js liest den Dump und ordnet jeden Zug einer Zone zu',
   }
 });
 
+test('auswertung/wurzel-gleichstand.js rekonstruiert die Wurzelliste aus dem Dump', () => {
+  ersterLauf();
+  const {messen} = require('../auswertung/wurzel-gleichstand.js');
+  const z = messen(path.join(TMP, 'a.jsonl'), {partien: 2, abstand: 5});
+  pruefe(z.length > 0, 'keine Stellung gemessen');
+  for (const r of z) {
+    pruefe(['sicher', 'los', 'darunter', 'pass', 'gefiltert'].includes(r.gespielt), `Klasse ${r.gespielt}`);
+    pruefe(r.voll >= 0 && r.voll <= 1 && r.fein >= 0 && r.fein <= 1, 'Überlappung außerhalb [0, 1]');
+    pruefe(r.ueber + r.gleich >= 16 || r.kandidaten <= 16, 'Platz 16 liegt nicht in ueber + gleich');
+  }
+});
+
 test('params_hash hängt an den Parametern, nicht am Seed', () => {
   /* §5.3: derselbe Parametersatz soll über Seeds hinweg denselben Hash
      tragen — sonst könnte man nicht prüfen, ob zwei Läufe dieselbe
