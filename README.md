@@ -162,8 +162,11 @@ node ab-harness.js --games 40 --seed 20260922 \
 ```
 
 `--roh` schreibt einen zugweisen Rohdump als JSON Lines, eine Zeile je Partie,
-angehängt direkt nach deren Ende — ein abgebrochener Lauf kostet damit nur die
-laufende Partie. Jede Zeile trägt `params_hash` und `final_board_hash`; sind
+angehängt direkt nach deren Ende. Bricht ein Lauf ab, setzt ihn derselbe Befehl
+mit `--fortsetzen` nach der letzten fertigen Partie fort — jede Zeile trägt den
+Zustand des Zufallsstroms, der fortgesetzte Dump ist Byte für Byte derselbe wie
+ein ununterbrochener. Ein Abbruch kostet damit nur die laufende Partie. Jede
+Zeile trägt außerdem `params_hash` und `final_board_hash`; sind
 beide bei einer Wiederholung gleich, hat der Lauf dieselben Partien gespielt.
 `--roh` gibt es nur im Standardmodus; zusammen mit `--paired` bricht der
 Harness mit einer Meldung ab, statt stundenlang zu spielen und nichts zu

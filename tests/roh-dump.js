@@ -168,6 +168,35 @@ test('auswertung/hashliste.js erkennt denselben Lauf und eine Abweichung', () =>
   pruefeGleich(pruefeListe(P, anders).length, 1, 'eine geänderte Partie muss auffallen');
 });
 
+test('--fortsetzen setzt einen abgebrochenen Lauf Partie für Partie gleich fort', () => {
+  /* Lange Läufe wurden vom Ausführungsrahmen mehrfach abgebrochen. Ein
+     fortgesetzter Lauf muss denselben Dump ergeben wie ein ununterbrochener —
+     bis auf das letzte Bit, sonst wäre er ein anderer Lauf. */
+  const K = ['--html', STANDARD_HTML, '--seed', '4242', '--maxmoves', '40',
+             '--A', 'mctsFixedSims=60', '--B', 'mctsFixedSims=60'];
+  const ganz = path.join(TMP, 'ganz.jsonl'), teil = path.join(TMP, 'teil.jsonl');
+  execFileSync(process.execPath, [HARNESS, ...K, '--games', '3', '--roh', ganz], {stdio: 'ignore'});
+  execFileSync(process.execPath, [HARNESS, ...K, '--games', '1', '--roh', teil], {stdio: 'ignore'});
+  execFileSync(process.execPath, [HARNESS, ...K, '--games', '3', '--roh', teil, '--fortsetzen'],
+               {stdio: 'ignore'});
+  const a = fs.readFileSync(ganz, 'utf8'), b = fs.readFileSync(teil, 'utf8');
+  pruefeGleich(b.trim().split('\n').length, 3, 'Partien nach dem Fortsetzen');
+  pruefe(a === b, 'fortgesetzter Dump weicht vom ununterbrochenen ab');
+  pruefe(JSON.parse(a.split('\n')[0]).zufall, 'Zufallszustand fehlt im Partiesatz');
+});
+
+test('--fortsetzen bricht bei anderem Seed ab, statt einen fremden Lauf anzuhängen', () => {
+  const teil = path.join(TMP, 'teil.jsonl');
+  let code = 0, fehler = '';
+  try {
+    execFileSync(process.execPath, [HARNESS, '--html', STANDARD_HTML, '--seed', '4243',
+      '--maxmoves', '40', '--A', 'mctsFixedSims=60', '--B', 'mctsFixedSims=60',
+      '--games', '4', '--roh', teil, '--fortsetzen'], {stdio: ['ignore', 'ignore', 'pipe']});
+  } catch (e) { code = e.status; fehler = String(e.stderr || ''); }
+  pruefeGleich(code, 2, 'Exit-Code bei fremdem Seed');
+  pruefe(fehler.includes('anderer Seed'), `Meldung: ${fehler}`);
+});
+
 test('params_hash hängt an den Parametern, nicht am Seed', () => {
   /* §5.3: derselbe Parametersatz soll über Seeds hinweg denselben Hash
      tragen — sonst könnte man nicht prüfen, ob zwei Läufe dieselbe

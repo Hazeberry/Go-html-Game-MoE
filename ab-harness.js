@@ -66,6 +66,15 @@
                        Wer dieses Format ändert, ändert zuerst dort.
                        Nur im Standardmodus; mit --paired bricht der
                        Harness ab.
+     --fortsetzen      Einen abgebrochenen Lauf fortsetzen: liest die
+                       fertigen Partien aus der --roh-Datei, prüft Seed
+                       und params_hash, setzt den Zufallsstrom auf den
+                       Stand nach der letzten Partie und spielt ab der
+                       nächsten weiter. Braucht --seed, --roh und feste
+                       Simulationen (mctsFixedSims in beiden Armen), sonst
+                       wären die Partien ohnehin nicht dieselben. --json
+                       und die Zusammenfassung umfassen danach nur die neu
+                       gespielten Partien; maßgeblich ist der Rohdump.
      --net <pfad>      Gewichte für das PolicyNet. Inhalt ist exakt der
                        String, den der Browser unter localStorage
                        'go_pnet' ablegt (im Dashboard gespeichert oder
@@ -738,7 +747,7 @@ function parseArgs(argv) {
     html: './index.html', games: 4, paired: 0, opening: 20, obudget: 100,
     budget: 250, maxMoves: 400, komi: 7.5,
     A: {spec: '', plain: {}, steps: {}}, B: {spec: '', plain: {}, steps: {}},
-    seed: null, json: null, roh: null, net: null, netGames: 0, netTrain: null
+    seed: null, json: null, roh: null, fortsetzen: false, net: null, netGames: 0, netTrain: null
   };
   /* Konfiguration = feste Werte plus optionale Phasenstufen (k@N=v).
      Ergebnisform: {spec, plain:{k:v}, steps:{k:[[abZug,wert],...]}} */
@@ -779,6 +788,7 @@ function parseArgs(argv) {
       case '--seed': a.seed = parseInt(v, 10); i++; break;
       case '--json': a.json = v; i++; break;
       case '--roh':  a.roh  = v; i++; break;
+      case '--fortsetzen': a.fortsetzen = true; break;
       case '--net': a.net = v; i++; break;
       case '--netgames': a.netGames = parseInt(v, 10); i++; break;
       case '--nettrain': a.netTrain = v; i++; break;
@@ -795,12 +805,18 @@ const args = parseArgs(process.argv);
 /* ── Seedbarer Zufall (mulberry32) ───────────────────────────── */
 function mulberry32(seed) {
   let s = seed >>> 0;
-  return function () {
+  const f = function () {
     s |= 0; s = (s + 0x6D2B79F5) | 0;
     let t = Math.imul(s ^ (s >>> 15), 1 | s);
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+  /* Zustand lesen und setzen, für --fortsetzen. Der Generator ist eine
+     einzige 32-Bit-Zahl; wer sie nach einer Partie aufschreibt und vor der
+     nächsten wieder einsetzt, setzt den Strom exakt dort fort. */
+  f.zustand = () => s;
+  f.setze = v => { s = v; };
+  return f;
 }
 const zufallHaupt = args.seed !== null ? mulberry32(args.seed) : Math.random;
 const zufallNetz  = args.seed !== null ? mulberry32((args.seed ^ 0x9E3779B9) >>> 0) : Math.random;
@@ -1827,7 +1843,27 @@ const driver = `
     /* ═══ Standard-Modus ═══ */
     console.log('Modus: ' + AB.games + ' Partien (Farbwechsel)\\n');
     const agg = newAgg();
-    for (let g = 0; g < AB.games; g++) {
+    /* --fortsetzen: fertige Partien aus dem Rohdump übernehmen und den
+       Zufallsstrom auf den Stand nach der letzten setzen. Alles andere, was
+       eine Partie braucht, legt playGame je Partie neu an. */
+    let g0 = 0;
+    if (AB.fortsetzen && require('fs').existsSync(AB.roh)) {
+      const alt = require('fs').readFileSync(AB.roh, 'utf8').split('\\n')
+        .filter(z => z.trim()).map(z => JSON.parse(z));
+      if (alt.length) {
+        const letzte = alt[alt.length - 1];
+        const fehler = alt.some(p => p.seed !== AB.seed) ? 'anderer Seed'
+          : alt.some(p => p.params_hash !== _paramsHash()) ? 'anderer params_hash'
+          : alt.some((p, i) => p.nr !== i + 1) ? 'Partien nicht lückenlos'
+          : !letzte.zufall ? 'kein Zufallszustand im Dump (älterer Harness)' : null;
+        if (fehler) { console.error('--fortsetzen unmöglich: ' + fehler); process.exit(2); }
+        zufallHaupt.setze(letzte.zufall.haupt);
+        zufallNetz.setze(letzte.zufall.netz);
+        g0 = alt.length;
+        console.log('Fortgesetzt nach Partie ' + g0 + '\\n');
+      }
+    }
+    for (let g = g0; g < AB.games; g++) {
       const aIsBlack = g % 2 === 0;
       const t0 = Date.now();
       const r = playGame(aIsBlack ? AB.A : AB.B, aIsBlack ? AB.B : AB.A, null);
@@ -1862,7 +1898,8 @@ const driver = `
         zuege: r.moves,
         gefangene: r.gefangene,
         aufgabe: r.resignedBy ? (r.resignedBy === 1 ? 'S' : 'W') : null,
-        ereignisse: r.ereignisse
+        ereignisse: r.ereignisse,
+        zufall: AB.seed !== null ? {haupt: zufallHaupt.zustand(), netz: zufallNetz.zustand()} : null
       });
       console.log('Partie ' + (g + 1) + '/' + AB.games + ': A=' + (aIsBlack ? 'Schwarz' : 'Weiß')
         + ' → ' + (w.aWon ? 'A' : 'B') + ' (' + (r.winner === 1 ? 'S' : 'W') + ')'
@@ -1888,6 +1925,7 @@ const AB_CONFIG = {
   games: args.games, paired: args.paired, opening: args.opening,
   openingBudget: args.obudget, budget: args.budget, maxMoves: args.maxMoves,
   komi: args.komi, seed: args.seed, json: args.json, roh: args.roh,
+  fortsetzen: args.fortsetzen,
   net: args.net, netGames: args.netGames, netTrain: args.netTrain
 };
 
@@ -1903,6 +1941,11 @@ if (args.roh && args.paired > 0) {
   console.error('--roh und --paired schließen sich aus: der Rohdump ist nur im '
     + 'Standardmodus (--games) verdrahtet, ein Paarlauf schriebe nichts. '
     + 'Siehe docs/pilot-benson-defense.md, §5.');
+  process.exit(2);
+}
+
+if (args.fortsetzen && (!args.roh || args.seed === null || args.paired > 0)) {
+  console.error('--fortsetzen braucht --roh und --seed und läuft nur im Standardmodus.');
   process.exit(2);
 }
 

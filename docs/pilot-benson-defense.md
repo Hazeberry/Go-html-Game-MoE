@@ -834,3 +834,26 @@ Das Auswertewerkzeug im Repository, und je Lauf eine kleine Liste unter
 `docs/daten/`: `params_hash`, je Partie `final_board_hash` und Sieger. Damit
 lässt sich jede spätere Wiederholung Partie für Partie gegen diesen Lauf
 prüfen, ohne die Rohdumps aufzubewahren.
+
+---
+
+# Nachtrag vom 01.10.2026: Feld `zufall` im Partiesatz
+
+Lange Läufe wurden vom Ausführungsrahmen mehrfach abgebrochen (Zeitlimit für
+Hintergrundbefehle, Neustarts des Containers). Weil der Zufallsstrom über
+alle Partien eines Laufs läuft, ließ sich ein abgebrochener Lauf bisher nur
+von vorn wiederholen.
+
+Der Partiesatz aus §5.1 trägt deshalb ein zusätzliches Feld:
+
+| Feld | Inhalt |
+|---|---|
+| `zufall` | `{haupt, netz}`: Zustand beider Zufallsströme (mulberry32, je eine 32-Bit-Zahl) nach dem Ende der Partie; `null` ohne `--seed` |
+
+`ab-harness.js --fortsetzen` liest damit die fertigen Partien eines Dumps,
+prüft Seed, `params_hash` und lückenlose Nummerierung, setzt beide Ströme auf
+den Stand nach der letzten Partie und spielt ab der nächsten weiter. Geprüft
+in `tests/roh-dump.js`: ein fortgesetzter Dump ist Byte für Byte gleich einem
+ununterbrochenen. Ohne `--fortsetzen` ändert das Feld nichts an den Partien;
+gemessen gegen den Harness vor der Änderung, vier Partien, alle Felder gleich.
+Alle übrigen Felder aus §5 bleiben unverändert.
