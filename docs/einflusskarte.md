@@ -60,6 +60,17 @@ Zwischen Rang 1 und Rang 16 liegen bis Zug 80 nur 24 bis 114 Punkte. Ab Zug
 **150** stark; keines der beiden hebt ab Zug 120 einen Zug von unterhalb des
 Plateaus hinein. Das sind die beiden Dosen des Piloten.
 
+In Partien der Engine gegen sich selbst liegt die Grenze bei Platz 16 meist
+mitten in einem Gleichstand. Gemessen an jeder 20. Stellung der ersten zehn
+Partien des Kontrolllaufs aus `pilot-benson-defense.md` §14.1, ohne Rauschen
+gerechnet: in 144 von 161 Stellungen reichen gleich bewertete Züge über
+Platz 16 hinweg, im Median 58 Züge, am häufigsten beim Wert 30 — dem
+Grundwert des Endspiel-Experten (`endAreaGain` × ein Feld, weil
+`estimateArea` offenes Gebiet nicht sieht). Welche davon an die Wurzel
+kommen, entscheidet heute das Rauschen. Jedes Gewicht über 0 entscheidet
+diese Gleichstände stattdessen nach Zone; auch die kleine Dosis wirkt also
+nicht nur am Rand.
+
 ## 4. Arme
 
 | Arm | Parameter |
