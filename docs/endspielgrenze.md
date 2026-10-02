@@ -95,3 +95,36 @@ gestartet; die Partien sind dann dieselben.
 - Ob B im Browser mit Zeitbudget anders spielt. Ob der Mittelspiel-Experte
   teurer rechnet als der Endspiel-Experte, ist hier nicht gemessen; mit
   fester Simulationszahl spielt das für den Lauf keine Rolle.
+
+---
+
+# Nachtrag vom 02.10.2026: Ergebnis
+
+## 7. Ergebnis
+
+360 Partien nach §3, `index.html` aus `cdd9e48`, Harness aus `b42349c`
+(dieser Stand fügt nur das Feld `zufall` und `--fortsetzen` hinzu). Hash-Liste:
+`docs/daten/endspiel-150.json`.
+
+```
+Siegrate B (endgameMoves = 150): 113 von 360 = 31,4 %   z = −7,06   p < 0,0001
+Aufgaben A / B: 78 / 153                                Partielänge Ø 323 Züge
+
+Wirksamkeitsnachweis (jede 5. Stellung, je Arm mit eigenen Parametern bewertet)
+          Stellungen   Endspiel-Experte   Losplätze Ø   gespielter Zug aus dem Los
+  A         11 531         76,6 %            11,2              26,9 %
+  B         11 494         54,6 %             8,8              16,7 %
+```
+
+**B spielt schwächer** — nach der Tabelle in §4 die dritte Lesart, und mit
+z = −7,06 eindeutig. Der Mechanismus hat dabei gewirkt wie erwartet: der
+Anteil der Züge, die nur per Los in die Suche kamen, fällt von 26,9 % auf
+16,7 %. Weniger Los hilft also nicht, wenn das, was es ersetzt, schlechter
+bewertet. Naheliegende Deutung, nicht geprüft: Zwischen Zug 80 und 150
+bewertet bei B der Mittelspiel-Experte mit seinem bekannten Hang zum Rand
+(§2), und das kostet mehr, als das Los im Endspiel-Experten kostet. Auffällig
+ist auch hier die Zahl der Aufgaben (153 gegen 78).
+
+**`endgameMoves` bleibt 80** — jetzt gemessen statt gesetzt. Für die Frage
+aus `wurzel-gleichstand.md` heißt das: der Hebel ist nicht die Phasengrenze,
+sondern ein Endspiel-Experte, der offenes Gebiet sieht (§6, zweiter Punkt).

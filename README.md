@@ -1897,8 +1897,7 @@ Gemessen nach vorab registrierter Planung
 ([`docs/pilot-benson-defense.md`](docs/pilot-benson-defense.md)): zwei
 Vergleiche zu je **360 Partien**, getrennte Seeds, primär die Zahl der Züge
 in Gruppen, die später bewiesen sterben (V2), gepaart, Bonferroni α = 0,025.
-Jeder Vergleich ist ein **Erstlauf**; wiederholt mit frischem Seed wurde
-keiner.
+A–B ist inzwischen mit frischem Seed **wiederholt** (unten); B–E nicht.
 
 Erster Vergleich, Übertrag an oder aus:
 
@@ -1935,12 +1934,25 @@ Siegraten, dieser Eingriff hat keine. Der Default bleibt deshalb 0 — dieselbe
 Lage wie beim Augen-Überzähler (`tsumegoEyeOpenPenalty`): Defekt belegt,
 Behebung ohne Stärkeeffekt.
 
-Drei Einschränkungen gehören zum Befund. Als Erstlauf ist A–B nach der
-Methodik-Regel unten eine starke Hypothese, kein Beleg. V2 wurde nie auf
-einen Zusammenhang mit dem Partieausgang geprüft — von den im Piloten
-geprüften Größen hing nur der größte erlittene Einzelschlag damit zusammen.
-Und Arm B sieht seiner Tor-Grenze wegen nur 39,9 % der V2-Gelegenheiten
-überhaupt voraus, A–B misst also eine verdünnte Wirkung.
+**Wiederholung, vorab festgelegt** (`docs/pilot-benson-defense.md` §14–15):
+zuerst ein Kontrolllauf mit dem alten Seed, der jede Zahl der Tabelle oben
+exakt wieder ergab — damit war das neu zusammengesetzte Auswertewerkzeug
+geprüft. Dann 360 neue Partien:
+
+| | A (160/0) | B (160/1) | Differenz | p |
+|---|---|---|---|---|
+| Züge in später sterbende Gruppen, je toter Gruppe | 0,330 | 0,258 | −0,056 | 0,027 |
+| Siegrate B | | 48,3 % | | n. s. |
+
+**Repliziert, mit halbem Effekt** (Erstlauf −0,111) — der übliche Schwund
+eines Erstlaufs. Und **V2 hängt am Ausgang:** in jeder Partie investiert der
+Verlierer öfter in später sterbende Gruppen als der Gewinner, auch auf die
+Zahl toter Gruppen normiert (+0,073, p = 0,004). Der Übertrag senkt also eine
+Größe, die mit Verlieren einhergeht — und trotzdem gewinnt B über beide Läufe
+gepoolt genau 360 von 720 Partien. Der Default bleibt 0.
+
+Eine Einschränkung bleibt: Arm B sieht seiner Tor-Grenze wegen nur 39,9 % der
+V2-Gelegenheiten überhaupt voraus, A–B misst also eine verdünnte Wirkung.
 
 **Bit-Identität**, gegen Referenzwerte vom Stand vor dem Eingriff
 (Commit `0b80584`), über `Object.is`, in drei Richtungen: Regler auf 0,
@@ -1997,6 +2009,23 @@ geprüft: ohne Tree-Reuse liegt jeder gespielte Zug in der nachgebauten Liste.
 Mit Reuse liegen 15 % der Züge darunter — sie stammen aus wiederverwendeten
 Teilbäumen, deren Kinder `quickEval` gewählt hat. Methode und Zahlen:
 [`docs/wurzel-gleichstand.md`](docs/wurzel-gleichstand.md).
+
+Zwei Versuche, das Los zu verkleinern, beide vorab festgelegt, je 360
+Partien:
+
+| Eingriff | Los im Endspiel | Siegrate des Eingriffs | Lesart |
+|---|---|---:|---|
+| Endspielgrenze `endgameMoves` 80 → 150 | 26,9 % → 16,7 % der Züge | **31,4 %** (p < 0,0001) | deutlich schwächer |
+| Einflusskarte `influenceInvade`/`influenceOwn` = 150 | Züge in der Gegnerzone 4,6 % → 10,0 % | 45,0 % (p = 0,058) | kein Effekt nachweisbar, Richtung Schaden |
+
+Beide Eingriffe wirken — der Mechanismus bewegt sich jeweils deutlich —, und
+keiner macht die Engine stärker. Die Phasengrenze später zu setzen verringert
+das Los, übergibt die Züge 80 bis 150 aber dem Mittelspiel-Experten, und das
+kostet weit mehr. `endgameMoves` bleibt 80, jetzt gemessen statt gesetzt; die
+Einflusskarte bleibt aus. Der Hebel wäre ein Endspiel-Experte, der offenes
+Gebiet sieht — gebaut ist er nicht. Einzelheiten:
+[`docs/endspielgrenze.md`](docs/endspielgrenze.md),
+[`docs/einflusskarte.md`](docs/einflusskarte.md).
 
 ## Methodik
 
