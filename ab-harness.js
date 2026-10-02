@@ -75,6 +75,12 @@
                        wären die Partien ohnehin nicht dieselben. --json
                        und die Zusammenfassung umfassen danach nur die neu
                        gespielten Partien; maßgeblich ist der Rohdump.
+                       Grenze: ein langlebiger Prozess kann nach vielen
+                       Partien numerisch minimal anders suchen als ein
+                       frisch gestarteter (gemessen: einmal, ab Partie
+                       151, siehe docs/endspielgrenze.md §8). Ein
+                       fortgesetzter Lauf ist dann ein gültiger, aber
+                       nicht bitgleicher Lauf.
      --net <pfad>      Gewichte für das PolicyNet. Inhalt ist exakt der
                        String, den der Browser unter localStorage
                        'go_pnet' ablegt (im Dashboard gespeichert oder

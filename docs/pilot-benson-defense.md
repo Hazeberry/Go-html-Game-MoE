@@ -886,6 +886,12 @@ Wiederholung (Seed 20261001):  44/44, 18/18, 271/271
 Hash-Listen: `docs/daten/kontrolle-ab-20260923.json`,
 `docs/daten/wiederholung-ab-20261001.json`.
 
+Eine Grenze von `--fortsetzen` zeigte sich erst in einem anderen Lauf: dort
+suchte ein seit Partie 1 laufender Prozess ab Partie 151 numerisch minimal
+anders als ein später eingesetzter (`endspielgrenze.md`, §8). Die Aussage
+„Byte für Byte gleich" aus dem vorigen Nachtrag gilt für den dort genannten
+Test, nicht allgemein.
+
 ### 15.2 §14.1: das Werkzeug ist geprüft
 
 Der Kontrolllauf ergibt jede in §14.1 verlangte Zahl exakt:

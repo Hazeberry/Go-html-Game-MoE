@@ -16,3 +16,9 @@ node auswertung/hashliste.js neu.jsonl --pruefe docs/daten/<lauf>.json
 Weicht eine Partie ab, stimmt der Commit nicht, oder die Reproduzierbarkeit
 ist gebrochen. Im Paarmodus gilt das nicht (Errata E7); alle Läufe hier sind
 im Standardmodus gefahren.
+
+Wurde ein Lauf unterbrochen und mit `--fortsetzen` zu Ende gespielt, steht das
+im Befehl. Bitgleich nachvollziehbar ist er dann mit derselben Unterbrechung:
+erst bis zur genannten Partie laufen lassen, dann mit `--fortsetzen` weiter.
+Ein ununterbrochener Lauf kann davon später abweichen; gemessen einmal, bei
+`endspiel-150.json` ab Partie 151 (`docs/endspielgrenze.md`, §8).

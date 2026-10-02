@@ -128,3 +128,33 @@ ist auch hier die Zahl der Aufgaben (153 gegen 78).
 **`endgameMoves` bleibt 80** — jetzt gemessen statt gesetzt. Für die Frage
 aus `wurzel-gleichstand.md` heißt das: der Hebel ist nicht die Phasengrenze,
 sondern ein Endspiel-Experte, der offenes Gebiet sieht (§6, zweiter Punkt).
+
+## 8. Zur Reproduzierbarkeit dieses Laufs
+
+Dieser Lauf wurde nach Partie 45 unterbrochen und mit `--fortsetzen` zu Ende
+gespielt. Ein früherer, ununterbrochener Lauf desselben Befehls (vom
+Ausführungsrahmen nach 285 Partien abgebrochen) stimmt mit ihm in den
+Partien 1 bis 150 überein, ab Partie 151 nicht mehr. Eingegrenzt:
+
+```
+Prozess beginnt bei Partie   1 (frisch, ununterbrochen, Wiederholung):  Partie 151 wie der alte ununterbrochene Lauf
+Prozess beginnt bei Partie  46, 101, 141 (fortgesetzt):                 Partie 151 untereinander gleich, anders als oben
+erste Abweichung: Partie 151, Zug 198, Arm B — derselbe Zug, Q −0,66 gegen −0,67, beide 120 Simulationen
+```
+
+Ein Prozess, der seit Partie 1 läuft, sucht in Partie 151 also numerisch
+minimal anders als einer, der später eingesetzt hat. Ausgeschlossen sind:
+der Zufallsstrom (beide Ströme werden gesetzt, die Prozesse ab 46, 101 und 141
+stimmen überein), der Überlauf des Epochenzählers (an 48 Stellen in den
+Partien 1 und 151 erzwungen, nie eine Abweichung), Fristen und Uhr (mit
+`mctsFixedSims` stehen alle Fristen der Suche auf unendlich) und die
+gemeinsame leere Hash-Menge der Rollouts (wird nie beschrieben). Die Ursache
+ist nicht gefunden.
+
+Für das Ergebnis spielt das keine Rolle: in den ersten 285 Partien gewinnt B
+im ununterbrochenen Lauf 30,9 %, im fortgesetzten 28,8 %. Für die Behauptung
+„derselbe Befehl, dieselben Partien" heißt es: sie gilt für ununterbrochene
+Läufe, und fortgesetzte stimmen meist mit ihnen überein — der Kontrolllauf in
+`pilot-benson-defense.md` §15.2, selbst nach Partie 41 fortgesetzt, ergab
+jede Kennzahl der Septemberserie auf die letzte Stelle. Bitgleich garantiert
+ist ein fortgesetzter Lauf aber nur mit derselben Unterbrechung.
