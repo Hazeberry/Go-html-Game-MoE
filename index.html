@@ -544,7 +544,7 @@ function coordToLabel(x, y) { return `${COL_LETTERS[x]}${SIZE-y}`; }
 globalThis.PARAMS = {
   /* Phasen-Grenzen */
   openingMoves:      20,
-  endgameMoves:      80,
+  endgameMoves:      80,   /* gemessen gegen 150: 150 gewinnt 31,4 % (docs/endspielgrenze.md) */
   endgameEmpty:      50,
   /* Eröffnung */
   openEdge3:         40,
@@ -1574,7 +1574,10 @@ globalThis.PARAMS = {
                         (Reduktion/Invasion)
        influenceOwn     Abzug fuer Zuege in der eigenen Zone (Selbstauffuellen)
      Beide additiv wie localityBonus -- dieselbe Skalenwarnung gilt: Eroeffnung
-     (~40-95) und Mittelspiel (~Hunderte) haben verschiedene Skalen. Ungemessen.
+     (~40-95) und Mittelspiel (~Hunderte) haben verschiedene Skalen.
+     Gemessen (docs/einflusskarte.md): beide auf 150, 360 Partien gegen 0 —
+     45,0 % (p = 0,058), kein Staerkeeffekt, Richtung Schaden, obwohl sich
+     die Zuege in der Gegnerzone verdoppeln. Deshalb aus.
      Default 0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
   influenceInvade:   0,
   influenceOwn:      0,
@@ -5546,7 +5549,7 @@ globalThis.policyNet = new PolicyNet();
         {key:'openingMoves',    label:'Eröffnung ≤ Zug',   step:1,   min:5,   max:60,
          tip:'↑ = längere territoriale Eröffnungsphase'},
         {key:'endgameMoves',    label:'Endspiel ≥ Zug',    step:1,   min:20,  max:200,
-         tip:'↓ = früher Gebiets-Denken (Area-Scoring)'},
+         tip:'↓ = früher Gebiets-Denken (Area-Scoring). Gemessen: 150 statt 80 gewinnt nur 31 % (docs/endspielgrenze.md).'},
         {key:'endgameEmpty',    label:'Endspiel ≤ Frei',   step:1,   min:10,  max:150,
          tip:'↓ = schaltet noch früher in Endspiel-Modus'},
       ]
@@ -5678,9 +5681,9 @@ globalThis.policyNet = new PolicyNet();
         {key:'localityRadius', label:'Lokal-Radius', step:1, min:1, max:9,
          tip:'Chebyshev-Radius um den letzten Gegnerzug, linear abfallend'},
         {key:'influenceInvade', label:'Einfluss: Invasion', step:50, min:0, max:600,
-         tip:'EXPERIMENTELL. Bonus für Züge in der Einflusszone des Gegners (Bouzy-Karte, einmal pro Zug). Sieht auch Rahmen mit Lücken, die estimateArea nicht zählt. Default 0 = aus. Ungemessen, braucht A/B-Test.'},
+         tip:'EXPERIMENTELL. Bonus für Züge in der Einflusszone des Gegners (Bouzy-Karte, einmal pro Zug). Sieht auch Rahmen mit Lücken, die estimateArea nicht zählt. Default 0 = aus. Gemessen mit 150 (zusammen mit eigener Zone): 45 % Siegrate, kein Nutzen.'},
         {key:'influenceOwn', label:'Einfluss: eigene Zone', step:50, min:0, max:600,
-         tip:'EXPERIMENTELL. Abzug für Züge in der eigenen Einflusszone (nicht das eigene Gebiet auffüllen). Default 0 = aus. Ungemessen.'},
+         tip:'EXPERIMENTELL. Abzug für Züge in der eigenen Einflusszone (nicht das eigene Gebiet auffüllen). Default 0 = aus. Nur zusammen mit der Invasion gemessen: kein Nutzen.'},
         {key:'bensonMoveFilter', label:'Benson-Filter', step:1, min:0, max:1,
          tip:'1 = todgeborene Züge (beweisbar toter Stein) fliegen aus der Kandidatenliste; nur Pass bleibt, wenn nichts übrig ist'},
         {key:'captureCap', label:'Gefangenen-Deckel', step:50, min:0, max:1000,

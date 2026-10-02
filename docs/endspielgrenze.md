@@ -95,3 +95,66 @@ gestartet; die Partien sind dann dieselben.
 - Ob B im Browser mit Zeitbudget anders spielt. Ob der Mittelspiel-Experte
   teurer rechnet als der Endspiel-Experte, ist hier nicht gemessen; mit
   fester Simulationszahl spielt das für den Lauf keine Rolle.
+
+---
+
+# Nachtrag vom 02.10.2026: Ergebnis
+
+## 7. Ergebnis
+
+360 Partien nach §3, `index.html` aus `cdd9e48`, Harness aus `b42349c`
+(dieser Stand fügt nur das Feld `zufall` und `--fortsetzen` hinzu). Hash-Liste:
+`docs/daten/endspiel-150.json`.
+
+```
+Siegrate B (endgameMoves = 150): 113 von 360 = 31,4 %   z = −7,06   p < 0,0001
+Aufgaben A / B: 78 / 153                                Partielänge Ø 323 Züge
+
+Wirksamkeitsnachweis (jede 5. Stellung, je Arm mit eigenen Parametern bewertet)
+          Stellungen   Endspiel-Experte   Losplätze Ø   gespielter Zug aus dem Los
+  A         11 531         76,6 %            11,2              26,9 %
+  B         11 494         54,6 %             8,8              16,7 %
+```
+
+**B spielt schwächer** — nach der Tabelle in §4 die dritte Lesart, und mit
+z = −7,06 eindeutig. Der Mechanismus hat dabei gewirkt wie erwartet: der
+Anteil der Züge, die nur per Los in die Suche kamen, fällt von 26,9 % auf
+16,7 %. Weniger Los hilft also nicht, wenn das, was es ersetzt, schlechter
+bewertet. Naheliegende Deutung, nicht geprüft: Zwischen Zug 80 und 150
+bewertet bei B der Mittelspiel-Experte mit seinem bekannten Hang zum Rand
+(§2), und das kostet mehr, als das Los im Endspiel-Experten kostet. Auffällig
+ist auch hier die Zahl der Aufgaben (153 gegen 78).
+
+**`endgameMoves` bleibt 80** — jetzt gemessen statt gesetzt. Für die Frage
+aus `wurzel-gleichstand.md` heißt das: der Hebel ist nicht die Phasengrenze,
+sondern ein Endspiel-Experte, der offenes Gebiet sieht (§6, zweiter Punkt).
+
+## 8. Zur Reproduzierbarkeit dieses Laufs
+
+Dieser Lauf wurde nach Partie 45 unterbrochen und mit `--fortsetzen` zu Ende
+gespielt. Ein früherer, ununterbrochener Lauf desselben Befehls (vom
+Ausführungsrahmen nach 285 Partien abgebrochen) stimmt mit ihm in den
+Partien 1 bis 150 überein, ab Partie 151 nicht mehr. Eingegrenzt:
+
+```
+Prozess beginnt bei Partie   1 (frisch, ununterbrochen, Wiederholung):  Partie 151 wie der alte ununterbrochene Lauf
+Prozess beginnt bei Partie  46, 101, 141 (fortgesetzt):                 Partie 151 untereinander gleich, anders als oben
+erste Abweichung: Partie 151, Zug 198, Arm B — derselbe Zug, Q −0,66 gegen −0,67, beide 120 Simulationen
+```
+
+Ein Prozess, der seit Partie 1 läuft, sucht in Partie 151 also numerisch
+minimal anders als einer, der später eingesetzt hat. Ausgeschlossen sind:
+der Zufallsstrom (beide Ströme werden gesetzt, die Prozesse ab 46, 101 und 141
+stimmen überein), der Überlauf des Epochenzählers (an 48 Stellen in den
+Partien 1 und 151 erzwungen, nie eine Abweichung), Fristen und Uhr (mit
+`mctsFixedSims` stehen alle Fristen der Suche auf unendlich) und die
+gemeinsame leere Hash-Menge der Rollouts (wird nie beschrieben). Die Ursache
+ist nicht gefunden.
+
+Für das Ergebnis spielt das keine Rolle: in den ersten 285 Partien gewinnt B
+im ununterbrochenen Lauf 30,9 %, im fortgesetzten 28,8 %. Für die Behauptung
+„derselbe Befehl, dieselben Partien" heißt es: sie gilt für ununterbrochene
+Läufe, und fortgesetzte stimmen meist mit ihnen überein — der Kontrolllauf in
+`pilot-benson-defense.md` §15.2, selbst nach Partie 41 fortgesetzt, ergab
+jede Kennzahl der Septemberserie auf die letzte Stelle. Bitgleich garantiert
+ist ein fortgesetzter Lauf aber nur mit derselben Unterbrechung.

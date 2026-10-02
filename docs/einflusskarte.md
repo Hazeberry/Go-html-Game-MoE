@@ -188,3 +188,41 @@ Antwort.
 
 Hauptreihe gestartet am 01.10.2026 um 20:18 UTC auf Commit `a34fe3f`, Befehl
 aus §6 mit X = 150, Seed 20261004.
+
+---
+
+# Nachtrag vom 02.10.2026: Ergebnis der Hauptreihe
+
+## 11. Ergebnis
+
+360 Partien nach §6 mit X = 150, `index.html` aus `a34fe3f`, Harness aus
+`b42349c` (nur das Feld `zufall` und `--fortsetzen` kamen hinzu). Der Lauf
+wurde nach Partie 42 unterbrochen und mit `--fortsetzen` zu Ende gespielt;
+die abgebrochenen Teilserien des ersten Harness stimmen in allen gemeinsamen
+Partien überein (14/14, 271/271). Hash-Liste:
+`docs/daten/einfluss-haupt-150.json`.
+
+```
+Siegrate B(150): 162 von 360 = 45,0 %   z = −1,90   p = 0,058   95 %-Band ±5,2 pp
+Aufgaben A / B:  124 / 172              Partielänge Ø 323 Züge
+
+Züge in der Gegnerzone    A 4,6 %  →  B 10,0 %   gepaart +5,62 pp   t = 33,7
+Züge in der eigenen Zone  A 8,8 %  →  B 5,6 %    gepaart −3,34 pp   t = −20,9
+```
+
+**p ≥ 0,05: nach der Tabelle in §6 ist kein Stärkeeffekt in dieser Größe
+nachweisbar.** Der Mechanismus greift dabei stark — der Anteil der Züge in
+der Gegnerzone verdoppelt sich, der in der eigenen Zone sinkt um ein Drittel.
+Am Parameter liegt das Nullergebnis also nicht.
+
+Die Richtung zeigt zum Schaden, nicht zum Nutzen: 45,0 % hier, 35 % im
+Piloten derselben Dosis. Das Konfidenzintervall der Hauptreihe reicht von
+39,8 % bis 50,2 %; ein nennenswerter Vorteil für B ist damit ausgeschlossen, ein
+Nachteil nicht belegt. Auffällig wie im Piloten: B gibt deutlich öfter auf
+(172 gegen 124) — nicht vorab als Endpunkt festgelegt, deshalb nur
+festgehalten.
+
+**Defaults bleiben 0.** Wer die Karte wieder aufgreift, findet in
+`wurzel-gleichstand.md` den Ort, an dem ein Tie-Break wirken müsste: die
+Gleichstände beim Wert 30 im Endspiel-Experten. Die beiden Terme hier wirken
+auf alle Kandidaten, nicht nur dort.

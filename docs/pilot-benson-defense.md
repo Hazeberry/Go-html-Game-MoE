@@ -857,3 +857,128 @@ in `tests/roh-dump.js`: ein fortgesetzter Dump ist Byte für Byte gleich einem
 ununterbrochenen. Ohne `--fortsetzen` ändert das Feld nichts an den Partien;
 gemessen gegen den Harness vor der Änderung, vier Partien, alle Felder gleich.
 Alle übrigen Felder aus §5 bleiben unverändert.
+
+---
+
+# Nachtrag vom 02.10.2026: Ergebnis der Wiederholung
+
+## 15. Wiederholung nach §14
+
+### 15.1 Durchführung
+
+Beide Läufe mit `index.html` wie in `217d714` und dem Harness aus `b42349c`
+(dieser Stand fügt nur das Feld `zufall` und `--fortsetzen` hinzu, siehe den
+vorigen Nachtrag). Bevor es `--fortsetzen` gab, wurden die Läufe dreimal vom
+Ausführungsrahmen abgebrochen und jeweils mit identischem Befehl von vorn
+gestartet: einmal durch ein Zeitlimit für Hintergrundbefehle, zweimal durch
+Neustarts des Containers. Die endgültigen Läufe wurden nach Partie 41
+(Kontrolllauf) bzw. 40 (Wiederholung) noch einmal unterbrochen und mit
+`--fortsetzen` zu Ende gespielt.
+
+Jede abgebrochene Teilserie ist in allen gemeinsamen Partien identisch mit
+dem endgültigen Lauf — `final_board_hash` und jedes Zugereignis:
+
+```
+Kontrolllauf (Seed 20260923):  60/60, 19/19, 278/278
+Wiederholung (Seed 20261001):  44/44, 18/18, 271/271
+```
+
+Hash-Listen: `docs/daten/kontrolle-ab-20260923.json`,
+`docs/daten/wiederholung-ab-20261001.json`.
+
+Eine Grenze von `--fortsetzen` zeigte sich erst in einem anderen Lauf: dort
+suchte ein seit Partie 1 laufender Prozess ab Partie 151 numerisch minimal
+anders als ein später eingesetzter (`endspielgrenze.md`, §8). Die Aussage
+„Byte für Byte gleich" aus dem vorigen Nachtrag gilt für den dort genannten
+Test, nicht allgemein.
+
+### 15.2 §14.1: das Werkzeug ist geprüft
+
+Der Kontrolllauf ergibt jede in §14.1 verlangte Zahl exakt:
+
+```
+                      §12           Kontrolllauf
+V2 absolut            1,850 → 1,147  1,850 → 1,147   Differenz −0,703   t = −5,570
+V2 je Gruppe gepoolt  0,346 → 0,247  0,346 → 0,247
+V2 je Gruppe gepaart  −0,1108        −0,1108         t = −4,081   345 Partien
+tote Gruppen          5,35 → 4,64    5,35 → 4,64
+tote Steine           12,85 → 9,59   12,85 → 9,59
+verlustMax            8,29 → 7,50    8,29 → 7,50
+D1                    62,33 → 53,55  62,33 → 53,55
+Siegrate B            51,7 %         51,7 %
+Aufgaben A / B        115 / 124      115 / 124
+```
+
+Damit ist zweierlei belegt: `auswertung/benson-reihe.js` rechnet wie die
+verlorenen Skripte, und eine Serie von 360 Partien lässt sich gut eine
+Woche später, in einem anderen Container und mit unterbrochenem Lauf, Zahl für Zahl
+wiederholen.
+
+### 15.3 §14.2: repliziert, mit halbem Effekt
+
+```
+V2 je toter Gruppe, gepaart, 354 Partien
+  A (160/0) 0,330  →  B (160/1) 0,258   (gepoolt)
+  Differenz −0,0562   t = −2,218   p = 0,0265   95%-KI [−0,1058, −0,0065]
+```
+
+Differenz kleiner als 0 und p < 0,05: nach der Tabelle in §14.2 **repliziert**.
+Der Effekt ist halb so groß wie im Erstlauf (−0,111). Genau diese Möglichkeit
+hatte §14.2 vorab benannt — Erstläufe überschätzen ihren Effekt. Der
+Erstlaufwert liegt knapp außerhalb des Konfidenzintervalls, null ebenfalls.
+
+Sekundär, ohne Anspruch:
+
+```
+                A (160/0)   B (160/1)   Differenz   t
+V2 absolut        1,822       1,233      −0,589    −4,68
+tote Gruppen      5,52        4,78       −0,733    −4,89
+tote Steine      12,95       10,13       −2,819    −5,25
+D1               67,27       56,64      −10,628    −4,81
+verlustMax        8,00        8,29       +0,294    +0,66
+Siegrate B                   48,3 %                n. s.
+Aufgaben         96          125
+```
+
+### 15.4 §14.3: V2 hängt am Ausgang
+
+```
+je Partie Verlierer − Gewinner, neuer Lauf
+  V2 je toter Gruppe   +0,073   t = 2,90   p = 0,0037   354 Partien   95%-KI [0,024, 0,123]
+  V2 absolut           +0,761   t = 6,17
+  tote Gruppen         +1,283   t = 9,22
+  verlustMax           +4,894   t = 13,41   (Gegenprobe)
+```
+
+Positiv bei p < 0,05: wer verliert, investiert öfter in Gruppen, die später
+bewiesen sterben — auch auf die Zahl toter Gruppen normiert. Auf dem
+Kontrolllauf, nicht vorab registriert, dasselbe Bild (+0,097, t = 3,57). Wie
+§14.3 sagt: ein Zusammenhang, keine Ursache.
+
+### 15.5 Was daraus folgt
+
+E5 nannte zwei Lücken. Beide sind geschlossen: Der A–B-Befund ist mit frischem
+Seed wiederholt, und V2 misst etwas, das mit Verlieren einhergeht.
+
+Die Siegrate bewegt sich trotzdem nicht. Über beide Läufe gepoolt gewinnt B
+360 von 720 Partien, genau 50,0 %. `bensonDeathTransfer` senkt also eine
+Größe, die mit Verlieren zusammenhängt, ohne dass B dadurch öfter gewinnt.
+Möglich ist, dass der Effekt dafür zu klein ist: weniger als eine
+Fehlinvestition je Partie. In beiden Läufen gibt B außerdem öfter auf
+(124 gegen 115, 125 gegen 96) — nicht geprüft, nur festgehalten.
+
+**Der Default bleibt 0.** Der Mechanismus ist jetzt belegt, ein
+Stärkegewinn nicht.
+
+### 15.6 Die offenen Fragen aus dem Schlussstand
+
+1. **Die Blindheit während des Laufkampfs:** weiter offen.
+2. **Die Wurzel-Kandidaten sind ein Los:** beantwortet in
+   [`wurzel-gleichstand.md`](wurzel-gleichstand.md). Das Los entsteht nicht
+   am Rauschen, sondern an Gleichständen beim Wert 30 im Endspiel-Experten.
+   Der naheliegende Hebel, die Endspielgrenze später zu setzen, kostet
+   Spielstärke ([`endspielgrenze.md`](endspielgrenze.md)); die Einflusskarte
+   als informierter Tie-Break zeigt keinen Stärkeeffekt
+   ([`einflusskarte.md`](einflusskarte.md)).
+3. **Der Tree-Reuse greift fast nie:** im Selbstspiel greift er bei
+   mindestens 15 % der Züge (`wurzel-gleichstand.md`, §3.5).
