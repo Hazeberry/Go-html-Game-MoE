@@ -21,7 +21,7 @@
    Die Stellungen stammen aus einem Rohdump (echte Partien der Engine gegen
    sich selbst). Die Vorbereitung folgt getAIMove: Benson-Zugfilter,
    emptyFields = Zahl der Kandidaten nach dem Filter, buildCrisisMap,
-   primeAreaCache. Abweichung: kein Superko-Verlauf (der Dump trägt keinen);
+   primeAreaCache, bei endTieBreak > 0 primeEndTieBreak. Abweichung: kein Superko-Verlauf (der Dump trägt keinen);
    der einfache Ko-Punkt wird aus dem letzten Einzelschlag rekonstruiert.
 
    Aufruf:
@@ -61,6 +61,7 @@ function bewerte(board, farbe, mc, ko, zufall) {
   const empty = legal.length;
   E.buildCrisisMap(board, farbe);
   E.primeAreaCache(board, farbe);
+  if (E.PARAMS.endTieBreak > 0) E.primeEndTieBreak(board);
   const echt = Math.random;
   Math.random = zufall;
   try {

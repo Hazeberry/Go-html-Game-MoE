@@ -1582,6 +1582,25 @@ globalThis.PARAMS = {
      Default 0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
   influenceInvade:   0,
   influenceOwn:      0,
+  /* Gleichstandsbrecher im Endspiel-Experten. Anlass (docs/endspiel-gleichstand.md):
+     evalEndgame bewertet Gebiet ueber estimateArea, das nur umschlossene
+     Regionen zaehlt. Auf einem offenen Brett aendert ein ruhiger Zug daran
+     nichts, alle ruhigen Zuege bekommen genau endAreaGain (30), und welche
+     davon an der Wurzel in die Liste kommen, entscheidet das Rauschen
+     (+0..0,5) per Los. In einer echten Partie (Bug-Report, Zug 243) kamen
+     so 18 weisse Zuege in Folge (Zug 88-122) aus einer Gruppe von 140-170
+     gleich bewerteten Zuegen.
+     Der Term ordnet diese Gruppe: Aenderung der Bouzy-Bilanz (Felder der
+     eigenen Zone minus Felder der Gegnerzone) durch den Zug, gegen die
+     Wurzelstellung, auf +-1 begrenzt (Bilanz/20) und mit endTieBreak
+     gewichtet. Bei 1 bleibt er weit unter dem kleinsten Abstand
+     verschiedener Endspielwerte in jener Partie (6,7), bricht dort also nur
+     Gleichstaende; wie oft er anderswo verschiedene Werte umordnet, misst
+     auswertung/wurzel-gleichstand.js.
+     Kosten: eine Bouzy-Karte pro Kandidat, nur an der Wurzel und nur bei
+     aktivem Endspiel-Experten.
+     Default 0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
+  endTieBreak:       0,
   /* Adaptives Zeitbudget (Tin/GLM-Vorschlag, stufenlos statt Sprungfunktion).
      Reale Partie zeigte 86% Sim-Rückgang über 156 Züge (317→43) durch
      wachsende floodFill-Kosten auf großen Gruppen — kontinuierlicher Verfall,
@@ -2734,7 +2753,13 @@ const _infA = new Int32Array(BOARD_SIZE), _infB = new Int32Array(BOARD_SIZE);
 let _infMap = _infA, _infValid = false;
 
 function primeInfluenceCache(board) {
-  let z = _infA, w = _infB;
+  _infMap = bouzyKarte(board, _infA, _infB);
+  _infValid = true;
+}
+
+/* Rechnet die Karte in den Puffern z/w und gibt den zurueck, der das
+   Ergebnis haelt. Die Puffer gehoeren dem Aufrufer. */
+function bouzyKarte(board, z, w) {
   for (let i = 0; i < BOARD_SIZE; i++)
     z[i] = board[i] === 1 ? 128 : board[i] === 2 ? -128 : 0;
   for (let k = 0; k < INFLUENCE_DILATE; k++) {
@@ -2758,8 +2783,23 @@ function primeInfluenceCache(board) {
     }
     const t = z; z = w; w = t;
   }
-  _infMap = z;
-  _infValid = true;
+  return z;
+}
+
+/* Gleichstandsbrecher (endTieBreak): Bilanz der Karte in absoluten Farben,
+   Felder der schwarzen Zone minus Felder der weissen. Eigene Puffer, damit
+   _infMap der Einflusszonen-Terme unberuehrt bleibt. */
+const _tbA = new Int32Array(BOARD_SIZE), _tbB = new Int32Array(BOARD_SIZE);
+let _tbBilanz = 0, _tbValid = false;
+function bouzyBilanz(board) {
+  const z = bouzyKarte(board, _tbA, _tbB);
+  let s = 0;
+  for (let i = 0; i < BOARD_SIZE; i++) s += z[i] > 0 ? 1 : z[i] < 0 ? -1 : 0;
+  return s;
+}
+function primeEndTieBreak(board) {
+  _tbBilanz = bouzyBilanz(board);
+  _tbValid = true;
 }
 
 /* +1 = Feld liegt in der eigenen Zone von `color`, -1 = in der des Gegners,
@@ -2808,6 +2848,10 @@ function evalEndgame(board, i, color, mc) {
   }
   for (const n of NEIGHBORS[i]) {
     if (board[n] === opp && countLiberties(board, n, 2) === 1) s += PARAMS.endOppAtari;
+  }
+  if (PARAMS.endTieBreak > 0 && _tbValid) {
+    const d = (bouzyBilanz(_evalScratch) - _tbBilanz) * (color === 1 ? 1 : -1);
+    s += PARAMS.endTieBreak * Math.max(-1, Math.min(1, d / 20));
   }
   return s + Math.random() * 0.5;
 }
@@ -3740,6 +3784,7 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
   if (PARAMS.tsumegoSunkCost > 0) aktualisiereKrisenDauer(board, aiColor);
   primeAreaCache(board, aiColor);
   if (PARAMS.influenceInvade > 0 || PARAMS.influenceOwn > 0) primeInfluenceCache(board);
+  if (PARAMS.endTieBreak > 0) primeEndTieBreak(board);
   const scored = legal.map(m => ({m, score: evaluateMove(board, m.idx, aiColor, mc, empty)}));
   scored.sort((a,b) => b.score - a.score);
   /* PolicyNet: Priors berechnen + Score blenden (nur Hard-KI).
@@ -3806,7 +3851,7 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
   /* Die Einflusskarte ist farbneutral und die Stellung bis hierher
      unveraendert: der Pass-Check unten bewertet die Gegnerzuege mit derselben
      Karte. Wer nicht in den Pass-Check geht, braucht sie nicht mehr. */
-  if (!wantsToPass) _infValid = false;
+  if (!wantsToPass) { _infValid = false; _tbValid = false; }
 
   if (wantsToPass) {
     let ownInAtari = false;
@@ -3829,6 +3874,7 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
     }
     _areaCacheValid = false;
     _infValid = false;
+    _tbValid = false;
     buildCrisisMap(board, aiColor);
     const opponentGainsAlot = oppBest > PASS_GAIN_THRESHOLD;
     if (!ownInAtari && !opponentGainsAlot) {
@@ -5725,6 +5771,8 @@ globalThis.policyNet = new PolicyNet();
          tip:'EXPERIMENTELL. Bonus für Züge in der Einflusszone des Gegners (Bouzy-Karte, einmal pro Zug). Sieht auch Rahmen mit Lücken, die estimateArea nicht zählt. Default 0 = aus. Gemessen mit 150 (zusammen mit eigener Zone): 45 % Siegrate, kein Nutzen.'},
         {key:'influenceOwn', label:'Einfluss: eigene Zone', step:50, min:0, max:600,
          tip:'EXPERIMENTELL. Abzug für Züge in der eigenen Einflusszone (nicht das eigene Gebiet auffüllen). Default 0 = aus. Nur zusammen mit der Invasion gemessen: kein Nutzen.'},
+        {key:'endTieBreak', label:'Endspiel-Gleichstand', step:0.5, min:0, max:5,
+         tip:'EXPERIMENTELL. Ordnet im Endspiel die gleich bewerteten ruhigen Züge nach ihrem Einfluss (Bouzy-Bilanz), statt sie zu losen. 1 = bricht nur Gleichstände. Default 0 = aus. Braucht A/B-Test.'},
         {key:'bensonMoveFilter', label:'Benson-Filter', step:1, min:0, max:1,
          tip:'1 = todgeborene Züge (beweisbar toter Stein) fliegen aus der Kandidatenliste; nur Pass bleibt, wenn nichts übrig ist'},
         {key:'captureCap', label:'Gefangenen-Deckel', step:50, min:0, max:1000,
