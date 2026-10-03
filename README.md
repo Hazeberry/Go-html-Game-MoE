@@ -2086,9 +2086,12 @@ getrennt in Entwicklung und Bestätigung. Eine besteht: der **Einflussraum**,
 die Felder der eigenen Bouzy-Zone, die mit der Gruppe zusammenhängen. Bei 4–7
 Freiheiten trennt er sterbende von überlebenden Gruppen mit AUC 0,80, auf
 beiden Hälften. In beiden Partien stand er 12 bzw. 25 Züge vor dem
-Benson-Beweis auf 0. Ein Term darauf ist damit begründet, gebaut und
-gemessen ist er noch nicht:
-[`docs/laufkampf.md`](docs/laufkampf.md).
+Benson-Beweis auf 0. Darauf stehen zwei Parameter, beide Default 0:
+`raumGewicht` bucht gefährdete Ketten in der Stellungsbewertung anteilig
+als geschlagen, `raumZug` bewertet Wurzelkandidaten nach der Änderung
+dieses Risikos. An der Partie vom 03.10. findet die KI damit den einen
+rettenden Punkt (M11), den sie vorher nie spielte. Der A/B-Lauf ist vorab
+festgelegt: [`docs/laufkampf.md`](docs/laufkampf.md), §7.
 
 ## Methodik
 
@@ -2149,9 +2152,9 @@ tests/stellungen/               echte Partien als Testvorlage (SGF)
 .github/workflows/ab-harness.yml  Messläufe in CI, manuell startbar
 ```
 
-[`tests/`](tests/) umfasst zwölf Suiten: NaN-Schutzschichten,
+[`tests/`](tests/) umfasst dreizehn Suiten: NaN-Schutzschichten,
 Aufgabekriterium, Transfer-Wächter, Benson-Übertrag, feste Simulationszahl,
-Rohdump, Einflusskarte, Endspiel-Gleichstand, Epochenzähler, Trainings-Stabilität, einen Rauchtest des Harness und
+Rohdump, Einflusskarte, Endspiel-Gleichstand, Epochenzähler, Raumrisiko, Trainings-Stabilität, einen Rauchtest des Harness und
 einen Browser-Test — ohne `node_modules`, gegen dieselben `<script>`-Blöcke, die
 ausgeliefert werden. Ein Test gegen eine Kopie prüft irgendwann etwas, das niemand
 ausliefert. Der Browser-Test braucht zusätzlich Playwright und überspringt

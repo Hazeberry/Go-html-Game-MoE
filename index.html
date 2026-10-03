@@ -1616,6 +1616,32 @@ globalThis.PARAMS = {
      gemessen nur fuer Schwer.
      0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
   endTieBreak:       1,
+  /* Raumrisiko im Laufkampf (docs/laufkampf.md). evaluateBoard sieht bei
+     Ketten mit 4-7 Freiheiten keine Gefahr: STERBE_RAMPE endet bei 3. In
+     zwei echten Partien ging so eine eingeschlossene Gruppe verloren, ohne
+     dass die Bewertung sank. Gemessen (laufkampf.md, §6): ob eine Kette mit
+     4-7 Freiheiten stirbt, trennt der Einflussraum K3 -- Felder der eigenen
+     Bouzy-Zone, die mit der Kette zusammenhaengen -- mit AUC 0,80, auf
+     Entwicklung und Bestaetigung. An der Wurzel wird K3 einmal je Zug fuer
+     alle Ketten berechnet (primeRaum) und an ihren Steinen vermerkt. In der
+     Blattbewertung gilt fuer eine Kette das groesste K3 ihrer Wurzelsteine:
+     verbindet sie sich in der Suche mit einer Gruppe, die Raum hat, faellt
+     das Risiko weg. Der Abschlag folgt RAUM_RISIKO und wirkt wie
+     deathTransfer (die Gruppe gilt anteilig als geschlagen).
+     Default 0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
+  raumGewicht:       0,
+  /* Gegenstueck in der Zugbewertung an der Wurzel. raumGewicht allein
+     verschiebt die Bewertung, aendert aber kaum die Zugwahl: K3 kommt aus
+     der Wurzel, in der Suche bleibt der Abschlag fast gleich (gemessen an
+     der Partie vom 03.10., docs/laufkampf.md §7.2). raumZug bewertet jeden
+     Kandidaten nach der Aenderung des Risikos der Ketten, die an der Wurzel
+     4-7 Freiheiten haben: Bouzy-Karte und K3 NACH dem Zug, Risiko wie oben
+     (ab 3 Freiheiten abwaerts STERBE_RAMPE, geschlagen = 1). Eigene Ketten
+     sicherer oder fremde gefaehrdeter = Bonus, in Steinen mal
+     captureWeight. In der Partie hob genau ein Zug K3 der Gruppe (M11 bei
+     Zug 196, 0 -> 15); den soll die Wurzel kennen.
+     Default 0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
+  raumZug:           0,
   /* Adaptives Zeitbudget (Tin/GLM-Vorschlag, stufenlos statt Sprungfunktion).
      Reale Partie zeigte 86% Sim-Rückgang über 156 Züge (317→43) durch
      wachsende floodFill-Kosten auf großen Gruppen — kontinuierlicher Verfall,
@@ -2861,6 +2887,93 @@ function primeEndTieBreak(board) {
   _tbValid = true;
 }
 
+/* Raumrisiko (raumGewicht): Anteil, mit dem eine Kette mit 4-7 Freiheiten
+   als geschlagen gilt, nach Freiheiten (Zeile 4..7) und K3-Stufe
+   (Spalte: 0 | 1-4 | 5-14 | ab 15). Grundlage: Sterberate binnen 40
+   Halbzuegen, Ketten ab 6 Steinen, Entwicklungsdaten (docs/laufkampf.md,
+   §7.1). Gerundet, bis 0,5 % als 0, und bei 4 Freiheiten auf 0,25 gedeckelt:
+   STERBE_RAMPE gibt bei 3 Freiheiten 0,25, sonst lohnte es, eine eigene
+   Kette von 4 auf 3 Freiheiten zu bringen. In beiden Richtungen fallend. */
+const RAUM_RISIKO = [
+  [0.25, 0.25, 0.17, 0],
+  [0.18, 0.10, 0.06, 0],
+  [0.18, 0.07, 0.02, 0],
+  [0.08, 0.02, 0,    0],
+];
+const _raumK3 = new Int32Array(BOARD_SIZE);
+const _raumBrett = new Uint8Array(BOARD_SIZE);
+const _raA = new Int32Array(BOARD_SIZE), _raB = new Int32Array(BOARD_SIZE);
+let _raumValid = false;
+
+const _raInKette = new Uint8Array(BOARD_SIZE), _raGesehen = new Uint8Array(BOARD_SIZE);
+const _raScratch = new Uint8Array(BOARD_SIZE);
+let _raumKetten = [];   /* Wurzelketten mit 4-7 Freiheiten, fuer raumZug */
+
+/* K3 einer Kette (group) auf der Karte z: Felder der eigenen Zone, ueber
+   eigene Zonenfelder mit der Kette zusammenhaengend, ohne die Kette selbst
+   -- wie auswertung/einschliessung.js. */
+function _raumK3Von(z, group, c) {
+  _raInKette.fill(0); _raGesehen.fill(0);
+  for (const g of group) _raInKette[g] = 1;
+  const eigen = c === 1 ? (v => v > 0) : (v => v < 0);
+  const q = [];
+  for (const g of group) for (const n of NEIGHBORS[g])
+    if (!_raInKette[n] && !_raGesehen[n] && eigen(z[n])) { _raGesehen[n] = 1; q.push(n); }
+  for (let k = 0; k < q.length; k++)
+    for (const n of NEIGHBORS[q[k]])
+      if (!_raInKette[n] && !_raGesehen[n] && eigen(z[n])) { _raGesehen[n] = 1; q.push(n); }
+  return q.length;
+}
+
+/* Risiko einer Kette nach Freiheiten und K3: geschlagen 1, bis 3 Freiheiten
+   STERBE_RAMPE, 4-7 RAUM_RISIKO, darueber 0. */
+function raumRisiko(libs, k3) {
+  if (libs < STERBE_RAMPE.length) return STERBE_RAMPE[libs];
+  if (libs > 7) return 0;
+  return RAUM_RISIKO[libs - 4][k3 === 0 ? 0 : k3 <= 4 ? 1 : k3 <= 14 ? 2 : 3];
+}
+
+/* Einmal je Zug an der Wurzel: K3 je Stein, dazu die Ketten fuer raumZug. */
+function primeRaum(board) {
+  const z = bouzyKarte(board, _raA, _raB);
+  _raumBrett.set(board);
+  _raumK3.fill(-1);
+  _raumKetten = [];
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    const c = board[i];
+    if (!c || _raumK3[i] >= 0) continue;
+    const {group, liberties} = floodFill(board, i);
+    const k3 = _raumK3Von(z, group, c);
+    for (const g of group) _raumK3[g] = k3;
+    const fr = liberties.length;
+    if (fr >= 4 && fr <= 7 && group.length >= PARAMS.deathDiscountSize)
+      _raumKetten.push({anker: i, farbe: c, groesse: group.length, risiko: raumRisiko(fr, k3)});
+  }
+  _raumValid = true;
+}
+
+/* raumZug: Risikoaenderung der Wurzelketten durch den Zug i von color, in
+   Steinen; positiv = gut fuer color. Eine volle Bouzy-Karte je Kandidat,
+   nur an der Wurzel und nur, wenn es solche Ketten gibt. */
+function raumZugGewinn(board, i, color) {
+  if (!_raumKetten.length) return 0;
+  const nb = _raScratch;
+  nb.set(board); nb[i] = color;
+  removeDeadGroups(nb, color === 1 ? 2 : 1, i);
+  const z = bouzyKarte(nb, _raA, _raB);
+  let g = 0;
+  for (const k of _raumKetten) {
+    let nachher = 1;
+    if (nb[k.anker] === k.farbe) {
+      const {group, liberties} = floodFill(nb, k.anker);
+      nachher = raumRisiko(liberties.length, _raumK3Von(z, group, k.farbe));
+    }
+    const sicherer = k.risiko - nachher;
+    g += (k.farbe === color ? sicherer : -sicherer) * k.groesse;
+  }
+  return g;
+}
+
 /* Bilanz der Karte nach dem Zug (nb), aus den Wurzelebenen. Je Ebene wird
    _tbAkt zur vollen Vorebene des Kandidaten: Wurzelebene kopiert, die
    geaenderten Felder darueber. Die Kopie kostet 361 Werte, der Zugriff
@@ -3240,6 +3353,10 @@ function evaluateMove(board, i, color, mc, emptyFields) {
      eigenen Zone bestrafen. Wie der Lokalitaetsbonus VOR dem Crisis-Blend,
      damit Taktik ihn ueberstimmen darf. Bei beiden Gewichten 0 wird kein
      Zweig betreten -- bitgenau der alte Wert. */
+  /* Raumrisiko je Kandidat, wie der Einflussterm vor dem Crisis-Blend.
+     Bei 0 kein Zweig. */
+  if (PARAMS.raumZug > 0 && _raumValid)
+    sPhase += PARAMS.raumZug * PARAMS.captureWeight * raumZugGewinn(board, i, color);
   if ((PARAMS.influenceInvade > 0 || PARAMS.influenceOwn > 0) && _infValid) {
     const zone = influenceZone(i, color);
     if (zone < 0) sPhase += PARAMS.influenceInvade;
@@ -3325,6 +3442,10 @@ function _nextEvalSeenEpoch() {
 let _trRufe = 0, _trGruppen = 0, _trSumme = 0, _trMax = 0, _trUeber = 0;
 let _trEigen = 0, _trFremd = 0, _trCapAbs = 0, _trGesamtAbs = 0;
 
+/* Wie oft der Raumrisiko-Abschlag greift (Ketten je Bewertung, summiert). */
+let _raumGriff = 0;
+function leseRaumWaechter(reset) { const v = _raumGriff; if (reset) _raumGriff = 0; return v; }
+
 function leseTransferWaechter(reset) {
   const v = {rufe: _trRufe, gruppen: _trGruppen, summe: _trSumme, max: _trMax,
              ueber: _trUeber, eigen: _trEigen, fremd: _trFremd,
@@ -3359,6 +3480,7 @@ function evaluateBoard(board, color, captures) {
     if (empt <= PARAMS.bensonEvalMaxEmpty) bEpoch = bensonClassify(board);
   }
   const seenEpoch = _nextEvalSeenEpoch();
+  const raum = PARAMS.raumGewicht > 0 && _raumValid;
   for (let i = 0; i < BOARD_SIZE; i++) {
     const c = board[i]; if (!c || _evalBoardSeen[i] === seenEpoch) continue;
     if (bEpoch >= 0 && _bnDead[i] === bEpoch) {
@@ -3384,10 +3506,11 @@ function evaluateBoard(board, color, captures) {
       continue;
     }
     const libEpoch = _nextFfEpoch();
-    let head = 0, tail = 0, size = 0, libs = 0;
+    let head = 0, tail = 0, size = 0, libs = 0, k3 = -1;
     _groupQueue[tail++] = i; _evalBoardSeen[i] = seenEpoch;
     while (head < tail) {
       const g = _groupQueue[head++]; size++;
+      if (raum && board[g] === _raumBrett[g] && _raumK3[g] > k3) k3 = _raumK3[g];
       for (const n of NEIGHBORS[g]) {
         const cc = board[n];
         if (cc === c) {
@@ -3427,6 +3550,12 @@ function evaluateBoard(board, color, captures) {
         }
         v -= _dt;
       }
+    }
+    /* Raumrisiko: nur 4-7 Freiheiten und nur Ketten mit mindestens einem
+       Wurzelstein (k3 >= 0); neue Steine allein tragen kein K3. */
+    if (raum && libs >= 4 && libs <= 7 && k3 >= 0 && size >= PARAMS.deathDiscountSize) {
+      const r = RAUM_RISIKO[libs - 4][k3 === 0 ? 0 : k3 <= 4 ? 1 : k3 <= 14 ? 2 : 3];
+      if (r > 0) { v -= PARAMS.raumGewicht * r * size * PARAMS.captureWeight; _raumGriff++; }
     }
     s += (c === color) ? v : -v;
   }
@@ -3915,6 +4044,7 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
   primeAreaCache(board, aiColor);
   if (PARAMS.influenceInvade > 0 || PARAMS.influenceOwn > 0) primeInfluenceCache(board);
   if (PARAMS.endTieBreak > 0) primeEndTieBreak(board);
+  if (PARAMS.raumGewicht > 0 || PARAMS.raumZug > 0) primeRaum(board);
   const scored = legal.map(m => ({m, score: evaluateMove(board, m.idx, aiColor, mc, empty)}));
   scored.sort((a,b) => b.score - a.score);
   /* PolicyNet: Priors berechnen + Score blenden (nur Hard-KI).
@@ -5901,6 +6031,10 @@ globalThis.policyNet = new PolicyNet();
          tip:'EXPERIMENTELL. Bonus für Züge in der Einflusszone des Gegners (Bouzy-Karte, einmal pro Zug). Sieht auch Rahmen mit Lücken, die estimateArea nicht zählt. Default 0 = aus. Gemessen mit 150 (zusammen mit eigener Zone): 45 % Siegrate, kein Nutzen.'},
         {key:'influenceOwn', label:'Einfluss: eigene Zone', step:50, min:0, max:600,
          tip:'EXPERIMENTELL. Abzug für Züge in der eigenen Einflusszone (nicht das eigene Gebiet auffüllen). Default 0 = aus. Nur zusammen mit der Invasion gemessen: kein Nutzen.'},
+        {key:'raumZug', label:'Raumrisiko je Zug', step:0.5, min:0, max:3,
+         tip:'EXPERIMENTELL. Bewertet Züge danach, wie sie das Raumrisiko gefährdeter Ketten (4–7 Freiheiten) ändern: Ausbruch der eigenen, Einschließung der fremden. Default 0 = aus. Braucht A/B-Test.'},
+        {key:'raumGewicht', label:'Raumrisiko (Laufkampf)', step:0.5, min:0, max:3,
+         tip:'EXPERIMENTELL. Ketten mit 4–7 Freiheiten, die kaum eigenen Einflussraum haben, gelten anteilig als gefährdet (gemessenes Sterberisiko). Soll eingeschlossene Gruppen früher sehen lassen. Default 0 = aus. Braucht A/B-Test.'},
         {key:'endTieBreak', label:'Endspiel-Gleichstand', step:0.5, min:0, max:5,
          tip:'Ordnet im Endspiel die gleich bewerteten ruhigen Züge nach ihrem Einfluss (Bouzy-Bilanz), statt sie zu losen. 1 = bricht nur Gleichstände (Default). Gemessen gegen 0: 57,2 % und in der Wiederholung 59,4 % Siegrate. 0 = altes Verhalten.'},
         {key:'bensonMoveFilter', label:'Benson-Filter', step:1, min:0, max:1,

@@ -1,7 +1,8 @@
 # Blindheit im Laufkampf: Gibt es eine Fassung von „Einschließung", die trennt?
 
 **Status: festgelegt am 03.10.2026, vor der Messung.** Was danach hinzukommt,
-steht als Nachtrag darunter; die Abschnitte 1–5 werden nicht mehr geändert.
+steht als Nachtrag darunter; die Abschnitte 1–5 werden nicht mehr geändert,
+§7 nach dem Lauf ebenfalls nicht.
 
 Explorativ in dem Sinn, dass noch kein Eingriff gemessen wird. Hier wird nur
 geprüft, ob es eine Größe gibt, auf die ein Eingriff sich stützen könnte.
@@ -162,3 +163,113 @@ Simulation nicht. Ein Term gehört deshalb in die Zugbewertung an der Wurzel
 inkrementellen Karte aus `endTieBreak` wenig. Und dort sitzt auch der Fehler
 der Partie vom 03.10.: Die Ausbruchszüge kamen nicht unter die 16
 Wurzelkandidaten.
+
+---
+
+## 7. Der Term und seine Messung: vorab festgelegt (03.10.2026, vor dem Lauf)
+
+### 7.1 Entwurf
+
+Zwei Parameter, beide Default 0 und dann bitgenau das alte Verhalten:
+
+- **`raumGewicht`** (Stellungsbewertung): An der Wurzel wird einmal je Zug K3
+  für alle Ketten berechnet (`primeRaum`) und an ihren Steinen vermerkt. In
+  jeder Blattbewertung gilt eine Kette mit 4–7 Freiheiten und mindestens
+  `deathDiscountSize` (6) Steinen anteilig als geschlagen, mit dem Anteil
+  aus `RAUM_RISIKO`. Maßgeblich ist das größte K3 ihrer Wurzelsteine:
+  Verbindet sie sich in der Suche mit einer Gruppe, die Raum hat, fällt das
+  Risiko weg. Das ist dieselbe Form wie `deathTransfer` mit `STERBE_RAMPE`
+  für 0–3 Freiheiten.
+- **`raumZug`** (Zugbewertung an der Wurzel): Jeder Kandidat bekommt die
+  Risikoänderung der Wurzelketten mit 4–7 Freiheiten gutgeschrieben, in
+  Steinen mal `captureWeight`. Dafür werden Karte und K3 nach dem Zug
+  berechnet. Eigene Ketten sicherer oder fremde gefährdeter zählt positiv.
+
+`RAUM_RISIKO`, Sterberate binnen 40 Halbzügen, Ketten ab 6 Steinen, nur
+Entwicklungsdaten:
+
+| Freiheiten | K3 = 0 | 1–4 | 5–14 | ≥ 15 |
+|---|---:|---:|---:|---:|
+| 4 | 33,0 % | 29,9 % | 16,6 % | 0,5 % |
+| 5 | 18,4 % | 10,3 % | 5,5 % | 0,0 % |
+| 6 | 19,4 % | 7,1 % | 2,4 % | 0,3 % |
+| 7 | 7,7 % | 2,1 % | 0,3 % | 0,2 % |
+
+Im Code gerundet, bis 0,5 % als 0. Die Zeile 4 ist auf 0,25 gedeckelt,
+weil `STERBE_RAMPE` bei 3 Freiheiten 0,25 gibt. Sonst lohnte es, eine
+eigene Kette von 4 auf 3 Freiheiten zu bringen. Die Zeile 6 bei K3 = 0 steht
+auf 0,18, so hoch wie die Zeile 5, damit der Anteil mit mehr Freiheiten nie
+steigt.
+
+### 7.2 Warum zwei Teile: an der Partie vom 03.10. geprüft
+
+Vor Weiß' Zügen 194–204 je 6 Ziehungen mit `mctsFixedSims` = 120:
+
+| vor Zug | ohne | nur `raumGewicht` | beide |
+|---|---|---|---|
+| 196 | K7 K8 L9 M3 S7 G14 | K7 N2 A15 M3 S7 G14 | **M11 ×6** |
+| 198 | K8 L6 S8 M12 R5 M3 | T10 E18 M1 L2 R5 L10 | F14 O13 N13 F14 N13 F14 |
+| 200 | S7 A15 O3 S7 J1 S8 | S7 A15 O3 S7 N2 S8 | F14 ×6 |
+
+`raumGewicht` allein senkt Q (Ø 0,39 → 0,16 vor Zug 196), ändert aber die
+Züge kaum. K3 stammt aus der Wurzel, in der Suche verschiebt der Abschlag
+fast alles gleich. Erst `raumZug` bringt M11 in die Wurzelliste, den einen
+Zug, der K3 der Gruppe von 0 auf 15 hebt. Danach kommen Ausbrüche wie F14
+und N13. Mit Zeitbudget (250 ms) ebenso: M11 in 3 von 3 Ziehungen, ohne den
+Term nie.
+
+Der Entwurf wurde an den beiden echten Partien geprüft, nicht an
+Selbstspieldaten. Die Tabelle stammt nur aus der Entwicklung.
+
+**Kosten:** Mit beiden Teilen dauert ein Zug an dieser Stellung 25–40 ms
+länger: eine Bouzy-Karte je Kandidat, nur wenn es Ketten mit 4–7
+Freiheiten gibt, dazu `primeRaum` einmal je Zug. Wie bei `endTieBreak`
+liegt das vor dem Start der Suchuhr und nimmt der Suche nichts.
+
+### 7.3 Arme und Lauf
+
+| Arm | Parameter |
+|---|---|
+| A | Default |
+| B | `raumGewicht` = 1, `raumZug` = 1 |
+
+```bash
+for s in 20261014 20261015 20261016 20261017; do
+  node ab-harness.js --games 90 --seed $s \
+    --A mctsFixedSims=120 \
+    --B mctsFixedSims=120,raumGewicht=1,raumZug=1 \
+    --roh laufkampf-$s.jsonl --json laufkampf-$s.json &
+done
+```
+
+Commit: der Merge dieser Festlegung. Eine Dosis, beide Teile zusammen. Ob
+einer allein reicht, ist eine spätere Frage.
+
+### 7.4 Endpunkte
+
+**Primär:** Siegrate von B über alle 360 Partien, zweiseitig gegen 50 %,
+α = 0,05. Kleinster nachweisbarer Effekt bei 80 % Power: ±7,4
+Prozentpunkte.
+
+| Ergebnis | Folge |
+|---|---|
+| B > 50 %, p < 0,05 | Hypothese „stärker"; vor einer Default-Änderung eine Wiederholung mit neuen Seeds, wie bei `endTieBreak` |
+| p ≥ 0,05 | kein Stärkeeffekt in dieser Größe nachweisbar; Default bleibt 0 |
+| B < 50 %, p < 0,05 | schwächer; Default bleibt 0 |
+
+**Wirksamkeit, ohne Test**, je Arm:
+
+1. **Große Verluste:** Anteil der Partien, in denen der Arm eine Kette von
+   mindestens 10 Steinen verliert. Das heißt: Ein Zug des Gegners schlägt
+   mindestens 10 Steine, oder bei Partieende ist eine eigene Kette ab 10
+   Steinen Benson-tot. Erwartet: bei B seltener.
+2. **Ausbruch:** an jeder Stellung, an der der ziehende Arm eine eigene
+   Kette ab 6 Steinen mit 4–7 Freiheiten und K3 ≤ 4 hat, der Anteil der
+   Züge, die eine Freiheit einer solchen Kette besetzen. Erwartet: bei B
+   höher.
+
+Liegen beide gleich, wirkt der Term im Selbstspiel nicht, und ein
+Nullergebnis sagt über die Frage nichts.
+
+**Sekundär, ohne Anspruch:** Siegrate ohne falsche Aufgaben
+(`weiterspielen.js`), Aufgaben je Arm, Partielänge.
