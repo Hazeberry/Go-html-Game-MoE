@@ -202,6 +202,7 @@ Simulationszahl pro Zug direkt an der Rechenleistung hängt.
 | Kurve 100/150/200/250/300/500/1000 | Plateau bei 150–250, Abfall zu beiden Seiten | Mitte des Plateaus gewählt, nicht der Höchstwert |
 | `endTieBreak` 1 statt 0 (Gleichstand im Endspiel ordnen statt losen) | 57,2 % und in der Wiederholung 59,4 % über je 360 Partien, p = 0,006 und 0,0003 | **eingebaut** — Default 1 |
 | `raumGewicht` + `raumZug` 1 (Raumrisiko im Laufkampf) | 45,3 % über 360 Partien, p = 0,073; Ausbrüche ×2, große Verluste unverändert | verworfen — Default 0 |
+| Suchtiefe: 240 gegen 120, 480 gegen 240 Simulationen | 60,6 % und 57,8 % über je 360 Partien (+75 und +55 Elo je Verdopplung) | Suche hilft, flacht ab — kein großer Hebel (`docs/skalierung.md`) |
 | `resignQ` 0,95 gegen 0,997 | 29:31 über 60 Partien, p = 0,90 | 0,95 bleibt — rechtzeitiges Aufgeben kostet nichts |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
@@ -2112,6 +2113,11 @@ beide Seiten es teilen. Die KI baut lange Mauern, Stein an Stein, lässt
 eigene Steine im Stich und füllt am Ende ihre Flächen selbst auf.
 `evaluateBoard` kennt nur Material und Freiheiten, kein Gebiet. Pilot und
 Analyse: [`docs/gnugo.md`](docs/gnugo.md).
+
+Mehr Suche schließt diese Lücke nicht. Im Selbstspiel bringt jede
+Verdopplung der Simulationen etwa +75 bzw. +55 Elo, mit abnehmender Tendenz
+([`docs/skalierung.md`](docs/skalierung.md)). Gegen GNU Go änderten 1 000
+statt 120 Simulationen nichts. Der Hebel liegt in der Bewertung.
 
 ## Methodik
 
