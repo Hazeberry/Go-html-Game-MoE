@@ -1597,8 +1597,9 @@ globalThis.PARAMS = {
      verschiedener Endspielwerte in jener Partie (6,7), bricht dort also nur
      Gleichstaende; wie oft er anderswo verschiedene Werte umordnet, misst
      auswertung/wurzel-gleichstand.js.
-     Kosten: eine Bouzy-Karte pro Kandidat, nur an der Wurzel und nur bei
-     aktivem Endspiel-Experten, gemessen rund 40 ms je Zug. Die gehen NICHT
+     Kosten: eine Bouzy-Karte pro Kandidat, inkrementell (tbBilanzNach),
+     nur an der Wurzel und nur bei aktivem Endspiel-Experten. Gemessen
+     waren es vor der inkrementellen Fassung rund 40 ms je Zug. Die gehen NICHT
      vom Suchbudget ab (dessen Uhr startet erst in mctsPUCT), sie
      verlaengern nur die Antwortzeit.
      Gemessen (docs/endspiel-gleichstand.md): 1 gegen 0, 360 Partien mit
@@ -2803,9 +2804,105 @@ function bouzyBilanz(board) {
   for (let i = 0; i < BOARD_SIZE; i++) s += z[i] > 0 ? 1 : z[i] < 0 ? -1 : 0;
   return s;
 }
+
+/* Dasselbe Ergebnis, aber inkrementell. primeEndTieBreak hebt alle 27
+   Zwischenstaende der Wurzelkarte auf (Ebene 0 = Startwerte, dann 5
+   Dilatationen und 21 Erosionen). Fuer einen Kandidaten wird je Ebene nur
+   neu gerechnet, was sich gegenueber der Wurzel geaendert hat, plus dessen
+   Nachbarn: jedes Feld haengt nur von sich und seinen Nachbarn auf der
+   Ebene davor ab, alles andere ist zwangslaeufig gleich. Damit bitgenau
+   dieselbe Bilanz wie bouzyBilanz (tests/endspiel-gleichstand.js prueft
+   das), bei einem Bruchteil der Kosten: ein Stein aendert meist nur
+   rund 20 Felder je Ebene. Besuchte Felder sind per Stempel markiert,
+   damit nichts pro Kandidat zurueckgesetzt werden muss. */
+const BOUZY_EBENEN = INFLUENCE_DILATE + INFLUENCE_ERODE;
+const _tbEbenen = new Int32Array((BOUZY_EBENEN + 1) * BOARD_SIZE);
+const _tbBrett = new Uint8Array(BOARD_SIZE);
+const _tbAkt = new Int32Array(BOARD_SIZE);
+const _tbListe = [new Int32Array(BOARD_SIZE), new Int32Array(BOARD_SIZE)];
+const _tbWert = [new Int32Array(BOARD_SIZE), new Int32Array(BOARD_SIZE)];
+const _tbBesucht = new Int32Array(BOARD_SIZE);
+let _tbStempel = 0;
+
 function primeEndTieBreak(board) {
-  _tbBilanz = bouzyBilanz(board);
+  const N = BOARD_SIZE, L = _tbEbenen;
+  _tbBrett.set(board);
+  for (let i = 0; i < N; i++) L[i] = board[i] === 1 ? 128 : board[i] === 2 ? -128 : 0;
+  for (let k = 1; k <= BOUZY_EBENEN; k++) {
+    const alt = (k - 1) * N, neu = k * N;
+    for (let i = 0; i < N; i++) {
+      const v = L[alt + i];
+      if (k <= INFLUENCE_DILATE) {
+        let pos = 0, neg = 0;
+        for (const n of NEIGHBORS[i]) { const q = L[alt + n]; if (q > 0) pos++; else if (q < 0) neg++; }
+        L[neu + i] = (v >= 0 && neg === 0) ? v + pos : (v <= 0 && pos === 0) ? v - neg : v;
+      } else {
+        let nichtPos = 0, nichtNeg = 0;
+        for (const n of NEIGHBORS[i]) { const q = L[alt + n]; if (q <= 0) nichtPos++; if (q >= 0) nichtNeg++; }
+        L[neu + i] = v > 0 ? Math.max(0, v - nichtPos) : v < 0 ? Math.min(0, v + nichtNeg) : 0;
+      }
+    }
+  }
+  let s = 0;
+  for (let i = 0, o = BOUZY_EBENEN * N; i < N; i++) s += L[o + i] > 0 ? 1 : L[o + i] < 0 ? -1 : 0;
+  _tbBilanz = s;
+  if (_tbStempel > 2e9) {   /* Stempel laufen nie ueber */
+    _tbStempel = 0;
+    _tbBesucht.fill(0);
+  }
   _tbValid = true;
+}
+
+/* Bilanz der Karte nach dem Zug (nb), aus den Wurzelebenen. Je Ebene wird
+   _tbAkt zur vollen Vorebene des Kandidaten: Wurzelebene kopiert, die
+   geaenderten Felder darueber. Die Kopie kostet 361 Werte, der Zugriff
+   danach ist ohne Verzweigung. */
+function tbBilanzNach(nb) {
+  const N = BOARD_SIZE, L = _tbEbenen, C = _tbAkt;
+  let p = 0, anz = 0;
+  for (let i = 0; i < N; i++) {
+    if (nb[i] === _tbBrett[i]) continue;
+    const v = nb[i] === 1 ? 128 : nb[i] === 2 ? -128 : 0;
+    if (v !== L[i]) { _tbListe[0][anz] = i; _tbWert[0][anz++] = v; }
+  }
+  for (let k = 1; k <= BOUZY_EBENEN && anz > 0; k++) {
+    const alt = (k - 1) * N, neu = k * N, q = 1 - p;
+    const lP = _tbListe[p], wP = _tbWert[p], lN = _tbListe[q], wN = _tbWert[q];
+    C.set(L.subarray(alt, alt + N));
+    for (let j = 0; j < anz; j++) C[lP[j]] = wP[j];
+    const besuch = ++_tbStempel;
+    let anzN = 0;
+    for (let j = 0; j < anz; j++) {
+      const d = lP[j], nd = NEIGHBORS[d];
+      for (let r = -1; r < nd.length; r++) {
+        const c = r < 0 ? d : nd[r];
+        if (_tbBesucht[c] === besuch) continue;
+        _tbBesucht[c] = besuch;
+        const v = C[c], nc = NEIGHBORS[c];
+        let w;
+        if (k <= INFLUENCE_DILATE) {
+          let pos = 0, neg = 0;
+          for (let m = 0; m < nc.length; m++) { const x = C[nc[m]]; if (x > 0) pos++; else if (x < 0) neg++; }
+          w = (v >= 0 && neg === 0) ? v + pos : (v <= 0 && pos === 0) ? v - neg : v;
+        } else {
+          let nichtPos = 0, nichtNeg = 0;
+          for (let m = 0; m < nc.length; m++) { const x = C[nc[m]]; if (x <= 0) nichtPos++; if (x >= 0) nichtNeg++; }
+          w = v > 0 ? Math.max(0, v - nichtPos) : v < 0 ? Math.min(0, v + nichtNeg) : 0;
+        }
+        if (w !== L[neu + c]) { lN[anzN] = c; wN[anzN++] = w; }
+      }
+    }
+    p = q; anz = anzN;
+  }
+  /* anz > 0 nur, wenn die Aenderung bis zur letzten Ebene reicht; dann
+     haelt Liste p genau die Felder, die sich in der Endkarte unterscheiden. */
+  let s = _tbBilanz;
+  const o = BOUZY_EBENEN * N, lE = _tbListe[p], wE = _tbWert[p];
+  for (let j = 0; j < anz; j++) {
+    const a = L[o + lE[j]], b = wE[j];
+    s += (b > 0 ? 1 : b < 0 ? -1 : 0) - (a > 0 ? 1 : a < 0 ? -1 : 0);
+  }
+  return s;
 }
 
 /* +1 = Feld liegt in der eigenen Zone von `color`, -1 = in der des Gegners,
@@ -2856,7 +2953,7 @@ function evalEndgame(board, i, color, mc) {
     if (board[n] === opp && countLiberties(board, n, 2) === 1) s += PARAMS.endOppAtari;
   }
   if (PARAMS.endTieBreak > 0 && _tbValid) {
-    const d = (bouzyBilanz(_evalScratch) - _tbBilanz) * (color === 1 ? 1 : -1);
+    const d = (tbBilanzNach(_evalScratch) - _tbBilanz) * (color === 1 ? 1 : -1);
     s += PARAMS.endTieBreak * Math.max(-1, Math.min(1, d / 20));
   }
   return s + Math.random() * 0.5;

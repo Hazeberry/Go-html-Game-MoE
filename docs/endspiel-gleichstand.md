@@ -246,3 +246,23 @@ ohne den Erstlauf. Zweiseitig gegen 50 %, α = 0,05.
 
 Wirksamkeitsnachweis und Aufgaben werden wie in §4 erhoben und berichtet.
 
+
+---
+
+## 9. Nachtrag: Beschleunigung (03.10.2026)
+
+`tbBilanzNach` rechnet die Karte nach einem Kandidaten nicht mehr ganz neu.
+`primeEndTieBreak` hebt alle 27 Zwischenstände der Wurzelkarte auf. Je
+Ebene wird dann nur neu gerechnet, was sich geändert hat, plus die
+Nachbarn. Das sind im Mittel rund 20 Felder je Ebene statt 361.
+
+- **Bitgenau:** Die Testsuite vergleicht über 10 000 Kandidaten auf 40
+  Zufallsstellungen jeder Dichte, mit Schlägen, gegen die volle Rechnung.
+  Ein absichtlich eingebauter Fehler fällt dort auf: Bei einer Variante,
+  die die Nachbarn vergisst, scheitern 4 von 6 Tests.
+- **Hash-gleich:** Die ersten vier Partien von Seed 20261010 sind mit dem
+  neuen Code Zug für Zug dieselben wie im laufenden Wiederholungslauf. Die
+  Wiederholung gilt damit auch für diesen Code.
+- **Schneller:** an der Stellung vor Zug 88 der Bug-Report-Partie, 276
+  Kandidaten, gemessen bei voll ausgelasteter Maschine: volle Rechnung
+  40–56 ms, inkrementell 9–21 ms je Wurzel.
