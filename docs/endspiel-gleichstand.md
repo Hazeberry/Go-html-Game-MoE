@@ -143,3 +143,57 @@ Die Läufe schreiben Rohdumps mit `params_hash`, `final_board_hash` und
 `zufall`. Abgebrochene Teilläufe werden mit `--fortsetzen` weitergeführt
 (README, „Lauf fortsetzen"). Die Hash-Listen kommen wie bei den früheren
 Läufen nach [`daten/`](daten/).
+
+---
+
+## 7. Nachtrag: Ergebnis (03.10.2026)
+
+Gelaufen auf dem Merge-Commit `2f54871`, alle vier Teilläufe ohne
+Unterbrechung. Hash-Listen: `daten/gleichstand-20261006.json` bis
+`…09.json`.
+
+**Primär: B gewinnt 206 von 360 Partien, 57,2 %** (z = 2,74, p = 0,006,
+95-%-KI 52,1–62,3 %). Nach §4 heißt das: B spielt stärker — als Erstlauf eine
+Hypothese, vor einer Default-Änderung zu wiederholen.
+
+| Teillauf | Siegrate B |
+|---|---:|
+| 20261006 | 61,1 % |
+| 20261007 | 57,8 % |
+| 20261008 | 56,7 % |
+| 20261009 | 53,3 % |
+
+Alle vier Teilläufe zeigen in dieselbe Richtung. Als Schwarz und als Weiß
+gewinnt B gleich oft, je 103 von 180.
+
+**Wirksamkeitsnachweis:** 23 962 Stellungen, jede mit den Parametern des
+Arms bewertet, der am Zug war.
+
+| | A | B |
+|---|---:|---:|
+| gespielt aus der gelosten Gruppe, alle Stellungen | 29,9 % | 13,5 % |
+| ebenso, nur Stellungen mit Endspiel-Experte | 38,6 % | 17,5 % |
+| geloste Wurzelplätze, Mittel | 11,5 | 7,3 |
+
+Der Brecher halbiert das Los wie vorab gemessen. Das Ergebnis ist damit
+auf den Mechanismus zurückzuführen, nicht nur ein Nebeneffekt.
+
+**Sekundär:**
+
+- Aufgaben: A gab 143-mal auf, B 106-mal. Weitergespielt gewinnt der
+  Aufgebende 7-mal (4,9 %) bzw. 8-mal (7,5 %). Ohne falsche Aufgaben liegt
+  B bei 57,5 %. Das sind 0,3 Punkte Abstand, unter der Schwelle aus §4.
+- Partielänge Ø 336 Züge.
+
+**Was daraus folgt.** Es ist der erste Eingriff dieser Reihe, der die Engine
+messbar stärker macht. Zwei Dinge fehlen vor einer Default-Änderung, beide
+in §2 und §4 vorab benannt:
+
+1. **Eine Wiederholung** mit neuen Seeds.
+2. **Die Kosten im Zeitbudget.** Gemessen wurde mit fester Simulationszahl.
+   Im Spiel kostet der Brecher rund 40 ms je Wurzelbewertung, die der Suche
+   fehlen. Entweder wird er billiger, oder ein Lauf mit Zeitbudget zeigt,
+   dass der Vorteil das trägt.
+
+Bis dahin bleibt der Default 0.
+

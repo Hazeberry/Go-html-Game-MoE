@@ -1598,7 +1598,11 @@ globalThis.PARAMS = {
      Gleichstaende; wie oft er anderswo verschiedene Werte umordnet, misst
      auswertung/wurzel-gleichstand.js.
      Kosten: eine Bouzy-Karte pro Kandidat, nur an der Wurzel und nur bei
-     aktivem Endspiel-Experten.
+     aktivem Endspiel-Experten, gemessen rund 40 ms je Zug.
+     Gemessen (docs/endspiel-gleichstand.md): 1 gegen 0, 360 Partien mit
+     fester Simulationszahl — 57,2 % (p = 0,006), das Los im Endspiel
+     halbiert. Erstlauf; vor einer Default-Aenderung vorab festgelegt: eine
+     Wiederholung und ein Lauf im Zeitbudget, das die 40 ms bezahlt.
      Default 0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
   endTieBreak:       0,
   /* Adaptives Zeitbudget (Tin/GLM-Vorschlag, stufenlos statt Sprungfunktion).
@@ -5772,7 +5776,7 @@ globalThis.policyNet = new PolicyNet();
         {key:'influenceOwn', label:'Einfluss: eigene Zone', step:50, min:0, max:600,
          tip:'EXPERIMENTELL. Abzug für Züge in der eigenen Einflusszone (nicht das eigene Gebiet auffüllen). Default 0 = aus. Nur zusammen mit der Invasion gemessen: kein Nutzen.'},
         {key:'endTieBreak', label:'Endspiel-Gleichstand', step:0.5, min:0, max:5,
-         tip:'EXPERIMENTELL. Ordnet im Endspiel die gleich bewerteten ruhigen Züge nach ihrem Einfluss (Bouzy-Bilanz), statt sie zu losen. 1 = bricht nur Gleichstände. Default 0 = aus. Braucht A/B-Test.'},
+         tip:'EXPERIMENTELL. Ordnet im Endspiel die gleich bewerteten ruhigen Züge nach ihrem Einfluss (Bouzy-Bilanz), statt sie zu losen. 1 = bricht nur Gleichstände. Gemessen mit 1: 57,2 % Siegrate (Erstlauf, feste Simulationszahl). Kostet rund 40 ms je Zug. Default 0, bis Wiederholung und Zeitbudget-Messung vorliegen.'},
         {key:'bensonMoveFilter', label:'Benson-Filter', step:1, min:0, max:1,
          tip:'1 = todgeborene Züge (beweisbar toter Stein) fliegen aus der Kandidatenliste; nur Pass bleibt, wenn nichts übrig ist'},
         {key:'captureCap', label:'Gefangenen-Deckel', step:50, min:0, max:1000,

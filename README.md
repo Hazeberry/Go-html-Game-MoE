@@ -2042,14 +2042,22 @@ Aufgabe-Meldung jetzt die Fläche ohne beweisbar tote Steine nennt — ein
 Bug-Report hatte „Gebiet 132:123" für die aufgebende Seite gezeigt, bei 46
 toten eigenen Steinen.
 
-**Dritter Versuch, läuft:** das Los nicht verschieben, sondern ordnen.
-`endTieBreak` (Default 0) sortiert im Endspiel-Experten nur die gleich
+**Dritter Versuch, der erste mit Wirkung:** das Los nicht verschieben,
+sondern ordnen. `endTieBreak` sortiert im Endspiel-Experten nur die gleich
 bewerteten ruhigen Züge nach ihrer Wirkung auf die Einflusskarte. Vorab
-gemessen kippt er keine einzige Reihenfolge verschieden bewerteter Züge und
-halbiert die gelosten Wurzelplätze (13,2 → 7,3 von 16). Anlass war auch eine
-echte Partie, in der Weiß von Zug 88 bis 122 achtzehnmal in Folge aus einer
-Gruppe von über 140 gleich bewerteten Zügen zog — für den Spieler sah das
-aus, als ignoriere ihn die KI. Festlegung und Lauf:
+gemessen kippt er keine einzige Reihenfolge verschieden bewerteter Züge.
+
+| Eingriff | Los im Endspiel | Siegrate des Eingriffs | Lesart |
+|---|---|---:|---|
+| Gleichstandsbrecher `endTieBreak` = 1 | 38,6 % → 17,5 % der Züge | **57,2 %** (p = 0,006) | stärker, Erstlauf |
+
+Ohne falsche Aufgaben 57,5 %; alle vier Teilläufe zu je 90 Partien liegen
+über 50 %. Der Default bleibt vorerst 0: Vorab festgelegt waren eine
+Wiederholung und eine Messung im Zeitbudget, denn der Brecher kostet rund
+40 ms je Zug, die der Suche fehlen. Anlass war auch eine echte Partie, in der
+Weiß von Zug 88 bis 122 achtzehnmal in Folge aus einer Gruppe von über 140
+gleich bewerteten Zügen zog — für den Spieler sah das aus, als ignoriere ihn
+die KI. Festlegung und Ergebnis:
 [`docs/endspiel-gleichstand.md`](docs/endspiel-gleichstand.md).
 
 ## Methodik
