@@ -201,6 +201,7 @@ Simulationszahl pro Zug direkt an der Rechenleistung hängt.
 | `mctsValueScale` 200 statt 350 | 65:35 über 100 gepaarte Partien, p = 0,0035 | **eingebaut** (≈ +108 Elo) |
 | Kurve 100/150/200/250/300/500/1000 | Plateau bei 150–250, Abfall zu beiden Seiten | Mitte des Plateaus gewählt, nicht der Höchstwert |
 | `endTieBreak` 1 statt 0 (Gleichstand im Endspiel ordnen statt losen) | 57,2 % und in der Wiederholung 59,4 % über je 360 Partien, p = 0,006 und 0,0003 | **eingebaut** — Default 1 |
+| `raumGewicht` + `raumZug` 1 (Raumrisiko im Laufkampf) | 45,3 % über 360 Partien, p = 0,073; Ausbrüche ×2, große Verluste unverändert | verworfen — Default 0 |
 | `resignQ` 0,95 gegen 0,997 | 29:31 über 60 Partien, p = 0,90 | 0,95 bleibt — rechtzeitiges Aufgeben kostet nichts |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
@@ -2090,8 +2091,15 @@ Benson-Beweis auf 0. Darauf stehen zwei Parameter, beide Default 0:
 `raumGewicht` bucht gefährdete Ketten in der Stellungsbewertung anteilig
 als geschlagen, `raumZug` bewertet Wurzelkandidaten nach der Änderung
 dieses Risikos. An der Partie vom 03.10. findet die KI damit den einen
-rettenden Punkt (M11), den sie vorher nie spielte. Der A/B-Lauf ist vorab
-festgelegt: [`docs/laufkampf.md`](docs/laufkampf.md), §7.
+rettenden Punkt (M11), den sie vorher nie spielte.
+
+Im A/B-Lauf (360 Partien, vorab festgelegt) gewinnt die Fassung mit beiden
+Teilen **45,3 %** (p = 0,073): kein Stärkeeffekt, eher Schaden. Sie bricht
+doppelt so oft aus (10,1 % statt 5,5 % der Züge in solchen Lagen), große
+Verluste werden aber nicht seltener. Ein Zug auf eine Freiheit ist noch
+keine Rettung; ob ein Ausbruch durchkommt, ist eine Lesefrage für die
+Suche, nicht für die Bewertung. Beide Parameter bleiben 0:
+[`docs/laufkampf.md`](docs/laufkampf.md), §8.
 
 ## Methodik
 
