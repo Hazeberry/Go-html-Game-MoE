@@ -74,3 +74,41 @@ der Bereich 120–480 wenig über die 750–1 300 Simulationen im Spiel.
 - Selbstspiel: Beide Arme haben dieselben Schwächen. Ob mehr Suche auch
   gegen einen fremden Gegner hilft, misst die Brücke zu GNU Go, die parallel
   entsteht.
+
+---
+
+## 5. Nachtrag: Ergebnis (03.10.2026)
+
+Gelaufen auf dem Merge-Commit `94b59d0`, alle acht Teilläufe ohne
+Unterbrechung. Hash-Listen: `daten/skalierung-k1-…json` und
+`daten/skalierung-k2-…json`.
+
+| Vergleich | Siegrate der doppelten Suche | p | Elo je Verdopplung (95-%-Intervall) |
+|---|---:|---:|---|
+| **K1** 240 gegen 120 | **60,6 %** (218/360) | 0,0001 | **+75** (38–112) |
+| **K2** 480 gegen 240 | **57,8 %** (208/360) | 0,003 | **+55** (19–92) |
+
+Teilläufe K1: 60,0 / 62,2 / 60,0 / 60,0 %. Teilläufe K2: 55,6 / 64,4 / 60,0
+/ 51,1 %.
+
+**Lesart nach §3:** Beide Vergleiche fallen in „zwischen 0 und 100 Elo,
+p < 0,05". Suche hilft, aber begrenzt. Von K1 zu K2 fällt der Gewinn je
+Verdopplung von 75 auf 55 Elo. Das ist kein gesicherter Unterschied (die
+Intervalle überlappen weit), passt aber zum erwarteten Abflachen.
+
+**Was das für das Spiel heißt.** Die KI rechnet im Spiel 750–1 300
+Simulationen, zwei bis drei Verdopplungen über 240. Setzt sich das Abflachen
+fort, bringt eine weitere Verdopplung dort eher 30–50 Elo. Das ist eine
+Hochrechnung, keine Messung. Arbeit an der Geschwindigkeit (die Zeit je
+Simulation verdoppelt sich über die Partie) wäre damit etwas wert, aber kein
+großer Hebel.
+
+**Zusammen mit dem GNU-Go-Pilot** ([`gnugo.md`](gnugo.md)): Gegen GNU Go
+änderten 1 000 statt 120 Simulationen nichts, 0 von 8 gegen 0 von 17 Siegen.
+Dort fehlen nicht 50 Elo, sondern mehr als neun Vorgabesteine. Die Grenze
+liegt also nicht in der Suche, sondern in der Bewertung, die sie füttert.
+
+**Sekundär, ohne Anspruch:** Der schwächere Arm gibt öfter auf (K1: 169
+gegen 99, K2: 151 gegen 100). In K2 gewinnt die doppelte Suche als Weiß
+öfter als als Schwarz (115 gegen 93 von je 180). Partielänge Ø 333 bzw. 337
+Züge.
