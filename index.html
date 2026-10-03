@@ -1599,15 +1599,19 @@ globalThis.PARAMS = {
      auswertung/wurzel-gleichstand.js.
      Kosten: eine Bouzy-Karte pro Kandidat, inkrementell (tbBilanzNach),
      nur an der Wurzel und nur bei aktivem Endspiel-Experten. Gemessen
-     waren es vor der inkrementellen Fassung rund 40 ms je Zug. Die gehen NICHT
+     rund 10 ms je Zug (276 Kandidaten; die volle Karte je Kandidat kostete
+     rund 40 ms). Die gehen NICHT
      vom Suchbudget ab (dessen Uhr startet erst in mctsPUCT), sie
      verlaengern nur die Antwortzeit.
-     Gemessen (docs/endspiel-gleichstand.md): 1 gegen 0, 360 Partien mit
-     fester Simulationszahl — 57,2 % (p = 0,006), das Los im Endspiel
-     halbiert. Erstlauf; vor einer Default-Aenderung vorab festgelegt: eine
-     Wiederholung (§8).
-     Default 0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
-  endTieBreak:       0,
+     Gemessen (docs/endspiel-gleichstand.md): 1 gegen 0, zweimal 360
+     Partien mit fester Simulationszahl — 57,2 % (p = 0,006), Wiederholung
+     mit neuen Seeds 59,4 % (p = 0,0003); das Los im Endspiel halbiert.
+     Nach der vorab festgelegten Regel (§8) deshalb Default 1 — der erste
+     Eingriff dieser Messreihe, der die Engine messbar staerker macht.
+     Wirkt in allen Stufen, die evaluateMove nutzen (auch Leicht/Mittel),
+     gemessen nur fuer Schwer.
+     0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
+  endTieBreak:       1,
   /* Adaptives Zeitbudget (Tin/GLM-Vorschlag, stufenlos statt Sprungfunktion).
      Reale Partie zeigte 86% Sim-Rückgang über 156 Züge (317→43) durch
      wachsende floodFill-Kosten auf großen Gruppen — kontinuierlicher Verfall,
@@ -5875,7 +5879,7 @@ globalThis.policyNet = new PolicyNet();
         {key:'influenceOwn', label:'Einfluss: eigene Zone', step:50, min:0, max:600,
          tip:'EXPERIMENTELL. Abzug für Züge in der eigenen Einflusszone (nicht das eigene Gebiet auffüllen). Default 0 = aus. Nur zusammen mit der Invasion gemessen: kein Nutzen.'},
         {key:'endTieBreak', label:'Endspiel-Gleichstand', step:0.5, min:0, max:5,
-         tip:'EXPERIMENTELL. Ordnet im Endspiel die gleich bewerteten ruhigen Züge nach ihrem Einfluss (Bouzy-Bilanz), statt sie zu losen. 1 = bricht nur Gleichstände. Gemessen mit 1: 57,2 % Siegrate (Erstlauf, feste Simulationszahl). Verlängert die Antwortzeit um rund 40 ms, das Suchbudget bleibt gleich. Default 0, bis die Wiederholung vorliegt.'},
+         tip:'Ordnet im Endspiel die gleich bewerteten ruhigen Züge nach ihrem Einfluss (Bouzy-Bilanz), statt sie zu losen. 1 = bricht nur Gleichstände (Default). Gemessen gegen 0: 57,2 % und in der Wiederholung 59,4 % Siegrate. 0 = altes Verhalten.'},
         {key:'bensonMoveFilter', label:'Benson-Filter', step:1, min:0, max:1,
          tip:'1 = todgeborene Züge (beweisbar toter Stein) fliegen aus der Kandidatenliste; nur Pass bleibt, wenn nichts übrig ist'},
         {key:'captureCap', label:'Gefangenen-Deckel', step:50, min:0, max:1000,

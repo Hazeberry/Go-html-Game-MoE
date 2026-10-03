@@ -266,3 +266,52 @@ Nachbarn. Das sind im Mittel rund 20 Felder je Ebene statt 361.
 - **Schneller:** an der Stellung vor Zug 88 der Bug-Report-Partie, 276
   Kandidaten, gemessen bei voll ausgelasteter Maschine: volle Rechnung
   40–56 ms, inkrementell 9–21 ms je Wurzel.
+
+---
+
+## 10. Nachtrag: Ergebnis der Wiederholung, Default 1 (03.10.2026)
+
+Gelaufen auf `43085fb`, alle vier Teilläufe ohne Unterbrechung. Hash-Listen:
+`daten/gleichstand-20261010.json` bis `…13.json`.
+
+**Primär: B gewinnt 214 von 360 Partien, 59,4 %** (z = 3,58, p = 0,0003,
+95-%-KI 54,4–64,5 %).
+
+| Teillauf | Siegrate B |
+|---|---:|
+| 20261010 | 54,4 % |
+| 20261011 | 63,3 % |
+| 20261012 | 60,0 % |
+| 20261013 | 60,0 % |
+
+Als Schwarz und als Weiß gewinnt B gleich oft, je 107 von 180.
+
+**Entscheidung nach §8: Default `endTieBreak` = 1.**
+
+**Wirksamkeitsnachweis** (24 020 Stellungen): Im Endspiel stammen bei A
+38,6 % der gespielten Züge aus der gelosten Gruppe, bei B 18,1 %. Im Mittel
+werden bei A 11,5 Wurzelplätze gelost, bei B 7,3. Das sind fast genau die
+Zahlen des Erstlaufs.
+
+**Sekundär:** A gab 143-mal auf, B 102-mal. Weitergespielt gewinnt der
+Aufgebende 5-mal (3,5 %) bzw. 5-mal (4,9 %). Ohne falsche Aufgaben liegt B
+damit unverändert bei 59,4 %. Partielänge Ø 337 Züge.
+
+**Kosten, auf unbelasteter Maschine nachgemessen:** Je Wurzel braucht die
+inkrementelle Fassung 8–9 ms statt 37 ms für die volle Rechnung. Ein ganzer
+Zug mit 250 ms Budget dauert 263–274 statt 253–262 ms (Stellung vor Zug 88
+der Bug-Report-Partie).
+
+**Beide Läufe zusammen**, nur beschreibend: 420 von 720, 58,3 %
+(95-%-KI 54,7–61,9 %).
+
+**Was bleibt offen.**
+
+- Gemessen ist Selbstspiel mit 120 Simulationen. Gegen Menschen und mit
+  längerem Zeitbudget ist der Vorteil nicht gemessen.
+- Der Brecher wirkt auch in den Stufen Leicht und Mittel. Sie ziehen
+  zufällig aus der Spitze der Bewertung, und die ist jetzt im Endspiel
+  geordnet. Gemessen ist das nicht.
+- Für ältere Läufe heißt „Default" jetzt etwas anderes. Wiederholt werden
+  sie auf ihrem Commit aus der Hash-Liste oder mit `endTieBreak=0` in
+  beiden Armen.
