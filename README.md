@@ -2052,9 +2052,10 @@ gemessen kippt er keine einzige Reihenfolge verschieden bewerteter Züge.
 | Gleichstandsbrecher `endTieBreak` = 1 | 38,6 % → 17,5 % der Züge | **57,2 %** (p = 0,006) | stärker, Erstlauf |
 
 Ohne falsche Aufgaben 57,5 %; alle vier Teilläufe zu je 90 Partien liegen
-über 50 %. Der Default bleibt vorerst 0: Vorab festgelegt waren eine
-Wiederholung und eine Messung im Zeitbudget, denn der Brecher kostet rund
-40 ms je Zug, die der Suche fehlen. Anlass war auch eine echte Partie, in der
+über 50 %. Der Default bleibt vorerst 0, bis die vorab festgelegte
+Wiederholung vorliegt. Der Brecher verlängert die Antwortzeit um rund
+40 ms; das Suchbudget bleibt gleich, denn dessen Uhr startet erst nach der
+Wurzelbewertung. Anlass war auch eine echte Partie, in der
 Weiß von Zug 88 bis 122 achtzehnmal in Folge aus einer Gruppe von über 140
 gleich bewerteten Zügen zog — für den Spieler sah das aus, als ignoriere ihn
 die KI. Festlegung und Ergebnis:
