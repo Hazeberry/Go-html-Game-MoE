@@ -1,0 +1,21 @@
+# Stellung bei Zug 243, Hard-KI (Weiß, O) gibt auf. Partie vom 02./03.10.2026,
+# Bug-Report aus dem Spiel. X = Schwarz (Mensch), O = Weiß (KI). Gefangene S 12, W 2.
+19 . . O . O . . . O . O . . . . . O . .
+18 O O . O . . . . . O O . O O . . . O O
+17 O X O X X . . . . . . . . . . X . . O
+16 X X . X X X X X X X X X X X X X X X X
+15 . X X X . . . . X O X O X . . X . . .
+14 X . X X . . . O O O O O O O . X . . .
+13 . O . X . . O O . O . O . O X X . . .
+12 X . X X . O . . O . O . O O O X . O O
+11 . . X X . . O . . O . O . O X X . . .
+10 X X X X X X X O O . O . O O O X X X X
+ 9 . . . X . O X X . O . O . O X X . O X
+ 8 . . . X O O O X X . O . O O O X . O X
+ 7 . . . X . O X X O X X O O O X X . O X
+ 6 . . . X X O X . O X . X O X . X . O X
+ 5 . O . X X X X X X X X X X X X X O O X
+ 4 . . . X X X . . . O . . . . . O O O X
+ 3 . O . X O O O O O O O O O O O O O O X
+ 2 . . . X O O O O O O O O O O O O O O X
+ 1 . . . X X X X X X X X X X X X X X X X

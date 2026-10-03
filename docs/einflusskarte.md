@@ -226,3 +226,24 @@ festgehalten.
 `wurzel-gleichstand.md` den Ort, an dem ein Tie-Break wirken müsste: die
 Gleichstände beim Wert 30 im Endspiel-Experten. Die beiden Terme hier wirken
 auf alle Kandidaten, nicht nur dort.
+
+---
+
+# Nachtrag vom 03.10.2026: die Aufgaben (explorativ)
+
+## 12. „Richtung Schaden" ist großteils die Aufgabe
+
+Nicht vorab festgelegt, deshalb als Einordnung, nicht als neue Lesart von
+§11. Jede der 296 Aufgaben der Hauptreihe wurde an der Aufgabestellung
+weitergespielt (`docs/aufgaben.md`):
+
+```
+A gab 124× auf, gewinnt weitergespielt  9× ( 7,3 %)
+B gab 172× auf, gewinnt weitergespielt 25× (14,5 %)    p ≈ 0,055
+Siegrate B 45,0 % → ohne falsche Aufgaben 49,4 %
+```
+
+B gibt doppelt so oft eine Partie auf, die noch zu gewinnen war. Ohne diese
+Fehlaufgaben ist B von 50 % nicht zu unterscheiden. Der Satz aus §11 „die
+Richtung zeigt zum Schaden" ist damit nicht mehr zu halten; es bleibt bei
+**kein Stärkeeffekt**, weder Nutzen noch Schaden. Die Defaults bleiben 0.

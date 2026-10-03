@@ -2021,7 +2021,7 @@ Partien:
 | Eingriff | Los im Endspiel | Siegrate des Eingriffs | Lesart |
 |---|---|---:|---|
 | Endspielgrenze `endgameMoves` 80 → 150 | 26,9 % → 16,7 % der Züge | **31,4 %** (p < 0,0001) | deutlich schwächer |
-| Einflusskarte `influenceInvade`/`influenceOwn` = 150 | Züge in der Gegnerzone 4,6 % → 10,0 % | 45,0 % (p = 0,058) | kein Effekt nachweisbar, Richtung Schaden |
+| Einflusskarte `influenceInvade`/`influenceOwn` = 150 | Züge in der Gegnerzone 4,6 % → 10,0 % | 45,0 % (p = 0,058) | kein Effekt nachweisbar¹ |
 
 Beide Eingriffe wirken — der Mechanismus bewegt sich jeweils deutlich —, und
 keiner macht die Engine stärker. Die Phasengrenze später zu setzen verringert
@@ -2031,6 +2031,16 @@ Einflusskarte bleibt aus. Der Hebel wäre ein Endspiel-Experte, der offenes
 Gebiet sieht — gebaut ist er nicht. Einzelheiten:
 [`docs/endspielgrenze.md`](docs/endspielgrenze.md),
 [`docs/einflusskarte.md`](docs/einflusskarte.md).
+
+¹ Die 45 % sind zum Teil ein Effekt der Aufgabe: B gab doppelt so oft eine
+Partie auf, die weitergespielt noch zu gewinnen war (14,5 % gegen 7,3 % der
+Aufgaben). Ohne diese Fehlaufgaben liegt B bei 49,4 %. In den drei anderen
+Läufen sind die Aufgaben zu rund 95 % richtig und die Siegraten unverändert.
+Explorativ, mit dem Weiterspiel-Werkzeug:
+[`docs/aufgaben.md`](docs/aufgaben.md). Dort steht auch, warum die
+Aufgabe-Meldung jetzt die Fläche ohne beweisbar tote Steine nennt — ein
+Bug-Report hatte „Gebiet 132:123" für die aufgebende Seite gezeigt, bei 46
+toten eigenen Steinen.
 
 ## Methodik
 
