@@ -53,7 +53,7 @@ function ladeKI({htmlPfad = STANDARD_HTML, mitNetz = true, speicher = null} = {}
                  'gebietSagtVerloren', 'estimateArea', 'evaluateBoard',
                  'evaluateMove', 'primeInfluenceCache', 'influenceZone', 'primeEndTieBreak', 'tbBilanzNach', 'bouzyBilanz',
                  'primeAreaCache', 'buildCrisisMap', '_bnBornDead', 'phaseWeights',
-                 'aufgabeGebiet',
+                 'aufgabeGebiet', 'setzeFfEpoche',
                  'leseTransferWaechter', 'removeDeadGroups', 'bensonClassify',
                  '_bnDead', 'floodFill',
                  'PARAMS', 'BOARD_SIZE', 'NEIGHBORS', 'idx', 'xOf', 'yOf'];

@@ -169,7 +169,7 @@ let   _ffEpoch   = 0;
    _ffEpoch wird pro countLiberties-/floodFill-/removeDeadGroups-/
    evaluateBoard-Aufruf erhöht — auf Schwer sind das gemessen
    ~6 Mio. pro Zug. Die Marker-Arrays (_ffVisited, _rdgChecked,
-   _evalBoardSeen) sind Int32Array: Überschreitet der Zähler 2^31,
+   früher auch _evalBoardSeen) sind Int32Array: Überschreitet der Zähler 2^31,
    kippt der gespeicherte Wert negativ, der Vergleich mit der echten
    Epoche schlägt ab dann IMMER fehl — die Besucht-Markierung ist
    lautlos tot. Folge: Gruppen-Queues laufen über → Crash in
@@ -181,12 +181,16 @@ let   _ffEpoch   = 0;
    Schwer-Zügen Summe auf. Fix: kurz vor 2^31 alle Marker nullen
    und bei 1 neu starten — Markierungen gelten ohnehin nur
    innerhalb eines Aufrufs, nichts geht verloren. */
+/* Nur fuer Tests (tests/epochen.js): Zaehler kurz vor den Ueberlauf setzen,
+   um ihn an einer bestimmten Stelle auszuloesen. 2^31 echte Aufrufe waeren
+   in einem Test nicht bezahlbar. */
+function setzeFfEpoche(n) { _ffEpoch = n; }
+
 function _nextFfEpoch() {
   if (++_ffEpoch >= 0x7fffffff) {
     _ffEpoch = 1;
     _ffVisited.fill(0);
     _rdgChecked.fill(0);
-    _evalBoardSeen.fill(0);
   }
   return _ffEpoch;
 }
@@ -3288,7 +3292,26 @@ function leseDeckelWaechter(reset) {
   return v;
 }
 
+/* Eigener Epochenzaehler fuer _evalBoardSeen, NICHT _nextFfEpoch.
+   evaluateBoard haelt seenEpoch ueber die ganze Schleife und holt darin
+   pro Gruppe eine Freiheiten-Epoche aus _nextFfEpoch. Hing _evalBoardSeen
+   am selben Zaehler, loeschte dessen Ueberlauf (rund alle neun Partien im
+   Harness) mitten in der Schleife alle Gesehen-Marken: jede schon gezaehlte
+   Gruppe mit einem Stein hinter der aktuellen Position wurde ein zweites
+   Mal gezaehlt. Ob das passierte, hing nur am Zaehlerstand seit
+   Prozessstart -- deshalb spielte ein Harness-Prozess, der bei Partie 1
+   begann, Partie 151 anders als einer, der spaeter einsetzte
+   (docs/endspielgrenze.md, §8 und §9). Dieser Zaehler laeuft nur am Anfang
+   von evaluateBoard ueber, vor jeder Marke dieses Aufrufs. */
 const _evalBoardSeen = new Int32Array(BOARD_SIZE);
+let _evalSeenEpoch = 0;
+function _nextEvalSeenEpoch() {
+  if (++_evalSeenEpoch >= 0x7fffffff) {
+    _evalSeenEpoch = 1;
+    _evalBoardSeen.fill(0);
+  }
+  return _evalSeenEpoch;
+}
 
 /* TRANSFER-WAECHTER. Zaehlt, was die Uebertragung (deathTransfer) in
    evaluateBoard tatsaechlich anrichtet. Alle Zaehler werden nur beschrieben,
@@ -3335,7 +3358,7 @@ function evaluateBoard(board, color, captures) {
     for (let i = 0; i < BOARD_SIZE; i++) if (!board[i]) empt++;
     if (empt <= PARAMS.bensonEvalMaxEmpty) bEpoch = bensonClassify(board);
   }
-  const seenEpoch = _nextFfEpoch();
+  const seenEpoch = _nextEvalSeenEpoch();
   for (let i = 0; i < BOARD_SIZE; i++) {
     const c = board[i]; if (!c || _evalBoardSeen[i] === seenEpoch) continue;
     if (bEpoch >= 0 && _bnDead[i] === bEpoch) {
