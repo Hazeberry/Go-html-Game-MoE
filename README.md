@@ -2042,6 +2042,16 @@ Aufgabe-Meldung jetzt die Fläche ohne beweisbar tote Steine nennt — ein
 Bug-Report hatte „Gebiet 132:123" für die aufgebende Seite gezeigt, bei 46
 toten eigenen Steinen.
 
+**Dritter Versuch, läuft:** das Los nicht verschieben, sondern ordnen.
+`endTieBreak` (Default 0) sortiert im Endspiel-Experten nur die gleich
+bewerteten ruhigen Züge nach ihrer Wirkung auf die Einflusskarte. Vorab
+gemessen kippt er keine einzige Reihenfolge verschieden bewerteter Züge und
+halbiert die gelosten Wurzelplätze (13,2 → 7,3 von 16). Anlass war auch eine
+echte Partie, in der Weiß von Zug 88 bis 122 achtzehnmal in Folge aus einer
+Gruppe von über 140 gleich bewerteten Zügen zog — für den Spieler sah das
+aus, als ignoriere ihn die KI. Festlegung und Lauf:
+[`docs/endspiel-gleichstand.md`](docs/endspiel-gleichstand.md).
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im
@@ -2101,9 +2111,9 @@ tests/stellungen/               echte Partien als Testvorlage (SGF)
 .github/workflows/ab-harness.yml  Messläufe in CI, manuell startbar
 ```
 
-[`tests/`](tests/) umfasst zehn Suiten: NaN-Schutzschichten,
+[`tests/`](tests/) umfasst elf Suiten: NaN-Schutzschichten,
 Aufgabekriterium, Transfer-Wächter, Benson-Übertrag, feste Simulationszahl,
-Rohdump, Einflusskarte, Trainings-Stabilität, einen Rauchtest des Harness und
+Rohdump, Einflusskarte, Endspiel-Gleichstand, Trainings-Stabilität, einen Rauchtest des Harness und
 einen Browser-Test — ohne `node_modules`, gegen dieselben `<script>`-Blöcke, die
 ausgeliefert werden. Ein Test gegen eine Kopie prüft irgendwann etwas, das niemand
 ausliefert. Der Browser-Test braucht zusätzlich Playwright und überspringt
