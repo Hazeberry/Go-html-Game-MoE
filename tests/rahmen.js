@@ -51,7 +51,7 @@ function ladeKI({htmlPfad = STANDARD_HTML, mitNetz = true, speicher = null} = {}
      scheitert dann für sich allein und mit klarer Meldung. */
   const namen = ['_mctsKids', 'mctsPUCT', 'getAIMove', 'getLegalMoves',
                  'gebietSagtVerloren', 'estimateArea', 'evaluateBoard',
-                 'evaluateMove', 'primeInfluenceCache', 'influenceZone', 'primeEndTieBreak',
+                 'evaluateMove', 'primeInfluenceCache', 'influenceZone', 'primeEndTieBreak', 'tbBilanzNach', 'bouzyBilanz',
                  'primeAreaCache', 'buildCrisisMap', '_bnBornDead', 'phaseWeights',
                  'aufgabeGebiet',
                  'leseTransferWaechter', 'removeDeadGroups', 'bensonClassify',

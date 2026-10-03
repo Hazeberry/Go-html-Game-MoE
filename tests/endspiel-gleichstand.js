@@ -9,6 +9,8 @@
         jeder Wert bleibt aber im Band ±1 um den alten.
      3. Die Richtung stimmt: ein Zug, der in den Rahmen des Gegners geht,
         steht vor einem, der das eigene Gebiet auffüllt.
+     4. Die inkrementelle Bilanz (tbBilanzNach) ist bitgenau die volle
+        (bouzyBilanz) — sonst änderte die Beschleunigung Partien.
 
    Math.random wird für die bitgenauen Vergleiche festgehalten.
 
@@ -18,7 +20,7 @@ const {ladeKI, test, pruefe, pruefeGleich, laufeTests} = require('./rahmen');
 
 const KI = ladeKI({htmlPfad: process.argv[2] || undefined, mitNetz: false});
 const {PARAMS, BOARD_SIZE, idx, evaluateMove, primeAreaCache, buildCrisisMap,
-       primeEndTieBreak, phaseWeights} = KI;
+       primeEndTieBreak, phaseWeights, tbBilanzNach, bouzyBilanz, removeDeadGroups} = KI;
 
 const MC = 200;   /* Endspiel-Experte allein */
 
@@ -89,6 +91,48 @@ test('Richtung: in den Gegnerrahmen vor eigenes Gebiet', () => {
   const nb = mitGewicht(1, () => werte(b, 1));
   const s = i => nb.find(x => x.i === i).s;
   pruefe(s(idx(13, 13)) > s(idx(5, 5)), 'Schwarz: spiegelbildlich');
+});
+
+/* Fester Zufall für reproduzierbare Stellungen. */
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+
+test('inkrementelle Bilanz = volle Bilanz, jeder Kandidat, jede Dichte', () => {
+  const r = mulberry32(20261003);
+  let kandidaten = 0, mitSchlag = 0;
+  for (let st = 0; st < 40; st++) {
+    const dichte = 0.05 + 0.6 * st / 40;
+    const b = new Uint8Array(BOARD_SIZE);
+    for (let i = 0; i < BOARD_SIZE; i++) if (r() < dichte) b[i] = r() < 0.5 ? 1 : 2;
+    primeEndTieBreak(b);
+    pruefeGleich(tbBilanzNach(b), bouzyBilanz(b), `Stellung ${st}: Wurzel selbst`);
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      if (b[i]) continue;
+      for (const f of [1, 2]) {
+        const nb = new Uint8Array(b);
+        nb[i] = f;
+        if (removeDeadGroups(nb, f === 1 ? 2 : 1, i) > 0) mitSchlag++;
+        kandidaten++;
+        const inkr = tbBilanzNach(nb), voll = bouzyBilanz(nb);
+        if (inkr !== voll) pruefeGleich(inkr, voll, `Stellung ${st}, Feld ${i}, Farbe ${f}`);
+      }
+    }
+  }
+  pruefe(kandidaten > 10000 && mitSchlag > 100, `Vorbedingung: ${kandidaten} Kandidaten, ${mitSchlag} mit Schlag`);
+});
+
+test('inkrementelle Bilanz auch gegen ein ganz anderes Brett', () => {
+  const r = mulberry32(7);
+  const zufall = () => { const b = new Uint8Array(BOARD_SIZE);
+    for (let i = 0; i < BOARD_SIZE; i++) if (r() < 0.3) b[i] = r() < 0.5 ? 1 : 2; return b; };
+  for (let k = 0; k < 50; k++) {
+    primeEndTieBreak(zufall());
+    const anderes = zufall();
+    pruefeGleich(tbBilanzNach(anderes), bouzyBilanz(anderes), `Paar ${k}`);
+  }
 });
 
 laufeTests('Endspiel-Gleichstand (endTieBreak)').then(ok => process.exit(ok ? 0 : 1));
