@@ -197,3 +197,52 @@ in §2 und §4 vorab benannt:
 
 Bis dahin bleibt der Default 0.
 
+---
+
+## 8. Nachtrag: Korrektur zu den Kosten, Wiederholung festgelegt (03.10.2026, vor dem Lauf)
+
+**Korrektur zu §2 und §7.** Dort steht, die rund 40 ms des Brechers fehlten
+im Spiel der Suche. Das stimmt nicht. Die Uhr der Suche startet in
+`mctsPUCT` (`_simStart`), also erst nach der Wurzelbewertung in
+`getAIMove`. Das Zeitbudget gehört deshalb ganz der Suche, mit und ohne
+Brecher. Gemessen an der Stellung vor Zug 88 der Bug-Report-Partie, mit
+`aiTimeBudget` = 250:
+
+| | Zug dauert (drei Wiederholungen) |
+|---|---|
+| `endTieBreak` = 0 | 290 / 255 / 254 ms |
+| `endTieBreak` = 1 | 338 / 295 / 293 ms |
+
+Der Brecher verlängert also die Antwortzeit um rund 40 ms. Er nimmt der
+Suche nichts weg. Ein eigener Lauf im Zeitbudget, wie in §7 angekündigt,
+würde dieselbe Suche messen wie die feste Simulationszahl, nur nicht
+reproduzierbar. Er entfällt. Billiger machen lohnt trotzdem, aber nur für
+die Wartezeit, und nur so, dass jede Partie Zug für Zug gleich bleibt
+(Prüfung: Hash-Gleichheit gegen diese Wiederholung). Dann gilt die
+Wiederholung auch für den beschleunigten Code.
+
+**Wiederholung**, gleiche Arme und gleicher Aufbau wie §3, neue Seeds:
+
+```bash
+for s in 20261010 20261011 20261012 20261013; do
+  node ab-harness.js --games 90 --seed $s \
+    --A mctsFixedSims=120 \
+    --B mctsFixedSims=120,endTieBreak=1 \
+    --roh wiederholung-$s.jsonl --json wiederholung-$s.json &
+done
+```
+
+Commit: der Merge dieses Nachtrags.
+
+**Primär:** Siegrate von B über die 360 Partien der Wiederholung, allein,
+ohne den Erstlauf. Zweiseitig gegen 50 %, α = 0,05.
+
+**Entscheidung, vorab festgelegt:**
+
+| Wiederholung | Folge |
+|---|---|
+| B > 50 %, p < 0,05 | Default `endTieBreak` = 1 |
+| sonst | Default bleibt 0; die 720 Partien beider Läufe werden zusammen berichtet, als explorativ |
+
+Wirksamkeitsnachweis und Aufgaben werden wie in §4 erhoben und berichtet.
+
