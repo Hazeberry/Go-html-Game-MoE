@@ -165,12 +165,15 @@ node ab-harness.js --games 40 --seed 20260922 \
 angehängt direkt nach deren Ende. Bricht ein Lauf ab, setzt ihn derselbe Befehl
 mit `--fortsetzen` nach der letzten fertigen Partie fort — jede Zeile trägt den
 Zustand des Zufallsstroms. Ein Abbruch kostet damit nur die laufende Partie.
-Der fortgesetzte Lauf ist **meist**, aber nicht immer derselbe wie ein
-ununterbrochener: in drei von vier Messläufen stimmten alle verglichenen
-Partien, in einem wich ab Partie 151 die Suche eines langlebigen Prozesses um
-einen numerischen Hauch ab (`docs/endspielgrenze.md`, §8). Statistisch ist
-beides ein gültiger Lauf derselben Konfiguration; Hash für Hash
-nachvollziehbar ist er nur mit denselben Unterbrechungen. Jede
+Bis zum 03.10. war der fortgesetzte Lauf **meist**, aber nicht immer derselbe
+wie ein ununterbrochener: in einem von vier Messläufen wich ab Partie 151 die
+Suche eines langlebigen Prozesses um einen numerischen Hauch ab. Die Ursache
+war ein Fehler in `evaluateBoard`: Lief ein Epochenzähler, der über Partien
+hinweg wächst, mitten in der Bewertung über, zählte sie schon gezählte
+Gruppen ein zweites Mal — abhängig nur davon, wie lange der Prozess schon
+lief. Behoben, mit Test (`tests/epochen.js`); Nachweis in
+`docs/endspielgrenze.md`, §9. Läufe auf älteren Commits sind Hash für Hash
+nur mit denselben Unterbrechungen nachvollziehbar. Jede
 Zeile trägt außerdem `params_hash` und `final_board_hash`; sind
 beide bei einer Wiederholung gleich, hat der Lauf dieselben Partien gespielt.
 `--roh` gibt es nur im Standardmodus; zusammen mit `--paired` bricht der
@@ -2130,9 +2133,9 @@ tests/stellungen/               echte Partien als Testvorlage (SGF)
 .github/workflows/ab-harness.yml  Messläufe in CI, manuell startbar
 ```
 
-[`tests/`](tests/) umfasst elf Suiten: NaN-Schutzschichten,
+[`tests/`](tests/) umfasst zwölf Suiten: NaN-Schutzschichten,
 Aufgabekriterium, Transfer-Wächter, Benson-Übertrag, feste Simulationszahl,
-Rohdump, Einflusskarte, Endspiel-Gleichstand, Trainings-Stabilität, einen Rauchtest des Harness und
+Rohdump, Einflusskarte, Endspiel-Gleichstand, Epochenzähler, Trainings-Stabilität, einen Rauchtest des Harness und
 einen Browser-Test — ohne `node_modules`, gegen dieselben `<script>`-Blöcke, die
 ausgeliefert werden. Ein Test gegen eine Kopie prüft irgendwann etwas, das niemand
 ausliefert. Der Browser-Test braucht zusätzlich Playwright und überspringt

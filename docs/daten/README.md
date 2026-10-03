@@ -21,4 +21,6 @@ Wurde ein Lauf unterbrochen und mit `--fortsetzen` zu Ende gespielt, steht das
 im Befehl. Bitgleich nachvollziehbar ist er dann mit derselben Unterbrechung:
 erst bis zur genannten Partie laufen lassen, dann mit `--fortsetzen` weiter.
 Ein ununterbrochener Lauf kann davon später abweichen; gemessen einmal, bei
-`endspiel-150.json` ab Partie 151 (`docs/endspielgrenze.md`, §8).
+`endspiel-150.json` ab Partie 151 (`docs/endspielgrenze.md`, §8). Die
+Ursache ist gefunden und seit dem 03.10. behoben (§9 dort); für Läufe auf
+älteren Commits gilt die Einschränkung weiter.

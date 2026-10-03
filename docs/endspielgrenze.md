@@ -158,3 +158,60 @@ Läufe, und fortgesetzte stimmen meist mit ihnen überein — der Kontrolllauf i
 `pilot-benson-defense.md` §15.2, selbst nach Partie 41 fortgesetzt, ergab
 jede Kennzahl der Septemberserie auf die letzte Stelle. Bitgleich garantiert
 ist ein fortgesetzter Lauf aber nur mit derselben Unterbrechung.
+
+---
+
+## 9. Nachtrag: Ursache der Abweichung gefunden und behoben (03.10.2026)
+
+**Ursache.** `evaluateBoard` markierte gezählte Gruppen in `_evalBoardSeen`
+mit einer Epoche aus `_nextFfEpoch` und holte sich in der Gruppenschleife je
+Gruppe eine weitere Epoche aus demselben Zähler, für die Freiheiten. Der
+Zähler wächst über Partien hinweg und läuft im Harness etwa alle neun
+Partien über. Beim Überlauf nullt er seine Markierungsfelder, damals auch
+`_evalBoardSeen`. Fiel der Überlauf in die Gruppenschleife, waren die
+Gesehen-Marken aller schon gezählten Gruppen weg. Jede dieser Gruppen, die
+einen Stein hinter der aktuellen Brettposition hatte, wurde ein zweites Mal
+gezählt. Ob das passierte, hing nur am Zählerstand seit Prozessstart.
+
+**Nachweis**, alles auf dem Stand dieses Laufs (Harness `b42349c`,
+`index.html` aus `cdd9e48`):
+
+1. **Zustandsvergleich.** Zwei Prozesse, einer ab Partie 1, einer mit
+   `--fortsetzen` ab Partie 141. Vor Partie 151 wurde der vollständige
+   Modulzustand der Engine verglichen: alle Variablen auf Modulebene, die
+   Parameter, das Netz und der Zufallsstrom. Verschieden waren nur die drei
+   Epochenzähler mit ihren Markierungsfeldern (und `_lastMsPerSim`, das der
+   Harness vor jedem Zug ohnehin je Farbe setzt). Im Prozess ab Partie 1
+   stand `_ffEpoch` bei 2 025 582 498, nur 122 Millionen unter dem Überlauf
+   bei 2^31 − 1.
+2. **Übertragung.** Der fortgesetzte Prozess bekam vor Partie 151 genau
+   diesen Zählerstand samt seinen Markierungsfeldern. Der Überlauf fiel dann
+   in `evaluateBoard`, bei der 29. Gruppe einer Bewertung. Partie 151 kam
+   Zug für Zug so heraus wie im Prozess ab Partie 1.
+3. **Korrektur.** Derselbe übernommene Zählerstand, aber mit eigenem
+   Zähler für `_evalBoardSeen`: Partie 151 kam so heraus wie in den
+   fortgesetzten Prozessen.
+
+Der frühere Versuch, Überläufe an 48 Stellen zu erzwingen (§8), hatte
+keinen davon in die Gruppenschleife gelegt.
+
+**Behoben:** `_evalBoardSeen` hat einen eigenen Zähler
+(`_nextEvalSeenEpoch`). Dessen Überlauf kann nur am Anfang einer Bewertung
+fallen, vor jeder Marke. Der neue Test `tests/epochen.js` legt den Überlauf
+von `_nextFfEpoch` nacheinander auf jeden der ersten 120 Aufrufe in
+`evaluateBoard` und verlangt jedes Mal denselben Wert. Gegen den alten Code
+scheitert er (−41 statt −70).
+
+**Folgen.**
+
+- Falsch war höchstens eine Blattbewertung je Überlauf, und auch das nur,
+  wenn der Überlauf in die Gruppenschleife fiel. Im Prozess ab Partie 1
+  traf das bis Partie 150 keinen der 14 Überläufe, erst den in Partie 151.
+  Beide Arme waren gleich betroffen, also verzerrt das keinen der
+  A/B-Vergleiche. Es machte nur die Läufe von der Prozessgeschichte
+  abhängig.
+- Im Browser lebt der Worker über viele Züge; dort lief der Zähler nach
+  grob 300 bis 350 Zügen auf Schwer über. Auch dort war jeweils eine
+  Bewertung betroffen.
+- Ab diesem Commit sind ununterbrochene und fortgesetzte Läufe gleich.
+  Hash-Listen älterer Läufe gelten für deren Commits.
