@@ -206,7 +206,8 @@ scheitert er (−41 statt −70).
 
 - Falsch war höchstens eine Blattbewertung je Überlauf, und auch das nur,
   wenn der Überlauf in die Gruppenschleife fiel. Im Prozess ab Partie 1
-  traf das bis Partie 150 keinen der 14 Überläufe, erst den in Partie 151.
+  (unverändert, nur protokolliert) lagen die ersten 16 Überläufe außerhalb,
+  der 17. fiel in Partie 151 in die Schleife, bei der 29. Gruppe.
   Beide Arme waren gleich betroffen, also verzerrt das keinen der
   A/B-Vergleiche. Es machte nur die Läufe von der Prozessgeschichte
   abhängig.
