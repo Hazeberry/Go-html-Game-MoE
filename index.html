@@ -1628,6 +1628,9 @@ globalThis.PARAMS = {
      verbindet sie sich in der Suche mit einer Gruppe, die Raum hat, faellt
      das Risiko weg. Der Abschlag folgt RAUM_RISIKO und wirkt wie
      deathTransfer (die Gruppe gilt anteilig als geschlagen).
+     Gemessen (laufkampf.md, §8), zusammen mit raumZug = 1, 360 Partien:
+     45,3 % (p = 0,073), kein Staerkeeffekt. Der Mechanismus wirkt -- doppelt
+     so viele Ausbrueche --, grosse Verluste werden aber nicht seltener.
      Default 0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
   raumGewicht:       0,
   /* Gegenstueck in der Zugbewertung an der Wurzel. raumGewicht allein
@@ -6032,9 +6035,9 @@ globalThis.policyNet = new PolicyNet();
         {key:'influenceOwn', label:'Einfluss: eigene Zone', step:50, min:0, max:600,
          tip:'EXPERIMENTELL. Abzug für Züge in der eigenen Einflusszone (nicht das eigene Gebiet auffüllen). Default 0 = aus. Nur zusammen mit der Invasion gemessen: kein Nutzen.'},
         {key:'raumZug', label:'Raumrisiko je Zug', step:0.5, min:0, max:3,
-         tip:'EXPERIMENTELL. Bewertet Züge danach, wie sie das Raumrisiko gefährdeter Ketten (4–7 Freiheiten) ändern: Ausbruch der eigenen, Einschließung der fremden. Default 0 = aus. Braucht A/B-Test.'},
+         tip:'EXPERIMENTELL. Bewertet Züge danach, wie sie das Raumrisiko gefährdeter Ketten (4–7 Freiheiten) ändern: Ausbruch der eigenen, Einschließung der fremden. Gemessen mit raumGewicht zusammen: doppelt so viele Ausbrüche, aber 45 % Siegrate. Default 0 = aus.'},
         {key:'raumGewicht', label:'Raumrisiko (Laufkampf)', step:0.5, min:0, max:3,
-         tip:'EXPERIMENTELL. Ketten mit 4–7 Freiheiten, die kaum eigenen Einflussraum haben, gelten anteilig als gefährdet (gemessenes Sterberisiko). Soll eingeschlossene Gruppen früher sehen lassen. Default 0 = aus. Braucht A/B-Test.'},
+         tip:'EXPERIMENTELL. Ketten mit 4–7 Freiheiten, die kaum eigenen Einflussraum haben, gelten anteilig als gefährdet (gemessenes Sterberisiko). Gemessen mit raumZug zusammen: 45 % Siegrate, kein Nutzen. Default 0 = aus.'},
         {key:'endTieBreak', label:'Endspiel-Gleichstand', step:0.5, min:0, max:5,
          tip:'Ordnet im Endspiel die gleich bewerteten ruhigen Züge nach ihrem Einfluss (Bouzy-Bilanz), statt sie zu losen. 1 = bricht nur Gleichstände (Default). Gemessen gegen 0: 57,2 % und in der Wiederholung 59,4 % Siegrate. 0 = altes Verhalten.'},
         {key:'bensonMoveFilter', label:'Benson-Filter', step:1, min:0, max:1,

@@ -273,3 +273,68 @@ Nullergebnis sagt über die Frage nichts.
 
 **Sekundär, ohne Anspruch:** Siegrate ohne falsche Aufgaben
 (`weiterspielen.js`), Aufgaben je Arm, Partielänge.
+
+---
+
+## 8. Nachtrag: Ergebnis des A/B-Laufs (03.10.2026)
+
+Gelaufen auf dem Merge-Commit `b938389`, alle vier Teilläufe ohne
+Unterbrechung. Hash-Listen: `daten/laufkampf-20261014.json` bis `…17.json`.
+
+**Primär: B gewinnt 163 von 360 Partien, 45,3 %** (z = −1,79, p = 0,073,
+95-%-KI 40,1–50,4 %). Nach §7.4: **kein Stärkeeffekt in dieser Größe
+nachweisbar. Der Default bleibt 0.** Die Richtung zeigt eher auf Schaden.
+
+| Teillauf | Siegrate B |
+|---|---:|
+| 20261014 | 44,4 % |
+| 20261015 | 54,4 % |
+| 20261016 | 50,0 % |
+| 20261017 | 32,2 % |
+
+Die Teilläufe streuen mehr als bei reinem Zufall zu erwarten wäre
+(χ² = 10,1 bei 3 Freiheitsgraden, 5-%-Grenze 7,8). Der Unterschied liegt
+fast nur am Teillauf 20261017. Das ist nicht vorab festgelegt geprüft und
+wird nur festgehalten.
+
+**Wirksamkeit:**
+
+| | A | B |
+|---|---:|---:|
+| Partien mit großem Verlust (Kette ≥ 10 Steine) | 153 von 360 (42,5 %) | 162 von 360 (45,0 %) |
+| Stellungen mit eigener gefährdeter Kette (K3 ≤ 4) | 9 852 | 5 955 |
+| davon Zug auf eine Freiheit dieser Kette | 5,5 % | **10,1 %** |
+
+Der Term wirkt: B bricht doppelt so oft aus und gerät seltener in solche
+Lagen. **Große Verluste werden dadurch aber nicht seltener.**
+
+**Sekundär:** A gab 116-mal auf, B 128-mal. Weitergespielt gewinnt der
+Aufgebende 14-mal (12,1 %) bzw. 9-mal (7,0 %). Ohne falsche Aufgaben liegt B
+bei 43,9 %, 1,4 Punkte unter dem Gemessenen. Partielänge Ø 342 Züge.
+
+### 8.1 Lesart
+
+Das Ergebnis ähnelt dem des Einschließungs-Terms in §10.5 und dem von
+`openContactResponse`: Der Mechanismus bewegt sich deutlich, die Stärke
+nicht. Hier lässt sich genauer sagen, woran es liegt.
+
+1. **Die Messgröße stimmt.** K3 trennt sterbende von überlebenden Gruppen,
+   bestätigt auf zwei unabhängigen Hälften (§6).
+2. **Die Zugwahl ändert sich in die gewollte Richtung**, an der echten
+   Partie (§7.2) und im Selbstspiel (doppelt so viele Ausbrüche).
+3. **Die Gruppen sterben trotzdem.** Ein Zug auf eine Freiheit ist noch
+   keine Rettung. Mit 120 Simulationen sieht die Suche nicht, ob ein
+   Ausbruch durchkommt. Der Term schiebt sie nur in die Richtung, nicht ans
+   Ziel.
+
+Dass die Siegrate eher sinkt, passt dazu: Ausbruchsversuche kosten Züge,
+die anderswo fehlen, und retten im Mittel nichts.
+
+### 8.2 Was bleibt
+
+- `raumGewicht` und `raumZug` bleiben im Code, abschaltbar und geprüft,
+  Default 0. Die Diagnose aus §6 bleibt gültig.
+- Der nächste Hebel wäre nicht die Bewertung, sondern die Suche: ob ein
+  Ausbruch gelingt, ist eine Lesefrage (Leitern, Netze, Verbindungen). Das
+  ist eine andere Baustelle, und dafür gibt es noch keinen begründeten
+  Ansatz.
