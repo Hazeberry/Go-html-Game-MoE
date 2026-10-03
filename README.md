@@ -2101,6 +2101,18 @@ keine Rettung; ob ein Ausbruch durchkommt, ist eine Lesefrage für die
 Suche, nicht für die Bewertung. Beide Parameter bleiben 0:
 [`docs/laufkampf.md`](docs/laufkampf.md), §8.
 
+### Gegen GNU Go: der erste fremde Gegner
+
+Alle Messungen oben sind Selbstspiel. Ein Pilot gegen GNU Go 3.8
+([`gnugo-duell.js`](gnugo-duell.js), über GTP) zeigt, wie weit die KI von
+einem klassischen Programm entfernt ist: **0 Siege in 39 Partien**, auch mit
+neun Vorgabesteinen gegen die schwächste Stufe, auch mit 1 000 Simulationen.
+Die Partien zeigen ein Muster, das im Selbstspiel nicht auffallen kann, weil
+beide Seiten es teilen. Die KI baut lange Mauern, Stein an Stein, lässt
+eigene Steine im Stich und füllt am Ende ihre Flächen selbst auf.
+`evaluateBoard` kennt nur Material und Freiheiten, kein Gebiet. Pilot und
+Analyse: [`docs/gnugo.md`](docs/gnugo.md).
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im
@@ -2160,9 +2172,10 @@ tests/stellungen/               echte Partien als Testvorlage (SGF)
 .github/workflows/ab-harness.yml  Messläufe in CI, manuell startbar
 ```
 
-[`tests/`](tests/) umfasst dreizehn Suiten: NaN-Schutzschichten,
+[`tests/`](tests/) umfasst vierzehn Suiten: NaN-Schutzschichten,
 Aufgabekriterium, Transfer-Wächter, Benson-Übertrag, feste Simulationszahl,
-Rohdump, Einflusskarte, Endspiel-Gleichstand, Epochenzähler, Raumrisiko, Trainings-Stabilität, einen Rauchtest des Harness und
+Rohdump, Einflusskarte, Endspiel-Gleichstand, Epochenzähler, Raumrisiko,
+GNU-Go-Brücke (überspringt sich ohne GNU Go), Trainings-Stabilität, einen Rauchtest des Harness und
 einen Browser-Test — ohne `node_modules`, gegen dieselben `<script>`-Blöcke, die
 ausgeliefert werden. Ein Test gegen eine Kopie prüft irgendwann etwas, das niemand
 ausliefert. Der Browser-Test braucht zusätzlich Playwright und überspringt
