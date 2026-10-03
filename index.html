@@ -1576,8 +1576,9 @@ globalThis.PARAMS = {
      Beide additiv wie localityBonus -- dieselbe Skalenwarnung gilt: Eroeffnung
      (~40-95) und Mittelspiel (~Hunderte) haben verschiedene Skalen.
      Gemessen (docs/einflusskarte.md): beide auf 150, 360 Partien gegen 0 —
-     45,0 % (p = 0,058), kein Staerkeeffekt, Richtung Schaden, obwohl sich
-     die Zuege in der Gegnerzone verdoppeln. Deshalb aus.
+     45,0 % (p = 0,058), kein Staerkeeffekt, obwohl sich die Zuege in der
+     Gegnerzone verdoppeln. Ohne falsche Aufgaben 49,4 % (docs/aufgaben.md).
+     Deshalb aus.
      Default 0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
   influenceInvade:   0,
   influenceOwn:      0,
@@ -3634,6 +3635,41 @@ function leseAufgabeWaechter(reset) {
   return v;
 }
 
+/* Flaeche fuer die Aufgabe-Meldung -- NUR Anzeige, entscheidet nichts.
+   Die Meldung zeigte frueher estimateArea [roh]. Das zaehlt tote, aber noch
+   stehende Ketten als lebendig, und die Meldung sah dann aus wie eine
+   Aufgabe aus der Fuehrung. Gemeldet am 03.10. aus einer echten Partie:
+   "Gebiet 132:123" fuer Weiss, obwohl 46 weisse Steine Benson-tot waren;
+   ohne sie stand es 86:184, Schwarz rund 90 Punkte vorn (die Aufgabe war
+   richtig). Hier werden die BEWIESEN toten Ketten entfernt und dann wie in
+   finalAreaScore gezaehlt: Steine plus Regionen mit nur einer Randfarbe.
+   Komi geht nicht ein, die Engine ist komi-blind. */
+function aufgabeGebiet(board, aiColor) {
+  const b = new Uint8Array(board);
+  const opp = aiColor === 1 ? 2 : 1;
+  const ep = bensonClassify(b);
+  const tot = {1: 0, 2: 0};
+  for (let i = 0; i < BOARD_SIZE; i++)
+    if (b[i] && _bnDead[i] === ep) { tot[b[i]]++; b[i] = 0; }
+  const flaeche = {1: 0, 2: 0}, gesehen = new Uint8Array(BOARD_SIZE);
+  for (let i = 0; i < BOARD_SIZE; i++) if (b[i]) flaeche[b[i]]++;
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    if (b[i] || gesehen[i]) continue;
+    const q = [i]; gesehen[i] = 1;
+    let kopf = 0, rand = 0;
+    while (kopf < q.length) {
+      const c = q[kopf++];
+      for (const n of NEIGHBORS[c]) {
+        if (!b[n]) { if (!gesehen[n]) { gesehen[n] = 1; q.push(n); } }
+        else rand |= b[n];
+      }
+    }
+    if (rand === 1 || rand === 2) flaeche[rand] += q.length;
+  }
+  return {eigen: flaeche[aiColor], fremd: flaeche[opp],
+          totEigen: tot[aiColor], totFremd: tot[opp]};
+}
+
 function gebietSagtVerloren(board, aiColor) {
   /* Massstab: [roh] -- estimateArea, ohne Totsteinbereinigung. Das ist hier
      eine bewusste Wahl (pro Zug bezahlbar), aber es bedeutet, dass das
@@ -3826,9 +3862,14 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
           _hopelessStreak++;
           if (_hopelessStreak >= PARAMS.resignStreak) {
             const opp = aiColor === 1 ? 2 : 1;
+            const g = aufgabeGebiet(board, aiColor);
+            const tote = g.totEigen + g.totFremd;
             return {type:'resign', requestId:reqId,
-              info:`Q ${r.q.toFixed(2)} über ${_hopelessStreak} Züge in Folge · Gebiet `
-                 + `${estimateArea(board, aiColor)}:${estimateArea(board, opp)}`};
+              info:`Q ${r.q.toFixed(2)} über ${_hopelessStreak} Züge in Folge · Fläche `
+                 + `${g.eigen}:${g.fremd}`
+                 + (tote === 1 ? ' ohne 1 beweisbar toten Stein'
+                    : tote ? ` ohne ${tote} beweisbar tote Steine` : '')
+                 + ` (roh ${estimateArea(board, aiColor)}:${estimateArea(board, opp)})`};
           }
         } else {
           _hopelessStreak = 0;

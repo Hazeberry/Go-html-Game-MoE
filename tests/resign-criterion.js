@@ -148,5 +148,29 @@ test('Eingeschaltet: das Kriterium gilt für beide Farben', () => {
   });
 });
 
+/* Die Meldung bei der Aufgabe. Anlass: eine echte Partie (Zug 243, Weiß =
+   KI) meldete "Gebiet 132:123" — Weiß scheinbar vorn. 46 weiße Steine waren
+   dort aber Benson-tot; ohne sie stand es 86:184. Die Aufgabe war richtig,
+   die Zahl in der Meldung irreführend. Seitdem meldet die KI die Fläche
+   ohne beweisbar tote Steine und die rohe Zahl nur noch in Klammern. */
+test('Aufgabe-Meldung: Fläche ohne beweisbar tote Steine (echte Stellung, Zug 243)', () => {
+  const fs = require('fs'), path = require('path');
+  const zeilen = fs.readFileSync(path.join(__dirname, 'stellungen', 'aufgabe-zug243.txt'), 'utf8')
+    .split('\n').filter(z => /^\s?\d/.test(z));
+  pruefeGleich(zeilen.length, 19, 'Zeilen der Stellung');
+  const b = new Uint8Array(KI.BOARD_SIZE);
+  zeilen.forEach((z, y) => z.slice(3).split(' ').forEach((c, x) => {
+    b[y * 19 + x] = c === 'X' ? 1 : c === 'O' ? 2 : 0; }));
+  /* Erst der rohe Wert, damit klar ist, dass die Stellung stimmt. */
+  pruefeGleich(KI.estimateArea(b, 2), 132, 'roh Weiß wie in der Meldung');
+  pruefeGleich(KI.estimateArea(b, 1), 123, 'roh Schwarz wie in der Meldung');
+  const g = KI.aufgabeGebiet(b, 2);
+  pruefeGleich(g.totEigen, 46, 'beweisbar tote weiße Steine');
+  pruefeGleich(g.totFremd, 0, 'beweisbar tote schwarze Steine');
+  pruefeGleich(g.eigen, 86, 'Fläche Weiß ohne tote Steine');
+  pruefeGleich(g.fremd, 184, 'Fläche Schwarz');
+  pruefe(g.eigen < g.fremd, 'bereinigt liegt die aufgebende Seite zurück');
+});
+
 laufeTests('Aufgabe-Kriterium (Gebiet als zweite Instanz)')
   .then(ok => process.exit(ok ? 0 : 1));
