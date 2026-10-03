@@ -2074,6 +2074,22 @@ hat, behält den gespeicherten Wert (siehe oben, „gespeicherte Parameter
 überschreiben jeden Default"); Gespeichertes von vor dem 03.10. kennt den
 Parameter nicht und bekommt den neuen Default.
 
+### Blindheit im Laufkampf
+
+Zweimal ging in echten Partien eine große weiße Gruppe verloren, ohne dass
+sie ausbrach (22.09.: 18 Steine; 03.10.: 13 Steine). Zwischen „wenige
+Freiheiten" und dem Benson-Beweis hatte die Bewertung nichts. Ein
+Einschließungs-Term galt seit `pilot-benson-defense.md` §10.5 als
+unbegründet, weil die damalige Fassung nach Freiheiten geschichtet nichts
+trennte. Vorab festgelegt geprüft wurden vier Fassungen an 720 Partien,
+getrennt in Entwicklung und Bestätigung. Eine besteht: der **Einflussraum**,
+die Felder der eigenen Bouzy-Zone, die mit der Gruppe zusammenhängen. Bei 4–7
+Freiheiten trennt er sterbende von überlebenden Gruppen mit AUC 0,80, auf
+beiden Hälften. In beiden Partien stand er 12 bzw. 25 Züge vor dem
+Benson-Beweis auf 0. Ein Term darauf ist damit begründet, gebaut und
+gemessen ist er noch nicht:
+[`docs/laufkampf.md`](docs/laufkampf.md).
+
 ## Methodik
 
 Drei Regeln, die aus Fehlern in diesem Projekt entstanden sind und im
