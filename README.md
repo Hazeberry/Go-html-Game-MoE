@@ -197,6 +197,7 @@ Simulationszahl pro Zug direkt an der Rechenleistung hängt.
 |---|---|---|
 | `mctsValueScale` 200 statt 350 | 65:35 über 100 gepaarte Partien, p = 0,0035 | **eingebaut** (≈ +108 Elo) |
 | Kurve 100/150/200/250/300/500/1000 | Plateau bei 150–250, Abfall zu beiden Seiten | Mitte des Plateaus gewählt, nicht der Höchstwert |
+| `endTieBreak` 1 statt 0 (Gleichstand im Endspiel ordnen statt losen) | 57,2 % und in der Wiederholung 59,4 % über je 360 Partien, p = 0,006 und 0,0003 | **eingebaut** — Default 1 |
 | `resignQ` 0,95 gegen 0,997 | 29:31 über 60 Partien, p = 0,90 | 0,95 bleibt — rechtzeitiges Aufgeben kostet nichts |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
@@ -2047,19 +2048,28 @@ sondern ordnen. `endTieBreak` sortiert im Endspiel-Experten nur die gleich
 bewerteten ruhigen Züge nach ihrer Wirkung auf die Einflusskarte. Vorab
 gemessen kippt er keine einzige Reihenfolge verschieden bewerteter Züge.
 
-| Eingriff | Los im Endspiel | Siegrate des Eingriffs | Lesart |
-|---|---|---:|---|
-| Gleichstandsbrecher `endTieBreak` = 1 | 38,6 % → 17,5 % der Züge | **57,2 %** (p = 0,006) | stärker, Erstlauf |
+| Lauf (je 360 Partien) | Los im Endspiel | Siegrate des Eingriffs |
+|---|---|---:|
+| Erstlauf, Seeds 20261006–09 | 38,6 % → 17,5 % der Züge | **57,2 %** (p = 0,006) |
+| Wiederholung, Seeds 20261010–13 | 38,6 % → 18,1 % der Züge | **59,4 %** (p = 0,0003) |
 
-Ohne falsche Aufgaben 57,5 %; alle vier Teilläufe zu je 90 Partien liegen
-über 50 %. Der Default bleibt vorerst 0, bis die vorab festgelegte
-Wiederholung vorliegt. Der Brecher verlängert die Antwortzeit um rund
-40 ms; das Suchbudget bleibt gleich, denn dessen Uhr startet erst nach der
-Wurzelbewertung. Anlass war auch eine echte Partie, in der
-Weiß von Zug 88 bis 122 achtzehnmal in Folge aus einer Gruppe von über 140
-gleich bewerteten Zügen zog — für den Spieler sah das aus, als ignoriere ihn
-die KI. Festlegung und Ergebnis:
+Ohne falsche Aufgaben 57,5 % und 59,4 %. Nach der vorab festgelegten Regel
+ist `endTieBreak` = 1 seitdem der Default. Er verlängert die Antwortzeit um
+rund 10 ms (inkrementelle Einflusskarte, bitgleich zur vollen);
+das Suchbudget bleibt gleich, denn dessen Uhr startet erst nach der
+Wurzelbewertung. Anlass war auch eine echte Partie, in der Weiß von Zug 88
+bis 122 achtzehnmal in Folge aus einer Gruppe von über 140 gleich bewerteten
+Zügen zog — für den Spieler sah das aus, als ignoriere ihn die KI.
+Festlegung und Ergebnis:
 [`docs/endspiel-gleichstand.md`](docs/endspiel-gleichstand.md).
+
+**Für ältere Läufe heißt das:** Ein Arm „Default" meint seitdem
+`endTieBreak` = 1. Wer einen Lauf von vorher wiederholt, nimmt dessen Commit
+aus der Hash-Liste in [`docs/daten/`](docs/daten/) oder setzt
+`endTieBreak=0` in beide Arme. Wer im Spiel einmal Parameter gespeichert
+hat, behält den gespeicherten Wert (siehe oben, „gespeicherte Parameter
+überschreiben jeden Default"); Gespeichertes von vor dem 03.10. kennt den
+Parameter nicht und bekommt den neuen Default.
 
 ## Methodik
 

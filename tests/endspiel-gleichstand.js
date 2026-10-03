@@ -4,7 +4,7 @@
    A/B-Harness zeigen —, sondern was vorher gelten muss:
 
      1. Bei 0 ändert sich am Zugwert NICHTS (bitgenau), auch wenn die
-        Wurzelbilanz berechnet wurde.
+        Wurzelbilanz berechnet wurde — 0 bleibt das alte Verhalten.
      2. Bei 1 wird die Gruppe der gleich bewerteten ruhigen Züge geordnet,
         jeder Wert bleibt aber im Band ±1 um den alten.
      3. Die Richtung stimmt: ein Zug, der in den Rahmen des Gegners geht,
@@ -50,15 +50,15 @@ function werte(b, farbe) {
   return mitFestemZufall(() => leer.map(i => ({i, s: evaluateMove(b, i, farbe, MC, leer.length)})));
 }
 
-test('Parameter existiert und steht standardmäßig auf 0', () => {
-  pruefeGleich(PARAMS.endTieBreak, 0, 'endTieBreak-Default');
+test('Parameter existiert und steht standardmäßig auf 1 (gemessen, docs §10)', () => {
+  pruefeGleich(PARAMS.endTieBreak, 1, 'endTieBreak-Default');
   pruefe(typeof primeEndTieBreak === 'function', 'primeEndTieBreak exportiert');
   pruefeGleich(phaseWeights(MC, 345).wEnd, 1, 'Vorbedingung: bei Zug 200 rechnet nur der Endspiel-Experte');
 });
 
 test('Gewicht 0: Zugwerte bitgenau gleich, mit und ohne berechnete Bilanz', () => {
   const b = stellung();
-  const ohne = werte(b, 2);
+  const ohne = mitGewicht(0, () => werte(b, 2));
   primeEndTieBreak(b);
   const mit = mitGewicht(0, () => werte(b, 2));
   for (let k = 0; k < ohne.length; k++)
@@ -67,7 +67,7 @@ test('Gewicht 0: Zugwerte bitgenau gleich, mit und ohne berechnete Bilanz', () =
 
 test('Gewicht 1: Gleichstand geordnet, jeder Wert im Band ±1', () => {
   const b = stellung();
-  const alt = werte(b, 2);
+  const alt = mitGewicht(0, () => werte(b, 2));
   primeEndTieBreak(b);
   const neu = mitGewicht(1, () => werte(b, 2));
   let maxAbw = 0;
