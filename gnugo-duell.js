@@ -28,6 +28,9 @@
                          [--roh aus.jsonl] [--gnugo pfad] [--maxzuege 400]
                          [--von K]   (erst ab Partie K, für Teilläufe)
                          [--vorgabe N] (wir bekommen N Vorgabesteine)
+                         [--schaetzung 60,120] (GNU Gos estimate_score nach
+                          diesen Zugzahlen, aus unserer Sicht: + = wir vorn;
+                          endet die Partie am Zuglimit, wird nicht ausgezählt)
    GTP_DEBUG=1 in der Umgebung zeigt jeden GTP-Befehl und jede Antwort.
 
    Vorgabe (--vorgabe N ≥ 2): Wir spielen in jeder Partie Schwarz mit N
@@ -43,7 +46,7 @@ const {spawn} = require('child_process');
 /* ── Optionen ─────────────────────────────────────────────────────── */
 const a = process.argv.slice(2);
 const opt = {partien: 10, seed: 1, stufe: 10, ki: {}, roh: null, gnugo: '/usr/games/gnugo',
-             maxZuege: 400, von: 1, vorgabe: 0};
+             maxZuege: 400, von: 1, vorgabe: 0, schaetzung: []};
 for (let i = 0; i < a.length; i++) {
   const v = a[i + 1];
   switch (a[i]) {
@@ -55,6 +58,7 @@ for (let i = 0; i < a.length; i++) {
     case '--maxzuege': opt.maxZuege = +v; i++; break;
     case '--von': opt.von = +v; i++; break;
     case '--vorgabe': opt.vorgabe = +v; i++; break;
+    case '--schaetzung': opt.schaetzung = v.split(',').map(Number); i++; break;
     case '--ki': for (const kv of v.split(',')) { const [k, w] = kv.split('='); opt.ki[k] = +w; } i++; break;
     default: console.error('Unbekannte Option ' + a[i]); process.exit(2);
   }
@@ -203,7 +207,7 @@ async function partieSpielen(nr) {
   const board = new Uint8Array(N), caps = {1: 0, 2: 0};
   const hist = new Set([E.computeZobrist(board)]);
   let ko = null, last = null, mc = 0, paesse = 0, aufgabe = null;
-  const zuege = [], sims = [];
+  const zuege = [], sims = [], schaetzung = {};
   let vorgabeSteine = [];
   if (opt.vorgabe >= 2) {
     const befehl = `fixed_handicap ${opt.vorgabe}`;
@@ -240,6 +244,11 @@ async function partieSpielen(nr) {
         zuege.push(zuGtp(i));
       }
       mc++;
+      if (opt.schaetzung.includes(mc)) {
+        const a = await g.frage('estimate_score');          /* "W+145.1 (upper …)" */
+        const m = /^([BW])\+([\d.]+)/.exec(a);
+        if (m) schaetzung[mc] = (m[1] === (wir === 1 ? 'B' : 'W') ? 1 : -1) * +m[2];
+      }
     }
     /* Bretter vergleichen: haben beide dieselbe Partie gespielt? */
     for (const [farbe, f] of [['black', 1], ['white', 2]]) {
@@ -249,17 +258,19 @@ async function partieSpielen(nr) {
     }
     let gnugoStand = null, sieger;
     if (aufgabe) sieger = 3 - aufgabe;
+    else if (mc >= opt.maxZuege && opt.schaetzung.length) sieger = null;   /* nur Schätzung */
     else {
       gnugoStand = await g.frage('final_score');            /* z. B. "W+12.5" */
       sieger = gnugoStand.startsWith('B') ? 1 : 2;
     }
     return {nr, stufe: opt.stufe, ki: opt.ki, seed, wirFarbe: wir === 1 ? 'S' : 'W',
-            gewonnen: sieger === wir, sieger: sieger === 1 ? 'S' : 'W',
+            gewonnen: sieger === null ? null : sieger === wir,
+            sieger: sieger === null ? null : sieger === 1 ? 'S' : 'W',
             vorgabe: opt.vorgabe, komi: KOMI, vorgabeSteine, beginnt: zuerst === 1 ? 'S' : 'W',
             aufgabe: aufgabe ? (aufgabe === 1 ? 'S' : 'W') : null,
             gnugoStand, unsereZaehlung: unsereZaehlung(board), zuegeAnzahl: mc,
             simsMittel: sims.length ? Math.round(sims.reduce((x, y) => x + y, 0) / sims.length) : null,
-            neustarts: g.neustarts(),
+            neustarts: g.neustarts(), schaetzung,
             zuege};
   } finally { g.ende(); }
 }
@@ -273,8 +284,10 @@ async function partieSpielen(nr) {
     n++; if (r.gewonnen) siege++;
     if (opt.roh) fs.appendFileSync(opt.roh, JSON.stringify(r) + '\n');
     if (r.abgebrochen) { n--; console.log(`Partie ${nr}: abgebrochen (${r.abgebrochen})`); continue; }
-    console.log(`Partie ${nr}: wir ${r.wirFarbe} → ${r.gewonnen ? 'gewonnen' : 'verloren'}`
-      + ` (${r.aufgabe ? 'Aufgabe ' + r.aufgabe : r.gnugoStand}; unsere Zählung S ${r.unsereZaehlung.b} : W ${r.unsereZaehlung.w})`
+    const sch = Object.entries(r.schaetzung).map(([z, v]) => `nach ${z}: ${v > 0 ? '+' : ''}${v}`).join(', ');
+    console.log(`Partie ${nr}: wir ${r.wirFarbe} → ${r.gewonnen === null ? 'nicht ausgezählt' : r.gewonnen ? 'gewonnen' : 'verloren'}`
+      + ` (${r.aufgabe ? 'Aufgabe ' + r.aufgabe : r.gnugoStand || 'Zuglimit'}; unsere Zählung S ${r.unsereZaehlung.b} : W ${r.unsereZaehlung.w})`
+      + (sch ? ` · Schätzung ${sch}` : '')
       + ` · ${r.zuegeAnzahl} Züge${r.neustarts ? ` · ${r.neustarts} Neustart(s) von GNU Go` : ''}`
       + ` · ${((Date.now() - t0) / 60000).toFixed(1)} min · Stand ${siege}/${n}`);
   }

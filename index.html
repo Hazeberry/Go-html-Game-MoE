@@ -1645,6 +1645,26 @@ globalThis.PARAMS = {
      Zug 196, 0 -> 15); den soll die Wurzel kennen.
      Default 0 = altes Verhalten, bitgenau (kein Zweig, keine Berechnung). */
   raumZug:           0,
+  /* Gebiet in der Stellungsbewertung (docs/gebiet.md). evaluateBoard kennt
+     sonst nur Material und Freiheiten (Groesse x 5 + Freiheiten x 3) und
+     Gefangene. Gegen GNU Go baute die KI deshalb Mauern Stein an Stein und
+     fuellte eigene Flaechen auf (docs/gnugo.md): eine lange Kette hat viele
+     Freiheiten, leeres Gebiet zaehlt nichts. Der Term addiert
+     gebietGewicht x (Felder der eigenen Bouzy-Zone - Felder der fremden),
+     Steine eingeschlossen -- dieselbe Karte wie influenceInvade und
+     endTieBreak, hier in jeder Blattbewertung (rund 0,1 ms, gegen 4-8 ms je
+     Simulation). Default 0 = altes Verhalten, bitgenau (kein Zweig, keine
+     Berechnung). */
+  gebietGewicht:     0,
+  /* Gebiet in der Zugbewertung an der Wurzel: jeder Kandidat bekommt
+     gebietZug x (Aenderung der Bouzy-Bilanz durch den Zug, aus Sicht des
+     Ziehenden) -- wie endTieBreak, aber ungedeckelt und in allen Phasen,
+     mit der inkrementellen Karte (tbBilanzNach). Im Pilot gegen GNU Go (9
+     Vorgabesteine, Stufe 1) hob 80 die Schaetzung nach 120 Zuegen um rund
+     230 Punkte; gebietGewicht allein wirkte nicht, weil die Zugwahl bei
+     120 Simulationen fast ganz aus evaluateMove kommt (docs/gebiet.md).
+     Default 0 = altes Verhalten, bitgenau. */
+  gebietZug:         0,
   /* Adaptives Zeitbudget (Tin/GLM-Vorschlag, stufenlos statt Sprungfunktion).
      Reale Partie zeigte 86% Sim-Rückgang über 156 Züge (317→43) durch
      wachsende floodFill-Kosten auf großen Gruppen — kontinuierlicher Verfall,
@@ -2890,6 +2910,17 @@ function primeEndTieBreak(board) {
   _tbValid = true;
 }
 
+/* Gebiet (gebietGewicht): Bilanz der Bouzy-Karte in absoluten Farben,
+   schwarze Zone minus weisse, Steine eingeschlossen. Eigene Puffer. */
+const _geA = new Int32Array(BOARD_SIZE), _geB = new Int32Array(BOARD_SIZE);
+const _gzScratch = new Uint8Array(BOARD_SIZE);
+function gebietBilanz(board) {
+  const z = bouzyKarte(board, _geA, _geB);
+  let s = 0;
+  for (let i = 0; i < BOARD_SIZE; i++) s += z[i] > 0 ? 1 : z[i] < 0 ? -1 : 0;
+  return s;
+}
+
 /* Raumrisiko (raumGewicht): Anteil, mit dem eine Kette mit 4-7 Freiheiten
    als geschlagen gilt, nach Freiheiten (Zeile 4..7) und K3-Stufe
    (Spalte: 0 | 1-4 | 5-14 | ab 15). Grundlage: Sterberate binnen 40
@@ -3358,6 +3389,12 @@ function evaluateMove(board, i, color, mc, emptyFields) {
      Zweig betreten -- bitgenau der alte Wert. */
   /* Raumrisiko je Kandidat, wie der Einflussterm vor dem Crisis-Blend.
      Bei 0 kein Zweig. */
+  if (PARAMS.gebietZug > 0 && _tbValid) {
+    const nb = _gzScratch;
+    nb.set(board); nb[i] = color;
+    removeDeadGroups(nb, color === 1 ? 2 : 1, i);
+    sPhase += PARAMS.gebietZug * (tbBilanzNach(nb) - _tbBilanz) * (color === 1 ? 1 : -1);
+  }
   if (PARAMS.raumZug > 0 && _raumValid)
     sPhase += PARAMS.raumZug * PARAMS.captureWeight * raumZugGewinn(board, i, color);
   if ((PARAMS.influenceInvade > 0 || PARAMS.influenceOwn > 0) && _infValid) {
@@ -3561,6 +3598,11 @@ function evaluateBoard(board, color, captures) {
       if (r > 0) { v -= PARAMS.raumGewicht * r * size * PARAMS.captureWeight; _raumGriff++; }
     }
     s += (c === color) ? v : -v;
+  }
+  /* Gebiet: nach allen Kettentermen, vor der Telemetrie. Bei 0 kein Zweig. */
+  if (PARAMS.gebietGewicht > 0) {
+    const g = gebietBilanz(board);
+    s += PARAMS.gebietGewicht * (color === 1 ? g : -g);
   }
   if (PARAMS.transferTelemetrie > 0) {
     _trRufe++;
@@ -4046,7 +4088,7 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
   if (PARAMS.tsumegoSunkCost > 0) aktualisiereKrisenDauer(board, aiColor);
   primeAreaCache(board, aiColor);
   if (PARAMS.influenceInvade > 0 || PARAMS.influenceOwn > 0) primeInfluenceCache(board);
-  if (PARAMS.endTieBreak > 0) primeEndTieBreak(board);
+  if (PARAMS.endTieBreak > 0 || PARAMS.gebietZug > 0) primeEndTieBreak(board);
   if (PARAMS.raumGewicht > 0 || PARAMS.raumZug > 0) primeRaum(board);
   const scored = legal.map(m => ({m, score: evaluateMove(board, m.idx, aiColor, mc, empty)}));
   scored.sort((a,b) => b.score - a.score);
@@ -6034,6 +6076,10 @@ globalThis.policyNet = new PolicyNet();
          tip:'EXPERIMENTELL. Bonus für Züge in der Einflusszone des Gegners (Bouzy-Karte, einmal pro Zug). Sieht auch Rahmen mit Lücken, die estimateArea nicht zählt. Default 0 = aus. Gemessen mit 150 (zusammen mit eigener Zone): 45 % Siegrate, kein Nutzen.'},
         {key:'influenceOwn', label:'Einfluss: eigene Zone', step:50, min:0, max:600,
          tip:'EXPERIMENTELL. Abzug für Züge in der eigenen Einflusszone (nicht das eigene Gebiet auffüllen). Default 0 = aus. Nur zusammen mit der Invasion gemessen: kein Nutzen.'},
+        {key:'gebietZug', label:'Gebiet je Zug', step:10, min:0, max:300,
+         tip:'EXPERIMENTELL. Bewertet Züge nach ihrer Wirkung auf die Einflusskarte (eigene minus fremde Zone), in allen Phasen. Gegen den Mauerbau. Default 0 = aus. Messung in docs/gebiet.md.'},
+        {key:'gebietGewicht', label:'Gebiet in der Stellung', step:1, min:0, max:20,
+         tip:'EXPERIMENTELL. Zählt die Einflussbilanz in jeder Blattbewertung mit. Im Pilot ohne Wirkung. Default 0 = aus.'},
         {key:'raumZug', label:'Raumrisiko je Zug', step:0.5, min:0, max:3,
          tip:'EXPERIMENTELL. Bewertet Züge danach, wie sie das Raumrisiko gefährdeter Ketten (4–7 Freiheiten) ändern: Ausbruch der eigenen, Einschließung der fremden. Gemessen mit raumGewicht zusammen: doppelt so viele Ausbrüche, aber 45 % Siegrate. Default 0 = aus.'},
         {key:'raumGewicht', label:'Raumrisiko (Laufkampf)', step:0.5, min:0, max:3,
