@@ -203,6 +203,7 @@ Simulationszahl pro Zug direkt an der Rechenleistung hängt.
 | `endTieBreak` 1 statt 0 (Gleichstand im Endspiel ordnen statt losen) | 57,2 % und in der Wiederholung 59,4 % über je 360 Partien, p = 0,006 und 0,0003 | **eingebaut** — Default 1 |
 | `raumGewicht` + `raumZug` 1 (Raumrisiko im Laufkampf) | 45,3 % über 360 Partien, p = 0,073; Ausbrüche ×2, große Verluste unverändert | verworfen — Default 0 |
 | **`gebietZug` 80 statt 0 (Gebiet in der Zugbewertung)** | **gegen GNU Go +229 Punkte nach 120 Zügen (p = 8 · 10⁻³³), im Selbstspiel 83,3 % über 360 Partien** | **eingebaut** — Default 80, rund +280 Elo |
+| **`augenSchutz` 2 + `passUnabwendbar` 1 (eigene Augen nie füllen, passen, wenn nichts zu retten ist)** | **gegen GNU Go Endstand +217 Punkte über 60 ganze Partien (p = 3 · 10⁻¹⁷), im Selbstspiel 53,9 % über 360 Partien (n. s.)** | **eingebaut** — vorher endeten 57 von 60 Partien gegen GNU Go mit W +370,5 |
 | Suchtiefe: 240 gegen 120, 480 gegen 240 Simulationen | 60,6 % und 57,8 % über je 360 Partien (+75 und +55 Elo je Verdopplung) | Suche hilft, flacht ab — kein großer Hebel (`docs/skalierung.md`) |
 | `resignQ` 0,95 gegen 0,997 | 29:31 über 60 Partien, p = 0,90 | 0,95 bleibt — rechtzeitiges Aufgeben kostet nichts |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
@@ -2134,9 +2135,26 @@ Partien, in denen GNU Go aufgibt (4 von 60). Im Selbstspiel **83,3 %** über
 meist verloren, der Vorsprung schmilzt im Mittel- und Endspiel:
 [`docs/gebiet.md`](docs/gebiet.md).
 
+**Augen füllen statt passen.** In ganzen Partien passt GNU Go, sobald
+nichts mehr zu holen ist. Unsere KI passte nie: Eine tote eigene Gruppe im
+Atari verbot den Pass, obwohl kein Zug sie retten konnte. Stattdessen
+spielte sie in ihr eigenes Gebiet, bis jede Gruppe nur noch ein Auge hatte.
+57 von 60 Partien endeten so mit W +370,5, dem ganzen Brett für Weiß. Auch
+im Selbstspiel füllte die KI in 224 von 360 Partien ein eigenes echtes
+Auge. Zwei Schalter beheben das: `augenSchutz` (kein Zug in ein eigenes
+echtes Auge, auch nicht in Suche und Rollouts) und `passUnabwendbar`
+(passen, wenn kein eigener Zug den großen Gegnerzug verhindern kann).
+Vorab festgelegt gemessen: Endstand gegen GNU Go **+217 Punkte**, im
+Selbstspiel 53,9 % (nicht signifikant). Seitdem Default.
+Den großen Verlust zwischen Zug 120 und 200 behebt das nicht; GNU Go dringt
+dort in den offenen Rahmen ein. Gebiet in der Stellungsbewertung half im
+Pilot auch dagegen nicht:
+[`docs/endspiel-augen.md`](docs/endspiel-augen.md).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
-`gebietZug` = 80. Wiederholen auf dem Commit aus der Hash-Liste oder mit
-`gebietZug=0` (und `endTieBreak=0` für Läufe vor dem 03.10.) in beiden Armen.
+`gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1. Wiederholen
+auf dem Commit aus der Hash-Liste oder mit `gebietZug=0,augenSchutz=0,passUnabwendbar=0`
+(und `endTieBreak=0` für Läufe vor dem 03.10.) in beiden Armen.
 
 ## Methodik
 

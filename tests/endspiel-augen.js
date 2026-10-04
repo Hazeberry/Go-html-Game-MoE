@@ -9,6 +9,8 @@
         ist er abwendbar; sonst nicht.
      4. Die Stellung aus einer GNU-Go-Partie, in der GNU Go gepasst hat und
         die KI ihre Augen zu füllen begann: mit passUnabwendbar passt sie.
+     Defaults seit §6: augenSchutz 2, passUnabwendbar 1. Die Prüfungen, die
+     das alte Verhalten zeigen, setzen beide ausdrücklich auf 0.
 
    Aufruf:  node tests/endspiel-augen.js [pfad/zur/index.html] */
 'use strict';
@@ -34,9 +36,9 @@ function brett(steine) {
 const kreuz = (x, y, f) => [[x - 1, y, f], [x + 1, y, f], [x, y - 1, f], [x, y + 1, f]]
   .filter(([a, c]) => a >= 0 && a < 19 && c >= 0 && c < 19);
 
-test('Defaults: beide aus (vor der Messung)', () => {
-  pruefeGleich(PARAMS.augenSchutz, 0, 'augenSchutz');
-  pruefeGleich(PARAMS.passUnabwendbar, 0, 'passUnabwendbar');
+test('Defaults: augenSchutz 2, passUnabwendbar 1 (gemessen, docs/endspiel-augen.md §6)', () => {
+  pruefeGleich(PARAMS.augenSchutz, 2, 'augenSchutz');
+  pruefeGleich(PARAMS.passUnabwendbar, 1, 'passUnabwendbar');
 });
 
 test('fuelltEigenesAuge: echte, falsche und Atari-Augen', () => {
@@ -120,7 +122,7 @@ test('GNU-Go-Partie nach Zug 311: mit passUnabwendbar Pass, ohne Stein', () => {
     if (z !== 'pass') { const i = ix(z); b[i] = f; caps[f] += removeDeadGroups(b, 3 - f, i); } });
   const zug = kv => mit({mctsFixedSims: 40, adaptiveBudgetEnabled: 0, ...kv}, () =>
     getAIMove(b, 1, [], caps, 311, 'hard', 1, null, null));
-  pruefeGleich(zug({}).type, 'stone', 'alt: kein Pass');
+  pruefeGleich(zug({passUnabwendbar: 0, augenSchutz: 0}).type, 'stone', 'alt: kein Pass');
   const r = zug({passUnabwendbar: 1});
   pruefeGleich(r.type, 'pass', 'passUnabwendbar 1');
   pruefe(/nicht abwendbar/.test(r.info || ''), 'Begründung im info');

@@ -143,3 +143,68 @@ M1 und M2 (`auswertung/augen.js`); Partielänge.
 - Die Pass-Regel bewertet Gegnerzüge mit `evaluateMove`, also mit unserer
   eigenen Heuristik. Wo die eine Drohung übersieht, passt die KI zu früh.
   M2 würde das zeigen, wenn es spielentscheidend wäre.
+
+---
+
+## 6. Nachtrag: Ergebnis, Defaults 2 und 1 (04.10.2026)
+
+Gelaufen auf dem Merge-Commit `bd7beb0`, ohne Unterbrechung. Daten:
+`daten/augen-m1.json` (je Partie Schätzungen, Endstand, Zugzahl) und
+`daten/augen-m2-20261030.json` bis `…33.json` (Hash-Listen).
+
+**M1, gegen GNU Go (primär):**
+
+| | A (Default) | B (`augenSchutz` 2, `passUnabwendbar` 1) | Differenz B − A, gepaart |
+|---|---:|---:|---|
+| **Endstand (60 Paare)** | −346,5 | −129,4 | **+217,1** (SD 141,9), p = 3,1 · 10⁻¹⁷ |
+| Schätzung nach Zug 200 (49 Paare) | −99,8 | −87,9 | +11,9 (SD 43,6), p = 0,061 |
+| Schätzung nach Zug 120 (55 Paare) | +17,1 | +15,4 | −1,6 (SD 40,5), p = 0,77 |
+
+- **A zerstört sich selbst:** 57 der 60 A-Partien enden mit W +370,5,
+  also mit dem ganzen Brett für Weiß. Der Median des Endstands liegt bei
+  A −370,5, bei B −160,5.
+- **Augenfüllungen:** A füllt 803 eigene Augen, B keines. Ohne den Fehler
+  endet die Partie im Mittel nach 293 statt 396 Zügen.
+- **GNU Go gibt auf:** in 8 B-Partien und 3 A-Partien. Abgebrochen ist keine
+  Partie, weder durch einen Absturz noch am Zuglimit.
+- **Vor Zug 200 ändert sich wenig:** Die Rollout-Stufe 2 verschiebt die
+  Schätzung nach 200 Zügen um +11,9, nicht signifikant.
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt **194 von 360 Partien, 53,9 %**
+(z = 1,48, p = 0,14, 95-%-KI 48,7–59,0 %). Das ist nicht signifikant
+schlechter.
+
+| Teillauf | Siegrate B |
+|---|---:|
+| 20261030 | 50,0 % |
+| 20261031 | 52,2 % |
+| 20261032 | 60,0 % |
+| 20261033 | 53,3 % |
+
+A füllt in 224 von 360 Partien mindestens ein eigenes Auge (582
+Füllungen), B in keiner. Zeit je Partie: A 15,5 s, B 15,2 s.
+
+**Entscheidung nach §4: Default `augenSchutz` = 2, `passUnabwendbar` = 1.**
+
+**Was offen bleibt:**
+
+- **Der große Verlust bleibt.** Er entsteht zwischen Zug 120 (Schätzung
+  um +16) und Zug 200 (um −90). In den angesehenen Partien dringt GNU Go in
+  den offenen schwarzen Rahmen ein und lebt dort.
+- **Gebiet in der Stellungsbewertung hilft dagegen nicht.** Pilot auf
+  `bd7beb0` mit den neuen Schaltern, `--seed 51`, 8 Partien, Endstand
+  gepaart gegen `gebietGewicht` 0:
+
+  | `gebietGewicht` | Endstand B − A | nach Zug 200 |
+  |---|---:|---:|
+  | 1 | −40,3 | +20,9 |
+  | 3 | −21,0 | −18,0 |
+  | 10 | −24,8 | +24,6 |
+
+  Keine dieser Differenzen ist signifikant. Bei 120 Simulationen kommt der
+  Zug fast ganz aus `evaluateMove`. Für die falschen Aufgaben (§1) bleibt
+  `gebietGewicht` trotzdem ein Kandidat, denn dort zählt Q, und Menschen
+  spielen mit 700 bis 1 300 Simulationen.
+- **Ältere Läufe:** Ein Arm „Default" heißt ab jetzt auch `augenSchutz` = 2
+  und `passUnabwendbar` = 1. Wer einen älteren Lauf wiederholt, nimmt dessen
+  Commit oder setzt beide in beiden Armen auf 0.
