@@ -1444,6 +1444,22 @@ globalThis.PARAMS = {
   passMinMc80:       20,
   passMinMc120:       8,
   passMinMc150:      10,
+  /* Augenschutz: kein Zug auf einen Punkt, der ein eigenes echtes Auge ist
+     (alle orthogonalen Nachbarn eigene Steine, Diagonalen wie
+     _diagIsTrueEye), ausser eine angrenzende eigene Kette steht im Atari.
+     1 = an der Wurzel (alle Stufen), 2 = zusaetzlich in MCTS-Knoten und
+     Rollouts. 0 = aus. Anlass: gegen GNU Go fuellte die KI nach dessen Pass
+     ihre eigenen Augen, bis jede Gruppe nur noch eines hatte (W+370,5);
+     im Selbstspiel fuellt sie in rund 40 % der Partien ein echtes Auge.
+     Siehe docs/endspiel-augen.md. */
+  augenSchutz:        0,
+  /* Pass trotz grossem Gegnerzug: Die Pass-Pruefung verweigert den Pass,
+     wenn der beste Gegnerzug mehr als passGainThreshold bringt -- auch dann,
+     wenn kein eigener Zug ihn verhindern kann (Schlag einer toten Gruppe).
+     1 = vorher pruefen, ob einer der besten eigenen Zuege (oder der Punkt
+     des Gegnerzugs selbst) den Gegnerzug unter die Schwelle drueckt; wenn
+     keiner das schafft, wird trotzdem gepasst. 0 = aus. */
+  passUnabwendbar:    0,
   aiTimeBudget:    1800,
   rolloutWeight:    0.65,
   scoreWeight:      0.35,
@@ -3667,9 +3683,10 @@ function rollout(board, startColor, histHashes, captures, depth, rootColor, koPo
        bevor mctsPUCT's äußere Schleife überhaupt wieder zum Zug kommt. */
     if (hardDeadline !== undefined && Date.now() > hardDeadline) break;
     const opp = color === 1 ? 2 : 1;
-    const legal = (S > 0)
+    let legal = (S > 0)
       ? sampleLegalMoves(_rolloutScratch, color, S, currentKo, hardDeadline)
       : getLegalMoves(_rolloutScratch, color, _emptyHashes, currentKo, hardDeadline);
+    if (PARAMS.augenSchutz >= 2) legal = legal.filter(m => !fuelltEigenesAuge(_rolloutScratch, m.idx, color));
     if (!legal.length) { if (++passes >= 2) break; color = opp; currentKo = null; continue; }
     passes = 0;
     const scored = legal.map(m => ({m, score: quickEval(_rolloutScratch, m.idx, color)}));
@@ -3857,7 +3874,8 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
     for (let depth = 0; depth < PARAMS.mctsMaxDepth; depth++) {
       if (Date.now() > hardDeadline) break;   /* Sicherheitsbremse: teure Expansion abbrechen */
       if (node !== root && node.kids === null) {
-        const legal = getLegalMoves(_mctsScratch, color, _emptyHashes, null, hardDeadline);
+        let legal = getLegalMoves(_mctsScratch, color, _emptyHashes, null, hardDeadline);
+        if (PARAMS.augenSchutz >= 2) legal = legal.filter(m => !fuelltEigenesAuge(_mctsScratch, m.idx, color));
         /* Deadline währenddessen gerissen → Liste evtl. abgeschnitten.
            NICHT cachen: kids=[] würde den Knoten dauerhaft als terminal
            markieren (Tree-Reuse trägt ihn in den nächsten Zug!). kids
@@ -4047,6 +4065,54 @@ function gebietSagtVerloren(board, aiColor) {
   return verloren;
 }
 
+/* Fuellt ein Zug von color auf i ein eigenes echtes Auge? Alle
+   orthogonalen Nachbarn eigene Steine, Diagonalen nach _diagIsTrueEye, und
+   keine angrenzende eigene Kette im Atari (dann ist der Punkt kein Auge,
+   sondern die letzte Freiheit, und das Fuellen verbindet). Siehe
+   PARAMS.augenSchutz. */
+function fuelltEigenesAuge(board, i, color) {
+  for (const n of NEIGHBORS[i]) if (board[n] !== color) return false;
+  if (!_diagIsTrueEye(board, i, color)) return false;
+  for (const n of NEIGHBORS[i]) if (countLiberties(board, n, 2) < 2) return false;
+  return true;
+}
+
+/* Bleibt der beste Gegnerzug gross, egal was wir spielen? Geprueft werden
+   unsere besten passUnabwendbarK Kandidaten und die Punkte der drei besten
+   Gegnerzuege (selbst dort zu spielen ist die naheliegende Abwehr). Nach
+   jedem Kandidaten werden die drei Gegnerzuege neu bewertet. Bringt einer
+   der Kandidaten alle drei unter die Schwelle, ist der Gegnerzug abwendbar.
+   Die Caches (Krisenkarte, Flaeche, Bouzy) werden je Brett neu gefuellt;
+   der Aufrufer stellt sie danach fuer das Ausgangsbrett wieder her. */
+const PASS_UNABWENDBAR_K = 8;
+const _puBrett = new Uint8Array(BOARD_SIZE), _puProbe = new Uint8Array(BOARD_SIZE);
+function gegnerzugUnabwendbar(board, aiColor, scored, oppTop, mc, schwelle, leer) {
+  const opp = aiColor === 1 ? 2 : 1;
+  const legalUns = new Set(scored.map(s => s.m.idx));
+  const kand = scored.slice(0, PASS_UNABWENDBAR_K).map(s => s.m.idx);
+  for (const o of oppTop) if (legalUns.has(o.idx) && !kand.includes(o.idx)) kand.push(o.idx);
+  for (const c of kand) {
+    _puBrett.set(board);
+    _puBrett[c] = aiColor;
+    removeDeadGroups(_puBrett, opp, c);
+    buildCrisisMap(_puBrett, opp);
+    primeAreaCache(_puBrett, opp);
+    if (PARAMS.endTieBreak > 0 || PARAMS.gebietZug > 0) primeEndTieBreak(_puBrett);
+    let groesster = -Infinity;
+    for (const o of oppTop) {
+      if (_puBrett[o.idx]) continue;
+      /* Selbstmord fuer den Gegner? Dann ist der Zug nach c weg. */
+      _puProbe.set(_puBrett); _puProbe[o.idx] = opp;
+      if (removeDeadGroups(_puProbe, aiColor, o.idx) === 0 && countLiberties(_puProbe, o.idx, 1) === 0) continue;
+      const sc = evaluateMove(_puBrett, o.idx, opp, mc, leer);
+      if (sc > groesster) groesster = sc;
+    }
+    _areaCacheValid = false; _tbValid = false;
+    if (groesster <= schwelle) return false;
+  }
+  return true;
+}
+
 function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove) {
   _lastMoveIdx = (lastMove === undefined || lastMove === null) ? -1 : lastMove;
   const hs = new Set(histHashes);
@@ -4083,6 +4149,13 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
     }
     _allDeadStreak = 0;
     legal = kept;
+  }
+  /* Augenschutz (PARAMS.augenSchutz): eigene echte Augen nie fuellen. Bleibt
+     nichts uebrig, ist Passen der einzige Zug, der nichts verschenkt. */
+  if (PARAMS.augenSchutz >= 1) {
+    const ohne = legal.filter(m => !fuelltEigenesAuge(board, m.idx, aiColor));
+    if (!ohne.length) return {type:'pass', requestId:reqId, info:'Pass — frei sind nur noch eigene Augen'};
+    legal = ohne;
   }
   const empty = legal.length;
   buildCrisisMap(board, aiColor);
@@ -4176,17 +4249,29 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
     primeAreaCache(board, opp);   /* sonst rechnet evalEndgame pro Kandidat O(n) neu */
     const oppLegal = getLegalMoves(board, opp, hs);
     let oppBest = -Infinity;
+    const oppTop = [];   /* die drei besten Gegnerzuege, fuer passUnabwendbar */
     for (const m of oppLegal) {
       const sc = evaluateMove(board, m.idx, opp, mc, oppLegal.length);
       if (sc > oppBest) oppBest = sc;
+      if (oppTop.length < 3 || sc > oppTop[oppTop.length - 1].sc) {
+        oppTop.push({idx: m.idx, sc}); oppTop.sort((x, y) => y.sc - x.sc);
+        if (oppTop.length > 3) oppTop.pop();
+      }
     }
+    const opponentGainsAlot = oppBest > PASS_GAIN_THRESHOLD;
+    /* passUnabwendbar: Atari oder grosser Gegnerzug verbieten den Pass nur,
+       wenn ein eigener Zug etwas dagegen tun kann. Muss vor dem
+       Zuruecksetzen der Caches laufen; es setzt sie selbst um. */
+    const unabwendbar = PARAMS.passUnabwendbar >= 1 && (ownInAtari || opponentGainsAlot)
+      && gegnerzugUnabwendbar(board, aiColor, scored, oppTop, mc, PASS_GAIN_THRESHOLD, oppLegal.length);
     _areaCacheValid = false;
     _infValid = false;
     _tbValid = false;
     buildCrisisMap(board, aiColor);
-    const opponentGainsAlot = oppBest > PASS_GAIN_THRESHOLD;
-    if (!ownInAtari && !opponentGainsAlot) {
-      return {type:'pass', requestId:reqId};
+    if ((!ownInAtari && !opponentGainsAlot) || unabwendbar) {
+      return unabwendbar
+        ? {type:'pass', requestId:reqId, info:'Pass — der Gegnerzug ist nicht abwendbar'}
+        : {type:'pass', requestId:reqId};
     }
   }
   let chosen;
@@ -6061,6 +6146,10 @@ globalThis.policyNet = new PolicyNet();
          tip:'Früh-Pass: wenn best < X → Pass-Kandidat'},
         {key:'passMinMc80',       label:'Pass mc>80',       step:5,   min:-100,max:100,
          tip:'Mittelspiel-Pass-Schwelle'},
+        {key:'augenSchutz',       label:'Augenschutz',      step:1,   min:0,   max:2,
+         tip:'Nie ein eigenes echtes Auge füllen. 1 = beim eigenen Zug, 2 = auch in der Suche. 0 = altes Verhalten. Messung: docs/endspiel-augen.md.'},
+        {key:'passUnabwendbar',   label:'Pass trotz Drohung', step:1, min:0,   max:1,
+         tip:'1 = passen, wenn kein eigener Zug den großen Gegnerzug verhindern kann (z. B. Schlag einer toten Gruppe). 0 = altes Verhalten.'},
         {key:'aiTimeBudget',      label:'Zeit-Budget ms',   step:100, min:100, max:5000, main:true,
          tip:'⭐ HAUPTHEBEL. ↓ 1200 bei Ruckeln auf Smartphone. ↑ 2500 auf PC. Basis-Wert für die adaptive Skalierung unten.'},
         {key:'adaptiveBudgetEnabled', label:'Adaptiv (0/1)', step:1, min:0, max:1,

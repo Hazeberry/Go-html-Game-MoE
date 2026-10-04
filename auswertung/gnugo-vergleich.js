@@ -4,7 +4,10 @@
    ihrem Partner heraus.
 
    Aufruf:
-     node auswertung/gnugo-vergleich.js --A a.jsonl[,a2.jsonl] --B b.jsonl[,...] [--zug 120] */
+     node auswertung/gnugo-vergleich.js --A a.jsonl[,a2.jsonl] --B b.jsonl[,...] [--zug 120,ende]
+
+   `ende` vergleicht den Endstand (GNU Gos Auszählung der Schlussstellung,
+   Feld `endstand`) statt einer Schätzung. */
 'use strict';
 const fs = require('fs');
 
@@ -12,7 +15,7 @@ const a = process.argv.slice(2);
 const opt = {A: [], B: [], zuege: [60, 120]};
 for (let i = 0; i < a.length; i++) {
   if (a[i] === '--A' || a[i] === '--B') opt[a[i].slice(2)] = a[++i].split(',');
-  else if (a[i] === '--zug') opt.zuege = a[++i].split(',').map(Number);
+  else if (a[i] === '--zug') opt.zuege = a[++i].split(',').map(z => z === 'ende' ? z : Number(z));
 }
 const lies = dateien => {
   const m = new Map();
@@ -52,20 +55,21 @@ function ibeta(x, a, b) {
 const pZweiseitig = (t, df) => ibeta(df / (df + t * t), df / 2, 0.5);
 
 const A = lies(opt.A), B = lies(opt.B);
+const wert = (r, zug) => zug === 'ende' ? r.endstand : r.schaetzung[zug];
 for (const zug of opt.zuege) {
   const d = [];
   let ab = 0;
   for (const [nr, ra] of A) {
     const rb = B.get(nr);
     if (!rb) continue;
-    if (ra.abgebrochen || rb.abgebrochen || ra.schaetzung[zug] === undefined || rb.schaetzung[zug] === undefined) { ab++; continue; }
-    d.push({a: ra.schaetzung[zug], b: rb.schaetzung[zug]});
+    if (ra.abgebrochen || rb.abgebrochen || wert(ra, zug) === undefined || wert(rb, zug) === undefined) { ab++; continue; }
+    d.push({a: wert(ra, zug), b: wert(rb, zug)});
   }
   const n = d.length, diffs = d.map(x => x.b - x.a);
   const mw = arr => arr.reduce((x, y) => x + y, 0) / arr.length;
   const md = mw(diffs), sd = Math.sqrt(diffs.reduce((s, x) => s + (x - md) ** 2, 0) / (n - 1));
   const t = md / (sd / Math.sqrt(n)), p = pZweiseitig(t, n - 1);
-  console.log(`nach Zug ${zug}: ${n} Paare (${ab} ohne Partner/abgebrochen) · A Ø ${mw(d.map(x => x.a)).toFixed(1)}`
+  console.log(`${zug === 'ende' ? 'Endstand' : 'nach Zug ' + zug}: ${n} Paare (${ab} ohne Partner/abgebrochen) · A Ø ${mw(d.map(x => x.a)).toFixed(1)}`
     + ` · B Ø ${mw(d.map(x => x.b)).toFixed(1)} · Differenz B − A ${md.toFixed(1)} (SD ${sd.toFixed(1)})`
     + ` · t = ${t.toFixed(2)}, p = ${p < 1e-4 ? p.toExponential(1) : p.toFixed(4)}`);
 }
