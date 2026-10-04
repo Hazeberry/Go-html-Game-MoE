@@ -1,0 +1,966 @@
+{
+ "lauf": "gebiet-m1",
+ "befehl": "node gnugo-duell.js --partien 15 --von {1,16,31,46} --seed 71 --stufe 1 --vorgabe 9 --maxzuege 120 --schaetzung 60,120 --ki mctsFixedSims=120,resignEnabled=0[,gebietZug=80] (Commit a5009dd, GNU Go 3.8)",
+ "partien": [
+  {
+   "arm": "A",
+   "nr": 1,
+   "s60": -84.8,
+   "s120": -159.5,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 2,
+   "s60": -112.5,
+   "s120": -189.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 3,
+   "s60": -118.6,
+   "s120": -202.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 4,
+   "s60": -126.9,
+   "s120": -188.3,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 5,
+   "s60": -109.1,
+   "s120": -183.7,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 6,
+   "s60": -99.8,
+   "s120": -224.1,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 7,
+   "s60": -106.7,
+   "s120": -370.5,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 8,
+   "s60": -111.4,
+   "s120": -169.3,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 9,
+   "s60": -104.8,
+   "s120": -185.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 10,
+   "s60": -97.8,
+   "s120": -192,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 11,
+   "s60": -107.4,
+   "s120": -159.3,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 12,
+   "s60": -156.1,
+   "s120": -222,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 13,
+   "s60": -170.7,
+   "s120": -370.5,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 14,
+   "s60": -104.8,
+   "s120": -160.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 15,
+   "s60": -89,
+   "s120": -179.5,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 16,
+   "s60": -149.4,
+   "s120": -211.7,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 17,
+   "s60": -78.1,
+   "s120": -170.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 18,
+   "s60": -102.7,
+   "s120": -219.7,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 19,
+   "s60": -146.3,
+   "s120": -216.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 20,
+   "s60": -98.4,
+   "s120": -207.7,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 21,
+   "s60": -115.8,
+   "s120": -193.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 22,
+   "s60": -155,
+   "s120": -208.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 23,
+   "s60": -106,
+   "s120": -160.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 24,
+   "s60": -115.1,
+   "s120": -187.1,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 25,
+   "s60": -104.8,
+   "s120": -210.3,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 26,
+   "s60": -89.3,
+   "s120": -193.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 27,
+   "s60": -104.9,
+   "s120": -155.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 28,
+   "s60": -105.1,
+   "s120": -172,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 29,
+   "s60": -132.1,
+   "s120": -304.5,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 30,
+   "s60": -97.5,
+   "s120": -185,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 31,
+   "s60": -130.6,
+   "s120": -355.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 32,
+   "s60": -142.7,
+   "s120": -186.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 33,
+   "s60": -134.7,
+   "s120": -205.6,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 34,
+   "s60": -115.6,
+   "s120": -185.6,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 35,
+   "s60": -84.3,
+   "s120": -190.7,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 36,
+   "s60": -177,
+   "s120": -330.6,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 37,
+   "s60": -129.6,
+   "s120": -241.3,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 38,
+   "s60": -133.6,
+   "s120": -186.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 39,
+   "s60": -94.3,
+   "s120": -177.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 40,
+   "s60": -111.7,
+   "s120": -165.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 41,
+   "s60": -115.4,
+   "s120": -176.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 42,
+   "s60": -104.4,
+   "s120": -188.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 43,
+   "s60": -130.5,
+   "s120": -189.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 44,
+   "s60": -57.9,
+   "s120": -171,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 45,
+   "s60": -149,
+   "s120": -237.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 46,
+   "s60": -78.4,
+   "s120": -224.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 47,
+   "s60": -109,
+   "s120": -198.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 48,
+   "s60": -100.6,
+   "s120": -167.5,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 49,
+   "s60": -96.8,
+   "s120": -195.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 50,
+   "s60": -124,
+   "s120": -183.6,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 51,
+   "s60": -88.4,
+   "s120": -181.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 52,
+   "s60": -157,
+   "s120": -288.7,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 53,
+   "s60": -106.4,
+   "s120": -185.1,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 54,
+   "s60": -88.4,
+   "s120": -200.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 55,
+   "s60": -70,
+   "s120": -175.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 56,
+   "s60": -143.8,
+   "s120": -336.3,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 57,
+   "s60": -93.6,
+   "s120": -181.3,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 58,
+   "s60": -80.9,
+   "s120": -192.6,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 59,
+   "s60": -117.2,
+   "s120": -179.7,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "A",
+   "nr": 60,
+   "s60": -118.5,
+   "s120": -227.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 1,
+   "s60": 131.6,
+   "s120": 25.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 2,
+   "s60": 116.9,
+   "s120": 31.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 3,
+   "s60": 78.2,
+   "s120": 26.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 4,
+   "s60": 108,
+   "s120": 5.7,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 5,
+   "s60": 105.1,
+   "s120": 30.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 6,
+   "s60": 148.7,
+   "s120": 58.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 7,
+   "s60": 107.8,
+   "s120": 32.1,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 8,
+   "s60": 100.9,
+   "s120": -19.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 9,
+   "s60": 123.2,
+   "s120": -0.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 10,
+   "s60": 90.1,
+   "s120": 19,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 11,
+   "s60": 114.4,
+   "s120": 35.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 12,
+   "s60": 100.9,
+   "s120": -13.5,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 13,
+   "s60": 70,
+   "s120": -12.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 14,
+   "s60": 68.4,
+   "s120": -7,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 15,
+   "s60": 110.8,
+   "s120": 51.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 16,
+   "s60": 104.4,
+   "s120": -8.5,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 17,
+   "s60": 85.8,
+   "s120": 28.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 18,
+   "s60": 124.5,
+   "s120": null,
+   "gnugoGibtAuf": true,
+   "zuege": 108
+  },
+  {
+   "arm": "B",
+   "nr": 19,
+   "s60": 133.6,
+   "s120": 62.5,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 20,
+   "s60": 141.1,
+   "s120": 71,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 21,
+   "s60": 156,
+   "s120": 71.6,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 22,
+   "s60": 115.5,
+   "s120": 44,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 23,
+   "s60": 88,
+   "s120": -7.6,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 24,
+   "s60": 132.5,
+   "s120": null,
+   "gnugoGibtAuf": true,
+   "zuege": 98
+  },
+  {
+   "arm": "B",
+   "nr": 25,
+   "s60": 91.6,
+   "s120": 32.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 26,
+   "s60": 83.1,
+   "s120": 24.3,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 27,
+   "s60": 59.7,
+   "s120": 14.6,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 28,
+   "s60": 83.6,
+   "s120": -6,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 29,
+   "s60": 83.8,
+   "s120": 65.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 30,
+   "s60": 110.8,
+   "s120": 50.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 31,
+   "s60": 101.1,
+   "s120": -15.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 32,
+   "s60": 75.7,
+   "s120": 41.3,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 33,
+   "s60": 76.5,
+   "s120": 88.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 34,
+   "s60": 60.5,
+   "s120": 3.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 35,
+   "s60": 153.2,
+   "s120": 49,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 36,
+   "s60": 115.5,
+   "s120": 21.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 37,
+   "s60": 89.8,
+   "s120": 73.6,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 38,
+   "s60": 120.8,
+   "s120": 17.5,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 39,
+   "s60": 99.8,
+   "s120": -6.6,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 40,
+   "s60": 110.8,
+   "s120": 46.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 41,
+   "s60": 102.5,
+   "s120": -4.1,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 42,
+   "s60": 88,
+   "s120": -30,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 43,
+   "s60": 83.4,
+   "s120": -59.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 44,
+   "s60": 87.7,
+   "s120": -25.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 45,
+   "s60": 115.6,
+   "s120": 47.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 46,
+   "s60": 126.1,
+   "s120": 34.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 47,
+   "s60": 136.2,
+   "s120": 27.1,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 48,
+   "s60": 87.7,
+   "s120": -2.9,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 49,
+   "s60": 128,
+   "s120": 0.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 50,
+   "s60": 66.7,
+   "s120": -3.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 51,
+   "s60": 86.9,
+   "s120": 11.2,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 52,
+   "s60": 117.7,
+   "s120": 39.5,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 53,
+   "s60": 98.4,
+   "s120": 50,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 54,
+   "s60": 124.5,
+   "s120": null,
+   "gnugoGibtAuf": true,
+   "zuege": 82
+  },
+  {
+   "arm": "B",
+   "nr": 55,
+   "s60": 100.9,
+   "s120": -15.8,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 56,
+   "s60": 139.4,
+   "s120": 47,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 57,
+   "s60": 101.1,
+   "s120": 24,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 58,
+   "s60": 108.8,
+   "s120": 39.1,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 59,
+   "s60": 125.1,
+   "s120": 14.4,
+   "gnugoGibtAuf": false,
+   "zuege": 120
+  },
+  {
+   "arm": "B",
+   "nr": 60,
+   "s60": 110.7,
+   "s120": null,
+   "gnugoGibtAuf": true,
+   "zuege": 114
+  }
+ ]
+}

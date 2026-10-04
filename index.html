@@ -1663,8 +1663,11 @@ globalThis.PARAMS = {
      Vorgabesteine, Stufe 1) hob 80 die Schaetzung nach 120 Zuegen um rund
      230 Punkte; gebietGewicht allein wirkte nicht, weil die Zugwahl bei
      120 Simulationen fast ganz aus evaluateMove kommt (docs/gebiet.md).
-     Default 0 = altes Verhalten, bitgenau. */
-  gebietZug:         0,
+     Gemessen (docs/gebiet.md §6): gegen GNU Go +229 Punkte nach 120 Zuegen,
+     gepaart, p = 8e-33, und die ersten Partien, in denen GNU Go aufgibt;
+     im Selbstspiel 83,3 % ueber 360 Partien. Deshalb Default 80.
+     0 = altes Verhalten, bitgenau. */
+  gebietZug:        80,
   /* Adaptives Zeitbudget (Tin/GLM-Vorschlag, stufenlos statt Sprungfunktion).
      Reale Partie zeigte 86% Sim-Rückgang über 156 Züge (317→43) durch
      wachsende floodFill-Kosten auf großen Gruppen — kontinuierlicher Verfall,
@@ -6077,7 +6080,7 @@ globalThis.policyNet = new PolicyNet();
         {key:'influenceOwn', label:'Einfluss: eigene Zone', step:50, min:0, max:600,
          tip:'EXPERIMENTELL. Abzug für Züge in der eigenen Einflusszone (nicht das eigene Gebiet auffüllen). Default 0 = aus. Nur zusammen mit der Invasion gemessen: kein Nutzen.'},
         {key:'gebietZug', label:'Gebiet je Zug', step:10, min:0, max:300,
-         tip:'EXPERIMENTELL. Bewertet Züge nach ihrer Wirkung auf die Einflusskarte (eigene minus fremde Zone), in allen Phasen. Gegen den Mauerbau. Default 0 = aus. Messung in docs/gebiet.md.'},
+         tip:'Bewertet Züge nach ihrer Wirkung auf die Einflusskarte (eigene minus fremde Zone), in allen Phasen — gegen den Mauerbau. Default 80: gegen GNU Go +229 Punkte nach 120 Zügen, im Selbstspiel 83 % Siegrate. 0 = altes Verhalten.'},
         {key:'gebietGewicht', label:'Gebiet in der Stellung', step:1, min:0, max:20,
          tip:'EXPERIMENTELL. Zählt die Einflussbilanz in jeder Blattbewertung mit. Im Pilot ohne Wirkung. Default 0 = aus.'},
         {key:'raumZug', label:'Raumrisiko je Zug', step:0.5, min:0, max:3,

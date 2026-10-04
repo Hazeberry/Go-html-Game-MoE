@@ -37,10 +37,12 @@ function mitFestemZufall(fn) {
   Math.random = () => 0.5;
   try { return fn(); } finally { Math.random = alt; }
 }
+/* gebietZug aus: der Gebietsterm (Default 80) nutzt dieselbe Wurzelbilanz
+   und würde hier mitgemessen. Geprüft wird allein der Brecher. */
 function mitGewicht(w, fn) {
-  const alt = PARAMS.endTieBreak;
-  PARAMS.endTieBreak = w;
-  try { return fn(); } finally { PARAMS.endTieBreak = alt; }
+  const alt = PARAMS.endTieBreak, altGz = PARAMS.gebietZug;
+  PARAMS.endTieBreak = w; PARAMS.gebietZug = 0;
+  try { return fn(); } finally { PARAMS.endTieBreak = alt; PARAMS.gebietZug = altGz; }
 }
 function werte(b, farbe) {
   buildCrisisMap(b, farbe);
