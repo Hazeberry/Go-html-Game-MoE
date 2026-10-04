@@ -133,3 +133,55 @@ Partielänge; die Kosten je Zug.
 - GNU Gos `estimate_score` ist eine Schätzung, keine Auszählung. Sie ist
   aber für beide Arme dieselbe und kommt von einem Programm, das unsere
   Bewertung nicht teilt.
+
+---
+
+## 6. Nachtrag: Ergebnis, Default 80 (04.10.2026)
+
+Gelaufen auf dem Merge-Commit `a5009dd`, ohne Unterbrechung. Daten:
+`daten/gebiet-m1.json` (je Partie die Schätzungen) und
+`daten/gebiet-m2-20261026.json` bis `…29.json` (Hash-Listen).
+
+**M1, gegen GNU Go (primär):**
+
+| | A (Default) | B (`gebietZug` = 80) | Differenz B − A, gepaart |
+|---|---:|---:|---|
+| Schätzung nach Zug 60 (60 Paare) | −113,1 | +105,1 | **+218,2** (SD 32,8), p = 9,7 · 10⁻⁵¹ |
+| Schätzung nach Zug 120 (56 Paare) | −207,6 | +21,8 | **+229,4** (SD 65,3), p = 7,8 · 10⁻³³ |
+
+Vier Paare fehlen nach Zug 120, weil **GNU Go in vier B-Partien aufgab**,
+bei Zug 82, 98, 108 und 114. Das sind die ersten Partien, die die KI gegen
+GNU Go gewonnen hat. In A gab GNU Go nie auf. Dass diese vier Paare
+herausfallen, benachteiligt B. Den Fall sah §4 nicht vor, dort sind nur
+Abstürze genannt; abgebrochen ist keine Partie.
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt **300 von 360 Partien, 83,3 %**
+(z = 12,65, 95-%-KI 79,5–87,2 %). Das sind rund +280 Elo, der größte Sprung
+der Messreihe.
+
+| Teillauf | Siegrate B |
+|---|---:|
+| 20261026 | 81,1 % |
+| 20261027 | 83,3 % |
+| 20261028 | 84,4 % |
+| 20261029 | 84,4 % |
+
+Als Schwarz gewinnt B 153 von 180, als Weiß 147 von 180. A gab 266-mal auf,
+B 47-mal. Partielänge Ø 278 Züge (früher rund 335). Ob die Aufgaben
+berechtigt waren, ist nicht geprüft (`weiterspielen.js`). An der Entscheidung
+ändert das nichts, denn M2 müsste dafür signifikant unter 50 % liegen.
+
+**Entscheidung nach §4: Default `gebietZug` = 80.**
+
+**Was offen bleibt:**
+
+- Ganze Partien gegen GNU Go gehen weiter meist verloren. Im Pilot mit 80
+  hielt der Vorsprung bis Zug 60 und schmolz danach (§2). Mittel- und
+  Endspiel sind die nächste Baustelle; GNU Gos Schätzung nach Zug 200 oder
+  der Endstand wären dafür die Messgröße.
+- `gebietGewicht` (Gebiet in der Stellungsbewertung) bleibt 0. Im Pilot
+  wirkte es nicht. Mit dem neuen Default könnte das anders sein,
+  gemessen ist das nicht.
+- Ältere Läufe: Ein Arm „Default" heißt ab jetzt `gebietZug` = 80. Wer
+  einen älteren Lauf wiederholt, nimmt dessen Commit oder setzt
+  `gebietZug=0` in beide Arme.

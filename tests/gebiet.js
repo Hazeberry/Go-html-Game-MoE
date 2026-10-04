@@ -1,7 +1,8 @@
 /* Gebiet in Stellungs- und Zugbewertung (gebietGewicht, gebietZug;
    docs/gebiet.md).
 
-     1. Bei 0 bleiben evaluateBoard und evaluateMove bitgenau.
+     1. Bei 0 bleiben evaluateBoard und evaluateMove bitgenau (0 ist das
+        alte Verhalten; der Default von gebietZug ist seit §6 80).
      2. gebietGewicht addiert genau Gewicht × Bouzy-Bilanz (aus Sicht von color).
      3. gebietZug addiert je Kandidat genau Gewicht × Bilanzänderung durch den
         Zug — nachgerechnet mit der vollen Karte (gebietBilanz), nicht mit der
@@ -46,9 +47,9 @@ function zugWerte(b, farbe, mc, w) {
   });
 }
 
-test('Parameter existieren und stehen standardmäßig auf 0', () => {
+test('Defaults: gebietGewicht 0, gebietZug 80 (gemessen, docs/gebiet.md §6)', () => {
   pruefeGleich(PARAMS.gebietGewicht, 0, 'gebietGewicht-Default');
-  pruefeGleich(PARAMS.gebietZug, 0, 'gebietZug-Default');
+  pruefeGleich(PARAMS.gebietZug, 80, 'gebietZug-Default');
 });
 
 test('gebietGewicht: 0 bitgenau, sonst genau Gewicht × Bilanz', () => {

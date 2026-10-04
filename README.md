@@ -202,6 +202,7 @@ Simulationszahl pro Zug direkt an der Rechenleistung hängt.
 | Kurve 100/150/200/250/300/500/1000 | Plateau bei 150–250, Abfall zu beiden Seiten | Mitte des Plateaus gewählt, nicht der Höchstwert |
 | `endTieBreak` 1 statt 0 (Gleichstand im Endspiel ordnen statt losen) | 57,2 % und in der Wiederholung 59,4 % über je 360 Partien, p = 0,006 und 0,0003 | **eingebaut** — Default 1 |
 | `raumGewicht` + `raumZug` 1 (Raumrisiko im Laufkampf) | 45,3 % über 360 Partien, p = 0,073; Ausbrüche ×2, große Verluste unverändert | verworfen — Default 0 |
+| **`gebietZug` 80 statt 0 (Gebiet in der Zugbewertung)** | **gegen GNU Go +229 Punkte nach 120 Zügen (p = 8 · 10⁻³³), im Selbstspiel 83,3 % über 360 Partien** | **eingebaut** — Default 80, rund +280 Elo |
 | Suchtiefe: 240 gegen 120, 480 gegen 240 Simulationen | 60,6 % und 57,8 % über je 360 Partien (+75 und +55 Elo je Verdopplung) | Suche hilft, flacht ab — kein großer Hebel (`docs/skalierung.md`) |
 | `resignQ` 0,95 gegen 0,997 | 29:31 über 60 Partien, p = 0,90 | 0,95 bleibt — rechtzeitiges Aufgeben kostet nichts |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
@@ -2118,6 +2119,24 @@ Mehr Suche schließt diese Lücke nicht. Im Selbstspiel bringt jede
 Verdopplung der Simulationen etwa +75 bzw. +55 Elo, mit abnehmender Tendenz
 ([`docs/skalierung.md`](docs/skalierung.md)). Gegen GNU Go änderten 1 000
 statt 120 Simulationen nichts. Der Hebel liegt in der Bewertung.
+
+**Gebiet in der Zugbewertung — der größte Sprung der Reihe.** Der Mauerbau
+kommt aus dem Freiheitsterm in `evalMidgame`. Er ist absolut: Ein Stein an
+einer langen Kette erbt alle ihre Freiheiten. Den Term zu schwächen schadet,
+auch gegen GNU Go, denn er trägt das Leben der Gruppen. Gebiet in der
+Stellungsbewertung wirkt nicht, weil bei 120 Simulationen die Zugwahl fast
+ganz aus `evaluateMove` kommt. Gebiet in der **Zugbewertung** wirkt:
+`gebietZug` gibt jedem Kandidaten seine Änderung der Bouzy-Bilanz. Vorab
+festgelegt gemessen: gegen GNU Go (9 Vorgabesteine, Stufe 1) **+229 Punkte**
+in GNU Gos Schätzung nach 120 Zügen, gepaart über 56 Partien, und erstmals
+Partien, in denen GNU Go aufgibt (4 von 60). Im Selbstspiel **83,3 %** über
+360 Partien. Seitdem Default 80. Ganze Partien gegen GNU Go gehen weiter
+meist verloren, der Vorsprung schmilzt im Mittel- und Endspiel:
+[`docs/gebiet.md`](docs/gebiet.md).
+
+**Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
+`gebietZug` = 80. Wiederholen auf dem Commit aus der Hash-Liste oder mit
+`gebietZug=0` (und `endTieBreak=0` für Läufe vor dem 03.10.) in beiden Armen.
 
 ## Methodik
 
