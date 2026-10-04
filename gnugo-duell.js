@@ -31,6 +31,8 @@
                          [--schaetzung 60,120] (GNU Gos estimate_score nach
                           diesen Zugzahlen, aus unserer Sicht: + = wir vorn;
                           endet die Partie am Zuglimit, wird nicht ausgezählt)
+   Jede Partie bekommt zusätzlich `endstand`: GNU Gos final_score der
+   Schlussstellung aus unserer Sicht, auch bei Aufgabe und Zuglimit.
    GTP_DEBUG=1 in der Umgebung zeigt jeden GTP-Befehl und jede Antwort.
 
    Vorgabe (--vorgabe N ≥ 2): Wir spielen in jeder Partie Schwarz mit N
@@ -257,10 +259,16 @@ async function partieSpielen(nr) {
         if ((board[k] === f) !== bei.has(k)) throw new Error(`Partie ${nr}: Bretter weichen ab an ${zuGtp(k)}`);
     }
     let gnugoStand = null, sieger;
+    /* Endstand: GNU Gos Auszählung der Schlussstellung, aus unserer Sicht,
+       wie immer die Partie endete (zwei Pässe, Aufgabe, Zuglimit). Bei
+       Aufgabe und Zuglimit ist das die Stellung, wie sie stehen blieb. */
+    const fsAntwort = await g.frage('final_score');
+    const fsM = /^([BW])\+([\d.]+)/.exec(fsAntwort);
+    const endstand = fsM ? (fsM[1] === (wir === 1 ? 'B' : 'W') ? 1 : -1) * +fsM[2] : 0;   /* "0" = Gleichstand */
     if (aufgabe) sieger = 3 - aufgabe;
     else if (mc >= opt.maxZuege && opt.schaetzung.length) sieger = null;   /* nur Schätzung */
     else {
-      gnugoStand = await g.frage('final_score');            /* z. B. "W+12.5" */
+      gnugoStand = fsAntwort;                                /* z. B. "W+12.5" */
       sieger = gnugoStand.startsWith('B') ? 1 : 2;
     }
     return {nr, stufe: opt.stufe, ki: opt.ki, seed, wirFarbe: wir === 1 ? 'S' : 'W',
@@ -268,7 +276,7 @@ async function partieSpielen(nr) {
             sieger: sieger === null ? null : sieger === 1 ? 'S' : 'W',
             vorgabe: opt.vorgabe, komi: KOMI, vorgabeSteine, beginnt: zuerst === 1 ? 'S' : 'W',
             aufgabe: aufgabe ? (aufgabe === 1 ? 'S' : 'W') : null,
-            gnugoStand, unsereZaehlung: unsereZaehlung(board), zuegeAnzahl: mc,
+            gnugoStand, endstand, unsereZaehlung: unsereZaehlung(board), zuegeAnzahl: mc,
             simsMittel: sims.length ? Math.round(sims.reduce((x, y) => x + y, 0) / sims.length) : null,
             neustarts: g.neustarts(), schaetzung,
             zuege};
