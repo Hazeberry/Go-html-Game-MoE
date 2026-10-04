@@ -2151,6 +2151,13 @@ dort in den offenen Rahmen ein. Gebiet in der Stellungsbewertung half im
 Pilot auch dagegen nicht:
 [`docs/endspiel-augen.md`](docs/endspiel-augen.md).
 
+**Falsche Aufgaben.** Eine Partie gegen einen Menschen gab die KI bei
+W +63,5 (GNU Go) auf, Q stand bei −0,99. Im Selbstspiel sind 13 % der
+Aufgaben mit `gebietZug` 80 falsch. Gebiet in der Stellungsbewertung
+verschiebt Q, behebt es aber nicht. Die Ursache liegt in den Rollouts, die
+viele schwache, aber lebende Gruppen schlagen. Befunde ohne Default:
+[`docs/falsche-aufgabe.md`](docs/falsche-aufgabe.md).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1. Wiederholen
 auf dem Commit aus der Hash-Liste oder mit `gebietZug=0,augenSchutz=0,passUnabwendbar=0`
