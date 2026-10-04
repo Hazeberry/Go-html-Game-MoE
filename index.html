@@ -1451,15 +1451,18 @@ globalThis.PARAMS = {
      Rollouts. 0 = aus. Anlass: gegen GNU Go fuellte die KI nach dessen Pass
      ihre eigenen Augen, bis jede Gruppe nur noch eines hatte (W+370,5);
      im Selbstspiel fuellt sie in rund 40 % der Partien ein echtes Auge.
-     Siehe docs/endspiel-augen.md. */
-  augenSchutz:        0,
+     Siehe docs/endspiel-augen.md. GEMESSEN (§6): mit passUnabwendbar 1
+     gegen GNU Go Endstand +217 Punkte (p = 3e-17), im Selbstspiel 53,9 %
+     ueber 360 Partien. Seitdem Default 2. */
+  augenSchutz:        2,
   /* Pass trotz grossem Gegnerzug: Die Pass-Pruefung verweigert den Pass,
      wenn der beste Gegnerzug mehr als passGainThreshold bringt -- auch dann,
      wenn kein eigener Zug ihn verhindern kann (Schlag einer toten Gruppe).
      1 = vorher pruefen, ob einer der besten eigenen Zuege (oder der Punkt
      des Gegnerzugs selbst) den Gegnerzug unter die Schwelle drueckt; wenn
-     keiner das schafft, wird trotzdem gepasst. 0 = aus. */
-  passUnabwendbar:    0,
+     keiner das schafft, wird trotzdem gepasst. 0 = aus. Gemessen zusammen
+     mit augenSchutz, siehe dort. Default 1. */
+  passUnabwendbar:    1,
   aiTimeBudget:    1800,
   rolloutWeight:    0.65,
   scoreWeight:      0.35,
@@ -6147,9 +6150,9 @@ globalThis.policyNet = new PolicyNet();
         {key:'passMinMc80',       label:'Pass mc>80',       step:5,   min:-100,max:100,
          tip:'Mittelspiel-Pass-Schwelle'},
         {key:'augenSchutz',       label:'Augenschutz',      step:1,   min:0,   max:2,
-         tip:'Nie ein eigenes echtes Auge füllen. 1 = beim eigenen Zug, 2 = auch in der Suche. 0 = altes Verhalten. Messung: docs/endspiel-augen.md.'},
+         tip:'Nie ein eigenes echtes Auge füllen. 1 = beim eigenen Zug, 2 = auch in der Suche (Default). Gegen GNU Go +217 Punkte im Endstand. 0 = altes Verhalten.'},
         {key:'passUnabwendbar',   label:'Pass trotz Drohung', step:1, min:0,   max:1,
-         tip:'1 = passen, wenn kein eigener Zug den großen Gegnerzug verhindern kann (z. B. Schlag einer toten Gruppe). 0 = altes Verhalten.'},
+         tip:'1 = passen, wenn kein eigener Zug den großen Gegnerzug verhindern kann, z. B. den Schlag einer toten Gruppe (Default). 0 = altes Verhalten.'},
         {key:'aiTimeBudget',      label:'Zeit-Budget ms',   step:100, min:100, max:5000, main:true,
          tip:'⭐ HAUPTHEBEL. ↓ 1200 bei Ruckeln auf Smartphone. ↑ 2500 auf PC. Basis-Wert für die adaptive Skalierung unten.'},
         {key:'adaptiveBudgetEnabled', label:'Adaptiv (0/1)', step:1, min:0, max:1,
