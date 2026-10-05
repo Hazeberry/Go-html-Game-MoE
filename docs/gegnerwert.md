@@ -139,3 +139,45 @@ in M1 (Harness-Zeile „GRUPPENVERLUST“); Aufgaben je Arm.
 - Der Schalter hebt die Bewertung nur auf den besten Kandidaten an. Bei 120
   Simulationen kann die Suche den Zug trotzdem verwerfen.
 - Gemessen wird mit 120 Simulationen; Menschen spielen mit 300 bis 1 300.
+
+---
+
+## 6. Nachtrag: Ergebnis, Default bleibt 0 (05.10.2026)
+
+Gelaufen auf dem Merge-Commit `8968c5b`. Die Läufe standen einmal für etwa
+eine Stunde still, weil der Prozess pausiert war. Mit `mctsFixedSims` ändert
+das an den Partien nichts. Daten: `daten/krise-20261060.json` bis
+`…67.json` (Hash-Listen), `daten/krise-gnugo.json` (je Partie Schätzungen
+und Endstand).
+
+**M1, Selbstspiel (primär):** B gewinnt **372 von 720 Partien, 51,7 %**
+(z = 0,89, **p = 0,37**, 95-%-KI 48,0–55,3 %).
+
+| Teillauf | 1060 | 1061 | 1062 | 1063 | 1064 | 1065 | 1066 | 1067 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Siegrate B | 45,6 % | 55,6 % | 42,2 % | 48,9 % | 60,0 % | 51,1 % | 60,0 % | 50,0 % |
+
+**M2, gegen GNU Go (Kontrolle), 60 Paare:**
+
+| | A | B | B − A |
+|---|---:|---:|---|
+| Endstand | −160,4 | −152,8 | +7,5 (SD 87,0), p = 0,50 |
+| nach Zug 120 | +21,7 | +17,8 | −3,9, p = 0,35 |
+| nach Zug 200 | −87,1 | −98,1 | −10,9, p = 0,10 |
+
+GNU Go gab in 1 (A) bzw. 3 (B) Partien auf.
+
+**Sekundär:** Schläge ab 5 Steinen über alle acht Teilläufe: A 1 349, B
+1 417. Steine insgesamt geschlagen: A 20 138, B 20 164. Der Schalter
+verhindert also keine Gruppenverluste, die im Selbstspiel entscheidend wären.
+
+**Entscheidung nach §4: Default `krisenKandidaten` bleibt 0.**
+
+**Einordnung:** Der Schalter tut, was er soll: Die Rettung erreicht die Suche
+(Test, Partie 6, Zug 134). Bei 120 Simulationen bewertet die Suche aber nach
+dem Rollout, und der sieht in der Rettung einer Gruppe im Atari kaum mehr
+Wert als in einem Gebietszug. Atari ist außerdem selten der Engpass. Die
+Gruppen, die im Selbstspiel und in den Partien des Menschen verloren gehen,
+stehen meist vorher mit zwei bis vier Freiheiten im Laufkampf
+([`laufkampf.md`](laufkampf.md)). Der Schalter bleibt im Code und kann in
+Einzelfällen helfen. Messbar besser spielt die KI damit nicht.
