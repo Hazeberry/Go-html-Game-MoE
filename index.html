@@ -1476,6 +1476,10 @@ globalThis.PARAMS = {
   /* Krisenkandidaten: Rettung aus dem Atari und Schlaege bekommen mindestens
      den Wert des besten Kandidaten. 0 = aus. Siehe docs/gegnerwert.md. */
   krisenKandidaten:   0,
+  /* Taktischer Leser in der Zugwahl: 1 = Rettung eigener fangbarer Ketten
+     (2+ Steine, bis 3 Freiheiten) an die Spitze, 2 = zusaetzlich Fang
+     gegnerischer. 0 = aus. Siehe docs/laufkampf-lesen.md. */
+  leseRettung:        0,
   aiTimeBudget:    1800,
   rolloutWeight:    0.65,
   scoreWeight:      0.35,
@@ -4081,6 +4085,100 @@ function gebietSagtVerloren(board, aiColor) {
   return verloren;
 }
 
+/* ═══ Taktischer Leser: kann eine Kette gefangen werden? ═══════════════
+   Kleine Tiefensuche Angriff gegen Verteidigung fuer Ketten mit hoechstens
+   drei Freiheiten (Atari, Leiter, einfaches Netz). Ab vier Freiheiten gilt
+   eine Kette als nicht fangbar. Ko wird nicht beachtet. Siehe
+   docs/laufkampf-lesen.md.
+
+   leseAngriff(board, a)     Angreifer am Zug: faengt er die Kette auf a?
+   leseVerteidigung(board, a) Verteidiger am Zug: kann er sie retten?
+   Ein Zug m des Verteidigers rettet, wenn danach leseAngriff nein sagt.
+   Beide liefern {ja, offen}: offen = Budget erschoepft, Antwort ungesichert
+   (dann ja = false bei Angriff, ja = true bei Verteidigung, also
+   vorsichtig). Budget = Zahl der Knoten, Tiefe in Halbzuegen. */
+const LESE_TIEFE = 40, LESE_BUDGET = 4000;
+
+function _leseZug(b, i, f) {
+  if (b[i]) return null;
+  const nb = new Uint8Array(b);
+  nb[i] = f;
+  removeDeadGroups(nb, 3 - f, i);
+  if (countLiberties(nb, i, 1) === 0) return null;   /* Selbstmord */
+  return nb;
+}
+
+/* Angriffskandidaten: die Freiheiten; bei zwei Freiheiten zusaetzlich die
+   leeren Nachbarn der Freiheiten (Netz). */
+function _angriffsZuege(b, L) {
+  const z = new Set(L);
+  if (L.length === 2) for (const l of L) for (const n of NEIGHBORS[l]) if (!b[n]) z.add(n);
+  return [...z];
+}
+
+/* Verteidigungskandidaten: die Freiheiten und die Freiheiten angrenzender
+   gegnerischer Ketten mit hoechstens zwei Freiheiten (schlagen, Atari). */
+function _verteidigungsZuege(b, group, L) {
+  const f = b[group[0]], opp = 3 - f, z = new Set(L), ges = new Set();
+  for (const g of group) for (const n of NEIGHBORS[g]) {
+    if (b[n] !== opp || ges.has(n)) continue;
+    const k = floodFill(b, n);
+    for (const x of k.group) ges.add(x);
+    if (k.liberties.length <= 2) for (const l of k.liberties) z.add(l);
+  }
+  return [...z];
+}
+
+/* ebene = Halbzuege seit der Wurzel. Drei Freiheiten werden nur an der
+   Wurzel angegriffen; danach gilt eine Kette mit drei Freiheiten als
+   entkommen (Leiter-Annahme). Netzzuege nur in den ersten beiden Ebenen. */
+function _angriff(b, a, ebene, z) {
+  if (++z.n > z.budget) { z.offen = true; return false; }
+  const f = b[a];
+  if (!f) return true;
+  const {liberties: L} = floodFill(b, a);
+  if (L.length === 1) return true;
+  if (L.length > (ebene === 0 ? 3 : 2)) return false;
+  if (ebene >= z.tiefe) { z.offen = true; return false; }
+  const kand = ebene <= 2 ? _angriffsZuege(b, L) : L;
+  for (const m of kand) {
+    const nb = _leseZug(b, m, 3 - f);
+    if (!nb) continue;
+    if (!nb[a] || !_verteidigung(nb, a, ebene + 1, z)) return true;
+  }
+  return false;
+}
+
+function _verteidigung(b, a, ebene, z) {
+  if (++z.n > z.budget) { z.offen = true; return true; }
+  const f = b[a];
+  if (!f) return false;
+  const {group, liberties: L} = floodFill(b, a);
+  if (ebene > 0 && L.length >= 3) return true;
+  if (ebene >= z.tiefe) { z.offen = true; return true; }
+  /* Schon sicher, wenn der Angreifer am Zug sie nicht faengt. */
+  if (ebene === 0 && !_angriff(b, a, 0, z)) return true;
+  for (const m of _verteidigungsZuege(b, group, L)) {
+    const nb = _leseZug(b, m, f);
+    if (!nb || !nb[a]) continue;
+    if (!_angriff(nb, a, ebene + 1, z)) return true;
+  }
+  return false;
+}
+
+function leseAngriff(board, a, budget = LESE_BUDGET, tiefe = LESE_TIEFE) {
+  const z = {n: 0, budget, tiefe, offen: false};
+  const ja = _angriff(board, a, 0, z);
+  return {ja, offen: z.offen, knoten: z.n};
+}
+
+/* Verteidiger am Zug. Mit zug: rettet genau dieser Zug die Kette? */
+function leseVerteidigung(board, a, budget = LESE_BUDGET, tiefe = LESE_TIEFE) {
+  const z = {n: 0, budget, tiefe, offen: false};
+  const ja = _verteidigung(board, a, 0, z);
+  return {ja, offen: z.offen, knoten: z.n};
+}
+
 /* Fuellt ein Zug von color auf i ein eigenes echtes Auge? Alle
    orthogonalen Nachbarn eigene Steine, Diagonalen nach _diagIsTrueEye, und
    keine angrenzende eigene Kette im Atari (dann ist der Punkt kein Auge,
@@ -4349,6 +4447,43 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
       if (krise) { s.score = top; gehoben = true; }
     }
     if (gehoben) scored.sort((a,b) => b.score - a.score);
+  }
+  /* Lese-Rettung (PARAMS.leseRettung): eigene Ketten ab zwei Steinen mit
+     hoechstens drei Freiheiten, die der taktische Leser fangen kann: Zuege,
+     nach denen er sie nicht mehr faengt, kommen an die Spitze. Stufe 2
+     zusaetzlich fuer gegnerische Ketten: Zuege, nach denen der Gegner sie
+     nicht mehr retten kann. Nach der Pass-Pruefung, wie krisenKandidaten.
+     Siehe docs/laufkampf-lesen.md. */
+  if (PARAMS.leseRettung > 0 && scored.length) {
+    const top = scored[0].score, opp = aiColor === 1 ? 2 : 1;
+    const legalSet = new Set(scored.map(s => s.m.idx)), heben = new Set();
+    const ges = new Uint8Array(BOARD_SIZE);
+    for (let k = 0; k < BOARD_SIZE; k++) {
+      const c = board[k];
+      if (!c || ges[k]) continue;
+      const {group, liberties} = floodFill(board, k);
+      for (const g of group) ges[g] = 1;
+      if (group.length < 2 || liberties.length > 3) continue;
+      if (c === aiColor) {
+        if (!leseAngriff(board, k).ja) continue;
+        for (const m of _verteidigungsZuege(board, group, liberties)) {
+          if (!legalSet.has(m)) continue;
+          const nb = _leseZug(board, m, aiColor);
+          if (nb && nb[k] && !leseAngriff(nb, k).ja) heben.add(m);
+        }
+      } else if (PARAMS.leseRettung >= 2) {
+        if (!leseAngriff(board, k).ja) continue;
+        for (const m of _angriffsZuege(board, liberties)) {
+          if (!legalSet.has(m)) continue;
+          const nb = _leseZug(board, m, aiColor);
+          if (nb && (!nb[k] || !leseVerteidigung(nb, k).ja)) heben.add(m);
+        }
+      }
+    }
+    if (heben.size) {
+      for (const s of scored) if (heben.has(s.m.idx)) s.score = Math.max(s.score, top) + 1;
+      scored.sort((a,b) => b.score - a.score);
+    }
   }
   if (_gegnerWerte) {
     for (const s of scored) {
