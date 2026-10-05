@@ -1463,6 +1463,19 @@ globalThis.PARAMS = {
      keiner das schafft, wird trotzdem gepasst. 0 = aus. Gemessen zusammen
      mit augenSchutz, siehe dort. Default 1. */
   passUnabwendbar:    1,
+  /* Gegnerwert: Jeder Kandidat bekommt gegnerWert x den Wert, den derselbe
+     Punkt fuer den Gegner haette (evaluateMove aus dessen Sicht, nur wenn
+     positiv und fuer ihn legal). Anlass: Menschliche Partien, in denen der
+     Gegner genau den Punkt nahm, den GNU Go fuer die KI vorschlug.
+     Die Pass-Pruefung sieht die Werte ohne diesen Aufschlag. 0 = aus.
+     Siehe docs/gegnerwert.md. */
+  gegnerWert:         0,
+  /* Nur der Gebietsanteil davon: gegnerGebiet x gebietZug x Bouzy-Gewinn des
+     Gegners an diesem Punkt. 0 = aus. Siehe docs/gegnerwert.md. */
+  gegnerGebiet:       0,
+  /* Krisenkandidaten: Rettung aus dem Atari und Schlaege bekommen mindestens
+     den Wert des besten Kandidaten. 0 = aus. Siehe docs/gegnerwert.md. */
+  krisenKandidaten:   0,
   aiTimeBudget:    1800,
   rolloutWeight:    0.65,
   scoreWeight:      0.35,
@@ -4116,6 +4129,7 @@ function gegnerzugUnabwendbar(board, aiColor, scored, oppTop, mc, schwelle, leer
   return true;
 }
 
+const _ggScratch = new Uint8Array(BOARD_SIZE);
 function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove) {
   _lastMoveIdx = (lastMove === undefined || lastMove === null) ? -1 : lastMove;
   const hs = new Set(histHashes);
@@ -4171,6 +4185,40 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
   if (PARAMS.raumGewicht > 0 || PARAMS.raumZug > 0) primeRaum(board);
   const scored = legal.map(m => ({m, score: evaluateMove(board, m.idx, aiColor, mc, empty)}));
   scored.sort((a,b) => b.score - a.score);
+  /* Gegnerwert (PARAMS.gegnerWert): was derselbe Punkt dem Gegner braechte,
+     mit evaluateMove aus seiner Sicht. Hier nur berechnet, solange die
+     Karten fuer dieses Brett gueltig sind; aufgeschlagen wird erst nach der
+     Pass-Pruefung, damit die unveraendert bleibt. Siehe docs/gegnerwert.md. */
+  let _gegnerWerte = null;
+  if (PARAMS.gegnerWert > 0) {
+    const opp = aiColor === 1 ? 2 : 1;
+    const oppLegal = new Set(getLegalMoves(board, opp, hs).map(m => m.idx));
+    buildCrisisMap(board, opp);
+    primeAreaCache(board, opp);
+    _gegnerWerte = new Map();
+    for (const s of scored) {
+      if (!oppLegal.has(s.m.idx)) continue;
+      const v = evaluateMove(board, s.m.idx, opp, mc, oppLegal.size);
+      if (v > 0) _gegnerWerte.set(s.m.idx, PARAMS.gegnerWert * v);
+    }
+    buildCrisisMap(board, aiColor);
+    primeAreaCache(board, aiColor);
+  }
+  /* Gegnergebiet (PARAMS.gegnerGebiet): nur der Gebietsanteil des
+     Gegnerwerts -- wie viel Bouzy-Bilanz der Gegner mit diesem Punkt
+     gewaenne, gewichtet wie gebietZug. Braucht die Bouzy-Ebenen dieses
+     Bretts (_tbValid), die getAIMove fuer gebietZug ohnehin vorbereitet. */
+  if (PARAMS.gegnerGebiet > 0 && _tbValid) {
+    const opp = aiColor === 1 ? 2 : 1, vz = opp === 1 ? 1 : -1;
+    if (!_gegnerWerte) _gegnerWerte = new Map();
+    for (const s of scored) {
+      const i = s.m.idx;
+      _ggScratch.set(board); _ggScratch[i] = opp;
+      if (removeDeadGroups(_ggScratch, aiColor, i) === 0 && countLiberties(_ggScratch, i, 1) === 0) continue;
+      const d = (tbBilanzNach(_ggScratch) - _tbBilanz) * vz;
+      if (d > 0) _gegnerWerte.set(i, (_gegnerWerte.get(i) || 0) + PARAMS.gegnerGebiet * PARAMS.gebietZug * d);
+    }
+  }
   /* PolicyNet: Priors berechnen + Score blenden (nur Hard-KI).
      FIX: Im Worker ist policyNet nur ein Stub OHNE boardToInput/forward —
      der alte Code crashte dort mit TypeError, sobald blendWeight > 0 war
@@ -4276,6 +4324,38 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
         ? {type:'pass', requestId:reqId, info:'Pass — der Gegnerzug ist nicht abwendbar'}
         : {type:'pass', requestId:reqId};
     }
+  }
+  /* Krisenkandidaten (PARAMS.krisenKandidaten): Rettung einer eigenen Kette
+     aus dem Atari (danach mindestens zwei Freiheiten) und jeder Schlag
+     bekommen mindestens den Wert des besten Kandidaten. Sonst ueberstrahlt
+     gebietZug die Taktik: Die Rettung von drei Steinen im Atari lag mit 422
+     auf Rang 222 hinter Gebietszuegen mit 1398 und erreichte die Suche nie.
+     Ob der Zug gespielt wird, entscheidet weiterhin die Suche. */
+  if (PARAMS.krisenKandidaten > 0 && scored.length) {
+    const top = scored[0].score, opp = aiColor === 1 ? 2 : 1;
+    let gehoben = false;
+    for (const s of scored) {
+      if (s.score >= top) continue;
+      const i = s.m.idx;
+      let krise = false;
+      for (const n of NEIGHBORS[i]) {
+        if (board[n] === opp && countLiberties(board, n, 2) === 1) { krise = true; break; }   /* Schlag */
+        if (board[n] === aiColor && countLiberties(board, n, 2) === 1) {                      /* Rettung? */
+          _ggScratch.set(board); _ggScratch[i] = aiColor;
+          removeDeadGroups(_ggScratch, opp, i);
+          if (countLiberties(_ggScratch, i, 2) >= 2) { krise = true; break; }
+        }
+      }
+      if (krise) { s.score = top; gehoben = true; }
+    }
+    if (gehoben) scored.sort((a,b) => b.score - a.score);
+  }
+  if (_gegnerWerte) {
+    for (const s of scored) {
+      const v = _gegnerWerte.get(s.m.idx);
+      if (v) s.score += v;
+    }
+    scored.sort((a,b) => b.score - a.score);
   }
   let chosen;
   if (diff === 'easy') {
