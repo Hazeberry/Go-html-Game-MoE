@@ -6184,7 +6184,7 @@ globalThis.policyNet = new PolicyNet();
         {key:'bensonMoveFilter', label:'Benson-Filter', step:1, min:0, max:1,
          tip:'1 = todgeborene Züge (beweisbar toter Stein) fliegen aus der Kandidatenliste; nur Pass bleibt, wenn nichts übrig ist'},
         {key:'captureCap', label:'Gefangenen-Deckel', step:50, min:0, max:1000,
-         tip:'0 = aus. Begrenzt, wie weit der Gefangenen-Saldo die Bewertung beherrschen darf — gegen die Q-Sättigung. Verschiebt auch die Aufgabeschwelle. Ungemessen.'},
+         tip:'0 = aus. Begrenzt, wie weit der Gefangenen-Saldo die Bewertung beherrschen darf. 200: im Selbstspiel 54 % über 1 440 Partien und halb so viele falsche Aufgaben — knapp nicht als Default beschlossen (docs/aufgabe-deckel.md). Wer die KI nach vielen geschlagenen Steinen nicht aufgeben sehen will: 200.'},
         {key:'resignQ', label:'Aufgabe-Q', step:0.01, min:0.5, max:1, float:true,
          tip:'Q-Schwelle (aus KI-Sicht negativ) für die Aufgabe-Serie'},
         {key:'resignStreak', label:'Aufgabe-Serie', step:1, min:2, max:20,
