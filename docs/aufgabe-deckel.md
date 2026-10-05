@@ -107,3 +107,64 @@ Fishers exakter Test, zweiseitig, α = 0,05.
 - Gemessen wird KI gegen KI mit 120 Simulationen. Ein Mensch, der gezielt
   Steine schlägt, um die Bewertung zu kippen, ist darin nicht abgebildet; die
   Partien 3 und 4 bleiben die Fallbeispiele dafür.
+
+---
+
+## 6. Nachtrag: Ergebnis, Default bleibt 0 (05.10.2026)
+
+Gelaufen auf dem Merge-Commit `63b3763`, ohne Unterbrechung. Daten:
+`daten/deckel-20261040.json` bis `…47.json` (Hash-Listen) und
+`daten/deckel-urteil.json` (jede Aufgabe mit GNU Gos Urteil).
+
+**Primär, falsche Aufgaben:**
+
+| | A (Default) | B (`captureCap` 200) |
+|---|---:|---:|
+| Aufgaben | 315 | 207 |
+| davon falsch | 16 (5,1 %) | 8 (3,9 %) |
+| falsche Aufgaben je Partie | 16 / 720 | 8 / 720 |
+
+Fisher zweiseitig: **p = 0,148, nicht signifikant.**
+
+- Die Vorprobe (§2) hatte für B etwa ein Neuntel der falschen Aufgaben
+  vorhergesagt. Gemessen ist die Hälfte.
+- Wie weit die Aufgebenden laut GNU Go vorn lagen:
+  - A: 0,3 bis 58,2 Punkte, Median 7,8, 10 von 16 als Weiß.
+  - B: 2,5 bis 46,8 Punkte, Median 18,4, 5 von 8 als Weiß.
+
+**Kontrolle, Siegrate:** B gewinnt **392 von 720 Partien, 54,4 %** (z = 2,39,
+p = 0,017, 95-%-KI 50,8–58,1 %).
+
+| Teillauf | 1040 | 1041 | 1042 | 1043 | 1044 | 1045 | 1046 | 1047 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Siegrate B | 57,8 % | 56,7 % | 55,6 % | 53,3 % | 44,4 % | 60,0 % | 48,9 % | 58,9 % |
+
+**Entscheidung nach §4: Default `captureCap` bleibt 0.** Der Hauptendpunkt
+ist nicht signifikant. Dass B signifikant besser spielt, war nur als
+Kontrolle festgelegt und wird hier nicht zur Entscheidung umgedeutet.
+
+**Einordnung:** Die frühere Messung des Deckels gegen die Spielstärke ergab
+bei Dosis 200 55,8 % über 120 Partien (n. s.). Das liegt nahe an den
+heutigen 54,4 %. Damals spielte die KI ohne `gebietZug`, Augenschutz und
+Pass-Regel.
+
+## 7. Wiederholung, vorab festgelegt (05.10.2026, vor dem Lauf)
+
+Die Siegrate aus §6 ist ein Nebenbefund. Sie wird mit neuen Seeds als
+**Hauptendpunkt** wiederholt, wie bei `endTieBreak`
+([`endspiel-gleichstand.md`](endspiel-gleichstand.md)).
+
+Arme, Simulationen und Aufruf wie in §4, Seeds 20261050 bis 20261057, 720
+Partien, Commit nach dem Merge dieses Nachtrags.
+
+**Primär:** Siegrate von B, zweiseitig gegen 50 %, α = 0,05.
+
+**Sekundär, ohne Anspruch:** falsche Aufgaben je Arm, über beide Läufe
+gepoolt (1 440 Partien), Fisher zweiseitig; Aufgaben je Arm; Partielänge.
+
+**Entscheidung:**
+
+| Siegrate B | Folge |
+|---|---|
+| über 50 %, p < 0,05 | Default `captureCap` = 200 |
+| sonst | Default bleibt 0 |
