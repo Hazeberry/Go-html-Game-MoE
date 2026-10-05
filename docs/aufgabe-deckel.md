@@ -168,3 +168,38 @@ gepoolt (1 440 Partien), Fisher zweiseitig; Aufgaben je Arm; Partielänge.
 |---|---|
 | über 50 %, p < 0,05 | Default `captureCap` = 200 |
 | sonst | Default bleibt 0 |
+
+## 8. Nachtrag: Wiederholung, Default bleibt 0 (05.10.2026)
+
+Gelaufen auf dem Merge-Commit `e82f57b`, ohne Unterbrechung. Daten:
+`daten/deckel-20261050.json` bis `…57.json` (Hash-Listen) und
+`daten/deckel-urteil-wiederholung.json`.
+
+**Primär, Siegrate:** B gewinnt **386 von 720 Partien, 53,6 %** (z = 1,94,
+**p = 0,053**, 95-%-KI 50,0–57,3 %).
+
+| Teillauf | 1050 | 1051 | 1052 | 1053 | 1054 | 1055 | 1056 | 1057 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Siegrate B | 53,3 % | 54,4 % | 53,3 % | 47,8 % | 55,6 % | 51,1 % | 63,3 % | 50,0 % |
+
+**Entscheidung nach §7: Default `captureCap` bleibt 0.** Die Schwelle ist
+knapp verfehlt.
+
+**Sekundär, ohne Anspruch:**
+
+- Falsche Aufgaben in diesem Lauf: A 17 von 315 Aufgaben, B 6 von 208
+  (Fisher p = 0,033).
+- Über beide Läufe gepoolt (1 440 Partien):
+  - Siegrate B: 778 von 1 440, 54,0 % (p = 0,002)
+  - Falsche Aufgaben: A 33, B 14 (Fisher p = 0,007)
+- Keine dieser Zahlen war als Entscheidungsgröße festgelegt. Beide Läufe
+  zeigen in dieselbe Richtung, jeder für sich verfehlt aber seinen
+  Hauptendpunkt.
+
+**Folgerung:**
+
+- Der Deckel bleibt ein Schalter im Dashboard („Gefangenen-Deckel“). Wer die
+  KI nach vielen geschlagenen Steinen nicht aufgeben sehen will, stellt 200
+  ein.
+- Ein dritter Lauf, nur um die Schwelle zu überschreiten, ist nicht
+  vorgesehen.

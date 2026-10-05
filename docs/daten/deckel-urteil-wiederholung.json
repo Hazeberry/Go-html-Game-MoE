@@ -1,0 +1,4205 @@
+{
+"lauf": "deckel-urteil-wiederholung",
+"befehl": "node auswertung/aufgabe-gnugo.js deckel-2026105*.jsonl (GNU Go 3.8, Komi 7.5)",
+"arm": {
+"A": {
+"partien": 720,
+"aufgaben": 315,
+"falsch": 17,
+"ohneUrteil": 0
+},
+"B": {
+"partien": 720,
+"aufgaben": 208,
+"falsch": 6,
+"ohneUrteil": 0
+}
+},
+"pFisher": 0.03327703197832568,
+"aufgaben": [
+{
+"seed": 20261050,
+"nr": 1,
+"arm": "A",
+"farbe": "S",
+"zug": 372,
+"gnugo": -112.5
+},
+{
+"seed": 20261050,
+"nr": 3,
+"arm": "A",
+"farbe": "S",
+"zug": 346,
+"gnugo": -95.5
+},
+{
+"seed": 20261050,
+"nr": 4,
+"arm": "A",
+"farbe": "W",
+"zug": 259,
+"gnugo": -172.1
+},
+{
+"seed": 20261050,
+"nr": 5,
+"arm": "A",
+"farbe": "S",
+"zug": 306,
+"gnugo": -81.7
+},
+{
+"seed": 20261050,
+"nr": 6,
+"arm": "A",
+"farbe": "W",
+"zug": 245,
+"gnugo": 29.7
+},
+{
+"seed": 20261050,
+"nr": 7,
+"arm": "A",
+"farbe": "S",
+"zug": 342,
+"gnugo": -101.2
+},
+{
+"seed": 20261050,
+"nr": 9,
+"arm": "A",
+"farbe": "S",
+"zug": 362,
+"gnugo": -94
+},
+{
+"seed": 20261050,
+"nr": 10,
+"arm": "A",
+"farbe": "W",
+"zug": 385,
+"gnugo": -22.2
+},
+{
+"seed": 20261050,
+"nr": 11,
+"arm": "A",
+"farbe": "S",
+"zug": 360,
+"gnugo": -74.5
+},
+{
+"seed": 20261050,
+"nr": 13,
+"arm": "A",
+"farbe": "S",
+"zug": 286,
+"gnugo": -95.8
+},
+{
+"seed": 20261050,
+"nr": 14,
+"arm": "B",
+"farbe": "S",
+"zug": 358,
+"gnugo": -114.2
+},
+{
+"seed": 20261050,
+"nr": 17,
+"arm": "B",
+"farbe": "W",
+"zug": 253,
+"gnugo": -147.5
+},
+{
+"seed": 20261050,
+"nr": 18,
+"arm": "A",
+"farbe": "W",
+"zug": 357,
+"gnugo": -17.4
+},
+{
+"seed": 20261050,
+"nr": 19,
+"arm": "B",
+"farbe": "W",
+"zug": 205,
+"gnugo": -23.4
+},
+{
+"seed": 20261050,
+"nr": 20,
+"arm": "A",
+"farbe": "W",
+"zug": 397,
+"gnugo": -13.5
+},
+{
+"seed": 20261050,
+"nr": 23,
+"arm": "A",
+"farbe": "S",
+"zug": 374,
+"gnugo": -34.7
+},
+{
+"seed": 20261050,
+"nr": 24,
+"arm": "A",
+"farbe": "W",
+"zug": 323,
+"gnugo": -57.7
+},
+{
+"seed": 20261050,
+"nr": 25,
+"arm": "B",
+"farbe": "W",
+"zug": 359,
+"gnugo": -77.8
+},
+{
+"seed": 20261050,
+"nr": 27,
+"arm": "A",
+"farbe": "S",
+"zug": 340,
+"gnugo": -142.1
+},
+{
+"seed": 20261050,
+"nr": 28,
+"arm": "A",
+"farbe": "W",
+"zug": 329,
+"gnugo": -161.3
+},
+{
+"seed": 20261050,
+"nr": 29,
+"arm": "A",
+"farbe": "S",
+"zug": 324,
+"gnugo": -54.2
+},
+{
+"seed": 20261050,
+"nr": 30,
+"arm": "B",
+"farbe": "S",
+"zug": 368,
+"gnugo": -70.6
+},
+{
+"seed": 20261050,
+"nr": 31,
+"arm": "B",
+"farbe": "W",
+"zug": 225,
+"gnugo": -51.7
+},
+{
+"seed": 20261050,
+"nr": 32,
+"arm": "A",
+"farbe": "W",
+"zug": 251,
+"gnugo": -103.4
+},
+{
+"seed": 20261050,
+"nr": 34,
+"arm": "B",
+"farbe": "S",
+"zug": 344,
+"gnugo": -138.7
+},
+{
+"seed": 20261050,
+"nr": 35,
+"arm": "B",
+"farbe": "W",
+"zug": 367,
+"gnugo": -51.2
+},
+{
+"seed": 20261050,
+"nr": 36,
+"arm": "A",
+"farbe": "W",
+"zug": 281,
+"gnugo": -80
+},
+{
+"seed": 20261050,
+"nr": 37,
+"arm": "B",
+"farbe": "W",
+"zug": 317,
+"gnugo": -72.8
+},
+{
+"seed": 20261050,
+"nr": 39,
+"arm": "B",
+"farbe": "W",
+"zug": 265,
+"gnugo": -76.5
+},
+{
+"seed": 20261050,
+"nr": 40,
+"arm": "B",
+"farbe": "S",
+"zug": 290,
+"gnugo": -147.3
+},
+{
+"seed": 20261050,
+"nr": 42,
+"arm": "A",
+"farbe": "W",
+"zug": 247,
+"gnugo": 9.1
+},
+{
+"seed": 20261050,
+"nr": 43,
+"arm": "B",
+"farbe": "W",
+"zug": 309,
+"gnugo": -142.2
+},
+{
+"seed": 20261050,
+"nr": 45,
+"arm": "A",
+"farbe": "S",
+"zug": 188,
+"gnugo": -23.8
+},
+{
+"seed": 20261050,
+"nr": 46,
+"arm": "B",
+"farbe": "S",
+"zug": 348,
+"gnugo": -63.4
+},
+{
+"seed": 20261050,
+"nr": 47,
+"arm": "B",
+"farbe": "W",
+"zug": 283,
+"gnugo": -55.7
+},
+{
+"seed": 20261050,
+"nr": 49,
+"arm": "B",
+"farbe": "W",
+"zug": 367,
+"gnugo": -57
+},
+{
+"seed": 20261050,
+"nr": 51,
+"arm": "A",
+"farbe": "S",
+"zug": 312,
+"gnugo": -115.7
+},
+{
+"seed": 20261050,
+"nr": 52,
+"arm": "A",
+"farbe": "W",
+"zug": 375,
+"gnugo": -43.6
+},
+{
+"seed": 20261050,
+"nr": 54,
+"arm": "A",
+"farbe": "W",
+"zug": 341,
+"gnugo": -70
+},
+{
+"seed": 20261050,
+"nr": 56,
+"arm": "A",
+"farbe": "W",
+"zug": 387,
+"gnugo": -18.2
+},
+{
+"seed": 20261050,
+"nr": 57,
+"arm": "B",
+"farbe": "W",
+"zug": 377,
+"gnugo": -74.8
+},
+{
+"seed": 20261050,
+"nr": 58,
+"arm": "A",
+"farbe": "W",
+"zug": 269,
+"gnugo": -93.5
+},
+{
+"seed": 20261050,
+"nr": 60,
+"arm": "A",
+"farbe": "W",
+"zug": 381,
+"gnugo": -49.3
+},
+{
+"seed": 20261050,
+"nr": 61,
+"arm": "A",
+"farbe": "S",
+"zug": 278,
+"gnugo": -108.7
+},
+{
+"seed": 20261050,
+"nr": 62,
+"arm": "A",
+"farbe": "W",
+"zug": 307,
+"gnugo": -98.7
+},
+{
+"seed": 20261050,
+"nr": 63,
+"arm": "B",
+"farbe": "W",
+"zug": 399,
+"gnugo": -17.5
+},
+{
+"seed": 20261050,
+"nr": 64,
+"arm": "A",
+"farbe": "W",
+"zug": 153,
+"gnugo": -91.1
+},
+{
+"seed": 20261050,
+"nr": 65,
+"arm": "B",
+"farbe": "W",
+"zug": 325,
+"gnugo": -0.7
+},
+{
+"seed": 20261050,
+"nr": 66,
+"arm": "B",
+"farbe": "S",
+"zug": 318,
+"gnugo": -180.2
+},
+{
+"seed": 20261050,
+"nr": 69,
+"arm": "A",
+"farbe": "S",
+"zug": 338,
+"gnugo": -60.1
+},
+{
+"seed": 20261050,
+"nr": 71,
+"arm": "B",
+"farbe": "W",
+"zug": 335,
+"gnugo": -131
+},
+{
+"seed": 20261050,
+"nr": 72,
+"arm": "B",
+"farbe": "S",
+"zug": 376,
+"gnugo": -111
+},
+{
+"seed": 20261050,
+"nr": 73,
+"arm": "B",
+"farbe": "W",
+"zug": 361,
+"gnugo": -54.3
+},
+{
+"seed": 20261050,
+"nr": 74,
+"arm": "B",
+"farbe": "S",
+"zug": 376,
+"gnugo": -16.9
+},
+{
+"seed": 20261050,
+"nr": 75,
+"arm": "A",
+"farbe": "S",
+"zug": 264,
+"gnugo": -46.3
+},
+{
+"seed": 20261050,
+"nr": 77,
+"arm": "B",
+"farbe": "W",
+"zug": 389,
+"gnugo": -5.5
+},
+{
+"seed": 20261050,
+"nr": 78,
+"arm": "A",
+"farbe": "W",
+"zug": 353,
+"gnugo": -47.4
+},
+{
+"seed": 20261050,
+"nr": 79,
+"arm": "B",
+"farbe": "W",
+"zug": 343,
+"gnugo": -48.3
+},
+{
+"seed": 20261050,
+"nr": 80,
+"arm": "A",
+"farbe": "W",
+"zug": 251,
+"gnugo": -104
+},
+{
+"seed": 20261050,
+"nr": 81,
+"arm": "A",
+"farbe": "S",
+"zug": 374,
+"gnugo": -76
+},
+{
+"seed": 20261050,
+"nr": 82,
+"arm": "B",
+"farbe": "S",
+"zug": 336,
+"gnugo": -114.3
+},
+{
+"seed": 20261050,
+"nr": 83,
+"arm": "B",
+"farbe": "W",
+"zug": 383,
+"gnugo": 0.5
+},
+{
+"seed": 20261050,
+"nr": 84,
+"arm": "A",
+"farbe": "W",
+"zug": 339,
+"gnugo": 8.8
+},
+{
+"seed": 20261050,
+"nr": 85,
+"arm": "B",
+"farbe": "W",
+"zug": 365,
+"gnugo": -96
+},
+{
+"seed": 20261050,
+"nr": 86,
+"arm": "B",
+"farbe": "S",
+"zug": 342,
+"gnugo": -97.4
+},
+{
+"seed": 20261050,
+"nr": 88,
+"arm": "A",
+"farbe": "W",
+"zug": 393,
+"gnugo": -24.5
+},
+{
+"seed": 20261050,
+"nr": 89,
+"arm": "A",
+"farbe": "S",
+"zug": 176,
+"gnugo": -15.3
+},
+{
+"seed": 20261050,
+"nr": 90,
+"arm": "A",
+"farbe": "W",
+"zug": 205,
+"gnugo": 48.6
+},
+{
+"seed": 20261051,
+"nr": 1,
+"arm": "B",
+"farbe": "W",
+"zug": 239,
+"gnugo": -104.1
+},
+{
+"seed": 20261051,
+"nr": 2,
+"arm": "B",
+"farbe": "S",
+"zug": 344,
+"gnugo": -91
+},
+{
+"seed": 20261051,
+"nr": 3,
+"arm": "A",
+"farbe": "S",
+"zug": 338,
+"gnugo": -109.2
+},
+{
+"seed": 20261051,
+"nr": 4,
+"arm": "B",
+"farbe": "S",
+"zug": 230,
+"gnugo": -125.9
+},
+{
+"seed": 20261051,
+"nr": 5,
+"arm": "A",
+"farbe": "S",
+"zug": 368,
+"gnugo": -30.3
+},
+{
+"seed": 20261051,
+"nr": 9,
+"arm": "A",
+"farbe": "S",
+"zug": 360,
+"gnugo": -77.5
+},
+{
+"seed": 20261051,
+"nr": 10,
+"arm": "B",
+"farbe": "S",
+"zug": 352,
+"gnugo": -43.5
+},
+{
+"seed": 20261051,
+"nr": 11,
+"arm": "A",
+"farbe": "S",
+"zug": 360,
+"gnugo": -35
+},
+{
+"seed": 20261051,
+"nr": 13,
+"arm": "B",
+"farbe": "W",
+"zug": 355,
+"gnugo": -54.6
+},
+{
+"seed": 20261051,
+"nr": 14,
+"arm": "A",
+"farbe": "W",
+"zug": 331,
+"gnugo": -57.2
+},
+{
+"seed": 20261051,
+"nr": 16,
+"arm": "B",
+"farbe": "S",
+"zug": 376,
+"gnugo": -97.1
+},
+{
+"seed": 20261051,
+"nr": 17,
+"arm": "A",
+"farbe": "S",
+"zug": 374,
+"gnugo": -88.3
+},
+{
+"seed": 20261051,
+"nr": 18,
+"arm": "B",
+"farbe": "S",
+"zug": 316,
+"gnugo": -90.4
+},
+{
+"seed": 20261051,
+"nr": 19,
+"arm": "A",
+"farbe": "S",
+"zug": 300,
+"gnugo": -95.2
+},
+{
+"seed": 20261051,
+"nr": 21,
+"arm": "B",
+"farbe": "W",
+"zug": 391,
+"gnugo": -60.5
+},
+{
+"seed": 20261051,
+"nr": 22,
+"arm": "B",
+"farbe": "S",
+"zug": 362,
+"gnugo": -81.5
+},
+{
+"seed": 20261051,
+"nr": 23,
+"arm": "B",
+"farbe": "W",
+"zug": 371,
+"gnugo": -20.4
+},
+{
+"seed": 20261051,
+"nr": 24,
+"arm": "A",
+"farbe": "W",
+"zug": 359,
+"gnugo": -99.5
+},
+{
+"seed": 20261051,
+"nr": 28,
+"arm": "A",
+"farbe": "W",
+"zug": 345,
+"gnugo": -38.5
+},
+{
+"seed": 20261051,
+"nr": 29,
+"arm": "A",
+"farbe": "S",
+"zug": 206,
+"gnugo": -38.1
+},
+{
+"seed": 20261051,
+"nr": 30,
+"arm": "A",
+"farbe": "W",
+"zug": 367,
+"gnugo": -53.5
+},
+{
+"seed": 20261051,
+"nr": 31,
+"arm": "A",
+"farbe": "S",
+"zug": 368,
+"gnugo": -42.5
+},
+{
+"seed": 20261051,
+"nr": 32,
+"arm": "A",
+"farbe": "W",
+"zug": 319,
+"gnugo": -107.5
+},
+{
+"seed": 20261051,
+"nr": 34,
+"arm": "A",
+"farbe": "W",
+"zug": 361,
+"gnugo": -59.4
+},
+{
+"seed": 20261051,
+"nr": 35,
+"arm": "A",
+"farbe": "S",
+"zug": 352,
+"gnugo": -228.7
+},
+{
+"seed": 20261051,
+"nr": 36,
+"arm": "B",
+"farbe": "S",
+"zug": 236,
+"gnugo": -74.7
+},
+{
+"seed": 20261051,
+"nr": 37,
+"arm": "A",
+"farbe": "S",
+"zug": 208,
+"gnugo": 47.3
+},
+{
+"seed": 20261051,
+"nr": 40,
+"arm": "A",
+"farbe": "W",
+"zug": 325,
+"gnugo": -161.7
+},
+{
+"seed": 20261051,
+"nr": 42,
+"arm": "A",
+"farbe": "W",
+"zug": 341,
+"gnugo": -32.9
+},
+{
+"seed": 20261051,
+"nr": 43,
+"arm": "B",
+"farbe": "W",
+"zug": 333,
+"gnugo": -26.7
+},
+{
+"seed": 20261051,
+"nr": 44,
+"arm": "A",
+"farbe": "W",
+"zug": 375,
+"gnugo": -20.1
+},
+{
+"seed": 20261051,
+"nr": 48,
+"arm": "A",
+"farbe": "W",
+"zug": 385,
+"gnugo": -12.5
+},
+{
+"seed": 20261051,
+"nr": 50,
+"arm": "A",
+"farbe": "W",
+"zug": 309,
+"gnugo": -84.8
+},
+{
+"seed": 20261051,
+"nr": 51,
+"arm": "B",
+"farbe": "W",
+"zug": 339,
+"gnugo": -154.8
+},
+{
+"seed": 20261051,
+"nr": 52,
+"arm": "B",
+"farbe": "S",
+"zug": 392,
+"gnugo": -95.5
+},
+{
+"seed": 20261051,
+"nr": 53,
+"arm": "A",
+"farbe": "S",
+"zug": 376,
+"gnugo": -27.7
+},
+{
+"seed": 20261051,
+"nr": 54,
+"arm": "A",
+"farbe": "W",
+"zug": 147,
+"gnugo": -150.2
+},
+{
+"seed": 20261051,
+"nr": 55,
+"arm": "A",
+"farbe": "S",
+"zug": 346,
+"gnugo": -53.2
+},
+{
+"seed": 20261051,
+"nr": 56,
+"arm": "A",
+"farbe": "W",
+"zug": 195,
+"gnugo": -70.1
+},
+{
+"seed": 20261051,
+"nr": 57,
+"arm": "B",
+"farbe": "W",
+"zug": 361,
+"gnugo": -106.5
+},
+{
+"seed": 20261051,
+"nr": 59,
+"arm": "A",
+"farbe": "S",
+"zug": 262,
+"gnugo": -51.2
+},
+{
+"seed": 20261051,
+"nr": 65,
+"arm": "B",
+"farbe": "W",
+"zug": 329,
+"gnugo": -50.6
+},
+{
+"seed": 20261051,
+"nr": 66,
+"arm": "A",
+"farbe": "W",
+"zug": 353,
+"gnugo": -41.5
+},
+{
+"seed": 20261051,
+"nr": 68,
+"arm": "A",
+"farbe": "W",
+"zug": 323,
+"gnugo": -72.1
+},
+{
+"seed": 20261051,
+"nr": 69,
+"arm": "B",
+"farbe": "W",
+"zug": 343,
+"gnugo": -23.2
+},
+{
+"seed": 20261051,
+"nr": 70,
+"arm": "B",
+"farbe": "S",
+"zug": 340,
+"gnugo": -142.5
+},
+{
+"seed": 20261051,
+"nr": 71,
+"arm": "B",
+"farbe": "W",
+"zug": 357,
+"gnugo": -93.3
+},
+{
+"seed": 20261051,
+"nr": 72,
+"arm": "A",
+"farbe": "W",
+"zug": 313,
+"gnugo": -114.2
+},
+{
+"seed": 20261051,
+"nr": 74,
+"arm": "A",
+"farbe": "W",
+"zug": 157,
+"gnugo": -56.6
+},
+{
+"seed": 20261051,
+"nr": 75,
+"arm": "A",
+"farbe": "S",
+"zug": 358,
+"gnugo": -74.5
+},
+{
+"seed": 20261051,
+"nr": 76,
+"arm": "A",
+"farbe": "W",
+"zug": 209,
+"gnugo": -84.9
+},
+{
+"seed": 20261051,
+"nr": 77,
+"arm": "A",
+"farbe": "S",
+"zug": 354,
+"gnugo": -41.2
+},
+{
+"seed": 20261051,
+"nr": 78,
+"arm": "A",
+"farbe": "W",
+"zug": 375,
+"gnugo": -41.7
+},
+{
+"seed": 20261051,
+"nr": 80,
+"arm": "A",
+"farbe": "W",
+"zug": 351,
+"gnugo": -87.5
+},
+{
+"seed": 20261051,
+"nr": 81,
+"arm": "B",
+"farbe": "W",
+"zug": 221,
+"gnugo": -80.4
+},
+{
+"seed": 20261051,
+"nr": 83,
+"arm": "A",
+"farbe": "S",
+"zug": 308,
+"gnugo": -78.9
+},
+{
+"seed": 20261051,
+"nr": 84,
+"arm": "B",
+"farbe": "S",
+"zug": 350,
+"gnugo": -66.7
+},
+{
+"seed": 20261051,
+"nr": 85,
+"arm": "A",
+"farbe": "S",
+"zug": 358,
+"gnugo": -130.9
+},
+{
+"seed": 20261052,
+"nr": 1,
+"arm": "A",
+"farbe": "S",
+"zug": 336,
+"gnugo": -97.2
+},
+{
+"seed": 20261052,
+"nr": 3,
+"arm": "A",
+"farbe": "S",
+"zug": 382,
+"gnugo": -24.6
+},
+{
+"seed": 20261052,
+"nr": 4,
+"arm": "A",
+"farbe": "W",
+"zug": 295,
+"gnugo": -74.3
+},
+{
+"seed": 20261052,
+"nr": 5,
+"arm": "B",
+"farbe": "W",
+"zug": 299,
+"gnugo": -89.2
+},
+{
+"seed": 20261052,
+"nr": 6,
+"arm": "B",
+"farbe": "S",
+"zug": 300,
+"gnugo": -133.7
+},
+{
+"seed": 20261052,
+"nr": 8,
+"arm": "B",
+"farbe": "S",
+"zug": 394,
+"gnugo": -53.5
+},
+{
+"seed": 20261052,
+"nr": 10,
+"arm": "A",
+"farbe": "W",
+"zug": 183,
+"gnugo": -32
+},
+{
+"seed": 20261052,
+"nr": 11,
+"arm": "A",
+"farbe": "S",
+"zug": 294,
+"gnugo": -130
+},
+{
+"seed": 20261052,
+"nr": 13,
+"arm": "B",
+"farbe": "W",
+"zug": 389,
+"gnugo": -85.5
+},
+{
+"seed": 20261052,
+"nr": 14,
+"arm": "B",
+"farbe": "S",
+"zug": 234,
+"gnugo": -59.7
+},
+{
+"seed": 20261052,
+"nr": 15,
+"arm": "B",
+"farbe": "W",
+"zug": 261,
+"gnugo": -28.6
+},
+{
+"seed": 20261052,
+"nr": 16,
+"arm": "B",
+"farbe": "S",
+"zug": 344,
+"gnugo": -144.6
+},
+{
+"seed": 20261052,
+"nr": 17,
+"arm": "A",
+"farbe": "S",
+"zug": 388,
+"gnugo": -81.6
+},
+{
+"seed": 20261052,
+"nr": 19,
+"arm": "B",
+"farbe": "W",
+"zug": 389,
+"gnugo": -17.6
+},
+{
+"seed": 20261052,
+"nr": 20,
+"arm": "A",
+"farbe": "W",
+"zug": 335,
+"gnugo": -23.6
+},
+{
+"seed": 20261052,
+"nr": 22,
+"arm": "B",
+"farbe": "S",
+"zug": 368,
+"gnugo": -67.5
+},
+{
+"seed": 20261052,
+"nr": 23,
+"arm": "A",
+"farbe": "S",
+"zug": 350,
+"gnugo": -20.4
+},
+{
+"seed": 20261052,
+"nr": 24,
+"arm": "B",
+"farbe": "S",
+"zug": 284,
+"gnugo": -84.2
+},
+{
+"seed": 20261052,
+"nr": 26,
+"arm": "A",
+"farbe": "W",
+"zug": 275,
+"gnugo": -115.3
+},
+{
+"seed": 20261052,
+"nr": 27,
+"arm": "B",
+"farbe": "W",
+"zug": 369,
+"gnugo": 1.5
+},
+{
+"seed": 20261052,
+"nr": 28,
+"arm": "A",
+"farbe": "W",
+"zug": 351,
+"gnugo": -163.3
+},
+{
+"seed": 20261052,
+"nr": 29,
+"arm": "A",
+"farbe": "S",
+"zug": 324,
+"gnugo": -80.7
+},
+{
+"seed": 20261052,
+"nr": 30,
+"arm": "B",
+"farbe": "S",
+"zug": 342,
+"gnugo": -90.8
+},
+{
+"seed": 20261052,
+"nr": 31,
+"arm": "A",
+"farbe": "S",
+"zug": 278,
+"gnugo": -113.3
+},
+{
+"seed": 20261052,
+"nr": 33,
+"arm": "B",
+"farbe": "W",
+"zug": 355,
+"gnugo": -25.5
+},
+{
+"seed": 20261052,
+"nr": 34,
+"arm": "A",
+"farbe": "W",
+"zug": 383,
+"gnugo": -1.9
+},
+{
+"seed": 20261052,
+"nr": 35,
+"arm": "A",
+"farbe": "S",
+"zug": 360,
+"gnugo": -62.1
+},
+{
+"seed": 20261052,
+"nr": 36,
+"arm": "A",
+"farbe": "W",
+"zug": 283,
+"gnugo": -78.2
+},
+{
+"seed": 20261052,
+"nr": 38,
+"arm": "A",
+"farbe": "W",
+"zug": 313,
+"gnugo": -130.5
+},
+{
+"seed": 20261052,
+"nr": 41,
+"arm": "A",
+"farbe": "S",
+"zug": 282,
+"gnugo": -183.5
+},
+{
+"seed": 20261052,
+"nr": 42,
+"arm": "B",
+"farbe": "S",
+"zug": 290,
+"gnugo": -141.9
+},
+{
+"seed": 20261052,
+"nr": 43,
+"arm": "A",
+"farbe": "S",
+"zug": 218,
+"gnugo": 29.5
+},
+{
+"seed": 20261052,
+"nr": 44,
+"arm": "A",
+"farbe": "W",
+"zug": 389,
+"gnugo": -19.9
+},
+{
+"seed": 20261052,
+"nr": 45,
+"arm": "A",
+"farbe": "S",
+"zug": 384,
+"gnugo": -51.6
+},
+{
+"seed": 20261052,
+"nr": 46,
+"arm": "A",
+"farbe": "W",
+"zug": 325,
+"gnugo": -135.5
+},
+{
+"seed": 20261052,
+"nr": 47,
+"arm": "B",
+"farbe": "W",
+"zug": 365,
+"gnugo": -60.7
+},
+{
+"seed": 20261052,
+"nr": 48,
+"arm": "A",
+"farbe": "W",
+"zug": 301,
+"gnugo": -86
+},
+{
+"seed": 20261052,
+"nr": 50,
+"arm": "A",
+"farbe": "W",
+"zug": 249,
+"gnugo": -15.5
+},
+{
+"seed": 20261052,
+"nr": 51,
+"arm": "B",
+"farbe": "W",
+"zug": 315,
+"gnugo": -100
+},
+{
+"seed": 20261052,
+"nr": 52,
+"arm": "A",
+"farbe": "W",
+"zug": 339,
+"gnugo": -152.2
+},
+{
+"seed": 20261052,
+"nr": 53,
+"arm": "A",
+"farbe": "S",
+"zug": 396,
+"gnugo": -47.5
+},
+{
+"seed": 20261052,
+"nr": 55,
+"arm": "B",
+"farbe": "W",
+"zug": 371,
+"gnugo": -116.4
+},
+{
+"seed": 20261052,
+"nr": 56,
+"arm": "A",
+"farbe": "W",
+"zug": 363,
+"gnugo": -76.5
+},
+{
+"seed": 20261052,
+"nr": 57,
+"arm": "B",
+"farbe": "W",
+"zug": 201,
+"gnugo": -80.8
+},
+{
+"seed": 20261052,
+"nr": 58,
+"arm": "A",
+"farbe": "W",
+"zug": 301,
+"gnugo": -82.2
+},
+{
+"seed": 20261052,
+"nr": 59,
+"arm": "A",
+"farbe": "S",
+"zug": 208,
+"gnugo": -61.4
+},
+{
+"seed": 20261052,
+"nr": 60,
+"arm": "B",
+"farbe": "S",
+"zug": 342,
+"gnugo": -89.2
+},
+{
+"seed": 20261052,
+"nr": 61,
+"arm": "B",
+"farbe": "W",
+"zug": 389,
+"gnugo": -58.7
+},
+{
+"seed": 20261052,
+"nr": 62,
+"arm": "A",
+"farbe": "W",
+"zug": 299,
+"gnugo": -106.7
+},
+{
+"seed": 20261052,
+"nr": 63,
+"arm": "B",
+"farbe": "W",
+"zug": 391,
+"gnugo": 12.5
+},
+{
+"seed": 20261052,
+"nr": 64,
+"arm": "B",
+"farbe": "S",
+"zug": 372,
+"gnugo": -100.6
+},
+{
+"seed": 20261052,
+"nr": 66,
+"arm": "B",
+"farbe": "S",
+"zug": 304,
+"gnugo": 0.3
+},
+{
+"seed": 20261052,
+"nr": 67,
+"arm": "B",
+"farbe": "W",
+"zug": 311,
+"gnugo": -143
+},
+{
+"seed": 20261052,
+"nr": 69,
+"arm": "A",
+"farbe": "S",
+"zug": 346,
+"gnugo": -111
+},
+{
+"seed": 20261052,
+"nr": 70,
+"arm": "A",
+"farbe": "W",
+"zug": 191,
+"gnugo": -112.4
+},
+{
+"seed": 20261052,
+"nr": 71,
+"arm": "A",
+"farbe": "S",
+"zug": 344,
+"gnugo": -11.1
+},
+{
+"seed": 20261052,
+"nr": 72,
+"arm": "B",
+"farbe": "S",
+"zug": 376,
+"gnugo": -147.5
+},
+{
+"seed": 20261052,
+"nr": 74,
+"arm": "A",
+"farbe": "W",
+"zug": 289,
+"gnugo": -37.6
+},
+{
+"seed": 20261052,
+"nr": 75,
+"arm": "A",
+"farbe": "S",
+"zug": 382,
+"gnugo": -37.7
+},
+{
+"seed": 20261052,
+"nr": 76,
+"arm": "A",
+"farbe": "W",
+"zug": 187,
+"gnugo": 34.7
+},
+{
+"seed": 20261052,
+"nr": 77,
+"arm": "A",
+"farbe": "S",
+"zug": 388,
+"gnugo": -58.2
+},
+{
+"seed": 20261052,
+"nr": 78,
+"arm": "A",
+"farbe": "W",
+"zug": 355,
+"gnugo": -105.3
+},
+{
+"seed": 20261052,
+"nr": 79,
+"arm": "A",
+"farbe": "S",
+"zug": 388,
+"gnugo": -50.5
+},
+{
+"seed": 20261052,
+"nr": 80,
+"arm": "B",
+"farbe": "S",
+"zug": 364,
+"gnugo": -52.1
+},
+{
+"seed": 20261052,
+"nr": 81,
+"arm": "B",
+"farbe": "W",
+"zug": 359,
+"gnugo": -110
+},
+{
+"seed": 20261052,
+"nr": 82,
+"arm": "A",
+"farbe": "W",
+"zug": 321,
+"gnugo": -245.5
+},
+{
+"seed": 20261052,
+"nr": 84,
+"arm": "B",
+"farbe": "S",
+"zug": 384,
+"gnugo": -18.5
+},
+{
+"seed": 20261052,
+"nr": 85,
+"arm": "B",
+"farbe": "W",
+"zug": 349,
+"gnugo": -72.3
+},
+{
+"seed": 20261052,
+"nr": 86,
+"arm": "A",
+"farbe": "W",
+"zug": 345,
+"gnugo": -107.5
+},
+{
+"seed": 20261052,
+"nr": 88,
+"arm": "B",
+"farbe": "S",
+"zug": 350,
+"gnugo": -164.8
+},
+{
+"seed": 20261053,
+"nr": 2,
+"arm": "A",
+"farbe": "W",
+"zug": 319,
+"gnugo": -43.4
+},
+{
+"seed": 20261053,
+"nr": 3,
+"arm": "A",
+"farbe": "S",
+"zug": 394,
+"gnugo": -36.5
+},
+{
+"seed": 20261053,
+"nr": 4,
+"arm": "A",
+"farbe": "W",
+"zug": 349,
+"gnugo": -15.5
+},
+{
+"seed": 20261053,
+"nr": 5,
+"arm": "B",
+"farbe": "W",
+"zug": 351,
+"gnugo": -53.5
+},
+{
+"seed": 20261053,
+"nr": 6,
+"arm": "B",
+"farbe": "S",
+"zug": 330,
+"gnugo": -144
+},
+{
+"seed": 20261053,
+"nr": 7,
+"arm": "B",
+"farbe": "W",
+"zug": 321,
+"gnugo": -131.7
+},
+{
+"seed": 20261053,
+"nr": 9,
+"arm": "B",
+"farbe": "W",
+"zug": 351,
+"gnugo": -13.6
+},
+{
+"seed": 20261053,
+"nr": 10,
+"arm": "A",
+"farbe": "W",
+"zug": 315,
+"gnugo": -100.5
+},
+{
+"seed": 20261053,
+"nr": 11,
+"arm": "B",
+"farbe": "W",
+"zug": 397,
+"gnugo": -18.6
+},
+{
+"seed": 20261053,
+"nr": 12,
+"arm": "A",
+"farbe": "W",
+"zug": 247,
+"gnugo": -4.8
+},
+{
+"seed": 20261053,
+"nr": 13,
+"arm": "A",
+"farbe": "S",
+"zug": 330,
+"gnugo": -109.3
+},
+{
+"seed": 20261053,
+"nr": 14,
+"arm": "A",
+"farbe": "W",
+"zug": 335,
+"gnugo": -49.4
+},
+{
+"seed": 20261053,
+"nr": 17,
+"arm": "A",
+"farbe": "S",
+"zug": 286,
+"gnugo": -65.3
+},
+{
+"seed": 20261053,
+"nr": 18,
+"arm": "A",
+"farbe": "W",
+"zug": 189,
+"gnugo": -27.3
+},
+{
+"seed": 20261053,
+"nr": 19,
+"arm": "A",
+"farbe": "S",
+"zug": 364,
+"gnugo": -99.2
+},
+{
+"seed": 20261053,
+"nr": 22,
+"arm": "A",
+"farbe": "W",
+"zug": 317,
+"gnugo": -103.5
+},
+{
+"seed": 20261053,
+"nr": 23,
+"arm": "A",
+"farbe": "S",
+"zug": 350,
+"gnugo": -64
+},
+{
+"seed": 20261053,
+"nr": 24,
+"arm": "B",
+"farbe": "S",
+"zug": 260,
+"gnugo": -86.2
+},
+{
+"seed": 20261053,
+"nr": 25,
+"arm": "A",
+"farbe": "S",
+"zug": 354,
+"gnugo": -82.6
+},
+{
+"seed": 20261053,
+"nr": 26,
+"arm": "A",
+"farbe": "W",
+"zug": 231,
+"gnugo": 28.3
+},
+{
+"seed": 20261053,
+"nr": 28,
+"arm": "B",
+"farbe": "S",
+"zug": 382,
+"gnugo": -134.5
+},
+{
+"seed": 20261053,
+"nr": 29,
+"arm": "B",
+"farbe": "W",
+"zug": 177,
+"gnugo": -49.4
+},
+{
+"seed": 20261053,
+"nr": 30,
+"arm": "A",
+"farbe": "W",
+"zug": 329,
+"gnugo": -54.7
+},
+{
+"seed": 20261053,
+"nr": 31,
+"arm": "B",
+"farbe": "W",
+"zug": 173,
+"gnugo": -54.8
+},
+{
+"seed": 20261053,
+"nr": 32,
+"arm": "A",
+"farbe": "W",
+"zug": 227,
+"gnugo": -42.3
+},
+{
+"seed": 20261053,
+"nr": 34,
+"arm": "B",
+"farbe": "S",
+"zug": 364,
+"gnugo": -28.1
+},
+{
+"seed": 20261053,
+"nr": 35,
+"arm": "B",
+"farbe": "W",
+"zug": 253,
+"gnugo": -23.1
+},
+{
+"seed": 20261053,
+"nr": 36,
+"arm": "B",
+"farbe": "S",
+"zug": 358,
+"gnugo": -39.3
+},
+{
+"seed": 20261053,
+"nr": 37,
+"arm": "A",
+"farbe": "S",
+"zug": 350,
+"gnugo": -103.7
+},
+{
+"seed": 20261053,
+"nr": 38,
+"arm": "B",
+"farbe": "S",
+"zug": 380,
+"gnugo": -12.6
+},
+{
+"seed": 20261053,
+"nr": 39,
+"arm": "B",
+"farbe": "W",
+"zug": 309,
+"gnugo": -123.4
+},
+{
+"seed": 20261053,
+"nr": 40,
+"arm": "B",
+"farbe": "S",
+"zug": 274,
+"gnugo": -60.9
+},
+{
+"seed": 20261053,
+"nr": 42,
+"arm": "A",
+"farbe": "W",
+"zug": 275,
+"gnugo": -71.6
+},
+{
+"seed": 20261053,
+"nr": 44,
+"arm": "A",
+"farbe": "W",
+"zug": 253,
+"gnugo": -16.3
+},
+{
+"seed": 20261053,
+"nr": 46,
+"arm": "A",
+"farbe": "W",
+"zug": 361,
+"gnugo": -30.8
+},
+{
+"seed": 20261053,
+"nr": 47,
+"arm": "B",
+"farbe": "W",
+"zug": 307,
+"gnugo": -90.9
+},
+{
+"seed": 20261053,
+"nr": 48,
+"arm": "A",
+"farbe": "W",
+"zug": 247,
+"gnugo": -91.9
+},
+{
+"seed": 20261053,
+"nr": 50,
+"arm": "A",
+"farbe": "W",
+"zug": 395,
+"gnugo": -26.5
+},
+{
+"seed": 20261053,
+"nr": 51,
+"arm": "B",
+"farbe": "W",
+"zug": 335,
+"gnugo": -38.1
+},
+{
+"seed": 20261053,
+"nr": 53,
+"arm": "B",
+"farbe": "W",
+"zug": 207,
+"gnugo": -37.9
+},
+{
+"seed": 20261053,
+"nr": 55,
+"arm": "B",
+"farbe": "W",
+"zug": 325,
+"gnugo": -42.9
+},
+{
+"seed": 20261053,
+"nr": 56,
+"arm": "B",
+"farbe": "S",
+"zug": 358,
+"gnugo": -205.6
+},
+{
+"seed": 20261053,
+"nr": 57,
+"arm": "A",
+"farbe": "S",
+"zug": 238,
+"gnugo": -3
+},
+{
+"seed": 20261053,
+"nr": 58,
+"arm": "B",
+"farbe": "S",
+"zug": 362,
+"gnugo": -27.7
+},
+{
+"seed": 20261053,
+"nr": 60,
+"arm": "B",
+"farbe": "S",
+"zug": 354,
+"gnugo": -86.6
+},
+{
+"seed": 20261053,
+"nr": 61,
+"arm": "B",
+"farbe": "W",
+"zug": 287,
+"gnugo": -73.6
+},
+{
+"seed": 20261053,
+"nr": 62,
+"arm": "B",
+"farbe": "S",
+"zug": 314,
+"gnugo": -97.6
+},
+{
+"seed": 20261053,
+"nr": 63,
+"arm": "A",
+"farbe": "S",
+"zug": 246,
+"gnugo": -87.9
+},
+{
+"seed": 20261053,
+"nr": 64,
+"arm": "A",
+"farbe": "W",
+"zug": 301,
+"gnugo": -14.1
+},
+{
+"seed": 20261053,
+"nr": 65,
+"arm": "B",
+"farbe": "W",
+"zug": 381,
+"gnugo": -100.5
+},
+{
+"seed": 20261053,
+"nr": 66,
+"arm": "A",
+"farbe": "W",
+"zug": 325,
+"gnugo": -65.5
+},
+{
+"seed": 20261053,
+"nr": 67,
+"arm": "B",
+"farbe": "W",
+"zug": 273,
+"gnugo": -78.3
+},
+{
+"seed": 20261053,
+"nr": 68,
+"arm": "B",
+"farbe": "S",
+"zug": 324,
+"gnugo": -163
+},
+{
+"seed": 20261053,
+"nr": 69,
+"arm": "A",
+"farbe": "S",
+"zug": 362,
+"gnugo": -125.6
+},
+{
+"seed": 20261053,
+"nr": 70,
+"arm": "A",
+"farbe": "W",
+"zug": 363,
+"gnugo": -191.6
+},
+{
+"seed": 20261053,
+"nr": 71,
+"arm": "A",
+"farbe": "S",
+"zug": 376,
+"gnugo": -63.5
+},
+{
+"seed": 20261053,
+"nr": 72,
+"arm": "B",
+"farbe": "S",
+"zug": 368,
+"gnugo": -80.6
+},
+{
+"seed": 20261053,
+"nr": 74,
+"arm": "A",
+"farbe": "W",
+"zug": 233,
+"gnugo": -47.3
+},
+{
+"seed": 20261053,
+"nr": 75,
+"arm": "B",
+"farbe": "W",
+"zug": 345,
+"gnugo": -91.1
+},
+{
+"seed": 20261053,
+"nr": 76,
+"arm": "A",
+"farbe": "W",
+"zug": 349,
+"gnugo": -80.5
+},
+{
+"seed": 20261053,
+"nr": 77,
+"arm": "A",
+"farbe": "S",
+"zug": 374,
+"gnugo": -142.2
+},
+{
+"seed": 20261053,
+"nr": 79,
+"arm": "A",
+"farbe": "S",
+"zug": 172,
+"gnugo": -17
+},
+{
+"seed": 20261053,
+"nr": 82,
+"arm": "A",
+"farbe": "W",
+"zug": 325,
+"gnugo": -61
+},
+{
+"seed": 20261053,
+"nr": 83,
+"arm": "B",
+"farbe": "W",
+"zug": 219,
+"gnugo": -97.5
+},
+{
+"seed": 20261053,
+"nr": 84,
+"arm": "A",
+"farbe": "W",
+"zug": 249,
+"gnugo": -101.7
+},
+{
+"seed": 20261053,
+"nr": 85,
+"arm": "A",
+"farbe": "S",
+"zug": 330,
+"gnugo": 12.9
+},
+{
+"seed": 20261053,
+"nr": 86,
+"arm": "B",
+"farbe": "S",
+"zug": 360,
+"gnugo": -39.5
+},
+{
+"seed": 20261053,
+"nr": 87,
+"arm": "B",
+"farbe": "W",
+"zug": 319,
+"gnugo": -147.2
+},
+{
+"seed": 20261053,
+"nr": 88,
+"arm": "A",
+"farbe": "W",
+"zug": 367,
+"gnugo": -79.2
+},
+{
+"seed": 20261053,
+"nr": 89,
+"arm": "B",
+"farbe": "W",
+"zug": 271,
+"gnugo": -3.9
+},
+{
+"seed": 20261053,
+"nr": 90,
+"arm": "B",
+"farbe": "S",
+"zug": 274,
+"gnugo": -90.3
+},
+{
+"seed": 20261054,
+"nr": 3,
+"arm": "B",
+"farbe": "W",
+"zug": 361,
+"gnugo": -50.5
+},
+{
+"seed": 20261054,
+"nr": 5,
+"arm": "B",
+"farbe": "W",
+"zug": 237,
+"gnugo": -97.5
+},
+{
+"seed": 20261054,
+"nr": 8,
+"arm": "A",
+"farbe": "W",
+"zug": 367,
+"gnugo": -23.8
+},
+{
+"seed": 20261054,
+"nr": 10,
+"arm": "B",
+"farbe": "S",
+"zug": 206,
+"gnugo": -80.9
+},
+{
+"seed": 20261054,
+"nr": 11,
+"arm": "A",
+"farbe": "S",
+"zug": 354,
+"gnugo": -67.7
+},
+{
+"seed": 20261054,
+"nr": 12,
+"arm": "A",
+"farbe": "W",
+"zug": 351,
+"gnugo": -68.3
+},
+{
+"seed": 20261054,
+"nr": 13,
+"arm": "B",
+"farbe": "W",
+"zug": 231,
+"gnugo": -139.3
+},
+{
+"seed": 20261054,
+"nr": 14,
+"arm": "B",
+"farbe": "S",
+"zug": 366,
+"gnugo": -78.5
+},
+{
+"seed": 20261054,
+"nr": 17,
+"arm": "A",
+"farbe": "S",
+"zug": 348,
+"gnugo": -124.6
+},
+{
+"seed": 20261054,
+"nr": 20,
+"arm": "B",
+"farbe": "S",
+"zug": 360,
+"gnugo": -38.5
+},
+{
+"seed": 20261054,
+"nr": 23,
+"arm": "B",
+"farbe": "W",
+"zug": 355,
+"gnugo": -68.9
+},
+{
+"seed": 20261054,
+"nr": 24,
+"arm": "A",
+"farbe": "W",
+"zug": 377,
+"gnugo": -38.2
+},
+{
+"seed": 20261054,
+"nr": 26,
+"arm": "A",
+"farbe": "W",
+"zug": 353,
+"gnugo": -91
+},
+{
+"seed": 20261054,
+"nr": 29,
+"arm": "B",
+"farbe": "W",
+"zug": 345,
+"gnugo": -85.8
+},
+{
+"seed": 20261054,
+"nr": 30,
+"arm": "B",
+"farbe": "S",
+"zug": 328,
+"gnugo": -124.9
+},
+{
+"seed": 20261054,
+"nr": 31,
+"arm": "A",
+"farbe": "S",
+"zug": 392,
+"gnugo": -22.5
+},
+{
+"seed": 20261054,
+"nr": 32,
+"arm": "A",
+"farbe": "W",
+"zug": 379,
+"gnugo": -37.4
+},
+{
+"seed": 20261054,
+"nr": 34,
+"arm": "A",
+"farbe": "W",
+"zug": 235,
+"gnugo": -27.7
+},
+{
+"seed": 20261054,
+"nr": 35,
+"arm": "A",
+"farbe": "S",
+"zug": 350,
+"gnugo": -49.3
+},
+{
+"seed": 20261054,
+"nr": 36,
+"arm": "A",
+"farbe": "W",
+"zug": 377,
+"gnugo": -40.8
+},
+{
+"seed": 20261054,
+"nr": 37,
+"arm": "A",
+"farbe": "S",
+"zug": 166,
+"gnugo": -107.6
+},
+{
+"seed": 20261054,
+"nr": 40,
+"arm": "A",
+"farbe": "W",
+"zug": 271,
+"gnugo": -133.4
+},
+{
+"seed": 20261054,
+"nr": 41,
+"arm": "A",
+"farbe": "S",
+"zug": 354,
+"gnugo": -69
+},
+{
+"seed": 20261054,
+"nr": 42,
+"arm": "A",
+"farbe": "W",
+"zug": 269,
+"gnugo": -82.5
+},
+{
+"seed": 20261054,
+"nr": 43,
+"arm": "A",
+"farbe": "S",
+"zug": 320,
+"gnugo": -111.8
+},
+{
+"seed": 20261054,
+"nr": 45,
+"arm": "A",
+"farbe": "S",
+"zug": 360,
+"gnugo": -13.6
+},
+{
+"seed": 20261054,
+"nr": 47,
+"arm": "B",
+"farbe": "W",
+"zug": 335,
+"gnugo": -66
+},
+{
+"seed": 20261054,
+"nr": 48,
+"arm": "A",
+"farbe": "W",
+"zug": 363,
+"gnugo": -20.9
+},
+{
+"seed": 20261054,
+"nr": 49,
+"arm": "A",
+"farbe": "S",
+"zug": 336,
+"gnugo": -107.3
+},
+{
+"seed": 20261054,
+"nr": 50,
+"arm": "A",
+"farbe": "W",
+"zug": 199,
+"gnugo": -91.5
+},
+{
+"seed": 20261054,
+"nr": 51,
+"arm": "A",
+"farbe": "S",
+"zug": 362,
+"gnugo": -64.4
+},
+{
+"seed": 20261054,
+"nr": 53,
+"arm": "B",
+"farbe": "W",
+"zug": 353,
+"gnugo": -131.3
+},
+{
+"seed": 20261054,
+"nr": 54,
+"arm": "B",
+"farbe": "S",
+"zug": 388,
+"gnugo": -37.4
+},
+{
+"seed": 20261054,
+"nr": 55,
+"arm": "B",
+"farbe": "W",
+"zug": 185,
+"gnugo": -59.5
+},
+{
+"seed": 20261054,
+"nr": 56,
+"arm": "A",
+"farbe": "W",
+"zug": 387,
+"gnugo": -69.5
+},
+{
+"seed": 20261054,
+"nr": 57,
+"arm": "A",
+"farbe": "S",
+"zug": 324,
+"gnugo": -87.1
+},
+{
+"seed": 20261054,
+"nr": 58,
+"arm": "A",
+"farbe": "W",
+"zug": 371,
+"gnugo": -21.6
+},
+{
+"seed": 20261054,
+"nr": 59,
+"arm": "B",
+"farbe": "W",
+"zug": 357,
+"gnugo": -72.6
+},
+{
+"seed": 20261054,
+"nr": 60,
+"arm": "A",
+"farbe": "W",
+"zug": 225,
+"gnugo": -15.2
+},
+{
+"seed": 20261054,
+"nr": 61,
+"arm": "B",
+"farbe": "W",
+"zug": 393,
+"gnugo": -22.1
+},
+{
+"seed": 20261054,
+"nr": 62,
+"arm": "A",
+"farbe": "W",
+"zug": 261,
+"gnugo": -109
+},
+{
+"seed": 20261054,
+"nr": 63,
+"arm": "A",
+"farbe": "S",
+"zug": 314,
+"gnugo": -139.8
+},
+{
+"seed": 20261054,
+"nr": 64,
+"arm": "A",
+"farbe": "W",
+"zug": 235,
+"gnugo": -32.1
+},
+{
+"seed": 20261054,
+"nr": 69,
+"arm": "B",
+"farbe": "W",
+"zug": 227,
+"gnugo": 6
+},
+{
+"seed": 20261054,
+"nr": 72,
+"arm": "B",
+"farbe": "S",
+"zug": 382,
+"gnugo": -110.5
+},
+{
+"seed": 20261054,
+"nr": 73,
+"arm": "A",
+"farbe": "S",
+"zug": 304,
+"gnugo": -60
+},
+{
+"seed": 20261054,
+"nr": 74,
+"arm": "B",
+"farbe": "S",
+"zug": 362,
+"gnugo": -50.6
+},
+{
+"seed": 20261054,
+"nr": 76,
+"arm": "A",
+"farbe": "W",
+"zug": 383,
+"gnugo": -129.5
+},
+{
+"seed": 20261054,
+"nr": 77,
+"arm": "A",
+"farbe": "S",
+"zug": 374,
+"gnugo": -118.8
+},
+{
+"seed": 20261054,
+"nr": 78,
+"arm": "B",
+"farbe": "S",
+"zug": 328,
+"gnugo": -25.4
+},
+{
+"seed": 20261054,
+"nr": 79,
+"arm": "B",
+"farbe": "W",
+"zug": 329,
+"gnugo": -44.4
+},
+{
+"seed": 20261054,
+"nr": 81,
+"arm": "A",
+"farbe": "S",
+"zug": 356,
+"gnugo": -63.8
+},
+{
+"seed": 20261054,
+"nr": 82,
+"arm": "A",
+"farbe": "W",
+"zug": 357,
+"gnugo": -59.8
+},
+{
+"seed": 20261054,
+"nr": 84,
+"arm": "A",
+"farbe": "W",
+"zug": 387,
+"gnugo": -24.4
+},
+{
+"seed": 20261054,
+"nr": 85,
+"arm": "A",
+"farbe": "S",
+"zug": 346,
+"gnugo": -100.9
+},
+{
+"seed": 20261054,
+"nr": 87,
+"arm": "B",
+"farbe": "W",
+"zug": 259,
+"gnugo": -71.8
+},
+{
+"seed": 20261054,
+"nr": 90,
+"arm": "A",
+"farbe": "W",
+"zug": 383,
+"gnugo": -37.6
+},
+{
+"seed": 20261055,
+"nr": 2,
+"arm": "B",
+"farbe": "S",
+"zug": 356,
+"gnugo": -99
+},
+{
+"seed": 20261055,
+"nr": 3,
+"arm": "B",
+"farbe": "W",
+"zug": 363,
+"gnugo": -155.5
+},
+{
+"seed": 20261055,
+"nr": 4,
+"arm": "A",
+"farbe": "W",
+"zug": 239,
+"gnugo": -50.2
+},
+{
+"seed": 20261055,
+"nr": 6,
+"arm": "B",
+"farbe": "S",
+"zug": 302,
+"gnugo": -57.4
+},
+{
+"seed": 20261055,
+"nr": 7,
+"arm": "A",
+"farbe": "S",
+"zug": 362,
+"gnugo": -55.2
+},
+{
+"seed": 20261055,
+"nr": 8,
+"arm": "B",
+"farbe": "S",
+"zug": 228,
+"gnugo": -50.6
+},
+{
+"seed": 20261055,
+"nr": 9,
+"arm": "B",
+"farbe": "W",
+"zug": 209,
+"gnugo": -41.9
+},
+{
+"seed": 20261055,
+"nr": 10,
+"arm": "A",
+"farbe": "W",
+"zug": 375,
+"gnugo": -40.4
+},
+{
+"seed": 20261055,
+"nr": 11,
+"arm": "A",
+"farbe": "S",
+"zug": 264,
+"gnugo": -36.3
+},
+{
+"seed": 20261055,
+"nr": 13,
+"arm": "A",
+"farbe": "S",
+"zug": 384,
+"gnugo": -29.7
+},
+{
+"seed": 20261055,
+"nr": 14,
+"arm": "A",
+"farbe": "W",
+"zug": 303,
+"gnugo": -82.6
+},
+{
+"seed": 20261055,
+"nr": 15,
+"arm": "B",
+"farbe": "W",
+"zug": 385,
+"gnugo": -29.8
+},
+{
+"seed": 20261055,
+"nr": 16,
+"arm": "A",
+"farbe": "W",
+"zug": 347,
+"gnugo": -126.1
+},
+{
+"seed": 20261055,
+"nr": 17,
+"arm": "B",
+"farbe": "W",
+"zug": 355,
+"gnugo": -82.1
+},
+{
+"seed": 20261055,
+"nr": 18,
+"arm": "A",
+"farbe": "W",
+"zug": 353,
+"gnugo": -59.3
+},
+{
+"seed": 20261055,
+"nr": 19,
+"arm": "B",
+"farbe": "W",
+"zug": 261,
+"gnugo": -70.4
+},
+{
+"seed": 20261055,
+"nr": 20,
+"arm": "B",
+"farbe": "S",
+"zug": 362,
+"gnugo": -60.6
+},
+{
+"seed": 20261055,
+"nr": 21,
+"arm": "A",
+"farbe": "S",
+"zug": 350,
+"gnugo": -65.9
+},
+{
+"seed": 20261055,
+"nr": 23,
+"arm": "B",
+"farbe": "W",
+"zug": 375,
+"gnugo": -16.5
+},
+{
+"seed": 20261055,
+"nr": 27,
+"arm": "B",
+"farbe": "W",
+"zug": 297,
+"gnugo": -144.7
+},
+{
+"seed": 20261055,
+"nr": 28,
+"arm": "A",
+"farbe": "W",
+"zug": 357,
+"gnugo": -20.7
+},
+{
+"seed": 20261055,
+"nr": 29,
+"arm": "A",
+"farbe": "S",
+"zug": 310,
+"gnugo": -66.5
+},
+{
+"seed": 20261055,
+"nr": 30,
+"arm": "A",
+"farbe": "W",
+"zug": 373,
+"gnugo": -20.5
+},
+{
+"seed": 20261055,
+"nr": 31,
+"arm": "B",
+"farbe": "W",
+"zug": 271,
+"gnugo": -92.8
+},
+{
+"seed": 20261055,
+"nr": 32,
+"arm": "B",
+"farbe": "S",
+"zug": 328,
+"gnugo": -114.6
+},
+{
+"seed": 20261055,
+"nr": 33,
+"arm": "A",
+"farbe": "S",
+"zug": 214,
+"gnugo": -34.7
+},
+{
+"seed": 20261055,
+"nr": 35,
+"arm": "B",
+"farbe": "W",
+"zug": 323,
+"gnugo": -68.1
+},
+{
+"seed": 20261055,
+"nr": 37,
+"arm": "A",
+"farbe": "S",
+"zug": 398,
+"gnugo": -100.5
+},
+{
+"seed": 20261055,
+"nr": 38,
+"arm": "A",
+"farbe": "W",
+"zug": 255,
+"gnugo": 16.2
+},
+{
+"seed": 20261055,
+"nr": 39,
+"arm": "A",
+"farbe": "S",
+"zug": 374,
+"gnugo": -19.6
+},
+{
+"seed": 20261055,
+"nr": 41,
+"arm": "B",
+"farbe": "W",
+"zug": 369,
+"gnugo": -88.6
+},
+{
+"seed": 20261055,
+"nr": 44,
+"arm": "A",
+"farbe": "W",
+"zug": 383,
+"gnugo": 1.5
+},
+{
+"seed": 20261055,
+"nr": 45,
+"arm": "B",
+"farbe": "W",
+"zug": 357,
+"gnugo": -50.6
+},
+{
+"seed": 20261055,
+"nr": 46,
+"arm": "A",
+"farbe": "W",
+"zug": 327,
+"gnugo": -98.8
+},
+{
+"seed": 20261055,
+"nr": 47,
+"arm": "A",
+"farbe": "S",
+"zug": 254,
+"gnugo": 15.9
+},
+{
+"seed": 20261055,
+"nr": 48,
+"arm": "A",
+"farbe": "W",
+"zug": 371,
+"gnugo": -40.6
+},
+{
+"seed": 20261055,
+"nr": 49,
+"arm": "A",
+"farbe": "S",
+"zug": 318,
+"gnugo": -151.1
+},
+{
+"seed": 20261055,
+"nr": 50,
+"arm": "A",
+"farbe": "W",
+"zug": 287,
+"gnugo": -32.4
+},
+{
+"seed": 20261055,
+"nr": 51,
+"arm": "A",
+"farbe": "S",
+"zug": 326,
+"gnugo": -55.1
+},
+{
+"seed": 20261055,
+"nr": 53,
+"arm": "A",
+"farbe": "S",
+"zug": 292,
+"gnugo": -195.2
+},
+{
+"seed": 20261055,
+"nr": 54,
+"arm": "A",
+"farbe": "W",
+"zug": 347,
+"gnugo": -59.2
+},
+{
+"seed": 20261055,
+"nr": 55,
+"arm": "A",
+"farbe": "S",
+"zug": 348,
+"gnugo": -113.6
+},
+{
+"seed": 20261055,
+"nr": 58,
+"arm": "B",
+"farbe": "S",
+"zug": 394,
+"gnugo": -28.5
+},
+{
+"seed": 20261055,
+"nr": 59,
+"arm": "B",
+"farbe": "W",
+"zug": 189,
+"gnugo": -116.7
+},
+{
+"seed": 20261055,
+"nr": 60,
+"arm": "B",
+"farbe": "S",
+"zug": 382,
+"gnugo": -118.2
+},
+{
+"seed": 20261055,
+"nr": 61,
+"arm": "A",
+"farbe": "S",
+"zug": 286,
+"gnugo": -52.1
+},
+{
+"seed": 20261055,
+"nr": 62,
+"arm": "A",
+"farbe": "W",
+"zug": 361,
+"gnugo": -66.7
+},
+{
+"seed": 20261055,
+"nr": 65,
+"arm": "B",
+"farbe": "W",
+"zug": 355,
+"gnugo": -43.3
+},
+{
+"seed": 20261055,
+"nr": 66,
+"arm": "A",
+"farbe": "W",
+"zug": 325,
+"gnugo": -86.2
+},
+{
+"seed": 20261055,
+"nr": 67,
+"arm": "B",
+"farbe": "W",
+"zug": 327,
+"gnugo": -127.4
+},
+{
+"seed": 20261055,
+"nr": 68,
+"arm": "B",
+"farbe": "S",
+"zug": 344,
+"gnugo": -136
+},
+{
+"seed": 20261055,
+"nr": 70,
+"arm": "B",
+"farbe": "S",
+"zug": 318,
+"gnugo": -101.3
+},
+{
+"seed": 20261055,
+"nr": 71,
+"arm": "A",
+"farbe": "S",
+"zug": 360,
+"gnugo": -77.5
+},
+{
+"seed": 20261055,
+"nr": 73,
+"arm": "B",
+"farbe": "W",
+"zug": 355,
+"gnugo": -24.4
+},
+{
+"seed": 20261055,
+"nr": 75,
+"arm": "B",
+"farbe": "W",
+"zug": 385,
+"gnugo": -140.1
+},
+{
+"seed": 20261055,
+"nr": 77,
+"arm": "B",
+"farbe": "W",
+"zug": 379,
+"gnugo": -14.6
+},
+{
+"seed": 20261055,
+"nr": 78,
+"arm": "A",
+"farbe": "W",
+"zug": 361,
+"gnugo": -21.5
+},
+{
+"seed": 20261055,
+"nr": 79,
+"arm": "A",
+"farbe": "S",
+"zug": 376,
+"gnugo": -94.2
+},
+{
+"seed": 20261055,
+"nr": 80,
+"arm": "A",
+"farbe": "W",
+"zug": 213,
+"gnugo": 25.4
+},
+{
+"seed": 20261055,
+"nr": 81,
+"arm": "A",
+"farbe": "S",
+"zug": 260,
+"gnugo": -54.9
+},
+{
+"seed": 20261055,
+"nr": 82,
+"arm": "A",
+"farbe": "W",
+"zug": 219,
+"gnugo": -35.4
+},
+{
+"seed": 20261055,
+"nr": 83,
+"arm": "B",
+"farbe": "W",
+"zug": 357,
+"gnugo": -51.6
+},
+{
+"seed": 20261055,
+"nr": 84,
+"arm": "A",
+"farbe": "W",
+"zug": 379,
+"gnugo": -51.5
+},
+{
+"seed": 20261055,
+"nr": 85,
+"arm": "A",
+"farbe": "S",
+"zug": 302,
+"gnugo": -69.3
+},
+{
+"seed": 20261055,
+"nr": 86,
+"arm": "B",
+"farbe": "S",
+"zug": 348,
+"gnugo": -70.1
+},
+{
+"seed": 20261055,
+"nr": 88,
+"arm": "A",
+"farbe": "W",
+"zug": 253,
+"gnugo": 34.6
+},
+{
+"seed": 20261055,
+"nr": 90,
+"arm": "A",
+"farbe": "W",
+"zug": 305,
+"gnugo": -41.2
+},
+{
+"seed": 20261056,
+"nr": 1,
+"arm": "B",
+"farbe": "W",
+"zug": 341,
+"gnugo": -48.5
+},
+{
+"seed": 20261056,
+"nr": 4,
+"arm": "A",
+"farbe": "W",
+"zug": 365,
+"gnugo": -77.5
+},
+{
+"seed": 20261056,
+"nr": 6,
+"arm": "A",
+"farbe": "W",
+"zug": 359,
+"gnugo": -70.3
+},
+{
+"seed": 20261056,
+"nr": 7,
+"arm": "B",
+"farbe": "W",
+"zug": 341,
+"gnugo": -184.8
+},
+{
+"seed": 20261056,
+"nr": 9,
+"arm": "A",
+"farbe": "S",
+"zug": 326,
+"gnugo": -62.9
+},
+{
+"seed": 20261056,
+"nr": 11,
+"arm": "B",
+"farbe": "W",
+"zug": 365,
+"gnugo": -70.2
+},
+{
+"seed": 20261056,
+"nr": 12,
+"arm": "B",
+"farbe": "S",
+"zug": 292,
+"gnugo": -52.9
+},
+{
+"seed": 20261056,
+"nr": 14,
+"arm": "A",
+"farbe": "W",
+"zug": 369,
+"gnugo": -67
+},
+{
+"seed": 20261056,
+"nr": 15,
+"arm": "A",
+"farbe": "S",
+"zug": 246,
+"gnugo": -77.7
+},
+{
+"seed": 20261056,
+"nr": 16,
+"arm": "B",
+"farbe": "S",
+"zug": 370,
+"gnugo": -48.7
+},
+{
+"seed": 20261056,
+"nr": 18,
+"arm": "A",
+"farbe": "W",
+"zug": 375,
+"gnugo": -34.1
+},
+{
+"seed": 20261056,
+"nr": 19,
+"arm": "A",
+"farbe": "S",
+"zug": 312,
+"gnugo": 33.4
+},
+{
+"seed": 20261056,
+"nr": 20,
+"arm": "B",
+"farbe": "S",
+"zug": 382,
+"gnugo": -30.5
+},
+{
+"seed": 20261056,
+"nr": 22,
+"arm": "A",
+"farbe": "W",
+"zug": 349,
+"gnugo": -119.5
+},
+{
+"seed": 20261056,
+"nr": 23,
+"arm": "A",
+"farbe": "S",
+"zug": 268,
+"gnugo": -194.8
+},
+{
+"seed": 20261056,
+"nr": 24,
+"arm": "A",
+"farbe": "W",
+"zug": 329,
+"gnugo": -85
+},
+{
+"seed": 20261056,
+"nr": 25,
+"arm": "A",
+"farbe": "S",
+"zug": 358,
+"gnugo": -80.5
+},
+{
+"seed": 20261056,
+"nr": 27,
+"arm": "A",
+"farbe": "S",
+"zug": 256,
+"gnugo": -142.2
+},
+{
+"seed": 20261056,
+"nr": 28,
+"arm": "B",
+"farbe": "S",
+"zug": 358,
+"gnugo": -115.8
+},
+{
+"seed": 20261056,
+"nr": 29,
+"arm": "A",
+"farbe": "S",
+"zug": 294,
+"gnugo": -32.7
+},
+{
+"seed": 20261056,
+"nr": 30,
+"arm": "A",
+"farbe": "W",
+"zug": 373,
+"gnugo": -35.5
+},
+{
+"seed": 20261056,
+"nr": 31,
+"arm": "B",
+"farbe": "W",
+"zug": 337,
+"gnugo": -95
+},
+{
+"seed": 20261056,
+"nr": 32,
+"arm": "A",
+"farbe": "W",
+"zug": 385,
+"gnugo": -10.8
+},
+{
+"seed": 20261056,
+"nr": 33,
+"arm": "A",
+"farbe": "S",
+"zug": 320,
+"gnugo": -227.1
+},
+{
+"seed": 20261056,
+"nr": 36,
+"arm": "A",
+"farbe": "W",
+"zug": 179,
+"gnugo": -51
+},
+{
+"seed": 20261056,
+"nr": 37,
+"arm": "A",
+"farbe": "S",
+"zug": 350,
+"gnugo": -89.4
+},
+{
+"seed": 20261056,
+"nr": 40,
+"arm": "A",
+"farbe": "W",
+"zug": 177,
+"gnugo": -67.8
+},
+{
+"seed": 20261056,
+"nr": 41,
+"arm": "A",
+"farbe": "S",
+"zug": 370,
+"gnugo": -45.2
+},
+{
+"seed": 20261056,
+"nr": 42,
+"arm": "A",
+"farbe": "W",
+"zug": 359,
+"gnugo": -28.3
+},
+{
+"seed": 20261056,
+"nr": 43,
+"arm": "A",
+"farbe": "S",
+"zug": 374,
+"gnugo": -27.2
+},
+{
+"seed": 20261056,
+"nr": 44,
+"arm": "B",
+"farbe": "S",
+"zug": 300,
+"gnugo": -155.7
+},
+{
+"seed": 20261056,
+"nr": 45,
+"arm": "B",
+"farbe": "W",
+"zug": 341,
+"gnugo": -87.9
+},
+{
+"seed": 20261056,
+"nr": 46,
+"arm": "B",
+"farbe": "S",
+"zug": 324,
+"gnugo": -110.9
+},
+{
+"seed": 20261056,
+"nr": 47,
+"arm": "A",
+"farbe": "S",
+"zug": 228,
+"gnugo": -29.4
+},
+{
+"seed": 20261056,
+"nr": 48,
+"arm": "B",
+"farbe": "S",
+"zug": 272,
+"gnugo": -24
+},
+{
+"seed": 20261056,
+"nr": 50,
+"arm": "A",
+"farbe": "W",
+"zug": 335,
+"gnugo": -62.3
+},
+{
+"seed": 20261056,
+"nr": 51,
+"arm": "A",
+"farbe": "S",
+"zug": 366,
+"gnugo": -125.5
+},
+{
+"seed": 20261056,
+"nr": 52,
+"arm": "A",
+"farbe": "W",
+"zug": 373,
+"gnugo": -10.5
+},
+{
+"seed": 20261056,
+"nr": 53,
+"arm": "A",
+"farbe": "S",
+"zug": 272,
+"gnugo": -50.5
+},
+{
+"seed": 20261056,
+"nr": 55,
+"arm": "A",
+"farbe": "S",
+"zug": 394,
+"gnugo": -40.5
+},
+{
+"seed": 20261056,
+"nr": 56,
+"arm": "A",
+"farbe": "W",
+"zug": 367,
+"gnugo": -51.4
+},
+{
+"seed": 20261056,
+"nr": 57,
+"arm": "A",
+"farbe": "S",
+"zug": 226,
+"gnugo": -140.7
+},
+{
+"seed": 20261056,
+"nr": 58,
+"arm": "A",
+"farbe": "W",
+"zug": 273,
+"gnugo": -35.2
+},
+{
+"seed": 20261056,
+"nr": 59,
+"arm": "B",
+"farbe": "W",
+"zug": 379,
+"gnugo": -43.5
+},
+{
+"seed": 20261056,
+"nr": 60,
+"arm": "A",
+"farbe": "W",
+"zug": 385,
+"gnugo": -23.5
+},
+{
+"seed": 20261056,
+"nr": 61,
+"arm": "A",
+"farbe": "S",
+"zug": 346,
+"gnugo": -116.7
+},
+{
+"seed": 20261056,
+"nr": 62,
+"arm": "A",
+"farbe": "W",
+"zug": 317,
+"gnugo": -128.1
+},
+{
+"seed": 20261056,
+"nr": 64,
+"arm": "B",
+"farbe": "S",
+"zug": 388,
+"gnugo": -41.5
+},
+{
+"seed": 20261056,
+"nr": 67,
+"arm": "A",
+"farbe": "S",
+"zug": 248,
+"gnugo": -117.1
+},
+{
+"seed": 20261056,
+"nr": 68,
+"arm": "B",
+"farbe": "S",
+"zug": 216,
+"gnugo": -122.8
+},
+{
+"seed": 20261056,
+"nr": 69,
+"arm": "A",
+"farbe": "S",
+"zug": 254,
+"gnugo": -141.3
+},
+{
+"seed": 20261056,
+"nr": 70,
+"arm": "A",
+"farbe": "W",
+"zug": 373,
+"gnugo": -21.5
+},
+{
+"seed": 20261056,
+"nr": 72,
+"arm": "A",
+"farbe": "W",
+"zug": 239,
+"gnugo": -26
+},
+{
+"seed": 20261056,
+"nr": 74,
+"arm": "A",
+"farbe": "W",
+"zug": 387,
+"gnugo": -16.5
+},
+{
+"seed": 20261056,
+"nr": 75,
+"arm": "A",
+"farbe": "S",
+"zug": 350,
+"gnugo": -48.7
+},
+{
+"seed": 20261056,
+"nr": 77,
+"arm": "A",
+"farbe": "S",
+"zug": 260,
+"gnugo": -161.8
+},
+{
+"seed": 20261056,
+"nr": 78,
+"arm": "A",
+"farbe": "W",
+"zug": 247,
+"gnugo": -124.3
+},
+{
+"seed": 20261056,
+"nr": 81,
+"arm": "A",
+"farbe": "S",
+"zug": 174,
+"gnugo": -90.7
+},
+{
+"seed": 20261056,
+"nr": 82,
+"arm": "A",
+"farbe": "W",
+"zug": 327,
+"gnugo": -32.6
+},
+{
+"seed": 20261056,
+"nr": 83,
+"arm": "A",
+"farbe": "S",
+"zug": 244,
+"gnugo": -18.9
+},
+{
+"seed": 20261056,
+"nr": 84,
+"arm": "A",
+"farbe": "W",
+"zug": 185,
+"gnugo": -6.4
+},
+{
+"seed": 20261056,
+"nr": 85,
+"arm": "B",
+"farbe": "W",
+"zug": 397,
+"gnugo": -24.4
+},
+{
+"seed": 20261056,
+"nr": 86,
+"arm": "A",
+"farbe": "W",
+"zug": 325,
+"gnugo": -102.1
+},
+{
+"seed": 20261056,
+"nr": 88,
+"arm": "A",
+"farbe": "W",
+"zug": 327,
+"gnugo": -133.5
+},
+{
+"seed": 20261056,
+"nr": 89,
+"arm": "B",
+"farbe": "W",
+"zug": 303,
+"gnugo": -83.9
+},
+{
+"seed": 20261056,
+"nr": 90,
+"arm": "A",
+"farbe": "W",
+"zug": 379,
+"gnugo": -1.3
+},
+{
+"seed": 20261057,
+"nr": 1,
+"arm": "B",
+"farbe": "W",
+"zug": 211,
+"gnugo": -32.6
+},
+{
+"seed": 20261057,
+"nr": 3,
+"arm": "A",
+"farbe": "S",
+"zug": 230,
+"gnugo": -12.1
+},
+{
+"seed": 20261057,
+"nr": 6,
+"arm": "A",
+"farbe": "W",
+"zug": 277,
+"gnugo": 31.9
+},
+{
+"seed": 20261057,
+"nr": 7,
+"arm": "B",
+"farbe": "W",
+"zug": 255,
+"gnugo": -114.4
+},
+{
+"seed": 20261057,
+"nr": 8,
+"arm": "A",
+"farbe": "W",
+"zug": 377,
+"gnugo": -7.4
+},
+{
+"seed": 20261057,
+"nr": 9,
+"arm": "A",
+"farbe": "S",
+"zug": 248,
+"gnugo": -76.7
+},
+{
+"seed": 20261057,
+"nr": 10,
+"arm": "A",
+"farbe": "W",
+"zug": 365,
+"gnugo": -37.4
+},
+{
+"seed": 20261057,
+"nr": 11,
+"arm": "B",
+"farbe": "W",
+"zug": 353,
+"gnugo": -42
+},
+{
+"seed": 20261057,
+"nr": 12,
+"arm": "A",
+"farbe": "W",
+"zug": 373,
+"gnugo": -42.7
+},
+{
+"seed": 20261057,
+"nr": 13,
+"arm": "A",
+"farbe": "S",
+"zug": 212,
+"gnugo": -140.1
+},
+{
+"seed": 20261057,
+"nr": 15,
+"arm": "A",
+"farbe": "S",
+"zug": 374,
+"gnugo": -57
+},
+{
+"seed": 20261057,
+"nr": 16,
+"arm": "A",
+"farbe": "W",
+"zug": 207,
+"gnugo": -129.4
+},
+{
+"seed": 20261057,
+"nr": 17,
+"arm": "B",
+"farbe": "W",
+"zug": 363,
+"gnugo": -50.7
+},
+{
+"seed": 20261057,
+"nr": 18,
+"arm": "B",
+"farbe": "S",
+"zug": 376,
+"gnugo": -169.5
+},
+{
+"seed": 20261057,
+"nr": 23,
+"arm": "A",
+"farbe": "S",
+"zug": 276,
+"gnugo": -48.7
+},
+{
+"seed": 20261057,
+"nr": 24,
+"arm": "A",
+"farbe": "W",
+"zug": 375,
+"gnugo": -29.9
+},
+{
+"seed": 20261057,
+"nr": 25,
+"arm": "A",
+"farbe": "S",
+"zug": 308,
+"gnugo": -216.9
+},
+{
+"seed": 20261057,
+"nr": 26,
+"arm": "A",
+"farbe": "W",
+"zug": 237,
+"gnugo": -99.2
+},
+{
+"seed": 20261057,
+"nr": 27,
+"arm": "B",
+"farbe": "W",
+"zug": 299,
+"gnugo": -82.5
+},
+{
+"seed": 20261057,
+"nr": 28,
+"arm": "A",
+"farbe": "W",
+"zug": 309,
+"gnugo": -101.8
+},
+{
+"seed": 20261057,
+"nr": 29,
+"arm": "A",
+"farbe": "S",
+"zug": 340,
+"gnugo": -99.1
+},
+{
+"seed": 20261057,
+"nr": 30,
+"arm": "A",
+"farbe": "W",
+"zug": 323,
+"gnugo": -124.9
+},
+{
+"seed": 20261057,
+"nr": 32,
+"arm": "A",
+"farbe": "W",
+"zug": 337,
+"gnugo": -59.3
+},
+{
+"seed": 20261057,
+"nr": 33,
+"arm": "A",
+"farbe": "S",
+"zug": 366,
+"gnugo": -76.9
+},
+{
+"seed": 20261057,
+"nr": 34,
+"arm": "A",
+"farbe": "W",
+"zug": 321,
+"gnugo": -146.8
+},
+{
+"seed": 20261057,
+"nr": 35,
+"arm": "A",
+"farbe": "S",
+"zug": 388,
+"gnugo": -80.6
+},
+{
+"seed": 20261057,
+"nr": 36,
+"arm": "B",
+"farbe": "S",
+"zug": 376,
+"gnugo": -72.1
+},
+{
+"seed": 20261057,
+"nr": 37,
+"arm": "B",
+"farbe": "W",
+"zug": 163,
+"gnugo": -152.4
+},
+{
+"seed": 20261057,
+"nr": 39,
+"arm": "A",
+"farbe": "S",
+"zug": 336,
+"gnugo": -191.1
+},
+{
+"seed": 20261057,
+"nr": 40,
+"arm": "B",
+"farbe": "S",
+"zug": 348,
+"gnugo": -71.3
+},
+{
+"seed": 20261057,
+"nr": 41,
+"arm": "A",
+"farbe": "S",
+"zug": 304,
+"gnugo": -142.5
+},
+{
+"seed": 20261057,
+"nr": 42,
+"arm": "B",
+"farbe": "S",
+"zug": 362,
+"gnugo": -57.2
+},
+{
+"seed": 20261057,
+"nr": 44,
+"arm": "B",
+"farbe": "S",
+"zug": 368,
+"gnugo": -99.5
+},
+{
+"seed": 20261057,
+"nr": 45,
+"arm": "A",
+"farbe": "S",
+"zug": 256,
+"gnugo": 44.5
+},
+{
+"seed": 20261057,
+"nr": 47,
+"arm": "A",
+"farbe": "S",
+"zug": 188,
+"gnugo": -41.2
+},
+{
+"seed": 20261057,
+"nr": 49,
+"arm": "B",
+"farbe": "W",
+"zug": 195,
+"gnugo": -165.8
+},
+{
+"seed": 20261057,
+"nr": 50,
+"arm": "A",
+"farbe": "W",
+"zug": 351,
+"gnugo": -52.6
+},
+{
+"seed": 20261057,
+"nr": 51,
+"arm": "B",
+"farbe": "W",
+"zug": 355,
+"gnugo": -37.2
+},
+{
+"seed": 20261057,
+"nr": 54,
+"arm": "A",
+"farbe": "W",
+"zug": 307,
+"gnugo": -171.5
+},
+{
+"seed": 20261057,
+"nr": 55,
+"arm": "A",
+"farbe": "S",
+"zug": 350,
+"gnugo": -149.8
+},
+{
+"seed": 20261057,
+"nr": 56,
+"arm": "B",
+"farbe": "S",
+"zug": 262,
+"gnugo": -92.2
+},
+{
+"seed": 20261057,
+"nr": 57,
+"arm": "A",
+"farbe": "S",
+"zug": 234,
+"gnugo": -15.9
+},
+{
+"seed": 20261057,
+"nr": 58,
+"arm": "B",
+"farbe": "S",
+"zug": 224,
+"gnugo": -84.7
+},
+{
+"seed": 20261057,
+"nr": 59,
+"arm": "A",
+"farbe": "S",
+"zug": 382,
+"gnugo": -67.6
+},
+{
+"seed": 20261057,
+"nr": 60,
+"arm": "A",
+"farbe": "W",
+"zug": 301,
+"gnugo": -20.4
+},
+{
+"seed": 20261057,
+"nr": 62,
+"arm": "A",
+"farbe": "W",
+"zug": 365,
+"gnugo": -68.5
+},
+{
+"seed": 20261057,
+"nr": 63,
+"arm": "A",
+"farbe": "S",
+"zug": 376,
+"gnugo": -39.8
+},
+{
+"seed": 20261057,
+"nr": 64,
+"arm": "B",
+"farbe": "S",
+"zug": 354,
+"gnugo": -125.6
+},
+{
+"seed": 20261057,
+"nr": 66,
+"arm": "B",
+"farbe": "S",
+"zug": 326,
+"gnugo": -100.6
+},
+{
+"seed": 20261057,
+"nr": 67,
+"arm": "A",
+"farbe": "S",
+"zug": 360,
+"gnugo": -169.8
+},
+{
+"seed": 20261057,
+"nr": 68,
+"arm": "A",
+"farbe": "W",
+"zug": 253,
+"gnugo": -48.3
+},
+{
+"seed": 20261057,
+"nr": 70,
+"arm": "A",
+"farbe": "W",
+"zug": 353,
+"gnugo": -103.8
+},
+{
+"seed": 20261057,
+"nr": 71,
+"arm": "B",
+"farbe": "W",
+"zug": 183,
+"gnugo": -85.2
+},
+{
+"seed": 20261057,
+"nr": 72,
+"arm": "B",
+"farbe": "S",
+"zug": 364,
+"gnugo": -79.4
+},
+{
+"seed": 20261057,
+"nr": 73,
+"arm": "A",
+"farbe": "S",
+"zug": 384,
+"gnugo": -24.5
+},
+{
+"seed": 20261057,
+"nr": 74,
+"arm": "B",
+"farbe": "S",
+"zug": 308,
+"gnugo": -133.7
+},
+{
+"seed": 20261057,
+"nr": 77,
+"arm": "B",
+"farbe": "W",
+"zug": 379,
+"gnugo": -107.1
+},
+{
+"seed": 20261057,
+"nr": 78,
+"arm": "A",
+"farbe": "W",
+"zug": 315,
+"gnugo": -79.9
+},
+{
+"seed": 20261057,
+"nr": 79,
+"arm": "B",
+"farbe": "W",
+"zug": 391,
+"gnugo": -47.4
+},
+{
+"seed": 20261057,
+"nr": 81,
+"arm": "B",
+"farbe": "W",
+"zug": 253,
+"gnugo": 24.5
+},
+{
+"seed": 20261057,
+"nr": 82,
+"arm": "B",
+"farbe": "S",
+"zug": 388,
+"gnugo": -11.6
+},
+{
+"seed": 20261057,
+"nr": 84,
+"arm": "B",
+"farbe": "S",
+"zug": 336,
+"gnugo": -111.9
+},
+{
+"seed": 20261057,
+"nr": 86,
+"arm": "A",
+"farbe": "W",
+"zug": 359,
+"gnugo": -57.2
+},
+{
+"seed": 20261057,
+"nr": 87,
+"arm": "B",
+"farbe": "W",
+"zug": 285,
+"gnugo": -116.5
+},
+{
+"seed": 20261057,
+"nr": 88,
+"arm": "B",
+"farbe": "S",
+"zug": 354,
+"gnugo": -46.3
+},
+{
+"seed": 20261057,
+"nr": 90,
+"arm": "B",
+"farbe": "S",
+"zug": 260,
+"gnugo": -58.2
+}
+]
+}
