@@ -207,6 +207,7 @@ Simulationszahl pro Zug direkt an der Rechenleistung hängt.
 | `captureCap` 200 (Gefangenen-Saldo deckeln, gegen falsche Aufgaben) | falsche Aufgaben 16 → 8 (p = 0,15), Siegrate 54,4 % (p = 0,017, nur Kontrolle); Wiederholung 53,6 % (p = 0,053) | **nicht beschlossen**, knapp — Schalter im Dashboard (`docs/aufgabe-deckel.md`) |
 | `gegnerWert` / `gegnerGebiet` (Wert des Punkts für den Gegner) | Pilot gegen GNU Go: Endstand −90 bis −126 | verworfen — Default 0 (`docs/gegnerwert.md`) |
 | `krisenKandidaten` (Rettung aus dem Atari und Schläge immer in die Suche) | Selbstspiel 51,7 % über 720 Partien (p = 0,37), gegen GNU Go +7,5 (p = 0,50) | verworfen — Default 0 |
+| **`leseRettung` 1 (taktischer Leser rettet gefährdete Ketten)** | **Selbstspiel 62,8 % über 720 Partien (p = 7 · 10⁻¹², +91 Elo)**, gegen GNU Go aber Endstand −30,5 (p = 0,011) | **kein Default** — widersprüchlich, wird untersucht; Schalter im Dashboard (`docs/laufkampf-lesen.md`) |
 | Suchtiefe: 240 gegen 120, 480 gegen 240 Simulationen | 60,6 % und 57,8 % über je 360 Partien (+75 und +55 Elo je Verdopplung) | Suche hilft, flacht ab — kein großer Hebel (`docs/skalierung.md`) |
 | `resignQ` 0,95 gegen 0,997 | 29:31 über 60 Partien, p = 0,90 | 0,95 bleibt — rechtzeitiges Aufgeben kostet nichts |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |

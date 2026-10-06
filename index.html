@@ -6364,6 +6364,8 @@ globalThis.policyNet = new PolicyNet();
          tip:'Früh-Pass: wenn best < X → Pass-Kandidat'},
         {key:'passMinMc80',       label:'Pass mc>80',       step:5,   min:-100,max:100,
          tip:'Mittelspiel-Pass-Schwelle'},
+        {key:'leseRettung',       label:'Lese-Rettung',     step:1,   min:0,   max:2,
+         tip:'1 = ein taktischer Leser prüft eigene gefährdete Ketten (bis 3 Freiheiten) und spielt nachweislich rettende Züge bevorzugt. Selbstspiel 62,8 %, gegen GNU Go aber 30 Punkte schlechter — kein Default. 2 = zusätzlich Fangen. Siehe docs/laufkampf-lesen.md.'},
         {key:'augenSchutz',       label:'Augenschutz',      step:1,   min:0,   max:2,
          tip:'Nie ein eigenes echtes Auge füllen. 1 = beim eigenen Zug, 2 = auch in der Suche (Default). Gegen GNU Go +217 Punkte im Endstand. 0 = altes Verhalten.'},
         {key:'passUnabwendbar',   label:'Pass trotz Drohung', step:1, min:0,   max:1,
