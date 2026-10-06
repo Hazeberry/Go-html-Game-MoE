@@ -133,3 +133,55 @@ Rettungen je Arm nach §3; M2 nach Zug 120 und 200.
   gelten als entkommen. Eine als Rettung gehobene Kandidatenkette kann also
   trotzdem sterben.
 - Gemessen wird mit 120 Simulationen; Menschen spielen mit 300 bis 1 300.
+
+---
+
+## 6. Nachtrag: Ergebnis, kein Default (06.10.2026)
+
+Gelaufen auf dem Merge-Commit `3f6db6d`, ohne Unterbrechung. Daten:
+`daten/lesen-20261070.json` bis `…77.json` (Hash-Listen) und
+`daten/lesen-gnugo.json`.
+
+**M1, Selbstspiel (primär):** B gewinnt **452 von 720 Partien, 62,8 %**
+(z = 6,86, p = 7 · 10⁻¹², 95-%-KI 59,2–66,3 %, rund +91 Elo). Alle acht
+Teilläufe liegen über 50 %:
+
+| Teillauf | 1070 | 1071 | 1072 | 1073 | 1074 | 1075 | 1076 | 1077 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Siegrate B | 65,6 % | 65,6 % | 56,7 % | 60,0 % | 58,9 % | 58,9 % | 67,8 % | 68,9 % |
+
+**M2, gegen GNU Go (Kontrolle), 60 Paare:**
+
+| | A | B | B − A |
+|---|---:|---:|---|
+| **Endstand** | −143,3 | −173,8 | **−30,5** (SD 90,0), **p = 0,011** |
+| nach Zug 120 | +15,1 | +19,0 | +3,9, p = 0,18 |
+| nach Zug 200 | −80,8 | −88,3 | −7,4, p = 0,21 |
+
+B ist im Endstand in 25 von 60 Paaren besser, im Median um 6 Punkte
+schlechter. Die B-Partien dauern länger (Ø 326 gegen 309 Züge). GNU Go gab in
+beiden Armen je dreimal auf.
+
+**Entscheidung nach §5: kein Default.** M1 ist signifikant besser, M2
+signifikant schlechter. Das ist genau der Fall, der zu untersuchen ist.
+`leseRettung` bleibt 0 und steht jetzt im Dashboard.
+
+**Sekundär:**
+
+- Schläge ab 5 Steinen: A 1 451, B 1 244. Geschlagene Steine insgesamt:
+  A 22 002, B 19 206.
+- Verpasste Rettungen nach §3: A 1 189 von 1 451 Verlusten (81,9 %),
+  B 969 von 1 244 (77,9 %). Auch B verpasst also viele. Der Schalter hebt
+  die Rettung an die Spitze der Kandidaten, gespielt wird sie aber nur, wenn
+  die Suche sie wählt. Ketten mit einem Stein erfasst er nicht.
+
+**Lesart.** Im Selbstspiel greift der Gegner bedrohte Ketten konsequent an,
+dort lohnt jede Rettung. GNU Go auf Stufe 1 tut das seltener. Der Verlust
+entsteht dort erst nach Zug 200, also im Endspiel. Wahrscheinlich rettet B
+dort kleine Ketten, die GNU Go nicht verfolgt hätte, und lässt dafür größere
+Punkte liegen. Naheliegende nächste Schritte, ungemessen:
+
+- eine Mindestgröße der geretteten Kette (etwa ab 4 Steinen)
+- den Schalter nur vor dem Endspiel wirken lassen
+- den Wert der Rettung gegen den besten anderen Zug abwägen, statt sie
+  immer an die Spitze zu setzen
