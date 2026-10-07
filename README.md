@@ -5,8 +5,12 @@ kein Build, kein Server: `index.html` im Browser öffnen und spielen. Die KI
 läuft als Monte-Carlo-Baumsuche in einem Web Worker.
 
 Der zweite Teil des Projekts ist ein Messrahmen. Jede Aussage über die
-Spielstärke in diesem README stammt aus gepaarten Selbstspiel-Läufen mit
-Signifikanztest, nicht aus dem Eindruck beim Spielen.
+Spielstärke in diesem README stammt aus Selbstspiel-Läufen oder Partien gegen
+GNU Go, jeweils mit Signifikanztest, nicht aus dem Eindruck beim Spielen.
+Seit der GNU-Go-Brücke ist GNU Go in den vorab festgelegten Messungen dabei,
+als Gegner oder als Schiedsrichter. Eine Änderung, die im Selbstspiel gewinnt,
+gegen GNU Go aber verliert, wird nicht Default (so geschehen bei
+`leseRettung`).
 https://hazeberry.github.io/Go-html-Game-MoE/
 
 ## Spielen
@@ -131,6 +135,10 @@ der auch im Browser läuft. Die ersten beiden Blöcke sind DOM-frei; `policy-net
 fasst `localStorage` und `document.getElementById` an und bekommt beide vom
 Messrahmen als Schale gestellt, statt im Code zu verzweigen.
 
+Der Messrahmen führt die Blöcke per `eval` aus. Er ist für die `index.html`
+dieses Repos gedacht: Eine fremde Datei damit zu messen heißt, fremden Code
+auszuführen.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/bilder/aufbau-dunkel.svg">
   <img alt="Aufbau: index.html mit vier Skriptblöcken; im Browser laufen sie im Web Worker und im Haupt-Thread, in Node lösen ab-harness.js, gnugo-duell.js, die Tests und die Auswertung dieselben Blöcke heraus" src="docs/bilder/aufbau-hell.svg" width="100%">
@@ -138,10 +146,15 @@ Messrahmen als Schale gestellt, statt im Code zu verzweigen.
 
 ### Bewertung
 
-Ein Mixture-of-Experts über die Partiephasen — `evalOpening`, `evalMidgame`,
+Eine Mixture of Experts über die Partiephasen — `evalOpening`, `evalMidgame`,
 `evalEndgame`, `evalTsumego`, `evalNakade` — mit weichem Übergang zwischen den
-Phasen. Darüber liegt Benson als beweisbare Schicht: Was als bedingungslos
-lebend erkannt ist, wird nicht mehr heuristisch bewertet.
+Phasen. Das Gating ist **handgebaut, nicht gelernt**: `phaseWeights` verteilt
+die Gewichte nach Zugzahl und freien Feldern, das Krisengewicht mischt
+`evalTsumego` dort ein, wo Ketten in Gefahr sind. Auch die Experten sind
+Heuristiken, keine trainierten Netze. In der ML-Literatur, wo Gate und
+Experten gemeinsam gelernt werden, hieße das eine MoE mit fester
+Gating-Funktion. Darüber liegt Benson als beweisbare Schicht: Was als
+bedingungslos lebend erkannt ist, wird nicht mehr heuristisch bewertet.
 
 So wird daraus ein Zug, Schritt für Schritt durch `getAIMove`:
 
