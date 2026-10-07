@@ -21,7 +21,7 @@ const OHNE_BROWSER = argv.includes('--ohne-browser');
 const pfad = argv.find(a => !a.startsWith('--'));
 const HTML = pfad ? [path.resolve(pfad)] : [];
 
-const ALLE = ['nan-guards.js', 'resign-criterion.js', 'transfer-telemetry.js',
+const ALLE = ['regeln.js', 'nan-guards.js', 'resign-criterion.js', 'transfer-telemetry.js',
               'benson-transfer.js', 'feste-sims.js', 'roh-dump.js',
               'influence.js', 'endspiel-gleichstand.js', 'epochen.js', 'raumrisiko.js', 'gebiet.js', 'endspiel-augen.js', 'gegnerwert.js', 'lesen.js', 'gnugo-bruecke.js',
               'training-stability.js', 'harness-smoke.js', 'browser-nan.js'];

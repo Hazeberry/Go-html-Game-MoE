@@ -122,7 +122,7 @@ function aufbau(t) {
   const werkzeuge = [
     ['ab-harness.js', 'Selbstspiel, A gegen B'],
     ['gnugo-duell.js', 'gegen GNU Go 3.8 über GTP'],
-    ['tests/run.js', '18 Testdateien'],
+    ['tests/run.js', 'Regeln, Taktik, Browser'],
     ['auswertung/', 'Rohdumps nachrechnen'],
   ];
   werkzeuge.forEach(([n, z], k) => L.kasten(RX, MY + 26 + k * 74, RW, 60, {titel: n, zeilen: [z]}));
