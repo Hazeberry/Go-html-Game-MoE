@@ -196,6 +196,14 @@ Simulationszahl pro Zug direkt an der Rechenleistung hängt.
 
 ## Belegte Ergebnisse
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/bilder/ergebnisse-dunkel.svg">
+  <img alt="Siegrate jeder gemessenen Änderung im Selbstspiel mit 95-%-Konfidenzintervall, dazu das Ergebnis gegen GNU Go; die Zahlen stehen in der Tabelle darunter" src="docs/bilder/ergebnisse-hell.svg" width="100%">
+</picture>
+
+Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
+`node auswertung/diagramm.js` (die Zahlen stehen oben im Skript).
+
 | Befund | Messung | Konsequenz |
 |---|---|---|
 | `mctsValueScale` 200 statt 350 | 65:35 über 100 gepaarte Partien, p = 0,0035 | **eingebaut** (≈ +108 Elo) |
