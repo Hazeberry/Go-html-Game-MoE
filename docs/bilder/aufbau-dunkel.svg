@@ -54,7 +54,7 @@
 <text x="660" y="240" font-size="12.5" fill="#c3c2b7" text-anchor="start">gegen GNU Go 3.8 über GTP</text>
 <rect x="646" y="274" width="250" height="60" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
 <text x="660" y="295" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">tests/run.js</text>
-<text x="660" y="314" font-size="12.5" fill="#c3c2b7" text-anchor="start">18 Testdateien</text>
+<text x="660" y="314" font-size="12.5" fill="#c3c2b7" text-anchor="start">Regeln, Taktik, Browser</text>
 <rect x="646" y="348" width="250" height="60" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
 <text x="660" y="369" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">auswertung/</text>
 <text x="660" y="388" font-size="12.5" fill="#c3c2b7" text-anchor="start">Rohdumps nachrechnen</text>

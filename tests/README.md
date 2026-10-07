@@ -5,6 +5,7 @@ Regressionstests zum NaN-Bug in `mctsPUCT` ([#49](https://github.com/Hazeberry/G
 ```
 node tests/run.js                     # alles
 node tests/run.js --ohne-browser      # alles außer dem Browser-Test
+node tests/regeln.js                  # Regeln und Grundformen (< 1 s)
 node tests/nan-guards.js              # nur die Schutzschichten (< 1 s)
 node tests/resign-criterion.js        # nur das Aufgabe-Kriterium (< 1 s)
 node tests/training-stability.js      # nur das Training (~20 s)
@@ -58,6 +59,7 @@ niemand ausliefert.
 
 | Datei | Ebene | Inhalt |
 |---|---|---|
+| `regeln.js` | Regeln | Selbstmord, Ko, Superko, Snapback, Seki und zwei echte Augen an festen Stellungen; dazu, dass die KI den Snapback schlägt und den verbotenen Rückschlag nicht spielt |
 | `nan-guards.js` | Logik im Prozess | `_mctsKids` bei NaN/Infinity, `mctsPUCT` mit vergifteter Wurzelliste, `forward`/`save`/`load`/`_backward`/`trainGame`-Schutz |
 | `resign-criterion.js` | Aufgabe | gibt die KI nur noch auf, wenn auch das Gebiet verloren sagt |
 | `training-stability.js` | Training | Regularisierungs-Parameter, Gradienten-Deckel, Max-Norm-Projektion, Advantage-Dämpfung, dazu der ursprüngliche Repro-Lauf |
@@ -72,6 +74,7 @@ den Worker und danach den synchronen Fallback.
 
 | Was geprüft wird | Datei |
 |---|---|
+| Spielregeln, Benson, Grundformen an einer festen Stellung | `regeln.js` |
 | Neue Guard-Logik — etwas fängt einen nicht-finiten oder entarteten Wert ab | `nan-guards.js` |
 | Trainingsdynamik oder Regularisierung — Gradienten, Normen, Dämpfung, Zerfall | `training-stability.js` |
 | Browser-spezifisches Verhalten oder `localStorage`-Interaktion | `browser-nan.js` |

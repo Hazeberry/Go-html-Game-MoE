@@ -55,7 +55,7 @@ function ladeKI({htmlPfad = STANDARD_HTML, mitNetz = true, speicher = null} = {}
                  'primeAreaCache', 'buildCrisisMap', '_bnBornDead', 'phaseWeights',
                  'aufgabeGebiet', 'setzeFfEpoche', 'fuelltEigenesAuge', 'gegnerzugUnabwendbar', 'leseAngriff', 'leseVerteidigung',
                  'leseTransferWaechter', 'removeDeadGroups', 'bensonClassify',
-                 '_bnDead', 'floodFill',
+                 '_bnDead', '_bnAlive', 'floodFill', 'computeZobrist',
                  'PARAMS', 'BOARD_SIZE', 'NEIGHBORS', 'idx', 'xOf', 'yOf'];
   quelle += `
     ;globalThis.__test = {};
