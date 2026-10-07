@@ -5428,7 +5428,14 @@ function updateUI(msg='') {
   elStone.className=isB?'black':'white'; elLabel.textContent=isB?'Schwarz':'Weiß';
   elCapB.textContent=state.captures[1]; elCapW.textContent=state.captures[2];
   elMsg.textContent=state.gameOver?'Spiel beendet':(msg||'–');
-  elLog.innerHTML=state.log.slice(-40).map(l=>`<div>${l}</div>`).join('');
+  /* Als Text, nicht als HTML: das Log nimmt auch Fehlermeldungen des Workers
+     auf, und nichts davon soll je als Markup gelesen werden. */
+  elLog.textContent = '';
+  for (const l of state.log.slice(-40)) {
+    const d = document.createElement('div');
+    d.textContent = l;
+    elLog.appendChild(d);
+  }
   elLog.scrollTop=elLog.scrollHeight;
 }
 
