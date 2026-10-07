@@ -131,12 +131,26 @@ der auch im Browser läuft. Die ersten beiden Blöcke sind DOM-frei; `policy-net
 fasst `localStorage` und `document.getElementById` an und bekommt beide vom
 Messrahmen als Schale gestellt, statt im Code zu verzweigen.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/bilder/aufbau-dunkel.svg">
+  <img alt="Aufbau: index.html mit vier Skriptblöcken; im Browser laufen sie im Web Worker und im Haupt-Thread, in Node lösen ab-harness.js, gnugo-duell.js, die Tests und die Auswertung dieselben Blöcke heraus" src="docs/bilder/aufbau-hell.svg" width="100%">
+</picture>
+
 ### Bewertung
 
 Ein Mixture-of-Experts über die Partiephasen — `evalOpening`, `evalMidgame`,
 `evalEndgame`, `evalTsumego`, `evalNakade` — mit weichem Übergang zwischen den
 Phasen. Darüber liegt Benson als beweisbare Schicht: Was als bedingungslos
 lebend erkannt ist, wird nicht mehr heuristisch bewertet.
+
+So wird daraus ein Zug, Schritt für Schritt durch `getAIMove`:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/bilder/zugwahl-dunkel.svg">
+  <img alt="Ablauf der Zugwahl: Stellung, legale Züge, Filter, Zugbewertung als Mischung von Experten, Pass-Prüfung, Taktik-Schalter, Monte-Carlo-Suche mit PUCT, Aufgabe-Prüfung, Zug" src="docs/bilder/zugwahl-hell.svg" width="100%">
+</picture>
+
+Beide Bilder erzeugt `node auswertung/architektur.js`.
 
 ## Messen
 
