@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="530" viewBox="0 0 920 530" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="titel beschr">
+<title id="titel">Aufbau der Go-KI: eine Datei, zwei Laufzeiten</title><desc id="beschr">index.html enthält vier Skriptblöcke. Im Browser laufen shared-go-logic und worker-ai im Web Worker, policy-net und das Haupt-Skript im Haupt-Thread. In Node lösen ab-harness.js, gnugo-duell.js und die Tests dieselben Blöcke zur Laufzeit heraus; es gibt kein Code-Duplikat.</desc>
+<defs><marker id="spitze" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#898781"/></marker><marker id="spitzeA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d95926"/></marker></defs>
+<rect width="920" height="530" rx="8" fill="#1a1a19"/>
+<text x="24" y="36" font-size="18" font-weight="600" fill="#ffffff" text-anchor="start">Aufbau: eine Datei, zwei Laufzeiten</text>
+<text x="24" y="58" font-size="13" fill="#c3c2b7" text-anchor="start">Browser und Messrahmen führen denselben Code aus. Gemessen wird also genau der Stand, der im Spiel läuft.</text>
+<rect x="340" y="100" width="250" height="376" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="354" y="121" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">index.html</text>
+<text x="576" y="121" font-size="11.5" fill="#898781" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">eine Datei</text>
+<rect x="354" y="140" width="222" height="64" rx="6" fill="#1b2533" stroke="#3987e5" stroke-width="1.5"/>
+<text x="368" y="161" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">shared-go-logic</text>
+<text x="368" y="180" font-size="12" fill="#c3c2b7" text-anchor="start">Regeln, Zobrist, Freiheiten,</text>
+<text x="368" y="197" font-size="12" fill="#c3c2b7" text-anchor="start">Benson</text>
+<rect x="354" y="214" width="222" height="64" rx="6" fill="#1b2533" stroke="#3987e5" stroke-width="1.5"/>
+<text x="368" y="235" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">worker-ai</text>
+<text x="368" y="254" font-size="12" fill="#c3c2b7" text-anchor="start">Bewertung, Suche, Rollouts,</text>
+<text x="368" y="271" font-size="12" fill="#c3c2b7" text-anchor="start">taktischer Leser</text>
+<rect x="354" y="288" width="222" height="64" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="368" y="309" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">policy-net</text>
+<text x="368" y="328" font-size="12" fill="#c3c2b7" text-anchor="start">Features, Forward,</text>
+<text x="368" y="345" font-size="12" fill="#c3c2b7" text-anchor="start">REINFORCE-Training</text>
+<rect x="354" y="362" width="222" height="64" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="368" y="383" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Haupt-Skript</text>
+<text x="368" y="402" font-size="12" fill="#c3c2b7" text-anchor="start">Brett, Eingaben, Worker,</text>
+<text x="368" y="419" font-size="12" fill="#c3c2b7" text-anchor="start">Dashboard, SGF</text>
+<text x="465" y="460" font-size="11.5" fill="#898781" text-anchor="middle">die blauen Blöcke sind DOM-frei</text>
+<text x="24" y="92" font-size="14" font-weight="600" fill="#c3c2b7" text-anchor="start">Im Browser</text>
+<text x="24" y="440" font-size="11.5" fill="#898781" text-anchor="start">beide Threads bekommen den Quelltext</text>
+<text x="24" y="456" font-size="11.5" fill="#898781" text-anchor="start">aus index.html, ohne Build-Schritt</text>
+<rect x="24" y="126" width="236" height="104" rx="6" fill="#1b2533" stroke="#3987e5" stroke-width="1.5"/>
+<text x="38" y="147" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Web Worker</text>
+<text x="246" y="147" font-size="11.5" fill="#898781" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">getAIMove</text>
+<text x="38" y="166" font-size="12.5" fill="#c3c2b7" text-anchor="start">sucht den Zug, ohne die</text>
+<text x="38" y="183.5" font-size="12.5" fill="#c3c2b7" text-anchor="start">Oberfläche zu blockieren</text>
+<text x="38" y="201" font-size="12.5" fill="#c3c2b7" text-anchor="start">gebaut aus den blauen Blöcken</text>
+<rect x="24" y="316" width="236" height="104" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="38" y="337" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Haupt-Thread</text>
+<text x="38" y="356" font-size="12.5" fill="#c3c2b7" text-anchor="start">zeichnet, nimmt Züge an,</text>
+<text x="38" y="373.5" font-size="12.5" fill="#c3c2b7" text-anchor="start">Dashboard und Parameter,</text>
+<text x="38" y="391" font-size="12.5" fill="#c3c2b7" text-anchor="start">Netz-Priors für „Schwer“</text>
+<line x1="142" y1="234" x2="142" y2="312" stroke="#898781" stroke-width="1.5" marker-start="url(#spitze)" marker-end="url(#spitze)"/>
+<text x="150" y="277" font-size="11.5" fill="#898781" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">postMessage</text>
+<polyline points="354,172 332,172 332,246 354,246" fill="none" stroke="#898781" stroke-width="1.5"/>
+<line x1="332" y1="178" x2="264" y2="178" stroke="#898781" stroke-width="1.5" marker-end="url(#spitze)"/>
+<polyline points="354,320 332,320 332,394 354,394" fill="none" stroke="#898781" stroke-width="1.5"/>
+<line x1="332" y1="368" x2="264" y2="368" stroke="#898781" stroke-width="1.5" marker-end="url(#spitze)"/>
+<text x="646" y="92" font-size="14" font-weight="600" fill="#c3c2b7" text-anchor="start">In Node (Messrahmen)</text>
+<text x="646" y="422" font-size="11.5" fill="#898781" text-anchor="start">löst die Blöcke zur Laufzeit heraus</text>
+<rect x="646" y="126" width="250" height="60" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="660" y="147" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">ab-harness.js</text>
+<text x="660" y="166" font-size="12.5" fill="#c3c2b7" text-anchor="start">Selbstspiel, A gegen B</text>
+<rect x="646" y="200" width="250" height="60" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="660" y="221" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">gnugo-duell.js</text>
+<text x="660" y="240" font-size="12.5" fill="#c3c2b7" text-anchor="start">gegen GNU Go 3.8 über GTP</text>
+<rect x="646" y="274" width="250" height="60" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="660" y="295" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">tests/run.js</text>
+<text x="660" y="314" font-size="12.5" fill="#c3c2b7" text-anchor="start">18 Testdateien</text>
+<rect x="646" y="348" width="250" height="60" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="660" y="369" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">auswertung/</text>
+<text x="660" y="388" font-size="12.5" fill="#c3c2b7" text-anchor="start">Rohdumps nachrechnen</text>
+<polyline points="576,172 598,172 598,320 576,320" fill="none" stroke="#898781" stroke-width="1.5"/>
+<polyline points="576,246 598,246" fill="none" stroke="#898781" stroke-width="1.5"/>
+<polyline points="598,255 624,255" fill="none" stroke="#898781" stroke-width="1.5"/>
+<polyline points="624,156 624,378" fill="none" stroke="#898781" stroke-width="1.5"/>
+<line x1="624" y1="156" x2="643" y2="156" stroke="#898781" stroke-width="1.5" marker-end="url(#spitze)"/>
+<line x1="624" y1="230" x2="643" y2="230" stroke="#898781" stroke-width="1.5" marker-end="url(#spitze)"/>
+<line x1="624" y1="304" x2="643" y2="304" stroke="#898781" stroke-width="1.5" marker-end="url(#spitze)"/>
+<line x1="624" y1="378" x2="643" y2="378" stroke="#898781" stroke-width="1.5" marker-end="url(#spitze)"/>
+<text x="24" y="514" font-size="11" fill="#898781" text-anchor="start">policy-net braucht im Messrahmen eine kleine Schale für localStorage und document. Erzeugt mit auswertung/architektur.js.</text>
+</svg>
