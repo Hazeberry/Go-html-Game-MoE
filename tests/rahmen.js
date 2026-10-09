@@ -53,7 +53,7 @@ function ladeKI({htmlPfad = STANDARD_HTML, mitNetz = true, speicher = null} = {}
                  'gebietSagtVerloren', 'estimateArea', 'evaluateBoard',
                  'evaluateMove', 'primeInfluenceCache', 'influenceZone', 'primeEndTieBreak', 'tbBilanzNach', 'bouzyBilanz', 'primeRaum', 'leseRaumWaechter', '_raumK3', 'gebietBilanz',
                  'primeAreaCache', 'buildCrisisMap', '_bnBornDead', 'phaseWeights',
-                 'aufgabeGebiet', 'setzeFfEpoche', 'fuelltEigenesAuge', 'gegnerzugUnabwendbar', 'leseAngriff', 'leseVerteidigung',
+                 'aufgabeGebiet', 'setzeFfEpoche', 'fuelltEigenesAuge', 'vergeblicherZug', 'gegnerzugUnabwendbar', 'leseAngriff', 'leseVerteidigung',
                  'leseTransferWaechter', 'removeDeadGroups', 'bensonClassify',
                  '_bnDead', '_bnAlive', 'floodFill', 'computeZobrist',
                  'PARAMS', 'BOARD_SIZE', 'NEIGHBORS', 'idx', 'xOf', 'yOf'];
