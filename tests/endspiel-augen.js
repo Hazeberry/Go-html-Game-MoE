@@ -129,4 +129,4 @@ test('GNU-Go-Partie nach Zug 311: mit passUnabwendbar Pass, ohne Stein', () => {
   pruefeGleich(zug({passUnabwendbar: 1, augenSchutz: 2}).type, 'pass', 'mit augenSchutz 2');
 });
 
-laufeTests('Augenschutz und Pass (docs/endspiel-augen.md)');
+laufeTests('Augenschutz und Pass (docs/endspiel-augen.md)').then(ok => process.exit(ok ? 0 : 1));

@@ -153,3 +153,53 @@ fremde Gegner vor dem Selbstspiel.
   verzerrt.
 - GNU Go Stufe 1 mit neun Vorgabesteinen ist ein einzelner, enger Gegner.
 - Gemessen wird mit 120 Simulationen.
+
+---
+
+## 6. Nachtrag: Ergebnis, Default 1 (09.10.2026)
+
+Gelaufen auf dem Merge-Commit `e8e23b3`, ohne Unterbrechung. M1 in
+13 Minuten, M2 in rund 30 Minuten. Daten: `daten/verzicht-gnugo.json` (M1,
+beide Arme) und `daten/verzicht-20261080.json` bis `…83.json`
+(Hash-Listen M2).
+
+**M1, gegen GNU Go (primär), 60 Paare, Seed 111:**
+
+| | A (Default) | B (`leseVerzicht` 1) | B − A |
+|---|---:|---:|---|
+| **Endstand** | −138,8 | −82,7 | **+56,1** (SD 101,1), **p = 0,00007** |
+| nach Zug 120 | +20,2 | +30,1 | +9,9, p = 0,07 (56 Paare) |
+| nach Zug 200 | −93,4 | −57,6 | +35,8, p = 2 · 10⁻⁷ (51 Paare) |
+
+- B ist in 43 von 60 Paaren besser, im Median um 66 Punkte.
+- GNU Go gab mit A dreimal auf, mit B sechsmal; so oft gewann die KI.
+- Die Partien sind kürzer: Ø 307 Züge (A) gegen 260 (B).
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt **262 von 360 Partien, 72,8 %**
+(z = 8,64, p = 5 · 10⁻¹⁸, 95-%-KI 68,0–77,1 %, rund +171 Elo).
+
+| Teillauf | 1080 | 1081 | 1082 | 1083 |
+|---|---:|---:|---:|---:|
+| Siegrate B | 74,4 % | 67,8 % | 76,7 % | 72,2 % |
+
+**Entscheidung nach §4: Default `leseVerzicht` = 1.** M1 ist signifikant
+besser, M2 nicht schlechter, sondern ebenfalls deutlich besser.
+
+**Sekundär, verschenkte Züge in M1** (`auswertung/verschenkt.js`):
+
+| ab Zug 100 | A | B |
+|---|---:|---:|
+| KI bis Zug 200 | 56 % (27,7 je Partie) | 41 % (19,3) |
+| KI nach Zug 200 | 68 % (36,9) | 54 % (17,5) |
+| Züge, deren Kette der Leser sofort fängt | 33,0 je Partie | 5,5 |
+| Rettungen aus dem Atari, die der Leser für aussichtslos hält | 8,5 je Partie | 0,8 |
+| GNU Go bis / nach Zug 200 | 6 % / 4 % | 9 % / 4 % |
+
+**Einordnung:**
+- Es ist der größte Gewinn im Selbstspiel seit `gebietZug` und der
+  zweitgrößte gegen GNU Go nach `augenSchutz`.
+- Die Änderung fügt nichts hinzu, sie verbietet nur Züge, von denen der
+  eigene Leser schon weiß, dass sie sterben.
+- Was bleibt: Weiterhin sind 41 % bzw. 54 % der eigenen Züge verschenkt.
+  Das sind vor allem Ketten, die an fehlenden Augen sterben, und Züge in
+  Suche und Rollouts. Beides sieht der Leser nicht (§5).

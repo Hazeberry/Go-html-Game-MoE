@@ -139,4 +139,4 @@ test('Zwei echte Augen: lebend, ein Stein ins Auge wäre todgeboren', () => {
   pruefe(!legal(b, W, null, null).has(P(0, 0)), 'und ohnehin Selbstmord');
 });
 
-laufeTests('Regeln und Grundformen (Selbstmord, Ko, Superko, Snapback, Seki)');
+laufeTests('Regeln und Grundformen (Selbstmord, Ko, Superko, Snapback, Seki)').then(ok => process.exit(ok ? 0 : 1));

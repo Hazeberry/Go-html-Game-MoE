@@ -8,6 +8,10 @@
         endet mit und ohne Gegnerwert im Pass.
      4. krisenKandidaten: Im selben Beispiel rettet die KI ihre Kette, ohne
         den Schalter spielt sie woanders (die Rettung lag auf Rang 222).
+     Die Flucht in 2 und 4 ist aussichtslos (Leiter an der Kante). Seit
+     leseVerzicht Default 1 ist, filtert die KI sie heraus
+     (docs/endspiel-verlust.md). Die beiden Tests prüfen die Mechanik der
+     Schalter und setzen leseVerzicht deshalb auf 0.
 
    Aufruf:  node tests/gegnerwert.js [pfad/zur/index.html] */
 'use strict';
@@ -58,7 +62,7 @@ test('Rettungspunkt der eigenen Gruppe wird mit Gegnerwert gewählt', () => {
                            [8, 18, 2], [9, 18, 2], [10, 18, 2], [7, 18, 1], [8, 17, 1], [9, 17, 1], [10, 17, 1]])
     b[P(x, y)] = f;
   /* Freiheit: (11,18). Schwarz am Zug würde dort 3 Steine schlagen. */
-  const r = zug(b, 2, 40, {gegnerWert: 1});
+  const r = zug(b, 2, 40, {gegnerWert: 1, leseVerzicht: 0});
   pruefeGleich(r.type, 'stone', 'Weiß zieht');
   pruefeGleich(P(r.x, r.y), P(11, 18), 'Weiß flieht auf die letzte Freiheit');
 });
@@ -68,10 +72,12 @@ test('krisenKandidaten: Rettung aus dem Atari kommt in die Suche', () => {
   for (const [x, y, f] of [[3, 3, 1], [15, 15, 1], [3, 15, 2], [15, 3, 2],
                            [8, 18, 2], [9, 18, 2], [10, 18, 2], [7, 18, 1], [8, 17, 1], [9, 17, 1], [10, 17, 1]])
     b[P(x, y)] = f;
-  const ohne = zug(b, 2, 40, {});
+  const ohne = zug(b, 2, 40, {leseVerzicht: 0});
   pruefe(P(ohne.x, ohne.y) !== P(11, 18), 'ohne Schalter: keine Rettung (Gebietszug überstrahlt)');
-  const mitK = zug(b, 2, 40, {krisenKandidaten: 1});
+  const mitK = zug(b, 2, 40, {krisenKandidaten: 1, leseVerzicht: 0});
   pruefeGleich(P(mitK.x, mitK.y), P(11, 18), 'mit Schalter: Flucht auf die letzte Freiheit');
+  const verzicht = zug(b, 2, 40, {krisenKandidaten: 1});
+  pruefe(P(verzicht.x, verzicht.y) !== P(11, 18), 'mit leseVerzicht (Default): die aussichtslose Flucht entfällt');
 });
 
 test('Pass-Prüfung unverändert: GNU-Go-Stellung nach Zug 311 endet im Pass', () => {
@@ -89,4 +95,4 @@ test('Pass-Prüfung unverändert: GNU-Go-Stellung nach Zug 311 endet im Pass', (
   }
 });
 
-laufeTests('Gegnerwert (docs/gegnerwert.md)');
+laufeTests('Gegnerwert (docs/gegnerwert.md)').then(ok => process.exit(ok ? 0 : 1));

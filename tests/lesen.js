@@ -72,8 +72,8 @@ test('leseRettung: Default 0; mit 1 wird die fangbare Kette gerettet', () => {
   pruefe(!ergebnis(1), 'mit Schalter: Kette danach nicht mehr fangbar');
 });
 
-test('vergeblicherZug: Selbstatari ja; freier Zug, Ausbruch, Einwurf nein; leseVerzicht Default 0', () => {
-  pruefeGleich(PARAMS.leseVerzicht, 0, 'Default');
+test('vergeblicherZug: Selbstatari ja; freier Zug, Ausbruch, Einwurf nein; leseVerzicht Default 1', () => {
+  pruefeGleich(PARAMS.leseVerzicht, 1, 'Default (gemessen, docs/endspiel-verlust.md §6)');
   const ecke = brett([[1, 0, 2], [1, 1, 2], [0, 2, 2]]);
   pruefe(vergeblicherZug(ecke, P(0, 0), 1), 'Ecke (0,0): Selbstatari');
   pruefe(vergeblicherZug(ecke, P(0, 1), 1), 'Ecke (0,1): Selbstatari');
@@ -86,4 +86,4 @@ test('vergeblicherZug: Selbstatari ja; freier Zug, Ausbruch, Einwurf nein; leseV
   pruefe(ecke.every((v, k) => v === vorher[k]), 'Brett unverändert');
 });
 
-laufeTests('Taktischer Leser (docs/laufkampf-lesen.md)');
+laufeTests('Taktischer Leser (docs/laufkampf-lesen.md)').then(ok => process.exit(ok ? 0 : 1));
