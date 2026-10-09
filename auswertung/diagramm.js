@@ -17,7 +17,7 @@ const path = require('path');
    art: eingebaut | offen | verworfen | massstab */
 const DATEN = [
   {name: 'gebietZug 80', text: 'Gebiet in der Zugbewertung', siege: 300, partien: 360, art: 'eingebaut', gnugo: '+229 nach Zug 120'},
-  {name: 'mctsValueScale 200', text: 'statt 350, Skala des Suchwerts', siege: 65, partien: 100, art: 'eingebaut', gnugo: ''},
+  {name: 'mctsValueScale 200', text: 'statt 350, Skala des Suchwerts', siege: 65, partien: 100, art: 'eingebaut', gnugo: '+14,2 Endstand (n. s.)'},
   {name: 'leseRettung 1', text: 'taktischer Leser rettet Ketten', siege: 452, partien: 720, art: 'offen', gnugo: '−30,5 Endstand'},
   {name: 'Doppelte Suche', text: '240 statt 120 Simulationen', siege: 218, partien: 360, art: 'massstab', gnugo: ''},
   {name: 'endTieBreak 1', text: 'Gleichstand im Endspiel ordnen', siege: 420, partien: 720, art: 'eingebaut', gnugo: ''},
