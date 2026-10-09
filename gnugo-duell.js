@@ -75,7 +75,8 @@ globalThis.document = {getElementById: () => null};
 (0, eval)(ex('shared-go-logic') + '\n' + ex('worker-ai')
   + ';globalThis.__D={PARAMS,getAIMove,computeZobrist,removeDeadGroups,floodFill,'
   + 'bensonClassify,_bnDead,BOARD_SIZE,NEIGHBORS,setzeKrisenDauer,'
-  + 'neuePartie(){_mctsSavedRoot=null;_hopelessStreak=0;_allDeadStreak=0;_lastMsPerSim=null;}};');
+  + 'neuePartie(){_mctsSavedRoot=null;_hopelessStreak=0;_allDeadStreak=0;_lastMsPerSim=null;},'
+  + 'wurzel:typeof leseWurzelWaechter==="function"?leseWurzelWaechter:null};');
 const E = globalThis.__D;
 const DEFAULT = JSON.parse(JSON.stringify(E.PARAMS));
 const N = E.BOARD_SIZE;
@@ -206,6 +207,7 @@ async function partieSpielen(nr) {
   await g.starte();
   Math.random = mulberry32(seed);
   E.neuePartie(); E.setzeKrisenDauer(null);
+  if (E.wurzel) E.wurzel(true);
   const board = new Uint8Array(N), caps = {1: 0, 2: 0};
   const hist = new Set([E.computeZobrist(board)]);
   let ko = null, last = null, mc = 0, paesse = 0, aufgabe = null;
@@ -279,6 +281,7 @@ async function partieSpielen(nr) {
             gnugoStand, endstand, unsereZaehlung: unsereZaehlung(board), zuegeAnzahl: mc,
             simsMittel: sims.length ? Math.round(sims.reduce((x, y) => x + y, 0) / sims.length) : null,
             neustarts: g.neustarts(), schaetzung,
+            wurzel: E.wurzel ? E.wurzel(true) : undefined,
             zuege};
   } finally { g.ende(); }
 }

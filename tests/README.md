@@ -60,6 +60,7 @@ niemand ausliefert.
 | Datei | Ebene | Inhalt |
 |---|---|---|
 | `regeln.js` | Regeln | Selbstmord, Ko, Superko, Snapback, Seki und zwei echte Augen an festen Stellungen; dazu, dass die KI den Snapback schlägt und den verbotenen Rückschlag nicht spielt |
+| `wurzel.js` | Suche | Wächter für Tree-Reuse; `wurzelFrisch` bildet die Wurzel eines übernommenen Teilbaums neu |
 | `nan-guards.js` | Logik im Prozess | `_mctsKids` bei NaN/Infinity, `mctsPUCT` mit vergifteter Wurzelliste, `forward`/`save`/`load`/`_backward`/`trainGame`-Schutz |
 | `resign-criterion.js` | Aufgabe | gibt die KI nur noch auf, wenn auch das Gebiet verloren sagt |
 | `training-stability.js` | Training | Regularisierungs-Parameter, Gradienten-Deckel, Max-Norm-Projektion, Advantage-Dämpfung, dazu der ursprüngliche Repro-Lauf |

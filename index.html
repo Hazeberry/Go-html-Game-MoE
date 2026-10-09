@@ -1547,6 +1547,15 @@ globalThis.PARAMS = {
   raveEnabled:         1,    // 0 = aus, reines PUCT wie vorher
   raveK:             300,    // AMAF-Einfluss; höher = länger stark gewichtet
   mctsTreeReuse:       1,    // 0 = aus, immer frischer Baum
+  /* Frische Wurzel bei Tree-Reuse: Uebernimmt die Suche den Teilbaum des
+     vorigen Zuges, stammen dessen Wurzelkinder aus quickEval (mctsChildren
+     Stueck, im vorigen Zug expandiert). Die Kandidatenliste von getAIMove
+     filtert sie dann nur noch nach Legalitaet. Mit 1 werden die
+     Wurzelkinder neu aus der Kandidatenliste gebildet (mctsRootChildren,
+     Prior aus evaluateMove); Besuche, Werte, Teilbaeume und AMAF-Zahlen
+     gleicher Zuege werden aus dem alten Baum uebernommen. Anlass:
+     docs/verschenkt-warum.md. 0 = aus, bitgenau. Siehe docs/wurzel-frisch.md. */
+  wurzelFrisch:        0,
   /* PolicyNet — FIX Bug 5: wurde referenziert aber nie definiert.
      netMaxBlend steht auf 0: das Netz lernt mit, steuert aber nicht.
      Grund ist nicht Vorsicht, sondern eine Messung. Der Netzbeitrag ist
@@ -3837,6 +3846,37 @@ function _mctsKids(list, K) {
    kein explizites Invalidieren nötig. */
 let _mctsSavedRoot = null;   // {node, board (Zustand NACH unserem Zug), aiColor}
 
+/* Waechter fuer Tree-Reuse und frische Wurzel: Suchen, davon mit
+   uebernommenem Teilbaum, und bei wurzelFrisch die Zahl der Wurzelkinder mit
+   uebernommener Statistik und der verworfenen alten Kinder. Nur gezaehlt,
+   aendert nichts an der Suche. */
+let _wurzelSuchen = 0, _wurzelWieder = 0, _wurzelUebernommen = 0, _wurzelVerworfen = 0;
+function leseWurzelWaechter(reset) {
+  const v = {suchen: _wurzelSuchen, wieder: _wurzelWieder,
+             uebernommen: _wurzelUebernommen, verworfen: _wurzelVerworfen};
+  if (reset) _wurzelSuchen = _wurzelWieder = _wurzelUebernommen = _wurzelVerworfen = 0;
+  return v;
+}
+
+/* Wurzel neu aus der Kandidatenliste bilden und die Statistik gleicher Zuege
+   aus dem uebernommenen Teilbaum mitnehmen. Siehe PARAMS.wurzelFrisch. */
+function _frischeWurzel(alt, rootScored) {
+  const kids = _mctsKids(rootScored, PARAMS.mctsRootChildren);
+  const vorher = new Map(alt.kids.map(k => [k.idx, k]));
+  let N = 0, W = 0;
+  for (const k of kids) {
+    const o = vorher.get(k.idx);
+    if (!o) continue;
+    k.N = o.N; k.W = o.W; k.kids = o.kids;
+    if (o.amafN !== undefined) { k.amafN = o.amafN; k.amafW = o.amafW; }
+    N += o.N; W += o.W;
+    vorher.delete(k.idx);
+    _wurzelUebernommen++;
+  }
+  _wurzelVerworfen += vorher.size;
+  return {N, W, kids};
+}
+
 function _tryReuseSubtree(savedBoard, aiColor, savedNode, currentBoard) {
   if (!savedNode || !savedNode.kids || !savedNode.kids.length) return null;
   const opp = aiColor === 1 ? 2 : 1;
@@ -3909,6 +3949,11 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
         if (!kept.length) root = null;
       }
     }
+  }
+  _wurzelSuchen++;
+  if (root) {
+    _wurzelWieder++;
+    if (PARAMS.wurzelFrisch >= 1) root = _frischeWurzel(root, rootScored);
   }
   if (!root) root = {N: 0, W: 0, kids: _mctsKids(rootScored, PARAMS.mctsRootChildren)};
   if (!root.kids.length) return null;
@@ -6424,6 +6469,8 @@ globalThis.policyNet = new PolicyNet();
          tip:'1 = ein taktischer Leser prüft eigene gefährdete Ketten (bis 3 Freiheiten) und spielt nachweislich rettende Züge bevorzugt. Selbstspiel 62,8 %, gegen GNU Go aber 30 Punkte schlechter — kein Default. 2 = zusätzlich Fangen. Siehe docs/laufkampf-lesen.md.'},
         {key:'leseVerzicht',      label:'Lese-Verzicht',    step:1,   min:0,   max:1,
          tip:'1 = keine Züge, deren eigene Kette der taktische Leser sofort fangen kann (außer Schlag oder Atari), Default. Gegen GNU Go +56 Punkte, im Selbstspiel 72,8 %. 0 = altes Verhalten. Siehe docs/endspiel-verlust.md.'},
+        {key:'wurzelFrisch',      label:'Frische Wurzel',   step:1,   min:0,   max:1,
+         tip:'1 = bei wiederverwendetem Suchbaum kommen die Kandidaten an der Wurzel trotzdem aus der vollen Zugbewertung; was der alte Baum über diese Züge weiß, bleibt erhalten. 0 = Kandidaten aus dem alten Baum. Siehe docs/wurzel-frisch.md.'},
         {key:'augenSchutz',       label:'Augenschutz',      step:1,   min:0,   max:2,
          tip:'Nie ein eigenes echtes Auge füllen. 1 = beim eigenen Zug, 2 = auch in der Suche (Default). Gegen GNU Go +217 Punkte im Endstand. 0 = altes Verhalten.'},
         {key:'passUnabwendbar',   label:'Pass trotz Drohung', step:1, min:0,   max:1,
