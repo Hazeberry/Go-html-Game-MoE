@@ -165,8 +165,9 @@ function zugwahl(t) {
 
   schritt(58, {titel: 'Stellung', zeilen: ['Brett, Ko-Punkt, Gefangene und alle bisherigen Stellungen']});
   schritt(58, {titel: 'Legale Züge', code: 'getLegalMoves', zeilen: ['kein Selbstmord, kein Ko, kein Superko']});
-  schritt(76, {titel: 'Filter', zeilen: ['Benson: Züge, deren Stein beweisbar tot geboren wäre, fallen weg',
-    'augenSchutz: eigene echte Augen werden nicht gefüllt']},
+  schritt(94, {titel: 'Filter', zeilen: ['Benson: Züge, deren Stein beweisbar tot geboren wäre, fallen weg',
+    'augenSchutz: eigene echte Augen werden nicht gefüllt',
+    'leseVerzicht: keine Züge, deren Kette der Leser sofort fängt']},
   y0 => raus(y0 + 38, 'Pass: nichts übrig'));
 
   /* Bewertung, mit Unterkästen */

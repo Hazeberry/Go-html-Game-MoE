@@ -241,6 +241,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | `raumGewicht` + `raumZug` 1 (Raumrisiko im Laufkampf) | 45,3 % über 360 Partien, p = 0,073; Ausbrüche ×2, große Verluste unverändert | verworfen — Default 0 |
 | **`gebietZug` 80 statt 0 (Gebiet in der Zugbewertung)** | **gegen GNU Go +229 Punkte nach 120 Zügen (p = 8 · 10⁻³³), im Selbstspiel 83,3 % über 360 Partien** | **eingebaut** — Default 80, rund +280 Elo |
 | **`augenSchutz` 2 + `passUnabwendbar` 1 (eigene Augen nie füllen, passen, wenn nichts zu retten ist)** | **gegen GNU Go Endstand +217 Punkte über 60 ganze Partien (p = 3 · 10⁻¹⁷), im Selbstspiel 53,9 % über 360 Partien (n. s.)** | **eingebaut** — vorher endeten 57 von 60 Partien gegen GNU Go mit W +370,5 |
+| **`leseVerzicht` 1 (keine Züge, deren Kette der eigene Leser sofort fängt)** | **gegen GNU Go Endstand +56,1 Punkte über 60 Paare (p = 0,00007), im Selbstspiel 72,8 % über 360 Partien (p = 5 · 10⁻¹⁸)** | **eingebaut** — Default 1, rund +171 Elo im Selbstspiel (`docs/endspiel-verlust.md`) |
 | `captureCap` 200 (Gefangenen-Saldo deckeln, gegen falsche Aufgaben) | falsche Aufgaben 16 → 8 (p = 0,15), Siegrate 54,4 % (p = 0,017, nur Kontrolle); Wiederholung 53,6 % (p = 0,053) | **nicht beschlossen**, knapp — Schalter im Dashboard (`docs/aufgabe-deckel.md`) |
 | `gegnerWert` / `gegnerGebiet` (Wert des Punkts für den Gegner) | Pilot gegen GNU Go: Endstand −90 bis −126 | verworfen — Default 0 (`docs/gegnerwert.md`) |
 | `krisenKandidaten` (Rettung aus dem Atari und Schläge immer in die Suche) | Selbstspiel 51,7 % über 720 Partien (p = 0,37), gegen GNU Go +7,5 (p = 0,50) | verworfen — Default 0 |
@@ -2199,9 +2200,19 @@ verschiebt Q, behebt es aber nicht. Die Ursache liegt in den Rollouts, die
 viele schwache, aber lebende Gruppen schlagen. Befunde ohne Default:
 [`docs/falsche-aufgabe.md`](docs/falsche-aufgabe.md).
 
+**Verschenkte Züge.** Die Nachprüfungen von `mctsValueScale` und
+`endTieBreak` gegen GNU Go änderten am Endstand nichts. Eine Diagnose Zug
+für Zug zeigte warum: Ab Zug 100 setzte die KI in mehr als der Hälfte ihrer
+Züge Steine, die später geschlagen wurden oder am Ende tot waren, GNU Go in
+5–7 %. Bei einem Drittel dieser Züge wusste unser eigener taktischer Leser
+schon vorher, dass die Kette fällt. `leseVerzicht` spielt solche Züge nicht
+mehr: gegen GNU Go **+56 Punkte** im Endstand, im Selbstspiel **72,8 %**.
+Seitdem Default: [`docs/endspiel-verlust.md`](docs/endspiel-verlust.md).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
-`gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1. Wiederholen
-auf dem Commit aus der Hash-Liste oder mit `gebietZug=0,augenSchutz=0,passUnabwendbar=0`
+`gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
+09.10. auch `leseVerzicht` = 1. Wiederholen auf dem Commit aus der
+Hash-Liste oder mit `gebietZug=0,augenSchutz=0,passUnabwendbar=0,leseVerzicht=0`
 (und `endTieBreak=0` für Läufe vor dem 03.10.) in beiden Armen.
 
 ## Methodik
