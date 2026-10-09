@@ -7,13 +7,16 @@
      4. Atari: im Freien rettbar, in der Ecke nicht.
      5. leseRettung: Default 0; mit 1 spielt die KI einen Zug, nach dem ihre
         fangbare Kette nicht mehr fangbar ist, ohne den Schalter nicht.
+     6. vergeblicherZug (leseVerzicht, docs/endspiel-verlust.md): Selbstatari
+        in der Ecke ist vergeblich; ein freier Zug, der rettende Ausbruch aus
+        der Leiter und der Snapback-Einwurf (gibt Atari) sind es nicht.
 
    Aufruf:  node tests/lesen.js [pfad/zur/index.html] */
 'use strict';
 const {ladeKI, test, pruefe, pruefeGleich, laufeTests} = require('./rahmen');
 
 const KI = ladeKI({htmlPfad: process.argv[2] || undefined, mitNetz: false});
-const {BOARD_SIZE, PARAMS, getAIMove, removeDeadGroups, leseAngriff, leseVerteidigung} = KI;
+const {BOARD_SIZE, PARAMS, getAIMove, removeDeadGroups, leseAngriff, leseVerteidigung, vergeblicherZug} = KI;
 const P = (x, y) => y * 19 + x;
 function brett(steine) {
   const b = new Uint8Array(BOARD_SIZE);
@@ -67,6 +70,20 @@ test('leseRettung: Default 0; mit 1 wird die fangbare Kette gerettet', () => {
   };
   pruefe(ergebnis(0), 'ohne Schalter: Kette bleibt fangbar');
   pruefe(!ergebnis(1), 'mit Schalter: Kette danach nicht mehr fangbar');
+});
+
+test('vergeblicherZug: Selbstatari ja; freier Zug, Ausbruch, Einwurf nein; leseVerzicht Default 0', () => {
+  pruefeGleich(PARAMS.leseVerzicht, 0, 'Default');
+  const ecke = brett([[1, 0, 2], [1, 1, 2], [0, 2, 2]]);
+  pruefe(vergeblicherZug(ecke, P(0, 0), 1), 'Ecke (0,0): Selbstatari');
+  pruefe(vergeblicherZug(ecke, P(0, 1), 1), 'Ecke (0,1): Selbstatari');
+  pruefe(!vergeblicherZug(brett(LEITER), P(15, 15), 1), 'freier Zug');
+  pruefe(!vergeblicherZug(brett(LEITER), P(6, 5), 1), 'Ausbruch aus der Leiterstellung (Schwarz am Zug rettet)');
+  const snap = brett([[0, 0, 2], [0, 1, 2], [1, 1, 2], [2, 1, 2], [0, 2, 1], [1, 2, 1], [2, 2, 1], [3, 1, 1], [3, 0, 1]]);
+  pruefe(!vergeblicherZug(snap, P(1, 0), 1), 'Snapback-Einwurf gibt Atari');
+  const vorher = new Uint8Array(ecke);
+  vergeblicherZug(ecke, P(0, 0), 1);
+  pruefe(ecke.every((v, k) => v === vorher[k]), 'Brett unverändert');
 });
 
 laufeTests('Taktischer Leser (docs/laufkampf-lesen.md)');

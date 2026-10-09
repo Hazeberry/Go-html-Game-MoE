@@ -1480,6 +1480,14 @@ globalThis.PARAMS = {
      (2+ Steine, bis 3 Freiheiten) an die Spitze, 2 = zusaetzlich Fang
      gegnerischer. 0 = aus. Siehe docs/laufkampf-lesen.md. */
   leseRettung:        0,
+  /* Lese-Verzicht: kein eigener Zug, nach dem der taktische Leser die
+     eigene Kette sofort faengt (bis 3 Freiheiten, Gegner am Zug), es sei
+     denn, der Zug schlaegt oder gibt Atari. Anlass: Gegen GNU Go setzen ab
+     Zug 100 mehr als die Haelfte der eigenen Zuege Steine, die spaeter
+     geschlagen werden oder am Ende tot sind; bei Zuegen, deren Kette der
+     Leser fangen kann, sind es 96 %. Bleibt kein Zug uebrig, gilt die
+     ungefilterte Liste. 0 = aus. Siehe docs/endspiel-verlust.md. */
+  leseVerzicht:       0,
   aiTimeBudget:    1800,
   rolloutWeight:    0.65,
   scoreWeight:      0.35,
@@ -4179,6 +4187,19 @@ function leseVerteidigung(board, a, budget = LESE_BUDGET, tiefe = LESE_TIEFE) {
   return {ja, offen: z.offen, knoten: z.n};
 }
 
+/* Waere ein Zug von color auf i vergeblich? Er schlaegt nichts, gibt kein
+   Atari, und der Leser faengt die Kette des neuen Steins mit dem Gegner am
+   Zug. Siehe PARAMS.leseVerzicht. */
+const _vzScratch = new Uint8Array(BOARD_SIZE);
+function vergeblicherZug(board, i, color) {
+  const opp = color === 1 ? 2 : 1, nb = _vzScratch;
+  nb.set(board); nb[i] = color;
+  if (removeDeadGroups(nb, opp, i) > 0) return false;
+  for (const n of NEIGHBORS[i]) if (nb[n] === opp && countLiberties(nb, n, 2) === 1) return false;
+  if (countLiberties(nb, i, 4) > 3) return false;
+  return leseAngriff(new Uint8Array(nb), i).ja;
+}
+
 /* Fuellt ein Zug von color auf i ein eigenes echtes Auge? Alle
    orthogonalen Nachbarn eigene Steine, Diagonalen nach _diagIsTrueEye, und
    keine angrenzende eigene Kette im Atari (dann ist der Punkt kein Auge,
@@ -4271,6 +4292,12 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
     const ohne = legal.filter(m => !fuelltEigenesAuge(board, m.idx, aiColor));
     if (!ohne.length) return {type:'pass', requestId:reqId, info:'Pass — frei sind nur noch eigene Augen'};
     legal = ohne;
+  }
+  /* Lese-Verzicht (PARAMS.leseVerzicht): Zuege, deren Kette der Leser sofort
+     faengt, kommen nicht in die Kandidaten. Siehe docs/endspiel-verlust.md. */
+  if (PARAMS.leseVerzicht >= 1) {
+    const ohne = legal.filter(m => !vergeblicherZug(board, m.idx, aiColor));
+    if (ohne.length) legal = ohne;
   }
   const empty = legal.length;
   buildCrisisMap(board, aiColor);
@@ -6373,6 +6400,8 @@ globalThis.policyNet = new PolicyNet();
          tip:'Mittelspiel-Pass-Schwelle'},
         {key:'leseRettung',       label:'Lese-Rettung',     step:1,   min:0,   max:2,
          tip:'1 = ein taktischer Leser prüft eigene gefährdete Ketten (bis 3 Freiheiten) und spielt nachweislich rettende Züge bevorzugt. Selbstspiel 62,8 %, gegen GNU Go aber 30 Punkte schlechter — kein Default. 2 = zusätzlich Fangen. Siehe docs/laufkampf-lesen.md.'},
+        {key:'leseVerzicht',      label:'Lese-Verzicht',    step:1,   min:0,   max:1,
+         tip:'1 = keine Züge, deren eigene Kette der taktische Leser sofort fangen kann (außer Schlag oder Atari). Gegen verschenkte Steine im Mittel- und Endspiel. Siehe docs/endspiel-verlust.md.'},
         {key:'augenSchutz',       label:'Augenschutz',      step:1,   min:0,   max:2,
          tip:'Nie ein eigenes echtes Auge füllen. 1 = beim eigenen Zug, 2 = auch in der Suche (Default). Gegen GNU Go +217 Punkte im Endstand. 0 = altes Verhalten.'},
         {key:'passUnabwendbar',   label:'Pass trotz Drohung', step:1, min:0,   max:1,
