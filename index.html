@@ -1558,6 +1558,14 @@ globalThis.PARAMS = {
      +25,7 Punkte im Endstand ueber 60 Paare (p = 0,021), im Selbstspiel
      55,3 % ueber 360 Partien (p = 0,045). Default 1. 0 = altes Verhalten. */
   wurzelFrisch:        1,
+  /* Rettungsbonus in quickEval: +80 je Nachbarstein einer eigenen Kette mit
+     hoechstens zwei Freiheiten. quickEval waehlt die Zuege der Rollouts und
+     die Kinder innerer Knoten; mit dem Bonus verlaengern beide Seiten dort
+     schwache Ketten, auch wenn die Kette danach so schwach bleibt
+     (docs/verschenkt-warum.md). 1 = Bonus nur, wenn die Kette nach dem Zug
+     mindestens drei Freiheiten hat. 0 = aus, bitgenau. Siehe
+     docs/quick-rettung.md. */
+  quickRettung:        0,
   /* PolicyNet — FIX Bug 5: wurde referenziert aber nie definiert.
      netMaxBlend steht auf 0: das Netz lernt mit, steuert aber nicht.
      Grund ist nicht Vorsicht, sondern eine Messung. Der Netzbeitrag ist
@@ -3490,21 +3498,24 @@ function evaluateMove(board, i, color, mc, emptyFields) {
 
 function quickEval(board, i, color) {
   const opp = color === 1 ? 2 : 1;
-  let score = 0, free = 0, oppN = 0, ownN = 0;
+  let score = 0, free = 0, oppN = 0, ownN = 0, schwach = 0;
   /* countLiberties mit Cap statt floodFill: läuft pro Rollout-Kandidat und
      pro MCTS-Expansions-Kind — die Arrays hier waren der heißeste Müll. */
   for (const n of NEIGHBORS[i]) {
     const c = board[n];
     if (c === 0) free++;
     else if (c === opp) { oppN++; if (countLiberties(board, n, 2) === 1) score += 200; }
-    else { ownN++; if (countLiberties(board, n, 3) <= 2) score += 80; }
+    else { ownN++; if (countLiberties(board, n, 3) <= 2) schwach++; }
   }
   _quickScratch.set(board);
   _quickScratch[i] = color;
   const cap = removeDeadGroups(_quickScratch, opp, i);
   score += cap * 500;
-  const selfLib = countLiberties(_quickScratch, i, 2);
+  const selfLib = countLiberties(_quickScratch, i, PARAMS.quickRettung > 0 ? 3 : 2);
   if (selfLib === 1 && cap === 0) score -= 300;
+  /* +80 je Nachbarstein einer eigenen Kette mit höchstens zwei Freiheiten.
+     quickRettung: nur, wenn die Kette danach mindestens drei hat. */
+  if (schwach && (PARAMS.quickRettung <= 0 || selfLib >= 3)) score += 80 * schwach;
   return score + free*40 + oppN*20 + ownN*15 + Math.random()*5;
 }
 
@@ -6471,6 +6482,8 @@ globalThis.policyNet = new PolicyNet();
          tip:'1 = ein taktischer Leser prüft eigene gefährdete Ketten (bis 3 Freiheiten) und spielt nachweislich rettende Züge bevorzugt. Selbstspiel 62,8 %, gegen GNU Go aber 30 Punkte schlechter — kein Default. 2 = zusätzlich Fangen. Siehe docs/laufkampf-lesen.md.'},
         {key:'leseVerzicht',      label:'Lese-Verzicht',    step:1,   min:0,   max:1,
          tip:'1 = keine Züge, deren eigene Kette der taktische Leser sofort fangen kann (außer Schlag oder Atari), Default. Gegen GNU Go +56 Punkte, im Selbstspiel 72,8 %. 0 = altes Verhalten. Siehe docs/endspiel-verlust.md.'},
+        {key:'quickRettung',      label:'Rettung in der Suche', step:1, min:0,   max:1,
+         tip:'1 = die schnelle Bewertung in Suche und Rollouts belohnt einen Zug an eine schwache eigene Kette nur, wenn die Kette danach mindestens drei Freiheiten hat. Siehe docs/quick-rettung.md.'},
         {key:'wurzelFrisch',      label:'Frische Wurzel',   step:1,   min:0,   max:1,
          tip:'1 = bei wiederverwendetem Suchbaum kommen die Kandidaten an der Wurzel trotzdem aus der vollen Zugbewertung; was der alte Baum über diese Züge weiß, bleibt erhalten (Default). Gegen GNU Go +26 Punkte, im Selbstspiel 55 %. 0 = Kandidaten aus dem alten Baum. Siehe docs/wurzel-frisch.md.'},
         {key:'augenSchutz',       label:'Augenschutz',      step:1,   min:0,   max:2,
