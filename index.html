@@ -1714,6 +1714,14 @@ globalThis.PARAMS = {
      im Selbstspiel 83,3 % ueber 360 Partien. Deshalb Default 80.
      0 = altes Verhalten, bitgenau. */
   gebietZug:        80,
+  /* Gebiet nach Freiheiten: Ein positiver Gewinn aus gebietZug zaehlt nur
+     anteilig, wenn die Kette des neuen Steins danach wenige Freiheiten hat:
+     bei einer 0, bei zwei 0,25, bei drei 0,6, ab vier voll. Anlass: gegen
+     GNU Go sterben Ketten mit zwei Freiheiten nach dem Zug zu 73 %, mit
+     fuenf und mehr zu 16 %, und den Vorsprung verschenkter Zuege bringt
+     meist der Gebietsanteil (docs/verschenkt-warum.md). 0 = aus, bitgenau.
+     Siehe docs/gebiet-freiheit.md. */
+  gebietFreiheit:     0,
   /* Adaptives Zeitbudget (Tin/GLM-Vorschlag, stufenlos statt Sprungfunktion).
      Reale Partie zeigte 86% Sim-Rückgang über 156 Züge (317→43) durch
      wachsende floodFill-Kosten auf großen Gruppen — kontinuierlicher Verfall,
@@ -3403,6 +3411,10 @@ function phaseWeights(mc, emptyFields) {
   return {wOpen, wMid: 1 - wEnd - wOpen, wEnd};
 }
 
+/* Anteil des Gebietsgewinns je Freiheiten der neuen Kette (0–3), siehe
+   PARAMS.gebietFreiheit. */
+const GEBIET_FREIHEIT = [0, 0, 0.25, 0.6];
+
 function evaluateMove(board, i, color, mc, emptyFields) {
   const {wOpen, wMid, wEnd} = phaseWeights(mc, emptyFields);
   const T = 0.02;   /* Experten unter 2% Gewicht nicht rechnen (Perf) */
@@ -3442,7 +3454,14 @@ function evaluateMove(board, i, color, mc, emptyFields) {
     const nb = _gzScratch;
     nb.set(board); nb[i] = color;
     removeDeadGroups(nb, color === 1 ? 2 : 1, i);
-    sPhase += PARAMS.gebietZug * (tbBilanzNach(nb) - _tbBilanz) * (color === 1 ? 1 : -1);
+    let gz = PARAMS.gebietZug * (tbBilanzNach(nb) - _tbBilanz) * (color === 1 ? 1 : -1);
+    /* Gebiet nach Freiheiten (PARAMS.gebietFreiheit): der Gewinn einer
+       schwachen neuen Kette zaehlt nur anteilig. */
+    if (PARAMS.gebietFreiheit > 0 && gz > 0) {
+      const lib = countLiberties(nb, i, 4);
+      if (lib < 4) gz *= GEBIET_FREIHEIT[lib];
+    }
+    sPhase += gz;
   }
   if (PARAMS.raumZug > 0 && _raumValid)
     sPhase += PARAMS.raumZug * PARAMS.captureWeight * raumZugGewinn(board, i, color);
@@ -6428,6 +6447,8 @@ globalThis.policyNet = new PolicyNet();
          tip:'EXPERIMENTELL. Abzug für Züge in der eigenen Einflusszone (nicht das eigene Gebiet auffüllen). Default 0 = aus. Nur zusammen mit der Invasion gemessen: kein Nutzen.'},
         {key:'gebietZug', label:'Gebiet je Zug', step:10, min:0, max:300,
          tip:'Bewertet Züge nach ihrer Wirkung auf die Einflusskarte (eigene minus fremde Zone), in allen Phasen — gegen den Mauerbau. Default 80: gegen GNU Go +229 Punkte nach 120 Zügen, im Selbstspiel 83 % Siegrate. 0 = altes Verhalten.'},
+        {key:'gebietFreiheit', label:'Gebiet nach Freiheiten', step:1, min:0, max:1,
+         tip:'1 = der Gebietsgewinn eines Zuges zählt nur anteilig, wenn seine Kette danach wenige Freiheiten hat (2: ein Viertel, 3: 60 %). Gegen verschenkte Steine in Kämpfen. Siehe docs/gebiet-freiheit.md.'},
         {key:'gebietGewicht', label:'Gebiet in der Stellung', step:1, min:0, max:20,
          tip:'EXPERIMENTELL. Zählt die Einflussbilanz in jeder Blattbewertung mit. Im Pilot ohne Wirkung. Default 0 = aus.'},
         {key:'raumZug', label:'Raumrisiko je Zug', step:0.5, min:0, max:3,

@@ -7,6 +7,10 @@
      3. gebietZug addiert je Kandidat genau Gewicht × Bilanzänderung durch den
         Zug — nachgerechnet mit der vollen Karte (gebietBilanz), nicht mit der
         inkrementellen, die der Code benutzt.
+     4. gebietFreiheit (docs/gebiet-freiheit.md): Default 0; bei 0 bitgenau,
+        bei 1 zählt ein positiver Gebietsanteil mit 0 / 0,25 / 0,6 bei einer,
+        zwei, drei Freiheiten der neuen Kette, ab vier voll; ein negativer
+        bleibt.
 
    Aufruf:  node tests/gebiet.js [pfad/zur/index.html] */
 'use strict';
@@ -15,7 +19,7 @@ const {ladeKI, test, pruefe, pruefeGleich, laufeTests} = require('./rahmen');
 
 const KI = ladeKI({htmlPfad: process.argv[2] || undefined, mitNetz: false});
 const {PARAMS, BOARD_SIZE, evaluateBoard, evaluateMove, gebietBilanz, primeEndTieBreak,
-       removeDeadGroups, primeAreaCache, buildCrisisMap} = KI;
+       removeDeadGroups, primeAreaCache, buildCrisisMap, floodFill} = KI;
 
 function mit(werte, fn) {
   const alt = {};
@@ -34,9 +38,9 @@ function stellungen() {
     return {bis, b};
   });
 }
-function zugWerte(b, farbe, mc, w) {
+function zugWerte(b, farbe, mc, w, extra = {}) {
   /* endTieBreak aus: sonst wirkt der Brecher, sobald primeEndTieBreak lief. */
-  return mit({gebietZug: w, endTieBreak: 0}, () => {
+  return mit({gebietZug: w, endTieBreak: 0, ...extra}, () => {
     buildCrisisMap(b, farbe); primeAreaCache(b, farbe);
     const alt = Math.random; Math.random = () => 0.5;
     try {
@@ -85,6 +89,30 @@ test('gebietZug: 0 bitgenau; sonst genau Gewicht × Bilanzänderung (volle Karte
     }
   }
   pruefe(mitBonus > 200, `Vorbedingung: ${mitBonus} Kandidaten mit Bonus`);
+});
+
+test('gebietFreiheit: Default 0, bitgenau; bei 1 Gebietsanteil × Anteil nach Freiheiten', () => {
+  pruefeGleich(PARAMS.gebietFreiheit, 0, 'Default');
+  const ANTEIL = [0, 0, 0.25, 0.6];
+  let geschwaecht = 0;
+  for (const {bis, b} of stellungen()) for (const farbe of [1, 2]) {
+    primeEndTieBreak(b);
+    const ohne = zugWerte(b, farbe, bis, 0);
+    const null0 = zugWerte(b, farbe, bis, 80, {gebietFreiheit: 0});
+    const voll = zugWerte(b, farbe, bis, 80);
+    for (let k = 0; k < ohne.length; k++)
+      if (!Object.is(null0[k].s, voll[k].s)) pruefe(false, `Zug ${bis}: gebietFreiheit 0 nicht bitgenau an ${ohne[k].i}`);
+    const eins = zugWerte(b, farbe, bis, 80, {gebietFreiheit: 1});
+    for (let k = 0; k < ohne.length; k++) {
+      const d0 = voll[k].s - ohne[k].s, d1 = eins[k].s - ohne[k].s;
+      const nb = Uint8Array.from(b); nb[ohne[k].i] = farbe; removeDeadGroups(nb, 3 - farbe, ohne[k].i);
+      const lib = floodFill(nb, ohne[k].i).liberties.length;
+      const soll = d0 > 0 && lib < 4 ? d0 * ANTEIL[lib] : d0;
+      if (d0 > 0 && lib < 4) geschwaecht++;
+      if (Math.abs(d1 - soll) > 1e-6) pruefeGleich(d1, soll, `Zug ${bis}, Farbe ${farbe}, Feld ${ohne[k].i}, ${lib} Freiheiten`);
+    }
+  }
+  pruefe(geschwaecht > 50, `Vorbedingung: ${geschwaecht} geschwächte Kandidaten`);
 });
 
 laufeTests('Gebiet (gebietGewicht, gebietZug)').then(ok => process.exit(ok ? 0 : 1));
