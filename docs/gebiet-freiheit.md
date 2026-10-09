@@ -99,3 +99,51 @@ Endpunkt: Siegrate von B, zweiseitig gegen 50 %, α = 0,05.
   hieße daher nicht, dass der Schalter wirkungslos ist.
 - GNU Go Stufe 1 mit neun Vorgabesteinen ist ein einzelner, enger Gegner.
   Gemessen wird mit 120 Simulationen.
+
+---
+
+## 6. Nachtrag: Ergebnis, Default bleibt 0 (09.10.2026)
+
+Gelaufen auf dem Merge-Commit `d2df4ee`, ohne Unterbrechung. Daten:
+`daten/freiheit-gnugo.json` (M1, beide Arme) und `daten/freiheit-20261090.json`
+bis `…93.json` (Hash-Listen M2).
+
+**M1, gegen GNU Go (primär), 60 Paare, Seed 121:**
+
+| | A (Default) | B (`gebietFreiheit` 1) | B − A |
+|---|---:|---:|---|
+| **Endstand** | −74,5 | −55,0 | **+19,5** (SD 99,9), **p = 0,14** |
+| nach Zug 120 | +27,3 | +17,1 | −10,2, p = 0,046 (50 Paare) |
+| nach Zug 200 | −65,1 | −51,3 | +13,8, p = 0,06 (42 Paare) |
+
+- B ist in 39 von 60 Paaren besser, im Median um 33 Punkte.
+- GNU Go gab mit A neunmal auf, mit B siebenmal.
+- Partielänge: Ø 254 Züge (A) gegen 232 (B).
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt 193 von 360 Partien, 53,6 %
+(z = 1,37, p = 0,17, 95-%-KI 48,4–58,7 %). Teilläufe: 53,3 / 53,3 / 52,2 /
+55,6 %.
+
+**Entscheidung nach §4: Default `gebietFreiheit` bleibt 0.** M1 ist nicht
+signifikant. Der Schalter bleibt im Dashboard.
+
+**Sekundär, verschenkte Züge** (`auswertung/verschenkt.js`):
+
+| ab Zug 100 | A | B |
+|---|---:|---:|
+| bis Zug 200 | 38 % (17,1 je Partie) | 37 % (17,1) |
+| nach Zug 200 | 54 % (17,5 je Partie) | 55 % (11,1) |
+
+**Einordnung:**
+- Beide Messungen zeigen in dieselbe Richtung, keine erreicht die Schwelle.
+  Der Pilot (+22,1 über 16 Partien) hat den Effekt etwa richtig geschätzt;
+  §5 hatte die geringe Trennschärfe bei diesem Abstand vorhergesagt.
+- Der Mechanismus greift schwächer als erhofft. Der Anteil verschenkter
+  Züge bleibt gleich, es werden nur weniger, weil die Partien kürzer sind.
+  Den Gebietsanteil schwacher Ketten zu senken, ändert also wenig daran,
+  welche Ketten sterben.
+- Nach Zug 120 liegt B sogar zurück. Wahrscheinlich spielt B im
+  Mittelspiel weniger in umkämpfte Gebiete und gibt dort etwas ab, das sich
+  erst später auszahlt.
+- Aus `verschenkt-warum.md` §4 bleiben die anderen Hebel: die Wurzel bei
+  Baumwiederverwendung und `quickEval`.
