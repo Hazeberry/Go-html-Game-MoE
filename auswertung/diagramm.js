@@ -22,6 +22,7 @@ const DATEN = [
   {name: 'leseRettung 1', text: 'taktischer Leser rettet Ketten', siege: 452, partien: 720, art: 'offen', gnugo: '−30,5 Endstand'},
   {name: 'Doppelte Suche', text: '240 statt 120 Simulationen', siege: 218, partien: 360, art: 'massstab', gnugo: ''},
   {name: 'endTieBreak 1', text: 'Gleichstand im Endspiel ordnen', siege: 420, partien: 720, art: 'eingebaut', gnugo: '−0,4 Endstand (n. s.)'},
+  {name: 'gebietFreiheit 1', text: 'Gebiet schwacher Ketten nur anteilig', siege: 193, partien: 360, art: 'offen', gnugo: '+19,5 Endstand (n. s.)'},
   {name: 'captureCap 200', text: 'Deckel gegen falsche Aufgaben', siege: 778, partien: 1440, art: 'offen', gnugo: ''},
   {name: 'augenSchutz + passUnabwendbar', text: 'eigene Augen nicht füllen, passen', siege: 194, partien: 360, art: 'eingebaut', gnugo: '+217 Endstand'},
   {name: 'krisenKandidaten', text: 'Atari-Rettung immer in die Suche', siege: 372, partien: 720, art: 'verworfen', gnugo: '+7,5 Endstand (n. s.)'},

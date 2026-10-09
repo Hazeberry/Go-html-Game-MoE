@@ -1719,8 +1719,9 @@ globalThis.PARAMS = {
      bei einer 0, bei zwei 0,25, bei drei 0,6, ab vier voll. Anlass: gegen
      GNU Go sterben Ketten mit zwei Freiheiten nach dem Zug zu 73 %, mit
      fuenf und mehr zu 16 %, und den Vorsprung verschenkter Zuege bringt
-     meist der Gebietsanteil (docs/verschenkt-warum.md). 0 = aus, bitgenau.
-     Siehe docs/gebiet-freiheit.md. */
+     meist der Gebietsanteil (docs/verschenkt-warum.md). Gemessen
+     (docs/gebiet-freiheit.md): gegen GNU Go +19,5 Punkte (p = 0,14), im
+     Selbstspiel 53,6 % (p = 0,17); kein Default. 0 = aus, bitgenau. */
   gebietFreiheit:     0,
   /* Adaptives Zeitbudget (Tin/GLM-Vorschlag, stufenlos statt Sprungfunktion).
      Reale Partie zeigte 86% Sim-Rückgang über 156 Züge (317→43) durch
@@ -6448,7 +6449,7 @@ globalThis.policyNet = new PolicyNet();
         {key:'gebietZug', label:'Gebiet je Zug', step:10, min:0, max:300,
          tip:'Bewertet Züge nach ihrer Wirkung auf die Einflusskarte (eigene minus fremde Zone), in allen Phasen — gegen den Mauerbau. Default 80: gegen GNU Go +229 Punkte nach 120 Zügen, im Selbstspiel 83 % Siegrate. 0 = altes Verhalten.'},
         {key:'gebietFreiheit', label:'Gebiet nach Freiheiten', step:1, min:0, max:1,
-         tip:'1 = der Gebietsgewinn eines Zuges zählt nur anteilig, wenn seine Kette danach wenige Freiheiten hat (2: ein Viertel, 3: 60 %). Gegen verschenkte Steine in Kämpfen. Siehe docs/gebiet-freiheit.md.'},
+         tip:'1 = der Gebietsgewinn eines Zuges zählt nur anteilig, wenn seine Kette danach wenige Freiheiten hat (2: ein Viertel, 3: 60 %). Gegen GNU Go +19,5 Punkte, im Selbstspiel 53,6 %, beides nicht signifikant — kein Default. Siehe docs/gebiet-freiheit.md.'},
         {key:'gebietGewicht', label:'Gebiet in der Stellung', step:1, min:0, max:20,
          tip:'EXPERIMENTELL. Zählt die Einflussbilanz in jeder Blattbewertung mit. Im Pilot ohne Wirkung. Default 0 = aus.'},
         {key:'raumZug', label:'Raumrisiko je Zug', step:0.5, min:0, max:3,

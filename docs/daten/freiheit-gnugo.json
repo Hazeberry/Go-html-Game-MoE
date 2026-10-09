@@ -1,0 +1,1206 @@
+{
+ "lauf": "freiheit-gnugo",
+ "befehl": "node gnugo-duell.js --partien 15 --von {1,16,31,46} --seed 121 --stufe 1 --vorgabe 9 --maxzuege 600 --schaetzung 120,200 --ki mctsFixedSims=120,resignEnabled=0[,gebietFreiheit=1] (Commit d2df4ee, GNU Go 3.8)",
+ "partien": [
+  {
+   "arm": "A",
+   "nr": 1,
+   "s120": 26.8,
+   "s200": -65.8,
+   "endstand": -82.5,
+   "gnugoGibtAuf": false,
+   "zuege": 289,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 2,
+   "s120": 71.1,
+   "s200": -24.3,
+   "endstand": -126.5,
+   "gnugoGibtAuf": false,
+   "zuege": 283,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 3,
+   "s120": 52.7,
+   "s200": -35.1,
+   "endstand": -162.5,
+   "gnugoGibtAuf": false,
+   "zuege": 310,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 4,
+   "s120": 25,
+   "s200": -62.2,
+   "endstand": -124.5,
+   "gnugoGibtAuf": false,
+   "zuege": 285,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 5,
+   "s120": 37.4,
+   "s200": -62.5,
+   "endstand": -62.5,
+   "gnugoGibtAuf": false,
+   "zuege": 235,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 6,
+   "s120": -20.1,
+   "s200": -75.5,
+   "endstand": -84.5,
+   "gnugoGibtAuf": false,
+   "zuege": 269,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 7,
+   "s120": 33.8,
+   "s200": -53.8,
+   "endstand": -128.5,
+   "gnugoGibtAuf": false,
+   "zuege": 311,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 8,
+   "s120": 23.3,
+   "s200": -40.8,
+   "endstand": -76.5,
+   "gnugoGibtAuf": false,
+   "zuege": 333,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 9,
+   "s120": 23.7,
+   "s200": -56.3,
+   "endstand": -120.5,
+   "gnugoGibtAuf": false,
+   "zuege": 293,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 10,
+   "s120": 65.4,
+   "s200": -23.3,
+   "endstand": -26.5,
+   "gnugoGibtAuf": false,
+   "zuege": 253,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 11,
+   "s120": 109.7,
+   "s200": null,
+   "endstand": 79.5,
+   "gnugoGibtAuf": true,
+   "zuege": 134,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 12,
+   "s120": 35.5,
+   "s200": -101,
+   "endstand": -138.5,
+   "gnugoGibtAuf": false,
+   "zuege": 275,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 13,
+   "s120": null,
+   "s200": null,
+   "endstand": 57.5,
+   "gnugoGibtAuf": true,
+   "zuege": 116,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 14,
+   "s120": 4.5,
+   "s200": -48.5,
+   "endstand": -58.5,
+   "gnugoGibtAuf": false,
+   "zuege": 243,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 15,
+   "s120": 18.2,
+   "s200": -92.8,
+   "endstand": -128.5,
+   "gnugoGibtAuf": false,
+   "zuege": 293,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 16,
+   "s120": 60.9,
+   "s200": -31,
+   "endstand": -58.5,
+   "gnugoGibtAuf": false,
+   "zuege": 293,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 17,
+   "s120": 53.1,
+   "s200": null,
+   "endstand": 39.5,
+   "gnugoGibtAuf": true,
+   "zuege": 120,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 18,
+   "s120": -24,
+   "s200": -141.4,
+   "endstand": -192.5,
+   "gnugoGibtAuf": false,
+   "zuege": 293,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 19,
+   "s120": -3.2,
+   "s200": -123.6,
+   "endstand": -170.5,
+   "gnugoGibtAuf": false,
+   "zuege": 305,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 20,
+   "s120": 29.2,
+   "s200": -84.9,
+   "endstand": -114.5,
+   "gnugoGibtAuf": false,
+   "zuege": 289,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 21,
+   "s120": 27.6,
+   "s200": -112.1,
+   "endstand": -138.5,
+   "gnugoGibtAuf": false,
+   "zuege": 301,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 22,
+   "s120": -4.8,
+   "s200": -40.5,
+   "endstand": -178.5,
+   "gnugoGibtAuf": false,
+   "zuege": 309,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 23,
+   "s120": 0.6,
+   "s200": -81.8,
+   "endstand": -102.5,
+   "gnugoGibtAuf": false,
+   "zuege": 276,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 24,
+   "s120": 54.9,
+   "s200": -35.5,
+   "endstand": -152.5,
+   "gnugoGibtAuf": false,
+   "zuege": 307,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 25,
+   "s120": 5.6,
+   "s200": -72,
+   "endstand": -92.5,
+   "gnugoGibtAuf": false,
+   "zuege": 261,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 26,
+   "s120": 37.4,
+   "s200": -46.1,
+   "endstand": -122.5,
+   "gnugoGibtAuf": false,
+   "zuege": 289,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 27,
+   "s120": 49.8,
+   "s200": -95.1,
+   "endstand": -184.5,
+   "gnugoGibtAuf": false,
+   "zuege": 301,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 28,
+   "s120": 1,
+   "s200": -83,
+   "endstand": -130.5,
+   "gnugoGibtAuf": false,
+   "zuege": 277,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 29,
+   "s120": 28.4,
+   "s200": -91.9,
+   "endstand": -98.5,
+   "gnugoGibtAuf": false,
+   "zuege": 281,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 30,
+   "s120": 8.3,
+   "s200": -37.5,
+   "endstand": -48.5,
+   "gnugoGibtAuf": false,
+   "zuege": 232,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 31,
+   "s120": 41.2,
+   "s200": -42.7,
+   "endstand": -86.5,
+   "gnugoGibtAuf": false,
+   "zuege": 299,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 32,
+   "s120": 31.9,
+   "s200": -53.9,
+   "endstand": -74.5,
+   "gnugoGibtAuf": false,
+   "zuege": 271,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 33,
+   "s120": 72.1,
+   "s200": 1.6,
+   "endstand": -8.5,
+   "gnugoGibtAuf": false,
+   "zuege": 257,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 34,
+   "s120": null,
+   "s200": null,
+   "endstand": 81.5,
+   "gnugoGibtAuf": true,
+   "zuege": 84,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 35,
+   "s120": 28.3,
+   "s200": -42,
+   "endstand": -94.5,
+   "gnugoGibtAuf": false,
+   "zuege": 275,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 36,
+   "s120": 72.4,
+   "s200": null,
+   "endstand": 41.5,
+   "gnugoGibtAuf": true,
+   "zuege": 134,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 37,
+   "s120": -2.8,
+   "s200": -67.1,
+   "endstand": -90.5,
+   "gnugoGibtAuf": false,
+   "zuege": 263,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 38,
+   "s120": 45.9,
+   "s200": -17.1,
+   "endstand": -20.5,
+   "gnugoGibtAuf": false,
+   "zuege": 231,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 39,
+   "s120": 57.4,
+   "s200": -51.8,
+   "endstand": -54.5,
+   "gnugoGibtAuf": false,
+   "zuege": 257,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 40,
+   "s120": 27.8,
+   "s200": -79.8,
+   "endstand": -190.5,
+   "gnugoGibtAuf": false,
+   "zuege": 287,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 41,
+   "s120": 9.8,
+   "s200": -52.9,
+   "endstand": -62.5,
+   "gnugoGibtAuf": false,
+   "zuege": 277,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 42,
+   "s120": 36.6,
+   "s200": -86.7,
+   "endstand": -102.5,
+   "gnugoGibtAuf": false,
+   "zuege": 253,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 43,
+   "s120": 29,
+   "s200": -21.2,
+   "endstand": -64.5,
+   "gnugoGibtAuf": false,
+   "zuege": 269,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 44,
+   "s120": 39.2,
+   "s200": -38.2,
+   "endstand": -60.5,
+   "gnugoGibtAuf": false,
+   "zuege": 275,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 45,
+   "s120": 42.6,
+   "s200": -70.3,
+   "endstand": -60.5,
+   "gnugoGibtAuf": false,
+   "zuege": 319,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 46,
+   "s120": -16.7,
+   "s200": -29.1,
+   "endstand": -70.5,
+   "gnugoGibtAuf": false,
+   "zuege": 277,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 47,
+   "s120": 1,
+   "s200": -137.7,
+   "endstand": -170.5,
+   "gnugoGibtAuf": false,
+   "zuege": 301,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 48,
+   "s120": 47,
+   "s200": -61.7,
+   "endstand": -90.5,
+   "gnugoGibtAuf": false,
+   "zuege": 294,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 49,
+   "s120": 68.4,
+   "s200": null,
+   "endstand": 35.5,
+   "gnugoGibtAuf": true,
+   "zuege": 128,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 50,
+   "s120": null,
+   "s200": null,
+   "endstand": 121.5,
+   "gnugoGibtAuf": true,
+   "zuege": 90,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 51,
+   "s120": null,
+   "s200": null,
+   "endstand": 75.5,
+   "gnugoGibtAuf": true,
+   "zuege": 94,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 52,
+   "s120": 58.8,
+   "s200": -75.3,
+   "endstand": -76.5,
+   "gnugoGibtAuf": false,
+   "zuege": 245,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 53,
+   "s120": 23.3,
+   "s200": -76.3,
+   "endstand": -86.5,
+   "gnugoGibtAuf": false,
+   "zuege": 273,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 54,
+   "s120": 20.1,
+   "s200": -95.9,
+   "endstand": -102.5,
+   "gnugoGibtAuf": false,
+   "zuege": 271,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 55,
+   "s120": 50.3,
+   "s200": -8.6,
+   "endstand": -8.5,
+   "gnugoGibtAuf": false,
+   "zuege": 235,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 56,
+   "s120": 59.6,
+   "s200": -30.7,
+   "endstand": -44.5,
+   "gnugoGibtAuf": false,
+   "zuege": 275,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 57,
+   "s120": 70.7,
+   "s200": null,
+   "endstand": 67.5,
+   "gnugoGibtAuf": true,
+   "zuege": 124,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 58,
+   "s120": 20.9,
+   "s200": -39.5,
+   "endstand": -118.5,
+   "gnugoGibtAuf": false,
+   "zuege": 254,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 59,
+   "s120": -24.9,
+   "s200": -89.4,
+   "endstand": -102.5,
+   "gnugoGibtAuf": false,
+   "zuege": 282,
+   "abgebrochen": false
+  },
+  {
+   "arm": "A",
+   "nr": 60,
+   "s120": -45.6,
+   "s200": -107.9,
+   "endstand": -122.5,
+   "gnugoGibtAuf": false,
+   "zuege": 309,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 1,
+   "s120": null,
+   "s200": null,
+   "endstand": 81.5,
+   "gnugoGibtAuf": true,
+   "zuege": 110,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 2,
+   "s120": 34.3,
+   "s200": -27.4,
+   "endstand": -32.5,
+   "gnugoGibtAuf": false,
+   "zuege": 249,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 3,
+   "s120": 22,
+   "s200": -72.9,
+   "endstand": -132.5,
+   "gnugoGibtAuf": false,
+   "zuege": 287,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 4,
+   "s120": 2.6,
+   "s200": -54.2,
+   "endstand": -100.5,
+   "gnugoGibtAuf": false,
+   "zuege": 287,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 5,
+   "s120": -0.7,
+   "s200": -20.5,
+   "endstand": -20.5,
+   "gnugoGibtAuf": false,
+   "zuege": 211,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 6,
+   "s120": 28.7,
+   "s200": -7.3,
+   "endstand": -50.5,
+   "gnugoGibtAuf": false,
+   "zuege": 262,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 7,
+   "s120": 5.6,
+   "s200": null,
+   "endstand": -6.5,
+   "gnugoGibtAuf": false,
+   "zuege": 181,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 8,
+   "s120": 14.5,
+   "s200": -71.3,
+   "endstand": -78.5,
+   "gnugoGibtAuf": false,
+   "zuege": 257,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 9,
+   "s120": 32.4,
+   "s200": -47.8,
+   "endstand": -52.5,
+   "gnugoGibtAuf": false,
+   "zuege": 231,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 10,
+   "s120": 26.9,
+   "s200": -89.5,
+   "endstand": -174.5,
+   "gnugoGibtAuf": false,
+   "zuege": 285,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 11,
+   "s120": null,
+   "s200": null,
+   "endstand": 35.5,
+   "gnugoGibtAuf": true,
+   "zuege": 114,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 12,
+   "s120": 7.9,
+   "s200": -93.7,
+   "endstand": -106.5,
+   "gnugoGibtAuf": false,
+   "zuege": 265,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 13,
+   "s120": 41.4,
+   "s200": -71.3,
+   "endstand": -76.5,
+   "gnugoGibtAuf": false,
+   "zuege": 249,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 14,
+   "s120": -10.4,
+   "s200": -76.6,
+   "endstand": -76.5,
+   "gnugoGibtAuf": false,
+   "zuege": 229,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 15,
+   "s120": 10.8,
+   "s200": null,
+   "endstand": -4.5,
+   "gnugoGibtAuf": false,
+   "zuege": 195,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 16,
+   "s120": 64.2,
+   "s200": null,
+   "endstand": 41.5,
+   "gnugoGibtAuf": true,
+   "zuege": 136,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 17,
+   "s120": 18.4,
+   "s200": -83.6,
+   "endstand": -136.5,
+   "gnugoGibtAuf": false,
+   "zuege": 275,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 18,
+   "s120": 2.5,
+   "s200": -26.4,
+   "endstand": -26.5,
+   "gnugoGibtAuf": false,
+   "zuege": 214,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 19,
+   "s120": 24.7,
+   "s200": -50.7,
+   "endstand": -92.5,
+   "gnugoGibtAuf": false,
+   "zuege": 267,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 20,
+   "s120": -10.7,
+   "s200": -77.3,
+   "endstand": -102.5,
+   "gnugoGibtAuf": false,
+   "zuege": 271,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 21,
+   "s120": 56.6,
+   "s200": -27.1,
+   "endstand": -70.5,
+   "gnugoGibtAuf": false,
+   "zuege": 273,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 22,
+   "s120": -14.9,
+   "s200": -25.1,
+   "endstand": -24.5,
+   "gnugoGibtAuf": false,
+   "zuege": 213,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 23,
+   "s120": 0.7,
+   "s200": -104.9,
+   "endstand": -148.5,
+   "gnugoGibtAuf": false,
+   "zuege": 293,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 24,
+   "s120": 43.1,
+   "s200": -18.7,
+   "endstand": -26.5,
+   "gnugoGibtAuf": false,
+   "zuege": 259,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 25,
+   "s120": 19.3,
+   "s200": -82.3,
+   "endstand": -94.5,
+   "gnugoGibtAuf": false,
+   "zuege": 253,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 26,
+   "s120": null,
+   "s200": null,
+   "endstand": 81.5,
+   "gnugoGibtAuf": true,
+   "zuege": 106,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 27,
+   "s120": 42.2,
+   "s200": -48,
+   "endstand": -68.5,
+   "gnugoGibtAuf": false,
+   "zuege": 255,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 28,
+   "s120": -31.7,
+   "s200": -83.6,
+   "endstand": -90.5,
+   "gnugoGibtAuf": false,
+   "zuege": 247,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 29,
+   "s120": -10,
+   "s200": -83.8,
+   "endstand": -84.5,
+   "gnugoGibtAuf": false,
+   "zuege": 217,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 30,
+   "s120": 18.4,
+   "s200": -27.6,
+   "endstand": -30.5,
+   "gnugoGibtAuf": false,
+   "zuege": 231,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 31,
+   "s120": 1.5,
+   "s200": -64,
+   "endstand": -102.5,
+   "gnugoGibtAuf": false,
+   "zuege": 261,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 32,
+   "s120": 25.4,
+   "s200": -69.2,
+   "endstand": -72.5,
+   "gnugoGibtAuf": false,
+   "zuege": 241,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 33,
+   "s120": -23.8,
+   "s200": -90.1,
+   "endstand": -124.5,
+   "gnugoGibtAuf": false,
+   "zuege": 257,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 34,
+   "s120": -12.7,
+   "s200": -41.6,
+   "endstand": -62.5,
+   "gnugoGibtAuf": false,
+   "zuege": 215,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 35,
+   "s120": 24.6,
+   "s200": -43.5,
+   "endstand": -56.5,
+   "gnugoGibtAuf": false,
+   "zuege": 245,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 36,
+   "s120": -0.8,
+   "s200": -82.5,
+   "endstand": -82.5,
+   "gnugoGibtAuf": false,
+   "zuege": 243,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 37,
+   "s120": 23.9,
+   "s200": -27.1,
+   "endstand": -42.5,
+   "gnugoGibtAuf": false,
+   "zuege": 241,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 38,
+   "s120": 8.7,
+   "s200": -37.2,
+   "endstand": -38.5,
+   "gnugoGibtAuf": false,
+   "zuege": 341,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 39,
+   "s120": 37.3,
+   "s200": -55.4,
+   "endstand": -80.5,
+   "gnugoGibtAuf": false,
+   "zuege": 253,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 40,
+   "s120": 25.1,
+   "s200": -14.9,
+   "endstand": -10.5,
+   "gnugoGibtAuf": false,
+   "zuege": 219,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 41,
+   "s120": 54.2,
+   "s200": -67.8,
+   "endstand": -72.5,
+   "gnugoGibtAuf": false,
+   "zuege": 240,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 42,
+   "s120": 12.3,
+   "s200": -98.2,
+   "endstand": -152.5,
+   "gnugoGibtAuf": false,
+   "zuege": 286,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 43,
+   "s120": -11.5,
+   "s200": null,
+   "endstand": -30.5,
+   "gnugoGibtAuf": false,
+   "zuege": 199,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 44,
+   "s120": 18.4,
+   "s200": -36.3,
+   "endstand": -46.5,
+   "gnugoGibtAuf": false,
+   "zuege": 249,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 45,
+   "s120": 14.4,
+   "s200": -10.1,
+   "endstand": -0.5,
+   "gnugoGibtAuf": false,
+   "zuege": 209,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 46,
+   "s120": 27.2,
+   "s200": -39.4,
+   "endstand": -36.5,
+   "gnugoGibtAuf": false,
+   "zuege": 212,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 47,
+   "s120": 21.8,
+   "s200": -87.1,
+   "endstand": -134.5,
+   "gnugoGibtAuf": false,
+   "zuege": 269,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 48,
+   "s120": null,
+   "s200": null,
+   "endstand": 95.5,
+   "gnugoGibtAuf": true,
+   "zuege": 114,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 49,
+   "s120": 26.8,
+   "s200": -58.5,
+   "endstand": -58.5,
+   "gnugoGibtAuf": false,
+   "zuege": 209,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 50,
+   "s120": 49.7,
+   "s200": -39,
+   "endstand": -64.5,
+   "gnugoGibtAuf": false,
+   "zuege": 252,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 51,
+   "s120": 70.8,
+   "s200": -85,
+   "endstand": -170.5,
+   "gnugoGibtAuf": false,
+   "zuege": 293,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 52,
+   "s120": null,
+   "s200": null,
+   "endstand": 35.5,
+   "gnugoGibtAuf": true,
+   "zuege": 106,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 53,
+   "s120": 41.1,
+   "s200": -44.5,
+   "endstand": -60.5,
+   "gnugoGibtAuf": false,
+   "zuege": 273,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 54,
+   "s120": 42.7,
+   "s200": 23.3,
+   "endstand": -2.5,
+   "gnugoGibtAuf": false,
+   "zuege": 241,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 55,
+   "s120": null,
+   "s200": null,
+   "endstand": 45.5,
+   "gnugoGibtAuf": true,
+   "zuege": 114,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 56,
+   "s120": 6.6,
+   "s200": -91.6,
+   "endstand": -96.5,
+   "gnugoGibtAuf": false,
+   "zuege": 259,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 57,
+   "s120": -8.4,
+   "s200": -106.5,
+   "endstand": -106.5,
+   "gnugoGibtAuf": false,
+   "zuege": 243,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 58,
+   "s120": 43.7,
+   "s200": -34.5,
+   "endstand": -36.5,
+   "gnugoGibtAuf": false,
+   "zuege": 255,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 59,
+   "s120": -5.6,
+   "s200": -44.8,
+   "endstand": -46.5,
+   "gnugoGibtAuf": false,
+   "zuege": 235,
+   "abgebrochen": false
+  },
+  {
+   "arm": "B",
+   "nr": 60,
+   "s120": 51,
+   "s200": -7.5,
+   "endstand": -20.5,
+   "gnugoGibtAuf": false,
+   "zuege": 251,
+   "abgebrochen": false
+  }
+ ]
+}
