@@ -200,13 +200,14 @@ function zugwahl(t) {
     });
 
   /* Suche */
-  schritt(366, {titel: 'Suche: Monte-Carlo-Baum mit PUCT', code: 'mctsPUCT', art: 'akzent',
+  schritt(384, {titel: 'Suche: Monte-Carlo-Baum mit PUCT', code: 'mctsPUCT', art: 'akzent',
     zeilen: ['Simulationen nach Zeitbudget; der Baum wird im nächsten Zug weiterverwendet.']},
   y0 => {
     const iw = W - 28, ix = X + 14;
     let iy = y0 + 54;
     const zeile = (h, titel, zeilen) => { L.kasten(ix, iy, iw, h, {titel, zeilen, zg: 12}); iy += h + 10; };
-    zeile(58, 'Wurzel', ['die 16 besten Kandidaten aus der Zugbewertung, Prior per Softmax']);
+    zeile(76, 'Wurzel', ['die 16 besten Kandidaten aus der Zugbewertung, Prior per Softmax;',
+      'auch bei übernommenem Baum (wurzelFrisch), mit dessen Besuchen']);
     zeile(58, 'Auswahl', ['Q + 1,4 · P · √N / (1 + n), dazu RAVE; innere Knoten mit 8 Kindern']);
     zeile(76, 'Blatt: Rollout', ['24 Halbzüge, jeweils zufällig unter den 3 bzw. 6 besten Zügen',
       'nach quickEval, ohne eigene Augen zu füllen']);

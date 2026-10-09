@@ -114,3 +114,50 @@ Endpunkt: Siegrate von B, zweiseitig gegen 50 %, α = 0,05.
   KI. Die Häufigkeit kann sich zwischen M1 und M2 unterscheiden.
 - GNU Go Stufe 1 mit neun Vorgabesteinen ist ein einzelner, enger Gegner.
   Gemessen wird mit 120 Simulationen.
+
+---
+
+## 6. Nachtrag: Ergebnis, Default 1 (09.10.2026)
+
+Gelaufen auf dem Merge-Commit `b018203`, ohne Unterbrechung. Daten:
+`daten/wurzel-gnugo.json` (M1, beide Arme, mit Wächter) und
+`daten/wurzel-20261100.json` bis `…03.json` (Hash-Listen M2).
+
+**M1, gegen GNU Go (primär), 60 Paare, Seed 131:**
+
+| | A (Default) | B (`wurzelFrisch` 1) | B − A |
+|---|---:|---:|---|
+| **Endstand** | −93,1 | −67,4 | **+25,7** (SD 84,0), **p = 0,021** |
+| nach Zug 120 | +27,1 | +47,2 | +20,1, p = 0,00003 (53 Paare) |
+| nach Zug 200 | −68,1 | −47,8 | +20,3, p = 0,003 (49 Paare) |
+
+- B ist in 41 von 60 Paaren besser, in einem gleich, im Median um 19 Punkte.
+- GNU Go gab mit A siebenmal auf, mit B sechsmal.
+- Partielänge: Ø 259 Züge (A) gegen 265 (B).
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt **199 von 360 Partien, 55,3 %**
+(z = 2,00, p = 0,045, 95-%-KI 50,1–60,3 %). Teilläufe: 56,7 / 60,0 / 45,6 /
+58,9 %.
+
+**Entscheidung nach §4: Default `wurzelFrisch` = 1.** M1 ist signifikant
+besser, M2 nicht schlechter, sondern knapp ebenfalls besser.
+
+**Sekundär:**
+
+| | A | B |
+|---|---:|---:|
+| Suchen mit übernommenem Teilbaum | 10 % (778 von 7 680) | 11 % (900 von 7 871) |
+| alte Wurzelkinder übernommen / verworfen | | 721 / 3 837 |
+| verschenkt ab Zug 100, bis Zug 200 | 40 % (18,3 je Partie) | 37 % (17,5) |
+| verschenkt nach Zug 200 | 56 % (18,3 je Partie) | 48 % (16,9) |
+
+**Einordnung:**
+- Der Schalter wirkt nur in jeder zehnten Suche, und doch zeigt sich der
+  Gewinn schon nach Zug 120. In diesen Suchen kam bisher kaum ein Kandidat
+  aus `evaluateMove` vor: Mit frischer Wurzel werden 84 % der alten
+  Wurzelkinder verworfen.
+- Der Pilot (+40,4 über 16 Partien) lag höher als die Messung. Das ist das
+  übliche Zurückfallen eines Piloten, der ausgewählt wurde, weil er gut
+  aussah.
+- Der Fehler war kein Mangel der Bewertung, sondern eine Lücke in der
+  Suche: Die Zugbewertung wurde in diesen Zügen gar nicht gefragt.

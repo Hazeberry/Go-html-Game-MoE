@@ -1,6 +1,6 @@
 /* Frische Wurzel bei Tree-Reuse (wurzelFrisch; docs/wurzel-frisch.md).
 
-     1. Default 0.
+     1. Default 1 (gemessen, docs/wurzel-frisch.md §6).
      2. Der Wächter zählt Suchen und übernommene Teilbäume: Nach einem
         eigenen Zug und einer gegnerischen Antwort, die die Suche schon
         untersucht hatte, übernimmt die nächste Suche den Teilbaum.
@@ -56,8 +56,8 @@ function zweiteSuche(werte) {
   } finally { Object.assign(PARAMS, alt); }
 }
 
-test('Default wurzelFrisch 0', () => {
-  pruefeGleich(PARAMS.wurzelFrisch, 0, 'Default');
+test('Default wurzelFrisch 1', () => {
+  pruefeGleich(PARAMS.wurzelFrisch, 1, 'Default');
 });
 
 test('Wächter: übernommener Teilbaum wird gezählt; bei 0 nichts übernommen oder verworfen', () => {
