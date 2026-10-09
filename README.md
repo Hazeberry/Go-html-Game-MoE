@@ -40,7 +40,9 @@ nichts zu installieren.
 **Bekannte Grenzen, gemessen statt vermutet:**
 
 - **Der Suchmechanismus ist nur teilweise verstanden.** `mctsValueScale` ist
-  belegt der wichtigste Parameter, *warum* er wirkt, ist offen (siehe unten).
+  im Selbstspiel belegt der wichtigste Parameter, *warum* er wirkt, ist offen
+  (siehe unten). Gegen GNU Go ist der Unterschied zwischen 200 und 350 klein
+  und nicht signifikant (`docs/wertskala-gnugo.md`).
 - **Die Phasengrenze liegt nicht dort, wo der Parameter sagt.** `openingMoves`
   steht auf 20, aber der Eröffnungs-Experte regiert effektiv nur etwa 15 Züge:
   Der Blend mittelt Rohwerte, und `evalMidgame` hat die rund zehnfach größere
@@ -233,7 +235,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 
 | Befund | Messung | Konsequenz |
 |---|---|---|
-| `mctsValueScale` 200 statt 350 | 65:35 über 100 gepaarte Partien, p = 0,0035 | **eingebaut** (≈ +108 Elo) |
+| `mctsValueScale` 200 statt 350 | 65:35 über 100 gepaarte Partien, p = 0,0035; gegen GNU Go nachgeprüft: 350 −14,2 Punkte über 60 Paare (p = 0,30) | **eingebaut** (≈ +108 Elo im Selbstspiel); GNU Go widerspricht nicht (`docs/wertskala-gnugo.md`) |
 | Kurve 100/150/200/250/300/500/1000 | Plateau bei 150–250, Abfall zu beiden Seiten | Mitte des Plateaus gewählt, nicht der Höchstwert |
 | `endTieBreak` 1 statt 0 (Gleichstand im Endspiel ordnen statt losen) | 57,2 % und in der Wiederholung 59,4 % über je 360 Partien, p = 0,006 und 0,0003 | **eingebaut** — Default 1 |
 | `raumGewicht` + `raumZug` 1 (Raumrisiko im Laufkampf) | 45,3 % über 360 Partien, p = 0,073; Ausbrüche ×2, große Verluste unverändert | verworfen — Default 0 |

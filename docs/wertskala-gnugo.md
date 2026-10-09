@@ -83,3 +83,39 @@ GNU Go je Arm, Partielänge.
 - Bei einer Streuung der Paardifferenz um 90 Punkte, wie in den letzten
   Läufen, erkennen 60 Paare einen Unterschied von etwa 33 Punkten mit 80 %
   Wahrscheinlichkeit. Kleinere Unterschiede bleiben unentschieden.
+
+---
+
+## 6. Nachtrag: Ergebnis, 200 bleibt (09.10.2026)
+
+Gelaufen auf dem Merge-Commit `c5ddb1a`, ohne Unterbrechung, in neun
+Minuten. Daten: `daten/skala-gnugo.json` (Arm B, Gegenprobe A), Arm A in
+`daten/lesen-gnugo.json`.
+
+**Gegenprobe A:** Die Partien 1, 16, 31 und 46 kamen auf heutigem Stand
+exakt wieder: gleicher Endstand, gleiche Zugzahl, gleiche Schätzung nach Zug
+120 und 200. Arm A gilt damit unverändert.
+
+**Primär, Endstand, 60 Paare:**
+
+| | A (200) | B (350) | B − A |
+|---|---:|---:|---|
+| **Endstand** | −143,3 | −157,6 | **−14,2** (SD 105,6), **p = 0,30** |
+| nach Zug 120 | +13,8 | +18,1 | +4,4, p = 0,37 (54 Paare) |
+| nach Zug 200 | −80,9 | −92,0 | −11,1, p = 0,11 (54 Paare) |
+
+- B ist in 25 von 60 Paaren besser, im Median um 26 Punkte schlechter.
+- GNU Go gab mit A dreimal auf, mit B viermal, jeweils vor Zug 120. Diese
+  Paare fehlen in den Zeilen nach Zug 120 und 200.
+- Partielänge: A Ø 309, B Ø 311 Züge.
+
+**Entscheidung nach §4: `mctsValueScale` bleibt 200.** Der fremde Maßstab
+widerspricht dem Selbstspiel nicht. Die Richtung spricht leicht für 200,
+signifikant ist sie nicht.
+
+**Einordnung:** Im Selbstspiel war 200 gegen 350 der größte Einzeleffekt
+seiner Zeit (65:35). Gegen GNU Go ist der Unterschied klein. Das passt zur
+Lesart aus [`laufkampf-lesen.md`](laufkampf-lesen.md): Im Selbstspiel
+entscheiden taktische Gefechte, die GNU Go auf Stufe 1 selten sucht. Die
+Partien gegen GNU Go entscheidet vor allem das Endspiel nach Zug 200, und
+dort hilft keine der beiden Skalen.
