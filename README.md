@@ -242,6 +242,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | **`gebietZug` 80 statt 0 (Gebiet in der Zugbewertung)** | **gegen GNU Go +229 Punkte nach 120 Zügen (p = 8 · 10⁻³³), im Selbstspiel 83,3 % über 360 Partien** | **eingebaut** — Default 80, rund +280 Elo |
 | **`augenSchutz` 2 + `passUnabwendbar` 1 (eigene Augen nie füllen, passen, wenn nichts zu retten ist)** | **gegen GNU Go Endstand +217 Punkte über 60 ganze Partien (p = 3 · 10⁻¹⁷), im Selbstspiel 53,9 % über 360 Partien (n. s.)** | **eingebaut** — vorher endeten 57 von 60 Partien gegen GNU Go mit W +370,5 |
 | **`leseVerzicht` 1 (keine Züge, deren Kette der eigene Leser sofort fängt)** | **gegen GNU Go Endstand +56,1 Punkte über 60 Paare (p = 0,00007), im Selbstspiel 72,8 % über 360 Partien (p = 5 · 10⁻¹⁸)** | **eingebaut** — Default 1, rund +171 Elo im Selbstspiel (`docs/endspiel-verlust.md`) |
+| **`wurzelFrisch` 1 (bei übernommenem Suchbaum Wurzelkandidaten trotzdem aus der Zugbewertung)** | **gegen GNU Go Endstand +25,7 Punkte über 60 Paare (p = 0,021), im Selbstspiel 55,3 % über 360 Partien (p = 0,045)** | **eingebaut** — Default 1 (`docs/wurzel-frisch.md`) |
 | `gebietFreiheit` 1 (Gebietsgewinn schwacher neuer Ketten nur anteilig) | gegen GNU Go Endstand +19,5 über 60 Paare (p = 0,14), im Selbstspiel 53,6 % über 360 Partien (p = 0,17) | **nicht beschlossen** — beide Richtungen positiv, keine signifikant; Schalter im Dashboard (`docs/gebiet-freiheit.md`) |
 | `captureCap` 200 (Gefangenen-Saldo deckeln, gegen falsche Aufgaben) | falsche Aufgaben 16 → 8 (p = 0,15), Siegrate 54,4 % (p = 0,017, nur Kontrolle); Wiederholung 53,6 % (p = 0,053) | **nicht beschlossen**, knapp — Schalter im Dashboard (`docs/aufgabe-deckel.md`) |
 | `gegnerWert` / `gegnerGebiet` (Wert des Punkts für den Gegner) | Pilot gegen GNU Go: Endstand −90 bis −126 | verworfen — Default 0 (`docs/gegnerwert.md`) |
@@ -2210,10 +2211,23 @@ schon vorher, dass die Kette fällt. `leseVerzicht` spielt solche Züge nicht
 mehr: gegen GNU Go **+56 Punkte** im Endstand, im Selbstspiel **72,8 %**.
 Seitdem Default: [`docs/endspiel-verlust.md`](docs/endspiel-verlust.md).
 
+**Warum die Züge verschenkt werden.** Die Suche folgt mit 120 Simulationen
+fast immer dem Favoriten der Zugbewertung, und die rechnet Gebiet und
+Rettung so, als überlebe der neue Stein
+([`docs/verschenkt-warum.md`](docs/verschenkt-warum.md)). Den
+Gebietsgewinn schwacher Ketten zu dämpfen (`gebietFreiheit`) zeigte in die
+richtige Richtung, blieb aber unter der Schwelle. Eine Lücke in der Suche
+selbst war wirksamer: Übernahm sie den Baum des vorigen Zuges, kamen die
+Kandidaten an der Wurzel aus der schnellen Bewertung `quickEval`, nicht aus
+der Zugbewertung. `wurzelFrisch` bildet die Wurzel dann neu: gegen GNU Go
+**+26 Punkte**, im Selbstspiel 55,3 %. Seitdem Default:
+[`docs/wurzel-frisch.md`](docs/wurzel-frisch.md).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
-09.10. auch `leseVerzicht` = 1. Wiederholen auf dem Commit aus der
-Hash-Liste oder mit `gebietZug=0,augenSchutz=0,passUnabwendbar=0,leseVerzicht=0`
+09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1. Wiederholen auf dem
+Commit aus der Hash-Liste oder mit
+`gebietZug=0,augenSchutz=0,passUnabwendbar=0,leseVerzicht=0,wurzelFrisch=0`
 (und `endTieBreak=0` für Läufe vor dem 03.10.) in beiden Armen.
 
 ## Methodik

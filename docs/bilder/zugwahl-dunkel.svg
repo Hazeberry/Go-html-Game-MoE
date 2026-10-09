@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="920" height="1498" viewBox="0 0 920 1498" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="titel beschr">
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="1516" viewBox="0 0 920 1516" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="titel beschr">
 <title id="titel">Wie die KI einen Zug findet</title><desc id="beschr">Stellung, legale Züge, Filter (Benson, augenSchutz), Zugbewertung als Mischung von Experten mit Gebiet und Krise, Pass-Prüfung, optionale Taktik-Schalter, Monte-Carlo-Suche mit PUCT, Rollouts und tanh(evaluateBoard/200), Aufgabe-Prüfung, dann der meistbesuchte Zug.</desc>
 <defs><marker id="spitze" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#898781"/></marker><marker id="spitzeA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d95926"/></marker></defs>
-<rect width="920" height="1498" rx="8" fill="#1a1a19"/>
+<rect width="920" height="1516" rx="8" fill="#1a1a19"/>
 <text x="24" y="36" font-size="18" font-weight="600" fill="#ffffff" text-anchor="start">Wie die KI einen Zug findet</text>
 <text x="24" y="58" font-size="13" fill="#c3c2b7" text-anchor="start">Der Weg durch getAIMove auf Stufe „Schwer“, mit den heutigen Defaults. Gestrichelt: Schalter, die im Default aus sind.</text>
 <text x="24" y="78" font-size="13" fill="#c3c2b7" text-anchor="start">Rechts die Ausgänge: Hier kann die KI passen oder aufgeben, statt zu ziehen.</text>
@@ -64,33 +64,34 @@
 <text x="714" y="883" font-size="12" fill="#c3c2b7" text-anchor="start">Leicht / Mittel: Zufall</text>
 <text x="714" y="900" font-size="12" fill="#c3c2b7" text-anchor="start">unter den besten 25 % / 8 %</text>
 <line x1="332" y1="918" x2="332" y2="941" stroke="#898781" stroke-width="1.5" marker-end="url(#spitze)"/>
-<rect x="32" y="944" width="600" height="366" rx="6" fill="#1b2533" stroke="#3987e5" stroke-width="1.5"/>
+<rect x="32" y="944" width="600" height="384" rx="6" fill="#1b2533" stroke="#3987e5" stroke-width="1.5"/>
 <text x="46" y="965" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Suche: Monte-Carlo-Baum mit PUCT</text>
 <text x="618" y="965" font-size="11.5" fill="#898781" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">mctsPUCT</text>
 <text x="46" y="984" font-size="12.5" fill="#c3c2b7" text-anchor="start">Simulationen nach Zeitbudget; der Baum wird im nächsten Zug weiterverwendet.</text>
-<rect x="46" y="998" width="572" height="58" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<rect x="46" y="998" width="572" height="76" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
 <text x="60" y="1019" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Wurzel</text>
-<text x="60" y="1038" font-size="12" fill="#c3c2b7" text-anchor="start">die 16 besten Kandidaten aus der Zugbewertung, Prior per Softmax</text>
-<rect x="46" y="1066" width="572" height="58" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
-<text x="60" y="1087" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Auswahl</text>
-<text x="60" y="1106" font-size="12" fill="#c3c2b7" text-anchor="start">Q + 1,4 · P · √N / (1 + n), dazu RAVE; innere Knoten mit 8 Kindern</text>
-<rect x="46" y="1134" width="572" height="76" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
-<text x="60" y="1155" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Blatt: Rollout</text>
-<text x="60" y="1174" font-size="12" fill="#c3c2b7" text-anchor="start">24 Halbzüge, jeweils zufällig unter den 3 bzw. 6 besten Zügen</text>
-<text x="60" y="1191" font-size="12" fill="#c3c2b7" text-anchor="start">nach quickEval, ohne eigene Augen zu füllen</text>
-<rect x="46" y="1220" width="572" height="76" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
-<text x="60" y="1241" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Wert</text>
-<text x="60" y="1260" font-size="12" fill="#c3c2b7" text-anchor="start">tanh(evaluateBoard / 200), aus Sicht der KI zwischen −1 und +1</text>
-<text x="60" y="1277" font-size="12" fill="#c3c2b7" text-anchor="start">evaluateBoard = Gefangene × 20 + je Kette Größe × 5 + Freiheiten × 3</text>
-<line x1="332" y1="1310" x2="332" y2="1333" stroke="#898781" stroke-width="1.5" marker-end="url(#spitze)"/>
-<rect x="32" y="1336" width="600" height="58" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
-<text x="46" y="1357" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Aufgabe-Prüfung</text>
-<text x="46" y="1376" font-size="12.5" fill="#c3c2b7" text-anchor="start">Q ≤ −0,95 in 5 Zügen in Folge (ab Zug 60), und die Gebietsschätzung sagt verloren</text>
-<line x1="635" y1="1365" x2="697" y2="1365" stroke="#d95926" stroke-width="1.5" marker-end="url(#spitzeA)"/>
-<rect x="700" y="1350" width="190" height="30" rx="15" fill="#1a1a19" stroke="#d95926" stroke-width="1.5"/>
-<text x="795" y="1370" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Aufgabe</text>
-<line x1="332" y1="1394" x2="332" y2="1417" stroke="#898781" stroke-width="1.5" marker-end="url(#spitze)"/>
-<rect x="192" y="1420" width="280" height="34" rx="17" fill="#3987e5"/>
-<text x="332" y="1442" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="middle">Zug: das meistbesuchte Kind</text>
-<text x="24" y="1482" font-size="11" fill="#898781" text-anchor="start">Erzeugt mit auswertung/architektur.js. Die Zahlen sind Defaults und im Dashboard einstellbar.</text>
+<text x="60" y="1038" font-size="12" fill="#c3c2b7" text-anchor="start">die 16 besten Kandidaten aus der Zugbewertung, Prior per Softmax;</text>
+<text x="60" y="1055" font-size="12" fill="#c3c2b7" text-anchor="start">auch bei übernommenem Baum (wurzelFrisch), mit dessen Besuchen</text>
+<rect x="46" y="1084" width="572" height="58" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="60" y="1105" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Auswahl</text>
+<text x="60" y="1124" font-size="12" fill="#c3c2b7" text-anchor="start">Q + 1,4 · P · √N / (1 + n), dazu RAVE; innere Knoten mit 8 Kindern</text>
+<rect x="46" y="1152" width="572" height="76" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="60" y="1173" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Blatt: Rollout</text>
+<text x="60" y="1192" font-size="12" fill="#c3c2b7" text-anchor="start">24 Halbzüge, jeweils zufällig unter den 3 bzw. 6 besten Zügen</text>
+<text x="60" y="1209" font-size="12" fill="#c3c2b7" text-anchor="start">nach quickEval, ohne eigene Augen zu füllen</text>
+<rect x="46" y="1238" width="572" height="76" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="60" y="1259" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Wert</text>
+<text x="60" y="1278" font-size="12" fill="#c3c2b7" text-anchor="start">tanh(evaluateBoard / 200), aus Sicht der KI zwischen −1 und +1</text>
+<text x="60" y="1295" font-size="12" fill="#c3c2b7" text-anchor="start">evaluateBoard = Gefangene × 20 + je Kette Größe × 5 + Freiheiten × 3</text>
+<line x1="332" y1="1328" x2="332" y2="1351" stroke="#898781" stroke-width="1.5" marker-end="url(#spitze)"/>
+<rect x="32" y="1354" width="600" height="58" rx="6" fill="#242423" stroke="#4a4a46" stroke-width="1"/>
+<text x="46" y="1375" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="start">Aufgabe-Prüfung</text>
+<text x="46" y="1394" font-size="12.5" fill="#c3c2b7" text-anchor="start">Q ≤ −0,95 in 5 Zügen in Folge (ab Zug 60), und die Gebietsschätzung sagt verloren</text>
+<line x1="635" y1="1383" x2="697" y2="1383" stroke="#d95926" stroke-width="1.5" marker-end="url(#spitzeA)"/>
+<rect x="700" y="1368" width="190" height="30" rx="15" fill="#1a1a19" stroke="#d95926" stroke-width="1.5"/>
+<text x="795" y="1388" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Aufgabe</text>
+<line x1="332" y1="1412" x2="332" y2="1435" stroke="#898781" stroke-width="1.5" marker-end="url(#spitze)"/>
+<rect x="192" y="1438" width="280" height="34" rx="17" fill="#3987e5"/>
+<text x="332" y="1460" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="middle">Zug: das meistbesuchte Kind</text>
+<text x="24" y="1500" font-size="11" fill="#898781" text-anchor="start">Erzeugt mit auswertung/architektur.js. Die Zahlen sind Defaults und im Dashboard einstellbar.</text>
 </svg>
