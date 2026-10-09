@@ -237,7 +237,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 |---|---|---|
 | `mctsValueScale` 200 statt 350 | 65:35 über 100 gepaarte Partien, p = 0,0035; gegen GNU Go nachgeprüft: 350 −14,2 Punkte über 60 Paare (p = 0,30) | **eingebaut** (≈ +108 Elo im Selbstspiel); GNU Go widerspricht nicht (`docs/wertskala-gnugo.md`) |
 | Kurve 100/150/200/250/300/500/1000 | Plateau bei 150–250, Abfall zu beiden Seiten | Mitte des Plateaus gewählt, nicht der Höchstwert |
-| `endTieBreak` 1 statt 0 (Gleichstand im Endspiel ordnen statt losen) | 57,2 % und in der Wiederholung 59,4 % über je 360 Partien, p = 0,006 und 0,0003 | **eingebaut** — Default 1 |
+| `endTieBreak` 1 statt 0 (Gleichstand im Endspiel ordnen statt losen) | 57,2 % und in der Wiederholung 59,4 % über je 360 Partien, p = 0,006 und 0,0003 (vor `gebietZug`); gegen GNU Go nachgeprüft: 0 statt 1 +0,4 Punkte über 60 Paare (p = 0,97) | **eingebaut** — Default 1; gegen GNU Go ohne Wirkung, neben `gebietZug` vermutlich überflüssig (`docs/gleichstand-gnugo.md`) |
 | `raumGewicht` + `raumZug` 1 (Raumrisiko im Laufkampf) | 45,3 % über 360 Partien, p = 0,073; Ausbrüche ×2, große Verluste unverändert | verworfen — Default 0 |
 | **`gebietZug` 80 statt 0 (Gebiet in der Zugbewertung)** | **gegen GNU Go +229 Punkte nach 120 Zügen (p = 8 · 10⁻³³), im Selbstspiel 83,3 % über 360 Partien** | **eingebaut** — Default 80, rund +280 Elo |
 | **`augenSchutz` 2 + `passUnabwendbar` 1 (eigene Augen nie füllen, passen, wenn nichts zu retten ist)** | **gegen GNU Go Endstand +217 Punkte über 60 ganze Partien (p = 3 · 10⁻¹⁷), im Selbstspiel 53,9 % über 360 Partien (n. s.)** | **eingebaut** — vorher endeten 57 von 60 Partien gegen GNU Go mit W +370,5 |

@@ -20,7 +20,7 @@ const DATEN = [
   {name: 'mctsValueScale 200', text: 'statt 350, Skala des Suchwerts', siege: 65, partien: 100, art: 'eingebaut', gnugo: '+14,2 Endstand (n. s.)'},
   {name: 'leseRettung 1', text: 'taktischer Leser rettet Ketten', siege: 452, partien: 720, art: 'offen', gnugo: '−30,5 Endstand'},
   {name: 'Doppelte Suche', text: '240 statt 120 Simulationen', siege: 218, partien: 360, art: 'massstab', gnugo: ''},
-  {name: 'endTieBreak 1', text: 'Gleichstand im Endspiel ordnen', siege: 420, partien: 720, art: 'eingebaut', gnugo: ''},
+  {name: 'endTieBreak 1', text: 'Gleichstand im Endspiel ordnen', siege: 420, partien: 720, art: 'eingebaut', gnugo: '−0,4 Endstand (n. s.)'},
   {name: 'captureCap 200', text: 'Deckel gegen falsche Aufgaben', siege: 778, partien: 1440, art: 'offen', gnugo: ''},
   {name: 'augenSchutz + passUnabwendbar', text: 'eigene Augen nicht füllen, passen', siege: 194, partien: 360, art: 'eingebaut', gnugo: '+217 Endstand'},
   {name: 'krisenKandidaten', text: 'Atari-Rettung immer in die Suche', siege: 372, partien: 720, art: 'verworfen', gnugo: '+7,5 Endstand (n. s.)'},

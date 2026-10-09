@@ -64,3 +64,44 @@ Wie in [`wertskala-gnugo.md`](wertskala-gnugo.md) §5:
 - GNU Go ist ein einzelner, enger Gegner.
 - Gemessen wird mit 120 Simulationen.
 - Ein Unterschied unter etwa 33 Punkten bleibt bei 60 Paaren unentschieden.
+
+---
+
+## 6. Nachtrag: Ergebnis, 1 bleibt (09.10.2026)
+
+Gelaufen auf dem Merge-Commit `5acc2a7`, ohne Unterbrechung, in sieben
+Minuten. Daten: `daten/gleich-gnugo.json` (Arm B), Arm A in
+`daten/lesen-gnugo.json`.
+
+**Primär, Endstand, 60 Paare:**
+
+| | A (1) | B (0) | B − A |
+|---|---:|---:|---|
+| **Endstand** | −143,3 | −143,0 | **+0,4** (SD 77,2), **p = 0,97** |
+| nach Zug 120 | +15,7 | +18,9 | +3,1, p = 0,24 (57 Paare) |
+| nach Zug 200 | −82,1 | −85,1 | −3,1, p = 0,53 (55 Paare) |
+
+- B ist in 33 von 60 Paaren besser, in einem gleich. Im Median ist B um 18
+  Punkte besser, der Betrag der Paardifferenz liegt im Median bei 44 Punkten.
+- GNU Go gab mit A dreimal auf (Partien 8, 49, 57), mit B fünfmal (zusätzlich
+  11 und 35, um Zug 130).
+
+**Entscheidung nach §4: `endTieBreak` bleibt 1.**
+
+**Zur Erwartung aus §1:** Der Schalter ändert die Partien, aber nicht ihr
+Ergebnis.
+- An den vier Partien mit gespeicherter Zugfolge (Gegenprobe der Wert-Skala)
+  verlaufen A und B bis Zug 85 bis 105 gleich. Dort setzt der
+  Endspiel-Experte ein, in dem der Term sitzt (`endgameMoves` 80). Danach
+  trennen sie sich.
+- Nur eine Partie (Nr. 57, GNU Go gibt bei Zug 104 auf) endet in beiden
+  Armen gleich.
+- Die Unterschiede danach heben sich im Mittel auf. Die Streuung von 44
+  Punkten je Paar ist das Rauschen, das ein Schalter erzeugt, der die Priors
+  der Suche um höchstens einen Punkt verschiebt.
+
+**Einordnung:** Der Vorteil im Selbstspiel (57,2 % und 59,4 %) wurde gemessen,
+bevor es `gebietZug` gab. Gegen GNU Go zeigt sich heute keine Wirkung. Ob
+der Schalter neben `gebietZug` im Selbstspiel noch etwas bringt, ist offen.
+Er kostet rund 10 ms je Zug und wäre ein Kandidat zum Vereinfachen; dafür
+bräuchte es eine eigene Messung.
