@@ -1,0 +1,1926 @@
+{
+ "lauf": "quick-gnugo",
+ "befehl": "node gnugo-duell.js --partien 15 --von {1,16,31,46} --seed 141 --stufe 1 --vorgabe 9 --maxzuege 600 --schaetzung 120,200 --ki mctsFixedSims=120,resignEnabled=0[,quickRettung=1] (Commit 94d3f8b, GNU Go 3.8)",
+ "partien": [
+  {
+   "arm": "A",
+   "nr": 1,
+   "s120": 35.9,
+   "s200": -38.1,
+   "endstand": -94.5,
+   "gnugoGibtAuf": false,
+   "zuege": 279,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 138,
+    "wieder": 19,
+    "uebernommen": 17,
+    "verworfen": 84
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 2,
+   "s120": 53.3,
+   "s200": -114,
+   "endstand": -156.5,
+   "gnugoGibtAuf": false,
+   "zuege": 299,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 148,
+    "wieder": 13,
+    "uebernommen": 6,
+    "verworfen": 64
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 3,
+   "s120": 19.5,
+   "s200": null,
+   "endstand": 55.5,
+   "gnugoGibtAuf": true,
+   "zuege": 122,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 61,
+    "wieder": 8,
+    "uebernommen": 8,
+    "verworfen": 35
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 4,
+   "s120": 64.1,
+   "s200": -12.5,
+   "endstand": -12.5,
+   "gnugoGibtAuf": false,
+   "zuege": 213,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 105,
+    "wieder": 9,
+    "uebernommen": 8,
+    "verworfen": 26
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 5,
+   "s120": 24.1,
+   "s200": -5,
+   "endstand": -4.5,
+   "gnugoGibtAuf": false,
+   "zuege": 244,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 121,
+    "wieder": 14,
+    "uebernommen": 15,
+    "verworfen": 57
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 6,
+   "s120": 60.8,
+   "s200": null,
+   "endstand": 59.5,
+   "gnugoGibtAuf": true,
+   "zuege": 136,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 68,
+    "wieder": 7,
+    "uebernommen": 6,
+    "verworfen": 38
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 7,
+   "s120": 82.8,
+   "s200": -47.2,
+   "endstand": -88.5,
+   "gnugoGibtAuf": false,
+   "zuege": 281,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 139,
+    "wieder": 14,
+    "uebernommen": 12,
+    "verworfen": 53
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 8,
+   "s120": 39.8,
+   "s200": -62.2,
+   "endstand": -72.5,
+   "gnugoGibtAuf": false,
+   "zuege": 266,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 132,
+    "wieder": 23,
+    "uebernommen": 17,
+    "verworfen": 94
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 9,
+   "s120": -15.1,
+   "s200": -40.3,
+   "endstand": -58.5,
+   "gnugoGibtAuf": false,
+   "zuege": 275,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 136,
+    "wieder": 19,
+    "uebernommen": 24,
+    "verworfen": 64
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 10,
+   "s120": null,
+   "s200": null,
+   "endstand": 125.5,
+   "gnugoGibtAuf": true,
+   "zuege": 98,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 49,
+    "wieder": 1,
+    "uebernommen": 1,
+    "verworfen": 6
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 11,
+   "s120": 78.9,
+   "s200": null,
+   "endstand": 47.5,
+   "gnugoGibtAuf": true,
+   "zuege": 122,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 61,
+    "wieder": 5,
+    "uebernommen": 3,
+    "verworfen": 30
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 12,
+   "s120": null,
+   "s200": null,
+   "endstand": 101.5,
+   "gnugoGibtAuf": true,
+   "zuege": 100,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 50,
+    "wieder": 3,
+    "uebernommen": 2,
+    "verworfen": 20
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 13,
+   "s120": 66,
+   "s200": -2.6,
+   "endstand": -60.5,
+   "gnugoGibtAuf": false,
+   "zuege": 255,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 126,
+    "wieder": 17,
+    "uebernommen": 13,
+    "verworfen": 94
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 14,
+   "s120": 34.9,
+   "s200": -32.3,
+   "endstand": -132.5,
+   "gnugoGibtAuf": false,
+   "zuege": 263,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 130,
+    "wieder": 17,
+    "uebernommen": 20,
+    "verworfen": 50
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 15,
+   "s120": 82.8,
+   "s200": -41.9,
+   "endstand": -88.5,
+   "gnugoGibtAuf": false,
+   "zuege": 279,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 137,
+    "wieder": 14,
+    "uebernommen": 10,
+    "verworfen": 51
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 16,
+   "s120": 53.5,
+   "s200": -45,
+   "endstand": -72.5,
+   "gnugoGibtAuf": false,
+   "zuege": 289,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 143,
+    "wieder": 17,
+    "uebernommen": 13,
+    "verworfen": 63
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 17,
+   "s120": 67.1,
+   "s200": null,
+   "endstand": 61.5,
+   "gnugoGibtAuf": true,
+   "zuege": 120,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 60,
+    "wieder": 9,
+    "uebernommen": 4,
+    "verworfen": 55
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 18,
+   "s120": -17.3,
+   "s200": -6.3,
+   "endstand": -8.5,
+   "gnugoGibtAuf": false,
+   "zuege": 203,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 100,
+    "wieder": 10,
+    "uebernommen": 6,
+    "verworfen": 38
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 19,
+   "s120": 70.3,
+   "s200": null,
+   "endstand": 27.5,
+   "gnugoGibtAuf": true,
+   "zuege": 134,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 67,
+    "wieder": 8,
+    "uebernommen": 10,
+    "verworfen": 44
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 20,
+   "s120": 58,
+   "s200": -39.3,
+   "endstand": -50.5,
+   "gnugoGibtAuf": false,
+   "zuege": 257,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 127,
+    "wieder": 16,
+    "uebernommen": 11,
+    "verworfen": 90
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 21,
+   "s120": 50.5,
+   "s200": -29.2,
+   "endstand": -168.5,
+   "gnugoGibtAuf": false,
+   "zuege": 325,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 161,
+    "wieder": 19,
+    "uebernommen": 19,
+    "verworfen": 65
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 22,
+   "s120": null,
+   "s200": null,
+   "endstand": 67.5,
+   "gnugoGibtAuf": true,
+   "zuege": 90,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 45,
+    "wieder": 3,
+    "uebernommen": 0,
+    "verworfen": 23
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 23,
+   "s120": 103.1,
+   "s200": null,
+   "endstand": 43.5,
+   "gnugoGibtAuf": true,
+   "zuege": 122,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 61,
+    "wieder": 5,
+    "uebernommen": 2,
+    "verworfen": 31
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 24,
+   "s120": null,
+   "s200": null,
+   "endstand": 129.5,
+   "gnugoGibtAuf": true,
+   "zuege": 92,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 46,
+    "wieder": 12,
+    "uebernommen": 11,
+    "verworfen": 80
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 25,
+   "s120": 46.6,
+   "s200": -40.7,
+   "endstand": -60.5,
+   "gnugoGibtAuf": false,
+   "zuege": 273,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 135,
+    "wieder": 17,
+    "uebernommen": 24,
+    "verworfen": 79
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 26,
+   "s120": 56.5,
+   "s200": -74.4,
+   "endstand": -114.5,
+   "gnugoGibtAuf": false,
+   "zuege": 303,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 149,
+    "wieder": 16,
+    "uebernommen": 16,
+    "verworfen": 57
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 27,
+   "s120": 49.9,
+   "s200": -18.8,
+   "endstand": -86.5,
+   "gnugoGibtAuf": false,
+   "zuege": 283,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 140,
+    "wieder": 22,
+    "uebernommen": 18,
+    "verworfen": 68
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 28,
+   "s120": 70.9,
+   "s200": null,
+   "endstand": 55.5,
+   "gnugoGibtAuf": true,
+   "zuege": 128,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 64,
+    "wieder": 4,
+    "uebernommen": 2,
+    "verworfen": 24
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 29,
+   "s120": 82.8,
+   "s200": -45.9,
+   "endstand": -66.5,
+   "gnugoGibtAuf": false,
+   "zuege": 271,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 134,
+    "wieder": 13,
+    "uebernommen": 12,
+    "verworfen": 47
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 30,
+   "s120": 45.2,
+   "s200": -65.9,
+   "endstand": -114.5,
+   "gnugoGibtAuf": false,
+   "zuege": 271,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 134,
+    "wieder": 13,
+    "uebernommen": 10,
+    "verworfen": 43
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 31,
+   "s120": 77.1,
+   "s200": -49.8,
+   "endstand": -108.5,
+   "gnugoGibtAuf": false,
+   "zuege": 269,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 133,
+    "wieder": 16,
+    "uebernommen": 19,
+    "verworfen": 80
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 32,
+   "s120": 35.1,
+   "s200": -55.4,
+   "endstand": -144.5,
+   "gnugoGibtAuf": false,
+   "zuege": 306,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 152,
+    "wieder": 15,
+    "uebernommen": 12,
+    "verworfen": 60
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 33,
+   "s120": 9.5,
+   "s200": -66.7,
+   "endstand": -102.5,
+   "gnugoGibtAuf": false,
+   "zuege": 267,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 132,
+    "wieder": 18,
+    "uebernommen": 18,
+    "verworfen": 92
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 34,
+   "s120": 60.8,
+   "s200": null,
+   "endstand": 49.5,
+   "gnugoGibtAuf": true,
+   "zuege": 132,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 66,
+    "wieder": 7,
+    "uebernommen": 6,
+    "verworfen": 40
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 35,
+   "s120": 71.3,
+   "s200": null,
+   "endstand": 49.5,
+   "gnugoGibtAuf": true,
+   "zuege": 148,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 74,
+    "wieder": 5,
+    "uebernommen": 5,
+    "verworfen": 28
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 36,
+   "s120": 61.5,
+   "s200": null,
+   "endstand": 63.5,
+   "gnugoGibtAuf": true,
+   "zuege": 120,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 60,
+    "wieder": 7,
+    "uebernommen": 4,
+    "verworfen": 44
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 37,
+   "s120": 46.8,
+   "s200": -63.4,
+   "endstand": -82.5,
+   "gnugoGibtAuf": false,
+   "zuege": 265,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 131,
+    "wieder": 12,
+    "uebernommen": 7,
+    "verworfen": 45
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 38,
+   "s120": 23.5,
+   "s200": -90.4,
+   "endstand": -96.5,
+   "gnugoGibtAuf": false,
+   "zuege": 251,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 124,
+    "wieder": 17,
+    "uebernommen": 20,
+    "verworfen": 75
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 39,
+   "s120": null,
+   "s200": null,
+   "endstand": 107.5,
+   "gnugoGibtAuf": true,
+   "zuege": 80,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 40,
+    "wieder": 2,
+    "uebernommen": 3,
+    "verworfen": 11
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 40,
+   "s120": 47.9,
+   "s200": null,
+   "endstand": 51.5,
+   "gnugoGibtAuf": true,
+   "zuege": 136,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 68,
+    "wieder": 7,
+    "uebernommen": 4,
+    "verworfen": 24
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 41,
+   "s120": 15,
+   "s200": -80.6,
+   "endstand": -86.5,
+   "gnugoGibtAuf": false,
+   "zuege": 256,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 127,
+    "wieder": 18,
+    "uebernommen": 10,
+    "verworfen": 94
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 42,
+   "s120": -4.4,
+   "s200": 38.9,
+   "endstand": 11.5,
+   "gnugoGibtAuf": false,
+   "zuege": 394,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 196,
+    "wieder": 30,
+    "uebernommen": 45,
+    "verworfen": 133
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 43,
+   "s120": 32,
+   "s200": 1.6,
+   "endstand": -74.5,
+   "gnugoGibtAuf": false,
+   "zuege": 279,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 138,
+    "wieder": 18,
+    "uebernommen": 18,
+    "verworfen": 95
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 44,
+   "s120": 29,
+   "s200": -43.7,
+   "endstand": -84.5,
+   "gnugoGibtAuf": false,
+   "zuege": 317,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 157,
+    "wieder": 28,
+    "uebernommen": 34,
+    "verworfen": 115
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 45,
+   "s120": null,
+   "s200": null,
+   "endstand": 107.5,
+   "gnugoGibtAuf": true,
+   "zuege": 80,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 40,
+    "wieder": 2,
+    "uebernommen": 4,
+    "verworfen": 10
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 46,
+   "s120": 88,
+   "s200": null,
+   "endstand": 81.5,
+   "gnugoGibtAuf": true,
+   "zuege": 130,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 65,
+    "wieder": 6,
+    "uebernommen": 2,
+    "verworfen": 38
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 47,
+   "s120": 36.1,
+   "s200": -25.2,
+   "endstand": -130.5,
+   "gnugoGibtAuf": false,
+   "zuege": 317,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 157,
+    "wieder": 16,
+    "uebernommen": 15,
+    "verworfen": 67
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 48,
+   "s120": 70.3,
+   "s200": null,
+   "endstand": 55.5,
+   "gnugoGibtAuf": true,
+   "zuege": 134,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 67,
+    "wieder": 8,
+    "uebernommen": 8,
+    "verworfen": 45
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 49,
+   "s120": null,
+   "s200": null,
+   "endstand": 107.5,
+   "gnugoGibtAuf": true,
+   "zuege": 80,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 40,
+    "wieder": 2,
+    "uebernommen": 3,
+    "verworfen": 11
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 50,
+   "s120": 34.2,
+   "s200": -55,
+   "endstand": -66.5,
+   "gnugoGibtAuf": false,
+   "zuege": 271,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 134,
+    "wieder": 15,
+    "uebernommen": 13,
+    "verworfen": 75
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 51,
+   "s120": 77.5,
+   "s200": -75,
+   "endstand": -166.5,
+   "gnugoGibtAuf": false,
+   "zuege": 317,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 157,
+    "wieder": 25,
+    "uebernommen": 27,
+    "verworfen": 118
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 52,
+   "s120": 27.4,
+   "s200": -56.7,
+   "endstand": -124.5,
+   "gnugoGibtAuf": false,
+   "zuege": 283,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 140,
+    "wieder": 15,
+    "uebernommen": 7,
+    "verworfen": 49
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 53,
+   "s120": -8.2,
+   "s200": 5.1,
+   "endstand": 95.5,
+   "gnugoGibtAuf": true,
+   "zuege": 244,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 122,
+    "wieder": 16,
+    "uebernommen": 25,
+    "verworfen": 68
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 54,
+   "s120": 65.4,
+   "s200": -48.7,
+   "endstand": -62.5,
+   "gnugoGibtAuf": false,
+   "zuege": 281,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 139,
+    "wieder": 10,
+    "uebernommen": 8,
+    "verworfen": 60
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 55,
+   "s120": 10.8,
+   "s200": -162.8,
+   "endstand": -182.5,
+   "gnugoGibtAuf": false,
+   "zuege": 303,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 150,
+    "wieder": 16,
+    "uebernommen": 24,
+    "verworfen": 59
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 56,
+   "s120": 51.2,
+   "s200": -83.8,
+   "endstand": -164.5,
+   "gnugoGibtAuf": false,
+   "zuege": 297,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 147,
+    "wieder": 18,
+    "uebernommen": 17,
+    "verworfen": 86
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 57,
+   "s120": 12.5,
+   "s200": -27.6,
+   "endstand": -26.5,
+   "gnugoGibtAuf": false,
+   "zuege": 241,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 119,
+    "wieder": 16,
+    "uebernommen": 8,
+    "verworfen": 40
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 58,
+   "s120": 60.8,
+   "s200": null,
+   "endstand": 53.5,
+   "gnugoGibtAuf": true,
+   "zuege": 132,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 66,
+    "wieder": 7,
+    "uebernommen": 8,
+    "verworfen": 36
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 59,
+   "s120": 95.3,
+   "s200": null,
+   "endstand": 49.5,
+   "gnugoGibtAuf": true,
+   "zuege": 138,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 69,
+    "wieder": 6,
+    "uebernommen": 3,
+    "verworfen": 31
+   }
+  },
+  {
+   "arm": "A",
+   "nr": 60,
+   "s120": 48.8,
+   "s200": -28.6,
+   "endstand": -32.5,
+   "gnugoGibtAuf": false,
+   "zuege": 241,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 119,
+    "wieder": 23,
+    "uebernommen": 22,
+    "verworfen": 54
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 1,
+   "s120": 82.8,
+   "s200": 15.4,
+   "endstand": -10.5,
+   "gnugoGibtAuf": false,
+   "zuege": 258,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 127,
+    "wieder": 11,
+    "uebernommen": 10,
+    "verworfen": 61
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 2,
+   "s120": 36.5,
+   "s200": -70.2,
+   "endstand": -144.5,
+   "gnugoGibtAuf": false,
+   "zuege": 303,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 150,
+    "wieder": 21,
+    "uebernommen": 28,
+    "verworfen": 90
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 3,
+   "s120": 13.6,
+   "s200": -8,
+   "endstand": -44.5,
+   "gnugoGibtAuf": false,
+   "zuege": 233,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 113,
+    "wieder": 14,
+    "uebernommen": 16,
+    "verworfen": 64
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 4,
+   "s120": 95.1,
+   "s200": null,
+   "endstand": 51.5,
+   "gnugoGibtAuf": true,
+   "zuege": 152,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 76,
+    "wieder": 6,
+    "uebernommen": 4,
+    "verworfen": 37
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 5,
+   "s120": 13,
+   "s200": -9,
+   "endstand": -18.5,
+   "gnugoGibtAuf": false,
+   "zuege": 249,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 123,
+    "wieder": 12,
+    "uebernommen": 14,
+    "verworfen": 64
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 6,
+   "s120": 70.3,
+   "s200": null,
+   "endstand": 51.5,
+   "gnugoGibtAuf": true,
+   "zuege": 134,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 67,
+    "wieder": 8,
+    "uebernommen": 8,
+    "verworfen": 47
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 7,
+   "s120": 29.3,
+   "s200": -54.5,
+   "endstand": -70.5,
+   "gnugoGibtAuf": false,
+   "zuege": 250,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 124,
+    "wieder": 11,
+    "uebernommen": 10,
+    "verworfen": 52
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 8,
+   "s120": 32.1,
+   "s200": -40.1,
+   "endstand": -114.5,
+   "gnugoGibtAuf": false,
+   "zuege": 303,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 150,
+    "wieder": 17,
+    "uebernommen": 21,
+    "verworfen": 80
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 9,
+   "s120": 2.8,
+   "s200": 35,
+   "endstand": -2.5,
+   "gnugoGibtAuf": false,
+   "zuege": 244,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 121,
+    "wieder": 12,
+    "uebernommen": 15,
+    "verworfen": 77
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 10,
+   "s120": null,
+   "s200": null,
+   "endstand": 125.5,
+   "gnugoGibtAuf": true,
+   "zuege": 98,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 49,
+    "wieder": 1,
+    "uebernommen": 1,
+    "verworfen": 6
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 11,
+   "s120": 59.7,
+   "s200": null,
+   "endstand": 41.5,
+   "gnugoGibtAuf": true,
+   "zuege": 122,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 61,
+    "wieder": 5,
+    "uebernommen": 6,
+    "verworfen": 31
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 12,
+   "s120": null,
+   "s200": null,
+   "endstand": 107.5,
+   "gnugoGibtAuf": true,
+   "zuege": 80,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 40,
+    "wieder": 2,
+    "uebernommen": 3,
+    "verworfen": 13
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 13,
+   "s120": 45.4,
+   "s200": null,
+   "endstand": 49.5,
+   "gnugoGibtAuf": true,
+   "zuege": 120,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 60,
+    "wieder": 6,
+    "uebernommen": 4,
+    "verworfen": 42
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 14,
+   "s120": 17,
+   "s200": 36.4,
+   "endstand": -4.5,
+   "gnugoGibtAuf": false,
+   "zuege": 203,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 100,
+    "wieder": 11,
+    "uebernommen": 9,
+    "verworfen": 51
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 15,
+   "s120": 82.8,
+   "s200": -41.4,
+   "endstand": -62.5,
+   "gnugoGibtAuf": false,
+   "zuege": 271,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 134,
+    "wieder": 9,
+    "uebernommen": 7,
+    "verworfen": 52
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 16,
+   "s120": 53.5,
+   "s200": -31.5,
+   "endstand": -52.5,
+   "gnugoGibtAuf": false,
+   "zuege": 355,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 176,
+    "wieder": 18,
+    "uebernommen": 21,
+    "verworfen": 79
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 17,
+   "s120": null,
+   "s200": null,
+   "endstand": 57.5,
+   "gnugoGibtAuf": true,
+   "zuege": 116,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 58,
+    "wieder": 8,
+    "uebernommen": 5,
+    "verworfen": 50
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 18,
+   "s120": 51,
+   "s200": -67.6,
+   "endstand": -78.5,
+   "gnugoGibtAuf": false,
+   "zuege": 292,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 144,
+    "wieder": 15,
+    "uebernommen": 17,
+    "verworfen": 97
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 19,
+   "s120": 69.7,
+   "s200": null,
+   "endstand": 73.5,
+   "gnugoGibtAuf": true,
+   "zuege": 126,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 63,
+    "wieder": 7,
+    "uebernommen": 5,
+    "verworfen": 42
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 20,
+   "s120": 38.8,
+   "s200": -68.7,
+   "endstand": -132.5,
+   "gnugoGibtAuf": false,
+   "zuege": 299,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 148,
+    "wieder": 17,
+    "uebernommen": 21,
+    "verworfen": 95
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 21,
+   "s120": 50.5,
+   "s200": -16.3,
+   "endstand": -14.5,
+   "gnugoGibtAuf": false,
+   "zuege": 227,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 112,
+    "wieder": 15,
+    "uebernommen": 13,
+    "verworfen": 65
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 22,
+   "s120": -8,
+   "s200": -54.6,
+   "endstand": -60.5,
+   "gnugoGibtAuf": false,
+   "zuege": 221,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 109,
+    "wieder": 10,
+    "uebernommen": 4,
+    "verworfen": 60
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 23,
+   "s120": 95.1,
+   "s200": -3.8,
+   "endstand": -6.5,
+   "gnugoGibtAuf": false,
+   "zuege": 243,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 120,
+    "wieder": 6,
+    "uebernommen": 2,
+    "verworfen": 34
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 24,
+   "s120": 20.3,
+   "s200": -23.3,
+   "endstand": -80.5,
+   "gnugoGibtAuf": false,
+   "zuege": 272,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 135,
+    "wieder": 14,
+    "uebernommen": 24,
+    "verworfen": 86
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 25,
+   "s120": 53.3,
+   "s200": -106.6,
+   "endstand": -126.5,
+   "gnugoGibtAuf": false,
+   "zuege": 275,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 136,
+    "wieder": 17,
+    "uebernommen": 10,
+    "verworfen": 102
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 26,
+   "s120": 40.8,
+   "s200": -71,
+   "endstand": -146.5,
+   "gnugoGibtAuf": false,
+   "zuege": 301,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 149,
+    "wieder": 18,
+    "uebernommen": 23,
+    "verworfen": 68
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 27,
+   "s120": 18.5,
+   "s200": -60.1,
+   "endstand": -162.5,
+   "gnugoGibtAuf": false,
+   "zuege": 287,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 142,
+    "wieder": 14,
+    "uebernommen": 19,
+    "verworfen": 81
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 28,
+   "s120": 95.1,
+   "s200": null,
+   "endstand": 87.5,
+   "gnugoGibtAuf": true,
+   "zuege": 128,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 64,
+    "wieder": 4,
+    "uebernommen": 2,
+    "verworfen": 25
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 29,
+   "s120": 82.8,
+   "s200": 19.4,
+   "endstand": -54.5,
+   "gnugoGibtAuf": false,
+   "zuege": 271,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 134,
+    "wieder": 10,
+    "uebernommen": 12,
+    "verworfen": 53
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 30,
+   "s120": 53.7,
+   "s200": -62,
+   "endstand": -160.5,
+   "gnugoGibtAuf": false,
+   "zuege": 287,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 142,
+    "wieder": 15,
+    "uebernommen": 20,
+    "verworfen": 53
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 31,
+   "s120": 77.1,
+   "s200": -64,
+   "endstand": -86.5,
+   "gnugoGibtAuf": false,
+   "zuege": 293,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 145,
+    "wieder": 20,
+    "uebernommen": 26,
+    "verworfen": 107
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 32,
+   "s120": 61.9,
+   "s200": -48.7,
+   "endstand": -108.5,
+   "gnugoGibtAuf": false,
+   "zuege": 302,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 150,
+    "wieder": 19,
+    "uebernommen": 11,
+    "verworfen": 124
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 33,
+   "s120": 7.4,
+   "s200": -56.5,
+   "endstand": -98.5,
+   "gnugoGibtAuf": false,
+   "zuege": 278,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 135,
+    "wieder": 17,
+    "uebernommen": 17,
+    "verworfen": 104
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 34,
+   "s120": 47.7,
+   "s200": -42.1,
+   "endstand": -72.5,
+   "gnugoGibtAuf": false,
+   "zuege": 260,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 129,
+    "wieder": 14,
+    "uebernommen": 19,
+    "verworfen": 72
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 35,
+   "s120": 71.7,
+   "s200": null,
+   "endstand": 35.5,
+   "gnugoGibtAuf": true,
+   "zuege": 134,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 67,
+    "wieder": 6,
+    "uebernommen": 6,
+    "verworfen": 35
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 36,
+   "s120": 60.8,
+   "s200": null,
+   "endstand": 53.5,
+   "gnugoGibtAuf": true,
+   "zuege": 132,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 66,
+    "wieder": 7,
+    "uebernommen": 7,
+    "verworfen": 42
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 37,
+   "s120": 27.2,
+   "s200": -27.7,
+   "endstand": -108.5,
+   "gnugoGibtAuf": false,
+   "zuege": 325,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 161,
+    "wieder": 31,
+    "uebernommen": 48,
+    "verworfen": 142
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 38,
+   "s120": 51,
+   "s200": -99.5,
+   "endstand": -102.5,
+   "gnugoGibtAuf": false,
+   "zuege": 286,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 141,
+    "wieder": 18,
+    "uebernommen": 12,
+    "verworfen": 114
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 39,
+   "s120": null,
+   "s200": null,
+   "endstand": 107.5,
+   "gnugoGibtAuf": true,
+   "zuege": 80,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 40,
+    "wieder": 2,
+    "uebernommen": 3,
+    "verworfen": 13
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 40,
+   "s120": 25.1,
+   "s200": -28,
+   "endstand": -84.5,
+   "gnugoGibtAuf": false,
+   "zuege": 297,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 147,
+    "wieder": 18,
+    "uebernommen": 27,
+    "verworfen": 69
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 41,
+   "s120": 36.2,
+   "s200": -56.9,
+   "endstand": -96.5,
+   "gnugoGibtAuf": false,
+   "zuege": 295,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 146,
+    "wieder": 27,
+    "uebernommen": 27,
+    "verworfen": 150
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 42,
+   "s120": -23.5,
+   "s200": -82.4,
+   "endstand": -82.5,
+   "gnugoGibtAuf": false,
+   "zuege": 255,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 126,
+    "wieder": 11,
+    "uebernommen": 14,
+    "verworfen": 61
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 43,
+   "s120": 45.8,
+   "s200": -1.5,
+   "endstand": -8.5,
+   "gnugoGibtAuf": false,
+   "zuege": 245,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 121,
+    "wieder": 24,
+    "uebernommen": 37,
+    "verworfen": 106
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 44,
+   "s120": 50.8,
+   "s200": -28.6,
+   "endstand": -164.5,
+   "gnugoGibtAuf": false,
+   "zuege": 299,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 148,
+    "wieder": 18,
+    "uebernommen": 21,
+    "verworfen": 104
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 45,
+   "s120": null,
+   "s200": null,
+   "endstand": 57.5,
+   "gnugoGibtAuf": true,
+   "zuege": 102,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 51,
+    "wieder": 4,
+    "uebernommen": 3,
+    "verworfen": 29
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 46,
+   "s120": 70.9,
+   "s200": null,
+   "endstand": 55.5,
+   "gnugoGibtAuf": true,
+   "zuege": 128,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 64,
+    "wieder": 4,
+    "uebernommen": 2,
+    "verworfen": 25
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 47,
+   "s120": 31.7,
+   "s200": -28.1,
+   "endstand": -32.5,
+   "gnugoGibtAuf": false,
+   "zuege": 247,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 122,
+    "wieder": 17,
+    "uebernommen": 17,
+    "verworfen": 78
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 48,
+   "s120": 60.8,
+   "s200": null,
+   "endstand": 57.5,
+   "gnugoGibtAuf": true,
+   "zuege": 136,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 68,
+    "wieder": 6,
+    "uebernommen": 6,
+    "verworfen": 34
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 49,
+   "s120": null,
+   "s200": null,
+   "endstand": 107.5,
+   "gnugoGibtAuf": true,
+   "zuege": 80,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 40,
+    "wieder": 2,
+    "uebernommen": 2,
+    "verworfen": 14
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 50,
+   "s120": -8.8,
+   "s200": -78.6,
+   "endstand": -78.5,
+   "gnugoGibtAuf": false,
+   "zuege": 223,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 110,
+    "wieder": 15,
+    "uebernommen": 10,
+    "verworfen": 101
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 51,
+   "s120": 77.5,
+   "s200": 9.6,
+   "endstand": -176.5,
+   "gnugoGibtAuf": false,
+   "zuege": 315,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 156,
+    "wieder": 20,
+    "uebernommen": 20,
+    "verworfen": 113
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 52,
+   "s120": 31.8,
+   "s200": -68.1,
+   "endstand": -76.5,
+   "gnugoGibtAuf": false,
+   "zuege": 239,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 118,
+    "wieder": 17,
+    "uebernommen": 9,
+    "verworfen": 97
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 53,
+   "s120": 77.5,
+   "s200": -80.1,
+   "endstand": -166.5,
+   "gnugoGibtAuf": false,
+   "zuege": 319,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 158,
+    "wieder": 16,
+    "uebernommen": 22,
+    "verworfen": 94
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 54,
+   "s120": 50.8,
+   "s200": -32.5,
+   "endstand": -32.5,
+   "gnugoGibtAuf": false,
+   "zuege": 281,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 139,
+    "wieder": 17,
+    "uebernommen": 18,
+    "verworfen": 92
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 55,
+   "s120": 31.5,
+   "s200": -102.3,
+   "endstand": -150.5,
+   "gnugoGibtAuf": false,
+   "zuege": 281,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 139,
+    "wieder": 18,
+    "uebernommen": 19,
+    "verworfen": 113
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 56,
+   "s120": 35.5,
+   "s200": -82.1,
+   "endstand": -118.5,
+   "gnugoGibtAuf": false,
+   "zuege": 273,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 135,
+    "wieder": 14,
+    "uebernommen": 20,
+    "verworfen": 70
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 57,
+   "s120": 21.1,
+   "s200": -43.5,
+   "endstand": -52.5,
+   "gnugoGibtAuf": false,
+   "zuege": 263,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 130,
+    "wieder": 8,
+    "uebernommen": 7,
+    "verworfen": 47
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 58,
+   "s120": 60.8,
+   "s200": null,
+   "endstand": 57.5,
+   "gnugoGibtAuf": true,
+   "zuege": 136,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 68,
+    "wieder": 6,
+    "uebernommen": 8,
+    "verworfen": 33
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 59,
+   "s120": 9.6,
+   "s200": -68.2,
+   "endstand": -108.5,
+   "gnugoGibtAuf": false,
+   "zuege": 289,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 142,
+    "wieder": 23,
+    "uebernommen": 27,
+    "verworfen": 101
+   }
+  },
+  {
+   "arm": "B",
+   "nr": 60,
+   "s120": 46,
+   "s200": -52.3,
+   "endstand": -104.5,
+   "gnugoGibtAuf": false,
+   "zuege": 283,
+   "abgebrochen": false,
+   "wurzel": {
+    "suchen": 137,
+    "wieder": 24,
+    "uebernommen": 22,
+    "verworfen": 117
+   }
+  }
+ ]
+}

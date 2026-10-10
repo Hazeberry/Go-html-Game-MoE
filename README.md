@@ -244,6 +244,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | **`leseVerzicht` 1 (keine Züge, deren Kette der eigene Leser sofort fängt)** | **gegen GNU Go Endstand +56,1 Punkte über 60 Paare (p = 0,00007), im Selbstspiel 72,8 % über 360 Partien (p = 5 · 10⁻¹⁸)** | **eingebaut** — Default 1, rund +171 Elo im Selbstspiel (`docs/endspiel-verlust.md`) |
 | **`wurzelFrisch` 1 (bei übernommenem Suchbaum Wurzelkandidaten trotzdem aus der Zugbewertung)** | **gegen GNU Go Endstand +25,7 Punkte über 60 Paare (p = 0,021), im Selbstspiel 55,3 % über 360 Partien (p = 0,045)** | **eingebaut** — Default 1 (`docs/wurzel-frisch.md`) |
 | `gebietFreiheit` 1 (Gebietsgewinn schwacher neuer Ketten nur anteilig) | gegen GNU Go Endstand +19,5 über 60 Paare (p = 0,14), im Selbstspiel 53,6 % über 360 Partien (p = 0,17) | **nicht beschlossen** — beide Richtungen positiv, keine signifikant; Schalter im Dashboard (`docs/gebiet-freiheit.md`) |
+| `quickRettung` 1 (Rettungsbonus in Suche und Rollouts nur, wenn die Rettung wirkt) | gegen GNU Go Endstand −14,9 über 60 Paare (p = 0,13), im Selbstspiel 51,9 % über 360 Partien (p = 0,46); der Pilot hatte +25,6 über 20 Partien | verworfen — Default 0, in keiner Messung ein Vorteil (`docs/quick-rettung.md`) |
 | `captureCap` 200 (Gefangenen-Saldo deckeln, gegen falsche Aufgaben) | falsche Aufgaben 16 → 8 (p = 0,15), Siegrate 54,4 % (p = 0,017, nur Kontrolle); Wiederholung 53,6 % (p = 0,053) | **nicht beschlossen**, knapp — Schalter im Dashboard (`docs/aufgabe-deckel.md`) |
 | `gegnerWert` / `gegnerGebiet` (Wert des Punkts für den Gegner) | Pilot gegen GNU Go: Endstand −90 bis −126 | verworfen — Default 0 (`docs/gegnerwert.md`) |
 | `krisenKandidaten` (Rettung aus dem Atari und Schläge immer in die Suche) | Selbstspiel 51,7 % über 720 Partien (p = 0,37), gegen GNU Go +7,5 (p = 0,50) | verworfen — Default 0 |
@@ -2221,7 +2222,11 @@ selbst war wirksamer: Übernahm sie den Baum des vorigen Zuges, kamen die
 Kandidaten an der Wurzel aus der schnellen Bewertung `quickEval`, nicht aus
 der Zugbewertung. `wurzelFrisch` bildet die Wurzel dann neu: gegen GNU Go
 **+26 Punkte**, im Selbstspiel 55,3 %. Seitdem Default:
-[`docs/wurzel-frisch.md`](docs/wurzel-frisch.md).
+[`docs/wurzel-frisch.md`](docs/wurzel-frisch.md). Den Rettungsbonus der
+schnellen Bewertung auf wirksame Rettungen zu beschränken (`quickRettung`)
+brachte nichts: Ein Pilot mit +26 Punkten hielt in der vollen Messung nicht
+(−15, n. s., im Selbstspiel 51,9 %):
+[`docs/quick-rettung.md`](docs/quick-rettung.md).
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
