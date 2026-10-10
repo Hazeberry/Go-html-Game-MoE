@@ -31,8 +31,15 @@
                          [--schaetzung 60,120] (GNU Gos estimate_score nach
                           diesen Zugzahlen, aus unserer Sicht: + = wir vorn;
                           endet die Partie am Zuglimit, wird nicht ausgezählt)
+                         [--gnugo-aufgabe 0] (GNU Go darf nicht aufgeben,
+                          --never-resign; jede Partie wird ausgespielt)
    Jede Partie bekommt zusätzlich `endstand`: GNU Gos final_score der
    Schlussstellung aus unserer Sicht, auch bei Aufgabe und Zuglimit.
+   Bei Aufgabe ist das die Stellung, wie sie stehen blieb, oft weit vor dem
+   Ende. Das verrauscht den gepaarten Vergleich: Gibt GNU Go nur gegen einen
+   Arm auf, steht dort ein früher Zwischenstand gegen einen ausgespielten.
+   Mit --gnugo-aufgabe 0 gibt GNU Go nie auf (docs/gnugo-ausspielen.md).
+   Ohne die Option bleibt alles wie bisher, alte Läufe sind wiederholbar.
    GTP_DEBUG=1 in der Umgebung zeigt jeden GTP-Befehl und jede Antwort.
 
    Vorgabe (--vorgabe N ≥ 2): Wir spielen in jeder Partie Schwarz mit N
@@ -48,7 +55,7 @@ const {spawn} = require('child_process');
 /* ── Optionen ─────────────────────────────────────────────────────── */
 const a = process.argv.slice(2);
 const opt = {partien: 10, seed: 1, stufe: 10, ki: {}, roh: null, gnugo: '/usr/games/gnugo',
-             maxZuege: 400, von: 1, vorgabe: 0, schaetzung: []};
+             maxZuege: 400, von: 1, vorgabe: 0, schaetzung: [], gnugoAufgabe: 1};
 for (let i = 0; i < a.length; i++) {
   const v = a[i + 1];
   switch (a[i]) {
@@ -61,6 +68,7 @@ for (let i = 0; i < a.length; i++) {
     case '--von': opt.von = +v; i++; break;
     case '--vorgabe': opt.vorgabe = +v; i++; break;
     case '--schaetzung': opt.schaetzung = v.split(',').map(Number); i++; break;
+    case '--gnugo-aufgabe': opt.gnugoAufgabe = +v; i++; break;
     case '--ki': for (const kv of v.split(',')) { const [k, w] = kv.split('='); opt.ki[k] = +w; } i++; break;
     default: console.error('Unbekannte Option ' + a[i]); process.exit(2);
   }
@@ -104,7 +112,8 @@ function vonGtp(s) {
 /* ── GTP: eine Anfrage, eine Antwort (endet mit Leerzeile) ──────────── */
 function gnugoStarten(seed) {
   const p = spawn(opt.gnugo, ['--mode', 'gtp', '--level', String(opt.stufe), '--chinese-rules',
-                              '--komi', String(KOMI), '--seed', String(seed)], {stdio: ['pipe', 'pipe', 'pipe']});
+                              '--komi', String(KOMI), '--seed', String(seed),
+                              ...(opt.gnugoAufgabe ? [] : ['--never-resign'])], {stdio: ['pipe', 'pipe', 'pipe']});
   let puffer = '', warte = [], stderr = '';
   p.stderr.on('data', d => { stderr += d.toString(); });
   /* Stirbt GNU Go, darf keine Anfrage ewig warten. */
@@ -277,7 +286,7 @@ async function partieSpielen(nr) {
             gewonnen: sieger === null ? null : sieger === wir,
             sieger: sieger === null ? null : sieger === 1 ? 'S' : 'W',
             vorgabe: opt.vorgabe, komi: KOMI, vorgabeSteine, beginnt: zuerst === 1 ? 'S' : 'W',
-            aufgabe: aufgabe ? (aufgabe === 1 ? 'S' : 'W') : null,
+            aufgabe: aufgabe ? (aufgabe === 1 ? 'S' : 'W') : null, gnugoDarfAufgeben: !!opt.gnugoAufgabe,
             gnugoStand, endstand, unsereZaehlung: unsereZaehlung(board), zuegeAnzahl: mc,
             simsMittel: sims.length ? Math.round(sims.reduce((x, y) => x + y, 0) / sims.length) : null,
             neustarts: g.neustarts(), schaetzung,

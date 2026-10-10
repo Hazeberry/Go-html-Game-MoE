@@ -66,6 +66,7 @@ niemand ausliefert.
 | `resign-criterion.js` | Aufgabe | gibt die KI nur noch auf, wenn auch das Gebiet verloren sagt |
 | `training-stability.js` | Training | Regularisierungs-Parameter, Gradienten-Deckel, Max-Norm-Projektion, Advantage-Dämpfung, dazu der ursprüngliche Repro-Lauf |
 | `harness-smoke.js` | Messwerkzeug | läuft `ab-harness.js` einmal winzig durch — misst nichts, prüft nur, dass er noch anläuft |
+| `gnugo-bruecke.js` | Messwerkzeug | kurze Partien gegen GNU Go über GTP, mit und ohne Vorgabe; mit `--gnugo-aufgabe 0` läuft eine Partie weiter, die GNU Go sonst aufgibt. Ohne GNU Go übersprungen |
 | `browser-nan.js` | echter Browser | Chromium, echter Web Worker, echtes `localStorage` — der Pfad, auf dem der Fehler gemeldet wurde |
 
 Der Browser-Test ist nicht redundant: die Node-Tests werten die Skript-Blöcke
