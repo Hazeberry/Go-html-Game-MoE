@@ -1496,8 +1496,9 @@ globalThis.PARAMS = {
      danach gefangen ist (Snapback), bleibt erlaubt. Anlass: Gegen GNU Go
      setzen 4,5 Atari-Zuege je Partie ab Zug 100 einen Stein, dessen Kette
      der Leser danach faengt; 98 % davon sind verschenkt
-     (docs/atari-verschenkt.md). Wirkt nur mit leseVerzicht. 0 = aus,
-     bitgenau. */
+     (docs/atari-verschenkt.md). Wirkt nur mit leseVerzicht. Gemessen:
+     gegen GNU Go +2,4 Punkte (p = 0,78), im Selbstspiel 50,6 % (p = 0,83);
+     kein Default. 0 = aus, bitgenau. */
   atariVerzicht:      0,
   aiTimeBudget:    1800,
   rolloutWeight:    0.65,
@@ -1750,7 +1751,8 @@ globalThis.PARAMS = {
      fuenf und mehr zu 16 %, und den Vorsprung verschenkter Zuege bringt
      meist der Gebietsanteil (docs/verschenkt-warum.md). Gemessen
      (docs/gebiet-freiheit.md): gegen GNU Go +19,5 Punkte (p = 0,14), im
-     Selbstspiel 53,6 % (p = 0,17); kein Default. 0 = aus, bitgenau. */
+     Selbstspiel 53,6 % (p = 0,17); nachgemessen mit ausgespielten Partien
+     +8,9 (p = 0,35) und 45,6 % (p = 0,09). Kein Default. 0 = aus, bitgenau. */
   gebietFreiheit:     0,
   /* Adaptives Zeitbudget (Tin/GLM-Vorschlag, stufenlos statt Sprungfunktion).
      Reale Partie zeigte 86% Sim-Rückgang über 156 Züge (317→43) durch
@@ -6501,7 +6503,7 @@ globalThis.policyNet = new PolicyNet();
         {key:'leseVerzicht',      label:'Lese-Verzicht',    step:1,   min:0,   max:1,
          tip:'1 = keine Züge, deren eigene Kette der taktische Leser sofort fangen kann (außer Schlag oder Atari), Default. Gegen GNU Go +56 Punkte, im Selbstspiel 72,8 %. 0 = altes Verhalten. Siehe docs/endspiel-verlust.md.'},
         {key:'atariVerzicht',     label:'Atari-Verzicht',   step:1,   min:0,   max:1,
-         tip:'1 = auch ein Atari fällt unter den Lese-Verzicht, wenn der Leser die eigene Kette danach fängt und das Ziel entkommt. Ein Einwurf mit Snapback bleibt erlaubt. Nur mit Lese-Verzicht. Siehe docs/atari-verschenkt.md.'},
+         tip:'1 = auch ein Atari fällt unter den Lese-Verzicht, wenn der Leser die eigene Kette danach fängt und das Ziel entkommt. Ein Einwurf mit Snapback bleibt erlaubt. Nur mit Lese-Verzicht. Gegen GNU Go +2,4 Punkte, im Selbstspiel 50,6 %, beides nicht signifikant — kein Default. Siehe docs/atari-verschenkt.md.'},
         {key:'quickRettung',      label:'Rettung in der Suche', step:1, min:0,   max:1,
          tip:'1 = die schnelle Bewertung in Suche und Rollouts belohnt einen Zug an eine schwache eigene Kette nur, wenn die Kette danach mindestens drei Freiheiten hat. Gegen GNU Go −14,9 Punkte, im Selbstspiel 51,9 %, beides nicht signifikant — kein Default. Siehe docs/quick-rettung.md.'},
         {key:'wurzelFrisch',      label:'Frische Wurzel',   step:1,   min:0,   max:1,
@@ -6531,7 +6533,7 @@ globalThis.policyNet = new PolicyNet();
         {key:'gebietZug', label:'Gebiet je Zug', step:10, min:0, max:300,
          tip:'Bewertet Züge nach ihrer Wirkung auf die Einflusskarte (eigene minus fremde Zone), in allen Phasen — gegen den Mauerbau. Default 80: gegen GNU Go +229 Punkte nach 120 Zügen, im Selbstspiel 83 % Siegrate. 0 = altes Verhalten.'},
         {key:'gebietFreiheit', label:'Gebiet nach Freiheiten', step:1, min:0, max:1,
-         tip:'1 = der Gebietsgewinn eines Zuges zählt nur anteilig, wenn seine Kette danach wenige Freiheiten hat (2: ein Viertel, 3: 60 %). Gegen GNU Go +19,5 Punkte, im Selbstspiel 53,6 %, beides nicht signifikant — kein Default. Siehe docs/gebiet-freiheit.md.'},
+         tip:'1 = der Gebietsgewinn eines Zuges zählt nur anteilig, wenn seine Kette danach wenige Freiheiten hat (2: ein Viertel, 3: 60 %). Gegen GNU Go +19,5 Punkte, im Selbstspiel 53,6 %; nachgemessen +8,9 und 45,6 %, alles nicht signifikant — kein Default. Siehe docs/gebiet-freiheit.md.'},
         {key:'gebietGewicht', label:'Gebiet in der Stellung', step:1, min:0, max:20,
          tip:'EXPERIMENTELL. Zählt die Einflussbilanz in jeder Blattbewertung mit. Im Pilot ohne Wirkung. Default 0 = aus.'},
         {key:'raumZug', label:'Raumrisiko je Zug', step:0.5, min:0, max:3,

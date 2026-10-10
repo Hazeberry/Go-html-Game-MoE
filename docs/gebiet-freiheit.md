@@ -221,3 +221,57 @@ Endpunkt: Siegrate von B, zweiseitig gegen 50 %, α = 0,05.
   Wahrscheinlichkeit; bei 100 Punkten wie in §6 nur mit etwa 40 %.
 - GNU Go Stufe 1 mit neun Vorgabesteinen ist ein einzelner, enger Gegner.
   Gemessen wird mit 120 Simulationen.
+
+---
+
+## 8. Nachtrag: Ergebnis der Nachmessung, Default bleibt 0 (10.10.2026)
+
+Gelaufen auf dem Merge-Commit `77b3f89`, ohne Unterbrechung. Daten:
+`daten/freiheit2-gnugo.json` (M1, beide Arme) und
+`daten/freiheit2-20261120.json` bis `…23.json` (Hash-Listen M2).
+
+**M1, gegen GNU Go (primär), 60 Paare, Seed 151, ausgespielt:**
+
+| | A (Default) | B (`gebietFreiheit` 1) | B − A |
+|---|---:|---:|---|
+| **Endstand** | −81,1 | −72,1 | **+8,9** (SD 72,9), p = 0,35 |
+| nach Zug 120 | +46,4 | +23,5 | −22,9, p = 0,00003 (60 Paare) |
+| nach Zug 200 | −45,2 | −51,9 | −6,7, p = 0,43 (59 Paare) |
+
+- B ist in 33 von 60 Paaren besser, in 27 schlechter, im Median um 14
+  Punkte besser.
+- Teilläufe B − A: +20,4 / +22,0 / +20,4 / −27,1.
+- Keine Aufgaben, kein Zuglimit. Die KI gewann mit A eine Partie, mit B drei.
+- Partielänge: Ø 278 Züge (A) gegen 253 (B).
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt **164 von 360 Partien, 45,6 %**
+(z = −1,69, p = 0,09, 95-%-KI 40,5–50,7 %). Teilläufe: 45,6 / 40,0 / 52,2 /
+44,4 %.
+
+**Entscheidung nach §7: Default `gebietFreiheit` bleibt 0.** M1 ist nicht
+signifikant. Der Schalter bleibt im Dashboard.
+
+**Sekundär:**
+
+| verschenkte Züge ab Zug 100 | A | B |
+|---|---:|---:|
+| bis Zug 200 | 38 % (19,2 je Partie) | 37 % (18,8) |
+| nach Zug 200 | 52 % (19,4 je Partie) | 54 % (13,4) |
+| Leser fängt die eigene Kette danach | 7,5 je Partie | 3,4 |
+
+**Streuung der Paare:** SD 72,9 statt 99,9 in §6, mit neuem Seed und
+ausgespielten Partien. Das passt zur Erwartung aus
+[`gnugo-ausspielen.md`](gnugo-ausspielen.md).
+
+**Einordnung:**
+- Wie in §6 liegt B nach Zug 120 deutlich zurück. B spielt im Mittelspiel
+  weniger in umkämpfte Gebiete und gibt dort Punkte ab. Bis zum Ende holt
+  B das auf, aber nicht mehr.
+- Im Selbstspiel ist B jetzt eher schlechter (45,6 % statt 53,6 % in §6).
+  Damals war `wurzelFrisch` noch aus. Was der Schalter ändert, scheint
+  `wurzelFrisch` zum Teil schon zu erledigen.
+- B verschenkt nach Zug 200 sechs Züge je Partie weniger, vor allem weil die
+  Partien kürzer sind. Der Endstand gewinnt dadurch kaum.
+- Damit ist der Gebietsteil als Hebel gegen verschenkte Züge ausgeschöpft.
+  Zusammen mit `atariVerzicht` ([`atari-verschenkt.md`](atari-verschenkt.md))
+  zeigt sich: Weniger verschenkte Steine bringen für sich kaum Punkte.
