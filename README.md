@@ -2276,6 +2276,14 @@ Vorwärtsläufe und davon solche mit Wirkung auf die Zugwahl. Ein Zähler
 genügte nicht: seit Beobachten und Steuern getrennt sind, läuft das Netz bei
 jedem Zug, ohne deshalb etwas zu bewirken.
 
+**Ein aufgegebenes Spiel ist kein Endstand.** Gegen GNU Go zählte bei einer
+Aufgabe die Stellung, wie sie stehen blieb, oft um Zug 80. Eine Partie, die
+GNU Go nach 80 Zügen bei +107,5 aufgab, verlor die KI ausgespielt mit
+−56,5. Der Zwischenstand verdeckte genau die Schwäche, die gemessen werden
+sollte, und verrauschte die Paare. Seit dem 10.10. darf GNU Go in Messungen
+nicht mehr aufgeben (`gnugo-duell.js --gnugo-aufgabe 0`):
+[`docs/gnugo-ausspielen.md`](docs/gnugo-ausspielen.md).
+
 Abgelehnte Befunde stehen als Kommentar an der jeweiligen Codestelle. Sonst
 wird derselbe Versuch in einem Jahr erneut gefahren und die Untersuchungskosten
 fallen zweimal an.
