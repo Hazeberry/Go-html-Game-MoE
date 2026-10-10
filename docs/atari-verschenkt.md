@@ -179,3 +179,57 @@ Endpunkt: Siegrate von B, zweiseitig gegen 50 %, α = 0,05.
   nicht sofort fangbar ist.
 - GNU Go Stufe 1 mit neun Vorgabesteinen ist ein einzelner, enger Gegner.
   Gemessen wird mit 120 Simulationen.
+
+---
+
+## 6. Nachtrag: Ergebnis, Default bleibt 0 (10.10.2026)
+
+Gelaufen auf dem Merge-Commit `1b6c1e3`, ohne Unterbrechung. Daten:
+`daten/atari-gnugo.json` (M1, beide Arme) und `daten/atari-20261130.json`
+bis `…33.json` (Hash-Listen M2).
+
+**M1, gegen GNU Go (primär), 60 Paare, Seed 161, ausgespielt:**
+
+| | A (Default) | B (`atariVerzicht` 1) | B − A |
+|---|---:|---:|---|
+| **Endstand** | −80,1 | −77,7 | **+2,4** (SD 66,5), p = 0,78 |
+| nach Zug 120 | +45,4 | +48,3 | +2,9, p = 0,41 (60 Paare) |
+| nach Zug 200 | −43,3 | −40,3 | +3,0, p = 0,60 (58 Paare) |
+
+- B ist in 34 von 60 Paaren besser, in 25 schlechter, in einem gleich, im
+  Median um 6 Punkte besser.
+- Teilläufe B − A: −6,0 / +17,9 / +0,9 / −3,1.
+- Keine Aufgaben, kein Zuglimit. Die KI gewann mit jedem Arm 4 Partien.
+- Partielänge: Ø 276 Züge (A) gegen 263 (B).
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt **182 von 360 Partien, 50,6 %**
+(z = 0,21, p = 0,83, 95-%-KI 45,4–55,7 %). Teilläufe: 58,9 / 45,6 / 55,6 /
+42,2 %.
+
+**Entscheidung nach §5: Default `atariVerzicht` bleibt 0.** M1 ist nicht
+signifikant. Der Schalter bleibt im Dashboard.
+
+**Sekundär**, ab Zug 100, je Partie:
+
+| | A | B |
+|---|---:|---:|
+| Atari, Leser fängt die eigene Kette, Ziel entkommt | 3,7 | **0** |
+| verschenkte Ataris | 8,7 (51 %) | 5,4 (39 %) |
+| verschenkte Züge bis Zug 200 | 19,2 (38 %) | 19,0 (37 %) |
+| verschenkte Züge nach Zug 200 | 20,3 (56 %) | 15,3 (50 %) |
+
+**Einordnung:**
+- Der Schalter wirkt wie im Pilot: Die aussichtslosen Ataris verschwinden,
+  die KI verschenkt fünf Züge je Partie weniger. Am Endstand ändert das
+  nichts Messbares.
+- Ein verschenkter Stein kostet bei Flächenzählung wenig. Der Gegner
+  braucht selbst einen Zug, um ihn zu schlagen, und der Zug, den die KI
+  stattdessen spielt, ist nicht unbedingt besser.
+- Dasselbe zeigen `quickRettung` ([`quick-rettung.md`](quick-rettung.md))
+  und die Nachmessung von `gebietFreiheit`
+  ([`gebiet-freiheit.md`](gebiet-freiheit.md) §8): weniger verschenkte
+  Steine, kein messbarer Gewinn. Die Zahl verschenkter Züge taugt damit
+  nicht als Maß für Punkte.
+- Wo die Punkte verloren gehen, zeigt GNU Gos Schätzung im Default-Arm:
+  +45 nach Zug 120, −43 nach Zug 200, −80 am Ende. Der größte Verlust, rund
+  90 Punkte, entsteht zwischen Zug 120 und 200.

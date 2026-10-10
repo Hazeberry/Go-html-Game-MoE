@@ -243,8 +243,9 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | **`augenSchutz` 2 + `passUnabwendbar` 1 (eigene Augen nie füllen, passen, wenn nichts zu retten ist)** | **gegen GNU Go Endstand +217 Punkte über 60 ganze Partien (p = 3 · 10⁻¹⁷), im Selbstspiel 53,9 % über 360 Partien (n. s.)** | **eingebaut** — vorher endeten 57 von 60 Partien gegen GNU Go mit W +370,5 |
 | **`leseVerzicht` 1 (keine Züge, deren Kette der eigene Leser sofort fängt)** | **gegen GNU Go Endstand +56,1 Punkte über 60 Paare (p = 0,00007), im Selbstspiel 72,8 % über 360 Partien (p = 5 · 10⁻¹⁸)** | **eingebaut** — Default 1, rund +171 Elo im Selbstspiel (`docs/endspiel-verlust.md`) |
 | **`wurzelFrisch` 1 (bei übernommenem Suchbaum Wurzelkandidaten trotzdem aus der Zugbewertung)** | **gegen GNU Go Endstand +25,7 Punkte über 60 Paare (p = 0,021), im Selbstspiel 55,3 % über 360 Partien (p = 0,045)** | **eingebaut** — Default 1 (`docs/wurzel-frisch.md`) |
-| `gebietFreiheit` 1 (Gebietsgewinn schwacher neuer Ketten nur anteilig) | gegen GNU Go Endstand +19,5 über 60 Paare (p = 0,14), im Selbstspiel 53,6 % über 360 Partien (p = 0,17) | **nicht beschlossen** — beide Richtungen positiv, keine signifikant; Schalter im Dashboard (`docs/gebiet-freiheit.md`) |
+| `gebietFreiheit` 1 (Gebietsgewinn schwacher neuer Ketten nur anteilig) | gegen GNU Go Endstand +19,5 über 60 Paare (p = 0,14), im Selbstspiel 53,6 % über 360 Partien (p = 0,17); nachgemessen mit ausgespielten Partien: +8,9 (p = 0,35), im Selbstspiel 45,6 % (p = 0,09) | verworfen — Default 0, in der Nachmessung kein Vorteil; Schalter im Dashboard (`docs/gebiet-freiheit.md` §8) |
 | `quickRettung` 1 (Rettungsbonus in Suche und Rollouts nur, wenn die Rettung wirkt) | gegen GNU Go Endstand −14,9 über 60 Paare (p = 0,13), im Selbstspiel 51,9 % über 360 Partien (p = 0,46); der Pilot hatte +25,6 über 20 Partien | verworfen — Default 0, in keiner Messung ein Vorteil (`docs/quick-rettung.md`) |
+| `atariVerzicht` 1 (aussichtslose Ataris fallen unter den Lese-Verzicht) | gegen GNU Go Endstand +2,4 über 60 ausgespielte Paare (p = 0,78), im Selbstspiel 50,6 % über 360 Partien (p = 0,83); verschenkte Züge je Partie −5 | verworfen — Default 0, wirkt auf die verschenkten Züge, nicht auf den Endstand (`docs/atari-verschenkt.md`) |
 | `captureCap` 200 (Gefangenen-Saldo deckeln, gegen falsche Aufgaben) | falsche Aufgaben 16 → 8 (p = 0,15), Siegrate 54,4 % (p = 0,017, nur Kontrolle); Wiederholung 53,6 % (p = 0,053) | **nicht beschlossen**, knapp — Schalter im Dashboard (`docs/aufgabe-deckel.md`) |
 | `gegnerWert` / `gegnerGebiet` (Wert des Punkts für den Gegner) | Pilot gegen GNU Go: Endstand −90 bis −126 | verworfen — Default 0 (`docs/gegnerwert.md`) |
 | `krisenKandidaten` (Rettung aus dem Atari und Schläge immer in die Suche) | Selbstspiel 51,7 % über 720 Partien (p = 0,37), gegen GNU Go +7,5 (p = 0,50) | verworfen — Default 0 |
@@ -2227,6 +2228,16 @@ schnellen Bewertung auf wirksame Rettungen zu beschränken (`quickRettung`)
 brachte nichts: Ein Pilot mit +26 Punkten hielt in der vollen Messung nicht
 (−15, n. s., im Selbstspiel 51,9 %):
 [`docs/quick-rettung.md`](docs/quick-rettung.md).
+
+**Weniger verschenkte Steine sind nicht mehr Punkte.** Seit dem 10.10. wird
+gegen GNU Go ausgespielt. Zwei weitere Schalter senken die verschenkten
+Züge je Partie um fünf bis sechs, ohne den Endstand messbar zu ändern: die
+Nachmessung von `gebietFreiheit` (+8,9, n. s.) und `atariVerzicht`, der
+aussichtslose Ataris streicht (+2,4, n. s.;
+[`docs/atari-verschenkt.md`](docs/atari-verschenkt.md)). Ein verschenkter
+Stein kostet bei Flächenzählung wenig. Die Punkte gehen woanders verloren:
+In GNU Gos Schätzung liegt die KI nach Zug 120 rund 45 Punkte vorn, nach
+Zug 200 rund 45 hinten.
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
