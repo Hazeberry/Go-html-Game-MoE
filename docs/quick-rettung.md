@@ -120,3 +120,73 @@ Endpunkt: Siegrate von B, zweiseitig gegen 50 %, α = 0,05.
   Hälfte.
 - GNU Go Stufe 1 mit neun Vorgabesteinen ist ein einzelner, enger Gegner.
   Gemessen wird mit 120 Simulationen.
+
+---
+
+## 6. Nachtrag: Ergebnis, Default bleibt 0 (10.10.2026)
+
+Gelaufen auf dem Merge-Commit `94d3f8b`, ohne Unterbrechung. Daten:
+`daten/quick-gnugo.json` (M1, beide Arme, mit Wächter) und
+`daten/quick-20261110.json` bis `…13.json` (Hash-Listen M2).
+
+**M1, gegen GNU Go (primär), 60 Paare, Seed 141:**
+
+| | A (Default) | B (`quickRettung` 1) | B − A |
+|---|---:|---:|---|
+| **Endstand** | −26,5 | −41,4 | **−14,9** (SD 75,1), p = 0,13 |
+| nach Zug 120 | +47,6 | +46,5 | −1,0, p = 0,78 (52 Paare) |
+| nach Zug 200 | −47,6 | −44,9 | +2,7, p = 0,71 (36 Paare) |
+
+- B ist in 25 von 60 Paaren besser, in 32 schlechter, in 3 gleich, im
+  Median um 6 Punkte schlechter.
+- Teilläufe B − A: +22,3 / −33,4 / −28,0 / −20,4. Nur die ersten 15
+  Partien sehen aus wie der Pilot.
+- GNU Go gab mit A 23-mal auf, mit B 17-mal.
+- Partielänge: Ø 218 Züge (A) gegen 230 (B).
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt **187 von 360 Partien, 51,9 %**
+(z = 0,74, p = 0,46, 95-%-KI 46,8–57,1 %). Teilläufe: 50,0 / 53,3 / 48,9 /
+55,6 %.
+
+**Entscheidung nach §5: Default bleibt `quickRettung` = 0.** M1 ist nicht
+signifikant besser, sondern im Mittel 15 Punkte schlechter, ebenfalls nicht
+signifikant. Der Schalter bleibt im Dashboard.
+
+**Sekundär:**
+
+| | A | B |
+|---|---:|---:|
+| Suchen mit übernommenem Teilbaum | 12 % (768 von 6 496) | 11 % (777 von 6 826) |
+| verschenkt ab Zug 100, bis Zug 200 | 38 % (14,0 je Partie) | 40 % (16,1) |
+| verschenkt nach Zug 200 | 60 % (14,0 je Partie) | 53 % (13,4) |
+
+**Woher die −14,9 kommen:**
+
+| Paare | Anzahl | B − A im Mittel |
+|---|---:|---:|
+| GNU Go gibt nur gegen A auf | 8 | −145,8 |
+| GNU Go gibt nur gegen B auf | 2 | +87,0 |
+| GNU Go gibt in beiden auf | 15 | −1,9 |
+| beide ausgespielt | 35 | +3,7 |
+
+Bei einer Aufgabe zählt die Stellung, wie sie stehen blieb, oft weit vor
+dem Ende. Der Unterschied kommt also fast ganz aus den acht Paaren, die GNU
+Go nur gegen A aufgab. In den ausgespielten Paaren liegen die Arme
+gleichauf.
+
+**Einordnung:**
+- Der Pilot (+25,6 über 20 Partien, t = 2,16) hielt nicht. Auch die
+  letzten Piloten lagen über dem späteren Ergebnis, dieser so weit, dass
+  kein Vorteil übrig blieb. §5 hatte damit gerechnet: Bei dieser Streuung
+  ist ein Pilot über 20 Partien zum Teil Zufall.
+- Weder M1 noch M2 noch die verschenkten Züge zeigen eine Wirkung. Die
+  Rettungen in Suche und Rollouts sind damit kein messbarer Hebel. Den
+  größten Teil des Vorsprungs verschenkter Züge bringt weiter die
+  Zugbewertung selbst ([`verschenkt-warum.md`](verschenkt-warum.md) §2).
+- Mit Seed 141 gewann der Default 24 von 60 Partien, 23 davon durch
+  Aufgabe von GNU Go. Mit Seed 131 waren es 8. Vier Default-Partien mit
+  Seed 131 kamen auf dem Messcommit exakt wie in `daten/wurzel-gnugo.json`
+  gespeichert heraus. Der Code ist also unverändert; die Partien dieses
+  Seeds liegen der KI besser. Der gepaarte Vergleich ist davon nicht
+  berührt, Mittelwerte aus verschiedenen Seeds sind aber nicht
+  vergleichbar.

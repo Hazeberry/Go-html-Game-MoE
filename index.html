@@ -1563,8 +1563,9 @@ globalThis.PARAMS = {
      die Kinder innerer Knoten; mit dem Bonus verlaengern beide Seiten dort
      schwache Ketten, auch wenn die Kette danach so schwach bleibt
      (docs/verschenkt-warum.md). 1 = Bonus nur, wenn die Kette nach dem Zug
-     mindestens drei Freiheiten hat. 0 = aus, bitgenau. Siehe
-     docs/quick-rettung.md. */
+     mindestens drei Freiheiten hat. 0 = aus, bitgenau. Gemessen
+     (docs/quick-rettung.md): gegen GNU Go -14,9 Punkte (p = 0,13), im
+     Selbstspiel 51,9 % (p = 0,46); kein Default. */
   quickRettung:        0,
   /* PolicyNet — FIX Bug 5: wurde referenziert aber nie definiert.
      netMaxBlend steht auf 0: das Netz lernt mit, steuert aber nicht.
@@ -6483,7 +6484,7 @@ globalThis.policyNet = new PolicyNet();
         {key:'leseVerzicht',      label:'Lese-Verzicht',    step:1,   min:0,   max:1,
          tip:'1 = keine Züge, deren eigene Kette der taktische Leser sofort fangen kann (außer Schlag oder Atari), Default. Gegen GNU Go +56 Punkte, im Selbstspiel 72,8 %. 0 = altes Verhalten. Siehe docs/endspiel-verlust.md.'},
         {key:'quickRettung',      label:'Rettung in der Suche', step:1, min:0,   max:1,
-         tip:'1 = die schnelle Bewertung in Suche und Rollouts belohnt einen Zug an eine schwache eigene Kette nur, wenn die Kette danach mindestens drei Freiheiten hat. Siehe docs/quick-rettung.md.'},
+         tip:'1 = die schnelle Bewertung in Suche und Rollouts belohnt einen Zug an eine schwache eigene Kette nur, wenn die Kette danach mindestens drei Freiheiten hat. Gegen GNU Go −14,9 Punkte, im Selbstspiel 51,9 %, beides nicht signifikant — kein Default. Siehe docs/quick-rettung.md.'},
         {key:'wurzelFrisch',      label:'Frische Wurzel',   step:1,   min:0,   max:1,
          tip:'1 = bei wiederverwendetem Suchbaum kommen die Kandidaten an der Wurzel trotzdem aus der vollen Zugbewertung; was der alte Baum über diese Züge weiß, bleibt erhalten (Default). Gegen GNU Go +26 Punkte, im Selbstspiel 55 %. 0 = Kandidaten aus dem alten Baum. Siehe docs/wurzel-frisch.md.'},
         {key:'augenSchutz',       label:'Augenschutz',      step:1,   min:0,   max:2,
