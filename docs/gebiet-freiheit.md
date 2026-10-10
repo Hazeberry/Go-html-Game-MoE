@@ -147,3 +147,77 @@ signifikant. Der Schalter bleibt im Dashboard.
   erst später auszahlt.
 - Aus `verschenkt-warum.md` §4 bleiben die anderen Hebel: die Wurzel bei
   Baumwiederverwendung und `quickEval`.
+
+---
+
+## 7. Nachtrag: Nachmessung, vorab festgelegt (10.10.2026, vor dem Lauf)
+
+**Anlass:** Beide Messungen aus §6 zeigen in dieselbe Richtung, keine
+erreicht die Schwelle. Seitdem hat sich zweierlei geändert:
+- Der Default enthält `wurzelFrisch` = 1 ([`wurzel-frisch.md`](wurzel-frisch.md)).
+- Gegen GNU Go wird ausgespielt, GNU Go gibt nicht mehr auf
+  ([`gnugo-ausspielen.md`](gnugo-ausspielen.md)). Die Endstände aus §6
+  mischen ausgespielte Partien mit Zwischenständen bei Aufgabe.
+
+In den 45 Paaren aus §6, in denen GNU Go in keinem Arm aufgab, lag B um
++37,1 Punkte vorn (SD 67,4). Das ist nachträglich herausgegriffen und kein
+Beleg, aber Grund für eine saubere Nachmessung. Sie zählt für sich allein
+und wird nicht mit §6 verrechnet.
+
+**Arme:**
+
+| Arm | Parameter |
+|---|---|
+| A | Default (`gebietFreiheit` 0; `leseVerzicht` 1, `wurzelFrisch` 1, `quickRettung` 0) |
+| B | `gebietFreiheit` = 1 |
+
+**M1, gegen GNU Go, primär:** Stufe 1, neun Vorgabesteine, 120
+Simulationen, Aufgabe der KI aus, **GNU Go gibt nicht auf**, bis 600 Züge,
+neuer Seed `--seed 151`, 60 Partien je Arm in vier Teilläufen.
+
+```bash
+for v in 1 16 31 46; do
+  node gnugo-duell.js --partien 15 --von $v --seed 151 --stufe 1 --vorgabe 9 \
+    --maxzuege 600 --schaetzung 120,200 --gnugo-aufgabe 0 \
+    --ki mctsFixedSims=120,resignEnabled=0 --roh freiheit2-gnugo-A-$v.jsonl &
+  # B ebenso mit --ki mctsFixedSims=120,resignEnabled=0,gebietFreiheit=1
+done
+node auswertung/gnugo-vergleich.js --A freiheit2-gnugo-A-*.jsonl --B freiheit2-gnugo-B-*.jsonl --zug 120,200,ende
+```
+
+Endpunkt: gepaarte Differenz B − A des Endstands, zweiseitig, α = 0,05.
+Erreicht eine Partie das Zuglimit, zählt wie bisher GNU Gos Auszählung der
+Schlussstellung; die Zahl solcher Partien wird berichtet.
+
+**M2, Selbstspiel, Kontrolle:** 360 Partien, vier Teilläufe zu je 90.
+
+```bash
+for s in 20261120 20261121 20261122 20261123; do
+  node ab-harness.js --games 90 --seed $s \
+    --A mctsFixedSims=120 --B mctsFixedSims=120,gebietFreiheit=1 \
+    --roh freiheit2-$s.jsonl --json freiheit2-$s.json &
+done
+```
+
+Endpunkt: Siegrate von B, zweiseitig gegen 50 %, α = 0,05.
+
+**Entscheidung, vorab festgelegt** (wie in §4):
+
+| M1 (GNU Go) | M2 (Selbstspiel) | Folge |
+|---|---|---|
+| B signifikant besser | nicht signifikant unter 50 % | Default `gebietFreiheit` = 1 |
+| B signifikant besser | signifikant unter 50 % | kein Default; untersuchen |
+| sonst | — | Default bleibt 0 |
+
+**Sekundär, ohne Anspruch:**
+- M1 nach Zug 120 und 200, Siege je Arm, Partielänge, Partien am Zuglimit
+- Streuung der Paare (SD) im Vergleich zu §6: Prüft die Erwartung aus
+  `gnugo-ausspielen.md`, dass ausgespielte Partien weniger streuen
+- verschenkte Züge je Arm (`auswertung/verschenkt.js`)
+
+**Grenzen:**
+- Erste Messung mit der neuen Methode. Bei einer Streuung um 60 Punkte
+  erkennen 60 Paare einen Unterschied von gut 20 Punkten mit etwa 80 %
+  Wahrscheinlichkeit; bei 100 Punkten wie in §6 nur mit etwa 40 %.
+- GNU Go Stufe 1 mit neun Vorgabesteinen ist ein einzelner, enger Gegner.
+  Gemessen wird mit 120 Simulationen.
