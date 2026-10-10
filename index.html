@@ -1490,6 +1490,15 @@ globalThis.PARAMS = {
      +56,1 Punkte im Endstand ueber 60 Paare (p = 0,00007), im Selbstspiel
      72,8 % ueber 360 Partien (p = 5e-18). Default 1. 0 = altes Verhalten. */
   leseVerzicht:       1,
+  /* Atari-Verzicht: Auch ein Zug, der Atari gibt, faellt unter den
+     Lese-Verzicht, wenn der Leser die eigene Kette danach faengt und jedes
+     Ziel des Ataris entkommt (leseVerteidigung). Ein Einwurf, dessen Ziel
+     danach gefangen ist (Snapback), bleibt erlaubt. Anlass: Gegen GNU Go
+     setzen 4,5 Atari-Zuege je Partie ab Zug 100 einen Stein, dessen Kette
+     der Leser danach faengt; 98 % davon sind verschenkt
+     (docs/atari-verschenkt.md). Wirkt nur mit leseVerzicht. 0 = aus,
+     bitgenau. */
+  atariVerzicht:      0,
   aiTimeBudget:    1800,
   rolloutWeight:    0.65,
   scoreWeight:      0.35,
@@ -4270,15 +4279,23 @@ function leseVerteidigung(board, a, budget = LESE_BUDGET, tiefe = LESE_TIEFE) {
 
 /* Waere ein Zug von color auf i vergeblich? Er schlaegt nichts, gibt kein
    Atari, und der Leser faengt die Kette des neuen Steins mit dem Gegner am
-   Zug. Siehe PARAMS.leseVerzicht. */
+   Zug. Siehe PARAMS.leseVerzicht. Mit PARAMS.atariVerzicht auch ein Atari,
+   wenn jedes Ziel entkommt. */
 const _vzScratch = new Uint8Array(BOARD_SIZE);
 function vergeblicherZug(board, i, color) {
   const opp = color === 1 ? 2 : 1, nb = _vzScratch;
   nb.set(board); nb[i] = color;
   if (removeDeadGroups(nb, opp, i) > 0) return false;
-  for (const n of NEIGHBORS[i]) if (nb[n] === opp && countLiberties(nb, n, 2) === 1) return false;
+  const ziele = [];
+  for (const n of NEIGHBORS[i]) if (nb[n] === opp && countLiberties(nb, n, 2) === 1) {
+    if (PARAMS.atariVerzicht <= 0) return false;
+    ziele.push(n);
+  }
   if (countLiberties(nb, i, 4) > 3) return false;
-  return leseAngriff(new Uint8Array(nb), i).ja;
+  const kopie = new Uint8Array(nb);
+  if (!leseAngriff(kopie, i).ja) return false;
+  for (const n of ziele) if (!leseVerteidigung(kopie, n).ja) return false;
+  return true;
 }
 
 /* Fuellt ein Zug von color auf i ein eigenes echtes Auge? Alle
@@ -6483,6 +6500,8 @@ globalThis.policyNet = new PolicyNet();
          tip:'1 = ein taktischer Leser prüft eigene gefährdete Ketten (bis 3 Freiheiten) und spielt nachweislich rettende Züge bevorzugt. Selbstspiel 62,8 %, gegen GNU Go aber 30 Punkte schlechter — kein Default. 2 = zusätzlich Fangen. Siehe docs/laufkampf-lesen.md.'},
         {key:'leseVerzicht',      label:'Lese-Verzicht',    step:1,   min:0,   max:1,
          tip:'1 = keine Züge, deren eigene Kette der taktische Leser sofort fangen kann (außer Schlag oder Atari), Default. Gegen GNU Go +56 Punkte, im Selbstspiel 72,8 %. 0 = altes Verhalten. Siehe docs/endspiel-verlust.md.'},
+        {key:'atariVerzicht',     label:'Atari-Verzicht',   step:1,   min:0,   max:1,
+         tip:'1 = auch ein Atari fällt unter den Lese-Verzicht, wenn der Leser die eigene Kette danach fängt und das Ziel entkommt. Ein Einwurf mit Snapback bleibt erlaubt. Nur mit Lese-Verzicht. Siehe docs/atari-verschenkt.md.'},
         {key:'quickRettung',      label:'Rettung in der Suche', step:1, min:0,   max:1,
          tip:'1 = die schnelle Bewertung in Suche und Rollouts belohnt einen Zug an eine schwache eigene Kette nur, wenn die Kette danach mindestens drei Freiheiten hat. Gegen GNU Go −14,9 Punkte, im Selbstspiel 51,9 %, beides nicht signifikant — kein Default. Siehe docs/quick-rettung.md.'},
         {key:'wurzelFrisch',      label:'Frische Wurzel',   step:1,   min:0,   max:1,

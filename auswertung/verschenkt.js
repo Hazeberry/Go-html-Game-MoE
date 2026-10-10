@@ -122,4 +122,4 @@ if (require.main === module) {
   bericht(alle, partien.length);
 }
 
-module.exports = {analysiere, art};
+module.exports = {analysiere, art, toteSteine};
