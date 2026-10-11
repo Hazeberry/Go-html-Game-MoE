@@ -165,4 +165,4 @@ if (require.main === module) {
   })();
 }
 
-module.exports = {analysiere, bericht, wert};
+module.exports = {analysiere, bericht, wert, gtp};

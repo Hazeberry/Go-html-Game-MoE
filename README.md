@@ -2239,6 +2239,19 @@ Stein kostet bei Flächenzählung wenig. Die Punkte gehen woanders verloren:
 In GNU Gos Schätzung liegt die KI nach Zug 120 rund 45 Punkte vorn, nach
 Zug 200 rund 45 hinten.
 
+**Wohin die Punkte gehen.** Zug für Zug gegen GNU Gos Vorschlag lässt
+sich der Verlust nicht zuordnen; der Vergleich bevorzugt erzwingende Züge.
+Eine Buchung jedes Brettpunkts nach GNU Gos Status zwischen Zug 100 und 200
+zeigt dagegen, woraus der Abstieg von rund 95 Punkten besteht: −63 über
+eigenes Gebiet, −21 netto über neutrales Gebiet, nur −20 über eigene
+Steine, die sterben, und +15 zurückgewonnen.
+GNU Go reduziert vom Rand her. Die KI antwortet meist direkt daneben, und
+trotzdem leben 86 % dieser Steine. Kritische große Gruppen rettet die KI in
+33 % der Fälle, GNU Go in 89 %. GNU Gos Rettungspunkt steht dann meist gar
+nicht unter den Kandidaten der Suche, obwohl der eigene Leser die Gefahr in
+zwei Dritteln der Fälle kennt:
+[`docs/punktverlust.md`](docs/punktverlust.md).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
 09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1. Wiederholen auf dem
