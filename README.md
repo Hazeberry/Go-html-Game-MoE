@@ -2242,9 +2242,9 @@ Zug 200 rund 45 hinten.
 **Wohin die Punkte gehen.** Zug für Zug gegen GNU Gos Vorschlag lässt
 sich der Verlust nicht zuordnen; der Vergleich bevorzugt erzwingende Züge.
 Eine Buchung jedes Brettpunkts nach GNU Gos Status zwischen Zug 100 und 200
-zeigt dagegen, woraus der Abstieg von rund 95 Punkten besteht: −63 über
-eigenes Gebiet, −21 netto über neutrales Gebiet, nur −20 über eigene
-Steine, die sterben, und +15 zurückgewonnen.
+zeigt dagegen, woraus der Abstieg von 94,5 Punkten besteht (gerundet): −63
+über eigenes Gebiet, −21 netto über neutrales Gebiet, nur −20 über eigene
+Steine, die sterben, und +10, die die KI GNU Go abnimmt.
 GNU Go reduziert vom Rand her. Die KI antwortet meist direkt daneben, und
 trotzdem leben 86 % dieser Steine. Kritische große Gruppen rettet die KI in
 33 % der Fälle, GNU Go in 89 %. GNU Gos Rettungspunkt steht dann meist gar
