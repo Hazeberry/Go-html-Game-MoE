@@ -185,3 +185,84 @@ Punkte liegen. Naheliegende nächste Schritte, ungemessen:
 - den Schalter nur vor dem Endspiel wirken lassen
 - den Wert der Rettung gegen den besten anderen Zug abwägen, statt sie
   immer an die Spitze zu setzen
+
+---
+
+## 7. Nachtrag: Nachmessung, vorab festgelegt (11.10.2026, vor dem Lauf)
+
+**Anlass:** [`punktverlust.md`](punktverlust.md) §5–6. Zwischen Zug 100 und
+200 rettet die KI kritische eigene Gruppen ab drei Steinen in 33 % der
+Fälle, GNU Go in 89 %. In 61 % der nicht geretteten Fälle steht GNU Gos
+Rettungspunkt jenseits der 16 Kandidaten der Suche. Der Leser hält 64 % der
+Ketten für fangbar und fast alle davon für rettbar. Genau diese Rettungen
+hebt `leseRettung` an die Spitze.
+
+Die Messung in §5–6 ist überholt:
+- Seitdem gelten `leseVerzicht` 1 und `wurzelFrisch` 1.
+- Gegen GNU Go zählte damals bei einer Aufgabe der Zwischenstand
+  ([`gnugo-ausspielen.md`](gnugo-ausspielen.md)).
+- Primär war das Selbstspiel. Heute ist es wie bei allen Messungen seit
+  [`endspiel-verlust.md`](endspiel-verlust.md) die Partie gegen GNU Go.
+
+Die Nachmessung zählt für sich allein und wird nicht mit §6 verrechnet.
+
+**Arme:**
+
+| Arm | Parameter |
+|---|---|
+| A | Default (`leseRettung` 0; `leseVerzicht` 1, `wurzelFrisch` 1) |
+| B | `leseRettung` = 1 |
+
+**M1, gegen GNU Go, primär:** Stufe 1, neun Vorgabesteine, 120
+Simulationen, Aufgabe der KI aus, GNU Go gibt nicht auf, bis 600 Züge,
+neuer Seed `--seed 171`, 60 Partien je Arm in vier Teilläufen.
+
+```bash
+for v in 1 16 31 46; do
+  node gnugo-duell.js --partien 15 --von $v --seed 171 --stufe 1 --vorgabe 9 \
+    --maxzuege 600 --schaetzung 120,200 --gnugo-aufgabe 0 \
+    --ki mctsFixedSims=120,resignEnabled=0 --roh rettung-gnugo-A-$v.jsonl &
+  # B ebenso mit --ki mctsFixedSims=120,resignEnabled=0,leseRettung=1
+done
+node auswertung/gnugo-vergleich.js --A rettung-gnugo-A-*.jsonl --B rettung-gnugo-B-*.jsonl --zug 120,200,ende
+```
+
+Endpunkt: gepaarte Differenz B − A des Endstands, zweiseitig, α = 0,05.
+
+**M2, Selbstspiel, Kontrolle:** 360 Partien, vier Teilläufe zu je 90.
+
+```bash
+for s in 20261140 20261141 20261142 20261143; do
+  node ab-harness.js --games 90 --seed $s \
+    --A mctsFixedSims=120 --B mctsFixedSims=120,leseRettung=1 \
+    --roh rettung-$s.jsonl --json rettung-$s.json &
+done
+```
+
+Endpunkt: Siegrate von B, zweiseitig gegen 50 %, α = 0,05.
+
+**Entscheidung, vorab festgelegt** (wie in
+[`endspiel-verlust.md`](endspiel-verlust.md) §4):
+
+| M1 (GNU Go) | M2 (Selbstspiel) | Folge |
+|---|---|---|
+| B signifikant besser | nicht signifikant unter 50 % | Default `leseRettung` = 1 |
+| B signifikant besser | signifikant unter 50 % | kein Default; untersuchen |
+| sonst | — | Default bleibt 0 |
+
+**Sekundär, ohne Anspruch:**
+- M1 nach Zug 120 und 200, Siege je Arm, Partielänge
+- Wirksamkeit: kritische eigene Gruppen ab drei Steinen, Zug 100–200,
+  gerettet je Arm (`auswertung/kritisch.js`)
+- Buchung der Brettpunkte je Arm, Zug 100–200
+  (`auswertung/besitz-verlauf.js`)
+
+**Grenzen:**
+- Der Schalter zielt auf den Posten „eigene Steine sterben“, rund 20 von
+  95 Punkten zwischen Zug 100 und 200. Den größeren Gebietsverlust fasst er
+  nicht an.
+- §6 vermutete, dass B im Endspiel kleine Ketten rettet und größere Punkte
+  liegen lässt. Das kann auch hier geschehen; die Buchung nach Zug 200 wird
+  nicht erhoben.
+- Bei einer Streuung um 70 Punkte erkennen 60 Paare einen Unterschied von
+  etwa 25 Punkten mit 80 % Wahrscheinlichkeit.
