@@ -101,3 +101,29 @@ Wellen zu je acht. Das dauert rund 60–90 Minuten.
 - **Kleiner als rund 10 Punkte bleibt praktisch unmessbar.** Eine Obergrenze
   wie die 7 Punkte aus [`augen-urteil.md`](augen-urteil.md) bedeutet: Selbst
   ein perfekter Schalter wäre mit 240 Paaren kaum nachweisbar.
+
+---
+
+## 7. Nachtrag: Vorgabe nach `musterGewicht` (11.10.2026)
+
+Seit `musterGewicht` Default ist ([`muster.md`](muster.md)), gewinnt die KI
+gegen GNU Go mit neun Vorgabesteinen die Mehrzahl der Partien. Ist der
+Prüfstand damit zu leicht geworden? Gemessen mit der heutigen Standard-KI,
+je 30 ausgespielte Partien gegen GNU Go Stufe 1, 120 Simulationen, Seed
+211 (Daten: `daten/vorgabe-gnugo.json`):
+
+| Vorgabe | Siege der KI | Endstand Ø | SD | nach Zug 120 |
+|---:|---:|---:|---:|---:|
+| 9 | 17 von 30 (57 %) | +16,2 | 57,3 | +66,3 |
+| 6 | 5 von 30 (17 %) | −46,4 | 55,8 | +28,0 |
+| 4 | 0 von 30 | −78,5 | 42,3 | −7,5 |
+| 2 | 0 von 30 | −95,2 | 36,8 | −37,3 |
+
+- **Neun Vorgabesteine bleiben der Prüfstand.** Die KI ist dort ungefähr
+  ebenbürtig. In knappen Partien reagiert der Endstand am empfindlichsten
+  auf eine Änderung: Weder gewinnt eine Seite sicher noch verliert sie
+  sicher.
+- **Die Muster sind rund fünf Vorgabesteine wert.** Mit vier Steinen steht
+  die neue KI im Schnitt so da wie die alte mit neun (−78,5 gegen −78,3 im
+  Arm A der Messung in `muster.md` §8; andere Seeds, also eine grobe
+  Schätzung).
