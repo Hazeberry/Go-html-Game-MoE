@@ -575,7 +575,12 @@ globalThis.PARAMS = {
      isoliert. evalOpening wirkt nur bis etwa Zug 28 (openingMoves 20 plus
      Blendzone), danach regiert evalMidgame. Der Rand-Anteil von 53 % in
      Phase 51-150 gehört dorthin und ist für diesen Parameter konstruktions-
-     bedingt unerreichbar. */
+     bedingt unerreichbar.
+
+     NACHGEMESSEN in ganzen Partien (docs/eroeffnung-linie.md): Mit 160 sinkt
+     der Anteil der zweiten Linie in den Zuegen 1-20 im Selbstspiel von 25 %
+     auf 12 %, danach wirkt der Regler nicht mehr. Gegen GNU Go ohne Vorgabe
+     -6,0 Punkte (p = 0,45), im Selbstspiel 53,9 % (p = 0,14). Bleibt 0. */
   openLineWeight:     0,
   openEdge5:         25,
   openCenter:         8,

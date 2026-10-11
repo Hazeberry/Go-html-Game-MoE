@@ -119,3 +119,56 @@ Endpunkt: Siegrate von B, zweiseitig gegen 50 %, α = 0,05.
   dritte und vierte Linie, im Selbstspiel vor allem Züge von der zweiten
   Linie (§2). Beide Messungen prüfen damit nicht ganz dasselbe.
 - Die Messung prüft nicht, ob die KI gegen Menschen besser eröffnet.
+
+---
+
+## 5. Nachtrag: Ergebnis, Default bleibt 0 (11.10.2026)
+
+Gelaufen auf dem Merge-Commit `0662576`, ohne Unterbrechung. Daten:
+`daten/linie-gnugo.json` (M1, beide Arme, mit Schätzungen nach Zug 30, 60,
+120 und 200) und `daten/linie-20261150.json` bis `…53.json` (Hash-Listen M2).
+
+**M1, gegen GNU Go ohne Vorgabe (primär), 60 Paare, Seed 191:**
+
+| | A (Default) | B (`openLineWeight` 160) | B − A |
+|---|---:|---:|---|
+| nach Zug 30 | +17,9 | +19,6 | +1,7, p = 0,63 |
+| nach Zug 60 | +16,7 | +20,2 | +3,5, p = 0,37 |
+| nach Zug 120 | −46,1 | −42,1 | +3,9, p = 0,38 |
+| nach Zug 200 | −113,8 | −112,6 | +1,2, p = 0,84 |
+| **Endstand** | −135,7 | −141,8 | **−6,0** (SD 61,1), p = 0,45 |
+
+- B ist in 28 von 60 Paaren besser, in 32 schlechter, im Median um 7
+  Punkte schlechter.
+- Teilläufe B − A: −5,9 / −11,7 / −13,2 / +6,7.
+- Die KI verliert in beiden Armen alle 60 Partien. Keine Aufgaben, kein
+  Zuglimit. Partielänge: Ø 281 Züge (A) gegen 287 (B).
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt **194 von 360 Partien, 53,9 %**
+(z = 1,48, p = 0,14, 95-%-KI 48,7–59,0 %). Teilläufe: 46,7 / 53,3 / 52,2 /
+63,3 %.
+
+**Entscheidung nach §4: Default `openLineWeight` bleibt 0.** M1 ist nicht
+signifikant.
+
+**Wirksamkeit** (`auswertung/eroeffnung.js`), Linie der Züge 1–20 des
+jeweiligen Arms:
+
+| | Linie 2 A → B | Linie 3 A → B | ab Linie 5 A → B |
+|---|---:|---:|---:|
+| M1, gegen GNU Go | 11 % → 6 % | 39 % → 48 % | 34 % → 30 % |
+| M2, Selbstspiel | 25 % → **12 %** | 48 % → 65 % | 8 % → 5 % |
+
+In den Zügen 21–40 unterscheiden sich die Arme nicht (Linie 2: 28 % in
+beiden).
+
+**Einordnung:**
+- Der Regler tut im Selbstspiel, was er soll: Die KI spielt in den ersten
+  20 Zügen halb so oft auf der zweiten Linie. Gegen GNU Go ist die
+  Verschiebung kleiner, weil die KI dort ohnehin kaum tief spielt.
+- Den Endstand ändert das nicht, gegen GNU Go so wenig wie im Selbstspiel.
+  Nach Zug 30 und 60 liegt die KI gegen GNU Go in beiden Armen vorn.
+  Verloren wird im Mittelspiel ([`punktverlust.md`](punktverlust.md)).
+- Die tiefen Züge der KI sind also ein Schönheitsfehler, kein Punktverlust,
+  jedenfalls bei 120 Simulationen und gegen diese Gegner. Die späte
+  Besetzung der Ecken im Selbstspiel (§2) bleibt ungeprüft.

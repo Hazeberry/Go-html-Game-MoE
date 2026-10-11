@@ -7,11 +7,12 @@
    Züge im Eckbereich lagen (beide Abstände zum Rand höchstens 5). Dazu der
    Zug, nach dem in allen vier Eckbereichen ein Stein steht (Median).
 
+   Mit --arm A oder B zählen bei ab-harness-Dumps nur die Züge dieses Arms.
    Mit --gnugo-selbst N spielt GNU Go N Eröffnungen zu 60 Zügen gegen sich
    selbst (Stufe --stufe, Seed 1000 + Partie) als Vergleich.
 
    Aufruf:
-     node auswertung/eroeffnung.js <dump.jsonl> [...]
+     node auswertung/eroeffnung.js <dump.jsonl> [...] [--arm A|B]
      node auswertung/eroeffnung.js --gnugo-selbst 10 [--stufe 5] [--gnugo pfad] */
 'use strict';
 const fs = require('fs');
@@ -42,12 +43,15 @@ function bericht(name, partien) {
   console.log(`${name}: alle vier Eckbereiche besetzt (von beiden Seiten) nach Zug ${voll[voll.length >> 1]} (Median, ${partien.length} Partien)`);
 }
 
-function lies(dateien) {
+function lies(dateien, arm = null) {
   const partien = [];
   for (const d of dateien) for (const zeile of fs.readFileSync(d, 'utf8').trim().split('\n').filter(Boolean)) {
     const r = JSON.parse(zeile);
-    if (r.typ === 'partie' && r.ereignisse)
-      partien.push({zuege: r.ereignisse.map(e => e.idx ?? -1), zaehlt: () => true});
+    if (r.typ === 'partie' && r.ereignisse) {
+      const farbe = arm === null ? null : r.armSchwarz === arm ? 'S' : 'W';
+      partien.push({zuege: r.ereignisse.map(e => e.idx ?? -1),
+                    zaehlt: k => farbe === null || (r.ereignisse[k] && r.ereignisse[k].farbe === farbe)});
+    }
     else if (r.zuege && r.wirFarbe && !r.abgebrochen) {
       /* gnugo-duell: Vorgabesteine zählen nicht als Züge; nur die KI */
       const zuerst = r.beginnt === 'S' ? 1 : 2, wir = r.wirFarbe === 'S' ? 1 : 2;
@@ -59,15 +63,16 @@ function lies(dateien) {
 
 if (require.main === module) {
   const a = process.argv.slice(2);
-  let selbst = 0, stufe = 5, gnugo = '/usr/games/gnugo';
+  let selbst = 0, stufe = 5, gnugo = '/usr/games/gnugo', arm = null;
   const dateien = [];
   for (let k = 0; k < a.length; k++) {
     if (a[k] === '--gnugo-selbst') selbst = +a[++k];
     else if (a[k] === '--stufe') stufe = +a[++k];
     else if (a[k] === '--gnugo') gnugo = a[++k];
+    else if (a[k] === '--arm') arm = a[++k];
     else dateien.push(a[k]);
   }
-  if (dateien.length) bericht(dateien.length > 1 ? `${dateien.length} Dateien` : dateien[0].split('/').pop(), lies(dateien));
+  if (dateien.length) bericht((dateien.length > 1 ? `${dateien.length} Dateien` : dateien[0].split('/').pop()) + (arm ? `, Arm ${arm}` : ''), lies(dateien, arm));
   if (selbst) (async () => {
     const partien = [];
     for (let n = 0; n < selbst; n++) {
