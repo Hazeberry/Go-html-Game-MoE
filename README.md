@@ -2332,6 +2332,15 @@ sollte, und verrauschte die Paare. Seit dem 10.10. darf GNU Go in Messungen
 nicht mehr aufgeben (`gnugo-duell.js --gnugo-aufgabe 0`):
 [`docs/gnugo-ausspielen.md`](docs/gnugo-ausspielen.md).
 
+**Ein Nullergebnis braucht eine Teststärke.** Die Paardifferenz gegen GNU
+Go streut um rund 65 Punkte. Mit 60 Paaren erkennt M1 deshalb sicher erst
+Effekte ab rund 24 Punkten, und ein echter Gewinn von 10 Punkten fiele in
+vier von fünf Messungen durch. Ab dem 11.10. sind 240 Paare vorgesehen,
+sicher erkennbar ab rund 12 Punkten. Jede Vorabfestlegung nennt die
+erkennbare Effektgröße, jedes Ergebnis das 95-%-Intervall. Ein
+Nullergebnis heißt „nicht belegt“, nicht „kein Effekt“:
+[`docs/teststaerke.md`](docs/teststaerke.md).
+
 Abgelehnte Befunde stehen als Kommentar an der jeweiligen Codestelle. Sonst
 wird derselbe Versuch in einem Jahr erneut gefahren und die Untersuchungskosten
 fallen zweimal an.
