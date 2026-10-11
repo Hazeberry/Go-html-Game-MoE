@@ -203,6 +203,7 @@ Rohdumps wie in [`augen-urteil.md`](augen-urteil.md) §8. Dann:
 node auswertung/annaeherung.js <dumps> --aus annaeherung.jsonl
 node auswertung/annaeherung.js --bericht annaeherung.jsonl
 node auswertung/annaeherung-merkmale.js --ereignisse annaeherung.jsonl --dumps <dumps>
+node auswertung/annaeherung-gegenprobe.js --ereignisse annaeherung.jsonl --dumps <dumps>
 ```
 
 `annaeherung.js` braucht rund 90 s je Partie (zwei GNU-Go-Prozesse und die
@@ -210,3 +211,36 @@ nachgestellte Zugwahl). Mit acht Prozessen auf vier Kernen dauerten die 120
 Partien gut eine Stunde. Die Tabellen in §3–5 und die Rauschprüfung stehen
 im Bericht von `annaeherung.js`, §6 und §7 im Bericht von
 `annaeherung-merkmale.js`.
+
+---
+
+## 10. Nachtrag: zwei Gegenproben (11.10.2026)
+
+Bevor ein Schalter nachgemessen oder gebaut wird: Bringt er GNU Gos Antwort
+nach vorn? `auswertung/annaeherung-gegenprobe.js` bewertet die 2014
+Annäherungen an die KI mit lokaler Referenz neu. Der Rang zählt unter
+allen leeren Punkten, ohne die Filter von `getAIMove`, an jeder fünften
+Stellung (403).
+
+| Bewertung | Referenz höher als der Zug der KI | Referenz auf Rang 1 | Rang ≤ 16 |
+|---|---:|---:|---:|
+| Default | 2,5 % | 19,4 % | 72,2 % |
+| `gebietFreiheit` 1 | 14,4 % | 14,4 % | 73,7 % |
+| `gebietZug` mit Lesestatus (Prototyp) | 10,1 % | 9,2 % | 54,1 % |
+
+- **`gebietFreiheit`** wertet den Gebietsgewinn schwacher neuer Ketten ab.
+  Der Zug der KI fällt dadurch öfter hinter die Referenz. Auf Rang 1 kommt
+  die Referenz aber seltener, weil andere Züge nach vorn rücken. Für eine
+  Nachmessung mit 240 Paaren ([`teststaerke.md`](teststaerke.md)) fehlt
+  damit der Grund.
+- **`gebietZug` mit Lesestatus:** Im Prototyp, nicht in `index.html`, zählt
+  die Bouzy-Karte keine Kette, die der taktische Leser für verloren hält.
+  Damit verliert die Referenz deutlich an Rang. An die Spitze springen
+  Rettungen von Ketten, die taktisch noch zu halten sind. Das ist das
+  Muster von `leseRettung`
+  ([`punktverlust.md`](punktverlust.md) §8: kurzfristig gerettet, zehn
+  Züge später fast genauso oft tot). Nicht gebaut.
+
+Beide Eingriffe gewichten nur um, was die Bewertung schon weiß: Gebiet und
+Taktik. GNU Gos Antwort beruht auf Formwissen, also darauf, welcher lokale
+Zug die Gruppe hält. Das fehlt der Bewertung.
