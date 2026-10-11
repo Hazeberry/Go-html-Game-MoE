@@ -56,6 +56,7 @@ function ladeKI({htmlPfad = STANDARD_HTML, mitNetz = true, speicher = null} = {}
                  'aufgabeGebiet', 'setzeFfEpoche', 'fuelltEigenesAuge', 'findEyes', 'vergeblicherZug', 'gegnerzugUnabwendbar', 'leseAngriff', 'leseVerteidigung',
                  'leseTransferWaechter', 'removeDeadGroups', 'bensonClassify',
                  '_bnDead', '_bnAlive', 'floodFill', 'computeZobrist', 'getCrisisWeight', 'evalTsumego', 'leseWurzelWaechter', 'quickEval',
+                 'musterWert', 'musterSchluessel', 'MUSTER_TABELLE',
                  'PARAMS', 'BOARD_SIZE', 'NEIGHBORS', 'idx', 'xOf', 'yOf'];
   quelle += `
     ;globalThis.__test = {};
