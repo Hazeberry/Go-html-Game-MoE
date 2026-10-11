@@ -29,7 +29,11 @@
      node auswertung/muster.js daten.jsonl [...] [--gewichte 25,50,100,200,400]
           [--ohne-vor] [--min 1] [--tabelle muster-tabelle.json]
      node auswertung/muster.js daten.jsonl [...] --alle --ohne-vor --min 20 --tabelle t.json
-       (Tabelle aus allen Partien, ohne Test; so entsteht MUSTER_TABELLE in index.html) */
+       (Tabelle aus allen Partien, ohne Test; so entsteht MUSTER_TABELLE in index.html)
+   Weitere Schalter: --taktik (taktisches Merkmal), --verfahren mm (gemeinsam
+   gelernte Gewichte statt einzeln gezählter), --iter 30, --aktuell (statt
+   zu lernen die Tabelle aus index.html prüfen), --test datei (nur an den
+   Testpartien dieser Datei prüfen) */
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -40,6 +44,8 @@ const {ladeKI} = require(path.join(__dirname, '..', 'tests', 'rahmen.js'));
    bekommen. */
 let _E = null;
 const ki = () => _E || (_E = ladeKI({mitNetz: false}));
+/* Für Tests: die Engine des Aufrufers benutzen statt eine zweite zu laden. */
+const nutzeKI = e => { _E = e; };
 const N = 361, G = 19;
 const L = 'ABCDEFGHJKLMNOPQRST';
 const vonGtp = s => { s = (s || '').toUpperCase(); return !s || s === 'PASS' || s === 'RESIGN' ? -1 : (19 - +s.slice(1)) * 19 + L.indexOf(s[0]); };
@@ -77,10 +83,28 @@ function musterSchluessel(b, m, c, frei) {
 /* Der vorletzte Zug (der eigene) ist der Engine in getAIMove nicht bekannt;
    --ohne-vor lässt das Merkmal weg, um zu sehen, was es kostet. */
 let MIT_VOR = true;
+/* --taktik: zusätzlich ein taktisches Merkmal t: aus dem Brett nach dem Zug
+   (c0/c1/c2 = schlägt 0, 1, 2+ Steine; s = Selbstatari; r = rettet eine
+   eigene Kette aus dem Atari; a = setzt eine fremde Kette ins Atari). */
+let MIT_TAKTIK = false;
 /* Merkmalswerte, die seltener als MIN_MOEGLICH Mal möglich waren, kommen
    nicht in die Tabelle (Wert 0). */
 let MIN_MOEGLICH = 1;
 const eimer = d => d >= 99 ? 'keiner' : d <= 3 ? String(d) : d <= 6 ? '4-6' : 'weit';
+
+function taktik(b, nb, m, c, cap, frei) {
+  let t = cap === 0 ? 'c0' : cap === 1 ? 'c1' : 'c2';
+  const eigen = ki().floodFill(nb, m).liberties.length;
+  if (eigen === 1 && !cap) t += 's';
+  let rettet = false, atari = false;
+  for (const n of ki().NEIGHBORS[m]) {
+    if (b[n] === c && frei(n) === 1 && eigen >= 2) rettet = true;
+    if (nb[n] === 3 - c && ki().floodFill(nb, n).liberties.length === 1) atari = true;
+  }
+  if (rettet) t += 'r';
+  if (atari) t += 'a';
+  return t;
+}
 
 /* Alle legalen Züge der Stellung mit ihren Merkmalen */
 function zuege(b, c, letzt, vor) {
@@ -99,6 +123,7 @@ function zuege(b, c, letzt, vor) {
     if (!cap && ki().floodFill(nb, m).liberties.length === 0) continue;
     const f = ['m:' + musterSchluessel(b, m, c, frei), 'l:' + eimer(abstand(m, letzt)), 'z:' + Math.min(linie(m), 5)];
     if (MIT_VOR) f.push('v:' + eimer(abstand(m, vor)));
+    if (MIT_TAKTIK) f.push('t:' + taktik(b, nb, m, c, cap, frei));
     aus.push({m, f});
   }
   return aus;
@@ -135,6 +160,61 @@ function lerne(partien) {
   return {tabelle, grund, merkmale: moeglich.size, stellungen: nG};
 }
 
+/* Gemeinsam gelernte Gewichte (verallgemeinertes Bradley-Terry-Modell,
+   MM-Verfahren nach Coulom 2007): Jeder Merkmalswert i hat eine Stärke
+   gamma_i, ein Zug die Stärke des Produkts seiner Merkmale, und GNU Gos Zug
+   wird mit Wahrscheinlichkeit Stärke / Summe aller Stärken gewählt. Jeder
+   Zug hat genau ein Merkmal je Gruppe (m, l, z, ...); die Gruppen werden
+   nacheinander aktualisiert. Vorwissen: ein virtueller Sieg und eine
+   virtuelle Niederlage gegen Stärke 1. Tabellenwert = ln gamma. */
+function lerneMM(partien, iter = 30) {
+  const id = new Map(), namen = [];
+  let K = 0, feats = new Int32Array(1 << 20), nF = 0;
+  const pos = [];   /* [erster Kandidat, Zahl, gewählter Kandidat] */
+  let nKand = 0;
+  for (const p of partien) stellungen(p, (b, c, k, letzt, vor, t) => {
+    const zs = zuege(b, c, letzt, vor);
+    const gi = zs.findIndex(z => z.m === t);
+    if (gi < 0) return;
+    K = zs[0].f.length;
+    pos.push([nKand, zs.length, nKand + gi]);
+    for (const z of zs) {
+      for (const x of z.f) {
+        let j = id.get(x);
+        if (j === undefined) { j = namen.length; id.set(x, j); namen.push(x); }
+        if (nF === feats.length) { const n = new Int32Array(feats.length * 2); n.set(feats); feats = n; }
+        feats[nF++] = j;
+      }
+      nKand++;
+    }
+  });
+  const F = namen.length, gamma = new Float64Array(F).fill(1), W = new Float64Array(F), moeglich = new Float64Array(F);
+  for (const [, , g] of pos) for (let k = 0; k < K; k++) W[feats[g * K + k]]++;
+  for (let q = 0; q < nKand * K; q++) moeglich[feats[q]]++;
+  const staerke = new Float64Array(nKand);
+  for (let it = 0; it < iter; it++) {
+    for (let grp = 0; grp < K; grp++) {
+      const D = new Float64Array(F);
+      for (const [a, n] of pos) {
+        let E = 0;
+        for (let m = a; m < a + n; m++) {
+          let s = 1;
+          for (let k = 0; k < K; k++) s *= gamma[feats[m * K + k]];
+          staerke[m] = s; E += s;
+        }
+        for (let m = a; m < a + n; m++) { const i = feats[m * K + grp]; D[i] += staerke[m] / gamma[i] / E; }
+      }
+      for (let i = 0; i < F; i++) {
+        if (!D[i]) continue;   /* Merkmal einer anderen Gruppe */
+        gamma[i] = (W[i] + 1) / (D[i] + 2 / (gamma[i] + 1));
+      }
+    }
+  }
+  const tabelle = {};
+  for (let i = 0; i < F; i++) if (moeglich[i] >= MIN_MOEGLICH) tabelle[namen[i]] = +Math.log(gamma[i]).toFixed(3);
+  return {tabelle, grund: pos.length / nKand, merkmale: F, stellungen: pos.length};
+}
+
 const musterWert = (tabelle, z) => z.f.reduce((s, x) => s + (tabelle[x] || 0), 0);
 
 function teste(partien, tabelle, gewichte) {
@@ -162,7 +242,7 @@ function teste(partien, tabelle, gewichte) {
 
 if (require.main === module) {
   const a = process.argv.slice(2);
-  let gewichte = [25, 50, 100, 200, 400], tabelleAus = null, alle = false;
+  let gewichte = [25, 50, 100, 200, 400], tabelleAus = null, alle = false, verfahren = 'naiv', iter = 30, aktuell = false, testDatei = null;
   const dateien = [];
   for (let k = 0; k < a.length; k++) {
     if (a[k] === '--gewichte') gewichte = a[++k].split(',').map(Number);
@@ -170,12 +250,21 @@ if (require.main === module) {
     else if (a[k] === '--ohne-vor') MIT_VOR = false;
     else if (a[k] === '--min') MIN_MOEGLICH = +a[++k];
     else if (a[k] === '--alle') alle = true;
+    else if (a[k] === '--taktik') MIT_TAKTIK = true;
+    else if (a[k] === '--verfahren') verfahren = a[++k];
+    else if (a[k] === '--iter') iter = +a[++k];
+    else if (a[k] === '--aktuell') aktuell = true;
+    else if (a[k] === '--test') testDatei = a[++k];
     else dateien.push(a[k]);
   }
   const partien = dateien.flatMap(d => fs.readFileSync(d, 'utf8').trim().split('\n').filter(Boolean).map(z => JSON.parse(z)));
-  const training = alle ? partien : partien.filter(p => p.nr % 4 !== 0), test = alle ? [] : partien.filter(p => p.nr % 4 === 0);
+  /* --test datei: geprüft wird nur an den Testpartien dieser Datei (zum
+     Beispiel nur an Partien der neuen KI); gelernt wird weiter aus allen. */
+  const testQuelle = testDatei ? fs.readFileSync(testDatei, 'utf8').trim().split('\n').filter(Boolean).map(z => JSON.parse(z)) : partien;
+  const training = alle ? partien : partien.filter(p => p.nr % 4 !== 0), test = alle ? [] : testQuelle.filter(p => p.nr % 4 === 0);
   const t0 = Date.now();
-  const {tabelle, grund, merkmale, stellungen: n} = lerne(training);
+  const {tabelle, grund, merkmale, stellungen: n} = aktuell ? {tabelle: ki().MUSTER_TABELLE, grund: 0, merkmale: Object.keys(ki().MUSTER_TABELLE).length, stellungen: 0}
+    : verfahren === 'mm' ? lerneMM(training, iter) : lerne(training);
   console.log(`Training: ${training.length} Partien, ${n} Stellungen, ${merkmale} Merkmalswerte, Grundrate ${(100 * grund).toFixed(2)} % · ${((Date.now() - t0) / 1000).toFixed(0)} s`);
   if (tabelleAus) fs.writeFileSync(tabelleAus, JSON.stringify(tabelle));
   if (alle) return;
@@ -187,4 +276,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = {musterSchluessel, zuege, lerne, teste, musterWert};
+module.exports = {musterSchluessel, zuege, lerne, lerneMM, teste, musterWert, taktik, nutzeKI};
