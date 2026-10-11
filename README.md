@@ -2253,6 +2253,18 @@ nicht unter den Kandidaten der Suche, obwohl der eigene Leser die Gefahr in
 zwei Dritteln der Fälle kennt:
 [`docs/punktverlust.md`](docs/punktverlust.md).
 
+**Augen zählen.** Die Krisenkarte sieht nur Freiheiten, die Engine kann
+aber auch Augen zählen, und zwar brauchbar: Wo sie zwei findet, sieht GNU
+Go in 84 % ebenfalls zwei. Augen beschreiben GNU Gos Urteil über eine
+Gruppe besser als Freiheiten, aber vor allem im Nachhinein, denn tote
+Gruppen haben keinen Augenraum. Welche lebende Gruppe als nächste stirbt,
+sagen sie kaum voraus. Keine Regel aus Augen findet die rettbaren Gruppen:
+„Kein Auge“ erfasst drei von vier kritischen Gruppen, markiert aber je
+Stellung 2,8 Gruppen der KI, von denen nur eine von zwanzig kritisch ist.
+Lebende Gruppen sterben, wenn GNU Go sie angreift und
+teilt, nicht weil sie Augen verlieren. Deshalb gibt es keinen Schalter:
+[`docs/augen-urteil.md`](docs/augen-urteil.md).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
 09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1. Wiederholen auf dem
