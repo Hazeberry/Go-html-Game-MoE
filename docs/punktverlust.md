@@ -66,10 +66,16 @@ und 200 wechseln die Brettpunkte so, je Partie:
 |   davon: GNU-Go-Steine leben dort | −32,5 |
 |   davon: wird Gebiet von GNU Go / neutral / toter KI-Stein | −12,5 / −11,8 / −6,4 |
 | neutrales Gebiet: an GNU Go −49,3, an die KI +28,2 | −21,1 |
-| Steine der KI sterben | −20,4 |
-| Steine und Gebiet von GNU Go an die KI | +14,5 |
-| tote GNU-Go-Steine leben wieder | −4,4 |
+| Steine der KI sterben | −20,3 |
+| von GNU Go zurückgewonnen (Steine und Gebiet) | +10,1 |
+| tote Steine leben wieder: eigene +4,4, die von GNU Go −4,4 | 0,0 |
 | **Summe** | **−94,5** |
+
+Die Einzelwerte sind auf eine Stelle gerundet, die Summe ist exakt
+(−94,53). In einer früheren Fassung dieser Tabelle standen „Steine und
+Gebiet von GNU Go an die KI +14,5“ und „tote GNU-Go-Steine leben wieder
+−4,4“. Die +14,5 enthielten aber 4,4 Punkte aus eigenen Steinen der KI, die
+GNU Go bei Zug 100 für tot und bei Zug 200 für lebend hielt.
 
 Alle 120 Partien steigen ab. In 116 verliert die KI mehr über Gebiet als
 über gestorbene Steine. (Mit Marken alle 10 Züge ergibt dieselbe Buchung

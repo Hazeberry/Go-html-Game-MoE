@@ -121,8 +121,10 @@ function bericht(rs, von, bis) {
   console.log(`  eigene Steine sterben (KI-Stein → KI-tot oder geschlagen): ${gruppe((a, b) => a === 'KI-Stein' && BESITZ[b] < 1).toFixed(1)}`);
   console.log(`  eigenes Gebiet geht verloren (KI-Gebiet → GNU Go oder neutral): ${gruppe((a, b) => a === 'KI-Gebiet' && BESITZ[b] < 1).toFixed(1)}`);
   console.log(`  neutrales Gebiet an GNU Go / an die KI: ${gruppe((a, b) => a === 'neutral' && BESITZ[b] < 0).toFixed(1)} / +${gruppe((a, b) => a === 'neutral' && BESITZ[b] > 0).toFixed(1)}`);
-  console.log(`  GNU-Go-Steine und -Gebiet an die KI: +${gruppe((a, b) => BESITZ[a] < 0 && BESITZ[b] > BESITZ[a]).toFixed(1)}`);
-  console.log(`  tote GNU-Go-Steine wieder lebend (GG-tot → GNU Go): ${gruppe((a, b) => a === 'GG-tot' && BESITZ[b] < 1).toFixed(1)}`);
+  console.log(`  von GNU Go zurückgewonnen (GG-Stein, GG-Gebiet → KI oder neutral): +${gruppe((a, b) => (a === 'GG-Stein' || a === 'GG-Gebiet') && BESITZ[b] > BESITZ[a]).toFixed(1)}`);
+  console.log(`  eigene tote Steine wieder lebend (KI-tot → KI oder neutral): +${gruppe((a, b) => a === 'KI-tot' && BESITZ[b] > BESITZ[a]).toFixed(1)}`);
+  console.log(`  tote GNU-Go-Steine wieder lebend (GG-tot → GNU Go oder neutral): ${gruppe((a, b) => a === 'GG-tot' && BESITZ[b] < 1).toFixed(1)}`);
+  console.log('  (Die sieben Posten teilen alle Übergänge, die Punkte ändern; ihre Summe ist die Summe oben.)');
 }
 
 if (require.main === module) {
