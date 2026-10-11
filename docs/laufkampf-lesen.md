@@ -266,3 +266,65 @@ Endpunkt: Siegrate von B, zweiseitig gegen 50 %, α = 0,05.
   nicht erhoben.
 - Bei einer Streuung um 70 Punkte erkennen 60 Paare einen Unterschied von
   etwa 25 Punkten mit 80 % Wahrscheinlichkeit.
+
+---
+
+## 8. Nachtrag: Ergebnis der Nachmessung, Default bleibt 0 (11.10.2026)
+
+Gelaufen auf dem Merge-Commit `5d13121`, ohne Unterbrechung. Daten:
+`daten/rettung-gnugo.json` (M1, beide Arme) und `daten/rettung-20261140.json`
+bis `…43.json` (Hash-Listen M2).
+
+**M1, gegen GNU Go (primär), 60 Paare, Seed 171, ausgespielt:**
+
+| | A (Default) | B (`leseRettung` 1) | B − A |
+|---|---:|---:|---|
+| **Endstand** | −73,1 | −79,5 | **−6,3** (SD 60,8), p = 0,42 |
+| nach Zug 120 | +52,4 | +53,9 | +1,5, p = 0,57 |
+| nach Zug 200 | −29,1 | −33,4 | −4,4, p = 0,39 |
+
+- B ist in 32 von 60 Paaren besser, in 27 schlechter, in einem gleich, im
+  Median um 3 Punkte besser.
+- Teilläufe B − A: −24,9 / 0,0 / +1,2 / −1,6.
+- Keine Aufgaben, kein Zuglimit. Die KI gewann mit A 4 Partien, mit B 6.
+- Partielänge: Ø 274 Züge (A) gegen 285 (B).
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt **209 von 360 Partien, 58,1 %**
+(z = 3,06, p = 0,002, 95-%-KI 52,9–63,0 %). Teilläufe: 53,3 / 60,0 / 57,8 /
+61,1 %.
+
+**Entscheidung nach §7: Default `leseRettung` bleibt 0.** M1 ist nicht
+signifikant. Wie in §6 gewinnt B im Selbstspiel deutlich und gegen GNU Go
+nicht.
+
+**Wirksamkeit**, kritische eigene Gruppen ab drei Steinen, Zug 100–200
+(`auswertung/kritisch.js`), je Partie:
+
+| | A | B |
+|---|---:|---:|
+| vor dem eigenen Zug kritisch | 7,4 | 6,8 |
+| direkt danach gerettet | 26 % | **43 %** |
+| 10 Züge später tot | 53 % | **51 %** |
+| von GNU Go mit seinen Zügen getötete Steine (Gruppen ab drei Steinen) | 30,7 | 30,6 |
+
+**Buchung der Brettpunkte**, Zug 100–200 (`auswertung/besitz-verlauf.js`),
+je Partie:
+
+| | A | B |
+|---|---:|---:|
+| eigene Steine sterben | −17,6 | −17,2 |
+| eigenes Gebiet geht verloren | −64,2 | −66,4 |
+| neutrales Gebiet netto | −19,2 | −18,0 |
+
+**Einordnung:**
+- Der Schalter wirkt: B rettet kritische Gruppen direkt nach dem Zug viel
+  öfter. Zehn Züge später sind sie aber fast genauso oft tot, und am
+  Posten „eigene Steine sterben“ ändert sich nichts.
+- Der Leser rettet eine Kette davor, sofort gefangen zu werden. GNU Go
+  nennt eine Gruppe kritisch, wenn ihr Leben an Augen hängt, und tötet sie
+  über den Raum, nicht über eine Leiter. Gegen diesen Angriff hilft eine
+  taktische Rettung nicht.
+- Im Selbstspiel greift der Gegner bedrohte Ketten taktisch an, dort lohnt
+  die Rettung. Das erklärt, warum B dort zweimal deutlich gewann.
+- Was fehlt, ist ein Urteil über Leben und Tod über die Taktik hinaus:
+  Augenraum und Augen einer Gruppe. Das hat die Engine bisher nicht.

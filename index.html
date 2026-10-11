@@ -1478,7 +1478,10 @@ globalThis.PARAMS = {
   krisenKandidaten:   0,
   /* Taktischer Leser in der Zugwahl: 1 = Rettung eigener fangbarer Ketten
      (2+ Steine, bis 3 Freiheiten) an die Spitze, 2 = zusaetzlich Fang
-     gegnerischer. 0 = aus. Siehe docs/laufkampf-lesen.md. */
+     gegnerischer. 0 = aus. Gemessen: Selbstspiel 62,8 % und 58,1 %, gegen
+     GNU Go -30,5 und (ausgespielt) -6,3 Punkte. Die Ketten leben danach
+     nicht laenger, eine taktische Rettung schafft keine Augen. Kein
+     Default. Siehe docs/laufkampf-lesen.md §8. */
   leseRettung:        0,
   /* Lese-Verzicht: kein eigener Zug, nach dem der taktische Leser die
      eigene Kette sofort faengt (bis 3 Freiheiten, Gegner am Zug), es sei
@@ -6499,7 +6502,7 @@ globalThis.policyNet = new PolicyNet();
         {key:'passMinMc80',       label:'Pass mc>80',       step:5,   min:-100,max:100,
          tip:'Mittelspiel-Pass-Schwelle'},
         {key:'leseRettung',       label:'Lese-Rettung',     step:1,   min:0,   max:2,
-         tip:'1 = ein taktischer Leser prüft eigene gefährdete Ketten (bis 3 Freiheiten) und spielt nachweislich rettende Züge bevorzugt. Selbstspiel 62,8 %, gegen GNU Go aber 30 Punkte schlechter — kein Default. 2 = zusätzlich Fangen. Siehe docs/laufkampf-lesen.md.'},
+         tip:'1 = ein taktischer Leser prüft eigene gefährdete Ketten (bis 3 Freiheiten) und spielt nachweislich rettende Züge bevorzugt. Selbstspiel 62,8 % und 58,1 %, gegen GNU Go aber −30,5 und, ausgespielt, −6,3 Punkte — kein Default. 2 = zusätzlich Fangen. Siehe docs/laufkampf-lesen.md.'},
         {key:'leseVerzicht',      label:'Lese-Verzicht',    step:1,   min:0,   max:1,
          tip:'1 = keine Züge, deren eigene Kette der taktische Leser sofort fangen kann (außer Schlag oder Atari), Default. Gegen GNU Go +56 Punkte, im Selbstspiel 72,8 %. 0 = altes Verhalten. Siehe docs/endspiel-verlust.md.'},
         {key:'atariVerzicht',     label:'Atari-Verzicht',   step:1,   min:0,   max:1,
