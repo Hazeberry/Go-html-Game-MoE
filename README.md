@@ -2265,6 +2265,17 @@ Lebende Gruppen sterben, wenn GNU Go sie angreift und
 teilt, nicht weil sie Augen verlieren. Deshalb gibt es keinen Schalter:
 [`docs/augen-urteil.md`](docs/augen-urteil.md).
 
+**Antwort auf Annäherung.** Setzt GNU Go einen Stein nah an eine lebende
+Gruppe der KI, antwortet die KI meist lokal, aber selten mit dem Zug, den
+GNU Go auf Stufe 10 für sie spielen würde: in 31 % der Fälle, GNU Go selbst
+in der umgekehrten Lage in 78 %. GNU Gos Antwort stärkt meist die eigene
+Kette, die KI legt lieber an. Ab Zug 81 bewertet allein der
+Endspiel-Experte, und der zählt Gebiet und Angriff, aber kein Stärken.
+Der Vorsprung des KI-Zugs kommt aus `gebietZug` und der Krisenkarte. Die
+Befunde halten mit Intervallen über ganze Partien, sind also kein Rauschen.
+Ein billiger Schalter ist nicht in Sicht:
+[`docs/annaeherung.md`](docs/annaeherung.md).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
 09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1. Wiederholen auf dem
