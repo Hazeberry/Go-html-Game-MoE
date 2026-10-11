@@ -169,3 +169,14 @@ Endständen, die bei einer Aufgabe von GNU Go nur Zwischenstände waren
 **Werkzeuge:** `punktverlust.js` (§2), `besitz-verlauf.js` (§3),
 `einbruch.js` (§4), `kritisch.js` (§5), `kritisch-rang.js` (§6). Alle unter
 `auswertung/`, Aufrufe in ihren Köpfen.
+
+---
+
+## 8. Nachtrag: `leseRettung` nachgemessen (11.10.2026)
+
+Vorab festgelegt in [`laufkampf-lesen.md`](laufkampf-lesen.md) §7,
+Ergebnis in §8: gegen GNU Go −6,3 Punkte (p = 0,42), im Selbstspiel 58,1 %
+(p = 0,002). Default bleibt 0. Der Schalter rettet kritische Gruppen direkt
+nach dem Zug öfter (43 % statt 26 %), zehn Züge später sind sie aber fast
+genauso oft tot (51 % statt 53 %). Eine taktische Rettung schafft keine
+Augen. Der Posten „eigene Steine sterben“ bleibt unverändert.
