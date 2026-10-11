@@ -16,6 +16,7 @@ const path = require('path');
 /* siege/partien: Partien der Änderung (B) im Selbstspiel.
    art: eingebaut | offen | verworfen | massstab */
 const DATEN = [
+  {name: 'musterGewicht 200', text: 'Muster aus GNU-Go-Zügen', siege: 355, partien: 360, art: 'eingebaut', gnugo: '+102,8 Endstand'},
   {name: 'gebietZug 80', text: 'Gebiet in der Zugbewertung', siege: 300, partien: 360, art: 'eingebaut', gnugo: '+229 nach Zug 120'},
   {name: 'leseVerzicht 1', text: 'keine Züge, deren Kette der Leser fängt', siege: 262, partien: 360, art: 'eingebaut', gnugo: '+56,1 Endstand'},
   {name: 'mctsValueScale 200', text: 'statt 350, Skala des Suchwerts', siege: 65, partien: 100, art: 'eingebaut', gnugo: '+14,2 Endstand (n. s.)'},
@@ -72,7 +73,7 @@ function svg(t) {
   const SP_RATE = X1 + 28, SP_GNU = SP_RATE + 74;
   const KOPF = 108, ZEILE = 40, FUSS = 92;
   const H = KOPF + DATEN.length * ZEILE + FUSS;
-  const MIN = 0.25, MAX = 0.90;
+  const MIN = 0.25, MAX = 1.00;
   const x = v => X0 + (v - MIN) / (MAX - MIN) * PLOT;
   const font = 'font-family="system-ui, -apple-system, \'Segoe UI\', Helvetica, Arial, sans-serif"';
   const o = [];

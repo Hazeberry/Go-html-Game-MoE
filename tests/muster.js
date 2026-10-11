@@ -1,7 +1,8 @@
 /* Muster aus GNU-Go-Zügen (musterGewicht; docs/muster.md).
 
-     1. Default 0, Tabelle vorhanden.
-     2. Bei 0 bleibt getAIMove bitgenau: derselbe Zug, dieselbe Info.
+     1. Default 200 (seit docs/muster.md §8), Tabelle vorhanden.
+     2. Der Term ist die einzige Änderung: mit leerer Tabelle spielt
+        getAIMove bei 200 bitgenau wie bei 0 (derselbe Zug, dieselbe Info).
      3. Der Musterschlüssel in index.html ist derselbe wie in
         auswertung/muster.js, mit dem die Tabelle gelernt wurde (alle freien
         Punkte echter Stellungen, beide Farben).
@@ -43,20 +44,25 @@ function stellungen() {
   });
 }
 
-test('Default musterGewicht 0, Tabelle mit Mustern, Abstand und Linie', () => {
-  pruefeGleich(PARAMS.musterGewicht, 0, 'Default');
+test('Default musterGewicht 200, Tabelle mit Mustern, Abstand und Linie', () => {
+  pruefeGleich(PARAMS.musterGewicht, 200, 'Default');
   const k = Object.keys(MUSTER_TABELLE);
   pruefe(k.filter(x => x.startsWith('m:')).length > 1000, 'Muster in der Tabelle');
   for (const x of ['l:1', 'l:2', 'l:keiner', 'z:1', 'z:3']) pruefe(x in MUSTER_TABELLE, `Merkmal ${x}`);
 });
 
-test('musterGewicht 0: getAIMove bitgenau wie ohne den Parameter', () => {
-  for (const b of stellungen()) {
-    const ohne = zug(b, 1, 120, {});
-    const null0 = zug(b, 1, 120, {musterGewicht: 0});
-    pruefeGleich(`${null0.type} ${null0.x},${null0.y}`, `${ohne.type} ${ohne.x},${ohne.y}`, 'Zug');
-    pruefeGleich(null0.info, ohne.info, 'Info');
-  }
+test('leere Tabelle: Gewicht 200 bitgenau wie Gewicht 0', () => {
+  const kopie = Object.assign({}, MUSTER_TABELLE);
+  for (const k of Object.keys(MUSTER_TABELLE)) delete MUSTER_TABELLE[k];
+  try {
+    for (const b of stellungen()) {
+      const null0 = zug(b, 1, 120, {musterGewicht: 0});
+      const leer = zug(b, 1, 120, {musterGewicht: 200});
+      pruefeGleich(`${leer.type} ${leer.x},${leer.y}`, `${null0.type} ${null0.x},${null0.y}`, 'Zug');
+      pruefeGleich(leer.info, null0.info, 'Info');
+    }
+  } finally { Object.assign(MUSTER_TABELLE, kopie); }
+  pruefe(Object.keys(MUSTER_TABELLE).length > 1000, 'Tabelle wiederhergestellt');
 });
 
 test('Schlüssel wie in auswertung/muster.js (alle freien Punkte, beide Farben)', () => {

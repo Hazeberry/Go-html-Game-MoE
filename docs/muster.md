@@ -174,3 +174,55 @@ Endpunkt: Siegrate von B, zweiseitig gegen 50 %, α = 0,05.
 - Mit 120 Simulationen folgt die Suche fast immer ihrem Favoriten. Der
   Schalter verschiebt vor allem diesen Favoriten. Bei mehr Simulationen
   kann die Wirkung anders ausfallen.
+
+---
+
+## 8. Nachtrag: Ergebnis, Default `musterGewicht` = 200 (11.10.2026)
+
+Gelaufen auf dem Merge-Commit `77466af`, ohne Unterbrechung. Daten:
+`daten/muster-gnugo.json` (M1, beide Arme) und `daten/muster-20261170.json`
+bis `…73.json` (Hash-Listen M2).
+
+**M1, gegen GNU Go (primär), 240 Paare, Seed 201, ausgespielt:**
+
+| | A (Default) | B (`musterGewicht` 200) | B − A |
+|---|---:|---:|---|
+| **Endstand** | −78,3 | **+24,5** | **+102,8** (SD 75,1), 95 %: [+93,2; +112,3], p = 8 · 10⁻⁵⁷ |
+| nach Zug 120 | +46,7 | +75,4 | +28,8, p = 8 · 10⁻²¹ (240 Paare) |
+| nach Zug 200 | −44,2 | +24,9 | +69,1, p = 2 · 10⁻³⁶ (182 Paare) |
+
+- **Paare:** B ist in 216 von 240 Paaren besser, in 24 schlechter. Der
+  Median liegt bei +110.
+- **Teilläufe:** Alle 16 sind positiv, von +60,8 bis +139,6.
+- **Siege der KI:** A **13 von 240**, B **156 von 240**. Zum ersten Mal
+  gewinnt die KI gegen GNU Go mit neun Vorgabesteinen die Mehrzahl der
+  Partien.
+- **Partien:** keine Aufgaben, kein Zuglimit. Die Partien sind kürzer:
+  Ø 275 Züge bei A, 239 bei B. 57 Partien von B enden vor Zug 200, daher die
+  58 fehlenden Paare nach Zug 200. GNU Go passt öfter (Ø 3,8 gegen 9,7
+  Pässe), die KI gleich selten (1,4 gegen 1,2).
+- **Laufzeit:** im Selbstspiel 73–75 ms je Zug mit dem Schalter gegen
+  70–73 ms ohne, also rund 3 % mehr.
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt **355 von 360 Partien, 98,6 %**
+(z = 18,45, p = 6 · 10⁻⁷⁶, 95-%-KI 96,8–99,4 %). Teilläufe: 90 : 0, 86 : 4,
+89 : 1, 90 : 0. Von den 355 Siegen kamen 330 durch Aufgabe von A. Im
+Selbstspiel ist rund jede achte Aufgabe falsch
+([`falsche-aufgabe.md`](falsche-aufgabe.md)). Selbst wenn es hier jede
+siebte wäre, gewönne B noch über 85 %.
+
+**Entscheidung nach §6: Default `musterGewicht` = 200.** M1 ist
+signifikant besser, M2 liegt weit über 50 %.
+
+**Einordnung:**
+- Der Effekt liegt weit über dem, was die Messung sicher erkennen kann
+  ([`teststaerke.md`](teststaerke.md): rund 12 Punkte). Die Piloten (+65
+  bis +76 bei 30 Paaren) haben ihn eher unterschätzt.
+- Bestätigt ist damit die Diagnose der letzten Tage: Der Zugbewertung
+  fehlte Formwissen. Umgewichten half nicht, neue Information hilft.
+- Die Grenzen aus §7 bleiben. Der Lehrer (GNU Go Stufe 10) und der Gegner
+  (Stufe 1) sind dasselbe Programm. Das Selbstspiel zeigt aber, dass die
+  Muster nicht nur gegen GNU Go helfen. Wie sie gegen Menschen wirken,
+  zeigt das Spiel.
+- Ab jetzt ist „Default“ in allen Messungen der Arm mit `musterGewicht`
+  200.

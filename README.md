@@ -32,6 +32,9 @@ nichts zu installieren.
 - MCTS mit PUCT, RAVE/AMAF und Baum-Wiederverwendung
 - Bensons Algorithmus für bedingungslos lebende Gruppen — bewiesen, nicht
   geschätzt, und damit die einzige Schicht, die nicht heuristisch ist
+- Muster aus GNU-Go-Zügen in der Zugbewertung (`musterGewicht`): gegen GNU
+  Go mit neun Vorgabesteinen +103 Punkte im Endstand, die KI gewinnt dort
+  jetzt 156 von 240 Partien statt 13
 - Aufgabe bei aussichtsloser Stellung, sowohl über Q als auch strukturell
   („alle legalen Züge wären todgeboren")
 - Worker-Fallback-Kette `data:` → `blob:` → Hauptthread, damit die KI auch
@@ -235,6 +238,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 
 | Befund | Messung | Konsequenz |
 |---|---|---|
+| **`musterGewicht` 200 (Muster aus GNU-Go-Zügen: 3×3-Umgebung, Abstand zum letzten Zug, Linie)** | **gegen GNU Go Endstand +102,8 Punkte über 240 ausgespielte Paare (95 %: +93 bis +112, p = 8 · 10⁻⁵⁷), Siege 13 → 156 von 240; im Selbstspiel 98,6 % über 360 Partien** | **eingebaut** — Default 200; zum ersten Mal gewinnt die KI gegen GNU Go mit neun Vorgabesteinen die Mehrzahl der Partien (`docs/muster.md`) |
 | `mctsValueScale` 200 statt 350 | 65:35 über 100 gepaarte Partien, p = 0,0035; gegen GNU Go nachgeprüft: 350 −14,2 Punkte über 60 Paare (p = 0,30) | **eingebaut** (≈ +108 Elo im Selbstspiel); GNU Go widerspricht nicht (`docs/wertskala-gnugo.md`) |
 | Kurve 100/150/200/250/300/500/1000 | Plateau bei 150–250, Abfall zu beiden Seiten | Mitte des Plateaus gewählt, nicht der Höchstwert |
 | `endTieBreak` 1 statt 0 (Gleichstand im Endspiel ordnen statt losen) | 57,2 % und in der Wiederholung 59,4 % über je 360 Partien, p = 0,006 und 0,0003 (vor `gebietZug`); gegen GNU Go nachgeprüft: 0 statt 1 +0,4 Punkte über 60 Paare (p = 0,97) | **eingebaut** — Default 1; gegen GNU Go ohne Wirkung, neben `gebietZug` vermutlich überflüssig (`docs/gleichstand-gnugo.md`) |
@@ -2276,12 +2280,24 @@ Befunde halten mit Intervallen über ganze Partien, sind also kein Rauschen.
 Ein billiger Schalter ist nicht in Sicht:
 [`docs/annaeherung.md`](docs/annaeherung.md).
 
+**Muster aus GNU-Go-Zügen.** Die Zugbewertung setzt GNU Gos Zug in 0–2 %
+der Stellungen auf Rang 1, kaum besser als Zufall. Muster, die aus 14 021
+Stellungen gelernt sind, schaffen 15–20 %. Gelernt wird, wie viel häufiger
+GNU Go auf Stufe 10 einen Zug mit dieser 3×3-Umgebung, diesem Abstand zum
+letzten Zug und auf dieser Linie wählt. Als Zusatz zur Zugbewertung
+(`musterGewicht` 200) bringen sie gegen GNU Go **+102,8 Punkte** im
+Endstand über 240 Paare, und die KI gewinnt 156 statt 13 Partien. Im
+Selbstspiel gewinnt sie 355 von 360. Seitdem Default:
+[`docs/muster.md`](docs/muster.md).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
-09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1. Wiederholen auf dem
-Commit aus der Hash-Liste oder mit
-`gebietZug=0,augenSchutz=0,passUnabwendbar=0,leseVerzicht=0,wurzelFrisch=0`
-(und `endTieBreak=0` für Läufe vor dem 03.10.) in beiden Armen.
+09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1, seit dem 11.10. auch
+`musterGewicht` = 200. Wiederholen auf dem Commit aus der Hash-Liste oder
+mit
+`gebietZug=0,augenSchutz=0,passUnabwendbar=0,leseVerzicht=0,wurzelFrisch=0,musterGewicht=0`
+(und `endTieBreak=0` für Läufe vor dem 03.10.) in beiden Armen. Für Läufe
+vom 09.10. bis 11.10. reicht `musterGewicht=0`.
 
 ## Methodik
 

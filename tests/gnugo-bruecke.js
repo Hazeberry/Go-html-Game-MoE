@@ -48,10 +48,12 @@ test('Partie mit 9 Vorgabesteinen: Steine, Komi, Weiß beginnt', () => {
 });
 
 /* Partie 39 aus docs/quick-rettung.md §6 (Seed 141, Arm A): GNU Go gibt
-   nach 80 Zügen auf. */
+   nach 80 Zügen auf. Die Partie stammt aus der Zeit vor musterGewicht
+   (Default 200 seit docs/muster.md); der Schalter ist hier auf 0 gesetzt,
+   damit sie gleich bleibt. */
 test('--gnugo-aufgabe 0: GNU Go gibt nicht auf, die Partie läuft weiter', () => {
   const basis = ['--partien', '1', '--von', '39', '--seed', '141', '--stufe', '1', '--vorgabe', '9',
-                 '--maxzuege', '90', '--ki', 'mctsFixedSims=120,resignEnabled=0'];
+                 '--maxzuege', '90', '--ki', 'mctsFixedSims=120,resignEnabled=0,musterGewicht=0'];
   const mit = partie([], basis), ohne = partie(['--gnugo-aufgabe', '0'], basis);
   pruefeGleich(mit.aufgabe, 'W', 'ohne Option: GNU Go gibt auf');
   pruefeGleich(mit.zuegeAnzahl, 80, 'nach 80 Zügen');
