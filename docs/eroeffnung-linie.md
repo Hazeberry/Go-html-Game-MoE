@@ -55,8 +55,8 @@ wechseln, 120 Simulationen, ausgespielt, Seed 9181, 8 Partien, Default):
 
 - Die KI verliert alle 8 Partien, Endstand Ø −140,5 (SD 44,9). Gepaarte
   Unterschiede sind damit messbar.
-- GNU Gos Schätzung nach Zug 30: Ø +11, nach Zug 60: Ø +24 aus Sicht der
-  KI. Verloren werden die Partien im Mittelspiel, nicht in der Eröffnung.
+- GNU Gos Schätzung nach Zug 30: Ø +8,8, nach Zug 60: Ø +24,1 aus Sicht
+  der KI. Verloren werden die Partien im Mittelspiel, nicht in der Eröffnung.
   Ein großer Effekt auf den Endstand ist deshalb nicht zu erwarten.
 
 ## 4. Messung, vorab festgelegt (11.10.2026, vor dem Lauf)
