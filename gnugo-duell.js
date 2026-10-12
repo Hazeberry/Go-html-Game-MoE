@@ -33,6 +33,10 @@
                           endet die Partie am Zuglimit, wird nicht ausgezählt)
                          [--gnugo-aufgabe 0] (GNU Go darf nicht aufgeben,
                           --never-resign; jede Partie wird ausgespielt)
+                         [--orakel STUFE] (ein zweites GNU Go auf dieser Stufe
+                          spielt mit und liefert vor jedem unserer Züge sein
+                          Lebensurteil, dragon_status; wirkt mit
+                          --ki gebietSicher=1, docs/gebiet-sicher.md)
    Jede Partie bekommt zusätzlich `endstand`: GNU Gos final_score der
    Schlussstellung aus unserer Sicht, auch bei Aufgabe und Zuglimit.
    Bei Aufgabe ist das die Stellung, wie sie stehen blieb, oft weit vor dem
@@ -55,7 +59,7 @@ const {spawn} = require('child_process');
 /* ── Optionen ─────────────────────────────────────────────────────── */
 const a = process.argv.slice(2);
 const opt = {partien: 10, seed: 1, stufe: 10, ki: {}, roh: null, gnugo: '/usr/games/gnugo',
-             maxZuege: 400, von: 1, vorgabe: 0, schaetzung: [], gnugoAufgabe: 1};
+             maxZuege: 400, von: 1, vorgabe: 0, schaetzung: [], gnugoAufgabe: 1, orakel: 0};
 for (let i = 0; i < a.length; i++) {
   const v = a[i + 1];
   switch (a[i]) {
@@ -69,6 +73,7 @@ for (let i = 0; i < a.length; i++) {
     case '--vorgabe': opt.vorgabe = +v; i++; break;
     case '--schaetzung': opt.schaetzung = v.split(',').map(Number); i++; break;
     case '--gnugo-aufgabe': opt.gnugoAufgabe = +v; i++; break;
+    case '--orakel': opt.orakel = +v; i++; break;
     case '--ki': for (const kv of v.split(',')) { const [k, w] = kv.split('='); opt.ki[k] = +w; } i++; break;
     default: console.error('Unbekannte Option ' + a[i]); process.exit(2);
   }
@@ -82,10 +87,11 @@ globalThis.localStorage = {getItem: () => null, setItem() {}, removeItem() {}};
 globalThis.document = {getElementById: () => null};
 (0, eval)(ex('shared-go-logic') + '\n' + ex('worker-ai')
   + ';globalThis.__D={PARAMS,getAIMove,computeZobrist,removeDeadGroups,floodFill,'
-  + 'bensonClassify,_bnDead,BOARD_SIZE,NEIGHBORS,setzeKrisenDauer,'
+  + 'bensonClassify,_bnDead,BOARD_SIZE,NEIGHBORS,setzeKrisenDauer,setzeLebensurteil,'
   + 'neuePartie(){_mctsSavedRoot=null;_hopelessStreak=0;_allDeadStreak=0;_lastMsPerSim=null;},'
   + 'wurzel:typeof leseWurzelWaechter==="function"?leseWurzelWaechter:null};');
 const E = globalThis.__D;
+const {urteilAusGtp} = require('./auswertung/lebensurteil.js');
 const DEFAULT = JSON.parse(JSON.stringify(E.PARAMS));
 const N = E.BOARD_SIZE;
 const KOMI = opt.vorgabe >= 2 ? 0.5 : 7.5;
@@ -110,8 +116,8 @@ function vonGtp(s) {
 }
 
 /* ── GTP: eine Anfrage, eine Antwort (endet mit Leerzeile) ──────────── */
-function gnugoStarten(seed) {
-  const p = spawn(opt.gnugo, ['--mode', 'gtp', '--level', String(opt.stufe), '--chinese-rules',
+function gnugoStarten(seed, stufe = opt.stufe) {
+  const p = spawn(opt.gnugo, ['--mode', 'gtp', '--level', String(stufe), '--chinese-rules',
                               '--komi', String(KOMI), '--seed', String(seed),
                               ...(opt.gnugoAufgabe ? [] : ['--never-resign'])], {stdio: ['pipe', 'pipe', 'pipe']});
   let puffer = '', warte = [], stderr = '';
@@ -174,12 +180,12 @@ function setze(board, i, f) {
    nachgespielt) bleibt als Gegenprobe; stürzt es wieder ab, wird die
    Partie als abgebrochen gezählt und nicht gewertet. */
 const MAX_NEUSTARTS = 1;
-function gnugoMitNeustart(seed) {
+function gnugoMitNeustart(seed, stufe = opt.stufe) {
   const verlauf = [];
   let g = null, versuch = 0, neustarts = 0;
   async function starte() {
     if (g) g.ende();
-    g = gnugoStarten(seed + 7919 * versuch);
+    g = gnugoStarten(seed + 7919 * versuch, stufe);
     await g.frage('boardsize 19'); await g.frage('clear_board'); await g.frage('komi ' + KOMI);
     for (const z of verlauf) await g.frage(z);
   }
@@ -214,6 +220,11 @@ async function partieSpielen(nr) {
   const seed = opt.seed * 100000 + nr;
   const g = gnugoMitNeustart(seed);
   await g.starte();
+  /* Orakel: eigenes GNU Go, spielt jeden Zug mit, zieht nie selbst. */
+  const o = opt.orakel ? gnugoMitNeustart(seed + 50000, opt.orakel) : null;
+  const orakel = {zuege: 0, tot: 0, krit: 0, verteidigt: 0, angegriffen: 0};
+  E.setzeLebensurteil(null);
+  if (o) await o.starte();
   Math.random = mulberry32(seed);
   E.neuePartie(); E.setzeKrisenDauer(null);
   if (E.wurzel) E.wurzel(true);
@@ -221,11 +232,13 @@ async function partieSpielen(nr) {
   const hist = new Set([E.computeZobrist(board)]);
   let ko = null, last = null, mc = 0, paesse = 0, aufgabe = null;
   const zuege = [], sims = [], schaetzung = {};
+  const mitspielen = async (farbe, i) => { if (o) await o.frage(`play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`); };
   let vorgabeSteine = [];
   if (opt.vorgabe >= 2) {
     const befehl = `fixed_handicap ${opt.vorgabe}`;
     vorgabeSteine = (await g.frage(befehl)).split(/\s+/).filter(Boolean);
     g.merke(befehl);   /* für einen Neustart mit nachzuspielen */
+    if (o) { await o.frage(befehl); o.merke(befehl); }
     for (const v of vorgabeSteine) board[vonGtp(v)] = 1;
     hist.add(E.computeZobrist(board));
   }
@@ -236,17 +249,29 @@ async function partieSpielen(nr) {
       let i;
       if (f === wir) {
         Object.assign(E.PARAMS, DEFAULT, {adaptiveBudgetEnabled: 0}, opt.ki);
+        let u = null;
+        if (o) {
+          u = urteilAusGtp(await o.frage('dragon_status'), await o.frage('dragon_stones'), board, vonGtp);
+          E.setzeLebensurteil(u);
+          orakel.zuege++; orakel.tot += u.toteSteine.length; orakel.krit += u.krit.length;
+        }
         const r = E.getAIMove(board, f, Array.from(hist), {...caps}, mc, 'hard', 1, ko, last);
         if (r.type === 'resign') { aufgabe = f; break; }
         i = r.type === 'stone' ? r.y * 19 + r.x : -1;
         const m = /MCTS (\d+) Sims/.exec(r.info || ''); if (m) sims.push(+m[1]);
         await g.frage(`play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`);
+        await mitspielen(farbe, i);
+        if (u) for (const k of u.krit) {
+          if (k.farbe === f && i === k.verteidigung) orakel.verteidigt++;
+          if (k.farbe !== f && i === k.angriff) orakel.angegriffen++;
+        }
       } else {
         i = vonGtp(await g.frage(`genmove ${farbe}`));
         if (i === -2) { aufgabe = f; break; }
         /* genmove legt den Zug bei GNU Go selbst; für einen Neustart muss er
            als play im Verlauf stehen. */
         g.merke(`play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`);
+        await mitspielen(farbe, i);
       }
       if (i < 0) { paesse++; ko = null; zuege.push('pass'); }
       else {
@@ -290,9 +315,10 @@ async function partieSpielen(nr) {
             gnugoStand, endstand, unsereZaehlung: unsereZaehlung(board), zuegeAnzahl: mc,
             simsMittel: sims.length ? Math.round(sims.reduce((x, y) => x + y, 0) / sims.length) : null,
             neustarts: g.neustarts(), schaetzung,
+            ...(o ? {orakel: {stufe: opt.orakel, ...orakel, neustarts: o.neustarts()}} : {}),
             wurzel: E.wurzel ? E.wurzel(true) : undefined,
             zuege};
-  } finally { g.ende(); }
+  } finally { g.ende(); if (o) o.ende(); E.setzeLebensurteil(null); }
 }
 
 (async () => {

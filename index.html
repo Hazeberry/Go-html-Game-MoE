@@ -1762,6 +1762,13 @@ globalThis.PARAMS = {
      Selbstspiel 53,6 % (p = 0,17); nachgemessen mit ausgespielten Partien
      +8,9 (p = 0,35) und 45,6 % (p = 0,09). Kein Default. 0 = aus, bitgenau. */
   gebietFreiheit:     0,
+  /* Gebiet mit Sicherheit: Die Bouzy-Karte von gebietZug zaehlt kritische
+     Gruppen nur, wenn der Zug sie haelt, bei 1 zudem tote Gruppen nicht,
+     bei 2 schon (siehe setzeLebensurteil). Wirkt nur mit einem
+     Lebensurteil von aussen, bisher GNU Go als Orakel (gnugo-duell.js
+     --orakel; docs/gebiet-sicher.md). 1 schadet: Die KI antwortet nicht
+     mehr bei Gruppen, die als tot gelten. 0 = aus, bitgenau. */
+  gebietSicher:       0,
   /* Muster aus GNU-Go-Zuegen: Jeder Kandidat an der Wurzel bekommt
      musterGewicht x musterWert(Zug). musterWert sagt, wie viel haeufiger als
      im Schnitt GNU Go (Stufe 10) einen Zug mit diesem 3x3-Muster, diesem
@@ -3000,8 +3007,51 @@ const _tbWert = [new Int32Array(BOARD_SIZE), new Int32Array(BOARD_SIZE)];
 const _tbBesucht = new Int32Array(BOARD_SIZE);
 let _tbStempel = 0;
 
+/* Gebiet mit Sicherheit (PARAMS.gebietSicher): ein Lebensurteil fuer die
+   Bouzy-Karte von gebietZug, endTieBreak und gegnerGebiet. Das Urteil gilt
+   fuer die Stellung an der Wurzel und kommt von aussen
+   (setzeLebensurteil), bisher nur von GNU Go in gnugo-duell.js --orakel;
+   ohne Urteil oder bei 0 aendert sich nichts.
+     tot:  Uint8Array, Farbe des Steins, wenn er zu einer toten Gruppe
+           gehoert, sonst 0; toteSteine: die Indizes dazu.
+     krit: [{farbe, steine, angriff, verteidigung}], kritische Gruppen.
+   Tote Steine fehlen in der Karte, an der Wurzel wie nach jedem Kandidaten.
+   Kritisch heisst: Wer zuerst zieht, entscheidet. Nach dem Zug des
+   Ziehenden ist der Gegner dran; die eigene kritische Gruppe zaehlt also
+   nur, wenn der Zug ihr Verteidigungspunkt ist, die fremde nur dann nicht,
+   wenn der Zug ihr Angriffspunkt ist. Haengt der neue Stein an Steinen,
+   die so wegfallen, faellt seine Kette mit weg. */
+let _lebensUrteil = null;
+function setzeLebensurteil(u) { _lebensUrteil = u; }
+const _lsWurzel = new Uint8Array(BOARD_SIZE), _lsNb = new Uint8Array(BOARD_SIZE);
+function lsAktiv() { return PARAMS.gebietSicher > 0 && _lebensUrteil !== null; }
+function lsOhneTote(board) {
+  const u = _lebensUrteil;
+  _lsWurzel.set(board);
+  for (const s of u.toteSteine) if (_lsWurzel[s] === u.tot[s]) _lsWurzel[s] = 0;
+  return _lsWurzel;
+}
+/* nb: Brett nach dem Zug i von color (Schlaege schon ausgefuehrt). Gibt
+   eine Kopie zurueck, nb bleibt unberuehrt. */
+function lsNach(nb, i, color) {
+  const u = _lebensUrteil, b = _lsNb;
+  b.set(nb);
+  if (PARAMS.gebietSicher !== 2) for (const s of u.toteSteine) if (b[s] === u.tot[s]) b[s] = 0;
+  for (const k of u.krit) {
+    if (k.farbe === color ? i === k.verteidigung : i !== k.angriff) continue;
+    for (const s of k.steine) if (b[s] === k.farbe) b[s] = 0;
+  }
+  if (i >= 0 && b[i] === color) {
+    let haengt = false;
+    for (const n of NEIGHBORS[i]) if (nb[n] === color && b[n] === 0) haengt = true;
+    if (haengt) for (const s of floodFill(b, i).group) b[s] = 0;
+  }
+  return b;
+}
+
 function primeEndTieBreak(board) {
   const N = BOARD_SIZE, L = _tbEbenen;
+  if (lsAktiv() && PARAMS.gebietSicher !== 2) board = lsOhneTote(board);
   _tbBrett.set(board);
   for (let i = 0; i < N; i++) L[i] = board[i] === 1 ? 128 : board[i] === 2 ? -128 : 0;
   for (let k = 1; k <= BOUZY_EBENEN; k++) {
@@ -3227,7 +3277,7 @@ function evalEndgame(board, i, color, mc) {
     if (board[n] === opp && countLiberties(board, n, 2) === 1) s += PARAMS.endOppAtari;
   }
   if (PARAMS.endTieBreak > 0 && _tbValid) {
-    const d = (tbBilanzNach(_evalScratch) - _tbBilanz) * (color === 1 ? 1 : -1);
+    const d = (tbBilanzNach(lsAktiv() ? lsNach(_evalScratch, i, color) : _evalScratch) - _tbBilanz) * (color === 1 ? 1 : -1);
     s += PARAMS.endTieBreak * Math.max(-1, Math.min(1, d / 20));
   }
   return s + Math.random() * 0.5;
@@ -3566,7 +3616,7 @@ function evaluateMove(board, i, color, mc, emptyFields) {
     const nb = _gzScratch;
     nb.set(board); nb[i] = color;
     removeDeadGroups(nb, color === 1 ? 2 : 1, i);
-    let gz = PARAMS.gebietZug * (tbBilanzNach(nb) - _tbBilanz) * (color === 1 ? 1 : -1);
+    let gz = PARAMS.gebietZug * (tbBilanzNach(lsAktiv() ? lsNach(nb, i, color) : nb) - _tbBilanz) * (color === 1 ? 1 : -1);
     /* Gebiet nach Freiheiten (PARAMS.gebietFreiheit): der Gewinn einer
        schwachen neuen Kette zaehlt nur anteilig. */
     if (PARAMS.gebietFreiheit > 0 && gz > 0) {
@@ -4523,7 +4573,7 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
       const i = s.m.idx;
       _ggScratch.set(board); _ggScratch[i] = opp;
       if (removeDeadGroups(_ggScratch, aiColor, i) === 0 && countLiberties(_ggScratch, i, 1) === 0) continue;
-      const d = (tbBilanzNach(_ggScratch) - _tbBilanz) * vz;
+      const d = (tbBilanzNach(lsAktiv() ? lsNach(_ggScratch, i, opp) : _ggScratch) - _tbBilanz) * vz;
       if (d > 0) _gegnerWerte.set(i, (_gegnerWerte.get(i) || 0) + PARAMS.gegnerGebiet * PARAMS.gebietZug * d);
     }
   }
