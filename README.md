@@ -240,6 +240,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 |---|---|---|
 | **`musterGewicht` 200 (Muster aus GNU-Go-Zügen: 3×3-Umgebung, Abstand zum letzten Zug, Linie)** | **gegen GNU Go Endstand +102,8 Punkte über 240 ausgespielte Paare (95 %: +93 bis +112, p = 8 · 10⁻⁵⁷), Siege 13 → 156 von 240; im Selbstspiel 98,6 % über 360 Partien** | **eingebaut** — Default 200; zum ersten Mal gewinnt die KI gegen GNU Go mit neun Vorgabesteinen die Mehrzahl der Partien (`docs/muster.md`) |
 | `musterTabelle` 2 (zweite Mustertabelle: gemeinsam gelernt, taktisches Merkmal, doppelt so viele Lehrdaten) | sagt GNU Gos Zug ab Zug 81 in 27,7 % statt 19,3 % voraus; gegen GNU Go aber Endstand −11,0 über 240 Paare (p = 0,04), im Selbstspiel 44,4 % über 360 Partien (p = 0,035) | verworfen — wieder entfernt; bessere Vorhersage ist nicht bessere Zugwahl (`docs/muster-ausbau.md`) |
+| `gebietSicher` 2 mit GNU Go als Orakel (Lebensurteil: kritische Gruppen zählen in `gebietZug` nur, wenn der Zug sie hält) | gegen GNU Go Endstand +13,6 über 240 Paare, 95 %: [+3,7; +23,4], p = 0,007; die erste Messung (−48,8) war durch einen Fehler ungültig, die KI passte vorzeitig | Obergrenze belegt, kein Default (braucht GNU Go); Stufe 2: eigenes Urteil über kritische Gruppen (`docs/gebiet-sicher.md`) |
 | `mctsValueScale` 200 statt 350 | 65:35 über 100 gepaarte Partien, p = 0,0035; gegen GNU Go nachgeprüft: 350 −14,2 Punkte über 60 Paare (p = 0,30) | **eingebaut** (≈ +108 Elo im Selbstspiel); GNU Go widerspricht nicht (`docs/wertskala-gnugo.md`) |
 | Kurve 100/150/200/250/300/500/1000 | Plateau bei 150–250, Abfall zu beiden Seiten | Mitte des Plateaus gewählt, nicht der Höchstwert |
 | `endTieBreak` 1 statt 0 (Gleichstand im Endspiel ordnen statt losen) | 57,2 % und in der Wiederholung 59,4 % über je 360 Partien, p = 0,006 und 0,0003 (vor `gebietZug`); gegen GNU Go nachgeprüft: 0 statt 1 +0,4 Punkte über 60 Paare (p = 0,97) | **eingebaut** — Default 1; gegen GNU Go ohne Wirkung, neben `gebietZug` vermutlich überflüssig (`docs/gleichstand-gnugo.md`) |
@@ -2297,6 +2298,18 @@ deutlich öfter voraus. Gegen GNU Go spielte sie trotzdem schlechter (−11,0
 über 240 Paare), im Selbstspiel ebenso (44,4 %). Die Piloten hatten +24
 und +11 gezeigt, das war Rauschen. Verworfen und wieder entfernt:
 [`docs/muster-ausbau.md`](docs/muster-ausbau.md).
+
+**Gebiet mit Sicherheit: erst die Obergrenze.** `gebietZug` behandelt alle
+Steine als lebendig. Wie viel ein Urteil über Leben und Tod brächte,
+zeigt ein Orakel: GNU Go auf Stufe 10 sagt der KI vor jedem Zug, welche
+Gruppen kritisch sind. Eine kritische Gruppe zählt dann nur, wenn der Zug
+sie hält. Gegen GNU Go bringt das **+13,6 Punkte** über 240 Paare (p =
+0,007). Tote Gruppen ganz wegzulassen schadet dagegen: Die KI antwortet
+dann nicht mehr bei Steinen, die als tot gelten, und der Gegner belebt sie
+wieder. Die erste Messung ergab −48,8, aber nur wegen eines Fehlers: Jeder
+Zug außer dem rettenden sackte ab, und die KI passte vorzeitig. Als
+Nächstes kommt ein eigenes Urteil, zuerst offline gegen GNU Gos geprüft:
+[`docs/gebiet-sicher.md`](docs/gebiet-sicher.md).
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem

@@ -214,3 +214,44 @@ Endpunkt und Entscheidung wie in §5:
 | sonst | Das Lebensurteil in `gebietZug` ist nicht der Hebel. Der Haken wird wieder entfernt. |
 
 **Sekundär, ohne Anspruch:** wie §5, dazu vorzeitige Pässe je Arm.
+
+---
+
+## 9. Nachtrag: Ergebnis der Wiederholung, Stufe 2 folgt (12.10.2026)
+
+Gelaufen auf dem Merge-Commit `2816458`, Seed 203, beide Arme neu, keine
+Partie abgebrochen. Daten: `daten/sicher2-gnugo.json`.
+
+| | A (ohne Orakel) | B (Orakel, `gebietSicher` 2) | B − A |
+|---|---:|---:|---|
+| **Endstand** | +21,6 | +35,2 | **+13,6** (SD 77,5), 95 %: [+3,7; +23,4], p = 0,007 |
+| nach Zug 120 | +72,0 | +61,4 | −10,6, p = 3·10⁻⁵ |
+| nach Zug 200 | +25,0 | +47,9 | +22,9, p = 3·10⁻⁷ (176 Paare) |
+
+- B ist in 134 Paaren besser, in 103 schlechter. Von den 16 Teilläufen
+  sind 12 positiv.
+- Siege der KI: A 149 von 240, B 156 von 240.
+- Vorzeitige Pässe: A 31, B 33. Der Fehler aus §7 ist behoben.
+- Partielänge: Ø 239 Züge (A) gegen 256 (B).
+- Arm B spielt in 28,1 % seiner Züge den Verteidigungs- oder
+  Angriffspunkt einer kritischen Gruppe (5964 Verteidigungen, 2666
+  Angriffe in 30 668 Zügen).
+
+**Entscheidung nach §8: B ist signifikant besser, es folgt Stufe 2.** Ein
+eigenes Urteil über kritische Gruppen wird gebaut und zuerst offline gegen
+GNU Gos Urteil geprüft. Der Haken `gebietSicher` bleibt dafür in
+`index.html`, mit Default 0.
+
+**Einordnung:**
+- **Die Obergrenze ist bescheiden.** +13,6 Punkte mit dem Urteil von GNU Go
+  auf Stufe 10 sind wenig gegen die Muster (+102,8). Ein eigenes Urteil
+  wird schlechter sein als GNU Gos. Es lohnt sich nur, wenn es einen großen
+  Teil dieser 13,6 Punkte erreicht, und genau das prüft Stufe 2 zuerst
+  offline.
+- **Nach Zug 120 liegt B hinten, am Ende vorn.** Das Urteil kostet im
+  Mittelspiel Gebiet, wohl durch Verteidigungszüge, die nichts einbringen.
+  Später gewinnt es mehr zurück: Gruppen überleben, fremde sterben.
+- **Die erste Messung zeigt, wie empfindlich der Term ist.** Ein Fehler im
+  Bezugspunkt machte aus einem Gewinn einen Verlust von fast 50 Punkten.
+  Ein eigenes Urteil muss gegen dieselben Tests laufen
+  (`tests/gebiet-sicher.js`).
