@@ -142,3 +142,47 @@ Partielänge, Laufzeit je Zug.
   die KI mit Tabelle 2 spielt, sieht wieder etwas anders aus.
 - Das Gewicht ist nur grob bestimmt. Ein besseres Gewicht kann es geben;
   die Messung prüft nur 200.
+
+---
+
+## 7. Nachtrag: Ergebnis, Default bleibt 1, Tabelle 2 entfernt (12.10.2026)
+
+Gelaufen auf dem Merge-Commit `6edae5d`. Daten: `daten/ausbau-gnugo.json`
+(M1, beide Arme) und `daten/ausbau-20261180.json` bis `…83.json`
+(Hash-Listen M2).
+
+**M1, gegen GNU Go (primär), 240 Paare, Seed 202, ausgespielt:**
+
+| | A (Tabelle 1) | B (Tabelle 2) | B − A |
+|---|---:|---:|---|
+| **Endstand** | +26,6 | +15,7 | **−11,0** (SD 82,9), 95 %: [−21,5; −0,4], p = 0,04 |
+| nach Zug 120 | +74,1 | +80,3 | +6,2, p = 0,04 |
+| nach Zug 200 | +23,7 | +15,2 | −8,5, p = 0,06 (152 Paare) |
+
+- B ist in 99 Paaren besser, in 137 schlechter. Von den 16 Teilläufen sind
+  12 negativ.
+- Siege der KI: A 154 von 240, B 143 von 240.
+- Partielänge: Ø 239 Züge (A) gegen 232 (B).
+
+**M2, Selbstspiel (Kontrolle):** B gewinnt **160 von 360 Partien, 44,4 %**
+(z = −2,11, p = 0,035, 95-%-KI 39,4–49,6 %). Teilläufe: 39, 37, 43 und 41
+von 90.
+
+**Entscheidung nach §5: Default `musterTabelle` bleibt 1.** M1 ist nicht
+besser, sondern signifikant schlechter, M2 ebenfalls.
+
+**Folgen:**
+- Tabelle 2, `musterTaktik` und der Schalter `musterTabelle` sind wieder aus
+  `index.html` entfernt (82 KB für einen verworfenen Schalter). Der Stand
+  der Messung ist über Commit `6edae5d` reproduzierbar. Die Werkzeuge in
+  `auswertung/muster.js` (`--verfahren mm`, `--taktik`) bleiben.
+- Die Piloten (+24,5 und +11,4 bei Gewicht 200) waren Rauschen. Bei 30
+  Paaren und einer Streuung um 80–90 Punkte ist das ohne Weiteres möglich.
+  Genau dafür gibt es die Vorabfestlegung mit 240 Paaren.
+- **Bessere Vorhersage ist nicht bessere Zugwahl.** Die neue Tabelle traf
+  GNU Gos Zug deutlich öfter. Sie gibt aber starke Werte für taktische
+  Merkmale, besonders für Retten und Schlagen. Mit Gewicht 200 überstimmen
+  diese Werte die übrige Bewertung öfter. Das Muster der Schalter, die
+  Ketten um jeden Preis retten (`leseRettung`), taucht hier wieder auf. Für
+  den nächsten Schritt heißt das: Die Bewertung braucht ein besseres Urteil
+  darüber, ob eine Gruppe lebt, nicht noch mehr Nachahmung.
