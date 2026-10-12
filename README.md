@@ -2411,4 +2411,15 @@ eines ist.
 
 ## Lizenz
 
-Siehe [LICENSE](LICENSE).
+[PolyForm Noncommercial License 1.0.0](LICENSE)
+(<https://polyformproject.org/licenses/noncommercial/1.0.0>).
+
+Kurz und unverbindlich: Benutzen, ändern und weitergeben ist für jeden
+nichtkommerziellen Zweck erlaubt, etwa privat, zum Lernen, für die
+Forschung, in Schulen und gemeinnützigen Einrichtungen. Wer weitergibt,
+gibt die Lizenz und die Zeile `Required Notice:` aus der Datei
+[LICENSE](LICENSE) mit. Kommerzielle Nutzung braucht eine eigene
+Erlaubnis. Verbindlich ist allein der englische Lizenztext.
+
+Bis Commit `6557635` stand das Projekt unter der MIT-Lizenz. Wer eine
+Fassung bis dahin bezogen hat, darf diese weiter unter MIT nutzen.
