@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="940" height="960" viewBox="0 0 940 960" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="titel beschr">
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="1000" viewBox="0 0 940 1000" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="titel beschr">
 <title id="titel">Gemessene Änderungen an der Go-KI: Siegrate im Selbstspiel</title>
-<desc id="beschr">musterGewicht 200: 98,6 % aus 360 Partien, eingebaut; gebietZug 80: 83,3 % aus 360 Partien, eingebaut; leseVerzicht 1: 72,8 % aus 360 Partien, eingebaut; mctsValueScale 200: 65,0 % aus 100 Partien, eingebaut; Doppelte Suche: 60,6 % aus 360 Partien, Maßstab; endTieBreak 1: 58,3 % aus 720 Partien, eingebaut; leseRettung 1: 58,1 % aus 360 Partien, kein Default, Schalter im Dashboard; wurzelFrisch 1: 55,3 % aus 360 Partien, eingebaut; captureCap 200: 54,0 % aus 1440 Partien, kein Default, Schalter im Dashboard; augenSchutz + passUnabwendbar: 53,9 % aus 360 Partien, eingebaut; openLineWeight 160: 53,9 % aus 360 Partien, verworfen; quickRettung 1: 51,9 % aus 360 Partien, verworfen; krisenKandidaten: 51,7 % aus 720 Partien, verworfen; atariVerzicht 1: 50,6 % aus 360 Partien, verworfen; openContactResponse: 48,8 % aus 80 Partien, verworfen; gebietFreiheit 1: 45,6 % aus 360 Partien, verworfen; raumGewicht + raumZug: 45,3 % aus 360 Partien, verworfen; phaseNormalize: 42,5 % aus 80 Partien, verworfen; netMaxBlend 0,3: 35,0 % aus 120 Partien, verworfen</desc>
-<rect width="940" height="960" rx="8" fill="#1a1a19"/>
+<desc id="beschr">musterGewicht 200: 98,6 % aus 360 Partien, eingebaut; gebietZug 80: 83,3 % aus 360 Partien, eingebaut; leseVerzicht 1: 72,8 % aus 360 Partien, eingebaut; mctsValueScale 200: 65,0 % aus 100 Partien, eingebaut; Doppelte Suche: 60,6 % aus 360 Partien, Maßstab; endTieBreak 1: 58,3 % aus 720 Partien, eingebaut; leseRettung 1: 58,1 % aus 360 Partien, kein Default, Schalter im Dashboard; wurzelFrisch 1: 55,3 % aus 360 Partien, eingebaut; captureCap 200: 54,0 % aus 1440 Partien, kein Default, Schalter im Dashboard; augenSchutz + passUnabwendbar: 53,9 % aus 360 Partien, eingebaut; musterTabelle 2: 44,4 % aus 360 Partien, verworfen; openLineWeight 160: 53,9 % aus 360 Partien, verworfen; quickRettung 1: 51,9 % aus 360 Partien, verworfen; krisenKandidaten: 51,7 % aus 720 Partien, verworfen; atariVerzicht 1: 50,6 % aus 360 Partien, verworfen; openContactResponse: 48,8 % aus 80 Partien, verworfen; gebietFreiheit 1: 45,6 % aus 360 Partien, verworfen; raumGewicht + raumZug: 45,3 % aus 360 Partien, verworfen; phaseNormalize: 42,5 % aus 80 Partien, verworfen; netMaxBlend 0,3: 35,0 % aus 120 Partien, verworfen</desc>
+<rect width="940" height="1000" rx="8" fill="#1a1a19"/>
 <text x="24" y="36" font-size="18" font-weight="600" fill="#ffffff">Was hat die KI stärker gemacht?</text>
 <text x="24" y="58" font-size="13" fill="#c3c2b7">Siegrate der Änderung im Selbstspiel gegen den Stand ohne sie, 95-%-Konfidenzintervall. 50 % = kein Unterschied.</text>
 <circle cx="30.0" cy="80" r="6" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
@@ -12,24 +12,24 @@
 <text x="400.4" y="84" font-size="12.5" fill="#c3c2b7">verworfen</text>
 <rect x="476.8" y="75" width="10" height="10" rx="1.5" fill="#c3c2b7" stroke="#1a1a19" stroke-width="2"/>
 <text x="493.79999999999995" y="84" font-size="12.5" fill="#c3c2b7">Maßstab</text>
-<line x1="344.0" y1="104" x2="344.0" y2="868" stroke="#2c2c2a" stroke-width="1"/>
-<text x="344.0" y="886" font-size="11.5" fill="#898781" text-anchor="middle">30 %</text>
-<line x1="388.0" y1="104" x2="388.0" y2="868" stroke="#2c2c2a" stroke-width="1"/>
-<text x="388.0" y="886" font-size="11.5" fill="#898781" text-anchor="middle">40 %</text>
-<line x1="432.0" y1="104" x2="432.0" y2="868" stroke="#898781" stroke-width="1" stroke-dasharray="4 3"/>
-<text x="432.0" y="886" font-size="11.5" fill="#898781" text-anchor="middle">50 %</text>
-<line x1="476.0" y1="104" x2="476.0" y2="868" stroke="#2c2c2a" stroke-width="1"/>
-<text x="476.0" y="886" font-size="11.5" fill="#898781" text-anchor="middle">60 %</text>
-<line x1="520.0" y1="104" x2="520.0" y2="868" stroke="#2c2c2a" stroke-width="1"/>
-<text x="520.0" y="886" font-size="11.5" fill="#898781" text-anchor="middle">70 %</text>
-<line x1="564.0" y1="104" x2="564.0" y2="868" stroke="#2c2c2a" stroke-width="1"/>
-<text x="564.0" y="886" font-size="11.5" fill="#898781" text-anchor="middle">80 %</text>
-<line x1="608.0" y1="104" x2="608.0" y2="868" stroke="#2c2c2a" stroke-width="1"/>
-<text x="608.0" y="886" font-size="11.5" fill="#898781" text-anchor="middle">90 %</text>
-<line x1="652.0" y1="104" x2="652.0" y2="868" stroke="#2c2c2a" stroke-width="1"/>
-<text x="652.0" y="886" font-size="11.5" fill="#898781" text-anchor="middle">100 %</text>
-<line x1="322" y1="868" x2="652" y2="868" stroke="#383835" stroke-width="1"/>
-<text x="487" y="906" font-size="12" fill="#c3c2b7" text-anchor="middle">Siegrate im Selbstspiel</text>
+<line x1="344.0" y1="104" x2="344.0" y2="908" stroke="#2c2c2a" stroke-width="1"/>
+<text x="344.0" y="926" font-size="11.5" fill="#898781" text-anchor="middle">30 %</text>
+<line x1="388.0" y1="104" x2="388.0" y2="908" stroke="#2c2c2a" stroke-width="1"/>
+<text x="388.0" y="926" font-size="11.5" fill="#898781" text-anchor="middle">40 %</text>
+<line x1="432.0" y1="104" x2="432.0" y2="908" stroke="#898781" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="432.0" y="926" font-size="11.5" fill="#898781" text-anchor="middle">50 %</text>
+<line x1="476.0" y1="104" x2="476.0" y2="908" stroke="#2c2c2a" stroke-width="1"/>
+<text x="476.0" y="926" font-size="11.5" fill="#898781" text-anchor="middle">60 %</text>
+<line x1="520.0" y1="104" x2="520.0" y2="908" stroke="#2c2c2a" stroke-width="1"/>
+<text x="520.0" y="926" font-size="11.5" fill="#898781" text-anchor="middle">70 %</text>
+<line x1="564.0" y1="104" x2="564.0" y2="908" stroke="#2c2c2a" stroke-width="1"/>
+<text x="564.0" y="926" font-size="11.5" fill="#898781" text-anchor="middle">80 %</text>
+<line x1="608.0" y1="104" x2="608.0" y2="908" stroke="#2c2c2a" stroke-width="1"/>
+<text x="608.0" y="926" font-size="11.5" fill="#898781" text-anchor="middle">90 %</text>
+<line x1="652.0" y1="104" x2="652.0" y2="908" stroke="#2c2c2a" stroke-width="1"/>
+<text x="652.0" y="926" font-size="11.5" fill="#898781" text-anchor="middle">100 %</text>
+<line x1="322" y1="908" x2="652" y2="908" stroke="#383835" stroke-width="1"/>
+<text x="487" y="946" font-size="12" fill="#c3c2b7" text-anchor="middle">Siegrate im Selbstspiel</text>
 <text x="732" y="100" font-size="11.5" font-weight="600" fill="#c3c2b7" text-anchor="end">Siegrate</text>
 <text x="754" y="100" font-size="11.5" font-weight="600" fill="#c3c2b7">gegen GNU Go</text>
 <text x="310" y="125" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">musterGewicht 200</text>
@@ -112,78 +112,86 @@
 <circle cx="449.1" cy="488" r="6" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
 <text x="732" y="492" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">53,9 %</text>
 <text x="754" y="492" font-size="12.5" fill="#ffffff">+217 Endstand</text>
-<text x="310" y="525" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">openLineWeight 160</text>
-<text x="310" y="540" font-size="11" fill="#898781" text-anchor="end">Eröffnung: 3.–4. Linie statt Rand · 360 Partien</text>
-<line x1="426.4" y1="528" x2="471.5" y2="528" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="426.4" y1="524" x2="426.4" y2="532" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="471.5" y1="524" x2="471.5" y2="532" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<circle cx="449.1" cy="528" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
-<text x="732" y="532" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">53,9 %</text>
-<text x="754" y="532" font-size="12.5" fill="#ffffff">−6,0 ohne Vorgabe (n. s.)</text>
-<text x="310" y="565" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">quickRettung 1</text>
-<text x="310" y="580" font-size="11" fill="#898781" text-anchor="end">Rettung in der Suche nur, wenn sie wirkt · 360 Partien</text>
-<line x1="417.9" y1="568" x2="463.1" y2="568" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="417.9" y1="564" x2="417.9" y2="572" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="463.1" y1="564" x2="463.1" y2="572" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<circle cx="440.6" cy="568" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
-<text x="732" y="572" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">51,9 %</text>
-<text x="754" y="572" font-size="12.5" fill="#ffffff">−14,9 Endstand (n. s.)</text>
-<text x="310" y="605" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">krisenKandidaten</text>
-<text x="310" y="620" font-size="11" fill="#898781" text-anchor="end">Atari-Rettung immer in die Suche · 720 Partien</text>
-<line x1="423.3" y1="608" x2="455.3" y2="608" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="423.3" y1="604" x2="423.3" y2="612" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="455.3" y1="604" x2="455.3" y2="612" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<circle cx="439.3" cy="608" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
-<text x="732" y="612" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">51,7 %</text>
-<text x="754" y="612" font-size="12.5" fill="#ffffff">+7,5 Endstand (n. s.)</text>
-<text x="310" y="645" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">atariVerzicht 1</text>
-<text x="310" y="660" font-size="11" fill="#898781" text-anchor="end">keine aussichtslosen Ataris · 360 Partien</text>
-<line x1="411.8" y1="648" x2="457.0" y2="648" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="411.8" y1="644" x2="411.8" y2="652" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="457.0" y1="644" x2="457.0" y2="652" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<circle cx="434.4" cy="648" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
-<text x="732" y="652" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">50,6 %</text>
-<text x="754" y="652" font-size="12.5" fill="#ffffff">+2,4 Endstand (n. s.)</text>
-<text x="310" y="685" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">openContactResponse</text>
-<text x="310" y="700" font-size="11" fill="#898781" text-anchor="end">Kontaktantwort in der Eröffnung · 80 Partien</text>
-<line x1="379.7" y1="688" x2="473.8" y2="688" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="379.7" y1="684" x2="379.7" y2="692" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="473.8" y1="684" x2="473.8" y2="692" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<circle cx="426.5" cy="688" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
-<text x="732" y="692" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">48,8 %</text>
-<text x="754" y="692" font-size="12.5" fill="#898781">–</text>
-<text x="310" y="725" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">gebietFreiheit 1</text>
-<text x="310" y="740" font-size="11" fill="#898781" text-anchor="end">Gebiet schwacher Ketten, nachgemessen · 360 Partien</text>
-<line x1="390.1" y1="728" x2="435.2" y2="728" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="390.1" y1="724" x2="390.1" y2="732" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="435.2" y1="724" x2="435.2" y2="732" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<circle cx="412.4" cy="728" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
-<text x="732" y="732" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">45,6 %</text>
-<text x="754" y="732" font-size="12.5" fill="#ffffff">+8,9 Endstand (n. s.)</text>
-<text x="310" y="765" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">raumGewicht + raumZug</text>
-<text x="310" y="780" font-size="11" fill="#898781" text-anchor="end">Raumrisiko im Laufkampf · 360 Partien</text>
-<line x1="388.9" y1="768" x2="433.9" y2="768" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="388.9" y1="764" x2="388.9" y2="772" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="433.9" y1="764" x2="433.9" y2="772" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<circle cx="411.2" cy="768" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
-<text x="732" y="772" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">45,3 %</text>
-<text x="754" y="772" font-size="12.5" fill="#898781">–</text>
-<text x="310" y="805" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">phaseNormalize</text>
-<text x="310" y="820" font-size="11" fill="#898781" text-anchor="end">Experten vor dem Blend normieren · 80 Partien</text>
-<line x1="353.9" y1="808" x2="447.1" y2="808" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="353.9" y1="804" x2="353.9" y2="812" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="447.1" y1="804" x2="447.1" y2="812" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<circle cx="399.0" cy="808" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
-<text x="732" y="812" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">42,5 %</text>
+<text x="310" y="525" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">musterTabelle 2</text>
+<text x="310" y="540" font-size="11" fill="#898781" text-anchor="end">zweite Mustertabelle (MM, Taktik) · 360 Partien</text>
+<line x1="385.3" y1="528" x2="430.3" y2="528" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="385.3" y1="524" x2="385.3" y2="532" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="430.3" y1="524" x2="430.3" y2="532" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<circle cx="407.6" cy="528" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
+<text x="732" y="532" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">44,4 %</text>
+<text x="754" y="532" font-size="12.5" fill="#ffffff">−11,0 Endstand</text>
+<text x="310" y="565" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">openLineWeight 160</text>
+<text x="310" y="580" font-size="11" fill="#898781" text-anchor="end">Eröffnung: 3.–4. Linie statt Rand · 360 Partien</text>
+<line x1="426.4" y1="568" x2="471.5" y2="568" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="426.4" y1="564" x2="426.4" y2="572" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="471.5" y1="564" x2="471.5" y2="572" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<circle cx="449.1" cy="568" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
+<text x="732" y="572" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">53,9 %</text>
+<text x="754" y="572" font-size="12.5" fill="#ffffff">−6,0 ohne Vorgabe (n. s.)</text>
+<text x="310" y="605" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">quickRettung 1</text>
+<text x="310" y="620" font-size="11" fill="#898781" text-anchor="end">Rettung in der Suche nur, wenn sie wirkt · 360 Partien</text>
+<line x1="417.9" y1="608" x2="463.1" y2="608" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="417.9" y1="604" x2="417.9" y2="612" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="463.1" y1="604" x2="463.1" y2="612" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<circle cx="440.6" cy="608" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
+<text x="732" y="612" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">51,9 %</text>
+<text x="754" y="612" font-size="12.5" fill="#ffffff">−14,9 Endstand (n. s.)</text>
+<text x="310" y="645" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">krisenKandidaten</text>
+<text x="310" y="660" font-size="11" fill="#898781" text-anchor="end">Atari-Rettung immer in die Suche · 720 Partien</text>
+<line x1="423.3" y1="648" x2="455.3" y2="648" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="423.3" y1="644" x2="423.3" y2="652" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="455.3" y1="644" x2="455.3" y2="652" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<circle cx="439.3" cy="648" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
+<text x="732" y="652" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">51,7 %</text>
+<text x="754" y="652" font-size="12.5" fill="#ffffff">+7,5 Endstand (n. s.)</text>
+<text x="310" y="685" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">atariVerzicht 1</text>
+<text x="310" y="700" font-size="11" fill="#898781" text-anchor="end">keine aussichtslosen Ataris · 360 Partien</text>
+<line x1="411.8" y1="688" x2="457.0" y2="688" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="411.8" y1="684" x2="411.8" y2="692" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="457.0" y1="684" x2="457.0" y2="692" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<circle cx="434.4" cy="688" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
+<text x="732" y="692" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">50,6 %</text>
+<text x="754" y="692" font-size="12.5" fill="#ffffff">+2,4 Endstand (n. s.)</text>
+<text x="310" y="725" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">openContactResponse</text>
+<text x="310" y="740" font-size="11" fill="#898781" text-anchor="end">Kontaktantwort in der Eröffnung · 80 Partien</text>
+<line x1="379.7" y1="728" x2="473.8" y2="728" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="379.7" y1="724" x2="379.7" y2="732" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="473.8" y1="724" x2="473.8" y2="732" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<circle cx="426.5" cy="728" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
+<text x="732" y="732" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">48,8 %</text>
+<text x="754" y="732" font-size="12.5" fill="#898781">–</text>
+<text x="310" y="765" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">gebietFreiheit 1</text>
+<text x="310" y="780" font-size="11" fill="#898781" text-anchor="end">Gebiet schwacher Ketten, nachgemessen · 360 Partien</text>
+<line x1="390.1" y1="768" x2="435.2" y2="768" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="390.1" y1="764" x2="390.1" y2="772" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="435.2" y1="764" x2="435.2" y2="772" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<circle cx="412.4" cy="768" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
+<text x="732" y="772" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">45,6 %</text>
+<text x="754" y="772" font-size="12.5" fill="#ffffff">+8,9 Endstand (n. s.)</text>
+<text x="310" y="805" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">raumGewicht + raumZug</text>
+<text x="310" y="820" font-size="11" fill="#898781" text-anchor="end">Raumrisiko im Laufkampf · 360 Partien</text>
+<line x1="388.9" y1="808" x2="433.9" y2="808" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="388.9" y1="804" x2="388.9" y2="812" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="433.9" y1="804" x2="433.9" y2="812" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<circle cx="411.2" cy="808" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
+<text x="732" y="812" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">45,3 %</text>
 <text x="754" y="812" font-size="12.5" fill="#898781">–</text>
-<text x="310" y="845" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">netMaxBlend 0,3</text>
-<text x="310" y="860" font-size="11" fill="#898781" text-anchor="end">KataGo-Netz als Prior · 120 Partien</text>
-<line x1="331.0" y1="848" x2="405.1" y2="848" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="331.0" y1="844" x2="331.0" y2="852" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<line x1="405.1" y1="844" x2="405.1" y2="852" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
-<circle cx="366.0" cy="848" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
-<text x="732" y="852" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">35,0 %</text>
+<text x="310" y="845" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">phaseNormalize</text>
+<text x="310" y="860" font-size="11" fill="#898781" text-anchor="end">Experten vor dem Blend normieren · 80 Partien</text>
+<line x1="353.9" y1="848" x2="447.1" y2="848" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="353.9" y1="844" x2="353.9" y2="852" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="447.1" y1="844" x2="447.1" y2="852" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<circle cx="399.0" cy="848" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
+<text x="732" y="852" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">42,5 %</text>
 <text x="754" y="852" font-size="12.5" fill="#898781">–</text>
-<text x="24" y="930" font-size="11" fill="#898781">Gegen GNU Go: GNU Go 3.8 Stufe 1, neun Vorgabesteine für die KI, gepaarte Differenz in Punkten aus Sicht der KI.</text>
-<text x="24" y="946" font-size="11" fill="#898781">Neuere Selbstspiel-Messungen mit 120 Simulationen je Zug, Einzelheiten in docs/. Erzeugt mit auswertung/diagramm.js.</text>
+<text x="310" y="885" font-size="13" font-weight="600" fill="#ffffff" text-anchor="end">netMaxBlend 0,3</text>
+<text x="310" y="900" font-size="11" fill="#898781" text-anchor="end">KataGo-Netz als Prior · 120 Partien</text>
+<line x1="331.0" y1="888" x2="405.1" y2="888" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="331.0" y1="884" x2="331.0" y2="892" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<line x1="405.1" y1="884" x2="405.1" y2="892" stroke="#199e70" stroke-width="2" stroke-linecap="round"/>
+<circle cx="366.0" cy="888" r="5" fill="#1a1a19" stroke="#199e70" stroke-width="2.5"/>
+<text x="732" y="892" font-size="12.5" fill="#ffffff" text-anchor="end" style="font-variant-numeric: tabular-nums">35,0 %</text>
+<text x="754" y="892" font-size="12.5" fill="#898781">–</text>
+<text x="24" y="970" font-size="11" fill="#898781">Gegen GNU Go: GNU Go 3.8 Stufe 1, neun Vorgabesteine für die KI, gepaarte Differenz in Punkten aus Sicht der KI.</text>
+<text x="24" y="986" font-size="11" fill="#898781">Neuere Selbstspiel-Messungen mit 120 Simulationen je Zug, Einzelheiten in docs/. Erzeugt mit auswertung/diagramm.js.</text>
 </svg>

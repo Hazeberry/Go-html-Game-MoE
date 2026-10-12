@@ -26,6 +26,7 @@ const DATEN = [
   {name: 'wurzelFrisch 1', text: 'frische Wurzel bei übernommenem Baum', siege: 199, partien: 360, art: 'eingebaut', gnugo: '+25,7 Endstand'},
   {name: 'captureCap 200', text: 'Deckel gegen falsche Aufgaben', siege: 778, partien: 1440, art: 'offen', gnugo: ''},
   {name: 'augenSchutz + passUnabwendbar', text: 'eigene Augen nicht füllen, passen', siege: 194, partien: 360, art: 'eingebaut', gnugo: '+217 Endstand'},
+  {name: 'musterTabelle 2', text: 'zweite Mustertabelle (MM, Taktik)', siege: 160, partien: 360, art: 'verworfen', gnugo: '−11,0 Endstand'},
   {name: 'openLineWeight 160', text: 'Eröffnung: 3.–4. Linie statt Rand', siege: 194, partien: 360, art: 'verworfen', gnugo: '−6,0 ohne Vorgabe (n. s.)'},
   {name: 'quickRettung 1', text: 'Rettung in der Suche nur, wenn sie wirkt', siege: 187, partien: 360, art: 'verworfen', gnugo: '−14,9 Endstand (n. s.)'},
   {name: 'krisenKandidaten', text: 'Atari-Rettung immer in die Suche', siege: 372, partien: 720, art: 'verworfen', gnugo: '+7,5 Endstand (n. s.)'},

@@ -10,10 +10,8 @@
         Spiegelungen des Bretts.
      5. Bei > 0 ist jeder Kandidatenwert an der Wurzel genau evaluateMove +
         musterGewicht × musterWert.
-     6. Zweite Tabelle (musterTabelle 2, docs/muster-ausbau.md): Default 1;
-        das taktische Merkmal ist dasselbe wie in auswertung/muster.js;
-        musterWert bleibt unter Drehung und Spiegelung gleich; der
-        Wurzelwert folgt auch mit Tabelle 2 der Formel aus 5.
+     Die zweite Tabelle (musterTabelle, docs/muster-ausbau.md) ist gemessen,
+     verworfen und wieder entfernt; ihre Tests stehen in Commit 6edae5d.
 
    Aufruf:  node tests/muster.js [pfad/zur/index.html] */
 'use strict';
@@ -21,7 +19,7 @@ const fs = require('fs'), path = require('path');
 const {ladeKI, test, pruefe, pruefeGleich, laufeTests} = require('./rahmen');
 
 const KI = ladeKI({htmlPfad: process.argv[2] || undefined, mitNetz: false});
-const {PARAMS, BOARD_SIZE, getAIMove, removeDeadGroups, musterWert, musterSchluessel, musterTaktik, MUSTER_TABELLE, MUSTER_TABELLE_2,
+const {PARAMS, BOARD_SIZE, getAIMove, removeDeadGroups, musterWert, musterSchluessel, MUSTER_TABELLE,
        evaluateMove, buildCrisisMap, primeAreaCache, primeEndTieBreak} = KI;
 const auswertung = require(path.join(__dirname, '..', 'auswertung', 'muster.js'));
 auswertung.nutzeKI(KI);   /* keine zweite Engine laden */
@@ -122,72 +120,6 @@ test('musterGewicht > 0: Wurzelwert = Wert bei 0 + Gewicht × musterWert', () =>
       gemeinsam++;
       pruefe(Math.abs(wert - ohne.get(idx) - 400 * musterWert(b, idx, 1)) < 1e-6, `Kandidat ${idx}`);
     }
-    pruefe(gemeinsam > 0, 'gemeinsame Kandidaten');
-  } finally { globalThis.mctsPUCT = echt; }
-});
-
-test('Tabelle 2: Default 1, Tabelle mit taktischen Merkmalen', () => {
-  pruefeGleich(PARAMS.musterTabelle, 1, 'Default');
-  for (const x of ['t:c0', 't:c0s', 't:c1', 't:c0r', 'l:1', 'z:3']) pruefe(x in MUSTER_TABELLE_2, `Merkmal ${x}`);
-  pruefe(Object.keys(MUSTER_TABELLE_2).filter(x => x.startsWith('m:')).length > 1000, 'Muster in Tabelle 2');
-});
-
-test('taktisches Merkmal wie in auswertung/muster.js (legale Züge, beide Farben)', () => {
-  let n = 0;
-  for (const b of stellungen()) for (const farbe of [1, 2]) {
-    const frei = i => KI.floodFill(b, i).liberties.length;
-    for (let i = 0; i < BOARD_SIZE; i++) {
-      if (b[i]) continue;
-      const nb = new Uint8Array(b); nb[i] = farbe;
-      const cap = removeDeadGroups(nb, 3 - farbe, i);
-      if (!cap && KI.floodFill(nb, i).liberties.length === 0) continue;
-      pruefeGleich(musterTaktik(b, i, farbe), auswertung.taktik(b, nb, i, farbe, cap, frei), `Punkt ${i}, Farbe ${farbe}`);
-      n++;
-    }
-  }
-  pruefe(n > 600, 'genug Punkte geprüft');
-});
-
-test('Tabelle 2: musterWert unter Drehung und Spiegelung gleich', () => {
-  const abb = [(x, y) => [x, y], (x, y) => [18 - x, y], (x, y) => [x, 18 - y], (x, y) => [18 - x, 18 - y],
-               (x, y) => [y, x], (x, y) => [18 - y, x], (x, y) => [y, 18 - x], (x, y) => [18 - y, 18 - x]];
-  const b = stellungen()[2];
-  mit({musterTabelle: 2}, () => {
-    for (const t of abb) {
-      const tb = new Uint8Array(BOARD_SIZE);
-      for (let i = 0; i < BOARD_SIZE; i++) { const [x, y] = t(i % 19, Math.floor(i / 19)); tb[y * 19 + x] = b[i]; }
-      for (let i = 0; i < BOARD_SIZE; i += 5) {
-        if (b[i]) continue;
-        const [x, y] = t(i % 19, Math.floor(i / 19));
-        pruefeGleich(musterWert(tb, y * 19 + x, 2), musterWert(b, i, 2), `Punkt ${i}`);
-      }
-    }
-  });
-});
-
-test('Tabelle 2: Wurzelwert = Wert bei 0 + Gewicht × musterWert', () => {
-  const b = stellungen()[1];
-  let liste = null;
-  const echt = globalThis.mctsPUCT;
-  globalThis.mctsPUCT = function (board, color, caps, rootScored, ko) {
-    liste = new Map(rootScored.map(s => [s.m.idx, s.score]));
-    return echt(board, color, caps, rootScored, ko);
-  };
-  const wurzel = w => mit({musterGewicht: w, musterTabelle: 2, mctsFixedSims: 30, adaptiveBudgetEnabled: 0, mctsTreeReuse: 0}, () => {
-    const zr = Math.random; Math.random = () => 0;
-    try { getAIMove(new Uint8Array(b), 1, [], {1: 0, 2: 0}, 120, 'hard', 1, null, null); } finally { Math.random = zr; }
-    return liste;
-  });
-  try {
-    const ohne = wurzel(0), mit150 = wurzel(150);
-    let gemeinsam = 0;
-    mit({musterTabelle: 2}, () => {
-      for (const [idx, wert] of mit150) {
-        if (!ohne.has(idx)) continue;
-        gemeinsam++;
-        pruefe(Math.abs(wert - ohne.get(idx) - 150 * musterWert(b, idx, 1)) < 1e-6, `Kandidat ${idx}`);
-      }
-    });
     pruefe(gemeinsam > 0, 'gemeinsame Kandidaten');
   } finally { globalThis.mctsPUCT = echt; }
 });

@@ -239,6 +239,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | Befund | Messung | Konsequenz |
 |---|---|---|
 | **`musterGewicht` 200 (Muster aus GNU-Go-Zügen: 3×3-Umgebung, Abstand zum letzten Zug, Linie)** | **gegen GNU Go Endstand +102,8 Punkte über 240 ausgespielte Paare (95 %: +93 bis +112, p = 8 · 10⁻⁵⁷), Siege 13 → 156 von 240; im Selbstspiel 98,6 % über 360 Partien** | **eingebaut** — Default 200; zum ersten Mal gewinnt die KI gegen GNU Go mit neun Vorgabesteinen die Mehrzahl der Partien (`docs/muster.md`) |
+| `musterTabelle` 2 (zweite Mustertabelle: gemeinsam gelernt, taktisches Merkmal, doppelt so viele Lehrdaten) | sagt GNU Gos Zug ab Zug 81 in 27,7 % statt 19,3 % voraus; gegen GNU Go aber Endstand −11,0 über 240 Paare (p = 0,04), im Selbstspiel 44,4 % über 360 Partien (p = 0,035) | verworfen — wieder entfernt; bessere Vorhersage ist nicht bessere Zugwahl (`docs/muster-ausbau.md`) |
 | `mctsValueScale` 200 statt 350 | 65:35 über 100 gepaarte Partien, p = 0,0035; gegen GNU Go nachgeprüft: 350 −14,2 Punkte über 60 Paare (p = 0,30) | **eingebaut** (≈ +108 Elo im Selbstspiel); GNU Go widerspricht nicht (`docs/wertskala-gnugo.md`) |
 | Kurve 100/150/200/250/300/500/1000 | Plateau bei 150–250, Abfall zu beiden Seiten | Mitte des Plateaus gewählt, nicht der Höchstwert |
 | `endTieBreak` 1 statt 0 (Gleichstand im Endspiel ordnen statt losen) | 57,2 % und in der Wiederholung 59,4 % über je 360 Partien, p = 0,006 und 0,0003 (vor `gebietZug`); gegen GNU Go nachgeprüft: 0 statt 1 +0,4 Punkte über 60 Paare (p = 0,97) | **eingebaut** — Default 1; gegen GNU Go ohne Wirkung, neben `gebietZug` vermutlich überflüssig (`docs/gleichstand-gnugo.md`) |
@@ -2289,6 +2290,13 @@ letzten Zug und auf dieser Linie wählt. Als Zusatz zur Zugbewertung
 Endstand über 240 Paare, und die KI gewinnt 156 statt 13 Partien. Im
 Selbstspiel gewinnt sie 355 von 360. Seitdem Default:
 [`docs/muster.md`](docs/muster.md).
+
+**Mehr Muster sind nicht besser.** Eine zweite Tabelle, gemeinsam gelernt,
+mit taktischen Merkmalen und doppelt so vielen Lehrdaten, sagte GNU Gos Zug
+deutlich öfter voraus. Gegen GNU Go spielte sie trotzdem schlechter (−11,0
+über 240 Paare), im Selbstspiel ebenso (44,4 %). Die Piloten hatten +24
+und +11 gezeigt, das war Rauschen. Verworfen und wieder entfernt:
+[`docs/muster-ausbau.md`](docs/muster-ausbau.md).
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
