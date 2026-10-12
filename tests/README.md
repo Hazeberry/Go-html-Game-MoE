@@ -65,6 +65,7 @@ niemand ausliefert.
 | `atari-verzicht.js` | Kandidaten | `vergeblicherZug` bei `atariVerzicht` 0 bitgenau wie vorher; bei 1 fällt ein Atari nur weg, wenn der Leser die eigene Kette fängt und das Ziel entkommt; Snapback bleibt erlaubt |
 | `muster.js` | Kandidaten | `musterGewicht` Default 200; mit leerer Tabelle bitgenau wie bei 0; Musterschlüssel gleich wie in `auswertung/muster.js`; `musterWert` unter Drehung und Spiegelung gleich; Wurzelwert = Wert bei 0 + Gewicht × `musterWert` |
 | `gebiet-sicher.js` | Kandidaten | `gebietSicher` Default 0; bitgenau ohne Urteil, mit Urteil bei 0 und mit leerem Urteil; `lsNach` (tote Steine weg, bei 2 nicht; kritische Gruppen je nach Zug, angehängter Stein fällt mit); Gebietsterm = `gebietZug` × Bilanzänderung mit Urteil, nicht inkrementell nachgerechnet; `urteilAusGtp` liest GNU Gos `dragon_status`/`dragon_stones` |
+| `zaehlung.js` | Auszählung | `toteSteineAmEnde`: in der Partie vom 12.10. genau die acht toten schwarzen Steine, W+102,5 wie GNU Go (alte Regel: W+70,5); Eindringling, zwei Augen, Zwei-Punkte-Auge, großes Auge; unfertige Stellungen fast unberührt |
 | `nan-guards.js` | Logik im Prozess | `_mctsKids` bei NaN/Infinity, `mctsPUCT` mit vergifteter Wurzelliste, `forward`/`save`/`load`/`_backward`/`trainGame`-Schutz |
 | `resign-criterion.js` | Aufgabe | gibt die KI nur noch auf, wenn auch das Gebiet verloren sagt |
 | `training-stability.js` | Training | Regularisierungs-Parameter, Gradienten-Deckel, Max-Norm-Projektion, Advantage-Dämpfung, dazu der ursprüngliche Repro-Lauf |

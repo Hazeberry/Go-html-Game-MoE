@@ -536,6 +536,107 @@ function bensonClassify(board) {
   return epoch;
 }
 
+/* ═══ Tote Steine am Partieende (für die Auszählung) ═══════════════════
+   Gibt ein Uint8Array zurück, 1 = Stein ist tot. Beurteilt GRUPPEN, nicht
+   einzelne Ketten: Ketten derselben Farbe, die sich eine Freiheit teilen,
+   bilden einen Verband (am Partieende ist so eine Lücke keine Schnitt-
+   stelle mehr). Ein Auge ist eine leere Region, die nur an Steine des
+   Verbands grenzt -- die Region als Ganzes, nicht jeder ihrer Punkte.
+     lebt: eine Kette Benson-lebendig, oder zwei Augen, oder ein Auge mit
+           mindestens AUGE_GROSS Punkten, oder der Verband grenzt an eine
+           gemischte Region ab OFFEN_GROSS Punkten (dann ist er nicht
+           eingeschlossen; das schützt unfertige Stellungen, etwa nach einer
+           Aufgabe, in denen kaum eine Region nur an eine Farbe grenzt)
+     tot:  Benson-tot; sonst der schwächste übrige Verband (wenigste Augen,
+           dann wenigste Freiheiten, dann wenigste Steine), danach wird
+           neu gerechnet, bis jeder übrige Verband lebt.
+   Einer nach dem anderen, weil tote Steine im eigenen Gebiet dessen
+   Regionen an zwei Farben grenzen lassen: Erst wenn der tote Stein weg
+   ist, wird das Gebiet zum Auge. Der schwächste ist fast immer der tote
+   Eindringling, nicht die große Gruppe drumherum.
+   Ersetzt die alte Regel je Kette (≤ 3 Freiheiten ohne Auge, ≤ 2 mit
+   einem), die lebende Randsteine entfernte und jeden Punkt eines
+   Zwei-Punkte-Auges als eigenes Auge zählte (docs/zaehlung.md).
+   Seki erkennt die Regel nicht: Von zwei Gruppen ohne zwei Augen, die
+   sich Freiheiten teilen, stirbt die schwächere. */
+const AUGE_GROSS = 6, OFFEN_GROSS = 40;
+function toteSteineAmEnde(board, augeGross = AUGE_GROSS, offenGross = OFFEN_GROSS) {
+  const N = BOARD_SIZE, tot = new Uint8Array(N);
+  const ep = bensonClassify(board);
+  for (let i = 0; i < N; i++) if (board[i] && _bnDead[i] === ep) tot[i] = 1;
+  const b = new Uint8Array(N), kette = new Int32Array(N), reg = new Int32Array(N);
+  for (let runde = 0; runde < 200; runde++) {
+    for (let i = 0; i < N; i++) b[i] = tot[i] ? 0 : board[i];
+    /* Ketten */
+    kette.fill(-1);
+    const ketten = [];
+    for (let i = 0; i < N; i++) {
+      if (!b[i] || kette[i] >= 0) continue;
+      const ff = floodFill(b, i), id = ketten.length;
+      for (const q of ff.group) kette[q] = id;
+      ketten.push({steine: ff.group, freiheiten: ff.liberties, benson: _bnAlive[i] === ep});
+    }
+    /* Leere Regionen: Größe und angrenzende Farben */
+    reg.fill(-1);
+    const regionen = [];
+    for (let i = 0; i < N; i++) {
+      if (b[i] || reg[i] >= 0) continue;
+      const id = regionen.length, q = [i]; reg[i] = id;
+      let rand = 0;
+      for (let k = 0; k < q.length; k++) for (const n of NEIGHBORS[q[k]]) {
+        if (!b[n]) { if (reg[n] < 0) { reg[n] = id; q.push(n); } }
+        else rand |= b[n];
+      }
+      regionen.push({groesse: q.length, rand, kette: -1});
+    }
+    /* Verbände: Ketten gleicher Farbe mit gemeinsamer Freiheit oder am
+       selben Auge (Region, die nur an diese Farbe grenzt) */
+    const vater = ketten.map((_, k) => k);
+    const wurzel = k => { while (vater[k] !== k) k = vater[k] = vater[vater[k]]; return k; };
+    const eins = (x, y) => { x = wurzel(x); y = wurzel(y); if (x !== y) vater[y] = x; };
+    for (let i = 0; i < N; i++) {
+      if (b[i]) continue;
+      const erste = [-1, -1, -1], r = regionen[reg[i]];
+      for (const n of NEIGHBORS[i]) {
+        if (!b[n]) continue;
+        const k = kette[n], f = b[n];
+        if (erste[f] < 0) erste[f] = k; else eins(erste[f], k);
+        if (r.rand === f) { if (r.kette < 0) r.kette = k; else eins(r.kette, k); }
+      }
+    }
+    const verb = new Map();
+    for (let k = 0; k < ketten.length; k++) {
+      const v = wurzel(k);
+      if (!verb.has(v)) verb.set(v, {ketten: [], augen: 0, gross: false, offen: false, benson: false, frei: new Set(), steine: 0});
+      const V = verb.get(v), K = ketten[k];
+      V.ketten.push(k); V.steine += K.steine.length; if (K.benson) V.benson = true;
+      for (const l of K.freiheiten) V.frei.add(l);
+    }
+    /* Offen: grenzt an eine gemischte Region ab offenGross Punkten */
+    for (let i = 0; i < N; i++) {
+      if (!b[i]) continue;
+      for (const n of NEIGHBORS[i]) if (!b[n] && regionen[reg[n]].rand === 3 && regionen[reg[n]].groesse >= offenGross) {
+        verb.get(wurzel(kette[i])).offen = true; break;
+      }
+    }
+    for (const r of regionen) {
+      if ((r.rand !== 1 && r.rand !== 2) || r.kette < 0) continue;
+      const V = verb.get(wurzel(r.kette));
+      V.augen++; if (r.groesse >= augeGross) V.gross = true;
+    }
+    let schwach = null;
+    for (const V of verb.values()) {
+      if (V.benson || V.augen >= 2 || V.gross || V.offen) continue;
+      if (!schwach || V.augen < schwach.augen
+          || (V.augen === schwach.augen && (V.frei.size < schwach.frei.size
+              || (V.frei.size === schwach.frei.size && V.steine < schwach.steine)))) schwach = V;
+    }
+    if (!schwach) break;
+    for (const k of schwach.ketten) for (const q of ketten[k].steine) tot[q] = 1;
+  }
+  return tot;
+}
+
 function coordToLabel(x, y) { return `${COL_LETTERS[x]}${SIZE-y}`; }
 </script>
 <script id="worker-ai">
@@ -5005,32 +5106,13 @@ function resetGame() {
 }
 
 function resolveLifeAndDeath() {
+  /* Tote Steine nach toteSteineAmEnde (gemeinsame Spiellogik): Benson
+     exakt, der Rest je Gruppe mit Augen. Die alte Regel je Kette entfernte
+     lebende Randsteine und zählte jeden Punkt eines Zwei-Punkte-Auges als
+     eigenes Auge (docs/zaehlung.md). */
   state.deadStones = new Set();
-  /* Benson zuerst: Bewiesenes wird exakt behandelt, NUR der unklare Rest
-     geht weiter durch die Freiheiten/Augen-Heuristik. Pass-alive-Ketten
-     können nie fälschlich entfernt werden, bewiesen tote Gegner in
-     pass-alive-Gebiet werden garantiert entfernt — die Heuristik kann
-     das Ergebnis nur noch für unklare Gruppen beeinflussen. */
-  const bEpoch = bensonClassify(state.board);
-  const processed = new Uint8Array(BOARD_SIZE);
-  for (let i = 0; i < BOARD_SIZE; i++) {
-    const color = state.board[i];
-    if (!color || processed[i]) continue;
-    const {group, liberties} = floodFill(state.board, i);
-    for (const g of group) processed[g] = 1;
-    if (_bnAlive[i] === bEpoch) continue;                                   /* bewiesen lebendig */
-    if (_bnDead[i] === bEpoch) {                                            /* bewiesen tot */
-      for (const g of group) state.deadStones.add(g);
-      continue;
-    }
-    if (liberties.length >= 5) continue;
-    const eyes = findEyes(state.board, group, color);
-    if (eyes.length >= 2) continue;
-    if (eyes.length === 1 && liberties.length >= 3) continue;
-    const maxLib = eyes.length === 0 ? 3 : 2;
-    if (liberties.length <= maxLib)
-      for (const g of group) state.deadStones.add(g);
-  }
+  const tot = toteSteineAmEnde(state.board);
+  for (let i = 0; i < BOARD_SIZE; i++) if (tot[i]) state.deadStones.add(i);
   for (const i of state.deadStones) {
     const color = state.board[i];
     state.board[i] = 0;
