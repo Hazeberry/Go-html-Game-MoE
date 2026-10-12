@@ -3015,12 +3015,15 @@ let _tbStempel = 0;
      tot:  Uint8Array, Farbe des Steins, wenn er zu einer toten Gruppe
            gehoert, sonst 0; toteSteine: die Indizes dazu.
      krit: [{farbe, steine, angriff, verteidigung}], kritische Gruppen.
-   Tote Steine fehlen in der Karte, an der Wurzel wie nach jedem Kandidaten.
+   Tote Steine zaehlen in der Karte als Steine des Gegners, an der Wurzel
+   wie nach jedem Kandidaten: Ihre Flaeche gehoert ihm. (Nur weglassen
+   hinterliesse ein Vakuum, in dem jeder eigene Zug scheinbar Gebiet
+   gewinnt, docs/gebiet-sicher.md §7.)
    Kritisch heisst: Wer zuerst zieht, entscheidet. Nach dem Zug des
    Ziehenden ist der Gegner dran; die eigene kritische Gruppe zaehlt also
    nur, wenn der Zug ihr Verteidigungspunkt ist, die fremde nur dann nicht,
-   wenn der Zug ihr Angriffspunkt ist. Haengt der neue Stein an Steinen,
-   die so wegfallen, faellt seine Kette mit weg. */
+   wenn der Zug ihr Angriffspunkt ist; sonst zaehlt sie wie eine tote.
+   Haengt der neue Stein an solchen Steinen, zaehlt seine Kette mit. */
 let _lebensUrteil = null;
 function setzeLebensurteil(u) { _lebensUrteil = u; }
 const _lsWurzel = new Uint8Array(BOARD_SIZE), _lsNb = new Uint8Array(BOARD_SIZE);
@@ -3028,7 +3031,7 @@ function lsAktiv() { return PARAMS.gebietSicher > 0 && _lebensUrteil !== null; }
 function lsOhneTote(board) {
   const u = _lebensUrteil;
   _lsWurzel.set(board);
-  for (const s of u.toteSteine) if (_lsWurzel[s] === u.tot[s]) _lsWurzel[s] = 0;
+  for (const s of u.toteSteine) if (_lsWurzel[s] === u.tot[s]) _lsWurzel[s] = 3 - u.tot[s];
   return _lsWurzel;
 }
 /* nb: Brett nach dem Zug i von color (Schlaege schon ausgefuehrt). Gibt
@@ -3036,21 +3039,32 @@ function lsOhneTote(board) {
 function lsNach(nb, i, color) {
   const u = _lebensUrteil, b = _lsNb;
   b.set(nb);
-  if (PARAMS.gebietSicher !== 2) for (const s of u.toteSteine) if (b[s] === u.tot[s]) b[s] = 0;
+  if (PARAMS.gebietSicher !== 2) for (const s of u.toteSteine) if (b[s] === u.tot[s]) b[s] = 3 - u.tot[s];
   for (const k of u.krit) {
-    if (k.farbe === color ? i === k.verteidigung : i !== k.angriff) continue;
-    for (const s of k.steine) if (b[s] === k.farbe) b[s] = 0;
+    if (k.farbe === color ? i >= 0 && i === k.verteidigung : !(i >= 0 && i === k.angriff)) continue;
+    for (const s of k.steine) if (b[s] === k.farbe) b[s] = 3 - k.farbe;
   }
   if (i >= 0 && b[i] === color) {
     let haengt = false;
-    for (const n of NEIGHBORS[i]) if (nb[n] === color && b[n] === 0) haengt = true;
-    if (haengt) for (const s of floodFill(b, i).group) b[s] = 0;
+    for (const n of NEIGHBORS[i]) if (nb[n] === color && b[n] !== color) haengt = true;
+    if (haengt) for (const s of floodFill(b, i).group) b[s] = 3 - color;
   }
   return b;
+}
+/* Bezug fuer die Bilanzaenderung mit Urteil: die Wurzel, als haette color
+   gepasst (eigene kritische Gruppen weg, fremde da). Gegen die Wurzel
+   selbst sackten sonst alle Zuege ausser dem Verteidigungspunkt um den Wert
+   der Gruppe ab, und die Pass-Pruefung sah nur noch schlechte Zuege
+   (docs/gebiet-sicher.md §7). Je Farbe einmal nach primeEndTieBreak. */
+const _lsBasis = [0, 0, 0], _lsBasisOk = [false, false, false];
+function lsBasis(color) {
+  if (!_lsBasisOk[color]) { _lsBasis[color] = tbBilanzNach(lsNach(_tbBrett, -1, color)); _lsBasisOk[color] = true; }
+  return _lsBasis[color];
 }
 
 function primeEndTieBreak(board) {
   const N = BOARD_SIZE, L = _tbEbenen;
+  _lsBasisOk[1] = _lsBasisOk[2] = false;
   if (lsAktiv() && PARAMS.gebietSicher !== 2) board = lsOhneTote(board);
   _tbBrett.set(board);
   for (let i = 0; i < N; i++) L[i] = board[i] === 1 ? 128 : board[i] === 2 ? -128 : 0;
@@ -3277,7 +3291,7 @@ function evalEndgame(board, i, color, mc) {
     if (board[n] === opp && countLiberties(board, n, 2) === 1) s += PARAMS.endOppAtari;
   }
   if (PARAMS.endTieBreak > 0 && _tbValid) {
-    const d = (tbBilanzNach(lsAktiv() ? lsNach(_evalScratch, i, color) : _evalScratch) - _tbBilanz) * (color === 1 ? 1 : -1);
+    const d = (tbBilanzNach(lsAktiv() ? lsNach(_evalScratch, i, color) : _evalScratch) - (lsAktiv() ? lsBasis(color) : _tbBilanz)) * (color === 1 ? 1 : -1);
     s += PARAMS.endTieBreak * Math.max(-1, Math.min(1, d / 20));
   }
   return s + Math.random() * 0.5;
@@ -3616,7 +3630,7 @@ function evaluateMove(board, i, color, mc, emptyFields) {
     const nb = _gzScratch;
     nb.set(board); nb[i] = color;
     removeDeadGroups(nb, color === 1 ? 2 : 1, i);
-    let gz = PARAMS.gebietZug * (tbBilanzNach(lsAktiv() ? lsNach(nb, i, color) : nb) - _tbBilanz) * (color === 1 ? 1 : -1);
+    let gz = PARAMS.gebietZug * (tbBilanzNach(lsAktiv() ? lsNach(nb, i, color) : nb) - (lsAktiv() ? lsBasis(color) : _tbBilanz)) * (color === 1 ? 1 : -1);
     /* Gebiet nach Freiheiten (PARAMS.gebietFreiheit): der Gewinn einer
        schwachen neuen Kette zaehlt nur anteilig. */
     if (PARAMS.gebietFreiheit > 0 && gz > 0) {
@@ -4573,7 +4587,7 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
       const i = s.m.idx;
       _ggScratch.set(board); _ggScratch[i] = opp;
       if (removeDeadGroups(_ggScratch, aiColor, i) === 0 && countLiberties(_ggScratch, i, 1) === 0) continue;
-      const d = (tbBilanzNach(lsAktiv() ? lsNach(_ggScratch, i, opp) : _ggScratch) - _tbBilanz) * vz;
+      const d = (tbBilanzNach(lsAktiv() ? lsNach(_ggScratch, i, opp) : _ggScratch) - (lsAktiv() ? lsBasis(opp) : _tbBilanz)) * vz;
       if (d > 0) _gegnerWerte.set(i, (_gegnerWerte.get(i) || 0) + PARAMS.gegnerGebiet * PARAMS.gebietZug * d);
     }
   }

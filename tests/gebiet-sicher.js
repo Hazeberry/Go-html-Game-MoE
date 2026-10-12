@@ -3,14 +3,17 @@
      1. Default 0. Bitgenau wie vorher: mit Urteil bei 0, ohne Urteil bei 1
         und mit leerem Urteil bei 1 spielt getAIMove denselben Zug mit
         derselben Info.
-     2. lsNach: tote Steine fallen weg (bei 2 nicht); die eigene kritische
+     2. lsNach: tote Steine zählen für den Gegner (bei 2 nicht); die eigene kritische
         Gruppe bleibt nur am Verteidigungspunkt, die fremde fällt nur am
         Angriffspunkt; ein neuer Stein an weggefallenen Steinen fällt mit.
      3. Der Gebietsterm in evaluateMove ist genau gebietZug × Änderung der
-        Bouzy-Bilanz ohne die weggefallenen Steine, gegen eine Wurzel ohne
-        die toten Steine (nachgerechnet mit der nicht inkrementellen
-        bouzyBilanz).
-     4. urteilAusGtp liest GNU Gos dragon_status und dragon_stones.
+        Bouzy-Bilanz ohne die weggefallenen Steine, gegen die Wurzel ohne
+        tote Steine, als hätte der Ziehende gepasst (nachgerechnet mit der
+        nicht inkrementellen bouzyBilanz).
+     4. Mit einer eigenen kritischen Gruppe sackt kein Zug ab (daran
+        scheiterte die Pass-Prüfung, docs/gebiet-sicher.md §7), der
+        Verteidigungspunkt gewinnt.
+     5. urteilAusGtp liest GNU Gos dragon_status und dragon_stones.
 
    Aufruf:  node tests/gebiet-sicher.js [pfad/zur/index.html] */
 'use strict';
@@ -94,7 +97,7 @@ test('lsNach: tote weg, kritische je nach Zug, angehängter Stein fällt mit', (
     const nach = (i, c) => { const nb = new Uint8Array(b); nb[i] = c; removeDeadGroups(nb, 3 - c, i); return lsNach(nb, i, c); };
     const [ks, kw] = u.krit;
     const steht = (x, steine) => steine.every(q => x[q] !== 0);
-    const weg = (x, steine) => steine.every(q => x[q] === 0);
+    const weg = (x, steine) => steine.every(q => x[q] === 3 - b[q]);   /* umgefärbt */
     /* Schwarz verteidigt seine kritische Gruppe: bleibt; Weiß' kritische bleibt */
     let x = nach(ks.verteidigung, 1);
     pruefe(weg(x, u.toteSteine), 'tote Steine weg');
@@ -115,7 +118,7 @@ test('lsNach: tote weg, kritische je nach Zug, angehängter Stein fällt mit', (
     const anders = ketten(b, 1)[0].liberties.find(q => q !== ks.verteidigung && q !== kw.angriff);
     if (anders !== undefined) {
       x = nach(anders, 1);
-      pruefeGleich(x[anders], 0, 'angehängter Stein fällt mit der Gruppe');
+      pruefeGleich(x[anders], 2, 'angehängter Stein fällt mit der Gruppe');
     }
     /* Ein Stein weit weg von allem Weggefallenen bleibt */
     let frei = -1;
@@ -137,7 +140,7 @@ test('lsNach: tote weg, kritische je nach Zug, angehängter Stein fällt mit', (
 test('evaluateMove: Gebietsterm = gebietZug × Bilanzänderung mit Urteil (nicht inkrementell nachgerechnet)', () => {
   const b = stellung(60), u = testUrteil(b), farbe = 1, mc = 60;
   const ohneTote = new Uint8Array(b);
-  for (const s of u.toteSteine) ohneTote[s] = 0;
+  for (const s of u.toteSteine) ohneTote[s] = 3 - u.tot[s];
   const wert = (sicher, i) => {
     PARAMS.gebietSicher = sicher;
     setzeLebensurteil(sicher ? u : null);
@@ -156,7 +159,7 @@ test('evaluateMove: Gebietsterm = gebietZug × Bilanzänderung mit Urteil (nicht
       if (floodFill(nb, i).liberties.length === 0) continue;
       const w0 = wert(0, i), w1 = wert(1, i);
       if (getCrisisWeight(i) !== 0) continue;
-      const mitU = bouzyBilanz(lsNach(nb, i, farbe)) - bouzyBilanz(ohneTote);
+      const mitU = bouzyBilanz(lsNach(nb, i, farbe)) - bouzyBilanz(lsNach(ohneTote, -1, farbe));
       const ohneU = bouzyBilanz(nb) - bouzyBilanz(b);
       pruefe(Math.abs((w1 - w0) - PARAMS.gebietZug * (mitU - ohneU)) < 1e-6,
         `Kandidat ${i}: Differenz ${w1 - w0}, erwartet ${PARAMS.gebietZug * (mitU - ohneU)}`);
@@ -164,6 +167,33 @@ test('evaluateMove: Gebietsterm = gebietZug × Bilanzänderung mit Urteil (nicht
     }
   } finally { PARAMS.gebietSicher = 0; setzeLebensurteil(null); }
   pruefe(geprueft >= 10, `genug Kandidaten geprüft (${geprueft})`);
+});
+
+test('nur eine eigene kritische Gruppe: kein Zug sackt ab, der Verteidigungspunkt gewinnt', () => {
+  /* Vor §7 verlor jeder Zug außer dem Verteidigungspunkt den ganzen Wert
+     der Gruppe, und die Pass-Prüfung passte. */
+  const b = stellung(120), farbe = 1, s = ketten(b, 1)[0];
+  const u = {tot: new Uint8Array(N), toteSteine: [], krit: [{farbe, steine: s.group.slice(), angriff: s.liberties[0], verteidigung: s.liberties[1]}]};
+  const wert = (sicher, i) => {
+    PARAMS.gebietSicher = sicher; setzeLebensurteil(sicher ? u : null);
+    buildCrisisMap(b, farbe); primeAreaCache(b, farbe); primeEndTieBreak(b);
+    const r = Math.random; Math.random = () => 0;
+    try { return evaluateMove(b, i, farbe, 120, 200); } finally { Math.random = r; }
+  };
+  let n = 0;
+  try {
+    for (let i = 0; i < N; i += 3) {
+      if (b[i] || i === u.krit[0].verteidigung) continue;
+      const nb = new Uint8Array(b); nb[i] = farbe; removeDeadGroups(nb, 2, i);
+      if (floodFill(nb, i).liberties.length === 0) continue;
+      const d = wert(1, i) - wert(0, i);
+      pruefe(d >= -5 * PARAMS.gebietZug, `Zug ${i} sackt ab um ${d}`);
+      n++;
+    }
+    const v = wert(1, u.krit[0].verteidigung) - wert(0, u.krit[0].verteidigung);
+    pruefe(v > 0, `Verteidigungspunkt gewinnt (${v})`);
+  } finally { PARAMS.gebietSicher = 0; setzeLebensurteil(null); }
+  pruefe(n > 50, `genug Züge (${n})`);
 });
 
 test('urteilAusGtp liest dragon_status und dragon_stones', () => {

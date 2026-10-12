@@ -144,3 +144,73 @@ KI den Verteidigungs- oder Angriffspunkt einer kritischen Gruppe spielt
   verfehlt.
 - Das Urteil gilt an der Wurzel. In der Suche werden tiefere Stellungen mit
   demselben Urteil bewertet.
+
+---
+
+## 7. Nachtrag: erste Messung ungültig, zwei Fehler behoben (12.10.2026)
+
+Gelaufen auf dem Merge-Commit `d1981a0`. Daten: `daten/sicher-gnugo.json`
+(Arm B). Die Kontrolle von Arm A, Teillauf 1, ergab 15 von 15 Partien
+zugweise gleich. Eine Partie von Arm B brach ab, weil GNU Go abstürzte (Nr.
+176).
+
+**Ergebnis nach §5:** Endstand B − A **−48,8** (SD 130,1, 239 Paare), 95 %:
+[−65,4; −32,2], p = 2·10⁻⁸. Siege: A 154, B 122. B war in 92 Paaren
+besser und in 144 schlechter, 15 von 16 Teilläufen negativ. Nach Zug 120
+−26,6 (p = 10⁻¹⁶).
+
+**Das misst aber vor allem einen Fehler.** Die KI passt in Arm B 931-mal
+vor dem Ende der Partie, in Arm A 39-mal. Jeder solche Pass schenkt GNU Go
+einen Zug.
+
+- **Ursache 1, Bezug:** Die Bilanzänderung wurde gegen die Wurzel
+  gerechnet, mit der eigenen kritischen Gruppe darin. Nach jedem Zug außer
+  dem Verteidigungspunkt fehlte die Gruppe. Damit sackte jeder Zug um den
+  ganzen Wert der Gruppe ab, oft um Tausende. Die Pass-Prüfung sah nur
+  noch schlechte Züge und passte.
+  **Behoben:** Bezug ist jetzt die Wurzel, als hätte die KI gepasst: eigene
+  kritische Gruppen weg, fremde da (`lsBasis`).
+- **Ursache 2, Vakuum:** Was wegfiel, wurde vom Brett genommen. In der
+  Bouzy-Karte entstand dort leerer Raum, in dem jeder eigene Stein
+  scheinbar Gebiet gewann. **Behoben:** Tote und verlorene Steine zählen
+  jetzt als Steine des Gegners, denn im Go gehört ihre Fläche ihm.
+- Ein neuer Test (`tests/gebiet-sicher.js`, Fall 4) prüft, dass mit einer
+  eigenen kritischen Gruppe kein Zug absackt. Der Code von `d1981a0`
+  fällt dabei durch.
+
+Probe mit dem behobenen Code, Seed 202, Nr. 1–8: ein vorzeitiger Pass
+statt rund 30. Endstand B − A: −78, +86, +126, +158, +32, +86, +48, −32;
+im Schnitt +53. Das ist eine Probe, keine Aussage.
+
+Die Entscheidung aus §5 („sonst: Haken entfernen“) wird auf diese Messung
+nicht angewandt: Sie hat die Frage aus §1 nicht beantwortet. Die Frage wird
+**einmal** neu gemessen, vorab festgelegt in §8. Deren Ergebnis
+entscheidet.
+
+## 8. Wiederholung, vorab festgelegt (12.10.2026)
+
+Wie §5, mit diesen Änderungen:
+- behobener Code (§7), `gebietSicher` 2 wie bisher,
+- **neuer Seed 203**, weil die Probe in §7 Partien von Seed 202 benutzt,
+- **beide Arme neu gespielt**, 240 Partien je Arm in 16 Teilläufen zu 15.
+
+```bash
+for v in 1 16 31 46 61 76 91 106 121 136 151 166 181 196 211 226; do
+  node gnugo-duell.js --partien 15 --von $v --seed 203 --stufe 1 --vorgabe 9 \
+    --maxzuege 600 --schaetzung 120,200 --gnugo-aufgabe 0 \
+    --ki mctsFixedSims=120,resignEnabled=0 --roh sicher2-gnugo-A-$v.jsonl
+  node gnugo-duell.js --partien 15 --von $v --seed 203 --stufe 1 --vorgabe 9 \
+    --maxzuege 600 --schaetzung 120,200 --gnugo-aufgabe 0 --orakel 10 \
+    --ki mctsFixedSims=120,resignEnabled=0,gebietSicher=2 --roh sicher2-gnugo-B-$v.jsonl
+done
+node auswertung/gnugo-vergleich.js --A sicher2-gnugo-A-*.jsonl --B sicher2-gnugo-B-*.jsonl --zug 120,200,ende
+```
+
+Endpunkt und Entscheidung wie in §5:
+
+| M1 | Folge |
+|---|---|
+| B signifikant besser | Stufe 2: ein eigenes Urteil über kritische Gruppen bauen, zuerst offline gegen GNU Gos Urteil prüfen |
+| sonst | Das Lebensurteil in `gebietZug` ist nicht der Hebel. Der Haken wird wieder entfernt. |
+
+**Sekundär, ohne Anspruch:** wie §5, dazu vorzeitige Pässe je Arm.
