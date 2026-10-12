@@ -99,8 +99,10 @@ if (require.main === module) {
   const lies = d => fs.readFileSync(d, 'utf8').trim().split('\n').filter(Boolean).map(z => JSON.parse(z));
   if (opt.bericht) { bericht(dateien.flatMap(lies)); return; }
   (async () => {
+    /* Fortsetzbar: Partien, die schon in --aus stehen, werden übersprungen. */
+    const fertig = new Set(opt.aus && fs.existsSync(opt.aus) ? lies(opt.aus).map(r => r.nr) : []);
     for (const p of dateien.flatMap(lies)) {
-      if (p.abgebrochen || !p.zuege) continue;
+      if (p.abgebrochen || !p.zuege || fertig.has(p.nr)) continue;
       let r;
       try { r = await analysiere(p, opt); }
       catch (e) { console.error(`Partie ${p.nr}: ${e.message.slice(0, 100)}`); continue; }   /* GNU Go stürzt selten ab */
