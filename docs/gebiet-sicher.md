@@ -255,3 +255,59 @@ GNU Gos Urteil geprüft. Der Haken `gebietSicher` bleibt dafür in
   Bezugspunkt machte aus einem Gewinn einen Verlust von fast 50 Punkten.
   Ein eigenes Urteil muss gegen dieselben Tests laufen
   (`tests/gebiet-sicher.js`).
+
+---
+
+## 10. Nachtrag: Stufe 2 offline, das taktische Urteil reicht nicht (12.10.2026)
+
+**Daten:** Stellungen aus den Partien von Arm A der Wiederholung (§9),
+jeweils vor jedem vierten Zug der KI. Dazu GNU Gos Urteil auf Stufe 10
+(`auswertung/lebensurteil-daten.js`). Gesammelt wurden 2099 Stellungen aus
+71 Partien, danach wurde abgebrochen: Das Ergebnis war schon eindeutig.
+Auswertung: `auswertung/lebensurteil-vergleich.js`, Zahlen in
+`daten/lebensurteil-vergleich.json`.
+
+**Eigenes Urteil „taktisch“:** Eine Kette mit höchstens drei Freiheiten
+ist kritisch, wenn der taktische Leser sagt: Der Angreifer am Zug fängt
+sie, der Verteidiger am Zug rettet sie. Angriffs- und Verteidigungspunkt
+sind der erste Zug, nach dem das Gegenteil nicht mehr gelingt. Das kostet
+rund 4 ms je Stellung.
+
+**Prüfung auf der Ebene der Zugwahl:** Bestimmt wird der beste Kandidat an
+der Wurzel von `getAIMove`, ohne Suche und ohne Zufall, jeweils mit
+`gebietSicher` 2: ohne Urteil, mit GNU Gos Urteil und mit dem eigenen.
+
+| | alle Ketten | Ketten ab 2 Steinen |
+|---|---:|---:|
+| GNU Gos Urteil ändert den Zug | 473 von 2099 (22,5 %) | 473 (22,5 %) |
+| eigenes Urteil trifft dieselbe Änderung | **16 (3,4 %)** | 5 (1,1 %) |
+| eigenes ändert, wo GNU Go nicht ändert | **232 (11,1 % der Stellungen)** | 107 (5,1 %) |
+| Steine: Trefferquote / Genauigkeit | 25,0 % / 16,9 % | 7,4 % / 9,0 % |
+
+Auf jede getroffene Änderung kommen über zehn Fehlalarme.
+
+**Warum:** GNU Go hielt in diesen Stellungen 2199 Drachen für kritisch, 71 %
+davon einzelne Steine.
+- 514 haben keine Kette mit höchstens drei Freiheiten.
+- Bei 756 hat der Drache eine solche Kette, aber der Leser fängt sie nicht.
+- 43 fängt der Leser, hält sie dann aber für verloren.
+- 886 (40 %) erkennt er. Das sind meist einzelne Steine, deren Rettung
+  wenig Gebiet bewegt.
+
+Bei 395 der 457 Änderungen, die das eigene Urteil verfehlt, hat es die
+Gruppe gar nicht erkannt. Umgekehrt sind 2694 der 3680 Gruppen, die es
+kritisch nennt, für GNU Go längst tot. Der Leser ist ein Leiter- und
+Atari-Leser: Eine Kette mit drei Freiheiten gilt ihm als entkommen, Augen
+kennt er nicht.
+
+**Folgerung:** Ein taktisches Urteil trifft nicht, was GNU Gos Urteil in
+der Zugwahl bewirkt. Die kritischen Gruppen, auf die es ankommt, entscheiden
+sich über Augen und Augenraum. Dafür bräuchte es einen Leser für Leben und
+Tod ganzer Gruppen, wie GNU Gos „owl“. Das ist ein eigenes, großes Projekt.
+Sein Nutzen ist begrenzt: höchstens die +13,6 Punkte des Orakels, und ein
+eigener Leser bleibt darunter. Unterhalb von rund 12 Punkten ist ein Effekt
+mit 240 Paaren kaum nachweisbar ([`teststaerke.md`](teststaerke.md)).
+
+**Stand:** Es wird kein Urteil eingebaut. Der Haken `gebietSicher` bleibt
+mit Default 0 in `index.html`, damit ein späterer Leser für Leben und Tod
+ihn nutzen kann. Seine Tests bleiben ebenfalls.
