@@ -63,7 +63,7 @@ niemand ausliefert.
 | `wurzel.js` | Suche | Wächter für Tree-Reuse; `wurzelFrisch` bildet die Wurzel eines übernommenen Teilbaums neu |
 | `quick-rettung.js` | Suche | `quickEval` bei `quickRettung` 0 bitgenau wie vorher; bei 1 Rettungsbonus nur mit mindestens drei Freiheiten danach |
 | `atari-verzicht.js` | Kandidaten | `vergeblicherZug` bei `atariVerzicht` 0 bitgenau wie vorher; bei 1 fällt ein Atari nur weg, wenn der Leser die eigene Kette fängt und das Ziel entkommt; Snapback bleibt erlaubt |
-| `muster.js` | Kandidaten | `musterGewicht` Default 200; mit leerer Tabelle bitgenau wie bei 0; Musterschlüssel gleich wie in `auswertung/muster.js`; `musterWert` unter Drehung und Spiegelung gleich; Wurzelwert = Wert bei 0 + Gewicht × `musterWert` |
+| `muster.js` | Kandidaten | `musterGewicht` Default 200; mit leerer Tabelle bitgenau wie bei 0; Musterschlüssel gleich wie in `auswertung/muster.js`; `musterWert` unter Drehung und Spiegelung gleich; Wurzelwert = Wert bei 0 + Gewicht × `musterWert`; Tabelle 2 (`musterTabelle`): Default 1, taktisches Merkmal gleich wie in `auswertung/muster.js`, symmetrisch, Wurzelwert nach derselben Formel |
 | `nan-guards.js` | Logik im Prozess | `_mctsKids` bei NaN/Infinity, `mctsPUCT` mit vergifteter Wurzelliste, `forward`/`save`/`load`/`_backward`/`trainGame`-Schutz |
 | `resign-criterion.js` | Aufgabe | gibt die KI nur noch auf, wenn auch das Gebiet verloren sagt |
 | `training-stability.js` | Training | Regularisierungs-Parameter, Gradienten-Deckel, Max-Norm-Projektion, Advantage-Dämpfung, dazu der ursprüngliche Repro-Lauf |
