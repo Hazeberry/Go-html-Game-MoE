@@ -18,13 +18,17 @@
    in welche übergehen. Ein Punkt, der von der KI zu GNU Go wechselt, kostet
    2 Punkte, einer von der KI zu neutral 1.
 
+   Die Marke „ende“ steht für die Schlussstellung der Partie, wann immer sie
+   endet (Partien enden verschieden früh). Übersprungen werden nur Partien,
+   die kürzer sind als die größte Zahlenmarke.
+
    Mit --karten speichert die Ausgabe je Marke die Karte als Zeichenkette
    (361 Zeichen, Zeile 19 zuerst, Spalten A–T ohne I): S KI-Stein, G
    KI-Gebiet, t GG-tot, . neutral, s GG-Stein, g GG-Gebiet, T KI-tot. Die
    liest einbruch.js.
 
    Aufruf:
-     node auswertung/besitz-verlauf.js <dump.jsonl> [...] [--marken 100,120,140,160,180,200]
+     node auswertung/besitz-verlauf.js <dump.jsonl> [...] [--marken 100,120,140,160,180,200[,ende]]
           [--karten] [--aus besitz.jsonl] [--gnugo pfad]
      node auswertung/besitz-verlauf.js --bericht besitz.jsonl [...] [--von 100 --bis 200] */
 'use strict';
@@ -53,13 +57,19 @@ async function analysiere(p, opt) {
       return art;
     };
     const stand = {}, karten = {};
-    for (let k = 0; k < p.zuege.length && k < Math.max(...opt.marken); k++) {
+    const zahlen = opt.marken.filter(m => m !== 'ende'), mitEnde = opt.marken.includes('ende');
+    const bis = mitEnde ? p.zuege.length : Math.max(...zahlen);
+    for (let k = 0; k < p.zuege.length && k < bis; k++) {
       const mc = k + 1, f = k % 2 === 0 ? zuerst : (zuerst === 'B' ? 'W' : 'B');
       await g.frage(`play ${f} ${p.zuege[k]}`);
-      if (opt.marken.includes(mc)) {
+      if (zahlen.includes(mc)) {
         karten[mc] = await karte();
         stand[mc] = {schaetzung: wert(await g.frage('estimate_score'), ki)};
       }
+    }
+    if (mitEnde) {
+      karten.ende = await karte();
+      stand.ende = {schaetzung: wert(await g.frage('estimate_score'), ki), zug: p.zuege.length};
     }
     /* Alle Punkte (auch die, die in keiner Liste stehen, gelten als neutral). */
     const L = 'ABCDEFGHJKLMNOPQRST', punkte = [];
@@ -72,7 +82,8 @@ async function analysiere(p, opt) {
       stand[mc].zaehlung = +(punkte.reduce((t, s) => t + BESITZ[artVon(mc, s)], 0) - (ki === 'W' ? -p.komi : p.komi)).toFixed(1);
       stand[mc].arten = z;
     }
-    const marken = Object.keys(karten).map(Number).sort((a, b) => a - b);
+    const marken = Object.keys(karten).filter(m => m !== 'ende').map(Number).sort((a, b) => a - b);
+    if (karten.ende) marken.push('ende');
     const uebergaenge = {};
     for (let n = 0; n + 1 < marken.length; n++) {
       const t = marken[n], u = marken[n + 1], m = {};
@@ -132,12 +143,12 @@ if (require.main === module) {
   const opt = {marken: [100, 120, 140, 160, 180, 200], aus: null, gnugo: '/usr/games/gnugo', bericht: false, von: 0, bis: 0, karten: false};
   const dateien = [];
   for (let i = 0; i < a.length; i++) {
-    if (a[i] === '--marken') opt.marken = a[++i].split(',').map(Number);
+    if (a[i] === '--marken') opt.marken = a[++i].split(',').map(m => m === 'ende' ? 'ende' : +m);
     else if (a[i] === '--aus') opt.aus = a[++i];
     else if (a[i] === '--gnugo') opt.gnugo = a[++i];
     else if (a[i] === '--bericht') opt.bericht = true;
     else if (a[i] === '--von') opt.von = +a[++i];
-    else if (a[i] === '--bis') opt.bis = +a[++i];
+    else if (a[i] === '--bis') { const v = a[++i]; opt.bis = v === 'ende' ? 'ende' : +v; }
     else if (a[i] === '--karten') opt.karten = true;
     else dateien.push(a[i]);
   }
@@ -146,7 +157,7 @@ if (require.main === module) {
   (async () => {
     const alle = [];
     for (const p of dateien.flatMap(lies)) {
-      if (p.abgebrochen || !p.zuege || p.zuege.length < Math.max(...opt.marken)) continue;
+      if (p.abgebrochen || !p.zuege || p.zuege.length < Math.max(...opt.marken.filter(m => m !== 'ende'))) continue;
       const r = await analysiere(p, opt);
       alle.push(r);
       if (opt.aus) fs.appendFileSync(opt.aus, JSON.stringify(r) + '\n');
