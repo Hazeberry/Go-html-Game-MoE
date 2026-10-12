@@ -2314,6 +2314,14 @@ Fehlalarmen. Die entscheidenden Gruppen leben oder sterben über Augen, und
 die kennt der Leser nicht. Dafür bräuchte es einen eigenen Leser für Leben
 und Tod: [`docs/gebiet-sicher.md`](docs/gebiet-sicher.md).
 
+**Die App zählte am Ende falsch.** Vor dem Zählen entfernte sie tote Steine
+je Kette: Lebende Randsteine verschwanden, und ein Zwei-Punkte-Auge galt als
+zwei Augen. In einer Partie vom 12.10. zeigte sie W+70,5 statt W+102,5. Die
+neue Regel `toteSteineAmEnde` beurteilt Gruppen und ihre Augenräume. An
+480 Partien gegen GNU Go trifft sie dessen Endstand in 68,5 % genau (alt:
+2,1 %) und den Sieger in 440 statt 262 Fällen. Die KI selbst ist davon nicht
+betroffen: [`docs/zaehlung.md`](docs/zaehlung.md).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
 09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1, seit dem 11.10. auch
