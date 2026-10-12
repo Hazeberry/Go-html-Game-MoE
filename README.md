@@ -2322,6 +2322,16 @@ neue Regel `toteSteineAmEnde` beurteilt Gruppen und ihre Augenräume. An
 2,1 %) und den Sieger in 440 statt 262 Fällen. Die KI selbst ist davon nicht
 betroffen: [`docs/zaehlung.md`](docs/zaehlung.md).
 
+**Wo die Muster-KI ihre Punkte verliert.** Ab Zug 80 verliert sie gegen GNU
+Go rund 85 Punkte, fast alles als Gebiet an den Grenzen: gut die Hälfte auf
+den Linien 1 und 2, fast immer direkt an der alten Grenze. GNU Go verliert
+im selben Zeitraum ein Achtel seines Gebiets, die KI ein Drittel.
+Sterbende Steine kosten nur noch 7 Punkte. Im Endspiel spielt die KI GNU
+Gos besten Zug nur in 19 % der Züge (GNU Go Stufe 1: 69 %), obwohl er meist
+unter ihren Kandidaten steht. Weder ein einzelner Term noch mehr Suche
+(1000 statt 120 Simulationen) ändert das. Ihr fehlt ein Maß für den Wert
+eines Grenzzugs: [`docs/punktverlust-muster.md`](docs/punktverlust-muster.md).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
 09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1, seit dem 11.10. auch
