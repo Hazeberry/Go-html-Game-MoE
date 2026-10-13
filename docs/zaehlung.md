@@ -121,8 +121,8 @@ traf jede Zählung vor dem Ende, zum Beispiel den Stand nach einer Aufgabe.
 
 **Anlass.** In einer Partie vom 13.10. (Mensch Schwarz gegen KI Weiß, Stufe
 leicht, 479 Züge, jetzt `tests/stellungen/auge-479.sgf`) passte die KI ab Zug
-267 bei jedem Zug. Schwarz spielte weiter und füllte rund 100 Punkte des
-eigenen Gebiets, darunter fast alle eigenen Augen. Die große schwarze Gruppe
+330 bei jedem Zug. Schwarz spielte weiter und setzte 74 Steine ins eigene
+Gebiet, darunter in fast alle eigenen Augen. Die große schwarze Gruppe
 links (194 Steine) behielt ein einziges Auge mit fünf Punkten in T-Form
 (B13, C13, D13, C12, C11). Die App erklärte sie für tot und zeigte
 **W+304,5**. GNU Go zählt **B+93,5** und hält keinen Stein für tot.
@@ -158,6 +158,14 @@ fremde Steine im Auge.
 Mitten in der Partie (Stellungen nach Zug 60, 120, 180 wie in §3) ändert
 sich nichts: im Schnitt 0,1, 2,7 und 16,0 tote Steine wie vorher. Die
 Partien aus der Tabelle in §3 zählen wie vorher.
+
+**Die Partie Zug für Zug.** Nach jedem Zug von Schwarz ab Zug 265 (108
+Stellungen) gezählt und mit GNU Gos `final_score` verglichen: Von Zug 327
+bis 475 zählen alte und neue Regel wie GNU Go. Erst Zug 477 füllt das
+vorletzte Auge, danach zählt die alte Regel W+304,5, die neue B+93,5 wie GNU
+Go. Zwischen Zug 277 und 325 liegt die App 2 bis 8 Punkte über GNU Go, mit
+beiden Regeln gleich: Weiß spielte noch, und GNU Go bewertet offene Grenzen
+selbst.
 
 **Grenzen.** Die Sonderfälle in der Ecke kennt die Regel nicht, zum Beispiel
 die geknickte Vier. Ein Auge mit 6 oder mehr Punkten zählt weiter immer,
