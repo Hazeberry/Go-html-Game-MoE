@@ -110,5 +110,13 @@ Zugwahl: Jeder Schlag eines einzelnen Steins im Suchbaum setzt einen
 Ko-Punkt. Im Endstand gleichen sich die Änderungen aus. Warum, ist nicht
 gemessen.
 
+**Folge für ältere Läufe:** Die Korrektur hat keinen Schalter. Läufe von
+vor dem 13.10. lassen sich nur auf ihrem Commit bitgleich wiederholen, nicht
+auf dem neuen Stand mit den neueren Parametern auf 0. Geprüft: Die ersten
+vier Partien von `daten/ausbau-20261180.json` auf Commit `6edae5d` ergeben
+dieselben Fingerabdrücke. Ihre Ergebnisse bleiben gültig, denn jeder Lauf
+verglich beide Arme auf demselben Commit. Neue Messungen spielen beide Arme
+auf dem neuen Stand.
+
 Daten: [`daten/ko-gnugo.json`](daten/ko-gnugo.json), beide Arme, eine
 Zeile je Partie. Arm A ist derselbe wie in `daten/sicher2-gnugo.json`.

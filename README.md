@@ -2130,8 +2130,9 @@ Festlegung und Ergebnis:
 
 **Für ältere Läufe heißt das:** Ein Arm „Default" meint seitdem
 `endTieBreak` = 1. Wer einen Lauf von vorher wiederholt, nimmt dessen Commit
-aus der Hash-Liste in [`docs/daten/`](docs/daten/) oder setzt
-`endTieBreak=0` in beide Arme. Wer im Spiel einmal Parameter gespeichert
+aus der Hash-Liste in [`docs/daten/`](docs/daten/). Bis zum 12.10. ging auch
+`endTieBreak=0` in beiden Armen; seit der Ko-Korrektur vom 13.10. nicht mehr
+(siehe „Für ältere Läufe“ unten). Wer im Spiel einmal Parameter gespeichert
 hat, behält den gespeicherten Wert (siehe oben, „gespeicherte Parameter
 überschreiben jeden Default"); Gespeichertes von vor dem 03.10. kennt den
 Parameter nicht und bekommt den neuen Default.
@@ -2352,11 +2353,24 @@ von 240 Partien gegen GNU Go, der Endstand aber bleibt gleich: +0,9 Punkte,
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
 09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1, seit dem 11.10. auch
-`musterGewicht` = 200. Wiederholen auf dem Commit aus der Hash-Liste oder
-mit
+`musterGewicht` = 200.
+
+Seit dem 13.10. (Code-Review, Merge `7b05a74`) kennt die Suche den
+Ko-Punkt. Das ändert Züge, ohne dass ein Parameter es abschaltet: Von 240
+Partien gegen GNU Go weichen 235 ab, der Endstand bleibt gleich (+0,9,
+p = 0,77; [`docs/code-review.md`](docs/code-review.md) §4). **Läufe von
+vorher lassen sich deshalb nur noch auf ihrem Commit aus der Hash-Liste
+bitgleich wiederholen**, nicht mehr auf dem neuen Stand mit den Parametern
+auf 0. Geprüft am 13.10.: Die ersten vier Partien von `ausbau-20261180` auf
+Commit `6edae5d` ergeben dieselben Fingerabdrücke wie in der Hash-Liste.
+Ihre Ergebnisse bleiben gültig, weil jeder Lauf beide Arme auf demselben
+Commit verglich. Neue Messungen vergleichen beide Arme auf dem neuen Stand,
+nicht mit gespeicherten Partien von vorher.
+
+Bis zum 12.10. ging statt des Commits auch
 `gebietZug=0,augenSchutz=0,passUnabwendbar=0,leseVerzicht=0,wurzelFrisch=0,musterGewicht=0`
-(und `endTieBreak=0` für Läufe vor dem 03.10.) in beiden Armen. Für Läufe
-vom 09.10. bis 11.10. reicht `musterGewicht=0`.
+(und `endTieBreak=0` für Läufe vor dem 03.10.) in beiden Armen; für Läufe
+vom 09.10. bis 11.10. reichte `musterGewicht=0`.
 
 ## Methodik
 
