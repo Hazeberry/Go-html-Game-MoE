@@ -101,13 +101,15 @@ async function spiele(browser, port, pnet, menschZuege) {
   const seite = await ctx.newPage();
   const fehler = [], diagnose = [];
   /* Drei Sorten Konsolenausgabe auseinanderhalten:
-       Umgebung — blockierte Google Fonts, fehlendes Favicon. Kommen in JEDEM
-                  Lauf vor, auch im gesunden, und sagen nichts über das Spiel.
+       Umgebung — fehlendes Favicon und ähnliche Ladefehler. Kommen in
+                  jedem Lauf vor, auch im gesunden, und sagen nichts über das
+                  Spiel. (Google Fonts lädt die Seite seit dem 13.10. nicht
+                  mehr, tests/extern.js.)
        Diagnose — die eigene Meldung des Netzes, wenn es sich abmeldet. Das
                   ist das gewünschte Verhalten, kein Fehler.
        Fehler   — alles andere, insbesondere [Worker] und [Fallback]. Genau
                   die müssen null sein. */
-  const istUmgebung = t => /Failed to load resource|ERR_CONNECTION|fonts\.googleapis/.test(t);
+  const istUmgebung = t => /Failed to load resource|ERR_CONNECTION/.test(t);
   const istDiagnose = t => /^\[PolicyNet\]/.test(t);
   seite.on('console', m => {
     if (m.type() !== 'error') return;
