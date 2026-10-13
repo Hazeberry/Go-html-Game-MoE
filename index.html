@@ -5,8 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Go – 囲碁</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Noto+Sans+Mono:wght@300;400&display=swap');
+    /* Schriften nur lokal: kein Abruf von Google Fonts oder anderen fremden
+       Servern (Datenschutz: keine IP-Adresse an Dritte). Ist Noto installiert,
+       wird es benutzt, sonst eine ähnliche Systemschrift. */
     :root {
+      --font-serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', 'Segoe UI Symbol', Georgia, 'Times New Roman', serif;
+      --font-mono: 'Noto Sans Mono', ui-monospace, 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace;
       --wood: #c8a05a; --wood-dark: #9e7438; --wood-light: #e8c882;
       --ui-bg: #1a130a; --ui-border: #4a3520; --ui-text: #c8a05a;
       --ui-dim: #7a6040; --red: #c0392b; --green: #27ae60;
@@ -14,7 +18,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: var(--ui-bg); color: var(--ui-text);
-      font-family: 'Noto Serif JP', 'Segoe UI Symbol', serif;
+      font-family: var(--font-serif);
       min-height: 100vh; display: flex; flex-direction: column; align-items: center;
       padding: 24px 16px 40px;
       background-image:
@@ -22,7 +26,7 @@
         radial-gradient(ellipse at 80% 90%, rgba(200,160,90,0.06) 0%, transparent 60%);
     }
     h1 { font-size: clamp(1.4rem,4vw,2.2rem); font-weight:300; letter-spacing:.35em; color:var(--wood-light); margin-bottom:6px; }
-    .subtitle { font-family:'Noto Sans Mono',monospace; font-size:.7rem; letter-spacing:.2em; color:var(--ui-dim); margin-bottom:20px; }
+    .subtitle { font-family:var(--font-mono); font-size:.7rem; letter-spacing:.2em; color:var(--ui-dim); margin-bottom:20px; }
     .game-wrap { display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap; justify-content:center; }
     #board-wrap { position:relative; border-radius:4px; box-shadow: 0 0 0 3px var(--wood-dark), 0 0 0 6px var(--wood), 0 0 0 9px var(--wood-dark), 0 12px 40px rgba(0,0,0,.7); }
     #board { display:block; cursor:crosshair; border-radius:2px; touch-action:manipulation; }
@@ -36,25 +40,25 @@
     #turn-label { font-size:.85rem; font-weight:600; color:var(--wood-light); }
     .score-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
     .score-label { font-size:.72rem; color:var(--ui-dim); }
-    .score-val { font-family:'Noto Sans Mono',monospace; font-size:1.1rem; color:var(--wood-light); }
+    .score-val { font-family:var(--font-mono); font-size:1.1rem; color:var(--wood-light); }
     #captures-b { color:#d6d2c8; } #captures-w { color:#a0a0a0; }
     .territory-row { margin-top:8px; padding-top:8px; border-top:1px dashed var(--ui-border); }
     .territory-row .score-val { font-size:.9rem; }
     #final-score { color:var(--green); font-weight:600; }
-    #message { font-size:.72rem; min-height:2.4em; color:var(--red); line-height:1.6; font-family:'Noto Sans Mono',monospace; }
-    .btn { width:100%; padding:9px 12px; font-family:'Noto Serif JP',serif; font-size:.78rem; letter-spacing:.1em; background:transparent; color:var(--ui-text); border:1px solid var(--ui-border); border-radius:3px; cursor:pointer; transition:all .15s; }
+    #message { font-size:.72rem; min-height:2.4em; color:var(--red); line-height:1.6; font-family:var(--font-mono); }
+    .btn { width:100%; padding:9px 12px; font-family:var(--font-serif); font-size:.78rem; letter-spacing:.1em; background:transparent; color:var(--ui-text); border:1px solid var(--ui-border); border-radius:3px; cursor:pointer; transition:all .15s; }
     .btn:hover { background:rgba(200,160,90,.1); border-color:var(--wood); color:var(--wood-light); }
     .btn:active { background:rgba(200,160,90,.18); }
     .btn:disabled { opacity:.4; cursor:not-allowed; }
     .btn-pass { margin-bottom:6px; }
     .btn.active-mode { border-color:var(--green); color:var(--green); background:rgba(39,174,96,.08); }
-    #log { font-family:'Noto Sans Mono',monospace; font-size:.62rem; color:var(--ui-dim); max-height:140px; overflow-y:auto; line-height:1.7; }
+    #log { font-family:var(--font-mono); font-size:.62rem; color:var(--ui-dim); max-height:140px; overflow-y:auto; line-height:1.7; }
     #log::-webkit-scrollbar { width:4px; } #log::-webkit-scrollbar-thumb { background:var(--ui-border); border-radius:2px; }
     .choice-row { display:flex; gap:6px; margin-top:4px; }
-    .diff-btn,.color-btn,.scoring-btn { flex:1; padding:5px 2px; font-size:.6rem; font-family:'Noto Sans Mono',monospace; background:transparent; color:var(--ui-dim); border:1px solid var(--ui-border); border-radius:2px; cursor:pointer; transition:all .15s; }
+    .diff-btn,.color-btn,.scoring-btn { flex:1; padding:5px 2px; font-size:.6rem; font-family:var(--font-mono); background:transparent; color:var(--ui-dim); border:1px solid var(--ui-border); border-radius:2px; cursor:pointer; transition:all .15s; }
     .diff-btn:hover,.color-btn:hover,.scoring-btn:hover { border-color:var(--wood); color:var(--wood-light); }
     .diff-btn.active,.color-btn.active,.scoring-btn.active { border-color:var(--green); color:var(--green); background:rgba(39,174,96,.08); }
-    .ai-status { font-size:.6rem; color:var(--ui-dim); margin-top:6px; font-family:'Noto Sans Mono',monospace; }
+    .ai-status { font-size:.6rem; color:var(--ui-dim); margin-top:6px; font-family:var(--font-mono); }
     .ai-thinking { color:var(--wood-light); animation:pulse 1s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
   </style>
@@ -99,9 +103,9 @@
       <div class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
         <span>Zugprotokoll</span>
         <span>
-          <button id="btn-copy-log" style="font-size:.55rem;padding:2px 8px;font-family:'Noto Sans Mono',monospace;background:transparent;color:var(--ui-dim);border:1px solid var(--ui-border);border-radius:2px;cursor:pointer;letter-spacing:.05em;" title="Protokoll kopieren">📋</button>
-          <button id="btn-bug-report" style="font-size:.55rem;padding:2px 8px;font-family:'Noto Sans Mono',monospace;background:transparent;color:var(--ui-dim);border:1px solid var(--ui-border);border-radius:2px;cursor:pointer;letter-spacing:.05em;" title="Bug-Report kopieren (Protokoll + Brettzustand + KI-Diagnose)">🐞</button>
-          <button id="btn-sgf" style="font-size:.55rem;padding:2px 8px;font-family:'Noto Sans Mono',monospace;background:transparent;color:var(--ui-dim);border:1px solid var(--ui-border);border-radius:2px;cursor:pointer;letter-spacing:.05em;" title="Als SGF herunterladen">SGF</button>
+          <button id="btn-copy-log" style="font-size:.55rem;padding:2px 8px;font-family:var(--font-mono);background:transparent;color:var(--ui-dim);border:1px solid var(--ui-border);border-radius:2px;cursor:pointer;letter-spacing:.05em;" title="Protokoll kopieren">📋</button>
+          <button id="btn-bug-report" style="font-size:.55rem;padding:2px 8px;font-family:var(--font-mono);background:transparent;color:var(--ui-dim);border:1px solid var(--ui-border);border-radius:2px;cursor:pointer;letter-spacing:.05em;" title="Bug-Report kopieren (Protokoll + Brettzustand + KI-Diagnose)">🐞</button>
+          <button id="btn-sgf" style="font-size:.55rem;padding:2px 8px;font-family:var(--font-mono);background:transparent;color:var(--ui-dim);border:1px solid var(--ui-border);border-radius:2px;cursor:pointer;letter-spacing:.05em;" title="Als SGF herunterladen">SGF</button>
         </span>
       </div>
       <div id="log"></div>
@@ -5686,7 +5690,7 @@ function drawBoardToCache() {
   c.strokeStyle = '#4a2e08'; c.lineWidth = 1.5;
   c.strokeRect(M, M, (SIZE-1)*C, (SIZE-1)*C);
   c.fillStyle = '#5a3a10';
-  c.font = `${Math.round(C*0.38)}px 'Noto Sans Mono',monospace`;
+  c.font = `${Math.round(C*0.38)}px 'Noto Sans Mono', Menlo, Consolas, 'DejaVu Sans Mono', monospace`;
   c.textAlign = 'center'; c.textBaseline = 'middle';
   for (let i = 0; i < SIZE; i++) {
     const gx = M + i*C, gy = M + i*C;
@@ -6493,21 +6497,21 @@ globalThis.policyNet = new PolicyNet();
   display:flex; align-items:center; justify-content:space-between; gap:6px;
 }
 .pd-label {
-  font-size:.6rem; color:var(--ui-dim); font-family:'Noto Sans Mono',monospace;
+  font-size:.6rem; color:var(--ui-dim); font-family:var(--font-mono);
   flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .pd-input {
   width:58px; padding:2px 4px;
   background:rgba(255,255,255,.04); border:1px solid var(--ui-border);
   border-radius:2px; color:var(--wood-light);
-  font-family:'Noto Sans Mono',monospace; font-size:.65rem;
+  font-family:var(--font-mono); font-size:.65rem;
   text-align:right;
 }
 .pd-input:focus { outline:none; border-color:var(--wood); }
 .pd-input.changed { border-color:var(--green); color:var(--green); }
 
 #pd-phase-info {
-  font-family:'Noto Sans Mono',monospace; font-size:.58rem; color:var(--ui-dim);
+  font-family:var(--font-mono); font-size:.58rem; color:var(--ui-dim);
   margin-bottom:6px; line-height:1.7;
 }
 #pd-phase-badge {
@@ -6517,20 +6521,20 @@ globalThis.policyNet = new PolicyNet();
 }
 .pd-reset-row { margin-top:8px; display:flex; gap:6px; }
 .pd-reset-btn {
-  flex:1; padding:5px 4px; font-size:.6rem; font-family:'Noto Sans Mono',monospace;
+  flex:1; padding:5px 4px; font-size:.6rem; font-family:var(--font-mono);
   background:transparent; color:var(--ui-dim); border:1px solid var(--ui-border);
   border-radius:2px; cursor:pointer; letter-spacing:.05em;
 }
 .pd-reset-btn:hover { border-color:var(--red); color:var(--red); }
 .pd-export-btn {
-  flex:1; padding:5px 4px; font-size:.6rem; font-family:'Noto Sans Mono',monospace;
+  flex:1; padding:5px 4px; font-size:.6rem; font-family:var(--font-mono);
   background:transparent; color:var(--ui-dim); border:1px solid var(--ui-border);
   border-radius:2px; cursor:pointer; letter-spacing:.05em;
 }
 .pd-export-btn:hover { border-color:var(--wood); color:var(--wood-light); }
 .pn-stat { display:flex; justify-content:space-between; align-items:center; margin-bottom:3px; }
-.pn-key { font-size:.55rem; color:var(--ui-dim); font-family:'Noto Sans Mono',monospace; }
-.pn-val { font-size:.62rem; color:var(--wood-light); font-family:'Noto Sans Mono',monospace; font-weight:600; }
+.pn-key { font-size:.55rem; color:var(--ui-dim); font-family:var(--font-mono); }
+.pn-val { font-size:.62rem; color:var(--wood-light); font-family:var(--font-mono); font-weight:600; }
 .pn-bar-track { height:5px; background:rgba(255,255,255,.05); border-radius:3px; margin:6px 0 10px; }
 .pn-bar-fill { height:100%; background:linear-gradient(90deg,var(--green),#8fbc5a); border-radius:3px; width:0%; transition:width .6s; }
 .pd-crd-table { width:100%; border-collapse:collapse; margin-top:4px; }
@@ -6540,7 +6544,7 @@ globalThis.policyNet = new PolicyNet();
 }
 .pd-crd-table td { padding:2px 2px; vertical-align:middle; }
 .pd-crd-label {
-  font-size:.58rem; color:var(--ui-dim); font-family:'Noto Sans Mono',monospace;
+  font-size:.58rem; color:var(--ui-dim); font-family:var(--font-mono);
   white-space:nowrap;
 }
 .pd-crd-label.crisis { color:var(--red); }
@@ -6548,18 +6552,18 @@ globalThis.policyNet = new PolicyNet();
   width:38px; padding:2px 3px;
   background:rgba(255,255,255,.04); border:1px solid var(--ui-border);
   border-radius:2px; color:var(--wood-light);
-  font-family:'Noto Sans Mono',monospace; font-size:.62rem;
+  font-family:var(--font-mono); font-size:.62rem;
   text-align:center;
 }
 .pd-crd-input:focus { outline:none; border-color:var(--wood); }
 .pd-crd-input.changed { border-color:var(--green); color:var(--green); }
 .pd-crd-input.crisis-input { border-color:rgba(192,57,43,.4); color:#e07060; }
-.pd-crd-scale { font-size:.48rem; color:#5a5040; font-family:'Noto Sans Mono',monospace; }
+.pd-crd-scale { font-size:.48rem; color:#5a5040; font-family:var(--font-mono); }
 
 .pd-preset-row { display:flex; gap:4px; margin-bottom:8px; flex-wrap:wrap; }
 .pd-preset-btn {
   flex:1; min-width:60px; padding:4px 3px; font-size:.55rem;
-  font-family:'Noto Sans Mono',monospace; background:transparent;
+  font-family:var(--font-mono); background:transparent;
   color:var(--ui-dim); border:1px solid var(--ui-border);
   border-radius:2px; cursor:pointer; letter-spacing:.04em; text-align:center;
 }
@@ -6576,26 +6580,26 @@ globalThis.policyNet = new PolicyNet();
   flex-shrink:0; width:14px; height:14px; border-radius:50%;
   border:1px solid var(--ui-border); background:transparent;
   color:var(--ui-dim); font-size:.5rem; cursor:pointer; line-height:14px;
-  text-align:center; padding:0; font-family:'Noto Sans Mono',monospace;
+  text-align:center; padding:0; font-family:var(--font-mono);
   display:flex; align-items:center; justify-content:center;
 }
 .pd-tip-btn:hover { border-color:var(--wood); color:var(--wood-light); }
 .pd-tip-btn.active { border-color:var(--green); color:var(--green); }
 .pd-tip-text {
   display:none; font-size:.55rem; color:#8a9070;
-  font-family:'Noto Sans Mono',monospace; line-height:1.6;
+  font-family:var(--font-mono); line-height:1.6;
   padding:3px 6px 3px 0; margin-bottom:2px;
 }
 .pd-tip-text.show { display:block; }
 .pd-sec-hint {
-  font-size:.55rem; color:#7a8060; font-family:'Noto Sans Mono',monospace;
+  font-size:.55rem; color:#7a8060; font-family:var(--font-mono);
   line-height:1.6; padding:4px 0 6px; border-bottom:1px dashed var(--ui-border);
   margin-bottom:6px; display:none;
 }
 .pd-sec-hint.show { display:block; }
 .pd-hint-toggle {
   font-size:.5rem; color:var(--ui-dim); background:transparent;
-  border:none; cursor:pointer; padding:0 2px; font-family:'Noto Sans Mono',monospace;
+  border:none; cursor:pointer; padding:0 2px; font-family:var(--font-mono);
 }
 .pd-hint-toggle:hover { color:var(--wood-light); }
 </style>
