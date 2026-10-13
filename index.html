@@ -4004,6 +4004,16 @@ function sampleLegalMoves(board, color, S, koPoint, hardDeadline) {
   return moves;
 }
 
+/* Ko-Punkt nach einem Zug auf i, der cap Steine geschlagen hat: genau ein
+   Stein geschlagen, und der neue Stein steht allein mit einer Freiheit ->
+   diese Freiheit ist für den Gegner verboten. Sonst kein Ko. Dieselbe Regel
+   wie placeStone, rollout und die Wurzel. */
+function koNachZug(board, i, cap) {
+  if (cap !== 1) return null;
+  const ff = floodFill(board, i);
+  return (ff.group.length === 1 && ff.liberties.length === 1) ? ff.liberties[0] : null;
+}
+
 function rollout(board, startColor, histHashes, captures, depth, rootColor, koPoint, hardDeadline) {
   _rolloutScratch.set(board);
   const simCap = {1: captures[1]||0, 2: captures[2]||0};
@@ -4034,12 +4044,7 @@ function rollout(board, startColor, histHashes, captures, depth, rootColor, koPo
     simCap[color] += cap;
     /* Ko-Punkt für den nächsten Ply aktualisieren — floodFill ist billig,
        läuft nur bei Einzelschlag (cap===1), was in Rollouts selten ist. */
-    if (cap === 1) {
-      const ff = floodFill(_rolloutScratch, ch.m.idx);
-      currentKo = (ff.group.length === 1 && ff.liberties.length === 1) ? ff.liberties[0] : null;
-    } else {
-      currentKo = null;
-    }
+    currentKo = koNachZug(_rolloutScratch, ch.m.idx, cap);
     color = opp;
   }
   return evaluateBoard(_rolloutScratch, rootColor, simCap);
@@ -4241,11 +4246,16 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
     _mctsScratch.set(board);
     const cap = {1: captures[1]||0, 2: captures[2]||0};
     let node = root, color = aiColor, v = null;
+    /* Ko-Punkt der Stellung im Baum. An der Wurzel gilt der echte; danach
+       setzt ihn jeder Baumzug neu (koNachZug). Ohne ihn erlaubte die
+       Expansion direkte Ko-Rückschläge, und der Rollout am Blatt bekam den
+       Ko-Punkt der Wurzel statt den der Blattstellung. */
+    let ko = koPoint;
     const path = [];   /* {parentNode, color, kid} je Tiefe — für Standard- und AMAF-Backup */
     for (let depth = 0; depth < PARAMS.mctsMaxDepth; depth++) {
       if (Date.now() > hardDeadline) break;   /* Sicherheitsbremse: teure Expansion abbrechen */
       if (node !== root && node.kids === null) {
-        let legal = getLegalMoves(_mctsScratch, color, _emptyHashes, null, hardDeadline);
+        let legal = getLegalMoves(_mctsScratch, color, _emptyHashes, ko, hardDeadline);
         if (PARAMS.augenSchutz >= 2) legal = legal.filter(m => !fuelltEigenesAuge(_mctsScratch, m.idx, color));
         /* Deadline währenddessen gerissen → Liste evtl. abgeschnitten.
            NICHT cachen: kids=[] würde den Knoten dauerhaft als terminal
@@ -4296,12 +4306,14 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
       }
       const opp = color === 1 ? 2 : 1;
       _mctsScratch[best.idx] = color;
-      cap[color] += removeDeadGroups(_mctsScratch, opp, best.idx);
+      const geschlagen = removeDeadGroups(_mctsScratch, opp, best.idx);
+      cap[color] += geschlagen;
+      ko = koNachZug(_mctsScratch, best.idx, geschlagen);
       path.push({parentNode: node, color, kid: best});
       const firstVisit = best.N === 0;
       color = opp; node = best;
       if (firstVisit) {   /* Blatt: kurzer Rollout als Wert-Schätzung */
-        v = Math.tanh(rollout(_mctsScratch, color, null, cap, PARAMS.mctsRolloutDepth, aiColor, koPoint, hardDeadline) / scale);
+        v = Math.tanh(rollout(_mctsScratch, color, null, cap, PARAMS.mctsRolloutDepth, aiColor, ko, hardDeadline) / scale);
         break;
       }
     }
@@ -4625,8 +4637,10 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
          statt geschätzt und gilt daher für ALLE Stufen. */
       _allDeadStreak++;
       const opp = aiColor === 1 ? 2 : 1;
-      const zurueck = estimateArea(board, aiColor) + (captures[aiColor] || 0)
-                    < estimateArea(board, opp)     + (captures[opp]     || 0);
+      /* Fläche allein: Gefangene zählen bei Flächenzählung nicht (vorher
+         doppelt, Code-Review 13.10.). Komi bleibt draußen wie überall in
+         der Engine. */
+      const zurueck = estimateArea(board, aiColor) < estimateArea(board, opp);
       if (PARAMS.resignEnabled >= 1 && mc >= PARAMS.resignMinMoves &&
           zurueck && _allDeadStreak >= PARAMS.resignAllDeadStreak)
         return {type:'resign', requestId:reqId,
@@ -4949,7 +4963,9 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
       const {captured:cn, undo} = removeDeadGroupsUndoable(_simScratch, opp, m.idx);
       const sc = {1:captures[1], 2:captures[2]}; sc[aiColor] += cn;
       let tot = 0;
-      for (let r = 0; r < R; r++) tot += rollout(_simScratch, opp, histHashes, sc, D, aiColor, koPoint, hardDeadline);
+      /* Ko-Punkt nach dem Kandidaten, nicht der der Ausgangsstellung */
+      const koDanach = koNachZug(_simScratch, m.idx, cn);
+      for (let r = 0; r < R; r++) tot += rollout(_simScratch, opp, histHashes, sc, D, aiColor, koDanach, hardDeadline);
       const comb = (tot/R) * PARAMS.rolloutWeight + score * PARAMS.scoreWeight;
       if (comb > bs) { bs = comb; bm = m; }
       applyUndo(_simScratch, undo);
@@ -4970,6 +4986,10 @@ const KOMI = 7.5;
 const state = {
   board: createBoard(), currentPlayer: 1, captures: {1:0,2:0},
   boardHistory: new Set([computeZobrist(createBoard())]),
+  /* Dieselben Hashes in Zugfolge: undo() kürzt die Liste und baut die Menge
+     daraus neu. Vorher nahm undo() nur die letzten 50 Undo-Einträge, und
+     ältere Stellungen fielen aus der Superko-Prüfung. */
+  hashListe: [computeZobrist(createBoard())],
   currentHash: computeZobrist(createBoard()),
   consecutivePasses: 0, moveCount: 0, gameOver: false, log: [], lastMove: null,
   koPoint: null,                          // Fix 7: 1-Ply-Ko-Punkt (Index oder null)
@@ -5000,7 +5020,11 @@ function saveUndoState() {
     gameOver: state.gameOver, logLength: state.log.length,
     deadStones: new Set(state.deadStones), lastMove: state.lastMove,
     sgfLen: state.sgfMoves.length,
-    koPoint: state.koPoint                  // Fix 7
+    koPoint: state.koPoint,                 // Fix 7
+    hashLen: state.hashListe.length,
+    /* PolicyNet trainiert auf seinen Zügen dieser Partie; undo() nimmt die
+       zurückgenommenen aus dem Puffer. */
+    netBufLen: globalThis.policyNet && policyNet._gameBuffer ? policyNet._gameBuffer.length : 0
   });
   if (state.undoStack.length > 50) state.undoStack.shift();
   updateUndoButton();
@@ -5017,9 +5041,13 @@ function undo() {
   state.koPoint = prev.koPoint;            // Fix 7
   state.sgfMoves.length = prev.sgfLen;     // SGF-Zugliste mit zurückrollen
   state.log.splice(prev.logLength);
-  state.boardHistory = new Set([computeZobrist(createBoard())]);
-  for (const entry of state.undoStack) state.boardHistory.add(entry.currentHash);
-  state.boardHistory.add(state.currentHash);
+  state.hashListe.length = prev.hashLen;
+  state.boardHistory = new Set(state.hashListe);
+  if (globalThis.policyNet && policyNet._gameBuffer && policyNet._gameBuffer.length > prev.netBufLen)
+    policyNet._gameBuffer.length = prev.netBufLen;
+  /* Eine Aufgabe der KI hat keinen eigenen Undo-Eintrag; wer danach
+     zurücknimmt, spielt weiter, die Aufgabe gilt nicht mehr (SGF RE). */
+  state.resignedBy = null; state.finalMargin = null;
   document.getElementById('territory-panel').style.display = 'none';
   drawStateToCache(); render(); updateUI(); updateAIStatus(); updateUndoButton();
 }
@@ -5045,7 +5073,7 @@ function placeStone(x, y) {
   if (state.boardHistory.has(newHash)) return {ok:false,reason:'Superko verboten.'};
   saveUndoState();
   state.board = test; state.captures[state.currentPlayer] += cap;
-  state.currentHash = newHash; state.boardHistory.add(newHash);
+  state.currentHash = newHash; state.boardHistory.add(newHash); state.hashListe.push(newHash);
   state.consecutivePasses = 0; state.moveCount++;
   state.lastMove = i; pendingTouch = null;
   /* Fix 7: Ko-Punkt setzen — genau 1 Stein geschlagen, schlagender Stein ist
@@ -5093,7 +5121,7 @@ function resetGame() {
   const eb = createBoard(), eh = computeZobrist(eb);
   Object.assign(state, {
     board: eb, currentPlayer: 1, captures: {1:0,2:0},
-    boardHistory: new Set([eh]), currentHash: eh,
+    boardHistory: new Set([eh]), hashListe: [eh], currentHash: eh,
     consecutivePasses: 0, moveCount: 0, gameOver: false, lastMove: null,
     koPoint: null,                         // Fix 7
     sgfMoves: [],
@@ -5217,14 +5245,17 @@ function applyAIResult(result, reqId, netInp, netPriors, netHidden) {
   if (state.gameOver || state.currentPlayer !== state.aiColor) {
     state.aiThinking = false; updateAIStatus(); return;
   }
-  if (netPriors && result.type === 'stone' && globalThis.policyNet) {
-    policyNet._gameBuffer.push({
-      inp: netInp, probs: netPriors, hidden: netHidden,
-      moveIdx: idx(result.x, result.y)
-    });
-  }
   if (result.type === 'stone') {
     const r = placeStone(result.x, result.y);
+    /* Erst nach dem gelungenen Zug in den Trainingspuffer: placeStone hat
+       dabei den Undo-Eintrag mit der Pufferlänge davor angelegt, und ein
+       abgelehnter Zug gehört nicht ins Training. */
+    if (r.ok && netPriors && globalThis.policyNet) {
+      policyNet._gameBuffer.push({
+        inp: netInp, probs: netPriors, hidden: netHidden,
+        moveIdx: idx(result.x, result.y)
+      });
+    }
     if (!r.ok) {
       state.log.push(`! KI: ${r.reason} → Fallback`);
       const fb = findAnyLegalMove(state.aiColor);
@@ -5250,6 +5281,10 @@ function applyAIResult(result, reqId, netInp, netPriors, netHidden) {
     const _cSave = {...state.captures};
     const _dSave = state.deadStones;
     const _logLen = state.log.length;
+    /* PolicyNet: Die KI hat aufgegeben, also verloren -- wie die Fläche
+       gerade steht, spielt keine Rolle. Vor showFinalScore, das sonst nach
+       Fläche trainiert hätte. */
+    if (globalThis.policyNet && !policyNet._trained) { policyNet._trained = true; policyNet.trainGame(-1); }
     resolveLifeAndDeath();
     showFinalScore();
     const stand = state.finalMargin;
@@ -5365,9 +5400,27 @@ function fallbackToMainThread(reqId, netInp, netPriors, netHidden) {
   }, 10);
 }
 
+/* Worker aus data:- oder blob:-URL bauen und die Handler anhängen.
+   data: zuerst — unter file:// (Origin "null") oft der einzige Weg. */
+function erzeugeWorker(art) {
+  const workerSrc = buildWorkerSource();
+  let url;
+  if (art === 'data') {
+    /* UTF-8-sicheres Base64 — btoa() allein crasht an den deutschen
+       Umlauten in den Kommentaren. */
+    url = 'data:application/javascript;base64,' + btoa(unescape(encodeURIComponent(workerSrc)));
+  } else {
+    url = URL.createObjectURL(new Blob([workerSrc], {type: 'application/javascript'}));
+  }
+  state.aiWorker = new Worker(url);
+  state.aiWorkerCtx = {url, art, antwort: false, letzteAnfrage: null, netInp: null, netPriors: null, netHidden: null};
+  attachWorkerHandlers();
+}
+
 function attachWorkerHandlers() {
   state.aiWorker.onmessage = function(e) {
     const ctx = state.aiWorkerCtx;
+    if (ctx) ctx.antwort = true;   /* der Worker läuft; ein späterer Fehler ist ein echter Absturz */
     /* Messwert des Workers in die Hauptthread-Kopie übernehmen — der
        Watchdog in triggerAIMove nutzt getAdaptiveTimeBudget und rechnete
        sonst für immer mit _lastMsPerSim === null (worker-ai läuft in
@@ -5394,8 +5447,26 @@ function attachWorkerHandlers() {
       ctx ? ctx.netInp : null, ctx ? ctx.netPriors : null, ctx ? ctx.netHidden : null);
   };
   state.aiWorker.onerror = function(err) {
-    console.error('[Worker] Fehler:', err.message || err);
     const ctx = state.aiWorkerCtx;
+    /* Chrome lehnt einen data:-Worker manchmal erst asynchron ab, über
+       onerror, nicht beim Erzeugen. Dann zuerst blob: versuchen und dieselbe
+       Anfrage neu senden, statt sofort für immer auf den Hauptthread zu
+       gehen (Code-Review 13.10., Punkt 5). Nur, solange der data:-Worker
+       noch nie geantwortet hat. */
+    if (ctx && ctx.art === 'data' && !ctx.antwort && ctx.letzteAnfrage) {
+      const anfrage = ctx.letzteAnfrage, netz = {netInp: ctx.netInp, netPriors: ctx.netPriors, netHidden: ctx.netHidden};
+      try {
+        cleanupWorker();
+        erzeugeWorker('blob');
+        Object.assign(state.aiWorkerCtx, netz, {letzteAnfrage: anfrage});
+        state.log.push('! data:-Worker abgelehnt → blob:-Worker');
+        state.aiWorker.postMessage(anfrage);
+        return;
+      } catch (e2) {
+        console.warn('[Worker] blob:-URL ebenfalls fehlgeschlagen:', e2.message || e2);
+      }
+    }
+    console.error('[Worker] Fehler:', err.message || err);
     state.workerDeadReason = `onerror: ${err.message || 'unbekannt'}`;
     state.log.push(`! Worker-Crash: ${err.message || 'unbekannt'} → synchroner Modus`);
     state.workerDead = true;   /* nicht bei jedem Zug erneut versuchen */
@@ -5470,30 +5541,18 @@ function triggerAIMove() {
     if (state.workerDead) { fallbackToMainThread(reqId, _netInp, _netPriors, _netHidden); return; }
     try {
       if (!state.aiWorker) {
-        const workerSrc = buildWorkerSource();
-        try {
-          /* Versuch 1: data:-URL. UTF-8-sicheres Base64 — btoa() allein
-             crasht an den deutschen Umlauten in den Kommentaren. */
-          const dataUrl = 'data:application/javascript;base64,'
-                        + btoa(unescape(encodeURIComponent(workerSrc)));
-          state.aiWorker = new Worker(dataUrl);
-          state.aiWorkerCtx = {url: dataUrl, netInp: null, netPriors: null, netHidden: null};
-        } catch (e1) {
+        try { erzeugeWorker('data'); }
+        catch (e1) {
           console.warn('[Worker] data:-URL fehlgeschlagen, versuche blob:', e1.message || e1);
-          /* Versuch 2: blob:-URL */
-          const blob = new Blob([workerSrc], {type: 'application/javascript'});
-          const url  = URL.createObjectURL(blob);
-          state.aiWorker = new Worker(url);
-          state.aiWorkerCtx = {url: url, netInp: null, netPriors: null, netHidden: null};
+          erzeugeWorker('blob');
         }
-        attachWorkerHandlers();
       }
       /* Kontext für diesen Zug merken (onmessage braucht die Priors) */
       state.aiWorkerCtx.netInp    = _netInp;
       state.aiWorkerCtx.netPriors = _netPriors;
       state.aiWorkerCtx.netHidden = _netHidden;
 
-      state.aiWorker.postMessage({
+      const anfrage = {
         board:    Array.from(state.board),
         aiColor:  state.aiColor,
         histHashes: Array.from(state.boardHistory),
@@ -5505,7 +5564,9 @@ function triggerAIMove() {
         params:   JSON.parse(JSON.stringify(PARAMS)),
         netPriors: _netPriors ? Array.from(_netPriors) : null,
         netBlend:  _netPriors ? policyNet.blendWeight : 0
-      });
+      };
+      state.aiWorkerCtx.letzteAnfrage = anfrage;   /* für den Wechsel data: → blob: in onerror */
+      state.aiWorker.postMessage(anfrage);
 
       /* Watchdog: falls der Worker durch eine echte Endlosschleife hängt
          (kein try/catch der Welt hilft dagegen), erzwinge nach großzügiger
@@ -5650,6 +5711,9 @@ function findAnyLegalMove(color) {
     const test = cloneBoard(state.board); test[i] = color;
     const cap = removeDeadGroups(test, opp, i);
     if (cap === 0 && floodFill(test, i).liberties.length === 0) continue;
+    /* Kein eigenes Auge füllen: lieber passen (null) als die eigene Gruppe
+       umbringen. */
+    if (cap === 0 && fuelltEigenesAuge(state.board, i, color)) continue;
     if (!state.boardHistory.has(computeZobrist(test)))
       return {x: xOf(i), y: yOf(i)};
   }
@@ -6838,6 +6902,7 @@ globalThis.policyNet = new PolicyNet();
      liegt sie bis zu ihrer Auswertung in der temporalen Todeszone, und
      der Zugriff aus der (hochgezogenen) Funktion wirft dann still. */
   const PD_STORE = 'go_params';
+  const PD_VERSION = 2;   /* Format des Speichers, s. dashSave */
 
   const sidebar = document.querySelector('.sidebar');
   /* Gespeicherte Konfiguration einspielen, BEVOR die Regler gebaut werden —
@@ -7133,9 +7198,19 @@ globalThis.policyNet = new PolicyNet();
     if (window.policyNet) policyNet.dashUpdate();
   };
 
+  /* Gespeichert werden nur Abweichungen vom Default, mit Versionsnummer.
+     Früher lag hier der ganze Parametersatz: Wer einmal gespeichert hatte,
+     behielt alle Defaults von damals, und keine spätere Messung kam in
+     seinem Browser an (README, „Gemessen heißt nicht wirksam“). */
+  function dashAbweichungen() {
+    const a = {};
+    for (const k of Object.keys(PARAMS_DEFAULT))
+      if (typeof PARAMS[k] === 'number' && Math.abs(PARAMS[k] - PARAMS_DEFAULT[k]) > 1e-12) a[k] = PARAMS[k];
+    return a;
+  }
   window.dashSave = function() {
     let ok = true;
-    try { localStorage.setItem(PD_STORE, JSON.stringify(PARAMS)); }
+    try { localStorage.setItem(PD_STORE, JSON.stringify({version: PD_VERSION, abweichungen: dashAbweichungen()})); }
     catch (e) { console.warn('[Dashboard] Speichern fehlgeschlagen:', e); ok = false; }
     const btn = document.querySelectorAll('.pd-export-btn')[0];
     const orig = btn.textContent;
@@ -7154,9 +7229,20 @@ globalThis.policyNet = new PolicyNet();
     if (!raw) return 0;
     let obj;
     try { obj = JSON.parse(raw); } catch (e) { console.warn('[Dashboard] Gespeicherte Konfig unlesbar, ignoriert'); return 0; }
+    /* Altes Format (der ganze Parametersatz, ohne Version): Welche Werte
+       bewusst geändert waren, lässt sich nicht mehr erkennen, und die
+       übrigen hielten veraltete Defaults fest. Einmal verwerfen, sichtbar
+       im Protokoll. */
+    if (!obj || obj.version !== PD_VERSION || typeof obj.abweichungen !== 'object' || !obj.abweichungen) {
+      try { localStorage.removeItem(PD_STORE); } catch (e) {}
+      const hinweis = 'Gespeicherte Einstellungen im alten Format verworfen (sie hielten alte Defaults fest). Eigene Änderungen bitte neu speichern.';
+      console.warn('[Dashboard] ' + hinweis);
+      if (typeof state !== 'undefined' && state.log) state.log.push('! ' + hinweis);
+      return 0;
+    }
     let n = 0;
     for (const k of Object.keys(PARAMS_DEFAULT)) {
-      const v = obj[k];
+      const v = obj.abweichungen[k];
       if (typeof v === 'number' && Number.isFinite(v)) { PARAMS[k] = v; n++; }
     }
     if (n) console.log(`[Dashboard] ${n} gespeicherte Parameter geladen`);

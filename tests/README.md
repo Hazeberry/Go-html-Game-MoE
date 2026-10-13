@@ -67,12 +67,14 @@ niemand ausliefert.
 | `gebiet-sicher.js` | Kandidaten | `gebietSicher` Default 0; bitgenau ohne Urteil, mit Urteil bei 0 und mit leerem Urteil; `lsNach` (tote Steine weg, bei 2 nicht; kritische Gruppen je nach Zug, angehängter Stein fällt mit); Gebietsterm = `gebietZug` × Bilanzänderung mit Urteil, nicht inkrementell nachgerechnet; `urteilAusGtp` liest GNU Gos `dragon_status`/`dragon_stones` |
 | `zaehlung.js` | Auszählung | `toteSteineAmEnde`: in der Partie vom 12.10. genau die acht toten schwarzen Steine, W+102,5 wie GNU Go (alte Regel: W+70,5); Eindringling, zwei Augen, Zwei-Punkte-Auge, großes Auge; unfertige Stellungen fast unberührt |
 | `extern.js` | Datenschutz | `index.html` lädt nichts von fremden Servern: keine http(s)-Adressen in `src`, `href`, `@import`, `url()`, `fetch`, kein Google Fonts; Schriften aus lokalen Schriftreihen |
+| `ko-suche.js` | Suche | `koNachZug`; in `mctsPUCT` bekommen Expansion und Rollout nach einem Ko-Schlag den Ko-Punkt, der sofortige Rückschlag steht nicht unter den Antworten (Code-Review 13.10.) |
 | `nan-guards.js` | Logik im Prozess | `_mctsKids` bei NaN/Infinity, `mctsPUCT` mit vergifteter Wurzelliste, `forward`/`save`/`load`/`_backward`/`trainGame`-Schutz |
 | `resign-criterion.js` | Aufgabe | gibt die KI nur noch auf, wenn auch das Gebiet verloren sagt |
 | `training-stability.js` | Training | Regularisierungs-Parameter, Gradienten-Deckel, Max-Norm-Projektion, Advantage-Dämpfung, dazu der ursprüngliche Repro-Lauf |
 | `harness-smoke.js` | Messwerkzeug | läuft `ab-harness.js` einmal winzig durch — misst nichts, prüft nur, dass er noch anläuft |
 | `gnugo-bruecke.js` | Messwerkzeug | kurze Partien gegen GNU Go über GTP, mit und ohne Vorgabe; mit `--gnugo-aufgabe 0` läuft eine Partie weiter, die GNU Go sonst aufgibt. Ohne GNU Go übersprungen |
 | `browser-nan.js` | echter Browser | Chromium, echter Web Worker, echtes `localStorage` — der Pfad, auf dem der Fehler gemeldet wurde |
+| `browser-ui.js` | Browser | Code-Review 13.10.: Superko-Verlauf nach Undo über 50 Züge hinaus; PolicyNet-Puffer erst nach gelungenem Zug, Undo nimmt ihn heraus; Aufgabe der KI trainiert als Niederlage, nach Undo kein „+R“; Notzug füllt kein eigenes Auge; Dashboard speichert nur Abweichungen (Version 2), altes Format wird verworfen; asynchron abgelehnter `data:`-Worker → `blob:`-Worker |
 
 Der Browser-Test ist nicht redundant: die Node-Tests werten die Skript-Blöcke
 im Prozess aus und sehen den Worker nie. Der gemeldete Crash tötete aber erst

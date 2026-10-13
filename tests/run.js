@@ -1,7 +1,7 @@
 /* Alle Tests nacheinander. Jeder ist auch einzeln aufrufbar.
 
    Aufruf:  node tests/run.js [pfad/zur/index.html]
-            node tests/run.js --ohne-browser [pfad]   (alles außer browser-nan)
+            node tests/run.js --ohne-browser [pfad]   (alles außer browser-nan und browser-ui)
 
    Ohne Playwright überspringt sich der Browser-Test, der Gesamtlauf bleibt
    dann grün — er prüft die Logik dann eben nur im Prozess.
@@ -23,9 +23,9 @@ const HTML = pfad ? [path.resolve(pfad)] : [];
 
 const ALLE = ['regeln.js', 'nan-guards.js', 'resign-criterion.js', 'transfer-telemetry.js',
               'benson-transfer.js', 'feste-sims.js', 'roh-dump.js',
-              'influence.js', 'endspiel-gleichstand.js', 'epochen.js', 'raumrisiko.js', 'gebiet.js', 'endspiel-augen.js', 'gegnerwert.js', 'lesen.js', 'wurzel.js', 'quick-rettung.js', 'atari-verzicht.js', 'muster.js', 'gebiet-sicher.js', 'zaehlung.js', 'extern.js', 'gnugo-bruecke.js',
-              'training-stability.js', 'harness-smoke.js', 'browser-nan.js'];
-const SUITEN = OHNE_BROWSER ? ALLE.filter(s => s !== 'browser-nan.js') : ALLE;
+              'influence.js', 'endspiel-gleichstand.js', 'epochen.js', 'raumrisiko.js', 'gebiet.js', 'endspiel-augen.js', 'gegnerwert.js', 'lesen.js', 'wurzel.js', 'quick-rettung.js', 'atari-verzicht.js', 'muster.js', 'gebiet-sicher.js', 'zaehlung.js', 'extern.js', 'ko-suche.js', 'gnugo-bruecke.js',
+              'training-stability.js', 'harness-smoke.js', 'browser-nan.js', 'browser-ui.js'];
+const SUITEN = OHNE_BROWSER ? ALLE.filter(s => !s.startsWith('browser-')) : ALLE;
 
 /* training-stability nimmt Partien/Züge VOR dem Pfad — deshalb die Defaults
    mitgeben, wenn ein Pfad durchgereicht wird. */
