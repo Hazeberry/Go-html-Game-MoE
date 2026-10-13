@@ -14,7 +14,9 @@ node auswertung/hashliste.js neu.jsonl --pruefe docs/daten/<lauf>.json
 ```
 
 Weicht eine Partie ab, stimmt der Commit nicht, oder die Reproduzierbarkeit
-ist gebrochen. Im Paarmodus gilt das nicht (Errata E7); alle Läufe hier sind
+ist gebrochen. Den Commit aus dem Befehl auschecken, nicht den neuesten
+Stand: Seit der Ko-Korrektur vom 13.10. spielt die KI auf dem neuen Stand
+andere Züge (`docs/code-review.md` §4). Im Paarmodus gilt das nicht (Errata E7); alle Läufe hier sind
 im Standardmodus gefahren.
 
 Wurde ein Lauf unterbrochen und mit `--fortsetzen` zu Ende gespielt, steht das

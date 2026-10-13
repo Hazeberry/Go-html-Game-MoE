@@ -207,4 +207,5 @@ Füllungen), B in keiner. Zeit je Partie: A 15,5 s, B 15,2 s.
   spielen mit 700 bis 1 300 Simulationen.
 - **Ältere Läufe:** Ein Arm „Default" heißt ab jetzt auch `augenSchutz` = 2
   und `passUnabwendbar` = 1. Wer einen älteren Lauf wiederholt, nimmt dessen
-  Commit oder setzt beide in beiden Armen auf 0.
+  Commit. Bis zum 12.10. ging auch, beide in beiden Armen auf 0 zu setzen;
+  seit der Ko-Korrektur vom 13.10. nicht mehr (`code-review.md` §4).
