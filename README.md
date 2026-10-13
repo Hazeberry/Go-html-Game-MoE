@@ -307,6 +307,10 @@ mit und bewusste Abweichungen bleiben trotzdem erhalten. Bis dahin gilt:
 `dashReset` (`index.html:3697`) löscht den Speicher und stellt die gemessenen
 Werte wieder her.
 
+**Behoben am 13.10.:** `dashSave` speichert nur noch Abweichungen vom
+Default, mit Versionsnummer. Ein Speicherstand im alten Format wird einmal
+verworfen, mit Hinweis im Protokoll ([`docs/code-review.md`](docs/code-review.md)).
+
 ### Divergierendes Training, NaN-Priors, toter PUCT-Knoten
 
 Derselbe Speicher-Mechanismus hat einen zweiten Fehler sichtbar gemacht. Ein
@@ -2331,6 +2335,13 @@ Gos besten Zug nur in 19 % der Züge (GNU Go Stufe 1: 69 %), obwohl er meist
 unter ihren Kandidaten steht. Weder ein einzelner Term noch mehr Suche
 (1000 statt 120 Simulationen) ändert das. Ihr fehlt ein Maß für den Wert
 eines Grenzzugs: [`docs/punktverlust-muster.md`](docs/punktverlust-muster.md).
+
+**Code-Review vom 13.10.** Ein Review der ganzen `index.html` fand neun
+echte Fehler, alle behoben und mit Tests abgesichert. Der wichtigste: Die
+Suche kannte im Baum und in den Rollouts keinen Ko-Punkt. Dazu kamen Undo
+(Superko-Verlauf, Trainingspuffer, „+R“), das Training nach einer Aufgabe,
+der Rückfall des Workers, der Notzug und das Speichern im Dashboard:
+[`docs/code-review.md`](docs/code-review.md).
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
