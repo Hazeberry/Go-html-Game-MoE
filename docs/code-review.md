@@ -81,3 +81,34 @@ Endpunkt: gepaarte Differenz B − A des Endstands, zweiseitig, α = 0,05, mit
 **Entscheidung, vorab festgelegt:** Eine Regelkorrektur bleibt, außer sie
 ist signifikant schlechter. Ist B signifikant schlechter, wird die Ursache
 gesucht, bevor sie bleibt.
+
+## 4. Ergebnis der Messung
+
+**Stand: 13.10.2026.** Arm B lief wie festgelegt auf dem Merge-Commit
+`7b05a74`, alle 240 Partien ausgespielt, keine abgebrochen.
+
+| | Arm A (ohne Ko in der Suche) | Arm B (mit Ko) |
+|---|---:|---:|
+| Endstand im Schnitt | +21,6 | +22,6 |
+| Siege von 240 | 149 | 157 |
+| Partien mit vorzeitigem Pass | 27 | 24 |
+| Züge je Partie im Schnitt | 239 | 236 |
+
+- **Endstand B − A: +0,9 Punkte, 95 %: [−5,3; +7,2], p = 0,77.** B ist in
+  118 Paaren besser, in 94 schlechter, in 28 gleich.
+- Nach Zug 120: +0,3 (p = 0,76). Nach Zug 200: −2,4 (p = 0,40, nur 168
+  Paare, weil viele Partien vorher enden).
+- 235 von 240 Partien weichen ab. Die erste Abweichung liegt im Median bei
+  Zug 90 (Quartile 72 und 128).
+- Die Partien sind unabhängig von der Rechnerlast: Die 16 Partien der Probe
+  aus §3 kamen im Lauf Zug für Zug genauso heraus.
+
+**Entscheidung nach §3:** B ist nicht signifikant schlechter, die
+Korrektur bleibt. Sie macht die KI nicht messbar stärker. Das Intervall
+schließt aber Verluste über gut 5 Punkte aus. Die Korrektur ändert oft die
+Zugwahl: Jeder Schlag eines einzelnen Steins im Suchbaum setzt einen
+Ko-Punkt. Im Endstand gleichen sich die Änderungen aus. Warum, ist nicht
+gemessen.
+
+Daten: [`daten/ko-gnugo.json`](daten/ko-gnugo.json), beide Arme, eine
+Zeile je Partie. Arm A ist derselbe wie in `daten/sicher2-gnugo.json`.
