@@ -2324,7 +2324,10 @@ je Kette: Lebende Randsteine verschwanden, und ein Zwei-Punkte-Auge galt als
 zwei Augen. In einer Partie vom 12.10. zeigte sie W+70,5 statt W+102,5. Die
 neue Regel `toteSteineAmEnde` beurteilt Gruppen und ihre Augenräume. An
 480 Partien gegen GNU Go trifft sie dessen Endstand in 68,5 % genau (alt:
-2,1 %) und den Sieger in 440 statt 262 Fällen. Die KI selbst ist davon nicht
+2,1 %) und den Sieger in 440 statt 262 Fällen. Seit dem 13.10. erkennt sie
+auch Augen mit 4 oder 5 Punkten, die leben: Eine Partie, in der Schwarz nach
+den Pässen der KI die eigenen Augen zugefüllt hatte, zählte W+304,5 statt
+B+93,5. Jetzt trifft sie GNU Go in 70,2 %. Die KI selbst ist davon nicht
 betroffen: [`docs/zaehlung.md`](docs/zaehlung.md).
 
 **Wo die Muster-KI ihre Punkte verliert.** Ab Zug 80 verliert sie gegen GNU

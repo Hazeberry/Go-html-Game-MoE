@@ -1,6 +1,7 @@
 # Auszählung am Partieende: tote Steine je Gruppe statt je Kette
 
-**Stand: 12.10.2026.** Fehlerbehebung in der App, keine Änderung der KI.
+**Stand: 13.10.2026** (§5 neu). Fehlerbehebung in der App, keine Änderung
+der KI.
 
 ---
 
@@ -40,6 +41,8 @@ Ketten:
   - eine Kette ist nach Benson lebendig, oder
   - der Verband hat zwei Augen, oder
   - er hat ein Auge mit mindestens 6 Punkten (`AUGE_GROSS`), oder
+  - er hat ein leeres Auge mit 4 oder 5 Punkten ohne Nakade-Form, das an
+    nur eine Kette grenzt (seit dem 13.10., §5), oder
   - er grenzt an eine gemischte Region ab 40 Punkten (`OFFEN_GROSS`), ist
     also nicht eingeschlossen.
 - **Tot:** Was nach Benson tot ist. Danach stirbt der schwächste übrige
@@ -113,3 +116,60 @@ traf jede Zählung vor dem Ende, zum Beispiel den Stand nach einer Aufgabe.
   - Die KI selbst und alle Messungen. `gnugo-duell.js` lässt GNU Go zählen,
     `ab-harness.js` hat eine eigene Zählung.
 - Tests: `tests/zaehlung.js`
+
+## 5. Nachtrag 13.10.: die Form eines einzelnen Auges
+
+**Anlass.** In einer Partie vom 13.10. (Mensch Schwarz gegen KI Weiß, Stufe
+leicht, 479 Züge, jetzt `tests/stellungen/auge-479.sgf`) passte die KI ab Zug
+330 bei jedem Zug. Schwarz spielte weiter und setzte 74 Steine ins eigene
+Gebiet, darunter in fast alle eigenen Augen. Die große schwarze Gruppe
+links (194 Steine) behielt ein einziges Auge mit fünf Punkten in T-Form
+(B13, C13, D13, C12, C11). Die App erklärte sie für tot und zeigte
+**W+304,5**. GNU Go zählt **B+93,5** und hält keinen Stein für tot.
+
+**Ursache.** Ein einzelnes Auge galt erst ab 6 Punkten (`AUGE_GROSS`) als
+lebendig. Ein T-förmiges Fünf-Punkte-Auge lebt aber: Setzt der Gegner auf
+den Kreuzungspunkt, teilt der Besitzer den Rest in zwei Augen.
+
+**Regel.** Ein Auge mit 4 oder 5 Punkten zählt wie ein großes Auge, wenn
+- es keine Nakade-Form hat (`augeTeilbar`): Quadrat und Pyramide bei 4
+  Punkten, bauchige Fünf und Kreuz bei 5. Pyramide und Kreuz haben einen
+  Punkt, der an alle übrigen grenzt, Quadrat und bauchige Fünf enthalten
+  einen 2×2-Block. So geht es ohne Drehtabellen.
+- es an nur eine Kette grenzt. Sonst kann der Gegner die Wand schneiden.
+- kein Stein darin liegt. Sonst entscheidet ein Rennen um Freiheiten, nicht
+  die Form.
+
+**Prüfung an den 480 Partien aus §3:**
+
+| Regel | genau wie GNU Go | Abweichung Ø | Sieger wie GNU Go | geänderte Partien |
+|---|---:|---:|---:|---|
+| bisher (erst ab 6 Punkten) | 329 | 13,6 | 440 | — |
+| nur die Form | 334 | 13,4 | 437 | 20: 11 besser, 9 schlechter |
+| Form, eine Kette | 337 | 13,1 | 440 | 11: 10 besser, 1 schlechter |
+| **Form, eine Kette, leer** | **337 (70,2 %)** | **13,1** | **440** | **8: alle besser** |
+
+Mit der Form allein starben Gruppen nicht mehr, die GNU Go für tot hält.
+Ihre Augen grenzten an eine schwache Kette, etwa einen einzelnen Stein am
+Rand, der sich schlagen lässt, oder an zwei Ketten, die nur schräg
+zusammenhingen. Der eine schlechtere Fall mit „eine Kette“ hatte zwei
+fremde Steine im Auge.
+
+Mitten in der Partie (Stellungen nach Zug 60, 120, 180 wie in §3) ändert
+sich nichts: im Schnitt 0,1, 2,7 und 16,0 tote Steine wie vorher. Die
+Partien aus der Tabelle in §3 zählen wie vorher.
+
+**Die Partie Zug für Zug.** Nach jedem Zug von Schwarz ab Zug 265 (108
+Stellungen) gezählt und mit GNU Gos `final_score` verglichen: Von Zug 327
+bis 475 zählen alte und neue Regel wie GNU Go. Erst Zug 477 füllt das
+vorletzte Auge, danach zählt die alte Regel W+304,5, die neue B+93,5 wie GNU
+Go. Zwischen Zug 277 und 325 liegt die App 2 bis 8 Punkte über GNU Go, mit
+beiden Regeln gleich: Weiß spielte noch, und GNU Go bewertet offene Grenzen
+selbst.
+
+**Grenzen.** Die Sonderfälle in der Ecke kennt die Regel nicht, zum Beispiel
+die geknickte Vier. Ein Auge mit 6 oder mehr Punkten zählt weiter immer,
+auch das Kaninchen-Sechs. Seki kennt sie weiterhin nicht.
+
+Tests: `tests/zaehlung.js` (die Partie und die Nakade-Formen auf kleinen
+Brettern).

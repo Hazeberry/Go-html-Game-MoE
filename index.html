@@ -547,7 +547,8 @@ function bensonClassify(board) {
    stelle mehr). Ein Auge ist eine leere Region, die nur an Steine des
    Verbands grenzt -- die Region als Ganzes, nicht jeder ihrer Punkte.
      lebt: eine Kette Benson-lebendig, oder zwei Augen, oder ein Auge mit
-           mindestens AUGE_GROSS Punkten, oder der Verband grenzt an eine
+           mindestens AUGE_GROSS Punkten oder mit 4 bis 5 Punkten ohne
+           Nakade-Form (augeTeilbar), oder der Verband grenzt an eine
            gemischte Region ab OFFEN_GROSS Punkten (dann ist er nicht
            eingeschlossen; das schützt unfertige Stellungen, etwa nach einer
            Aufgabe, in denen kaum eine Region nur an eine Farbe grenzt)
@@ -564,6 +565,27 @@ function bensonClassify(board) {
    Seki erkennt die Regel nicht: Von zwei Gruppen ohne zwei Augen, die
    sich Freiheiten teilen, stirbt die schwächere. */
 const AUGE_GROSS = 6, OFFEN_GROSS = 40;
+/* Ein Auge mit 4 oder 5 Punkten teilt der Besitzer in zwei, auch wenn der
+   Gegner zuerst hineinsetzt -- außer bei den Nakade-Formen: Quadrat und
+   Pyramide (4 Punkte), bauchige Fünf und Kreuz (5). Ohne Drehtabellen
+   erkennbar: Pyramide und Kreuz haben einen Punkt, der an alle übrigen
+   grenzt; Quadrat und bauchige Fünf enthalten einen 2×2-Block.
+   Vorher galt ein einzelnes Auge erst ab AUGE_GROSS Punkten als lebendig:
+   Eine Gruppe mit einem T-förmigen Fünf-Punkte-Auge starb, die Partie vom
+   13.10. (stellungen/auge-479.sgf) zählte W+304,5 statt B+93,5. */
+function augeTeilbar(punkte) {
+  const n = punkte.length;
+  if (n < 4 || n > 5) return false;
+  const drin = new Set(punkte);
+  for (const p of punkte) {
+    let k = 0;
+    for (const q of NEIGHBORS[p]) if (drin.has(q)) k++;
+    if (k === n - 1) return false;
+    const x = p % SIZE, y = (p - x) / SIZE;
+    if (x < SIZE - 1 && y < SIZE - 1 && drin.has(p + 1) && drin.has(p + SIZE) && drin.has(p + SIZE + 1)) return false;
+  }
+  return true;
+}
 function toteSteineAmEnde(board, augeGross = AUGE_GROSS, offenGross = OFFEN_GROSS) {
   const N = BOARD_SIZE, tot = new Uint8Array(N);
   const ep = bensonClassify(board);
@@ -586,12 +608,15 @@ function toteSteineAmEnde(board, augeGross = AUGE_GROSS, offenGross = OFFEN_GROS
     for (let i = 0; i < N; i++) {
       if (b[i] || reg[i] >= 0) continue;
       const id = regionen.length, q = [i]; reg[i] = id;
-      let rand = 0;
+      let rand = 0, k1 = -1, eineKette = true;
       for (let k = 0; k < q.length; k++) for (const n of NEIGHBORS[q[k]]) {
         if (!b[n]) { if (reg[n] < 0) { reg[n] = id; q.push(n); } }
-        else rand |= b[n];
+        else {
+          rand |= b[n];
+          if (k1 < 0) k1 = kette[n]; else if (kette[n] !== k1) eineKette = false;
+        }
       }
-      regionen.push({groesse: q.length, rand, kette: -1});
+      regionen.push({groesse: q.length, rand, kette: -1, punkte: q, eineKette, leer: q.every(p => !board[p])});
     }
     /* Verbände: Ketten gleicher Farbe mit gemeinsamer Freiheit oder am
        selben Auge (Region, die nur an diese Farbe grenzt) */
@@ -626,7 +651,7 @@ function toteSteineAmEnde(board, augeGross = AUGE_GROSS, offenGross = OFFEN_GROS
     for (const r of regionen) {
       if ((r.rand !== 1 && r.rand !== 2) || r.kette < 0) continue;
       const V = verb.get(wurzel(r.kette));
-      V.augen++; if (r.groesse >= augeGross) V.gross = true;
+      V.augen++; if (r.groesse >= augeGross || (r.eineKette && r.leer && augeTeilbar(r.punkte))) V.gross = true;
     }
     let schwach = null;
     for (const V of verb.values()) {
