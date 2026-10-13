@@ -10,6 +10,11 @@
      3. Unfertige Stellungen bleiben fast unberührt: nach 60 Zügen von
         laufkampf-211.sgf kein toter Stein; die aufgegebene Partie
         stellungen/aufgabe-151.sgf zählt nicht absurd (GNU Go: B+51,5).
+     4. Form eines einzelnen Auges (augeTeilbar): Partie vom 13.10.
+        (stellungen/auge-479.sgf), in der Schwarz nach den Pässen der KI
+        fast alle eigenen Augen zugefüllt hat. Die große schwarze Gruppe
+        behält ein T-förmiges Fünf-Punkte-Auge und lebt: B+93,5 wie GNU
+        Go, vorher W+304,5. Dazu die Nakade-Formen auf kleinen Brettern.
 
    Aufruf:  node tests/zaehlung.js [pfad/zur/index.html] */
 'use strict';
@@ -108,6 +113,34 @@ test('unfertige Stellungen: nach 60 Zügen nichts tot, aufgegebene Partie nicht 
   /* GNU Go zählt die Stellung als B+51,5; ohne Sperre für offene
      Regionen ergab die neue Regel B+353,5. */
   pruefe(s > 20 && s < 80, `Stand ${s}`);
+});
+
+test('Partie vom 13.10.: T-förmiges Fünf-Punkte-Auge lebt, B+93,5 wie GNU Go', () => {
+  const b = sgf('auge-479.sgf'), tot = toteSteineAmEnde(b);
+  pruefeGleich(toteListe(tot).length, 0, 'keine toten Steine (GNU Go: keine)');
+  pruefeGleich(stand(b, tot), 93.5, 'Stand (Schwarz − Weiß − Komi)');
+});
+
+test('Form eines einzelnen Auges: 4 und 5 Punkte leben, Nakade-Formen sterben', () => {
+  /* Weiße Gruppe aus einer Kette mit genau einem Auge, rundum Schwarz */
+  const lebt = (zeilen, text) => {
+    const tot = toteSteineAmEnde(zeichne(zeilen));
+    pruefe(toteListe(tot).length === 0, `${text}: lebt (${toteListe(tot).map(name)})`);
+  };
+  const stirbt = (zeilen, text) => {
+    const b = zeichne(zeilen), tot = toteSteineAmEnde(b);
+    const weiss = [...b].filter(v => v === 2).length;
+    pruefe(toteListe(tot).length === weiss, `${text}: tot (${toteListe(tot).length} von ${weiss})`);
+  };
+  lebt(['....ox', 'ooooox', 'xxxxxx'], 'gerade Vier');
+  lebt(['...ox', 'o.oox', 'o.oox', 'oooox', 'xxxxx'], 'T-förmige Fünf');
+  stirbt(['...ox', 'o.oox', 'oooox', 'xxxxx'], 'Pyramide (4)');
+  stirbt(['..ox', '..ox', 'ooox', 'xxxx'], 'Quadrat (4)');
+  stirbt(['...ox', '..oox', 'oooox', 'xxxxx'], 'bauchige Fünf');
+  stirbt(['ooooox', 'oo.oox', 'o...ox', 'oo.oox', 'ooooox', 'xxxxxx'], 'Kreuz (5)');
+  /* Das Auge grenzt an zwei Ketten (E19 hängt nur schräg an D18): Die
+     Form zählt nicht, Schwarz schneidet bei E18. */
+  stirbt(['....ox', 'oooo.x', 'xxxxxx'], 'gerade Vier an zwei Ketten');
 });
 
 laufeTests('Tote Steine am Partieende (toteSteineAmEnde)').then(ok => process.exit(ok ? 0 : 1));
