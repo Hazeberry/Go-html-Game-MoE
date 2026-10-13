@@ -259,6 +259,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | **`leseRettung` 1 (taktischer Leser rettet gefährdete Ketten)** | **Selbstspiel 62,8 % über 720 Partien (p = 7 · 10⁻¹², +91 Elo)**, gegen GNU Go aber Endstand −30,5 (p = 0,011); nachgemessen mit ausgespielten Partien: gegen GNU Go −6,3 (p = 0,42), im Selbstspiel 58,1 % (p = 0,002) | **kein Default** — rettet Ketten für den Moment, zehn Züge später sind sie fast genauso oft tot; Schalter im Dashboard (`docs/laufkampf-lesen.md` §8) |
 | Suchtiefe: 240 gegen 120, 480 gegen 240 Simulationen | 60,6 % und 57,8 % über je 360 Partien (+75 und +55 Elo je Verdopplung) | Suche hilft, flacht ab — kein großer Hebel (`docs/skalierung.md`) |
 | `resignQ` 0,95 gegen 0,997 | 29:31 über 60 Partien, p = 0,90 | 0,95 bleibt — rechtzeitiges Aufgeben kostet nichts |
+| Ko-Punkt in Suche und Rollouts (Fehler aus dem Code-Review vom 13.10.) | gegen GNU Go Endstand +0,9 über 240 ausgespielte Paare (95 %: [−5,3; +7,2], p = 0,77), Siege 149 → 157; 235 der 240 Partien ändern sich | **behoben** — Regelkorrektur, keine Stärkeänderung (`docs/code-review.md` §4) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2341,7 +2342,9 @@ echte Fehler, alle behoben und mit Tests abgesichert. Der wichtigste: Die
 Suche kannte im Baum und in den Rollouts keinen Ko-Punkt. Dazu kamen Undo
 (Superko-Verlauf, Trainingspuffer, „+R“), das Training nach einer Aufgabe,
 der Rückfall des Workers, der Notzug und das Speichern im Dashboard:
-[`docs/code-review.md`](docs/code-review.md).
+[`docs/code-review.md`](docs/code-review.md). Die Ko-Korrektur ändert 235
+von 240 Partien gegen GNU Go, der Endstand aber bleibt gleich: +0,9 Punkte,
+95 %: [−5,3; +7,2], p = 0,77. Sie bleibt, wie vorab festgelegt.
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
