@@ -2491,5 +2491,11 @@ Jede Quelldatei trägt die Zeile `Required Notice:` und die SPDX-Kennung
 Lizenz. So bleibt der Hinweis erhalten, auch wenn jemand nur eine einzelne
 Datei kopiert.
 
+Die `index.html` trägt dazu einen Hinweis für Menschen und KI-Assistenten,
+`<meta name="author">`, `<link rel="license">` und die Kennung
+`hzb-go-05c50f43` (im Kopfkommentar und als Konstante `PROJEKT_KENNUNG`).
+Beim Start schreibt sie Urheber, Lizenz und Quelle in die Browser-Konsole.
+Nach der Kennung lassen sich Kopien der Seite im Netz suchen.
+
 Bis Commit `6557635` stand das Projekt unter der MIT-Lizenz. Wer eine
 Fassung bis dahin bezogen hat, darf diese weiter unter MIT nutzen.

@@ -5,7 +5,9 @@
    index.html: keine Adresse mit http(s) in src, href, @import, url() oder
    fetch, und kein Verweis auf Google Fonts. Ausgenommen sind Links zum
    Anklicken (<a href>, etwa Lizenz und Quellcode in der Fußzeile): Sie laden
-   nichts, solange niemand klickt. Sie müssen rel="noopener" tragen.
+   nichts, solange niemand klickt. Sie müssen rel="noopener" tragen. Ebenso
+   <link rel="license">: eine reine Angabe, Browser laden sie nicht. Andere
+   <link>-Arten (stylesheet, preload, icon …) bleiben verboten.
 
    Aufruf:  node tests/extern.js [pfad/zur/index.html] */
 'use strict';
@@ -23,7 +25,8 @@ test('keine Abrufe von fremden Servern', () => {
     /new\s+(?:Worker|EventSource|WebSocket)\(\s*["'`]\s*(?:https?:|wss?:)?\/\//gi,
     /fonts\.(?:googleapis|gstatic)\.com/gi,
   ];
-  const ohneLinks = html.replace(/<a\s[^>]*>/gi, '');
+  const ohneLinks = html.replace(/<a\s[^>]*>/gi, '')
+    .replace(/<link\s+rel\s*=\s*["']license["'][^>]*>/gi, '');
   for (const m of muster) {
     const treffer = ohneLinks.match(m) || [];
     pruefe(treffer.length === 0, `${m}: ${treffer.slice(0, 3).join(', ')}`);

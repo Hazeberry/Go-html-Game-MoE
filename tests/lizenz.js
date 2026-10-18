@@ -5,7 +5,9 @@
    Die Lizenz verlangt, dass jeder, der einen Teil der Software bekommt, auch
    die Zeilen bekommt, die mit „Required Notice:“ beginnen. Geprüft wird:
    jede versionierte Quelldatei (.html, .js, .py, .sh) trägt genau die Zeile
-   aus LICENSE und die SPDX-Kennung; index.html dazu die Lizenz-URL.
+   aus LICENSE und die SPDX-Kennung; index.html dazu die Lizenz-URL,
+   <link rel="license">, <meta name="author"> und die Kennung (Kommentar
+   und Konstante PROJEKT_KENNUNG gleich).
 
    Aufruf:  node tests/lizenz.js */
 'use strict';
@@ -33,9 +35,14 @@ test('jede Quelldatei trägt Required Notice und SPDX-Kennung', () => {
   }
 });
 
-test('index.html nennt die Lizenz-URL', () => {
+test('index.html: Lizenz-URL, Herkunftsangaben, Kennung', () => {
   const t = fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8');
   pruefe(t.includes('https://polyformproject.org/licenses/noncommercial/1.0.0'), 'URL vorhanden');
+  pruefe(/<link rel="license" href="https:\/\/polyformproject\.org\/licenses\/noncommercial\/1\.0\.0">/.test(t), '<link rel="license">');
+  pruefe(/<meta name="author" content="Hazeberry">/.test(t), '<meta name="author">');
+  const kennung = (t.match(/Kennung: (hzb-go-[0-9a-f]{8})/) || [])[1];
+  pruefe(!!kennung, 'Kennung im Kopfkommentar');
+  pruefe(t.includes(`const PROJEKT_KENNUNG = '${kennung}';`), 'dieselbe Kennung als Konstante im Code');
 });
 
 laufeTests('Lizenzhinweis').then(ok => process.exit(ok ? 0 : 1));
