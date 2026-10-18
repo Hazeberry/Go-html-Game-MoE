@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 'use strict';
 /* Beweist, dass der numpy-Export im Browser-Format nicht nur LAEDT, sondern
    dieselben Priors liefert. Ohne diesen Vergleich koennte eine vertauschte
