@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Aufgegebene Partien weiterspielen: War die Aufgabe richtig?
 
    Nimmt jede Partie eines Rohdumps (ab-harness.js --roh), die durch Aufgabe

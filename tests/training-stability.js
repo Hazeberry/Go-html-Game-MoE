@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Stabilität des REINFORCE-Trainings im Policy-Netz (PR #49).
 
    Ursache des NaN-Bugs war nicht die Suche, sondern das Training: bei

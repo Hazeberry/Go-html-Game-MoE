@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Raumrisiko im Laufkampf (raumGewicht, docs/laufkampf.md).
 
    Geprüft wird nicht, ob die KI dadurch stärker spielt — das kann nur der

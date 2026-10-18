@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Rohdump des A/B-Harness — Schema und Abbruchkriterium.
 
    Die verbindliche Beschreibung steht in docs/pilot-benson-defense.md, §5.

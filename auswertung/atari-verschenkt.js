@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Verschenkte Atari-Züge gegen GNU Go: Welche Ataris der KI sind
    verschenkt, und wusste der Leser vorher, dass die Kette entkommt? Gehört
    zu docs/atari-verschenkt.md.

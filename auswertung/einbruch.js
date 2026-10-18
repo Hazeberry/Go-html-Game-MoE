@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Einbrüche ins Gebiet: Wie antwortet die Seite, in deren Gebiet gespielt
    wird, und lebt der eingesetzte Stein? Gehört zu docs/punktverlust.md.
 

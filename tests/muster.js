@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Muster aus GNU-Go-Zügen (musterGewicht; docs/muster.md).
 
      1. Default 200 (seit docs/muster.md §8), Tabelle vorhanden.

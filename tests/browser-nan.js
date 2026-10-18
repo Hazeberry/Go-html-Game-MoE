@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Ende-zu-Ende im echten Browser (PR #49).
 
    Die Node-Tests schneiden die <script>-Blöcke aus index.html und werten sie

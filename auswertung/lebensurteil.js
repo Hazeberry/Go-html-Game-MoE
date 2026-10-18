@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Lebensurteil aus GNU Gos GTP-Antworten, im Format von setzeLebensurteil
    (index.html, PARAMS.gebietSicher). Gehört zu gnugo-duell.js --orakel und
    docs/gebiet-sicher.md.

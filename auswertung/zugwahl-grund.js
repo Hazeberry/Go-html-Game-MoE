@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Warum spielt die KI verschenkte Züge? Gehört zu docs/verschenkt-warum.md.
 
    Spielt Partien eines Rohdumps von gnugo-duell.js nach und stellt an jeder

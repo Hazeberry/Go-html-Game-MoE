@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Gegnerwert in der Zugwahl (gegnerWert; docs/gegnerwert.md).
 
      1. Bei 0 bleibt getAIMove bitgenau: derselbe Zug, dieselbe Info.

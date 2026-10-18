@@ -1,3 +1,5 @@
+# Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import json, numpy as np, os
 from features import board_to_input, IN
 faelle = json.load(open(os.path.join(os.path.dirname(__file__), 'boards.json')))

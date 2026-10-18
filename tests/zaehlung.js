@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Tote Steine am Partieende (toteSteineAmEnde; docs/zaehlung.md).
 
      1. Partie vom 12.10. (stellungen/zaehlung-358.sgf, ausgespielt): tot

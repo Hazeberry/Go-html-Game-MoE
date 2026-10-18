@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Wirksamkeit des Raumrisikos (raumGewicht/raumZug), nach
    docs/laufkampf.md §7.4. Je Arm:
 

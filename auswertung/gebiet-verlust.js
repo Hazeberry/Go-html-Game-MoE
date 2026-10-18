@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Wo geht das Gebiet der KI verloren? Liest die Karten von
    besitz-verlauf.js (--karten) und ordnet jeden Punkt, der zwischen zwei
    Marken vom Gebiet der KI (G) zu GNU Go (s, g, T) oder neutral (.)

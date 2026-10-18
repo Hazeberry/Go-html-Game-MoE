@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Eigenes Lebensurteil gegen GNU Gos Urteil (docs/gebiet-sicher.md, Stufe 2).
 
    Liest die Stellungen von lebensurteil-daten.js, stellt sie aus den

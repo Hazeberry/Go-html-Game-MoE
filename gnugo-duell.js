@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Unsere Hard-KI gegen GNU Go — ein Gegner, der nicht wir selbst sind.
 
    Alle A/B-Läufe in ab-harness.js sind Selbstspiel: Sie zeigen, ob eine

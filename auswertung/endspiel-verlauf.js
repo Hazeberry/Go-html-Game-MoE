@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Wo verliert die KI gegen GNU Go ihre Punkte? Zug für Zug, mit GNU Go als
    Schiedsrichter. Gehört zu docs/endspiel-verlust.md.
 
