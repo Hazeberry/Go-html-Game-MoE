@@ -65,6 +65,9 @@
     .ai-status { font-size:.6rem; color:var(--ui-dim); margin-top:6px; font-family:var(--font-mono); }
     .ai-thinking { color:var(--wood-light); animation:pulse 1s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+    .fuss { margin:28px auto 12px; text-align:center; font-size:.6rem; font-family:var(--font-mono); color:var(--ui-dim); letter-spacing:.05em; line-height:1.8; }
+    .fuss a { color:var(--wood); }
+    .fuss a:hover { color:var(--wood-light); }
   </style>
 </head>
 <body>
@@ -116,6 +119,11 @@
     </div>
   </div>
 </div>
+<footer class="fuss">
+  © 2026 Hazeberry ·
+  <a href="https://polyformproject.org/licenses/noncommercial/1.0.0" target="_blank" rel="noopener">PolyForm Noncommercial 1.0.0</a> ·
+  <a href="https://github.com/Hazeberry/Go-html-Game-MoE" target="_blank" rel="noopener">Quellcode</a>
+</footer>
 
 <script id="shared-go-logic">
 const SIZE = 19;
