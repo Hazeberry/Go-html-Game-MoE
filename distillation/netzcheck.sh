@@ -1,4 +1,6 @@
 #!/bin/sh
+# Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 # Sagt genau, WELCHE Hosts in der Allowlist fehlen — statt nur "geht nicht",
 # und statt nur den ersten zu nennen.
 # Die Shards liegen nicht auf huggingface.co selbst: der resolve-Pfad

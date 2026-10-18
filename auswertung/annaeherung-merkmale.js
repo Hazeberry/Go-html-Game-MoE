@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Was für ein Zug ist GNU Gos Antwort auf eine Annäherung, und was spielt
    die KI stattdessen? Gehört zu docs/annaeherung.md.
 

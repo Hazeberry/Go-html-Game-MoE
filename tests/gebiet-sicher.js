@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Gebiet mit Sicherheit (gebietSicher, setzeLebensurteil; docs/gebiet-sicher.md).
 
      1. Default 0. Bitgenau wie vorher: mit Urteil bei 0, ohne Urteil bei 1

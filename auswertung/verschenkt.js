@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Verschenkte Züge gegen GNU Go: Welche Steine werden später geschlagen
    oder sind am Ende tot? Gehört zu docs/endspiel-verlust.md.
 

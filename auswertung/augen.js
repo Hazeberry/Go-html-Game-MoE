@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Wie oft füllt ein Arm ein eigenes echtes Auge? Gehört zu
    docs/endspiel-augen.md. Gezählt wird nach fuelltEigenesAuge aus
    index.html, also mit derselben Definition, die augenSchutz benutzt.

@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Hash-Liste eines Laufs: kleiner Fingerabdruck statt Rohdump.
 
    Die Rohdumps eines 360-Partien-Laufs sind einige Megabyte groß und lassen

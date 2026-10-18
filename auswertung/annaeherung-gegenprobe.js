@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Bringen zwei naheliegende Eingriffe GNU Gos Antwort auf eine Annäherung
    nach vorn? Gehört zu docs/annaeherung.md §10.
 

@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Trennt eine Fassung von „Einschließung" sterbende von überlebenden
    Gruppen — auch bei gleicher Freiheitszahl? Gehört zu docs/laufkampf.md.
 

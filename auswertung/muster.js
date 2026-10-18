@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Sagen Muster GNU Gos Zug voraus, und hilft das der Zugbewertung? Gehört
    zu docs/muster.md.
 

@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Zwei Läufe von gnugo-duell.js gepaart vergleichen (gleiche --seed, gleiche
    Partienummern): mittlere Differenz B − A der GNU-Go-Schätzung nach einer
    Zugzahl, gepaarter t-Test, zweiseitig. Abgebrochene Partien fallen samt

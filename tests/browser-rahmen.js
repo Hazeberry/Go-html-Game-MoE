@@ -1,3 +1,5 @@
+// Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Gemeinsamer Unterbau der Browser-Tests (browser-nan.js, browser-ui.js):
    Playwright und Chromium finden, und ein winziger Datei-Server.
 

@@ -2486,5 +2486,10 @@ gibt die Lizenz und die Zeile `Required Notice:` aus der Datei
 [LICENSE](LICENSE) mit. Kommerzielle Nutzung braucht eine eigene
 Erlaubnis. Verbindlich ist allein der englische Lizenztext.
 
+Jede Quelldatei trägt die Zeile `Required Notice:` und die SPDX-Kennung
+`PolyForm-Noncommercial-1.0.0` im Kopf, die `index.html` dazu die URL der
+Lizenz. So bleibt der Hinweis erhalten, auch wenn jemand nur eine einzelne
+Datei kopiert.
+
 Bis Commit `6557635` stand das Projekt unter der MIT-Lizenz. Wer eine
 Fassung bis dahin bezogen hat, darf diese weiter unter MIT nutzen.
