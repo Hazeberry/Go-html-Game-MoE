@@ -1,0 +1,235 @@
+name: Endspiel-Muster Messung
+
+# Manueller Lauf der Messung M1 aus docs/muster-endspiel-messung.md:
+# 240 Paare gegen GNU Go, Arm A (Default, Schalter aus) gegen Arm B
+# (musterEndspiel mit der Tabelle aus dem Repo), gepaart nach Partienummer.
+#
+# Der Code kommt aus dem Commit `basis` (der Stand mit dem Schalter
+# musterEndspiel in index.html, Vorfahr von main; 63f727b). Auf main steht der
+# Schalter nicht; die Datei index.html des Laufs wird aus dem Basis-Commit
+# gelegt (auswertung/dagger/vorbereiten.sh) und nie eingecheckt. Beide Arme
+# bekommen dieselbe index.html mit der Tabelle von B und unterscheiden sich nur
+# im Parameter: A spielt mit musterEndspiel 0 (Schalter aus, bitgenau das
+# Verhalten ohne Schalter), B mit `gewicht`.
+#
+# Ablauf:
+#   pruefen    Eingaben prüfen, Basis zu einem vollen Hash auflösen
+#   spielen    2 Arme × 16 Teile zu je 15 Partien (Seed `seed`), 32 Jobs
+#   ergebnis   Bericht, Rohdaten gepackt, Branch ergebnisse/endspiel-messung-lauf<N>
+#
+# Reproduzierbar: mctsFixedSims=120 zählt Simulationen statt Zeit, GNU Go
+# bekommt den Seed (gnugo-duell.js), wie in endspiel-dagger.yml.
+
+on:
+  workflow_dispatch:
+    inputs:
+      basis:
+        description: 'Commit mit dem Schalter musterEndspiel in index.html, Vorfahr von main (63f727b)'
+        required: true
+        default: '63f727b'
+      tabelle:
+        description: 'Tabelle von Arm B als JSON im Repo (T4 der Datenaggregation)'
+        required: true
+        default: 'docs/daten/dagger/runde3-lauf3/tabelle-neu.json'
+      gewicht:
+        description: 'musterEndspiel von Arm B'
+        required: true
+        default: '200'
+      seed:
+        description: 'Seed der 240 Paare (206: in muster-endspiel-spiel.md §4 vorgemerkt)'
+        required: true
+        default: '206'
+
+# Ein Lauf nach dem anderen: Die Läufe teilen sich die Ergebnisbranches.
+concurrency:
+  group: endspiel-messung
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    name: Eingaben prüfen
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      basis: ${{ steps.p.outputs.basis }}
+      tabelle: ${{ steps.p.outputs.tabelle }}
+      gewicht: ${{ steps.p.outputs.gewicht }}
+      seed: ${{ steps.p.outputs.seed }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      # Eingaben nur über env und geprüft, nie in die Shell-Zeile interpoliert
+      # (Script-Injection über das Dispatch-Formular, wie in ab-harness.yml).
+      - name: Eingaben prüfen
+        id: p
+        env:
+          IN_BASIS: ${{ inputs.basis }}
+          IN_TABELLE: ${{ inputs.tabelle }}
+          IN_GEWICHT: ${{ inputs.gewicht }}
+          IN_SEED: ${{ inputs.seed }}
+        run: |
+          set -euo pipefail
+          zahl() { case "$2" in ''|*[!0-9]*) echo "::error::$1 muss eine nicht-negative ganze Zahl sein: '$2'"; exit 2;; esac; }
+          zahl gewicht "$IN_GEWICHT"; zahl seed "$IN_SEED"
+          [ "$IN_GEWICHT" -ge 1 ] || { echo "::error::gewicht muss ≥ 1 sein"; exit 2; }
+
+          # Basis: ein Commit aus der Geschichte von main, der den Schalter kennt
+          case "$IN_BASIS" in ''|*[!0-9a-f]*) echo "::error::basis muss ein Commit-Hash sein: '$IN_BASIS'"; exit 2;; esac
+          git cat-file -e "$IN_BASIS^{commit}"
+          git merge-base --is-ancestor "$IN_BASIS" origin/main || { echo "::error::basis ist kein Vorfahr von main"; exit 2; }
+          BASIS=$(git rev-parse "$IN_BASIS")
+          # (in eine Datei, nicht in eine Pipe: grep -q beendet sich früh, und pipefail
+          # machte aus dem SIGPIPE von git show einen Fehler)
+          git show "$BASIS:index.html" > "$RUNNER_TEMP/basis-index.html"
+          grep -q '^const MUSTER_ENDSPIEL = {"' "$RUNNER_TEMP/basis-index.html" || { echo "::error::index.html im Basis-Commit hat keinen Schalter musterEndspiel"; exit 2; }
+
+          # Tabelle: ein einfacher Pfad zu einer Datei im Repo, die sich einsetzen lässt
+          case "$IN_TABELLE" in ''|/*|*..*|*[!A-Za-z0-9_./-]*) echo "::error::ungültiger Pfad: '$IN_TABELLE'"; exit 2;; esac
+          [ -f "$IN_TABELLE" ] || { echo "::error::Datei fehlt im Repo: $IN_TABELLE"; exit 2; }
+          cp "$RUNNER_TEMP/basis-index.html" "$RUNNER_TEMP/probe-index.html"
+          node auswertung/muster-endspiel-tabelle.js --einsetzen "$IN_TABELLE" --index "$RUNNER_TEMP/probe-index.html"
+
+          {
+            echo "basis=$BASIS"; echo "tabelle=$IN_TABELLE"; echo "gewicht=$IN_GEWICHT"; echo "seed=$IN_SEED"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "## Messung M1: 240 Paare gegen GNU Go"
+            echo
+            echo "Basis \`${BASIS:0:7}\`, Tabelle von B: \`$IN_TABELLE\`, Gewicht $IN_GEWICHT, Seed $IN_SEED"
+            echo
+            echo "Dispatch-Commit \`${GITHUB_SHA:0:7}\` · GNU Go aus dem Paketstand des Runners"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  spielen:
+    name: Arm ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [A, B]
+        von: [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+          gnugo --version | head -n 1
+          dpkg -l gnugo | tail -n 1 | cut -c1-80
+          echo "Node $(node -v), $(nproc) Kerne, $(awk -F': ' '/model name/{print $2; exit}' /proc/cpuinfo)"
+
+      # Beide Arme: dieselbe index.html (Basis mit der Tabelle von B)
+      - name: index.html bereitlegen
+        env:
+          BASIS: ${{ needs.pruefen.outputs.basis }}
+          TABELLE: ${{ needs.pruefen.outputs.tabelle }}
+        run: bash auswertung/dagger/vorbereiten.sh "$BASIS" "$TABELLE"
+
+      # A ist der Default: Gewicht 0 lässt den Schalter aus (bitgenau das alte
+      # Verhalten, tests/muster-endspiel.js im Commit 63f727b).
+      - name: 15 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed }}
+          GEWICHT: ${{ needs.pruefen.outputs.gewicht }}
+        run: |
+          set -euo pipefail
+          [ "$ARM" = A ] && GEWICHT=0
+          bash auswertung/dagger/spielen.sh "messung/$ARM-$VON.jsonl" "$VON" 15 "$SEED" "$GEWICHT"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: messung-${{ matrix.arm }}-${{ matrix.von }}
+          path: messung/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [pruefen, spielen]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: messung-*
+          path: messung
+          merge-multiple: true
+
+      - name: Bericht
+        env:
+          BASIS: ${{ needs.pruefen.outputs.basis }}
+          TABELLE: ${{ needs.pruefen.outputs.tabelle }}
+          GEWICHT: ${{ needs.pruefen.outputs.gewicht }}
+          SEED: ${{ needs.pruefen.outputs.seed }}
+        run: |
+          set -euo pipefail
+          bash auswertung/dagger/messung-ergebnis.sh "$BASIS" "$TABELLE" "$GEWICHT" "$SEED"
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Ergebnisse sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ergebnisse-messung
+          path: ergebnisse/
+          if-no-files-found: warn
+          retention-days: 90
+
+      # Die Ergebnisse als Commit des Workflows auf einen eigenen Branch: Sie
+      # lassen sich von dort holen, ohne ein Artefakt herunterzuladen, und sind
+      # dem Lauf zugeordnet.
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/endspiel-messung-lauf${LAUF}"
+          ziel="docs/daten/endspiel-messung/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Messung M1 (240 Paare gegen GNU Go): Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"
