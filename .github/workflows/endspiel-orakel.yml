@@ -1,0 +1,183 @@
+name: Endspiel-Muster Orakel-Test
+
+# Manueller Lauf des Orakel-Tests aus docs/muster-endspiel-orakel.md: GNU Go
+# Stufe 10 zieht für die KI ab Zug 81 (in 25 %, 50 %, allen ihrer Züge) oder ab
+# Zug 161 (in allen), gespielt gegen GNU Go Stufe 1 mit neun Vorgabesteinen.
+# Gemessen wird, wie viele Punkte in besseren Zügen nach der Eröffnung stecken
+# und wie viel ein ersetzter Zug im Mittel wert ist.
+#
+# Der Code ist der des Dispatch-Commits (index.html und gnugo-duell.js auf
+# main); es gibt keinen Schalter, keine Tabelle, keinen Basis-Commit. Die Arme
+# unterscheiden sich nur in --orakel-zug (auswertung/dagger/orakel-spielen.sh).
+#
+# Ablauf:
+#   pruefen    Eingaben prüfen
+#   spielen    5 Arme × 8 Teile zu je 15 Partien (Seed `seed`), 40 Jobs
+#   ergebnis   Bericht, Rohdaten gepackt, Branch ergebnisse/endspiel-orakel-lauf<N>
+#
+# Reproduzierbar: mctsFixedSims=120 zählt Simulationen statt Zeit, GNU Go
+# bekommt den Seed (gnugo-duell.js), wie in endspiel-messung.yml. Arm A spielt
+# dieselben Partien wie Arm A der Messung M1 mit demselben Seed; die Eingabe
+# `kontrolle` vergleicht das.
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: 'Seed der 120 Partien je Arm (206 wie in der Messung M1)'
+        required: true
+        default: '206'
+      kontrolle:
+        description: 'Arm A der Messung M1 mit demselben Seed im Repo (jsonl oder jsonl.gz), gegen den Arm A verglichen wird; leer = keine Kontrolle'
+        required: false
+        default: 'docs/daten/endspiel-messung/lauf1/A.jsonl.gz'
+
+# Ein Lauf nach dem anderen: Die Läufe teilen sich die Ergebnisbranches.
+concurrency:
+  group: endspiel-orakel
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    name: Eingaben prüfen
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      seed: ${{ steps.p.outputs.seed }}
+      kontrolle: ${{ steps.p.outputs.kontrolle }}
+    steps:
+      - uses: actions/checkout@v7
+
+      # Eingaben nur über env und geprüft, nie in die Shell-Zeile interpoliert
+      # (Script-Injection über das Dispatch-Formular, wie in ab-harness.yml).
+      - name: Eingaben prüfen
+        id: p
+        env:
+          IN_SEED: ${{ inputs.seed }}
+          IN_KONTROLLE: ${{ inputs.kontrolle }}
+        run: |
+          set -euo pipefail
+          case "$IN_SEED" in ''|*[!0-9]*) echo "::error::seed muss eine nicht-negative ganze Zahl sein: '$IN_SEED'"; exit 2;; esac
+          # Kontrolldatei: ein einfacher Pfad zu einer Datei im Repo
+          if [ -n "$IN_KONTROLLE" ]; then
+            case "$IN_KONTROLLE" in /*|*..*|*[!A-Za-z0-9_./-]*) echo "::error::ungültiger Pfad: '$IN_KONTROLLE'"; exit 2;; esac
+            [ -f "$IN_KONTROLLE" ] || { echo "::error::Datei fehlt im Repo: $IN_KONTROLLE"; exit 2; }
+          fi
+          { echo "seed=$IN_SEED"; echo "kontrolle=$IN_KONTROLLE"; } >> "$GITHUB_OUTPUT"
+          {
+            echo "## Orakel-Test: 120 Paare je Arm gegen GNU Go"
+            echo
+            echo "Seed $IN_SEED, Kontrolle von Arm A gegen: \`${IN_KONTROLLE:-keine}\`"
+            echo
+            echo "Dispatch-Commit \`${GITHUB_SHA:0:7}\` · GNU Go aus dem Paketstand des Runners"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  spielen:
+    name: Arm ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [A, D25, D50, D100, E100]
+        von: [1, 16, 31, 46, 61, 76, 91, 106]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+          gnugo --version | head -n 1
+          dpkg -l gnugo | tail -n 1 | cut -c1-80
+          echo "Node $(node -v), $(nproc) Kerne, $(awk -F': ' '/model name/{print $2; exit}' /proc/cpuinfo)"
+
+      - name: 15 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed }}
+        run: bash auswertung/dagger/orakel-spielen.sh "$ARM" "$VON" "$SEED" "orakel/$ARM-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: orakel-${{ matrix.arm }}-${{ matrix.von }}
+          path: orakel/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [pruefen, spielen]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: orakel-*
+          path: orakel
+          merge-multiple: true
+
+      - name: Bericht
+        env:
+          SEED: ${{ needs.pruefen.outputs.seed }}
+          KONTROLLE: ${{ needs.pruefen.outputs.kontrolle }}
+        run: |
+          set -euo pipefail
+          bash auswertung/dagger/orakel-ergebnis.sh "$SEED" "$KONTROLLE"
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Ergebnisse sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ergebnisse-orakel
+          path: ergebnisse/
+          if-no-files-found: warn
+          retention-days: 90
+
+      # Die Ergebnisse als Commit des Workflows auf einen eigenen Branch: Sie
+      # lassen sich von dort holen, ohne ein Artefakt herunterzuladen, und sind
+      # dem Lauf zugeordnet.
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/endspiel-orakel-lauf${LAUF}"
+          ziel="docs/daten/endspiel-orakel/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Orakel-Test (120 Paare je Arm gegen GNU Go): Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"
