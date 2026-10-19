@@ -392,4 +392,4 @@ function pruefeTor(sammler, ziehungen, v) {
 }
 
 if (require.main === module) main();
-module.exports = {lade, lerneMM, lerneNaiv, rangWahrscheinlichkeit};
+module.exports = {lade, lerneMM, lerneNaiv, rangWahrscheinlichkeit, gruppenSpalten, streuung};

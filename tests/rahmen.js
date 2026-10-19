@@ -58,7 +58,7 @@ function ladeKI({htmlPfad = STANDARD_HTML, mitNetz = true, speicher = null} = {}
                  'aufgabeGebiet', 'setzeFfEpoche', 'fuelltEigenesAuge', 'findEyes', 'vergeblicherZug', 'gegnerzugUnabwendbar', 'leseAngriff', 'leseVerteidigung',
                  'leseTransferWaechter', 'removeDeadGroups', 'bensonClassify',
                  '_bnDead', '_bnAlive', 'floodFill', 'computeZobrist', 'getCrisisWeight', 'evalTsumego', 'leseWurzelWaechter', 'quickEval',
-                 'musterWert', 'musterSchluessel', 'MUSTER_TABELLE', 'setzeLebensurteil', 'lsNach', 'lsOhneTote', 'countLiberties', 'toteSteineAmEnde',
+                 'musterWert', 'musterSchluessel', 'MUSTER_TABELLE', 'musterWertEndspiel', 'primeMusterEndspiel', 'MUSTER_ENDSPIEL', 'musterRing', '_ME_U', '_ME_K', '_ME_LU', '_ME_LK', '_meEig', '_meFr', 'setzeLebensurteil', 'lsNach', 'lsOhneTote', 'countLiberties', 'toteSteineAmEnde',
                  'PARAMS', 'BOARD_SIZE', 'NEIGHBORS', 'idx', 'xOf', 'yOf'];
   quelle += `
     ;globalThis.__test = {};

@@ -12,6 +12,17 @@
         Rangfolge von getAIMove ihn hinstellt (Bewertung ohne Muster +
         musterGewicht × Muster ergibt die sortierte Liste).
 
+   Der Schalter musterEndspiel im Spiel (docs/muster-endspiel-spiel.md):
+     5. Default 0; die Tabelle MUSTER_ENDSPIEL hat die sechs Gruppen
+        m, l, z, d, u, k.
+     6. Die Schlüssel im Spiel sind die der Auswertung: musterWertEndspiel
+        ist die Summe der Tabellenwerte der sechs Schlüssel von
+        muster-endspiel-daten.js.
+     7. Der Wert ist unter Drehung und Spiegelung des Bretts gleich.
+     8. An der Wurzel: ab Zug 80 und bei Gewicht > 0 gilt Wert ohne Muster +
+        Gewicht × musterWertEndspiel (statt musterGewicht × musterWert);
+        vor Zug 80 und bei 0 bleibt alles wie vorher.
+
    Aufruf:  node tests/muster-endspiel.js */
 'use strict';
 const path = require('path');
@@ -93,4 +104,88 @@ test('Kandidatenliste: Bewertung ohne Muster + musterGewicht × Muster ergibt di
   pruefe(MD.GRUPPEN.length === MD.K && MD.K === 15, 'fünfzehn Merkmalsgruppen');
 });
 
-laufeTests('Endspiel-Muster: Werkzeuge').then(ok => process.exit(ok ? 0 : 1));
+const SECHS = 'mlzduk';
+function mit(werte, fn) {
+  const alt = {};
+  for (const k of Object.keys(werte)) { alt[k] = KI.PARAMS[k]; KI.PARAMS[k] = werte[k]; }
+  try { return fn(); } finally { for (const k of Object.keys(alt)) KI.PARAMS[k] = alt[k]; }
+}
+
+test('Schalter musterEndspiel: Default 0, Tabelle mit den sechs Gruppen', () => {
+  pruefeGleich(KI.PARAMS.musterEndspiel, 0, 'Default');
+  const T = KI.MUSTER_ENDSPIEL, gruppen = new Map();
+  for (const [k, v] of Object.entries(T)) {
+    pruefe(/^[mlzduk]:/.test(k), `Schlüssel ${k}`);
+    pruefe(Number.isFinite(v) && v !== 0 && Math.abs(v) < 20, `Wert ${k}: ${v}`);
+    gruppen.set(k[0], (gruppen.get(k[0]) || 0) + 1);
+  }
+  for (const g of SECHS) pruefe(gruppen.get(g) > 0, `Gruppe ${g} hat Einträge`);
+  pruefe(gruppen.get('m') > 1000 && gruppen.get('u') > 500 && gruppen.get('k') > 500, 'Muster, Ringe und Springerpunkte');
+  pruefeGleich(gruppen.get('z'), 5, 'fünf Linien');
+});
+
+test('Schalter musterEndspiel: Schlüssel im Spiel = Schlüssel der Auswertung', () => {
+  const b = stellung(), c = 2, letzt = i(10, 12), k = 90;
+  const liste = MD.kandidatenListe(KI, b, c, k, letzt);
+  KI.primeMusterEndspiel(b, c);
+  const T = KI.MUSTER_ENDSPIEL, kt = MD.karten(KI, b, c);
+  let n = 0;
+  for (const s of liste) {
+    const keys = MD.schluessel(KI, b, c, k, letzt, s.m.idx, kt).filter(x => SECHS.includes(x[0]));
+    pruefeGleich(keys.length, 6, 'sechs Schlüssel');
+    /* die Schlüsselzeichen selbst, nicht nur ihre Tabellenwerte */
+    const sk = g => keys.find(x => x[0] === g).slice(2), x0 = s.m.idx % 19, y0 = Math.floor(s.m.idx / 19);
+    pruefeGleich(KI.musterRing(b, x0, y0, c, KI._ME_U, KI._ME_LU), sk('u'), `Ring u, Punkt ${s.m.idx}`);
+    pruefeGleich(KI.musterRing(b, x0, y0, c, KI._ME_K, KI._ME_LK), sk('k'), `Ring k, Punkt ${s.m.idx}`);
+    pruefeGleich(KI._meEig[s.m.idx] + '-' + KI._meFr[s.m.idx], sk('d'), `Abstand d, Punkt ${s.m.idx}`);
+    let soll = 0;
+    for (const g of SECHS) soll += T[keys.find(x => x[0] === g)] || 0;
+    pruefeNah(KI.musterWertEndspiel(b, s.m.idx, c), soll, 1e-9, `Punkt ${s.m.idx}`);
+    n++;
+  }
+  pruefe(n > 100, 'genug Kandidaten geprüft');
+});
+
+test('Schalter musterEndspiel: Wert unter Drehung und Spiegelung gleich', () => {
+  const abb = [(x, y) => [x, y], (x, y) => [18 - x, y], (x, y) => [x, 18 - y], (x, y) => [18 - x, 18 - y],
+               (x, y) => [y, x], (x, y) => [18 - y, x], (x, y) => [y, 18 - x], (x, y) => [18 - y, 18 - x]];
+  const b = stellung(), c = 2;
+  MD.kandidatenListe(KI, b, c, 90, -1);   /* setzt den letzten Zug zurück: Abstand „keiner“ */
+  KI.primeMusterEndspiel(b, c);
+  const soll = new Map();
+  for (let p = 0; p < N; p += 3) if (!b[p]) soll.set(p, KI.musterWertEndspiel(b, p, c));
+  let n = 0;
+  for (const t of abb) {
+    const tb = new Uint8Array(N);
+    for (let p = 0; p < N; p++) { const [x, y] = t(p % 19, Math.floor(p / 19)); tb[y * 19 + x] = b[p]; }
+    KI.primeMusterEndspiel(tb, c);
+    for (const [p, w] of soll) {
+      const [x, y] = t(p % 19, Math.floor(p / 19));
+      pruefeNah(KI.musterWertEndspiel(tb, y * 19 + x, c), w, 1e-9, `Punkt ${p}`);
+      n++;
+    }
+  }
+  pruefe(n > 800, 'genug Punkte geprüft');
+});
+
+test('Schalter musterEndspiel: Wurzelwert ab Zug 80, davor und bei 0 wie bisher', () => {
+  const b = stellung(), c = 2, letzt = i(10, 12), mg = KI.PARAMS.musterGewicht;
+  const liste = (k, params) => new Map(mit(params, () => MD.kandidatenListe(KI, b, c, k, letzt)).map(s => [s.m.idx, s.score]));
+  const alt90 = liste(90, {}), ohne90 = liste(90, {musterGewicht: 0});
+  /* Default: Score = Wert ohne Muster + musterGewicht × musterWert (bitgleich zum Test oben) */
+  for (const [p, w] of alt90) pruefeNah(w, ohne90.get(p) + mg * KI.musterWert(b, p, c), 1e-9, `Default, Punkt ${p}`);
+  /* musterEndspiel 200 ab Zug 90: Wert ohne Muster + 200 × musterWertEndspiel */
+  const neu90 = liste(90, {musterEndspiel: 200}), neuOhne = liste(90, {musterEndspiel: 200, musterGewicht: 0});
+  for (const [p, w] of neu90) pruefeNah(w, ohne90.get(p) + 200 * KI.musterWertEndspiel(b, p, c), 1e-9, `Zug 90, Punkt ${p}`);
+  for (const [p, w] of neu90) pruefeGleich(neuOhne.get(p), w, `musterGewicht ist ab Zug 80 ohne Wirkung, Punkt ${p}`);
+  /* Grenze: Zug 79 alt, Zug 80 neu */
+  const alt79 = liste(79, {}), neu79 = liste(79, {musterEndspiel: 200});
+  for (const [p, w] of alt79) pruefeGleich(neu79.get(p), w, `Zug 79 unverändert, Punkt ${p}`);
+  const neu80 = liste(80, {musterEndspiel: 200}), ohne80 = liste(80, {musterGewicht: 0});
+  for (const [p, w] of neu80) pruefeNah(w, ohne80.get(p) + 200 * KI.musterWertEndspiel(b, p, c), 1e-9, `Zug 80, Punkt ${p}`);
+  /* die Rangfolge ändert sich tatsächlich */
+  const rang = m => [...m].sort((x, y) => y[1] - x[1]).map(x => x[0]).slice(0, 10).join();
+  pruefe(rang(neu90) !== rang(alt90), 'andere Spitze der Liste');
+});
+
+laufeTests('Endspiel-Muster: Werkzeuge und Schalter').then(ok => process.exit(ok ? 0 : 1));
