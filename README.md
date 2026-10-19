@@ -263,6 +263,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | Endspiel-Muster, Schritt 1 (nur offline): eigene Tabelle für Stellungen ab Zug 81 mit Abstand zu den Steinen und Ringen um den Punkt | an 16 228 frischen Stellungen sagt sie GNU Gos Zug in der Liste der KI öfter voraus: Rang 1 **+12,6** Prozentpunkte (95 %: [+10,7; +14,5]), auf Linie 1–2 +8,7, in verlorenen Partien +5,5; alle vier vorab festgelegten Tore bestanden | Schritt 2 (Schalter, Pilot, Messung im Spiel) folgt; bessere Vorhersage ist nicht bessere Zugwahl (`docs/muster-endspiel.md`) |
 | Endspiel-Muster, Schritt 2: Schalter `musterEndspiel` (die Tabelle aus Schritt 1 an der Wurzel ab Zug 80) | Pilot gegen GNU Go, 60 ausgespielte Paare je Gewicht: Endstand −38,5 (100), −21,8 (200), −23,3 (400), −19,4 (800), p = 0,0001 bis 0,022, Siege 20 bis 33 gegen 35 von 60. Auf den Stellungen der alten KI zieht die Tabelle im Einzelnen besser (+2,0 Punkte nach GNU Go), auf den Stellungen, in die sie selbst führt, trifft sie nicht mehr besser | verworfen — Messung entfällt nach der vorab festgelegten Regel, Schalter wieder entfernt (Stand: Commit `63f727b`); Verschiebung der Stellungen, nicht schlechtere Einzelzüge (`docs/muster-endspiel-spiel.md`) |
 | Endspiel-Muster, Datenaggregation Runde 1 (in GitHub Actions): neue Tabelle aus den Stellungen, in die die alte führt, von GNU Go beschriftet | Pilot gegen GNU Go, 60 ausgespielte Paare, Seed 204: gegenüber dem Default +1,1 Punkte (95 %: [−13,7; +15,8], p = 0,89), gegenüber der alten Tabelle **+22,9** ([+11,1; +34,6], p = 0,0003); Actions spielt dieselben Partien wie der Container (120 von 120) | der Schaden ist weg, ein Gewinn noch nicht: Runde 2 nach der vorab festgelegten Regel (`docs/muster-endspiel-dagger.md` §4, §6) |
+| Endspiel-Muster, Datenaggregation Runde 2 (in GitHub Actions): Tabelle T2 spielt, GNU Go beschriftet 240 Partien, daraus T3 | Pilot gegen GNU Go, 60 ausgespielte Paare, Seed 205: T3 gegenüber dem Default +4,0 Punkte (95 %: [−14,8; +22,8], p = 0,67), T2 gegenüber dem Default +0,7 ([−15,4; +16,9], p = 0,93); beide Piloten zusammen T2 − A +0,9 ([−9,9; +11,7]); offline auf neuen Stellungen T2 und T3 gleichauf (Rang 1: 25,0 gegen 24,8 %) | kein Gewinn nachweisbar: Runde 3, die letzte, nach der vorab festgelegten Regel (`docs/muster-endspiel-dagger.md` §4, §7) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2376,8 +2377,13 @@ Go beschriften lassen, neu lernen, wiederholen), und sie läuft in GitHub
 Actions ([`docs/muster-endspiel-dagger.md`](docs/muster-endspiel-dagger.md)).
 *Runde 1* (46 Minuten): Die neue Tabelle spielt im Pilot (60 Paare) +22,9
 Punkte besser als die alte (95 %: [+11,1; +34,6], p = 0,0003) und gleichauf mit
-dem Default (+1,1, p = 0,89). Der Schaden ist weg, ein Gewinn noch nicht;
-Runde 2 folgt nach der vorab festgelegten Regel.
+dem Default (+1,1, p = 0,89). Der Schaden ist weg, ein Gewinn noch nicht.
+*Runde 2* (47 Minuten, neue Seeds): Die Tabelle aus Runde 1 liegt wieder
+gleichauf mit dem Default (+0,7, p = 0,93), die neue bei +4,0 (95 %:
+[−14,8; +22,8], p = 0,67), also nicht signifikant. Auf Stellungen, die keine
+der beiden gesehen hat, unterscheiden sich beide offline kaum (Rang 1: 25,0
+gegen 24,8 %). Nach der vorab festgelegten Regel folgt Runde 3, die letzte;
+ist sie nicht signifikant, endet die Reihe als negatives Ergebnis.
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
