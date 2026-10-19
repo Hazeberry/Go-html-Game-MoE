@@ -349,3 +349,133 @@ Runde 2 lernen nicht mit.
 Verschiebungsprobe unterscheidet sich T4 von T3 voraussichtlich kaum. Erwartet
 wird NEU − A im Bereich von ±10 Punkten und kein Bestehen des Pilots. Das steht
 hier, damit sich die Erwartung nicht nachträglich anpassen lässt.
+
+---
+
+## 8. Nachtrag: Ergebnis von Runde 3 und Abschluss der Reihe (19.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #3
+([Run 39289776743](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/39289776743)),
+auf dem Merge-Commit `a0fc919` von `main`, Basis `63f727b`, mit den Eingaben
+aus §7, in 50 Minuten (16:56 bis 17:45 UTC). Die Ergebnisse legte der Workflow
+auf den Branch `ergebnisse/dagger-runde3-lauf3`; sie stehen hier unter
+[`daten/dagger/runde3-lauf3/`](daten/dagger/runde3-lauf3/). Der Bericht nennt
+die Daten der laufenden Runde wieder „D1“; gemeint sind die 240 Partien von
+Seed 209, hier D3.
+
+**VOR ist T3.** Die Tabelle der Strategie VOR (`tabelle-vor.json`) stimmt mit
+T3 aus Runde 2 in allen 4 943 Einträgen überein.
+
+**Daten D3.** 240 Partien von VOR (= T3, Seed 209), keine abgebrochen, 17 679
+beschriftete Stellungen, davon 16 408 verwertbar (ohne GNU Gos Antwort PASS:
+1 271). VOR gewann 147 der 240 Partien (61,3 %), Endstand Ø +18,3 (SD 63,0).
+Der Default in der Ko-Messung ([`code-review.md`](code-review.md) §4, Seed
+203): 157 Siege (65,4 %), Endstand Ø +22,6. Ungepaart und mit anderem Seed:
+−4,3 ± 10,4 Punkte (z = −0,8); gegenüber T2 in Runde 2 (Ø +17,6): +0,7 ± 11,6.
+
+**Die neue Tabelle T4.** 71 026 Lernstellungen (Daten B 3 968, Prüfdaten
+16 228, D1 17 881, D2 16 541, D3 16 408), 5 146 Einträge (m 2 663, l 5, z 5,
+d 20, u 1 105, k 1 348), Maßstab 0,57. Gegenüber T3 sind 4 942 Einträge
+gemeinsam (204 neu, 1 weggefallen). Mit den früheren Schritten:
+
+| Schritt | gemeinsame Einträge | r | mittlere Änderung | Vorzeichenwechsel |
+|---|---:|---:|---:|---:|
+| T1 → T2 | 4 039 | 0,81 | 0,43 | 19 % |
+| T2 → T3 | 4 667 | 0,93 | 0,25 | 11 % |
+| T3 → T4 | 4 942 | 0,96 | 0,17 | 8 % |
+
+Die Tabelle ändert sich von Runde zu Runde weniger.
+
+**Pilot** (60 Paare, Seed 210, Endstand nach GNU Gos Zählung, gepaart):
+
+| Arm | Endstand Ø | Siege |
+|---|---:|---:|
+| A (Default) | +27,7 | 40 |
+| VOR (T3) | +20,7 | 35 |
+| NEU (T4) | +22,0 | 36 |
+
+| Vergleich | Differenz | 95 % | p | Hälfte 1 / 2 | Siege | nach Zug 120 |
+|---|---:|---|---:|---|---|---:|
+| **NEU − A** | **−5,7** | [−20,4; +9,0] | 0,44 | −0,3 / −11,0 | 36 gegen 40 | +1,5 |
+| VOR − A | −7,0 | [−25,2; +11,2] | 0,44 | −5,5 / −8,5 | 35 gegen 40 | +0,4 |
+| NEU − VOR | +1,3 | [−12,1; +14,8] | 0,84 | +5,1 / −2,5 | 36 gegen 35 | +1,2 |
+
+NEU ist in 36 von 60 Paaren besser als A und in 24 schlechter. Der Mittelwert
+liegt trotzdem darunter: Die 24 schlechteren Paare fallen im Mittel doppelt so
+groß aus (−56,2 gegen +28,0); der Median der Differenz ist +5,0.
+
+**Verschiebungsprobe** (Rang von GNU Gos Zug in der Wurzelliste, Dosis 200,
+Stellungen mit der KI am Zug, Anteil in %; „alte Tabelle“ ist der Default,
+Arm A):
+
+| Stellungen | Zahl | Rang 1: alte Tabelle / T3 / T4 | Rang ≤ 16: alte Tabelle / T3 / T4 |
+|---|---:|---|---|
+| von VOR (D3) | 16 303 | 22,2 / **24,7** / 27,9 (hat sie mitgelernt) | 65,2 / **77,4** / 89,5 (hat sie mitgelernt) |
+| von NEU (30 Pilotpartien, außerhalb der Stichprobe) | 1 928 | 22,4 / 24,3 / **25,6** | 67,9 / 78,9 / **86,6** |
+
+T3 trifft auf den Stellungen, in die sie selbst führt, GNU Gos Zug besser als
+die alte Tabelle (24,7 gegen 22,2 %), wie T2 in Runde 2. Auf den Stellungen,
+die weder T3 noch T4 gesehen haben, liegt T4 vor T3: bei Rang 1 mit 25,6 gegen
+24,3 %, bei Rang ≤ 16 mit 86,6 gegen 78,9 %, vor allem in den Zügen 81–160
+(Rang ≤ 16: 87,6 gegen 74,5 %). Der gespielte Zug ist GNU Gos Zug in 24,7 %
+der Stellungen von NEU.
+
+**Entscheidung: Ende der Reihe, negatives Ergebnis.** NEU − A ist nicht
+signifikant (−5,7, p = 0,44), und mit Runde 3 ist die Obergrenze von drei
+Runden erreicht (§4, §7). Es gibt keine Runde 4 und keine Messung. Die Erwartung
+aus §7 hat sich bestätigt: NEU − A liegt im Bereich von ±10 Punkten, der Pilot
+besteht nicht, NEU − VOR ist +1,3. Nicht ganz getroffen: Offline lag T4 auf
+neuen Stellungen weiter vor T3 als erwartet (Rang ≤ 16 um 7,7 Punkte); im
+Spiel hat das nicht getragen.
+
+**Die drei Runden zusammen**
+
+| Runde | VOR → NEU | Seed Pilot | NEU − A | 95 % | p | VOR − A | NEU − VOR |
+|---|---|---:|---:|---|---:|---:|---:|
+| 1 | T1 → T2 | 204 | +1,1 | [−13,7; +15,8] | 0,89 | −21,8 | +22,9 |
+| 2 | T2 → T3 | 205 | +4,0 | [−14,8; +22,8] | 0,67 | +0,7 | +3,3 |
+| 3 | T3 → T4 | 210 | −5,7 | [−20,4; +9,0] | 0,44 | −7,0 | +1,3 |
+| **alle drei Piloten** | | | **−0,2** | [−9,4; +9,0] | 0,96 | | |
+
+Die letzte Zeile fasst die drei NEU-Arme gegen A zusammen (180 Paare aus drei
+unabhängigen Piloten). *Nachträglich und ohne Wirkung auf die Entscheidung:* NEU
+ist in 97 dieser Paare besser als A, in 82 schlechter, in 1 gleich
+(Vorzeichentest, zweiseitig, p = 0,30); der Median der Differenz ist +4. Je
+Tabelle gegen A, aus den beiden Piloten, in denen sie spielt (120 Paare): T2
++0,9 [−9,9; +11,7], T3 −1,5 [−14,4; +11,4].
+
+**Was die drei Runden gezeigt haben**
+
+1. **Die Diagnose aus Schritt 2 stimmt.** Die Verschiebung der Stellungen war
+   die Ursache des schlechten Pilots. Eine Runde Datenaggregation hebt die
+   Tabelle von −21,8 gegen den Default (T1) auf ±0 (T2: +1,1 und +0,7),
+   bestätigt an 240 unabhängigen Partien (T2 gegen T1 +22,8 ± 11,8).
+2. **Die Datenaggregation konvergiert, hebt die Tabelle aber nicht über den
+   Default.** Der Vorsprung gegenüber der alten Tabelle auf Stellungen, die die
+   neue Tabelle nicht gesehen hat, ist bei Rang 1 in allen drei Runden gleich
+   groß (+2,3, +2,1, +3,2 Prozentpunkte) und bei Rang ≤ 16 gewachsen (+7,6,
+   +13,0, +18,7). Im Spiel kommt davon kein Gewinn an: −0,2 [−9,4; +9,0].
+3. **Warum der bessere Treffer nicht zum besseren Spiel wird, ist nicht
+   bewiesen.** Naheliegende Erklärungen, nicht geprüft: Die Tabelle ordnet nur
+   die Kandidaten an der Wurzel, die Suche entscheidet danach selbst; ein
+   Vorsprung von 2 bis 3 Prozentpunkten bei Rang 1 ändert wenige Züge; und im
+   Endspiel gehen Punkte vor allem durch große ungelöste Stellen verloren,
+   deren Folgen die Tabelle nicht sieht (§5).
+
+**Was offen bleibt**
+
+- Der Pilot ist grob (§5). Mit 60 Paaren liegt der Standardfehler bei 7 bis 9
+  Punkten, über alle drei Piloten bei 4,7. Ein Gewinn über gut 9 Punkte ist
+  damit ausgeschlossen (obere Grenze +9,0), ein kleinerer nicht. Ob die Tabelle
+  3 bis 5 Punkte bringt, könnte nur eine Messung mit 240 Paaren und mehr zeigen
+  (Standardfehler rund 4). Sie gehört nicht mehr zu dieser Reihe und bräuchte
+  eine eigene Vorabfestlegung.
+- Lehrer, Schiedsrichter und Gegner sind dasselbe Programm (§5).
+- Die Tabelle lernt Züge, keine Folgen (§5).
+
+**Stand des Codes.** `index.html` auf `main` bleibt unverändert, der Schalter
+`musterEndspiel` steht nur im Commit `63f727b`, aus dem die Läufe die
+`index.html` holen. Die Tabellen T1 bis T4, die beschrifteten Stellungen und
+alle Partien (je Runde 240 Datenpartien und 180 Pilotpartien) liegen unter
+[`daten/dagger/`](daten/dagger/); Workflow und Werkzeuge bleiben für spätere
+Versuche im Repo.
