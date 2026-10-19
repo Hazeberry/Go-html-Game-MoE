@@ -2369,9 +2369,10 @@ abweichendem Zug), und die Suche folgt ihr in 83 % der Züge; aber auf den
 Stellungen, in die sie selbst führt, trifft sie GNU Gos Zug nicht mehr
 häufiger als die alte Tabelle (24,8 gegen 24,9 %, auf denen der alten KI
 31,3 gegen 19,4 %). Verschiebung der Stellungen, nicht schlechtere Züge:
-[`docs/muster-endspiel-spiel.md`](docs/muster-endspiel-spiel.md). Offen ist
-eine Datenaggregation (mit der Tabelle spielen, die erreichten Stellungen
-beschriften lassen, neu lernen, wiederholen).
+[`docs/muster-endspiel-spiel.md`](docs/muster-endspiel-spiel.md). Als Nächstes
+läuft eine Datenaggregation (mit der Tabelle spielen, die erreichten Stellungen
+von GNU Go beschriften lassen, neu lernen, wiederholen), in GitHub Actions:
+[`docs/muster-endspiel-dagger.md`](docs/muster-endspiel-dagger.md).
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
