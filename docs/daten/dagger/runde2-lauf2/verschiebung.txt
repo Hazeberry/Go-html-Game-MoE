@@ -1,0 +1,15 @@
+Stellungen der Partien von NEU (Pilot, Seed wie oben), Tabelle der Runde davor (VOR):
+Rang von GNU Gos Zug in der Wurzelliste (Wert ohne Muster + 200 × Muster), in %, Stellungen mit der KI am Zug
+Menge         Phase          Stellungen   heute Rang 1  neu Rang 1   heute ≤ 16  neu ≤ 16   gespielter Zug = GNU Go
+NEU           alle               2099     22.7          25.0         65.5       76.6       24.4
+NEU           Zug 81–160         1179     22.7          26.5         62.3       77.4       26.1
+NEU           Zug 161–200         455     19.8          19.6         65.2       65.5       17.6
+NEU           ab Zug 201          465     25.6          26.7         74.0       85.6       26.7
+
+dieselben Stellungen, neue Tabelle (NEU):
+Rang von GNU Gos Zug in der Wurzelliste (Wert ohne Muster + 200 × Muster), in %, Stellungen mit der KI am Zug
+Menge         Phase          Stellungen   heute Rang 1  neu Rang 1   heute ≤ 16  neu ≤ 16   gespielter Zug = GNU Go
+NEU           alle               2099     22.7          24.8         65.5       78.5       24.4
+NEU           Zug 81–160         1179     22.7          26.4         62.3       78.2       26.1
+NEU           Zug 161–200         455     19.8          18.7         65.2       70.8       17.6
+NEU           ab Zug 201          465     25.6          26.9         74.0       86.9       26.7

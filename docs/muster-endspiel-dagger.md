@@ -226,3 +226,126 @@ Entscheidung für Runde 2 geliefert, ein zweiter Blick auf dieselben 60 Partien
 wäre kein unabhängiger Test. Auf Seed 205 spielen A, VOR (= T2) und NEU
 (= T3) neu; VOR gegen A wiederholt damit zugleich, ob T2 nicht schadet. Die
 Pilotpartien von NEU aus Runde 1 lernen nicht mit.
+
+---
+
+## 7. Nachtrag: Ergebnis von Runde 2 (19.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #2
+([Run 39281783902](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/39281783902)),
+auf dem Merge-Commit `f67ee24` von `main`, Basis `63f727b`, mit den Eingaben
+aus §6, in 47 Minuten (15:57 bis 16:44 UTC). Die Ergebnisse legte der Workflow
+auf den Branch `ergebnisse/dagger-runde2-lauf2`; sie stehen hier unter
+[`daten/dagger/runde2-lauf2/`](daten/dagger/runde2-lauf2/), im selben Aufbau
+wie bei Runde 1. Runner-Image wie in Lauf 1 (`ubuntu-24.04`, 20261012.334.1).
+Der Bericht nennt die Daten der laufenden Runde fest „D1“; gemeint sind hier
+die 240 Partien von Seed 208, also D2.
+
+**VOR ist T2.** Die Tabelle der Strategie VOR (`tabelle-vor.json`) stimmt mit
+T2 aus Runde 1 in allen 4 670 Einträgen überein.
+
+**Daten D2.** 240 Partien von VOR (= T2, Seed 208), keine abgebrochen, 18 043
+beschriftete Stellungen, davon 16 541 verwertbar (ohne GNU Gos Antwort PASS:
+1 502). VOR gewann 138 der 240 Partien (57,5 %), Endstand Ø +17,6 (SD 66,2).
+Der Default in der Ko-Messung ([`code-review.md`](code-review.md) §4, Seed
+203): 157 Siege (65,4 %), Endstand Ø +22,6. Ungepaart und mit anderem Seed:
+−5,0 ± 10,7 Punkte (z = −0,9), gegen −27,8 ± 10,7 bei T1 in Runde 1. T2 liegt
+an 240 unabhängigen Partien 22,8 ± 11,8 Punkte über T1 (z = 3,8): Die
+Behebung des Schadens aus Runde 1 bestätigt sich.
+
+**Die neue Tabelle T3.** 54 618 Lernstellungen (Daten B 3 968, Prüfdaten
+16 228, D1 17 881, D2 16 541), 4 943 Einträge (m 2 471, l 5, z 5, d 20,
+u 1 105, k 1 337), Maßstab 0,57 (T2: 0,57). Gegenüber T2 sind 4 667 Einträge
+gemeinsam (276 neu, 3 weggefallen). Die Werte der gemeinsamen Einträge
+stimmen zu r = 0,93 überein, die mittlere Änderung ist 0,25, in 11 % der
+Einträge wechselt das Vorzeichen. Von T1 zu T2 waren es r = 0,81, 0,43 und
+19 %: Die Änderung von T2 zu T3 ist kleiner als die von T1 zu T2.
+
+**Pilot** (60 Paare, Seed 205, Endstand nach GNU Gos Zählung, gepaart):
+
+| Arm | Endstand Ø | Siege |
+|---|---:|---:|
+| A (Default) | +21,9 | 38 |
+| VOR (T2) | +22,7 | 37 |
+| NEU (T3) | +25,9 | 33 |
+
+| Vergleich | Differenz | 95 % | p | Hälfte 1 / 2 | Siege | nach Zug 120 |
+|---|---:|---|---:|---|---|---:|
+| **NEU − A** | **+4,0** | [−14,8; +22,8] | 0,67 | −6,6 / +14,6 | 33 gegen 38 | +2,8 |
+| VOR − A | +0,7 | [−15,4; +16,9] | 0,93 | −12,1 / +13,6 | 37 gegen 38 | +1,2 |
+| NEU − VOR | +3,3 | [−9,8; +16,3] | 0,62 | +5,5 / +1,0 | 33 gegen 37 | +1,6 |
+
+NEU ist in 32 von 60 Paaren besser als A und in 28 schlechter, gegen VOR in 28
+besser und in 30 schlechter.
+
+*Nebenbefund, nachträglich und ohne Wirkung auf die Entscheidung:* T2 gegen A
+in beiden Piloten zusammen (Runde 1, Seed 204: +1,1; Runde 2, Seed 205: +0,7),
+120 Paare: **+0,9, 95 %: [−9,9; +11,7]**, p = 0,87.
+
+**Verschiebungsprobe** (Rang von GNU Gos Zug in der Wurzelliste, Dosis 200,
+Stellungen mit der KI am Zug, Anteil in %; „alte Tabelle“ ist der Default,
+Arm A):
+
+| Stellungen | Zahl | Rang 1: alte Tabelle / T2 / T3 | Rang ≤ 16: alte Tabelle / T2 / T3 |
+|---|---:|---|---|
+| von VOR (D2) | 16 365 | 23,5 / **26,2** / 31,9 (hat sie mitgelernt) | 73,1 / **83,1** / 88,6 (hat sie mitgelernt) |
+| von NEU (30 Pilotpartien, außerhalb der Stichprobe) | 2 099 | 22,7 / 25,0 / **24,8** | 65,5 / 76,6 / **78,5** |
+
+Das ist die Probe, die in Schritt 2 durchgefallen war. Auf den Stellungen, in
+die T2 selbst führt, trifft sie GNU Gos Zug jetzt besser als die alte Tabelle
+(26,2 gegen 23,5 %), T1 hatte dort mit 24,2 gegen 25,1 % schlechter
+abgeschnitten (Runde 1). Auf den Stellungen, die weder T2 noch T3 gesehen
+haben, liegen beide gleichauf: Rang 1 25,0 gegen 24,8 %, Rang ≤ 16 76,6 gegen
+78,5 %. In den Zügen 81–160 bringen beide rund 4 Punkte bei Rang 1 gegenüber der
+alten Tabelle (26,5 und 26,4 gegen 22,7 %), ab Zug 201 gut einen (26,7 und
+26,9 gegen 25,6 %), in den Zügen 161–200 keinen (19,6 und 18,7 gegen 19,8 %;
+455 Stellungen). Der gespielte Zug ist GNU Gos Zug in 24,4 % der Stellungen von
+NEU (T2 in Runde 1: 26,0 %).
+
+**Was daraus folgt**
+
+1. **T2 schadet nicht, und das hält sich.** NEU − A war in Runde 1 +1,1, jetzt
+   VOR − A +0,7 auf einem frischen Seed; zusammen +0,9 [−9,9; +11,7]. Auch die
+   240 Datenpartien liegen im Mittel 5,0 Punkte unter dem Default (± 10,7,
+   ungepaart). Die obere Grenze des Intervalls für T2 gegen A liegt bei +11,7.
+2. **T3 bringt gegenüber T2 offline kaum etwas.** Auf neuen Stellungen
+   unterscheiden sich beide bei Rang 1 nicht (24,8 gegen 25,0 %) und bei Rang
+   ≤ 16 um 1,9 Punkte. Die zusätzlichen 16 541 Stellungen verändern die Tabelle
+   weniger als die der ersten Runde und verbessern sie nicht merklich.
+3. **Im Spiel ist kein Gewinn nachweisbar.** NEU − A +4,0 (p = 0,67), Siege 33
+   gegen 38. Das Intervall [−14,8; +22,8] lässt einen Gewinn von +10 zu, ebenso
+   einen Verlust von −10.
+4. **Entscheidung nach §4: Runde 3.** NEU − A ist nicht signifikant. Es ist die
+   letzte Runde (höchstens drei insgesamt).
+
+**Festlegung für Runde 3 (vor dem Lauf).** Dieselbe Entscheidungstabelle (§4),
+mit einer Klarstellung zur Obergrenze: Nach Runde 3 folgt keine Runde 4. Ist
+NEU − A dann nicht signifikant oder signifikant kleiner als 0, endet die Reihe
+als negatives Ergebnis (dritte Zeile der Tabelle, auch für den Fall, dass die
+zweite Zeile sonst eine weitere Runde verlangte). Besteht der Pilot (NEU − A
+signifikant größer als 0), ist das nur der Zugang zur Messung (240 Paare gegen
+GNU Go und 360 Partien im Selbstspiel, eigenes Dokument mit eigener
+Vorabfestlegung), kein Ergebnis: Es wäre der dritte Pilot der Reihe an
+derselben Schwelle.
+
+| Eingabe | Wert |
+|---|---|
+| `runde` | 3 |
+| `basis` | `63f727b` |
+| `tabelle` | `docs/daten/dagger/runde2-lauf2/tabelle-neu.json` (T3, jetzt die Strategie VOR) |
+| `daten_extra` | `docs/daten/dagger/runde1-lauf1/dagger-lehr.jsonl.gz,docs/daten/dagger/runde2-lauf2/dagger-lehr.jsonl.gz` (D1 und D2) |
+| `seed_daten` | 209 |
+| `seed_pilot` | 210 |
+| `gewicht` | 200 |
+| `kontrolle` | nein |
+
+Neue Seeds in beiden Teilen: Der Pilot von Runde 2 (Seed 205) hat die
+Entscheidung für Runde 3 geliefert. Seed 206 bleibt der Messung in
+[`muster-endspiel-spiel.md`](muster-endspiel-spiel.md) §4 vorbehalten. Auf Seed
+210 spielen A, VOR (= T3) und NEU (= T4) neu. Die Pilotpartien von NEU aus
+Runde 2 lernen nicht mit.
+
+**Erwartung vorab, ohne Wirkung auf die Entscheidung:** Nach der
+Verschiebungsprobe unterscheidet sich T4 von T3 voraussichtlich kaum. Erwartet
+wird NEU − A im Bereich von ±10 Punkten und kein Bestehen des Pilots. Das steht
+hier, damit sich die Erwartung nicht nachträglich anpassen lässt.

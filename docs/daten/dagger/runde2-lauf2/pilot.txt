@@ -1,0 +1,6 @@
+Arm A: 60 Partien, Endstand Ø 21.9, Siege 38
+Arm VOR: 60 Partien, Endstand Ø 22.7, Siege 37
+Arm NEU: 60 Partien, Endstand Ø 25.9, Siege 33
+NEU − A: 60 Paare · Ø 25.9 gegen 21.9 · Differenz +4,0 (SD 72.8), 95 %: [−14,8; +22,8], t = 0.43, p = 0,6719 · Hälften −6,6 / +14,6 · Siege 33 gegen 38 · besser 32, schlechter 28 · nach Zug 120: +2,8 (p = 0,2019)
+VOR − A: 60 Paare · Ø 22.7 gegen 21.9 · Differenz +0,7 (SD 62.5), 95 %: [−15,4; +16,9], t = 0.09, p = 0,9279 · Hälften −12,1 / +13,6 · Siege 37 gegen 38 · besser 32, schlechter 27 · nach Zug 120: +1,2 (p = 0,5842)
+NEU − VOR: 60 Paare · Ø 25.9 gegen 22.7 · Differenz +3,3 (SD 50.4), 95 %: [−9,8; +16,3], t = 0.50, p = 0,6175 · Hälften +5,5 / +1,0 · Siege 33 gegen 37 · besser 28, schlechter 30 · nach Zug 120: +1,6 (p = 0,3663)
