@@ -2034,9 +2034,15 @@ globalThis.PARAMS = {
      eine tote Gruppe ist kein Material, aber sie ist Gefangene des Gegners.
      Beides zugleich waere Doppelzaehlung in die andere Richtung.
 
-     Default 0: NICHT GEMESSEN. Der Defekt ist belegt, die Wirkung auf die
-     Spielstaerke nicht -- in diesem Projekt sind fuenf solcher Terme nach
-     Dosisreihen bei 0 geblieben. Erst messen, dann anschalten. */
+     Default 0: GEMESSEN, OHNE STAERKEGEWINN. A = 0 gegen B = 1 im Selbstspiel,
+     zwei Laeufe zu je 360 Partien (der zweite mit frischem Seed). Der
+     Mechanismus wirkt: Zuege in spaeter sterbende Gruppen je toter Gruppe
+     0,346 -> 0,247, tote Steine je Partie 12,85 -> 9,59; die Wiederholung
+     bestaetigt es mit halbem Effekt. Die Siegrate bewegt sich nicht (51,7 %
+     und 48,3 %, gepoolt 360 von 720). Der Defekt ist belegt, ein
+     Staerkegewinn nicht, deshalb bleibt der Default 0. Nicht gemessen: gegen
+     GNU Go. Nachweise: docs/pilot-benson-defense.md, Abschnitte 12 und 15;
+     README, "Der Benson-Uebertrag". */
   bensonDeathTransfer: 0,
   /* Sterbe-Abschlag auf große Gruppen mit wenigen Freiheiten.
 
