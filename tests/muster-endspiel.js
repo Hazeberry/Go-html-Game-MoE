@@ -90,7 +90,7 @@ test('Kandidatenliste: Bewertung ohne Muster + musterGewicht × Muster ergibt di
   const wert0 = new Map(ohne.map(s => [s.m.idx, s.score]));
   pruefeGleich(wert0.size, mit.length, 'gleiche Kandidaten ohne Muster');
   for (const s of mit) pruefeNah(s.score, wert0.get(s.m.idx) + mg * KI.musterWert(b, s.m.idx, c), 1e-9, `Punkt ${s.m.idx}`);
-  pruefe(MD.GRUPPEN.length === MD.K && MD.K === 11, 'elf Merkmalsgruppen');
+  pruefe(MD.GRUPPEN.length === MD.K && MD.K === 15, 'fünfzehn Merkmalsgruppen');
 });
 
 laufeTests('Endspiel-Muster: Werkzeuge').then(ok => process.exit(ok ? 0 : 1));

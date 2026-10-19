@@ -3,6 +3,10 @@
 ergebnisse/
 *.log
 
+# Zwischendateien der Auswertung zu den Endspiel-Mustern (docs/muster-endspiel.md §8),
+# je Datensatz über 100 MB
+zw/
+
 # Node — das Repo hat keine package.json, aber für Playwright & Co. wird
 # lokal gelegentlich eins angelegt
 node_modules/

@@ -26,3 +26,17 @@ Ein ununterbrochener Lauf kann davon später abweichen; gemessen einmal, bei
 `endspiel-150.json` ab Partie 151 (`docs/endspielgrenze.md`, §8). Die
 Ursache ist gefunden und seit dem 03.10. behoben (§9 dort); für Läufe auf
 älteren Commits gilt die Einschränkung weiter.
+
+## Lehrdaten der Endspiel-Muster
+
+Die Dateien `muster-endspiel-*` sind keine Hash-Listen, sondern Daten für
+`docs/muster-endspiel.md`:
+
+- `muster-endspiel-entw-a.jsonl.gz`, `…-entw-b.jsonl.gz`, `…-pruef.jsonl.gz`:
+  je Partie eine Zeile mit Seed, Nummer, Vorgabesteinen, allen Zügen und
+  `ziele`, GNU Gos Zug (Stufe 10) für die beschrifteten Stellungen
+  (`auswertung/muster-daten.js`). Die Kandidatenlisten daraus erzeugt
+  `auswertung/muster-endspiel-daten.js`; sie hängen von der Engine ab und
+  stehen deshalb nicht im Repo.
+- `muster-endspiel-ergebnisse.json`: der Endstand der KI je Partie
+  (`"Seed#Nummer"`), für die Teilmengen „gewonnene“ und „verlorene Partien“.

@@ -27,19 +27,31 @@
      n  umstrittene (Bouzy-Wert 0) leere Punkte im 5×5-Feld um den Punkt
      b  Stärke der Bouzy-Zone am Punkt, in eigener Sicht
      q  Linie 1–4 × Abstand zur nächsten Ecke
+     e  Linie 1–4 × Abstand zum nächsten eigenen × zum nächsten fremden Stein
+     x  Linie 1–5 × Abstand zum letzten Gegnerzug
+     u  die acht Punkte im Abstand 2 (Achsen und Diagonalen), auf Drehung und
+        Spiegelung normiert
+     k  die acht Springerpunkte (1, 2), ebenso normiert
+
+   Je Stellung merkt es sich auch den Stand der Bouzy-Karte in eigener Sicht
+   (Felder der eigenen Zone minus Felder der fremden Zone; positiv = die Seite
+   am Zug liegt vorn).
 
    Ausgabe (Präfix P): P.json (Kopf, Stellungen, Wörterbuch), P.idx (Punkt
-   je Kandidat, Uint16), P.e und P.w0 (Float64), P.f (Int32, 11 je Kandidat).
+   je Kandidat, Uint16), P.e und P.w0 (Float64), P.f (Int32, 15 je Kandidat).
 
    Aufruf:
      node auswertung/muster-endspiel-daten.js <lehr.jsonl> [...] --aus P [--ab 80] [--bis 400] */
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 const {execFileSync} = require('child_process');
 const {ladeKI} = require(path.join(__dirname, '..', 'tests', 'rahmen.js'));
 
-const GRUPPEN = ['m', 'l', 'z', 'y', 'r', 'd', 'g', 'p', 'n', 'b', 'q'];
+/* Lehrdaten dürfen als .jsonl oder .jsonl.gz vorliegen */
+const liesText = d => d.endsWith('.gz') ? zlib.gunzipSync(fs.readFileSync(d)).toString('utf8') : fs.readFileSync(d, 'utf8');
+const GRUPPEN = ['m', 'l', 'z', 'y', 'r', 'd', 'g', 'p', 'n', 'b', 'q', 'e', 'x', 'u', 'k'];
 const K = GRUPPEN.length;
 const N = 361, G = 19;
 const L = 'ABCDEFGHJKLMNOPQRST';
@@ -52,7 +64,8 @@ const eimerL = d => d >= 99 ? 'keiner' : d <= 3 ? String(d) : d <= 6 ? '4-6' : '
 function karten(E, b, c) {
   const zo = new Int32Array(N), s = c === 1 ? 1 : -1;
   const Z = E.bouzyKarte(b, new Int32Array(N), new Int32Array(N));
-  for (let i = 0; i < N; i++) zo[i] = s * Z[i];
+  let stand = 0;
+  for (let i = 0; i < N; i++) { zo[i] = s * Z[i]; stand += zo[i] > 0 ? 1 : zo[i] < 0 ? -1 : 0; }
   const dEig = new Uint8Array(N).fill(6), dFr = new Uint8Array(N).fill(6);
   for (let i = 0; i < N; i++) {
     if (!b[i]) continue;
@@ -71,13 +84,33 @@ function karten(E, b, c) {
     for (let k = 0; k < q.length; k++) for (const n of E.NEIGHBORS[q[k]]) if (!b[n] && reg[n] < 0) { reg[n] = id; q.push(n); }
     groesse.push(q.length);
   }
-  return {zo, dEig, dFr, reg, groesse};
+  return {zo, dEig, dFr, reg, groesse, stand};
 }
 const eimer4 = k => k === 0 ? '0' : k <= 2 ? '1' : k <= 5 ? '2' : '3';
 const eimerG = n => n <= 2 ? String(n) : n <= 4 ? '3-4' : n <= 8 ? '5-8' : n <= 16 ? '9-16' : n <= 32 ? '17-32' : n <= 64 ? '33-64' : '65+';
 const abschnitt = k => k <= 120 ? 'a' : k <= 160 ? 'b' : k <= 200 ? 'c' : 'd';
 const eimerN = n => n === 0 ? '0' : n <= 2 ? '1' : n <= 5 ? '2' : n <= 10 ? '3' : '4';
 const eimerB = v => v <= -11 ? 'a' : v <= -4 ? 'b' : v <= -1 ? 'c' : v === 0 ? 'd' : v <= 3 ? 'e' : v <= 10 ? 'f' : 'g';
+
+/* Punkte in festem Abstand als Schlüssel, kleinste Lesart über die acht
+   Drehungen und Spiegelungen (wie musterSchluessel) */
+const SYM8 = [(x, y) => [x, y], (x, y) => [-x, y], (x, y) => [x, -y], (x, y) => [-x, -y],
+              (x, y) => [y, x], (x, y) => [-y, x], (x, y) => [y, -x], (x, y) => [-y, -x]];
+const PUNKTE_U = [[-2, -2], [0, -2], [2, -2], [-2, 0], [2, 0], [-2, 2], [0, 2], [2, 2]];
+const PUNKTE_K = [[-1, -2], [1, -2], [-2, -1], [2, -1], [-2, 1], [2, 1], [-1, 2], [1, 2]];
+function ringSchluessel(b, c, x0, y0, punkte) {
+  const roh = new Map();
+  for (const [dx, dy] of punkte) {
+    const x = x0 + dx, y = y0 + dy;
+    roh.set(dx + ',' + dy, x < 0 || y < 0 || x >= G || y >= G ? '#' : !b[y * G + x] ? '.' : b[y * G + x] === c ? 'o' : 'x');
+  }
+  let best = null;
+  for (const t of SYM8) {
+    const str = punkte.map(([dx, dy]) => { const [u, v] = t(dx, dy); return roh.get(u + ',' + v); }).join('');
+    if (best === null || str < best) best = str;
+  }
+  return best;
+}
 
 function schluessel(E, b, c, k, letzt, m, kt) {
   const x0 = m % G, y0 = (m / G) | 0;
@@ -117,6 +150,10 @@ function schluessel(E, b, c, k, letzt, m, kt) {
     'n:' + eimerN(nn),
     'b:' + eimerB(kt.zo[m]),
     'q:' + Math.min(linieVon(m), 4) + '-' + (ecke <= 5 ? 'e' : ecke <= 11 ? 'm' : 'f'),
+    'e:' + Math.min(linieVon(m), 4) + '|' + kt.dEig[m] + '-' + kt.dFr[m],
+    'x:' + lin + '|' + eimerL(abstand(m, letzt)),
+    'u:' + ringSchluessel(b, c, x0, y0, PUNKTE_U),
+    'k:' + ringSchluessel(b, c, x0, y0, PUNKTE_K),
   ];
 }
 
@@ -156,8 +193,8 @@ function extrahiere(dateien, opt) {
   const positionen = [];
   let fehlend = 0;
   for (const datei of dateien) {
-    const quelle = path.basename(datei, '.jsonl');
-    for (const z of fs.readFileSync(datei, 'utf8').split('\n')) {
+    const quelle = path.basename(datei).replace(/\.jsonl(\.gz)?$/, '');
+    for (const z of liesText(datei).split('\n')) {
       if (!z.trim()) continue;
       const p = JSON.parse(z);
       if (p.abgebrochen || !p.zuege) continue;
@@ -181,7 +218,7 @@ function extrahiere(dateien, opt) {
               for (const t of schluessel(E, b, c, k, letzt, m, kt)) f.schiebe(id(t));
               if (m === gi) zielIdx = j;
             });
-            positionen.push({q: quelle, seed: p.seed, nr: p.nr, k, c, off, n: liste.length, ziel: zielIdx, gnugo: gz, letzt});
+            positionen.push({q: quelle, seed: p.seed, nr: p.nr, k, c, off, n: liste.length, ziel: zielIdx, gnugo: gz, letzt, stand: kt.stand});
           }
         }
         const i = vonGtp(p.zuege[k]);

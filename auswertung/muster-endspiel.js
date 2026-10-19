@@ -15,7 +15,7 @@
                 MM-Verfahren nach Coulom 2007, wie muster.js --verfahren mm)
                 mit einer Auswahl von Merkmalsgruppen:
                   mm-mlz    m, l, z
-                  mm-voll   alle elf Gruppen (m l z y r d g p n b q)
+                  mm-voll   alle fünfzehn Gruppen (m l z y r d g p n b q e x u k)
                   mm-voll-X alle außer X          mm-mlz+X  m, l, z und X
 
    Gemessen wird, wo GNU Gos Zug in der Kandidatenliste der KI landet:
@@ -34,8 +34,17 @@
      node auswertung/muster-endspiel.js --lehr P1,P2 --test P3 [--varianten a,b] [--iter 30]
      node auswertung/muster-endspiel.js --lehr P1,P2 --kreuz 4 [--test-quelle B]
    --zeige  Teilmengen der Ausgabe: alle, linie12, linie3+, KI-am-Zug, GNU-Go-am-Zug,
-            zug81-120, zug121-160, zug161-200, ab-zug201 (Standard: alle,linie12,linie3+)
+            zug81-120, zug121-160, zug161-200, ab-zug201, Partie-gewonnen, Partie-verloren
+            (Standard: alle,linie12,linie3+)
    --modi   stat, k100, k200, k400 (Standard: alle vier)
+   --dosen  Dosen der kombinierten Wertung (Standard 100,200,400)
+   --var n=gruppen,...  eigene gemeinsam gelernte Varianten (Gruppenbuchstaben
+            hintereinander, etwa mlzd); dann nur diese und „heute“
+   --ergebnis d1,d2  Ausgang der Partien (endstand der KI) für die Teilmengen
+            Partie-gewonnen / Partie-verloren: Rohdumps von gnugo-duell.js
+            (.jsonl) oder eine Datei {"seed#nr": endstand} (.json)
+   --tor V  wendet die vier Tore aus docs/muster-endspiel.md §8 auf die Variante V
+            an (Dosis 200) und gibt bestanden oder nicht bestanden aus
    --lern-farbe S   nur Stellungen mit Schwarz (der KI bei Vorgabe) am Zug lernen
    --test-farbe S   nur an Stellungen mit Schwarz am Zug prüfen
    --lehr  Präfixe der Zwischenspeicher zum Lernen
@@ -45,9 +54,9 @@
 'use strict';
 const fs = require('fs');
 
-const GRUPPEN = ['m', 'l', 'z', 'y', 'r', 'd', 'g', 'p', 'n', 'b', 'q'];
-const ERWEITERT = ['y', 'r', 'd', 'g', 'p', 'n', 'b', 'q'];
-const DOSEN = [100, 200, 400];
+const GRUPPEN = ['m', 'l', 'z', 'y', 'r', 'd', 'g', 'p', 'n', 'b', 'q', 'e', 'x', 'u', 'k'];
+const ERWEITERT = ['y', 'r', 'd', 'g', 'p', 'n', 'b', 'q', 'e', 'x', 'u', 'k'];
+let DOSEN = [100, 200, 400];
 
 /* ── Laden und zusammenführen ─────────────────────────────────────────── */
 function lies(datei, Typ) {
@@ -83,7 +92,7 @@ function lade(praefixe) {
       if (!spiele.has(sk)) spiele.set(sk, {nr: spiele.size, q: p.q});
       let lz = 0;
       if (p.ziel >= 0) { const m = t.idx[p.off + p.ziel], x = m % 19, y = (m / 19) | 0; lz = Math.min(x, y, 18 - x, 18 - y) + 1; }
-      pos.push({q: p.q, spiel: spiele.get(sk).nr, k: p.k, c: p.c, off: p.off + o, n: p.n, ziel: p.ziel, lz});
+      pos.push({q: p.q, spiel: spiele.get(sk).nr, seedNr: `${p.seed}#${p.nr}`, k: p.k, c: p.c, off: p.off + o, n: p.n, ziel: p.ziel, lz, verloren: null});
     }
     o += t.e.length;
   }
@@ -208,6 +217,7 @@ function messe(D, testPos, tabellen, skalen, sammler) {
 }
 function untermengen(p) {
   const u = ['alle', p.lz <= 2 ? 'linie12' : 'linie3+', p.c === 1 ? 'KI-am-Zug' : 'GNU-Go-am-Zug'];
+  if (p.verloren !== null) u.push(p.verloren ? 'Partie-verloren' : 'Partie-gewonnen');
   u.push(p.k <= 120 ? 'zug81-120' : p.k <= 160 ? 'zug121-160' : p.k <= 200 ? 'zug161-200' : 'ab-zug201');
   return u;
 }
@@ -250,7 +260,7 @@ const zeigeCI = (s, diff, d = 1) => s ? `${diff ? fmt(s.wert, d) : s.wert.toFixe
 
 /* ── Hauptprogramm ────────────────────────────────────────────────────── */
 function main() {
-  const a = process.argv.slice(2), opt = {lehr: [], test: [], kreuz: 0, testQuelle: null, iter: 30, minM: 5, varianten: null, json: null, boot: 1000, lernFarbe: 'beide', testFarbe: 'beide',
+  const a = process.argv.slice(2), opt = {lehr: [], test: [], kreuz: 0, testQuelle: null, iter: 30, minM: 5, varianten: null, json: null, boot: 1000, var: null, ergebnis: [], tor: null, lernFarbe: 'beide', testFarbe: 'beide',
                zeige: ['alle', 'linie12', 'linie3+'], modi: ['stat', 'k100', 'k200', 'k400']};
   for (let i = 0; i < a.length; i++) {
     if (a[i] === '--lehr') opt.lehr = a[++i].split(',');
@@ -263,36 +273,54 @@ function main() {
     else if (a[i] === '--json') opt.json = a[++i];
     else if (a[i] === '--boot') opt.boot = +a[++i];
     else if (a[i] === '--zeige') opt.zeige = a[++i].split(',');
+    else if (a[i] === '--var') opt.var = a[++i].split(',').map(x => { const [n, g] = x.split('='); return {name: n, art: 'mm', gruppen: g.split('')}; });
+    else if (a[i] === '--ergebnis') opt.ergebnis = a[++i].split(',');
+    else if (a[i] === '--tor') opt.tor = a[++i];
     else if (a[i] === '--lern-farbe') opt.lernFarbe = a[++i];
     else if (a[i] === '--test-farbe') opt.testFarbe = a[++i];
     else if (a[i] === '--modi') opt.modi = a[++i].split(',');
+    else if (a[i] === '--dosen') { DOSEN = a[++i].split(',').map(Number); opt.modi = ['stat', ...DOSEN.map(d => 'k' + d)]; }
   }
   if (!opt.lehr.length || (!opt.test.length && !opt.kreuz)) { console.error('Aufruf: siehe Kopf der Datei'); process.exit(1); }
   const D = lade([...opt.lehr, ...opt.test]);
+  if (opt.ergebnis.length) {
+    const ausgang = new Map();
+    for (const d of opt.ergebnis) {
+      if (d.endsWith('.json')) { for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(d, 'utf8')))) ausgang.set(k, v); continue; }
+      for (const z of fs.readFileSync(d, 'utf8').split('\n')) {
+        if (!z.trim()) continue;
+        const g = JSON.parse(z);
+        if (g.seed !== undefined && g.endstand !== undefined) ausgang.set(`${g.seed}#${g.nr}`, g.endstand);
+      }
+    }
+    for (const p of D.pos) { const e = ausgang.get(p.seedNr); p.verloren = e === undefined ? null : e < 0; }
+  }
   const lehrQ = new Set(), testQ = new Set();
   /* Quellen der Präfixe: die Namen stehen in den Stellungen (q) */
   const kopfQ = pf => new Set(JSON.parse(fs.readFileSync(pf + '.json', 'utf8')).positionen.map(p => p.q));
   for (const pf of opt.lehr) for (const q of kopfQ(pf)) lehrQ.add(q);
   for (const pf of opt.test) for (const q of kopfQ(pf)) testQ.add(q);
-  const varianten = alleVarianten().filter(v => !opt.varianten || v.name === 'heute' || opt.varianten.includes(v.name));
+  const benannt = alleVarianten().filter(v => v.name === 'heute' || (opt.varianten ? opt.varianten.includes(v.name) : !opt.var));
+  const varianten = [...benannt, ...(opt.var || [])];
   const nSpiele = D.spiele.length;
   const sammler = new Sammler(nSpiele), skalenLog = {}, tabLog = {};
   const spieleVon = q => D.spiele.map((s, i) => [s, i]).filter(([s]) => s.q === q).map(([, i]) => i);
 
+  /* Farbe der Lern- und Prüfstellungen einschränken */
+  const lernOk = p => opt.lernFarbe !== 'S' || p.c === 1, testOk = p => opt.testFarbe !== 'S' || p.c === 1;
   /* Aufteilungen: je Aufteilung Lernpartien und Prüfpartien */
   const aufteilungen = [];
   if (opt.test.length) {
     aufteilungen.push({train: D.pos.filter(p => lehrQ.has(p.q) && !testQ.has(p.q)), test: D.pos.filter(p => testQ.has(p.q))});
   } else {
-    const kandidaten = D.pos.filter(p => !opt.testQuelle || p.q.includes(opt.testQuelle));
+    /* nur Partien, die überhaupt Prüfstellungen haben, bekommen eine Falte */
+    const kandidaten = D.pos.filter(p => (!opt.testQuelle || p.q.includes(opt.testQuelle)) && testOk(p));
     const spielIds = [...new Set(kandidaten.map(p => p.spiel))].sort((x, y) => x - y);
     const falte = new Map(spielIds.map((s, i) => [s, i % opt.kreuz]));
     for (let f = 0; f < opt.kreuz; f++) {
       aufteilungen.push({train: D.pos.filter(p => falte.get(p.spiel) !== f), test: D.pos.filter(p => falte.get(p.spiel) === f)});
     }
   }
-  /* Farbe der Lern- und Prüfstellungen einschränken */
-  const lernOk = p => opt.lernFarbe !== 'S' || p.c === 1, testOk = p => opt.testFarbe !== 'S' || p.c === 1;
   for (const af of aufteilungen) { af.train = af.train.filter(lernOk); af.test = af.test.filter(testOk); }
   console.log(`Daten: ${D.pos.length} Stellungen aus ${nSpiele} Partien, ${D.namen.length} Merkmalswerte; ${aufteilungen.length} Aufteilung(en)`);
   const t0 = Date.now();
@@ -323,7 +351,7 @@ function main() {
   console.log('  ' + namen.filter(n => n !== 'heute').map(n => `${n} ${mittel(skalenLog[n]).toFixed(2)}`).join(' · '));
   const bericht = {optionen: opt, daten: {stellungen: D.pos.length, partien: nSpiele}, skalen: Object.fromEntries(Object.entries(skalenLog).map(([k, v]) => [k, mittel(v)])), ergebnis: {}};
   const modi = ['stat', ...DOSEN.map(d => 'k' + d)];
-  const mname = {stat: 'statisch (nur Muster)', k100: 'kombiniert, Dosis 100', k200: 'kombiniert, Dosis 200 (heute)', k400: 'kombiniert, Dosis 400'};
+  const mname = new Proxy({stat: 'statisch (nur Muster)'}, {get: (o, k) => o[k] || (k === 'k200' ? 'kombiniert, Dosis 200 (heute)' : `kombiniert, Dosis ${String(k).slice(1)}`)});
   for (const u of opt.zeige) {
     if (!sammler.m.has(`heute|stat|${u}`)) continue;
     const n = summe(sammler.m.get(`heute|stat|${u}`)).n;
@@ -342,7 +370,25 @@ function main() {
       }
     }
   }
+  if (opt.tor) bericht.tor = pruefeTor(sammler, ziehTest, opt.tor);
   if (opt.json) fs.writeFileSync(opt.json, JSON.stringify(bericht));
+}
+
+/* Die vier Tore aus docs/muster-endspiel.md §8, an der Dosis 200 mit dem
+   Maßstab von „heute“ (Modus k200). Alles muss stimmen. */
+function pruefeTor(sammler, ziehungen, v) {
+  const d = (u, groesse) => schaetze(sammler, ziehungen, `${v}|k200|${u}`, `heute|k200|${u}`, groesse);
+  const g1 = d('alle', 'r1'), g2 = d('alle', 'r16'), g3 = d('linie12', 'r1'), g4 = d('Partie-verloren', 'r1');
+  const zeile = (name, soll, s, ok) => console.log(`  ${name} ${soll.padEnd(58)} ${zeigeCI(s, true).padEnd(26)} ${s ? (ok ? 'bestanden' : 'NICHT bestanden') : 'nicht messbar'}`);
+  const ok1 = g1 && g1.wert >= 5 && g1.lo > 0, ok2 = g2 && g2.wert >= 5 && g2.lo > 0, ok3 = g3 && g3.lo > 0, ok4 = g4 && g4.wert >= -3;
+  console.log(`\nTor für „${v}“ (Dosis 200, gleicher Maßstab wie „heute“; Unterschied in Prozentpunkten, 95 %-Intervall):`);
+  zeile('G1', 'Rang 1, alle Stellungen: ≥ +5,0 und untere Grenze > 0', g1, ok1);
+  zeile('G2', 'Rang ≤ 16, alle Stellungen: ≥ +5,0 und untere Grenze > 0', g2, ok2);
+  zeile('G3', 'Rang 1, GNU Gos Zug auf Linie 1–2: untere Grenze > 0', g3, ok3);
+  zeile('G4', 'Rang 1, Stellungen aus verlorenen Partien: ≥ −3,0', g4, ok4);
+  const ok = !!(ok1 && ok2 && ok3 && ok4);
+  console.log(`  Ergebnis: ${ok ? 'TOR BESTANDEN, Schritt 2 folgt' : 'TOR NICHT BESTANDEN, kein Schritt 2'}`);
+  return {g1, g2, g3, g4, bestanden: ok};
 }
 
 if (require.main === module) main();
