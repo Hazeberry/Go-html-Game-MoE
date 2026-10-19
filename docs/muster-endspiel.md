@@ -292,3 +292,94 @@ spürbar schlechter ordnet.
   ([`muster-ausbau.md`](muster-ausbau.md) §7). Das klärt nur Schritt 2.
 - **Rund 40 Varianten** wurden in der Entwicklung angesehen. Der Kandidat ist
   deshalb ausgewählt; die Prüfdaten sind es nicht.
+
+---
+
+## 10. Nachtrag: Ergebnis der Prüfung, Tor bestanden (19.10.2026)
+
+Gelaufen auf dem Merge-Commit `a0dcd77` (PR #163), mit den Befehlen aus §8,
+unverändert. Die Extraktion lieferte 16 228 Prüfstellungen aus 240 Partien,
+genau die in §3 vorab gezählte Zahl, und keine Stellung ohne Liste. Die vier
+Falten haben 4 043, 4 080, 3 946 und 4 159 Prüfstellungen. Befehl und volle
+Ausgabe: [`daten/muster-endspiel-pruefung.txt`](daten/muster-endspiel-pruefung.txt).
+Es gab keine Abweichung von der Vorabfestlegung.
+
+**Das Tor ist bestanden, alle vier Bedingungen** (Dosis 200, Maßstab von
+„heute“, Unterschied in Prozentpunkten, 95-%-Intervall über Partien):
+
+| | Bedingung | Entwicklung | Prüfung | |
+|---|---|---:|---:|---|
+| G1 | Rang 1, alle Stellungen: ≥ +5,0, untere Grenze > 0 | +13,5 | **+12,6** [+10,7; +14,5] | bestanden |
+| G2 | Rang ≤ 16, alle Stellungen: ≥ +5,0, untere Grenze > 0 | +23,7 | **+25,9** [+23,3; +28,6] | bestanden |
+| G3 | Rang 1, GNU Gos Zug auf Linie 1–2: untere Grenze > 0 | +7,1 | **+8,7** [+7,2; +10,2] | bestanden |
+| G4 | Rang 1, Stellungen aus verlorenen Partien: ≥ −3,0 | +1,3 | **+5,5** [+4,1; +6,9] | bestanden |
+
+Die Entwicklung hat sich bestätigt: G1 bis G3 liegen innerhalb von rund zwei
+Punkten der Entwicklungswerte, G4 deutlich darüber. Die Schwellen waren weit
+genug entfernt; auch die unteren Grenzen der Intervalle liegen über ihnen
+(G1 +10,7, G2 +23,3).
+
+Alle Varianten, Rang 1 und Rang ≤ 16 von GNU Gos Zug in der Liste in %, in
+Klammern der Unterschied zu „heute“ bei Rang 1:
+
+| Variante | statisch Rang 1 | Dosis 200 Rang 1 | Dosis 200 Rang ≤ 16 | Linie 1–2, Dosis 200, Rang 1 | Linie 1–2, Dosis 400, Rang 1 |
+|---|---:|---:|---:|---:|---:|
+| heute | 19,9 | 20,3 | 63,2 | 23,0 | 25,0 |
+| naiv-mlz | 23,5 (+3,6) | 22,0 (+1,7) | 80,3 | 25,8 (+2,8) | 26,1 (+1,1) |
+| mlz | 27,4 (+7,5) | 23,7 (+3,4) | 81,6 | 26,8 (+3,8) | 26,9 (+2,0) |
+| **mlzduk** | **46,7 (+26,8)** | **32,9 (+12,6)** | **89,1** | **31,7 (+8,7)** | **36,8 (+11,8)** |
+| alle15 | 48,5 (+28,6) | 34,7 (+14,4) | 89,4 | 32,3 (+9,3) | 37,9 (+12,9) |
+
+Die Zahlen der Kreuzprüfung in §7 und die der Prüfung stehen dicht
+beieinander (mlzduk: statisch 44,3 und 46,7; Dosis 200 33,5 und 32,9; Linie
+1–2 31,8 und 31,7). Die mittlere Log-Wahrscheinlichkeit von GNU Gos Zug
+unter den Kandidaten, statisch, steigt von −3,03 (mlz) auf −2,27 (mlzduk) und
+−2,12 (alle15).
+
+**Dosis** (mlzduk, alle Stellungen, Rang 1, Unterschied zu „heute“): +3,5
+[+2,4; +4,6] bei 100, +12,6 bei 200, +18,6 [+16,2; +21,0] bei 400, +22,6
+[+19,9; +25,2] bei 800. Rang ≤ 16 bleibt dabei bei +25 bis +27. Wie in §7
+nähert sich Rang 1 mit der Dosis der statischen Quote; im Spiel überstimmt
+das Muster dann die übrige Bewertung.
+
+**Teilmengen** (Dosis 200, mlzduk gegen „heute“, Rang 1):
+
+| Teilmenge | Stellungen | heute | mlzduk | Unterschied |
+|---|---:|---:|---:|---:|
+| GNU Gos Zug auf Linie 1–2 | 5 802 | 23,0 | 31,7 | +8,7 [+7,2; +10,2] |
+| weiter innen | 10 426 | 18,8 | 33,5 | +14,8 [+11,9; +17,5] |
+| Partien, die die KI gewann | 9 632 | 19,8 | 37,3 | +17,5 [+14,8; +20,3] |
+| Partien, die die KI verlor | 6 596 | 20,9 | 26,4 | +5,5 [+4,1; +6,9] |
+
+**Was daraus folgt**
+
+1. **Der Gewinn kommt von den neuen Merkmalen, nicht vom Neulernen.** Dieselben
+   drei Merkmale, nur aus Endspiel-Stellungen gelernt (`naiv-mlz`, `mlz`),
+   bringen bei Rang 1 +1,7 und +3,4, mlzduk +12,6. Bei Rang ≤ 16 bringt dagegen schon
+   das Neulernen +17 bis +18: „heute“ ist aus allen Phasen und beiden Seiten
+   gelernt und passt für diese Stellungen schlecht. Das ist eine Eigenschaft
+   des Aufbaus, kein Beleg für die neuen Merkmale.
+2. **`alle15` bringt nur 1,8 Punkte mehr als `mlzduk`** (Dosis 200, Rang 1).
+   Die Wahl der kleinen Variante war richtig.
+3. **Auf Linie 1–2 und in verlorenen Partien ist der Gewinn kleiner**
+   (+8,7 gegen +14,8 innen, +5,5 gegen +17,5 in gewonnenen Partien), aber
+   überall positiv. Die Grenzzüge der Randlinien bleiben die schwerste
+   Stelle; in verlorenen Partien liegt die KI zurück, und GNU Go spielt dort
+   andere Züge als gegen eine führende KI (§9).
+4. **Maßstab.** Die mittlere Streuung der neuen Tabelle ist rund 1,7-mal die
+   von „heute“: Faktor 0,60 für mlzduk (0,89 naiv-mlz, 0,87 mlz, 0,61
+   alle15). In Schritt 2 gilt „Gewicht 200“ für die auf diesen Maßstab
+   gebrachte Tabelle.
+
+**Was die Prüfung nicht zeigt.** Rang 1 ist nicht der Endstand. Die KI
+spielt mit der neuen Tabelle andere Züge als die, aus deren Partien gelernt
+wurde, und gegen GNU Go zählen am Ende Punkte. Eine zweite Tabelle sagte
+GNU Gos Zug öfter voraus und spielte schlechter ([`muster-ausbau.md`](muster-ausbau.md)
+§7). Diesmal ist der Abstand zur Tabelle im Spiel größer (statisch Rang 1 plus
+26,8 Punkte; damals plus 8,4, dort aber unter allen legalen Zügen und für
+beide Seiten gezählt) und er liegt dort, wo die Punkte verloren gehen
+(Endspiel, KI am Zug). Ob das reicht, klärt nur die Messung im Spiel.
+
+**Entscheidung (nach §8):** Schritt 2 folgt, in einem eigenen Dokument mit
+eigener Vorabfestlegung: Schalter im Spiel, Pilot für die Dosis (30 Paare),
+Messung mit 240 Paaren gegen GNU Go und 360 Partien im Selbstspiel.

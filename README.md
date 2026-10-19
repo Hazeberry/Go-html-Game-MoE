@@ -260,6 +260,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | Suchtiefe: 240 gegen 120, 480 gegen 240 Simulationen | 60,6 % und 57,8 % über je 360 Partien (+75 und +55 Elo je Verdopplung) | Suche hilft, flacht ab — kein großer Hebel (`docs/skalierung.md`) |
 | `resignQ` 0,95 gegen 0,997 | 29:31 über 60 Partien, p = 0,90 | 0,95 bleibt — rechtzeitiges Aufgeben kostet nichts |
 | Ko-Punkt in Suche und Rollouts (Fehler aus dem Code-Review vom 13.10.) | gegen GNU Go Endstand +0,9 über 240 ausgespielte Paare (95 %: [−5,3; +7,2], p = 0,77), Siege 149 → 157; 235 der 240 Partien ändern sich | **behoben** — Regelkorrektur, keine Stärkeänderung (`docs/code-review.md` §4) |
+| Endspiel-Muster, Schritt 1 (nur offline): eigene Tabelle für Stellungen ab Zug 81 mit Abstand zu den Steinen und Ringen um den Punkt | an 16 228 frischen Stellungen sagt sie GNU Gos Zug in der Liste der KI öfter voraus: Rang 1 **+12,6** Prozentpunkte (95 %: [+10,7; +14,5]), auf Linie 1–2 +8,7, in verlorenen Partien +5,5; alle vier vorab festgelegten Tore bestanden | Schritt 2 (Schalter, Pilot, Messung im Spiel) folgt; bessere Vorhersage ist nicht bessere Zugwahl (`docs/muster-endspiel.md`) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2349,6 +2350,17 @@ der Rückfall des Workers, der Notzug und das Speichern im Dashboard:
 [`docs/code-review.md`](docs/code-review.md). Die Ko-Korrektur ändert 235
 von 240 Partien gegen GNU Go, der Endstand aber bleibt gleich: +0,9 Punkte,
 95 %: [−5,3; +7,2], p = 0,77. Sie bleibt, wie vorab festgelegt.
+
+**Endspiel-Muster, Schritt 1 (19.10.).** Die Muster-KI verliert ihre Punkte im
+Endspiel an den Grenzen. Eine Tabelle, die nur aus Stellungen ab Zug 81 mit
+der KI am Zug gelernt ist und neben dem 3×3-Muster den Abstand zu eigenen
+und fremden Steinen und zwei Ringe um den Punkt kennt, sagt GNU Gos Zug in
+der Kandidatenliste der KI deutlich öfter voraus als die Tabelle im Spiel.
+Geprüft an 240 frischen Partien (16 228 Stellungen), nach vorab festgelegtem
+Tor: Rang 1 plus 12,6 Prozentpunkte, auf Linie 1–2 plus 8,7. Das ist nur die
+Eintrittskarte: Eine bessere Vorhersage war schon einmal schlechteres Spiel.
+Ob die Tabelle im Spiel etwas bringt, messen Pilot und Messung in Schritt 2:
+[`docs/muster-endspiel.md`](docs/muster-endspiel.md).
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
