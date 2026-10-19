@@ -22,6 +22,9 @@
      6. Der Bericht des Orakel-Tests: Zählung der ersetzten und geänderten
         Züge, Punkte je geändertem Zug, Steigung und Messlatte, Kontrolle
         gegen eine frühere Messung, 8 Teile je Arm zu einem Bericht.
+     7. Die Zusatzrechnung zum Passen (orakel-nachspiel.js): erster Pass,
+        Zählung aus Sicht der KI, Zusammenfassung. Das Nachspielen in GNU Go
+        prüft tests/gnugo-bruecke.js.
 
    Aufruf:  node tests/dagger.js */
 'use strict';
@@ -32,6 +35,7 @@ const T = require('../auswertung/muster-endspiel-tabelle.js');
 const B = require('../auswertung/endspiel-pilot-bericht.js');
 const Z = require('../auswertung/messung-zusatz.js');
 const O = require('../auswertung/orakel-bericht.js');
+const N = require('../auswertung/orakel-nachspiel.js');
 
 const wurzel = path.join(__dirname, '..');
 const temp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'dagger-'));
@@ -366,5 +370,29 @@ test('Bericht des Orakel-Tests: 8 Teile je Arm zu einem Bericht, Kontrolle, Rohd
   }
 });
 
+
+test('Nachspiel-Zusatz: erster Pass, Zählung aus Sicht der KI, Zusammenfassung', () => {
+  pruefeGleich(N.ersterPass(['D4', 'Q16', 'pass', 'C3', 'pass', 'pass']), 2, 'erster Pass');
+  pruefeGleich(N.ersterPass(['D4', 'Q16']), -1, 'ohne Pass');
+  pruefeGleich(N.ausSicht('B+12.5', true), 12.5, 'Schwarz vorn, KI Schwarz');
+  pruefeGleich(N.ausSicht('B+12.5', false), -12.5, 'Schwarz vorn, KI Weiß');
+  pruefeGleich(N.ausSicht('W+3.5', true), -3.5, 'Weiß vorn, KI Schwarz');
+  pruefeGleich(N.ausSicht('0', true), 0, 'Gleichstand');
+  /* drei Partien: eine ohne Änderung, eine mit +4 nach dem ersten Pass, eine ohne Pass */
+  const a = N.auswerten([
+    {erster: 100, laenge: 130, nach: 10, ende: 10, aufgezeichnet: 10},
+    {erster: 90, laenge: 120, nach: 6, ende: 10, aufgezeichnet: 10},
+    {erster: -1, laenge: 80, nach: null, ende: 20, aufgezeichnet: 21},
+  ]);
+  pruefeGleich(a.partien, 3, 'Partien');
+  pruefeGleich(a.gleich, 2, 'Nachrechnung gleich der Aufzeichnung');
+  pruefeGleich(a.ohnePass, 1, 'Partien ohne Pass');
+  pruefeNah(a.diffMittel, 2, 1e-12, 'Ende − nach erstem Pass im Mittel über die Partien mit Pass');
+  pruefeGleich(a.geaendert, 1, 'Partien mit Änderung');
+  pruefeNah(a.zuegeDanach, 30, 1e-12, 'Züge nach dem ersten Pass');
+  pruefeNah(a.endeMittel, 40 / 3, 1e-12, 'Endstand Ø über alle Partien');
+  const t = N.text('X', a);
+  pruefe(/^X: 3 Partien · Nachrechnung gleich der Aufzeichnung: 2 von 3/.test(t) && /\+2,00/.test(t) && /1 Partien ohne Pass/.test(t), 'Textzeile: ' + t);
+});
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));

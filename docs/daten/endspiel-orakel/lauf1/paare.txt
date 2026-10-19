@@ -1,0 +1,9 @@
+Arm A: 120 Partien, Endstand Ø 22.9, Siege 79
+Arm D25: 120 Partien, Endstand Ø 44.3, Siege 100
+Arm D50: 120 Partien, Endstand Ø 55.7, Siege 107
+Arm D100: 120 Partien, Endstand Ø 101.7, Siege 120
+Arm E100: 120 Partien, Endstand Ø 57.4, Siege 109
+D25 − A: 120 Paare · Ø 44.3 gegen 22.9 · Differenz +21,3 (SD 59.4), 95 %: [+10,6; +32,1], t = 3.94, p = 0,0001 · Hälften +27,6 / +15,1 · Siege 100 gegen 79 · besser 80, schlechter 40 · nach Zug 120: +1,4 (p = 0,4550)
+D50 − A: 120 Paare · Ø 55.7 gegen 22.9 · Differenz +32,8 (SD 52.6), 95 %: [+23,3; +42,3], t = 6.82, p = 3,9 · 10⁻10 · Hälften +31,0 / +34,6 · Siege 107 gegen 79 · besser 91, schlechter 28 · nach Zug 120: +6,1 (p = 0,0091)
+D100 − A: 120 Paare · Ø 101.7 gegen 22.9 · Differenz +78,7 (SD 56.2), 95 %: [+68,5; +88,9], t = 15.34, p = 5,6 · 10⁻30 · Hälften +78,9 / +78,5 · Siege 120 gegen 79 · besser 117, schlechter 3 · nach Zug 120: +22,2 (p = 3,0 · 10⁻18)
+E100 − A: 120 Paare · Ø 57.4 gegen 22.9 · Differenz +34,4 (SD 46.6), 95 %: [+26,0; +42,8], t = 8.08, p = 5,9 · 10⁻13 · Hälften +35,9 / +32,9 · Siege 109 gegen 79 · besser 81, schlechter 12 · nach Zug 120: +0,0 (p = 1,0000)
