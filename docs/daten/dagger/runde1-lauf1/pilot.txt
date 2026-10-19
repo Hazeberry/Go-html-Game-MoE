@@ -1,0 +1,9 @@
+Arm A: 60 Partien, Endstand Ø 24.0, Siege 35
+Arm VOR: 60 Partien, Endstand Ø 2.2, Siege 26
+Arm NEU: 60 Partien, Endstand Ø 25.1, Siege 40
+NEU − A: 60 Paare · Ø 25.1 gegen 24.0 · Differenz +1,1 (SD 57.1), 95 %: [−13,7; +15,8], t = 0.14, p = 0,8871 · Hälften −5,6 / +7,7 · Siege 40 gegen 35 · besser 29, schlechter 30 · nach Zug 120: +3,9 (p = 0,0731)
+VOR − A: 60 Paare · Ø 2.2 gegen 24.0 · Differenz −21,8 (SD 55.8), 95 %: [−36,2; −7,4], t = -3.03, p = 0,0036 · Hälften −22,6 / −21,0 · Siege 26 gegen 35 · besser 16, schlechter 41 · nach Zug 120: −4,5 (p = 0,1781)
+NEU − VOR: 60 Paare · Ø 25.1 gegen 2.2 · Differenz +22,9 (SD 45.5), 95 %: [+11,1; +34,6], t = 3.89, p = 0,0003 · Hälften +17,0 / +28,7 · Siege 40 gegen 26 · besser 45, schlechter 15 · nach Zug 120: +8,4 (p = 0,0104)
+
+Kontrolle gegen den Container-Pilot, Arm A (dort A): 60 von 60 Partien mit gleichem Endstand und gleicher Zugzahl
+Kontrolle gegen den Container-Pilot, Arm VOR (dort 200): 60 von 60 Partien mit gleichem Endstand und gleicher Zugzahl
