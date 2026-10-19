@@ -71,13 +71,17 @@ Je Arm gegen A, gepaart nach Partienummer:
   KI), und wie oft der Zug der KI derselbe gewesen wäre.
 - **Punkte je geändertem Zug** = Differenz / Ø geänderte Züge je Partie.
   Näherung: Der Nenner wird als fest behandelt.
-- **Steigung** s über D25, D50, D100 (Regression durch den Ursprung der
-  Punkte (Ø geänderte Züge, Differenz)): Punkte je geändertem Zug.
+- **Steigung** s über die kleinen Dosen D25 und D50 (Regression durch den
+  Ursprung der Punkte (Ø geänderte Züge, Differenz)): Punkte je geändertem
+  Zug. Ein Lerner ändert wenige Züge, deshalb zählt die Steigung bei kleiner
+  Dosis. D100 geht nicht ein: Dort passt das Orakel früher und die Partien
+  enden kürzer (§5), die Wirkung ist nicht linear in der Dosis. D100 steht für
+  die Obergrenze.
 - **Messlatte:** Ein Lerner, der in einem Anteil q der Züge der KI ab Zug 81
   den Zug der KI durch den Orakelzug ersetzt, wo beide verschieden sind,
-  gewinnt rund s × n × q Punkte (n Gelegenheiten je Partie in D100). Für +5
-  Punkte ist q = 5 / (s × n). q ist der Zuwachs der Trefferquote der
-  gespielten Züge.
+  gewinnt rund s × n × q Punkte (n: Züge der KI ab Zug 81 in einer Partie von
+  Arm A, also ohne Orakel). Für +5 Punkte ist q = 5 / (s × n). q ist der
+  Zuwachs der Trefferquote der gespielten Züge.
 
 **Lesart, vorab festgelegt** (es gibt keine Entscheidung über die Engine, nur
 über die Richtung der Arbeit):
@@ -100,6 +104,17 @@ Punkten, die Intervalle bei ±12 bis ±16. Große Effekte (D100, E100) sind dami
 klar zu sehen; bei D25 reicht es nur für einen Bereich. Es ist eine Schätzung,
 kein Test einer Hypothese.
 
+**Trockenlauf vor dieser Festlegung.** Je Arm zwei Partien (die Partien 1 und
+2 von Seed 206; sie gehören zur Messung und zählen mit) liefen zur Probe der
+Werkzeuge. Sie zeigten: Das Orakel greift (D100 gewann beide mit +119,5 und
++193,5, Arm A verlor sie mit −0,5 und −2,5), Partien mit Orakel ab Zug 81
+enden früher (150 und 156 Züge statt 278 und 284, weil das Orakel passt), und
+die Wirkung wächst stärker als linear mit der Dosis. Danach wurde die
+Messlatte auf die Steigung bei kleinen Dosen und die Zügezahl von Arm A
+umgestellt; Arme, Endpunkt und die Lesart der Differenz D100 − A blieben. Die
+Erwartung unten ist vor dem Trockenlauf geschrieben und bleibt stehen; für
+D100 widersprechen ihr die zwei Partien schon.
+
 **Erwartung vorab, ohne Wirkung auf die Lesart:** D100 − A etwa +40 (zwischen
 +20 und +70), E100 − A etwa +15 (zwischen +5 und +35), s etwa 0,6 Punkte je
 geändertem Zug (zwischen 0,2 und 1,0), der Zug der KI gleich dem Orakelzug in
@@ -115,7 +130,10 @@ die Erwartung nicht nachträglich anpassen lässt.
   für Randspiel allein; E100 grenzt auf Züge ab Zug 161 ein.
 - Die Dosis-Wirkung muss nicht linear sein (ein Orakelzug kann mehr wert sein,
   wenn die folgenden auch gut sind). Die Steigung durch den Ursprung ist eine
-  Näherung; die drei Dosen zeigen, ob sie trägt.
+  Näherung für kleine Dosen; D25, D50 und D100 zeigen, ob sie trägt.
+- Das Orakel passt früher als die KI, die Partien mit Orakel werden kürzer
+  (§5). Das ist Teil der Wirkung und wird nicht herausgerechnet; die Zahl der
+  Züge je Partie steht im Bericht.
 - Lehrer, Schiedsrichter und Gegner sind dasselbe Programm (GNU Go): Das
   Orakel (Stufe 10) spielt gegen Stufe 1, und die Zählung ist die von GNU Go.
 - Ein Seed, 120 Paare je Arm. GNU Go 3.8 kann an einzelnen Stellungen

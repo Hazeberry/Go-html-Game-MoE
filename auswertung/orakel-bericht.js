@@ -8,12 +8,13 @@
    geteilt durch die mittlere Zahl geänderter Züge je Partie. Geändert heißt:
    Das Orakel hat gezogen und sein Zug war nicht der der KI.
 
-   Dazu die Steigung über die Dosis-Arme (gleicher Beginn, verschiedener
-   Anteil; Regression durch den Ursprung) und die Messlatte: Ein Lerner, der in
+   Dazu die Steigung über die Dosis-Arme (`--dosis`: gleicher Beginn, kleine
+   Anteile; Regression durch den Ursprung) und die Messlatte: Ein Lerner, der in
    einem Anteil q der Züge ab Zug AB den Zug der KI durch den Orakelzug ersetzt,
    wo beide verschieden sind, gewinnt rund s × n × q Punkte (s Punkte je
-   geändertem Zug, n Gelegenheiten je Partie). Für `--ziel` Punkte ist
-   q = ziel / (s × n). q ist der Zuwachs der Trefferquote der gespielten Züge.
+   geändertem Zug, n Züge der KI ab Zug AB in einer Partie des Referenzarms,
+   also ohne Orakel). Für `--ziel` Punkte ist q = ziel / (s × n). q ist der
+   Zuwachs der Trefferquote der gespielten Züge.
 
    Mit --kontrolle <datei> (jsonl, auch .gz) wird der Referenzarm gegen eine
    frühere Messung desselben Seeds verglichen: gleicher Endstand und gleiche
@@ -41,7 +42,16 @@ function orakelArm(arm) {
   };
 }
 
-/* Steigung durch den Ursprung: Punkte je ersetztem Zug aus mehreren Dosen */
+/* Züge der KI ab der Zugzahl ab in einer Partie: die KI zieht an den Zugnummern k mit
+   (k gerade) = (beginnt == wirFarbe) */
+function kiZuegeAb(p, ab) {
+  const gerade = p.beginnt === p.wirFarbe;
+  let n = 0;
+  for (let k = ab; k < p.zuegeAnzahl; k++) if ((k % 2 === 0) === gerade) n++;
+  return n;
+}
+
+/* Steigung durch den Ursprung: Punkte je geändertem Zug aus mehreren Dosen */
 function steigung(punkte) {
   const xx = punkte.reduce((s, p) => s + p.x * p.x, 0);
   return xx > 0 ? punkte.reduce((s, p) => s + p.x * p.y, 0) / xx : NaN;
@@ -60,9 +70,9 @@ function auswertung(arme, ref, dosis, ziel) {
   }
   const dz = zeilen.filter(z => dosis.includes(z.name));
   const s = dz.length ? steigung(dz.map(z => ({x: z.geaendert, y: z.diff}))) : NaN;
-  /* n: Gelegenheiten im Dosis-Arm mit dem größten Anteil */
-  const voll = dz.length ? dz.reduce((a, b) => (b.anteil > a.anteil ? b : a)) : null;
-  const n = voll ? voll.gelegenheiten : NaN;
+  /* n: Züge der KI ab Zug AB in den Partien des Referenzarms (ohne Orakel) */
+  const refPartien = [...arme[ref].values()].filter(p => !p.abgebrochen);
+  const n = dz.length && refPartien.length ? mittel(refPartien.map(p => kiZuegeAb(p, dz[0].ab))) : NaN;
   const q = s > 0 && n > 0 ? ziel / (s * n) : NaN;
   return {zeilen, steigung: s, gelegenheiten: n, ziel, q, dosis: dz.map(z => z.name)};
 }
@@ -98,7 +108,7 @@ function text(a, ref, opt) {
   }
   if (Number.isFinite(a.steigung)) {
     aus.push('', `Steigung über ${a.dosis.join(', ')} (Regression durch den Ursprung): ${f2(a.steigung)} Punkte je geändertem Zug.`);
-    if (Number.isFinite(a.q)) aus.push(`Messlatte: Mit n = ${z1(a.gelegenheiten)} Gelegenheiten je Partie gewinnt ein Lerner, der in einem Anteil q dieser Züge den Zug der KI durch den Orakelzug ersetzt, wo beide verschieden sind, rund ${f2(a.steigung)} × ${z1(a.gelegenheiten)} × q Punkte. Für ${a.ziel} Punkte ist q = ${pz(a.q)}.`);
+    if (Number.isFinite(a.q)) aus.push(`Messlatte: Mit n = ${z1(a.gelegenheiten)} Zügen der KI ab dem Beginn des Orakels in einer Partie von Arm ${ref} gewinnt ein Lerner, der in einem Anteil q dieser Züge den Zug der KI durch den Orakelzug ersetzt, wo beide verschieden sind, rund ${f2(a.steigung)} × ${z1(a.gelegenheiten)} × q Punkte. Für ${a.ziel} Punkte ist q = ${pz(a.q)}.`);
     else aus.push('Messlatte: nicht berechenbar (Steigung nicht positiv).');
   }
   return aus.join('\n');
@@ -123,4 +133,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = {orakelArm, steigung, auswertung, kontrolle, text};
+module.exports = {orakelArm, kiZuegeAb, steigung, auswertung, kontrolle, text};

@@ -293,7 +293,7 @@ function orakelTeile(verzeichnis, ohne) {
     const zeilen = [];
     for (let nr = von; nr < von + 15; nr++) {
       const a = ((nr * 37) % 101) - 50, endstand = o ? a + 0.5 * (o[1] - o[2]) + ((nr % 3) - 1) : a;
-      const rec = {nr, endstand, gewonnen: endstand > 0, zuegeAnzahl: 200 + (nr % 7), schaetzung: {120: endstand / 2, 200: endstand}};
+      const rec = {nr, beginnt: 'W', wirFarbe: 'S', endstand, gewonnen: endstand > 0, zuegeAnzahl: 240, schaetzung: {120: endstand / 2, 200: endstand}};
       if (o) rec.orakelZug = {ab: arm === 'E100' ? 160 : 80, anteil: {D25: 0.25, D50: 0.5, D100: 1, E100: 1}[arm], stufe: 10, gelegenheiten: o[0], eingesetzt: o[1], gleich: o[2], paesse: 0, neustarts: 0};
       zeilen.push(JSON.stringify(rec));
     }
@@ -313,14 +313,19 @@ test('Orakel-Bericht: ersetzte und geänderte Züge, Punkte je geändertem Zug, 
   pruefeGleich(O.orakelArm(arme.A), null, 'Arm ohne Orakel');
   pruefeNah(O.steigung([{x: 15, y: 7.5}, {x: 30, y: 15}, {x: 60, y: 30}]), 0.5, 1e-12, 'Steigung durch den Ursprung');
   pruefe(Number.isNaN(O.steigung([])), 'keine Punkte: keine Steigung');
-  const a = O.auswertung(arme, 'A', ['D25', 'D50', 'D100'], 5);
+  /* die KI zieht an ungeraden Zugnummern, wenn Weiß (GNU Go) beginnt und sie Schwarz ist */
+  pruefeGleich(O.kiZuegeAb({beginnt: 'W', wirFarbe: 'S', zuegeAnzahl: 240}, 80), 80, 'Züge der KI ab Zug 81 bei 240 Zügen');
+  pruefeGleich(O.kiZuegeAb({beginnt: 'W', wirFarbe: 'S', zuegeAnzahl: 240}, 160), 40, 'ab Zug 161');
+  pruefeGleich(O.kiZuegeAb({beginnt: 'S', wirFarbe: 'S', zuegeAnzahl: 241}, 80), 81, 'beginnt die KI, zieht sie an geraden Nummern');
+  pruefeGleich(O.kiZuegeAb({beginnt: 'W', wirFarbe: 'S', zuegeAnzahl: 50}, 80), 0, 'Partie endet vor dem Beginn');
+  const a = O.auswertung(arme, 'A', ['D25', 'D50'], 5);
   const z = n => a.zeilen.find(r => r.name === n);
   pruefeNah(z('D100').diff, 30, 1e-9, 'D100 − A'); pruefeNah(z('D50').diff, 15, 1e-9, 'D50 − A'); pruefeNah(z('D25').diff, 7.5, 1e-9, 'D25 − A');
   pruefeNah(z('E100').diff, 15, 1e-9, 'E100 − A'); pruefeNah(z('D100').jeZug, 0.5, 1e-9, 'Punkte je geändertem Zug');
-  pruefeNah(a.steigung, 0.5, 1e-9, 'Steigung über die Dosis-Arme'); pruefeGleich(a.gelegenheiten, 80, 'n aus dem Arm mit dem größten Anteil');
+  pruefeNah(a.steigung, 0.5, 1e-9, 'Steigung über die kleinen Dosen'); pruefeGleich(a.gelegenheiten, 80, 'n: Züge der KI ab Zug 81 in den Partien von Arm A');
   pruefeNah(a.q, 5 / (0.5 * 80), 1e-9, 'Messlatte q = 5 / (s × n)');
   const text = O.text(a, 'A', {markdown: false}), md = O.text(a, 'A', {markdown: true});
-  pruefe(/Steigung über D25, D50, D100 \(Regression durch den Ursprung\): \+0,50 Punkte je geändertem Zug/.test(text), 'Steigung im Text');
+  pruefe(/Steigung über D25, D50 \(Regression durch den Ursprung\): \+0,50 Punkte je geändertem Zug/.test(text), 'Steigung im Text');
   pruefe(/Für 5 Punkte ist q = 12,5 %/.test(text), 'Messlatte im Text');
   pruefe(/\| \*\*D100\*\* \| ab Zug 81, 100 % \| 120 \|/.test(md) && /\| \*\*E100\*\* \| ab Zug 161, 100 % \|/.test(md), 'Markdown-Tabelle');
   /* Kontrolle gegen eine frühere Datei: Partien 1 bis 120, eine mit anderem Endstand */
@@ -344,7 +349,7 @@ test('Bericht des Orakel-Tests: 8 Teile je Arm zu einem Bericht, Kontrolle, Rohd
   const lies = f => fs.readFileSync(path.join(d, 'ergebnisse', f), 'utf8');
   pruefe(/Orakel-Test: 120 Paare je Arm/.test(lies('bericht.md')) && /Seed 206/.test(lies('bericht.md')), 'Kopf des Berichts');
   pruefe(/\| \*\*D100 − A\*\* \| 120 \|/.test(lies('paare.md')) && /Differenz \+30,0/.test(lies('paare.txt')), 'gepaarte Differenz D100 − A = +30,0');
-  pruefe(/Steigung über D25, D50, D100/.test(lies('orakel.txt')) && /Kontrolle gegen kontrolle\.jsonl\.gz, Arm A: 120 von 120/.test(lies('orakel.txt')), 'Steigung und Kontrolle 120 von 120');
+  pruefe(/Steigung über D25, D50 \(/.test(lies('orakel.txt')) && /Kontrolle gegen kontrolle\.jsonl\.gz, Arm A: 120 von 120/.test(lies('orakel.txt')), 'Steigung und Kontrolle 120 von 120');
   pruefe(/== E100 gegen A/.test(lies('zusatz.txt')) && /Median der Differenz B − A: \+15,0/.test(lies('zusatz.txt')), 'Zusatzzahlen je Arm');
   for (const arm of ['A', 'D25', 'D50', 'D100', 'E100']) {
     const roh = require('zlib').gunzipSync(fs.readFileSync(path.join(d, 'ergebnisse', `${arm}.jsonl.gz`))).toString().trim().split('\n');

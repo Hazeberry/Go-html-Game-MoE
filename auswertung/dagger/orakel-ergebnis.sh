@@ -34,8 +34,8 @@ paare=D25-A,D50-A,D100-A,E100-A
 kargs=(); [ -z "$kontrolle" ] || kargs=(--kontrolle "$kontrolle")
 node "$wurzel/auswertung/endspiel-pilot-bericht.js" "${args[@]}" --paare "$paare" > ergebnisse/paare.txt
 node "$wurzel/auswertung/endspiel-pilot-bericht.js" "${args[@]}" --paare "$paare" --markdown > ergebnisse/paare.md
-node "$wurzel/auswertung/orakel-bericht.js" --ref A "${args[@]}" --dosis D25,D50,D100 --ziel 5 ${kargs[@]+"${kargs[@]}"} > ergebnisse/orakel.txt
-node "$wurzel/auswertung/orakel-bericht.js" --ref A "${args[@]}" --dosis D25,D50,D100 --ziel 5 ${kargs[@]+"${kargs[@]}"} --markdown > ergebnisse/orakel.md
+node "$wurzel/auswertung/orakel-bericht.js" --ref A "${args[@]}" --dosis D25,D50 --ziel 5 ${kargs[@]+"${kargs[@]}"} > ergebnisse/orakel.txt
+node "$wurzel/auswertung/orakel-bericht.js" --ref A "${args[@]}" --dosis D25,D50 --ziel 5 ${kargs[@]+"${kargs[@]}"} --markdown > ergebnisse/orakel.md
 for a in D25 D50 D100 E100; do
   echo "== $a gegen A"; node "$wurzel/auswertung/messung-zusatz.js" --A zw/A.jsonl --B "zw/$a.jsonl"
 done > ergebnisse/zusatz.txt
