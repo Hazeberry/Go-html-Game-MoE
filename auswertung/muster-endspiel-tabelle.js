@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Endspiel-Muster, zweiter Schritt: die Tabelle für den Schalter
    musterEndspiel in index.html erzeugen. Gehört zu
-   docs/muster-endspiel-spiel.md.
+   docs/muster-endspiel-spiel.md. Der Pilot fiel negativ aus, der Schalter
+   ist wieder entfernt; --index passt nur auf den Stand von Commit 63f727b,
+   dort steht die Zeile `const MUSTER_ENDSPIEL = {...};`. Ohne --index gibt
+   das Werkzeug die Zeile aus (oder schreibt sie mit --aus als JSON).
 
    Lernt mit dem Verfahren aus docs/muster-endspiel.md §5 (gemeinsames
    Bradley-Terry-Modell, MM-Verfahren, 25 Durchläufe, Merkmalswerte erst ab

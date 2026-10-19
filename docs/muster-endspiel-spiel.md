@@ -3,7 +3,9 @@
 **Status: Abschnitte 1–6 festgelegt am 19.10.2026, vor dem Pilot.** Die Datei
 mit den Regeln für Pilot und Messung war geschrieben, bevor der erste Pilotlauf
 startete; sie wurde erst danach eingecheckt. Was danach kommt, steht als
-Nachtrag darunter; die Abschnitte 1–6 werden nicht mehr geändert.
+Nachtrag darunter; die Abschnitte 1–6 werden nicht mehr geändert. **Der
+Schalter ist nach dem Pilot wieder aus `index.html` entfernt** (§7); die
+Abschnitte 1–6 beschreiben ihn, wie er im Commit `63f727b` steht.
 
 ---
 
@@ -225,4 +227,88 @@ signifikant negativ (p < 0,05). Der Versuch endet nach dem Pilot. Die Messung
 mit 240 Paaren und 360 Partien im Selbstspiel entfällt, der Default bleibt
 `musterEndspiel` 0, und der Schalter samt Tabelle wird wieder aus
 `index.html` entfernt (§4). Der Stand des Pilots bleibt über den Commit
-reproduzierbar, in dem der Schalter eingecheckt ist.
+`63f727b` reproduzierbar, in dem der Schalter eingecheckt ist.
+
+---
+
+## 8. Nachtrag: Warum? Diagnose an den Pilotpartien (19.10.2026)
+
+Das Folgende ist nach dem Pilot entstanden, ohne Vorabfestlegung und ohne
+Anspruch auf einen Beweis: Fragen, die der Pilot aufwirft. Als Schiedsrichter
+dient überall GNU Go Stufe 10, also dasselbe Programm, das die Lehrdaten
+geliefert hat; sein Urteil bevorzugt seinen eigenen Stil. Befehle, Ausgaben
+und Rohzeilen: [`daten/endmuster-diagnose.txt`](daten/endmuster-diagnose.txt),
+`daten/endmuster-zugwert.jsonl.gz`.
+
+**1. Auf den Stellungen der alten KI zieht die Tabelle besser.**
+`auswertung/muster-endspiel-zugwert.js`: In 40 Partien der heutigen KI (die
+Prüfdaten aus Schritt 1, KI am Zug, Zug 101–240) steht in 1 113 Stellungen
+an der Spitze der Wurzelliste mit der Endspiel-Tabelle (Dosis 200) ein
+anderer Zug als der, den die KI gespielt hat. Beide Züge, bewertet wie in
+`punktverlust.js` (Zug, GNU Gos Antwort, Schätzung aus Sicht der KI): Der Zug
+der Tabelle ist im Mittel **2,04 Punkte besser** (95 %: [+1,59; +2,49]), in
+61 % der Stellungen besser, in 23 % schlechter. Das gilt in allen Phasen
+(Zug 101–160 +1,78; 161–200 +2,80; ab 201 +1,27), auf Linie 1–2 (+1,36)
+wie weiter innen (+2,75). GNU Gos eigener Zug ist im Mittel 4,25 Punkte
+besser als der der KI und 2,22 besser als der der Tabelle. Die Tabelle
+macht also im Einzelnen den kleineren Fehler. Der Gewinn steckt in den
+Stellungen, in denen ihr Zug GNU Gos Zug ist (+4,31, 462 Stellungen); sonst
+gibt es keinen messbaren Unterschied (+0,43 [−0,22; +1,07], 651 Stellungen).
+
+**2. Die Suche folgt dem Favoriten.** In den Pilotpartien (erste 15 Partien
+je Arm, KI am Zug, ab Zug 101) ist der gespielte Zug die Spitze der
+Wurzelliste in 75,0 % (A) und in 82,9 % (B). B spielt also überwiegend, was
+die Tabelle vorne sieht.
+
+**3. Auf den Stellungen, in die die Tabelle führt, trifft sie nicht mehr
+besser.** `auswertung/muster-endspiel-verschiebung.js`: GNU Gos Zug (Stufe 10)
+an den KI-Stellungen der Pilotpartien (30 Partien je Arm, ab Zug 81), dazu
+die Wurzelliste bei Dosis 200, Rang von GNU Gos Zug in %:
+
+| Stellungen aus den Partien von | Zahl | heute Rang 1 | Tabelle Rang 1 | heute Rang ≤ 16 | Tabelle Rang ≤ 16 | gespielter Zug = GNU Go |
+|---|---:|---:|---:|---:|---:|---:|
+| A (alte Tabelle) | 2 166 | 19,4 | **31,3** | 63,5 | 90,4 | 19,2 |
+| B (Endspiel-Tabelle 200) | 2 168 | 24,9 | **24,8** | 81,4 | 81,6 | 24,3 |
+
+Auf den Stellungen von A (neuer Seed, außerhalb der Stichprobe) bestätigt sich
+Schritt 1: +11,9 Punkte bei Rang 1. Auf den Stellungen von B ist der Vorsprung
+weg (24,8 gegen 24,9), in Zug 161–200 liegt die Tabelle sogar zurück (21,2
+gegen 25,9). B spielt GNU Gos Zug in 24,3 % der Stellungen, A in 19,2 %: ein
+Bruchteil des Abstands von 12 Punkten, den die Wurzelliste auf den
+Stellungen von A verspricht. Der Gewinn schrumpft im Lauf der Partie (Zug
+81–160: 27,5 gegen 18,3 %; 161–200: 21,8 gegen 17,5 %) und kehrt sich zuletzt
+um (ab Zug 201: 19,1 gegen 23,8 %).
+
+**4. Wo B Punkte verliert.** `auswertung/endspiel-verlauf.js` (Stufe 10, ab
+Zug 100), 10 Partien A und 9 Partien B, abgebrochen, weil zu langsam (rund 5
+Minuten je Partie). Bis Zug 160 verlieren beide ähnlich viel nach GNU Gos
+Schätzung (Σ je Partie 93 gegen 100 Punkte in Zug 101–160). Ab Zug 161 hat B
+mehr große Fehler: Züge, die mindestens 15 Punkte kosten, 14 gegen 4 in Zug
+161–200 und 25 gegen 5 ab Zug 201 (Σ 994 gegen 88 Punkte); eigene tote Steine
+am Ende Ø 37,0 gegen 29,6. Ein einzelner Fall prägt die Summen: In Partie 2
+(A: +165,5, B: −32,5) ist GNU Gos Zug in 32 von 93 eigenen Zügen ab Zug 100
+derselbe Punkt, P17, von Zug 170 bis 236 in jedem eigenen Zug, im Mittel 34,4
+Punkte wert; B spielt ihn nie.
+
+**Was daraus folgt.**
+
+1. **Die Tabelle ist im Einzelnen besser, das Spiel mit ihr schlechter.**
+   Das ist kein Widerspruch zu „bessere Vorhersage ist nicht bessere
+   Zugwahl“ aus [`muster-ausbau.md`](muster-ausbau.md), sondern seine
+   genauere Fassung: Hier trifft die Tabelle bessere Züge als die KI, aber nur
+   auf den Stellungen, aus denen sie gelernt hat.
+2. **Verschiebung der Stellungen.** Die Tabelle ist aus Partien der alten KI
+   gelernt. Spielt die KI mit ihr, kommt sie in andere Stellungen, und dort
+   verschwindet der Vorsprung (3.). Fehler häufen sich dann, besonders spät,
+   wo große ungelöste Stellen übrig bleiben (4.). Das ist die bekannte
+   Schwäche des Lernens aus fremden Stellungen (Ross, Gordon und Bagnell
+   2011). Belegt ist die Verschiebung für die Vorhersage (3.); dass sie das
+   Spiel kostet, ist die naheliegende, nicht bewiesene Erklärung.
+3. **Das Urteil von GNU Go ist nicht unabhängig.** Lehrer und Schiedsrichter
+   sind dasselbe Programm; die +2,04 Punkte dürften zu günstig sein.
+4. **Offen und möglich:** die Datenaggregation von Ross et al. (DAgger): mit
+   der Tabelle spielen, die dabei erreichten Stellungen von GNU Go beschriften
+   lassen, mit den neuen und den alten Stellungen neu lernen, wiederholen.
+   Eine Runde kostet rund zwei Stunden (240 Partien, 18 000
+   Beschriftungen, Pilot) und braucht eine eigene Vorabfestlegung. Ob sie den
+   Pilot dreht, ist offen.
