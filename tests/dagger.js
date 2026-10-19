@@ -1,6 +1,7 @@
 // Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
-/* Werkzeuge und Workflow der Datenaggregation (docs/muster-endspiel-dagger.md).
+/* Werkzeuge und Workflows der Datenaggregation (docs/muster-endspiel-dagger.md)
+   und der Messung gegen GNU Go (docs/muster-endspiel-messung.md).
 
      1. Die Tabelle lässt sich aus index.html auslesen und wieder einsetzen
         (muster-endspiel-tabelle.js); eine index.html ohne die Zeile wird
@@ -9,9 +10,13 @@
         Siege; die Kontrolle gegen eine frühere Datei zählt gleiche Partien.
      3. Die Skripte in auswertung/dagger/ lehnen falsche Eingaben ab, ehe sie
         etwas tun.
-     4. Der Workflow endspiel-dagger.yml: Eingaben des Dispatch-Formulars
-        stehen nur in env-Blöcken, und in run-Blöcken steht kein ${{ }}
-        (Script-Injection, wie in ab-harness.yml).
+     4. Die Workflows endspiel-dagger.yml und endspiel-messung.yml: Eingaben
+        des Dispatch-Formulars stehen nur in env-Blöcken, und in run-Blöcken
+        steht kein ${{ }} (Script-Injection, wie in ab-harness.yml); die
+        Vorgaben des Messungs-Workflows stimmen mit der Vorabfestlegung überein.
+     5. Die Zusatzzahlen und der Bericht der Messung: Median, Vorzeichentest,
+        16 Teile je Arm zu einem Bericht; fehlende oder unvollständige Teile
+        werden abgelehnt.
 
    Aufruf:  node tests/dagger.js */
 'use strict';
@@ -20,6 +25,7 @@ const {spawnSync} = require('child_process');
 const {test, pruefe, pruefeGleich, pruefeNah, laufeTests} = require('./rahmen');
 const T = require('../auswertung/muster-endspiel-tabelle.js');
 const B = require('../auswertung/endspiel-pilot-bericht.js');
+const Z = require('../auswertung/messung-zusatz.js');
 
 const wurzel = path.join(__dirname, '..');
 const temp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'dagger-'));
@@ -93,11 +99,13 @@ test('Skripte lehnen falsche Eingaben ab, ehe sie etwas tun', () => {
   pruefeGleich(lauf('spielen.sh', 'x.jsonl', '1', '1', '1').status, 1, 'spielen.sh: Argument fehlt');
   const s = lauf('lernen.sh');
   pruefe(s.status !== 0, 'lernen.sh ohne Daten bricht ab');
+  pruefeGleich(lauf('messung-ergebnis.sh', 'abc1234', 'tabelle.json', '200').status, 1, 'messung-ergebnis.sh: Argument fehlt');
+  pruefeGleich(lauf('messung-ergebnis.sh', 'abc1234', 'gibt-es-nicht.json', '200', '206').status, 2, 'messung-ergebnis.sh: Tabelle fehlt');
 });
 
-/* Workflow: Eingaben des Dispatch-Formulars nur in env-Blöcken, in run-Blöcken kein ${{ }} */
-test('Workflow endspiel-dagger.yml: keine Ausdrücke in Shell-Zeilen', () => {
-  const zeilen = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'endspiel-dagger.yml'), 'utf8').split('\n');
+/* Workflows: Eingaben des Dispatch-Formulars nur in env-Blöcken, in run-Blöcken kein ${{ }} */
+function pruefeShellZeilen(datei, mindestensRun, eingaben) {
+  const zeilen = fs.readFileSync(path.join(wurzel, '.github', 'workflows', datei), 'utf8').split('\n');
   const einzug = z => z.length - z.trimStart().length;
   let imRun = false, basis = 0, nRun = 0, nEnv = 0;
   zeilen.forEach((z, i) => {
@@ -114,9 +122,13 @@ test('Workflow endspiel-dagger.yml: keine Ausdrücke in Shell-Zeilen', () => {
     if (m) { imRun = true; basis = m[1].length + (m[2] ? 2 : 0); nRun++; return; }
     if (/^\s*(- )?run:\s*\S/.test(z)) { pruefe(!z.includes('${{'), `Zeile ${w}: Ausdruck in einer run-Zeile: ${z.trim()}`); nRun++; }
   });
-  pruefe(nRun >= 15, 'run-Schritte gefunden');
-  pruefeGleich(nEnv, 8, 'acht Eingaben des Formulars, alle über env');
-});
+  pruefe(nRun >= mindestensRun, 'run-Schritte gefunden');
+  pruefeGleich(nEnv, eingaben, `${eingaben} Eingaben des Formulars, alle über env`);
+}
+test('Workflow endspiel-dagger.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-dagger.yml', 15, 8));
+test('Workflow endspiel-messung.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-messung.yml', 6, 4));
+
+const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
 
 test('Workflow endspiel-dagger.yml: Aufbau', () => {
   const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'endspiel-dagger.yml'), 'utf8');
@@ -125,7 +137,7 @@ test('Workflow endspiel-dagger.yml: Aufbau', () => {
   pruefe(/^permissions:\n  contents: read$/m.test(t), 'Standard: nur lesen');
   pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
   pruefe(/ergebnis:[\s\S]*permissions:\n      contents: write/.test(t), 'das Schreibrecht hat der Ergebnisjob');
-  for (const v of [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226]) pruefe(t.includes(String(v)), `Teil ${v}`);
+  for (const v of TEILE) pruefe(t.includes(String(v)), `Teil ${v}`);
   /* dieselben Versionen der Standardaktionen wie in tests.yml */
   const tests = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'tests.yml'), 'utf8');
   for (const a of ['actions/checkout', 'actions/setup-node']) {
@@ -134,4 +146,98 @@ test('Workflow endspiel-dagger.yml: Aufbau', () => {
   }
 });
 
-laufeTests('Datenaggregation: Werkzeuge und Workflow').then(ok => process.exit(ok ? 0 : 1));
+test('Workflow endspiel-messung.yml: Aufbau und Vorgaben wie in der Vorabfestlegung', () => {
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'endspiel-messung.yml'), 'utf8');
+  pruefe(/^on:\n  workflow_dispatch:/m.test(t), 'nur manuell gestartet');
+  for (const job of ['pruefen', 'spielen', 'ergebnis']) pruefe(new RegExp(`^  ${job}:$`, 'm').test(t), `Job ${job}`);
+  pruefe(/^permissions:\n  contents: read$/m.test(t), 'Standard: nur lesen');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefe(/ergebnis:[\s\S]*permissions:\n      contents: write/.test(t), 'das Schreibrecht hat der Ergebnisjob');
+  pruefe(/arm: \[A, B\]/.test(t), 'beide Arme');
+  pruefeGleich((/von: \[([0-9, ]+)\]/.exec(t) || [])[1].split(',').map(Number).join(','), TEILE.join(','), '16 Teile zu je 15 Partien');
+  pruefe(/spielen\.sh "messung\/\$ARM-\$VON\.jsonl" "\$VON" 15 /.test(t), 'je Teil 15 Partien');
+  pruefe(/\[ "\$ARM" = A \] && GEWICHT=0/.test(t), 'Arm A spielt mit Gewicht 0 (Schalter aus)');
+  const tests = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'tests.yml'), 'utf8');
+  for (const a of ['actions/checkout', 'actions/setup-node']) {
+    const ver = s => (s.match(new RegExp(a + '@(v[0-9]+)')) || [])[1];
+    pruefe(ver(t) && ver(t) === ver(tests), `${a} in derselben Version wie tests.yml`);
+  }
+  /* Vorgaben des Formulars = Eingaben in docs/muster-endspiel-messung.md §7 */
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'muster-endspiel-messung.md'), 'utf8');
+  for (const name of ['basis', 'tabelle', 'gewicht', 'seed']) {
+    const imDoc = (new RegExp('^\\| `' + name + '` \\| `?([^` |]+)', 'm').exec(doc) || [])[1];
+    const imFlow = (new RegExp('^      ' + name + ':\\n(?:        .*\\n)*?        default: \'([^\']*)\'', 'm').exec(t) || [])[1];
+    pruefe(imDoc !== undefined && imDoc === imFlow, `Vorgabe ${name}: Dokument „${imDoc}“, Workflow „${imFlow}“`);
+  }
+  /* die Tabelle von B gibt es und sie hat Einträge */
+  const tab = JSON.parse(fs.readFileSync(path.join(wurzel, 'docs', 'daten', 'dagger', 'runde3-lauf3', 'tabelle-neu.json'), 'utf8'));
+  pruefe(Object.keys(tab.tabelle).length > 1000, 'Tabelle T4 im Repo');
+});
+
+test('Zusatzzahlen der Paarmessung: Vorzeichentest, Median, abgebrochene Partien', () => {
+  pruefeNah(Z.vorzeichenP(5, 5), 1, 1e-12, 'gleich verteilt: p = 1');
+  pruefeNah(Z.vorzeichenP(9, 1), 2 * 11 / 1024, 1e-12, '9 gegen 1: p = 2 · 11/1024');
+  pruefeNah(Z.vorzeichenP(1, 9), 2 * 11 / 1024, 1e-12, 'symmetrisch');
+  pruefeGleich(Z.vorzeichenP(0, 0), 1, 'keine Paare');
+  pruefeNah(Z.vorzeichenP(97, 82), 0.2954, 5e-4, '97 gegen 82');
+  const arm = werte => new Map(werte.map(([nr, endstand, extra]) => [nr, {nr, endstand, zuegeAnzahl: 200 + nr, ...(extra || {})}]));
+  const A = arm([[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0]]);
+  const Bm = arm([[1, 10], [2, -4], [3, 0], [4, 6], [5, 8], [6, 99, {abgebrochen: true}]]);
+  const z = Z.zusatz(A, Bm);
+  pruefeGleich(z.paare, 5, 'die abgebrochene Partie fällt samt Partner heraus');
+  pruefeGleich(z.besser, 3, 'besser'); pruefeGleich(z.schlechter, 1, 'schlechter'); pruefeGleich(z.gleich, 1, 'gleich');
+  pruefeGleich(z.median, 6, 'Median der Differenzen 10, −4, 0, 6, 8');
+  pruefeNah(z.zuegeA, 203, 1e-12, 'Züge je Partie A (Partien 1–5)');
+  pruefeGleich(z.abgebrochenB, 1, 'eine abgebrochene Partie in B');
+  pruefe(/Median der Differenz B − A: \+6,0/.test(Z.text(z)) && /B besser in 3 Paaren, schlechter in 1, gleich in 1/.test(Z.text(z)), 'Textzeilen');
+});
+
+/* Bericht der Messung aus 16 Teilen je Arm: Differenz B − A = 5 + (nr mod 3 − 1), im Mittel genau +5 */
+function messungsTeile(verzeichnis, ohne) {
+  const dir = path.join(verzeichnis, 'messung');
+  fs.mkdirSync(dir, {recursive: true});
+  for (const arm of ['A', 'B']) for (const von of TEILE) {
+    if (ohne === `${arm}-${von}`) continue;
+    const zeilen = [];
+    for (let nr = von; nr < von + 15; nr++) {
+      const a = ((nr * 37) % 101) - 50, endstand = arm === 'A' ? a : a + 5 + ((nr % 3) - 1);
+      zeilen.push(JSON.stringify({nr, endstand, gewonnen: endstand > 0, zuegeAnzahl: 200 + (nr % 7), schaetzung: {120: endstand / 2, 200: endstand}}));
+    }
+    if (ohne === `${arm}-${von}-kurz`) zeilen.pop();
+    fs.writeFileSync(path.join(dir, `${arm}-${von}.jsonl`), zeilen.join('\n') + '\n');
+  }
+}
+
+test('Bericht der Messung: 16 Teile je Arm zu einem Bericht, Rohdaten gepackt', () => {
+  const d = temp();
+  messungsTeile(d);
+  fs.writeFileSync(path.join(d, 'tabelle.json'), '{"tabelle":{"m:x":1}}');
+  const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'messung-ergebnis.sh'), 'abc1234567', 'tabelle.json', '200', '206'], {cwd: d, encoding: 'utf8'});
+  pruefeGleich(r.status, 0, 'Bericht läuft durch: ' + (r.stderr || '').slice(0, 300));
+  const lies = f => fs.readFileSync(path.join(d, 'ergebnisse', f), 'utf8');
+  const bericht = lies('bericht.md');
+  pruefe(/Basis `abc1234`/.test(bericht) && /Gewicht 200, Seed 206/.test(bericht), 'Kopf mit Basis, Gewicht und Seed');
+  pruefe(/B − A: 240 Paare/.test(lies('messung.txt')) && /Differenz \+5,0/.test(lies('messung.txt')), 'gepaarte Differenz +5,0 aus 240 Paaren');
+  pruefe(/\| \*\*B − A\*\* \| 240 \|/.test(lies('messung.md')), 'Tabelle in Markdown');
+  pruefe(/nach Zug 120: 240 Paare/.test(lies('zuege.txt')) && /Endstand: 240 Paare/.test(lies('zuege.txt')), 'nach Zug 120, 200 und am Ende');
+  pruefe(/B besser in 240 Paaren, schlechter in 0/.test(lies('zusatz.txt')), 'Zusatzzahlen');
+  for (const a of ['A', 'B']) {
+    const roh = require('zlib').gunzipSync(fs.readFileSync(path.join(d, 'ergebnisse', `${a}.jsonl.gz`))).toString().trim().split('\n');
+    pruefeGleich(roh.length, 240, `Rohdaten von ${a}: 240 Partien`);
+  }
+  pruefeGleich(lies('tabelle-B.json'), '{"tabelle":{"m:x":1}}', 'Tabelle von B mitgenommen');
+});
+
+test('Bericht der Messung: fehlende oder unvollständige Teile werden abgelehnt', () => {
+  for (const [ohne, muster] of [['B-91', /B-91\.jsonl fehlt/], ['A-226-kurz', /A-226\.jsonl hat nicht 15 Partien/]]) {
+    const d = temp();
+    messungsTeile(d, ohne);
+    fs.writeFileSync(path.join(d, 'tabelle.json'), '{}');
+    const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'messung-ergebnis.sh'), 'abc1234', 'tabelle.json', '200', '206'], {cwd: d, encoding: 'utf8'});
+    pruefeGleich(r.status, 1, `${ohne}: Abbruch`);
+    pruefe(muster.test(r.stderr), `${ohne}: Meldung „${(r.stderr || '').trim()}“`);
+    pruefe(!fs.existsSync(path.join(d, 'ergebnisse', 'bericht.md')), `${ohne}: kein Bericht`);
+  }
+});
+
+laufeTests('Datenaggregation und Messung: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));

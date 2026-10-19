@@ -2391,8 +2391,12 @@ Datenaggregation beseitigt den Schaden der Verschiebung (die erste Tabelle
 −21,8, die folgenden ±0) und die Tabelle trifft GNU Gos Zug auf neuen
 Stellungen etwas öfter (Rang 1 plus 2 bis 3 Prozentpunkte, Rang ≤ 16 bis plus
 18,7), aber ein Gewinn gegenüber dem Default entsteht nicht; der Schalter
-kommt nicht nach `main`, eine Messung entfällt
-([`docs/muster-endspiel-dagger.md`](docs/muster-endspiel-dagger.md) §8).
+kommt nicht nach `main`, eine Messung war nach der Regel nicht vorgesehen
+([`docs/muster-endspiel-dagger.md`](docs/muster-endspiel-dagger.md) §8). Auf
+Wunsch läuft sie trotzdem: 240 Paare gegen GNU Go mit der letzten Tabelle in
+GitHub Actions, vorab festgelegt in
+[`docs/muster-endspiel-messung.md`](docs/muster-endspiel-messung.md) (Ergebnis
+folgt).
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
