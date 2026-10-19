@@ -1,0 +1,63 @@
+# Diagnose zu docs/muster-endspiel-spiel.md §8, 19.10.2026. Explorativ, nach dem Pilot, ohne Vorabfestlegung.
+# GNU Go 3.8, Stufe 10 als Schiedsrichter. Zahlen mit Punkt als Dezimaltrenner.
+
+## 1. Zug der Tabelle gegen Zug der KI auf denselben Stellungen
+# node auswertung/muster-endspiel-zugwert.js --cache zw/pruef --tabelle zw/tabelle.json --dumps <Rohdumps der 240 Partien, Seed 203> --partien 40 --ab 100 --bis 240 --dosis 200 --teil i/4 --aus zugwert-i.jsonl   (i = 0..3)
+# node auswertung/muster-endspiel-zugwert.js --bericht zugwert-0.jsonl,zugwert-1.jsonl,zugwert-2.jsonl,zugwert-3.jsonl
+# Rohzeilen: endmuster-zugwert.jsonl.gz. 31 weitere Stellungen fielen aus (Tabellenzug nach der Ko-Regel illegal).
+Wert = GNU Gos Schätzung (Stufe 10) nach dem Zug und seiner Antwort, aus Sicht der KI, in Punkten; 40 Partien
+alle                    1113 Stellungen · Tabelle − KI +2.04 [1.59; 2.49] · besser 61 %, schlechter 23 % · GNU Go − KI 4.25, GNU Go − Tabelle 2.22
+Zug 101–160              565 Stellungen · Tabelle − KI +1.78 [1.13; 2.43] · besser 64 %, schlechter 25 % · GNU Go − KI 4.14, GNU Go − Tabelle 2.36
+Zug 161–200              371 Stellungen · Tabelle − KI +2.80 [1.95; 3.64] · besser 62 %, schlechter 18 % · GNU Go − KI 4.79, GNU Go − Tabelle 1.99
+ab Zug 201               177 Stellungen · Tabelle − KI +1.27 [0.48; 2.06] · besser 53 %, schlechter 28 % · GNU Go − KI 3.49, GNU Go − Tabelle 2.22
+Tabellenzug Linie 1–2    572 Stellungen · Tabelle − KI +1.36 [0.68; 2.04] · besser 52 %, schlechter 28 % · GNU Go − KI 4.29, GNU Go − Tabelle 2.93
+Tabellenzug Linie 3+     541 Stellungen · Tabelle − KI +2.75 [2.17; 3.33] · besser 71 %, schlechter 18 % · GNU Go − KI 4.22, GNU Go − Tabelle 1.47
+KI-Zug Linie 1–2         310 Stellungen · Tabelle − KI +1.59 [0.72; 2.47] · besser 59 %, schlechter 21 % · GNU Go − KI 3.43, GNU Go − Tabelle 1.83
+KI-Zug Linie 3+          803 Stellungen · Tabelle − KI +2.21 [1.68; 2.73] · besser 62 %, schlechter 24 % · GNU Go − KI 4.57, GNU Go − Tabelle 2.37
+Tabellenzug = GNU Go     462 Stellungen · Tabelle − KI +4.31 [3.78; 4.83] · besser 83 %, schlechter 10 % · GNU Go − KI 4.31, GNU Go − Tabelle 0.00
+Tabellenzug ≠ GNU Go     651 Stellungen · Tabelle − KI +0.43 [-0.22; 1.07] · besser 46 %, schlechter 33 % · GNU Go − KI 4.22, GNU Go − Tabelle 3.79
+KI-Zug = GNU Go           79 Stellungen · Tabelle − KI -5.15 [-7.93; -2.38] · besser 33 %, schlechter 57 % · GNU Go − KI 0.00, GNU Go − Tabelle 5.15
+Unterschiede ab 15 Punkten: Tabellenzug schlechter 25, besser 32
+
+## 2. Folgt die Suche dem Favoriten der Wurzelliste? (einmaliges Skript auf dem Stand von Commit 63f727b)
+# Gespielter Zug = Spitze der Wurzelliste, erste 15 Pilotpartien je Arm (Seed 204, Partien 1-15), KI am Zug, ab Zug 101
+A (musterEndspiel 0):   905 Stellungen, gespielter Zug = Spitze 75.0 %, unter den ersten 16 96.0 %;  Zug 101-160: 86.4 %, 161-200: 68.6 %, 201+: 58.3 %
+B (musterEndspiel 200): 990 Stellungen, gespielter Zug = Spitze 82.9 %, unter den ersten 16 100.0 %; Zug 101-160: 89.8 %, 161-200: 80.5 %, 201+: 73.9 %
+
+## 3. Rang von GNU Gos Zug auf den eigenen Stellungen von A und B (Pilot, Seed 204, die ersten 15 Partien je Datei = 30 je Arm)
+# GNU Gos Zug (Stufe 10) an den KI-Stellungen ab Zug 81: node auswertung/muster-daten.js <Rohdump> --ab 80 --bis 300 --stufe 10 --seite ki --aus lehr.jsonl; dann muster-endspiel-daten.js (zw/pilA, zw/pilB)
+# node auswertung/muster-endspiel-verschiebung.js --tabelle zw/tabelle.json --menge A=zw/pilA:<Dumps A> --menge B200=zw/pilB:<Dumps B200>
+Rang von GNU Gos Zug in der Wurzelliste (Wert ohne Muster + 200 × Muster), in %, Stellungen mit der KI am Zug
+Menge         Phase          Stellungen   heute Rang 1  neu Rang 1   heute ≤ 16  neu ≤ 16   gespielter Zug = GNU Go
+A             alle               2166     19.4          31.3         63.5       90.4       19.2
+A             Zug 81–160         1200     18.9          30.3         54.7       91.7       18.3
+A             Zug 161–200         525     16.0          30.9         72.0       86.3       17.5
+A             ab Zug 201          441     24.7          34.9         77.4       91.6       23.8
+B200          alle               2168     24.9          24.8         81.4       81.6       24.3
+B200          Zug 81–160         1188     26.5          27.4         79.3       82.7       27.5
+B200          Zug 161–200         482     25.9          21.2         86.5       82.8       21.8
+B200          ab Zug 201          498     19.9          22.1         81.5       78.1       19.1
+
+## 4. Verlauf der Partien (auswertung/endspiel-verlauf.js --ab 100 --stufe 10 --takt 20), A 10 Partien, B(200) 9 Partien (abgebrochen, zu langsam)
+A: 10 Partien, B(200): 9 Partien
+
+A (Default) (10 Partien): Endstand Ø 20.1
+  Züge 101–120: 100 Züge, wie GNU Go 16.0 %, Verlust Σ je Partie 31.4, ≥15 Punkte: 4 Züge (Σ 138), Pässe 0
+  Züge 121–160: 200 Züge, wie GNU Go 21.5 %, Verlust Σ je Partie 61.6, ≥15 Punkte: 6 Züge (Σ 121), Pässe 0
+  Züge 161–200: 200 Züge, wie GNU Go 13.5 %, Verlust Σ je Partie 54.4, ≥15 Punkte: 4 Züge (Σ 79), Pässe 0
+  Züge 201–Ende: 241 Züge, wie GNU Go 18.3 %, Verlust Σ je Partie 43.8, ≥15 Punkte: 5 Züge (Σ 88), Pässe 10
+  tote eigene Steine (GNU Go) nach Zug: 100: 10.0 (10) · 120: 13.1 (10) · 140: 13.4 (10) · 160: 14.6 (10) · 180: 19.6 (10) · 200: 24.4 (10) · 220: 25.4 (9) · 240: 26.5 (6)
+  tote eigene Steine am Ende: Ø 29.6
+  GNU Gos Schätzung nach unserem Zug (Ø, + = KI vorn) um Zug 100: – · 120: – · 140: – · 160: – · 180: – · 200: – · 240: –
+
+B (musterEndspiel 200) (9 Partien): Endstand Ø -28.7
+  Züge 101–120: 90 Züge, wie GNU Go 27.8 %, Verlust Σ je Partie 25.4, ≥15 Punkte: 4 Züge (Σ 77), Pässe 0
+  Züge 121–160: 180 Züge, wie GNU Go 20.0 %, Verlust Σ je Partie 74.1, ≥15 Punkte: 6 Züge (Σ 192), Pässe 0
+  Züge 161–200: 177 Züge, wie GNU Go 16.4 %, Verlust Σ je Partie 69.0, ≥15 Punkte: 14 Züge (Σ 314), Pässe 2
+  Züge 201–Ende: 188 Züge, wie GNU Go 20.2 %, Verlust Σ je Partie 132.4, ≥15 Punkte: 25 Züge (Σ 994), Pässe 12
+  tote eigene Steine (GNU Go) nach Zug: 100: 12.2 (9) · 120: 13.3 (9) · 140: 17.6 (9) · 160: 20.7 (9) · 180: 27.3 (9) · 200: 32.9 (7) · 220: 30.6 (5) · 240: 33.5 (4)
+  tote eigene Steine am Ende: Ø 37.0
+  GNU Gos Schätzung nach unserem Zug (Ø, + = KI vorn) um Zug 100: – · 120: – · 140: – · 160: – · 180: – · 200: – · 240: –
+
+## 5. Pilotpartie 2, Arm B (musterEndspiel 200): der Punkt P17
+GNU Gos Zug war P17 in 32 von 93 eigenen Zügen ab Zug 100, von Zug 170 bis 236 in jedem eigenen Zug; Ø Verlust 34.4 Punkte je Zug; Endstand -32.5 (Arm A in derselben Partienummer: +165.5).

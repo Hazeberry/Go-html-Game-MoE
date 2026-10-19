@@ -383,3 +383,9 @@ beide Seiten gezählt) und er liegt dort, wo die Punkte verloren gehen
 **Entscheidung (nach §8):** Schritt 2 folgt, in einem eigenen Dokument mit
 eigener Vorabfestlegung: Schalter im Spiel, Pilot für die Dosis (30 Paare),
 Messung mit 240 Paaren gegen GNU Go und 360 Partien im Selbstspiel.
+
+**Folge (19.10.2026):** Schritt 2 ist gelaufen, [`muster-endspiel-spiel.md`](muster-endspiel-spiel.md).
+Der Pilot (60 Paare je Gewicht) fiel bei allen vier Gewichten negativ aus
+(Endstand −19 bis −38 Punkte gegen den Default); die Messung entfiel, der
+Schalter ist wieder entfernt. Die Vorhersage aus Schritt 1 gilt auf den
+Stellungen der alten KI, nicht auf denen, in die die Tabelle führt.
