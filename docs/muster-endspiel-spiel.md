@@ -312,3 +312,10 @@ Punkte wert; B spielt ihn nie.
    Eine Runde kostet rund zwei Stunden (240 Partien, 18 000
    Beschriftungen, Pilot) und braucht eine eigene Vorabfestlegung. Ob sie den
    Pilot dreht, ist offen.
+
+   *Folge (19.10.2026):* Gelaufen, drei Runden in GitHub Actions
+   ([`muster-endspiel-dagger.md`](muster-endspiel-dagger.md) §6–§8). Die
+   Datenaggregation beseitigt den Schaden (T1 gegen T2 +22,9 Punkte), macht aus
+   der Tabelle aber keinen Gewinn: Alle drei Piloten zusammen −0,2 Punkte
+   gegen den Default (95 %: [−9,4; +9,0], 180 Paare). Die Reihe endete nach der
+   vorab festgelegten Regel negativ.

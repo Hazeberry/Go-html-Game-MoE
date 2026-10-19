@@ -264,6 +264,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | Endspiel-Muster, Schritt 2: Schalter `musterEndspiel` (die Tabelle aus Schritt 1 an der Wurzel ab Zug 80) | Pilot gegen GNU Go, 60 ausgespielte Paare je Gewicht: Endstand −38,5 (100), −21,8 (200), −23,3 (400), −19,4 (800), p = 0,0001 bis 0,022, Siege 20 bis 33 gegen 35 von 60. Auf den Stellungen der alten KI zieht die Tabelle im Einzelnen besser (+2,0 Punkte nach GNU Go), auf den Stellungen, in die sie selbst führt, trifft sie nicht mehr besser | verworfen — Messung entfällt nach der vorab festgelegten Regel, Schalter wieder entfernt (Stand: Commit `63f727b`); Verschiebung der Stellungen, nicht schlechtere Einzelzüge (`docs/muster-endspiel-spiel.md`) |
 | Endspiel-Muster, Datenaggregation Runde 1 (in GitHub Actions): neue Tabelle aus den Stellungen, in die die alte führt, von GNU Go beschriftet | Pilot gegen GNU Go, 60 ausgespielte Paare, Seed 204: gegenüber dem Default +1,1 Punkte (95 %: [−13,7; +15,8], p = 0,89), gegenüber der alten Tabelle **+22,9** ([+11,1; +34,6], p = 0,0003); Actions spielt dieselben Partien wie der Container (120 von 120) | der Schaden ist weg, ein Gewinn noch nicht: Runde 2 nach der vorab festgelegten Regel (`docs/muster-endspiel-dagger.md` §4, §6) |
 | Endspiel-Muster, Datenaggregation Runde 2 (in GitHub Actions): Tabelle T2 spielt, GNU Go beschriftet 240 Partien, daraus T3 | Pilot gegen GNU Go, 60 ausgespielte Paare, Seed 205: T3 gegenüber dem Default +4,0 Punkte (95 %: [−14,8; +22,8], p = 0,67), T2 gegenüber dem Default +0,7 ([−15,4; +16,9], p = 0,93); beide Piloten zusammen T2 − A +0,9 ([−9,9; +11,7]); offline auf neuen Stellungen T2 und T3 gleichauf (Rang 1: 25,0 gegen 24,8 %) | kein Gewinn nachweisbar: Runde 3, die letzte, nach der vorab festgelegten Regel (`docs/muster-endspiel-dagger.md` §4, §7) |
+| Endspiel-Muster, Datenaggregation Runde 3, die letzte (in GitHub Actions): Tabelle T3 spielt, GNU Go beschriftet 240 Partien, daraus T4 | Pilot gegen GNU Go, 60 ausgespielte Paare, Seed 210: T4 gegenüber dem Default −5,7 Punkte (95 %: [−20,4; +9,0], p = 0,44), T3 −7,0 ([−25,2; +11,2]); alle drei Piloten zusammen NEU − A −0,2 ([−9,4; +9,0], 180 Paare, p = 0,96); offline auf neuen Stellungen T4 vor T3 (Rang ≤ 16: 86,6 gegen 78,9 %), im Spiel nicht | negatives Ergebnis, die Reihe endet nach der vorab festgelegten Regel: kein Schalter auf `main`, keine Messung (`docs/muster-endspiel-dagger.md` §7, §8) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2382,8 +2383,16 @@ dem Default (+1,1, p = 0,89). Der Schaden ist weg, ein Gewinn noch nicht.
 gleichauf mit dem Default (+0,7, p = 0,93), die neue bei +4,0 (95 %:
 [−14,8; +22,8], p = 0,67), also nicht signifikant. Auf Stellungen, die keine
 der beiden gesehen hat, unterscheiden sich beide offline kaum (Rang 1: 25,0
-gegen 24,8 %). Nach der vorab festgelegten Regel folgt Runde 3, die letzte;
-ist sie nicht signifikant, endet die Reihe als negatives Ergebnis.
+gegen 24,8 %). *Runde 3*, die letzte (50 Minuten): Die neue Tabelle liegt bei
+−5,7 (95 %: [−20,4; +9,0], p = 0,44), die davor bei −7,0, nicht signifikant.
+Alle drei Piloten zusammen (180 Paare): −0,2 [−9,4; +9,0]. **Die Reihe endet
+damit nach der vorab festgelegten Regel als negatives Ergebnis.** Die
+Datenaggregation beseitigt den Schaden der Verschiebung (die erste Tabelle
+−21,8, die folgenden ±0) und die Tabelle trifft GNU Gos Zug auf neuen
+Stellungen etwas öfter (Rang 1 plus 2 bis 3 Prozentpunkte, Rang ≤ 16 bis plus
+18,7), aber ein Gewinn gegenüber dem Default entsteht nicht; der Schalter
+kommt nicht nach `main`, eine Messung entfällt
+([`docs/muster-endspiel-dagger.md`](docs/muster-endspiel-dagger.md) §8).
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
