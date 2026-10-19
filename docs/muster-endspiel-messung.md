@@ -130,3 +130,67 @@ den Branch `ergebnisse/endspiel-messung-lauf<N>` unter
 letzte Job darf ins Repo schreiben, und nur auf einen neuen Branch. Die
 Partien der Datenaggregation dauerten in Actions 0,2 bis 0,3 Minuten; die 32
 Teile laufen in ein bis zwei Wellen, erwartet werden 15 bis 30 Minuten.
+
+---
+
+## 8. Nachtrag: Ergebnis der Messung (19.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #1 des Workflows `endspiel-messung.yml`
+([Run 39300292449](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/39300292449)),
+auf dem Merge-Commit `cd5788f` von `main`, mit den Eingaben aus §7, in 10
+Minuten (18:10 bis 18:20 UTC). Alle 240 Partien je Arm ausgespielt, keine
+abgebrochen. Die Ergebnisse legte der Workflow auf den Branch
+`ergebnisse/endspiel-messung-lauf1`; sie stehen hier unter
+[`daten/endspiel-messung/lauf1/`](daten/endspiel-messung/lauf1/): der Bericht,
+die Partien beider Arme und die Tabelle von B.
+
+**Endpunkt** (240 Paare, Endstand nach GNU Gos Zählung, gepaart nach
+Partienummer, Seed 206):
+
+| Arm | Endstand Ø | Siege |
+|---|---:|---:|
+| A (Default) | +20,8 | 149 |
+| B (T4, Gewicht 200) | +17,1 | 132 |
+
+| Vergleich | Differenz | 95 % | p | Hälfte 1 / 2 | Siege | nach Zug 120 |
+|---|---:|---|---:|---|---|---:|
+| **B − A** | **−3,7** | [−10,7; +3,3] | 0,30 | −3,8 / −3,6 | 132 gegen 149 | +0,1 |
+
+**Entscheidung nach §4: verworfen.** B − A ist nicht signifikant, und die
+Obergrenze des Intervalls (+3,3) liegt unter +10: Ein relevanter Gewinn ist
+ausgeschlossen. T4 wird nicht übernommen, der Schalter bleibt aus `main`; ein
+Selbstspiel (M2) entfällt. Die Erwartung aus §5 hat sich bestätigt: B − A
+zwischen −8 und +8, nicht signifikant, Obergrenze unter +10.
+
+**Sekundär, ohne Anspruch**
+
+- Nach Zug 120 liegen beide gleichauf (+0,1, p = 0,94), nach Zug 200 liegt B
+  bei −6,3 (152 Paare, 88 Partien enden vorher; nominal p = 0,048). Der
+  Unterschied entsteht also nach Zug 120.
+- Siege: In 47 Paaren gewinnt nur A, in 30 nur B, in 102 beide (McNemar,
+  exakt, p = 0,07). Züge je Partie: A 241,6, B 227,0.
+- Median der Differenz +6,0; Vorzeichentest: B besser in 135 Paaren,
+  schlechter in 102, gleich in 3 (zweiseitig p = 0,037). Das zeigt in die
+  andere Richtung als der Mittelwert. Die 135 besseren Paare liegen im Mittel
+  bei +33,2, die 102 schlechteren bei −52,6; das 5-%-gestutzte Mittel der
+  Differenz ist −2,4. Das Bild ist gemischt: In der typischen Partie ist B
+  eher ein paar Punkte besser, verliert dafür aber seltener deutlich mehr
+  (größte Verluste −212, −164, −164, −160, −144; größte Gewinne +116 bis
+  +170). Dasselbe Muster hatte der dritte Pilot der Datenaggregation (36
+  Paare besser mit +28,0, 24 schlechter mit −56,2). Warum, ist nicht
+  untersucht.
+
+*Nachträglich und ohne Wirkung auf die Entscheidung:* Die drei Piloten der
+Datenaggregation (NEU gegen A, 180 Paare) und diese Messung (240 Paare)
+zusammen: 420 Paare, **−2,2** [−7,8; +3,4], p = 0,44. Besser in 232 Paaren
+(Ø +36,4), schlechter in 184 (Ø −50,9), gleich in 4; Vorzeichentest p =
+0,021, Median +6.
+
+**Was die Messung sagt.** Die Tabelle, die GNU Gos Zug auf neuen Stellungen um
+2 bis 3 Prozentpunkte öfter trifft, bringt im Spiel keinen Gewinn, und mit 420
+Paaren auch keinen von mehr als rund 3 Punkten. Der Ausschluss eines Gewinns
+um 10 Punkte steht für diese Tabelle und dieses Gewicht gegen diesen Gegner.
+Ob die typische Partie etwas besser und die Ausreißer schlechter werden, ist
+ein Befund, keine Erklärung; ihm nachzugehen wäre eine eigene Untersuchung.
+Mit dem negativen Ergebnis der Datenaggregation ist die Reihe zum
+Endspiel-Muster abgeschlossen.
