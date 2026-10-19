@@ -265,6 +265,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | Endspiel-Muster, Datenaggregation Runde 1 (in GitHub Actions): neue Tabelle aus den Stellungen, in die die alte führt, von GNU Go beschriftet | Pilot gegen GNU Go, 60 ausgespielte Paare, Seed 204: gegenüber dem Default +1,1 Punkte (95 %: [−13,7; +15,8], p = 0,89), gegenüber der alten Tabelle **+22,9** ([+11,1; +34,6], p = 0,0003); Actions spielt dieselben Partien wie der Container (120 von 120) | der Schaden ist weg, ein Gewinn noch nicht: Runde 2 nach der vorab festgelegten Regel (`docs/muster-endspiel-dagger.md` §4, §6) |
 | Endspiel-Muster, Datenaggregation Runde 2 (in GitHub Actions): Tabelle T2 spielt, GNU Go beschriftet 240 Partien, daraus T3 | Pilot gegen GNU Go, 60 ausgespielte Paare, Seed 205: T3 gegenüber dem Default +4,0 Punkte (95 %: [−14,8; +22,8], p = 0,67), T2 gegenüber dem Default +0,7 ([−15,4; +16,9], p = 0,93); beide Piloten zusammen T2 − A +0,9 ([−9,9; +11,7]); offline auf neuen Stellungen T2 und T3 gleichauf (Rang 1: 25,0 gegen 24,8 %) | kein Gewinn nachweisbar: Runde 3, die letzte, nach der vorab festgelegten Regel (`docs/muster-endspiel-dagger.md` §4, §7) |
 | Endspiel-Muster, Datenaggregation Runde 3, die letzte (in GitHub Actions): Tabelle T3 spielt, GNU Go beschriftet 240 Partien, daraus T4 | Pilot gegen GNU Go, 60 ausgespielte Paare, Seed 210: T4 gegenüber dem Default −5,7 Punkte (95 %: [−20,4; +9,0], p = 0,44), T3 −7,0 ([−25,2; +11,2]); alle drei Piloten zusammen NEU − A −0,2 ([−9,4; +9,0], 180 Paare, p = 0,96); offline auf neuen Stellungen T4 vor T3 (Rang ≤ 16: 86,6 gegen 78,9 %), im Spiel nicht | negatives Ergebnis, die Reihe endet nach der vorab festgelegten Regel: kein Schalter auf `main`, keine Messung (`docs/muster-endspiel-dagger.md` §7, §8) |
+| Endspiel-Muster, Messung mit 240 Paaren gegen GNU Go (in GitHub Actions): letzte Tabelle T4, Gewicht 200 gegen Default, Seed 206 | Endstand B − A **−3,7** (95 %: [−10,7; +3,3], p = 0,30), Siege 132 gegen 149, nach Zug 120 +0,1; Median +6, Vorzeichentest B besser in 135 gegen 102 (p = 0,037), Mittelwert von wenigen großen Verlusten bestimmt | verworfen (Obergrenze unter +10): T4 wird nicht übernommen, die Reihe zum Endspiel-Muster ist abgeschlossen (`docs/muster-endspiel-messung.md` §4, §8) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2393,10 +2394,13 @@ Stellungen etwas öfter (Rang 1 plus 2 bis 3 Prozentpunkte, Rang ≤ 16 bis plus
 18,7), aber ein Gewinn gegenüber dem Default entsteht nicht; der Schalter
 kommt nicht nach `main`, eine Messung war nach der Regel nicht vorgesehen
 ([`docs/muster-endspiel-dagger.md`](docs/muster-endspiel-dagger.md) §8). Auf
-Wunsch läuft sie trotzdem: 240 Paare gegen GNU Go mit der letzten Tabelle in
-GitHub Actions, vorab festgelegt in
-[`docs/muster-endspiel-messung.md`](docs/muster-endspiel-messung.md) (Ergebnis
-folgt).
+Wunsch lief sie trotzdem, in GitHub Actions und vorab festgelegt in
+[`docs/muster-endspiel-messung.md`](docs/muster-endspiel-messung.md): 240 Paare
+gegen GNU Go mit der letzten Tabelle, 10 Minuten. Ergebnis **B − A −3,7**
+(95 %: [−10,7; +3,3], p = 0,30), also nicht signifikant und ein Gewinn um 10
+Punkte ausgeschlossen: **verworfen**. Der Median liegt bei +6, der Mittelwert
+wird von wenigen großen Verlusten bestimmt (102 schlechtere Paare im Mittel
+−52,6, 135 bessere +33,2).
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
