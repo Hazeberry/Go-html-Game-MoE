@@ -1,0 +1,464 @@
+name: Endspiel-Muster Datenaggregation
+
+# Manueller Lauf einer Runde der Datenaggregation (docs/muster-endspiel-dagger.md).
+# Die KI spielt mit der Endspiel-Tabelle gegen GNU Go, GNU Go beschriftet die
+# dabei erreichten Stellungen, daraus wird eine neue Tabelle gelernt, und ein
+# Pilot vergleicht A (Default), VOR (die Tabelle, mit der gespielt wurde) und
+# NEU (die gelernte Tabelle), je 60 Partien gegen GNU Go.
+#
+# Der Code kommt aus dem Commit `basis` (Runde 1: 63f727b, der Stand mit dem
+# Schalter musterEndspiel in index.html). Auf main steht der Schalter nicht; die
+# Datei index.html des Laufs wird aus dem Basis-Commit gelegt
+# (auswertung/dagger/vorbereiten.sh) und nie eingecheckt.
+#
+# Ablauf:
+#   pruefen    Eingaben prüfen, Basis zu einem vollen Hash auflösen
+#   daten      16 Teile zu je 15 Partien mit VOR spielen und beschriften
+#   lernen     Zwischenspeicher, neue Tabelle, index.html mit der neuen Tabelle
+#   pilot-ref  A und VOR, je 2 × 30 Partien (Seed seed_pilot)
+#   pilot-neu  NEU, 2 × 30 Partien, dazu die Stellungen beschriften
+#   ergebnis   Bericht, Rohdaten gepackt, Branch ergebnisse/dagger-runde<N>-lauf<M>
+#
+# Reproduzierbar: mctsFixedSims=120 zählt Simulationen statt Zeit, GNU Go
+# bekommt den Seed (gnugo-duell.js). Der Lauf prüft das, indem er die Partien
+# von A und VOR mit dem Container-Pilot (docs/daten/endmuster-pilot.json)
+# vergleicht: gleicher Endstand, gleiche Zugzahl je Partie.
+
+on:
+  workflow_dispatch:
+    inputs:
+      runde:
+        description: 'Nummer der Runde (nur für Namen und Bericht)'
+        required: true
+        default: '1'
+      basis:
+        description: 'Commit mit dem Schalter musterEndspiel in index.html, Vorfahr von main. Runde 1: 63f727b'
+        required: true
+        default: '63f727b'
+      tabelle:
+        description: 'Tabelle der Strategie VOR als JSON im Repo (leer = die in index.html des Basis-Commits)'
+        required: false
+        default: ''
+      daten_extra:
+        description: 'Beschriftete Stellungen früherer Runden zum Mitlernen, Dateien im Repo, mit Komma getrennt (leer = keine)'
+        required: false
+        default: ''
+      seed_daten:
+        description: 'Seed der 240 Partien, aus denen die neuen Stellungen stammen'
+        required: true
+        default: '207'
+      seed_pilot:
+        description: 'Seed des Pilots (A, VOR und NEU je 60 Partien)'
+        required: true
+        default: '204'
+      gewicht:
+        description: 'musterEndspiel für VOR und NEU'
+        required: true
+        default: '200'
+      kontrolle:
+        description: 'ja = A und VOR mit docs/daten/endmuster-pilot.json vergleichen (nur mit den Einstellungen von Runde 1 sinnvoll)'
+        required: false
+        default: 'ja'
+
+# Ein Lauf nach dem anderen: Die Läufe teilen sich die Ergebnisbranches.
+concurrency:
+  group: endspiel-dagger
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    name: Eingaben prüfen
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      runde: ${{ steps.p.outputs.runde }}
+      basis: ${{ steps.p.outputs.basis }}
+      tabelle: ${{ steps.p.outputs.tabelle }}
+      daten_extra: ${{ steps.p.outputs.daten_extra }}
+      seed_daten: ${{ steps.p.outputs.seed_daten }}
+      seed_pilot: ${{ steps.p.outputs.seed_pilot }}
+      gewicht: ${{ steps.p.outputs.gewicht }}
+      kontrolle: ${{ steps.p.outputs.kontrolle }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # Eingaben nur über env und geprüft, nie in die Shell-Zeile interpoliert
+      # (Script-Injection über das Dispatch-Formular, wie in ab-harness.yml).
+      - name: Eingaben prüfen
+        id: p
+        env:
+          IN_RUNDE: ${{ inputs.runde }}
+          IN_BASIS: ${{ inputs.basis }}
+          IN_TABELLE: ${{ inputs.tabelle }}
+          IN_EXTRA: ${{ inputs.daten_extra }}
+          IN_SEED_DATEN: ${{ inputs.seed_daten }}
+          IN_SEED_PILOT: ${{ inputs.seed_pilot }}
+          IN_GEWICHT: ${{ inputs.gewicht }}
+          IN_KONTROLLE: ${{ inputs.kontrolle }}
+        run: |
+          set -euo pipefail
+          zahl() { case "$2" in ''|*[!0-9]*) echo "::error::$1 muss eine nicht-negative ganze Zahl sein: '$2'"; exit 2;; esac; }
+          zahl runde "$IN_RUNDE"; zahl seed_daten "$IN_SEED_DATEN"; zahl seed_pilot "$IN_SEED_PILOT"; zahl gewicht "$IN_GEWICHT"
+          [ "$IN_GEWICHT" -ge 1 ] || { echo "::error::gewicht muss ≥ 1 sein"; exit 2; }
+          case "$IN_KONTROLLE" in ja|nein) ;; *) echo "::error::kontrolle muss ja oder nein sein: '$IN_KONTROLLE'"; exit 2;; esac
+
+          # Basis: ein Commit aus der Geschichte von main, der den Schalter kennt
+          case "$IN_BASIS" in ''|*[!0-9a-f]*) echo "::error::basis muss ein Commit-Hash sein: '$IN_BASIS'"; exit 2;; esac
+          git cat-file -e "$IN_BASIS^{commit}"
+          git merge-base --is-ancestor "$IN_BASIS" origin/main || { echo "::error::basis ist kein Vorfahr von main"; exit 2; }
+          BASIS=$(git rev-parse "$IN_BASIS")
+          # (in eine Datei, nicht in eine Pipe: grep -q beendet sich früh, und pipefail
+          # machte aus dem SIGPIPE von git show einen Fehler)
+          git show "$BASIS:index.html" > "$RUNNER_TEMP/basis-index.html"
+          grep -q '^const MUSTER_ENDSPIEL = {"' "$RUNNER_TEMP/basis-index.html" || { echo "::error::index.html im Basis-Commit hat keinen Schalter musterEndspiel"; exit 2; }
+
+          # Dateien im Repo: nur einfache Pfade, die es gibt
+          datei() {
+            case "$1" in ''|/*|*..*|*[!A-Za-z0-9_./-]*) echo "::error::ungültiger Pfad: '$1'"; exit 2;; esac
+            [ -f "$1" ] || { echo "::error::Datei fehlt im Repo: $1"; exit 2; }
+          }
+          [ -z "$IN_TABELLE" ] || datei "$IN_TABELLE"
+          if [ -n "$IN_EXTRA" ]; then IFS=',' read -ra EX <<< "$IN_EXTRA"; for f in "${EX[@]}"; do datei "$f"; done; fi
+
+          # Die Kontrolle gegen den Container-Pilot gilt nur für dessen Einstellungen
+          KONTROLLE=$IN_KONTROLLE
+          if [ "$KONTROLLE" = ja ] && { [ "$IN_SEED_PILOT" != 204 ] || [ "$IN_GEWICHT" != 200 ] || [ -n "$IN_TABELLE" ] || [ "${BASIS:0:7}" != 63f727b ]; }; then
+            echo "::warning::kontrolle=ja gilt nur für Seed 204, Gewicht 200, Basis 63f727b ohne eigene Tabelle; sie entfällt"
+            KONTROLLE=nein
+          fi
+          {
+            echo "runde=$IN_RUNDE"; echo "basis=$BASIS"; echo "tabelle=$IN_TABELLE"; echo "daten_extra=$IN_EXTRA"
+            echo "seed_daten=$IN_SEED_DATEN"; echo "seed_pilot=$IN_SEED_PILOT"; echo "gewicht=$IN_GEWICHT"; echo "kontrolle=$KONTROLLE"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "## Datenaggregation, Runde $IN_RUNDE"
+            echo
+            echo "Basis \`${BASIS:0:7}\`, Tabelle VOR: \`${IN_TABELLE:-aus index.html der Basis}\`, Gewicht $IN_GEWICHT, Seed Daten $IN_SEED_DATEN, Seed Pilot $IN_SEED_PILOT, mitgelernt: \`${IN_EXTRA:-nichts}\`"
+            echo
+            echo "Dispatch-Commit \`${GITHUB_SHA:0:7}\` · GNU Go aus dem Paketstand des Runners"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  daten:
+    name: Daten, Partien ab ${{ matrix.von }}
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        von: [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+          gnugo --version | head -n 1
+          dpkg -l gnugo | tail -n 1 | cut -c1-80
+          echo "Node $(node -v), $(nproc) Kerne, $(awk -F': ' '/model name/{print $2; exit}' /proc/cpuinfo)"
+
+      - name: index.html der Strategie VOR bereitlegen
+        env:
+          BASIS: ${{ needs.pruefen.outputs.basis }}
+          TABELLE: ${{ needs.pruefen.outputs.tabelle }}
+        run: bash auswertung/dagger/vorbereiten.sh "$BASIS" "$TABELLE"
+
+      - name: 15 Partien spielen und die Stellungen beschriften
+        env:
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed_daten }}
+          GEWICHT: ${{ needs.pruefen.outputs.gewicht }}
+        run: bash auswertung/dagger/spielen.sh "daten/spiel-$VON.jsonl" "$VON" 15 "$SEED" "$GEWICHT" "daten/lehr-$VON.jsonl"
+
+      - name: Daten sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: daten-${{ matrix.von }}
+          path: daten/
+          if-no-files-found: warn
+          retention-days: 90
+
+  lernen:
+    name: Neue Tabelle lernen
+    needs: [pruefen, daten]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: daten-*
+          path: daten
+          merge-multiple: true
+
+      # Die Engine für die Kandidatenlisten ist die des Basis-Commits (der
+      # Schalter ist aus, die Listen sind dieselben wie auf main).
+      - name: index.html der Strategie VOR bereitlegen
+        env:
+          BASIS: ${{ needs.pruefen.outputs.basis }}
+          TABELLE: ${{ needs.pruefen.outputs.tabelle }}
+        run: bash auswertung/dagger/vorbereiten.sh "$BASIS" "$TABELLE"
+
+      - name: Teile zusammenfügen
+        run: |
+          set -euo pipefail
+          mkdir -p tabelle
+          : > tabelle/d1-spiele.jsonl; : > tabelle/d1-lehr.jsonl
+          for v in 1 16 31 46 61 76 91 106 121 136 151 166 181 196 211 226; do
+            for f in spiel lehr; do
+              [ -s "daten/$f-$v.jsonl" ] || { echo "::error::daten/$f-$v.jsonl fehlt oder ist leer"; exit 1; }
+              cat "daten/$f-$v.jsonl" >> "tabelle/d1-${f/spiel/spiele}.jsonl"
+            done
+          done
+          echo "Partien: $(wc -l < tabelle/d1-spiele.jsonl), beschriftete Partien: $(wc -l < tabelle/d1-lehr.jsonl)"
+          [ "$(wc -l < tabelle/d1-spiele.jsonl)" -eq 240 ] && [ "$(wc -l < tabelle/d1-lehr.jsonl)" -eq 240 ]
+
+      - name: Tabelle der Strategie VOR auslesen
+        run: node auswertung/muster-endspiel-tabelle.js --auslesen index.html --aus tabelle/tabelle-vor.json
+
+      - name: Lernen
+        env:
+          EXTRA: ${{ needs.pruefen.outputs.daten_extra }}
+        run: |
+          set -euo pipefail
+          EX=(); if [ -n "$EXTRA" ]; then IFS=',' read -ra EX <<< "$EXTRA"; fi
+          bash auswertung/dagger/lernen.sh tabelle/d1-lehr.jsonl "${EX[@]}"
+          mv tabelle-neu.json tabelle/tabelle-neu.json
+
+      - name: Bericht zum Lernen
+        run: |
+          set -euo pipefail
+          {
+            for z in zw/*.log; do echo "$(basename "$z" .log): $(tail -n 1 "$z")"; done
+            echo
+            echo "Tabelle VOR auf den eigenen Stellungen (Daten dieser Runde):"
+            node auswertung/muster-endspiel-verschiebung.js --tabelle tabelle/tabelle-vor.json --menge "D1=zw/runde:tabelle/d1-spiele.jsonl"
+            echo
+            echo "Tabelle NEU auf denselben Stellungen (hat sie mitgelernt, also zu günstig):"
+            node auswertung/muster-endspiel-verschiebung.js --tabelle tabelle/tabelle-neu.json --menge "D1=zw/runde:tabelle/d1-spiele.jsonl"
+          } | tee tabelle/lernen-bericht.txt
+          { echo '### Lernen'; echo; echo '```'; cat tabelle/lernen-bericht.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: index.html mit der neuen Tabelle
+        run: |
+          set -euo pipefail
+          cp index.html index-neu.html
+          node auswertung/muster-endspiel-tabelle.js --einsetzen tabelle/tabelle-neu.json --index index-neu.html
+
+      - name: Tabelle sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tabelle
+          path: |
+            tabelle/
+            index-neu.html
+          if-no-files-found: warn
+          retention-days: 90
+
+  pilot-ref:
+    name: Pilot ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    needs: [pruefen, daten]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [A, VOR]
+        von: [1, 31]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+          gnugo --version | head -n 1
+
+      - name: index.html der Strategie VOR bereitlegen
+        env:
+          BASIS: ${{ needs.pruefen.outputs.basis }}
+          TABELLE: ${{ needs.pruefen.outputs.tabelle }}
+        run: bash auswertung/dagger/vorbereiten.sh "$BASIS" "$TABELLE"
+
+      # A ist der Default: Gewicht 0 lässt den Schalter aus (bitgenau das alte
+      # Verhalten, tests/muster-endspiel.js im Commit 63f727b).
+      - name: 30 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed_pilot }}
+          GEWICHT: ${{ needs.pruefen.outputs.gewicht }}
+        run: |
+          set -euo pipefail
+          [ "$ARM" = A ] && GEWICHT=0
+          bash auswertung/dagger/spielen.sh "pilot/pilot-$ARM-$VON.jsonl" "$VON" 30 "$SEED" "$GEWICHT"
+
+      - name: Pilot sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pilot-${{ matrix.arm }}-${{ matrix.von }}
+          path: pilot/
+          if-no-files-found: warn
+          retention-days: 90
+
+  pilot-neu:
+    name: Pilot NEU, Partien ab ${{ matrix.von }}
+    needs: [pruefen, lernen]
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        von: [1, 31]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+          gnugo --version | head -n 1
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: tabelle
+
+      - name: index.html mit der neuen Tabelle bereitlegen
+        run: |
+          set -euo pipefail
+          cp index-neu.html index.html
+          grep -q '^const MUSTER_ENDSPIEL = {"' index.html
+
+      # Beschriftet werden die ersten 15 der 30 Partien: zusammen 30 Partien
+      # für die Verschiebungsprobe (docs/muster-endspiel-dagger.md §2).
+      - name: 30 Partien spielen und die Stellungen der ersten 15 beschriften
+        env:
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed_pilot }}
+          GEWICHT: ${{ needs.pruefen.outputs.gewicht }}
+        run: bash auswertung/dagger/spielen.sh "pilot/pilot-NEU-$VON.jsonl" "$VON" 30 "$SEED" "$GEWICHT" "pilot/lehr-NEU-$VON.jsonl" 15
+
+      - name: Pilot sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pilot-NEU-${{ matrix.von }}
+          path: pilot/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [pruefen, lernen, pilot-ref, pilot-neu]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: pilot-*
+          path: pilot
+          merge-multiple: true
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: tabelle
+
+      - name: index.html der Strategie VOR bereitlegen
+        env:
+          BASIS: ${{ needs.pruefen.outputs.basis }}
+          TABELLE: ${{ needs.pruefen.outputs.tabelle }}
+        run: bash auswertung/dagger/vorbereiten.sh "$BASIS" "$TABELLE"
+
+      - name: Bericht
+        env:
+          RUNDE: ${{ needs.pruefen.outputs.runde }}
+          KONTROLLE: ${{ needs.pruefen.outputs.kontrolle }}
+        run: |
+          set -euo pipefail
+          bash auswertung/dagger/ergebnis.sh "$RUNDE" "$KONTROLLE"
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Ergebnisse sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ergebnisse-runde-${{ needs.pruefen.outputs.runde }}
+          path: ergebnisse/
+          if-no-files-found: warn
+          retention-days: 90
+
+      # Die Ergebnisse als Commit des Workflows auf einen eigenen Branch: Sie
+      # lassen sich von dort holen, ohne ein Artefakt herunterzuladen, und sind
+      # dem Lauf zugeordnet.
+      - name: Ergebnisbranch
+        env:
+          RUNDE: ${{ needs.pruefen.outputs.runde }}
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/dagger-runde${RUNDE}-lauf${LAUF}"
+          ziel="docs/daten/dagger/runde${RUNDE}-lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Datenaggregation, Runde ${RUNDE}: Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"
