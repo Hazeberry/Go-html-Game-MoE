@@ -54,7 +54,7 @@ function ladeKI({htmlPfad = STANDARD_HTML, mitNetz = true, speicher = null} = {}
   const namen = ['_mctsKids', 'mctsPUCT', 'getAIMove', 'getLegalMoves',
                  'gebietSagtVerloren', 'estimateArea', 'evaluateBoard',
                  'evaluateMove', 'primeInfluenceCache', 'influenceZone', 'primeEndTieBreak', 'tbBilanzNach', 'bouzyBilanz', 'primeRaum', 'leseRaumWaechter', '_raumK3', 'gebietBilanz',
-                 'primeAreaCache', 'buildCrisisMap', '_bnBornDead', 'phaseWeights',
+                 'primeAreaCache', 'bouzyKarte', 'buildCrisisMap', '_bnBornDead', 'phaseWeights',
                  'aufgabeGebiet', 'setzeFfEpoche', 'fuelltEigenesAuge', 'findEyes', 'vergeblicherZug', 'gegnerzugUnabwendbar', 'leseAngriff', 'leseVerteidigung',
                  'leseTransferWaechter', 'removeDeadGroups', 'bensonClassify',
                  '_bnDead', '_bnAlive', 'floodFill', 'computeZobrist', 'getCrisisWeight', 'evalTsumego', 'leseWurzelWaechter', 'quickEval',

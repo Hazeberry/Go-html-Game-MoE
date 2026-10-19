@@ -9,13 +9,16 @@
    beide Farben vorkommen, beginnt die Zählung je nach Partienummer bei
    --ab oder --ab + 1.
 
+   Mit --seite ki fragt es stattdessen an jedem Zug der KI (Seite wirFarbe
+   des Dumps, bei Vorgabepartien Schwarz) und nie für GNU Go.
+
    Ausgabe je Partie: seed, nr, beginnt, vorgabeSteine, zuege (die Partie)
    und ziele: [{k, gnugo}], k = Zahl der gespielten Züge vor der Stellung,
    gnugo = GNU Gos Zug (GTP-Koordinate oder PASS).
 
    Aufruf:
      node auswertung/muster-daten.js <dump.jsonl> [...] [--ab 10] [--bis 250]
-          [--stufe 10] --aus daten.jsonl [--gnugo pfad] */
+          [--stufe 10] [--seite ki] --aus daten.jsonl [--gnugo pfad] */
 'use strict';
 const fs = require('fs');
 const {gtp} = require('./endspiel-verlauf.js');
@@ -26,10 +29,12 @@ async function analysiere(p, opt) {
     await g.frage('boardsize 19'); await g.frage('clear_board');
     if (p.vorgabeSteine && p.vorgabeSteine.length) await g.frage('set_free_handicap ' + p.vorgabeSteine.join(' '));
     const zuerst = p.beginnt === 'S' ? 'B' : 'W', andere = f => f === 'B' ? 'W' : 'B';
+    const ki = p.wirFarbe === 'S' ? 'B' : 'W';
     const ziele = [];
     for (let k = 0; k < Math.min(p.zuege.length, opt.bis); k++) {
-      if (k >= opt.ab && (k - opt.ab - p.nr) % 2 === 0) {
-        const f = k % 2 === 0 ? zuerst : andere(zuerst);
+      const seite = k % 2 === 0 ? zuerst : andere(zuerst);
+      if (k >= opt.ab && (opt.seite === 'ki' ? seite === ki : (k - opt.ab - p.nr) % 2 === 0)) {
+        const f = seite;
         let z = (await g.frage('reg_genmove ' + f)).toUpperCase();
         if (z === 'RESIGN') z = 'PASS';
         ziele.push({k, gnugo: z});
@@ -42,7 +47,7 @@ async function analysiere(p, opt) {
 
 if (require.main === module) {
   const a = process.argv.slice(2);
-  const opt = {ab: 10, bis: 250, stufe: 10, aus: null, gnugo: '/usr/games/gnugo'};
+  const opt = {ab: 10, bis: 250, stufe: 10, aus: null, gnugo: '/usr/games/gnugo', seite: 'beide'};
   const dateien = [];
   for (let k = 0; k < a.length; k++) {
     if (a[k] === '--ab') opt.ab = +a[++k];
@@ -50,6 +55,7 @@ if (require.main === module) {
     else if (a[k] === '--stufe') opt.stufe = +a[++k];
     else if (a[k] === '--aus') opt.aus = a[++k];
     else if (a[k] === '--gnugo') opt.gnugo = a[++k];
+    else if (a[k] === '--seite') opt.seite = a[++k];
     else dateien.push(a[k]);
   }
   if (!opt.aus) { console.error('--aus fehlt'); process.exit(1); }
