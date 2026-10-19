@@ -9,6 +9,11 @@
    Eine Partie, die GNU Go sonst nach 80 Zügen aufgibt, läuft damit weiter,
    mit denselben ersten 80 Zügen.
 
+   --orakel-zug (docs/muster-endspiel-orakel.md): ein zweites GNU Go zieht ab
+   einer Zugzahl für die KI. Eine nicht erreichte Schwelle ändert nichts, bei
+   ANTEIL 1 wird jeder Zug ab AB ersetzt, mit ANTEIL 0,5 ein Teil; falsche
+   Angaben werden abgelehnt.
+
    Aufruf:  node tests/gnugo-bruecke.js */
 'use strict';
 const fs = require('fs'), path = require('path'), os = require('os');
@@ -64,6 +69,48 @@ test('--gnugo-aufgabe 0: GNU Go gibt nicht auf, die Partie läuft weiter', () =>
   pruefeGleich(ohne.zuegeAnzahl, 90, 'bis zum Zuglimit');
   pruefeGleich(ohne.gnugoDarfAufgeben, false, 'Feld im Datensatz');
   pruefeGleich(ohne.zuege.slice(0, 80).join(' '), mit.zuege.join(' '), 'dieselben ersten 80 Züge');
+});
+
+/* Orakel-Test: kurze Partie mit neun Vorgabesteinen, Orakel auf Stufe 1, damit
+   sie schnell bleibt. Weiß (GNU Go) beginnt, die KI zieht an den ungeraden
+   Zugnummern k = 1, 3, 5, … */
+const ORAKEL = ['--partien', '1', '--seed', '3', '--stufe', '1', '--vorgabe', '9', '--maxzuege', '40', '--gnugo-aufgabe', '0',
+                '--ki', 'mctsFixedSims=20,resignEnabled=0'];
+let ohneOrakel = null;   /* dieselbe Partie ohne Option, einmal gespielt */
+const ohneOption = () => (ohneOrakel = ohneOrakel || partie([], ORAKEL));
+
+test('--orakel-zug: ohne Option nichts, nicht erreichte Schwelle ändert die Partie nicht', () => {
+  const ohne = ohneOption(), nie = partie(['--orakel-zug', '99999'], ORAKEL);
+  pruefe(!('orakelZug' in ohne), 'ohne Option kein Feld im Datensatz');
+  pruefeGleich(nie.orakelZug.gelegenheiten, 0, 'Schwelle nie erreicht: keine Gelegenheit');
+  pruefeGleich(nie.orakelZug.eingesetzt, 0, 'nichts eingesetzt');
+  pruefeGleich(nie.zuege.join(' '), ohne.zuege.join(' '), 'dieselben Züge');
+  pruefeGleich(nie.endstand, ohne.endstand, 'derselbe Endstand');
+});
+
+test('--orakel-zug AB: ab AB zieht das Orakel in jedem Zug der KI', () => {
+  const ohne = ohneOption(), voll = partie(['--orakel-zug', '10', '--orakel-zug-stufe', '1'], ORAKEL);
+  pruefe(!voll.abgebrochen, 'nicht abgebrochen');
+  let erwartet = 0;
+  for (let k = 10; k < voll.zuegeAnzahl; k++) if (k % 2 === 1) erwartet++;
+  const o = voll.orakelZug;
+  pruefeGleich(o.ab, 10, 'AB im Datensatz'); pruefeGleich(o.anteil, 1, 'Anteil im Datensatz'); pruefeGleich(o.stufe, 1, 'Stufe im Datensatz');
+  pruefeGleich(o.gelegenheiten, erwartet, `Gelegenheiten: die ${erwartet} Züge der KI ab Zug 11`);
+  pruefeGleich(o.eingesetzt, o.gelegenheiten, 'bei Anteil 1 in jedem eingesetzt');
+  pruefe(o.gleich >= 0 && o.gleich <= o.eingesetzt, 'gleich liegt zwischen 0 und eingesetzt');
+  pruefeGleich(voll.zuege.slice(0, 10).join(' '), ohne.zuege.slice(0, 10).join(' '), 'die ersten 10 Züge sind dieselben');
+  pruefe(voll.zuege.slice(10).join(' ') !== ohne.zuege.slice(10).join(' '), 'danach spielt die Partie anders');
+});
+
+test('--orakel-zug AB:ANTEIL: nur ein Teil der Gelegenheiten, falsche Angaben abgelehnt', () => {
+  const halb = partie(['--orakel-zug', '10:0.5', '--orakel-zug-stufe', '1'], ORAKEL).orakelZug;
+  pruefe(halb.eingesetzt > 0 && halb.eingesetzt < halb.gelegenheiten, `ein Teil von ${halb.gelegenheiten}: ${halb.eingesetzt}`);
+  for (const falsch of ['abc', '10:0', '10:1.5', '-3']) {
+    let status = 0;
+    try { execFileSync(process.execPath, [WERKZEUG, ...ORAKEL, '--orakel-zug', falsch], {stdio: 'pipe', timeout: 20000}); }
+    catch (e) { status = e.status; }
+    pruefeGleich(status, 2, `--orakel-zug ${falsch} wird abgelehnt`);
+  }
 });
 
 laufeTests('GNU-Go-Brücke').then(ok => process.exit(ok ? 0 : 1));

@@ -39,6 +39,14 @@
                           spielt mit und liefert vor jedem unserer Züge sein
                           Lebensurteil, dragon_status; wirkt mit
                           --ki gebietSicher=1, docs/gebiet-sicher.md)
+                         [--orakel-zug AB[:ANTEIL]] (Orakel-Test,
+                          docs/muster-endspiel-orakel.md: ein zweites GNU Go
+                          spielt jeden Zug mit und liefert in jedem unserer
+                          Züge ab der Zugzahl AB (mc ≥ AB, AB 80 = ab dem 81.
+                          Zug) mit der Wahrscheinlichkeit ANTEIL (Standard 1)
+                          den Zug, der statt unseres gespielt wird. getAIMove
+                          läuft trotzdem; seine Wahl wird nur verglichen)
+                         [--orakel-zug-stufe S] (Stufe dieses GNU Go, Standard 10)
    Jede Partie bekommt zusätzlich `endstand`: GNU Gos final_score der
    Schlussstellung aus unserer Sicht, auch bei Aufgabe und Zuglimit.
    Bei Aufgabe ist das die Stellung, wie sie stehen blieb, oft weit vor dem
@@ -61,7 +69,8 @@ const {spawn} = require('child_process');
 /* ── Optionen ─────────────────────────────────────────────────────── */
 const a = process.argv.slice(2);
 const opt = {partien: 10, seed: 1, stufe: 10, ki: {}, roh: null, gnugo: '/usr/games/gnugo',
-             maxZuege: 400, von: 1, vorgabe: 0, schaetzung: [], gnugoAufgabe: 1, orakel: 0};
+             maxZuege: 400, von: 1, vorgabe: 0, schaetzung: [], gnugoAufgabe: 1, orakel: 0,
+             orakelZug: null, orakelZugStufe: 10};
 for (let i = 0; i < a.length; i++) {
   const v = a[i + 1];
   switch (a[i]) {
@@ -76,6 +85,15 @@ for (let i = 0; i < a.length; i++) {
     case '--schaetzung': opt.schaetzung = v.split(',').map(Number); i++; break;
     case '--gnugo-aufgabe': opt.gnugoAufgabe = +v; i++; break;
     case '--orakel': opt.orakel = +v; i++; break;
+    case '--orakel-zug': {
+      const [ab, anteil = '1'] = String(v).split(':');
+      opt.orakelZug = {ab: +ab, anteil: +anteil};
+      if (!(Number.isInteger(opt.orakelZug.ab) && opt.orakelZug.ab >= 0 && opt.orakelZug.anteil > 0 && opt.orakelZug.anteil <= 1)) {
+        console.error(`--orakel-zug AB[:ANTEIL] erwartet eine ganze Zahl AB ≥ 0 und 0 < ANTEIL ≤ 1: ${v}`); process.exit(2);
+      }
+      i++; break;
+    }
+    case '--orakel-zug-stufe': opt.orakelZugStufe = +v; i++; break;
     case '--ki': for (const kv of v.split(',')) { const [k, w] = kv.split('='); opt.ki[k] = +w; } i++; break;
     default: console.error('Unbekannte Option ' + a[i]); process.exit(2);
   }
@@ -225,8 +243,15 @@ async function partieSpielen(nr) {
   /* Orakel: eigenes GNU Go, spielt jeden Zug mit, zieht nie selbst. */
   const o = opt.orakel ? gnugoMitNeustart(seed + 50000, opt.orakel) : null;
   const orakel = {zuege: 0, tot: 0, krit: 0, verteidigt: 0, angegriffen: 0};
+  /* Orakel-Test: ein weiteres GNU Go, spielt jeden Zug mit und liefert unseren
+     Zug (reg_genmove) ab der Zugzahl AB. Eigener Zufallsstrom für die Wahl mit
+     ANTEIL < 1, damit unser Math.random unberührt bleibt. */
+  const oz = opt.orakelZug ? gnugoMitNeustart(seed + 60000, opt.orakelZugStufe) : null;
+  const orakelZug = {gelegenheiten: 0, eingesetzt: 0, gleich: 0, paesse: 0};
+  const zufallOrakel = mulberry32(seed + 70000);
   E.setzeLebensurteil(null);
   if (o) await o.starte();
+  if (oz) await oz.starte();
   Math.random = mulberry32(seed);
   E.neuePartie(); E.setzeKrisenDauer(null);
   if (E.wurzel) E.wurzel(true);
@@ -234,13 +259,18 @@ async function partieSpielen(nr) {
   const hist = new Set([E.computeZobrist(board)]);
   let ko = null, last = null, mc = 0, paesse = 0, aufgabe = null;
   const zuege = [], sims = [], schaetzung = {};
-  const mitspielen = async (farbe, i) => { if (o) await o.frage(`play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`); };
+  const mitspielen = async (farbe, i) => {
+    const befehl = `play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`;
+    if (o) await o.frage(befehl);
+    if (oz) await oz.frage(befehl);
+  };
   let vorgabeSteine = [];
   if (opt.vorgabe >= 2) {
     const befehl = `fixed_handicap ${opt.vorgabe}`;
     vorgabeSteine = (await g.frage(befehl)).split(/\s+/).filter(Boolean);
     g.merke(befehl);   /* für einen Neustart mit nachzuspielen */
     if (o) { await o.frage(befehl); o.merke(befehl); }
+    if (oz) { await oz.frage(befehl); oz.merke(befehl); }
     for (const v of vorgabeSteine) board[vonGtp(v)] = 1;
     hist.add(E.computeZobrist(board));
   }
@@ -261,6 +291,15 @@ async function partieSpielen(nr) {
         if (r.type === 'resign') { aufgabe = f; break; }
         i = r.type === 'stone' ? r.y * 19 + r.x : -1;
         const m = /MCTS (\d+) Sims/.exec(r.info || ''); if (m) sims.push(+m[1]);
+        if (oz && mc >= opt.orakelZug.ab) {
+          orakelZug.gelegenheiten++;
+          if (opt.orakelZug.anteil >= 1 || zufallOrakel() < opt.orakelZug.anteil) {
+            const oi = vonGtp(await oz.frage(`reg_genmove ${farbe}`));
+            const z = oi < 0 ? -1 : oi;   /* Aufgabe des Orakels zählt wie ein Pass */
+            orakelZug.eingesetzt++; if (z === i) orakelZug.gleich++; if (z < 0) orakelZug.paesse++;
+            i = z;
+          }
+        }
         await g.frage(`play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`);
         await mitspielen(farbe, i);
         if (u) for (const k of u.krit) {
@@ -318,9 +357,10 @@ async function partieSpielen(nr) {
             simsMittel: sims.length ? Math.round(sims.reduce((x, y) => x + y, 0) / sims.length) : null,
             neustarts: g.neustarts(), schaetzung,
             ...(o ? {orakel: {stufe: opt.orakel, ...orakel, neustarts: o.neustarts()}} : {}),
+            ...(oz ? {orakelZug: {ab: opt.orakelZug.ab, anteil: opt.orakelZug.anteil, stufe: opt.orakelZugStufe, ...orakelZug, neustarts: oz.neustarts()}} : {}),
             wurzel: E.wurzel ? E.wurzel(true) : undefined,
             zuege};
-  } finally { g.ende(); if (o) o.ende(); E.setzeLebensurteil(null); }
+  } finally { g.ende(); if (o) o.ende(); if (oz) oz.ende(); E.setzeLebensurteil(null); }
 }
 
 (async () => {
