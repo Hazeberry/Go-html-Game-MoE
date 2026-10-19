@@ -1,0 +1,3 @@
+Arm A: 240 Partien, Endstand Ø 20.8, Siege 149
+Arm B: 240 Partien, Endstand Ø 17.1, Siege 132
+B − A: 240 Paare · Ø 17.1 gegen 20.8 · Differenz −3,7 (SD 55.0), 95 %: [−10,7; +3,3], t = -1.04, p = 0,3016 · Hälften −3,8 / −3,6 · Siege 132 gegen 149 · besser 135, schlechter 102 · nach Zug 120: +0,1 (p = 0,9395)
