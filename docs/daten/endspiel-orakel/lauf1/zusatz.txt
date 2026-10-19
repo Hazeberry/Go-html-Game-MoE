@@ -1,0 +1,20 @@
+== D25 gegen A
+Paare: 120 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 238.8, B Ø 207.7
+Median der Differenz B − A: +26,0
+Vorzeichentest: B besser in 80 Paaren, schlechter in 40, gleich in 0 · p = 0,0003 (zweiseitig, exakt)
+== D50 gegen A
+Paare: 120 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 238.8, B Ø 197.2
+Median der Differenz B − A: +28,0
+Vorzeichentest: B besser in 91 Paaren, schlechter in 28, gleich in 1 · p = 0,0000 (zweiseitig, exakt)
+== D100 gegen A
+Paare: 120 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 238.8, B Ø 171.8
+Median der Differenz B − A: +86,0
+Vorzeichentest: B besser in 117 Paaren, schlechter in 3, gleich in 0 · p = 0,0000 (zweiseitig, exakt)
+== E100 gegen A
+Paare: 120 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 238.8, B Ø 193.2
+Median der Differenz B − A: +21,0
+Vorzeichentest: B besser in 81 Paaren, schlechter in 12, gleich in 27 · p = 0,0000 (zweiseitig, exakt)

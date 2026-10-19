@@ -14,6 +14,11 @@
    ANTEIL 1 wird jeder Zug ab AB ersetzt, mit ANTEIL 0,5 ein Teil; falsche
    Angaben werden abgelehnt.
 
+   auswertung/orakel-nachspiel.js (Zusatzrechnung zum Passen): Eine
+   aufgezeichnete Partie aus docs/daten/endspiel-orakel/lauf1/ nachgespielt
+   ergibt in GNU Go denselben Endstand wie in der Aufzeichnung, und die
+   Stellung nach dem ersten Pass lässt sich zählen.
+
    Aufruf:  node tests/gnugo-bruecke.js */
 'use strict';
 const fs = require('fs'), path = require('path'), os = require('os');
@@ -111,6 +116,18 @@ test('--orakel-zug AB:ANTEIL: nur ein Teil der Gelegenheiten, falsche Angaben ab
     catch (e) { status = e.status; }
     pruefeGleich(status, 2, `--orakel-zug ${falsch} wird abgelehnt`);
   }
+});
+
+test('orakel-nachspiel.js: eine aufgezeichnete Partie nachgespielt ergibt den aufgezeichneten Endstand', async () => {
+  const N = require('../auswertung/orakel-nachspiel.js');
+  const daten = path.join(__dirname, '..', 'docs', 'daten', 'endspiel-orakel', 'lauf1', 'A.jsonl.gz');
+  pruefe(fs.existsSync(daten), 'die eingecheckten Partien des Orakel-Tests liegen vor');
+  const q = N.liesJsonl(daten).slice(0, 1);
+  const [z] = await N.nachrechnen(q, GNUGO);
+  pruefeGleich(z.ende, q[0].endstand, 'Endstand wie aufgezeichnet');
+  pruefeGleich(z.laenge, q[0].zuege.length, 'alle Züge nachgespielt');
+  pruefeGleich(z.erster, q[0].zuege.indexOf('pass'), 'erster Pass');
+  pruefe(Number.isFinite(z.nach), `Stand nach dem ersten Pass: ${z.nach}`);
 });
 
 laufeTests('GNU-Go-Brücke').then(ok => process.exit(ok ? 0 : 1));

@@ -266,6 +266,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | Endspiel-Muster, Datenaggregation Runde 2 (in GitHub Actions): Tabelle T2 spielt, GNU Go beschriftet 240 Partien, daraus T3 | Pilot gegen GNU Go, 60 ausgespielte Paare, Seed 205: T3 gegenüber dem Default +4,0 Punkte (95 %: [−14,8; +22,8], p = 0,67), T2 gegenüber dem Default +0,7 ([−15,4; +16,9], p = 0,93); beide Piloten zusammen T2 − A +0,9 ([−9,9; +11,7]); offline auf neuen Stellungen T2 und T3 gleichauf (Rang 1: 25,0 gegen 24,8 %) | kein Gewinn nachweisbar: Runde 3, die letzte, nach der vorab festgelegten Regel (`docs/muster-endspiel-dagger.md` §4, §7) |
 | Endspiel-Muster, Datenaggregation Runde 3, die letzte (in GitHub Actions): Tabelle T3 spielt, GNU Go beschriftet 240 Partien, daraus T4 | Pilot gegen GNU Go, 60 ausgespielte Paare, Seed 210: T4 gegenüber dem Default −5,7 Punkte (95 %: [−20,4; +9,0], p = 0,44), T3 −7,0 ([−25,2; +11,2]); alle drei Piloten zusammen NEU − A −0,2 ([−9,4; +9,0], 180 Paare, p = 0,96); offline auf neuen Stellungen T4 vor T3 (Rang ≤ 16: 86,6 gegen 78,9 %), im Spiel nicht | negatives Ergebnis, die Reihe endet nach der vorab festgelegten Regel: kein Schalter auf `main`, keine Messung (`docs/muster-endspiel-dagger.md` §7, §8) |
 | Endspiel-Muster, Messung mit 240 Paaren gegen GNU Go (in GitHub Actions): letzte Tabelle T4, Gewicht 200 gegen Default, Seed 206 | Endstand B − A **−3,7** (95 %: [−10,7; +3,3], p = 0,30), Siege 132 gegen 149, nach Zug 120 +0,1; Median +6, Vorzeichentest B besser in 135 gegen 102 (p = 0,037), Mittelwert von wenigen großen Verlusten bestimmt | verworfen (Obergrenze unter +10): T4 wird nicht übernommen, die Reihe zum Endspiel-Muster ist abgeschlossen (`docs/muster-endspiel-messung.md` §4, §8) |
+| Endspiel-Muster, Orakel-Test (in GitHub Actions): GNU Go Stufe 10 zieht für die KI ab Zug 81 (in 25 %, 50 % oder allen Zügen) oder ab Zug 161 (in allen), 120 Paare je Arm gegen GNU Go, Seed 206 | Endstand gegenüber Arm A (+22,9, 79 Siege): **D100 +78,7** (95 %: [+68,5; +88,9], 120 Siege), D50 +32,8, D25 +21,3, E100 +34,4, alle p < 0,001; ein geänderter Zug ist im Mittel +1,60 Punkte wert (vorab erwartet 0,6), die KI trifft den Orakelzug in rund 25 % ihrer Züge; der Gewinn hängt nicht am früheren Passen (die Stellung nach dem ersten Pass ergibt den Endstand auf ±1 Punkt) | Spielraum belegt, keine Änderung an der Engine: Messlatte für einen stärkeren Lerner ist ein Zuwachs von 4,0 Prozentpunkten bei den gespielten Zügen für +5 Punkte; T4 mit 2 bis 3 Prozentpunkten wäre rund +3 Punkte wert gewesen, unter der Nachweisgrenze von M1 (`docs/muster-endspiel-orakel.md` §4, §8) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2401,6 +2402,24 @@ gegen GNU Go mit der letzten Tabelle, 10 Minuten. Ergebnis **B − A −3,7**
 Punkte ausgeschlossen: **verworfen**. Der Median liegt bei +6, der Mittelwert
 wird von wenigen großen Verlusten bestimmt (102 schlechtere Paare im Mittel
 −52,6, 135 bessere +33,2).
+
+Danach der **Orakel-Test** (19 Minuten, GitHub Actions,
+[`docs/muster-endspiel-orakel.md`](docs/muster-endspiel-orakel.md)): Er misst,
+wie viel in besseren Zügen steckt. Ein zweites GNU Go (Stufe 10) zieht für die
+KI ab Zug 81 in 25 %, 50 % oder allen ihrer Züge, oder ab Zug 161 in allen; 120
+Paare je Arm gegen GNU Go Stufe 1 mit neun Vorgabesteinen. Arm A ohne Orakel
+endet bei +22,9 mit 79 Siegen, **D100 bei +101,7 mit 120 Siegen, Differenz
++78,7** (95 %: [+68,5; +88,9]), D50 bei +32,8, D25 bei +21,3, E100 bei +34,4,
+alle p < 0,001. Ein vom Orakel geänderter Zug ist im Mittel rund 1,6 Punkte wert
+(vorab erwartet: 0,6); ohne Tabelle trifft die KI den Orakelzug in rund 25 %
+ihrer Züge. Ein Lerner müsste die gespielten Züge um 4,0 Prozentpunkte
+treffsicherer machen, um +5 Punkte zu bringen. T4 mit seinen 2 bis 3
+Prozentpunkten wäre rechnerisch rund +3 Punkte wert gewesen, weniger, als M1
+erkennen konnte; das passt zu M1, ohne es zu bestätigen. Der Gewinn hängt nicht
+am früheren Passen des Orakels (die Stellung nach dem ersten Pass ergibt den
+Endstand auf einen Punkt genau). Das sagt, dass es etwas zu holen gibt, nicht
+dass sich ein Lerner es holt; die Engine bleibt unverändert, der nächste Schritt
+wäre ein stärkerer Lerner offline, mit der Messlatte als Tor.
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
