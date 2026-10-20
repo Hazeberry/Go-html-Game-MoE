@@ -165,3 +165,49 @@ Jobs: `pruefen` (Eingaben), `teil` (16 Teile: beschriften und ziehen lassen,
 Workflow auf den Branch `ergebnisse/endspiel-lerner-lauf<N>` unter
 `docs/daten/endspiel-lerner/lauf<N>/`. Nur der letzte Job darf ins Repo
 schreiben. Erwartet werden 20 bis 40 Minuten.
+
+## 8. Nachtrag: Ergebnis der Prüfung, Tor bestanden (20.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #1 des Workflows `endspiel-lerner.yml`
+([Run 39378250135](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/39378250135)),
+auf dem Merge-Commit `526e01a` von `main`, mit den Eingaben aus §7, in 15 Minuten
+(06:04 bis 06:19 UTC). GNU Go Stufe 10 beschriftete 19 222 Stellungen aus den
+Partien 2 bis 240. Die Ergebnisse stehen unter
+[`daten/endspiel-lerner/lauf1/`](daten/endspiel-lerner/lauf1/): der Bericht, die
+beschrifteten Stellungen und je Stellung die Züge ohne und mit Lerner.
+
+| Stellungen | n | trifft ohne Lerner | mit Lerner | Differenz | nur mit / nur ohne | geändert | bester Netzzug | Zug in der Partie |
+|---|---:|---:|---:|---:|---|---:|---:|---:|
+| **alle** | 19 222 | 18,1 % | **34,9 %** | **+16,8** | 3 676 / 443 | 48,0 % | 39,3 % | 17,9 % |
+| Zug 81–160 | 9 550 | 18,6 % | 41,9 % | +23,2 | 2 444 / 226 | 49,1 % | 48,1 % | 18,6 % |
+| ab Zug 161 | 9 672 | 17,5 % | 28,0 % | +10,5 | 1 232 / 217 | 47,0 % | 30,6 % | 17,2 % |
+
+McNemar, exakt: p < 10⁻³⁰⁰ für alle Stellungen.
+
+**Tor nach §4: bestanden.** Die Differenz liegt mit +16,8 Prozentpunkten weit über
++4,0. Das Ergebnis der Entwicklungsdaten (+15,6) bestätigt sich auf Partien,
+die kein Lerner gesehen hat. Damit folgt Schritt 2 mit eigener
+Vorabfestlegung: das Netz als Schalter in `index.html` (Default 0), dann die
+Messung im Spiel nach der Hausregel, in Actions.
+
+**Gegen die Erwartung aus §5.** Die Erwartung stand vor der Prüfung und bleibt
+stehen. Getroffen haben: ohne Lerner 18,1 % (erwartet 19 bis 25 %), mit Lerner
+34,9 % (erwartet 30 bis 35 %), Tor bestanden. Höher als erwartet war die
+Differenz mit +16,8 (erwartet +8 bis +15); der Abstand zu den
+Entwicklungsdaten blieb aus.
+
+**Was das heißt, und was nicht.**
+
+- Der Lerner ändert fast jeden zweiten Zug ab Zug 81. In 3 676 Stellungen
+  trifft er GNU Gos Zug, wo die KI ihn verfehlte. In 443 verfehlt er ihn, wo die
+  KI ihn traf.
+- Nach der Messlatte aus dem Orakel-Test (s × n × q = 1,60 × 79,1 × 0,168)
+  wären das rund **+21 Punkte**. Das ist nur eine Größenordnung. Die Messlatte
+  zählt Züge, die durch genau GNU Gos Zug ersetzt werden. Hier wird aber die
+  Hälfte der geänderten Züge zu einem anderen Zug, und ob der besser ist als
+  der alte, sieht diese Prüfung nicht.
+- Im Spiel laufen die Partien in andere Stellungen. Bei den Tabellen hat genau
+  das den Vorsprung aufgezehrt (§6). Erst Schritt 2 sagt, ob der Lerner Punkte
+  bringt.
+- Im frühen Endspiel (Zug 81–160) ist der Vorsprung doppelt so groß wie danach.
+  Der beste Netzzug allein trifft dort in 48 % der Stellungen.
