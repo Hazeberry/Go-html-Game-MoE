@@ -1,0 +1,5 @@
+22 Stellungen (Zug 100, 150, 200 aus 8 Partien), Zeitbudget 1800 ms
+Netz allein (Ebenen + Vorwärtsrechnung): Median 43 ms, größter Wert 76 ms
+Ganzer Zug ohne Netz: Median 1814 ms, 4527 Simulationen
+Ganzer Zug mit Netz:  Median 1855 ms, 4619 Simulationen
+Unterschied: 41 ms je Zug, Simulationen 102 % von ohne Netz
