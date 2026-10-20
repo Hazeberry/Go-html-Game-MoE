@@ -1977,8 +1977,11 @@ globalThis.PARAMS = {
      Prior der Wurzelkinder (0 = aus), so viele beste Netzpunkte kommen unter
      die Kandidaten, ab dieser Zugzahl. Offline geprüft (docs/endspiel-
      lerner.md §8): die gespielten Züge treffen GNU Gos Zug mit 0,5 in 34,9 %
-     statt 18,1 %. Ob das Punkte bringt, misst docs/endspiel-netz.md. */
-  endspielNetz:      0,
+     statt 18,1 %.
+     GEMESSEN (docs/endspiel-netz.md §8, 240 Paare gegen GNU Go, Seed 213):
+     0,5 gegen 0 +46,9 [+40,4; +53,4], Siege 227 gegen 149 von 240; im
+     Selbstspiel 83,1 % von 360. Deshalb Default 0,5. */
+  endspielNetz:      0.5,
   endspielNetzTop:   4,
   endspielNetzAb:   80,
   /* Adaptives Zeitbudget (Tin/GLM-Vorschlag, stufenlos statt Sprungfunktion).

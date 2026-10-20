@@ -120,3 +120,58 @@ Jobs: `pruefen`, `spielen` (A und N × 16 Teile), `kontrolle` (ein Teil),
 auf den Branch `ergebnisse/endspiel-netz-lauf<N>` unter
 `docs/daten/endspiel-netz/lauf<N>/`. Nur der letzte Job darf ins Repo
 schreiben. Erwartet werden 20 bis 40 Minuten.
+
+## 8. Nachtrag: Ergebnis der Messung, Default 0,5 (20.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #1 des Workflows `endspiel-netz.yml`
+([Run 39382667707](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/39382667707)),
+auf dem Merge-Commit `c9e76fc` von `main`, mit den Eingaben aus §7, in 21 Minuten
+(06:50 bis 07:11 UTC). Alle 495 Partien gegen GNU Go und 360 im Selbstspiel
+ausgespielt, keine abgebrochen. Daten:
+[`daten/endspiel-netz/lauf1/`](daten/endspiel-netz/lauf1/).
+
+**Kontrolle.** Arm K gibt Arm A der Parameter-Reihe in **15 von 15** Partien
+wieder. Der Schalter bei 0 ändert also auch in ganzen Partien nichts.
+
+**M1** (240 Paare, Seed 213):
+
+| Arm | Endstand Ø | Siege | Züge Ø |
+|---|---:|---:|---:|
+| A (Default) | +18,9 | 149 | 242,0 |
+| N (`endspielNetz` 0,5) | **+65,9** | **227** | 253,4 |
+
+| Vergleich | Differenz | 95 % | p | Hälfte 1 / 2 | nach Zug 120 | nach Zug 200 |
+|---|---:|---|---:|---|---:|---:|
+| **N − A** | **+46,9** | [+40,4; +53,4] | 1,0 · 10⁻³³ | +43,8 / +50,1 | +7,5 | +45,4 |
+
+Siege: In 81 Paaren gewinnt nur N, in 3 nur A (McNemar p = 1,0 · 10⁻²⁰). Median
+der Differenz +44, Vorzeichentest 192 gegen 42.
+
+**M2** (N gegen A im Selbstspiel, 360 Partien): N gewinnt **299, also 83,1 %**
+[78,8 %; 86,6 %], p = 8,2 · 10⁻³⁹. **Nicht unter 50 %.**
+
+**Entscheidung nach §4: Default `endspielNetz` = 0,5.** N ist signifikant besser,
+und M2 liegt nicht unter 50 %. Das ist der größte gemessene Gewinn des Projekts
+seit den Mustern (+102,8).
+
+**Gegen die Erwartung aus §5.** Erwartet waren +3 bis +15 Punkte. Gemessen sind
++46,9, mehr als das Doppelte der Vorhersage aus der Messlatte des Orakel-Tests
+(rund +21). Die Prüfung offline hat den Gewinn also unterschätzt, nicht
+überschätzt wie bei den Tabellen. Eine Erklärung, ohne Beleg: Das Netz ändert die
+Partien so, dass die KI weniger Gebiet verschenkt, und die Wirkung summiert sich
+über rund 80 Züge.
+
+**Sekundär, ohne Anspruch.**
+- Der Vorsprung wächst über die Partie: +7,5 nach Zug 120, +45,4 nach Zug 200.
+- Die Partien dauern 11 Züge länger.
+- In M2 gibt A in 252 Partien auf, N in 27. Von den 81 ausgezählten Partien
+  gewinnt N 47 (58 %). Ein Teil des Vorsprungs im Selbstspiel kommt also aus
+  Aufgaben. Für die Regel zählt nur, dass N nicht unter 50 % liegt, und das ist
+  deutlich erfüllt.
+
+**Was offen bleibt.**
+- Im Browser kostet das Netz rund 0,1 s je Zug ab Zug 81.
+- Gemessen ist nur λ = 0,5 und Top 4.
+- Lehrer und Gegner sind GNU Go. Ein Teil des Gewinns kann daher kommen, dass
+  die KI GNU Gos Züge vorwegnimmt.
+- Für ältere Läufe heißt „Default“ seit diesem Commit auch `endspielNetz` = 0,5.

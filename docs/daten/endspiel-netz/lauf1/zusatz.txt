@@ -1,0 +1,4 @@
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 242.0, B Ø 253.4
+Median der Differenz B − A: +44,0
+Vorzeichentest: B besser in 192 Paaren, schlechter in 42, gleich in 6 · p = 0,0000 (zweiseitig, exakt)

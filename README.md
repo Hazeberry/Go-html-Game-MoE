@@ -275,6 +275,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | `mctsPriorSharp` 9 nachgemessen, frischer Seed (480 Paare gegen GNU Go, dazu 15, 30 und 9 erst ab Zug 120; Selbstspiel 360 Partien, 20.10.) | gegen GNU Go **+7,3** [+2,1; +12,5], p = 0,0064, Siege 365 gegen 304; 15: +12,7, 30: +3,9, ab Zug 120: −0,3; **im Selbstspiel 25,6 %** (p = 4 · 10⁻²¹), 213 der 268 Niederlagen eigene Aufgaben | kein Default nach der vorab festgelegten Regel (M1 und M2 widersprechen sich); untersuchen, vermutlich gibt der schärfere Prior zu früh auf (`docs/prior-nachmessung.md` §8) |
 | `bensonDeathTransfer` 1 gegen GNU Go (240 Paare, Selbstspiel 360, 20.10.) | −0,8 [−2,4; +0,7], 50,8 % im Selbstspiel | verworfen, Default 0 (`docs/prior-nachmessung.md` §8) |
 | Endspiel-Lerner, Schritt 1 (offline, GitHub Actions): ein kleines Faltungsnetz greift an der Wurzel ab Zug 81 ein (4 beste Netzzüge in die Kandidaten, Prior zur Hälfte vom Netz) | 19 222 frische Stellungen (Seed 206): die gespielten Züge treffen GNU Gos Zug (Stufe 10) in **34,9 % statt 18,1 %**, +16,8 Prozentpunkte (Zug 81–160: +23,2, ab 161: +10,5); 48 % der Züge ändern sich | Tor (+4,0) bestanden: Schritt 2 folgt, Schalter in `index.html` und Messung im Spiel; ob Treffer Punkte werden, ist offen (`docs/endspiel-lerner.md` §8) |
+| **`endspielNetz` 0,5 (Endspiel-Netz im Spiel, Schritt 2; 240 Paare gegen GNU Go, Selbstspiel 360, 20.10.)** | **Endstand +46,9** [+40,4; +53,4], p = 10⁻³³, Siege 227 gegen 149 von 240; Selbstspiel 83,1 %; Kontrolle 15 von 15 | **Default 0,5** (`docs/endspiel-netz.md` §8) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2479,10 +2480,19 @@ Schärfe 15 lag bei +12,7, 30 bei +3,9; die Idee, erst ab Zug 120 schärfer zu
 werden, trägt nicht (−0,3). `bensonDeathTransfer` ist jetzt auch gegen GNU Go
 gemessen: −0,8 [−2,4; +0,7], verworfen.
 
+**Das Endspiel-Netz (20.10.).** Ein kleines Faltungsnetz, gelernt an 80 474
+von GNU Go Stufe 10 beschrifteten Endspielstellungen, greift ab Zug 81 an der
+Wurzel ein: Die 4 besten Netzpunkte kommen unter die Kandidaten, und der Prior
+kommt zur Hälfte vom Netz. Offline trafen die gespielten Züge GNU Gos Zug in
+34,9 % statt 18,1 % ([`docs/endspiel-lerner.md`](docs/endspiel-lerner.md)). Im
+Spiel bringt es **+46,9 Punkte** [+40,4; +53,4] und 227 statt 149 Siege von
+240, im Selbstspiel 83,1 % ([`docs/endspiel-netz.md`](docs/endspiel-netz.md)).
+Seitdem ist `endspielNetz` = 0,5 Default. Alles lief in GitHub Actions.
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
 09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1, seit dem 11.10. auch
-`musterGewicht` = 200.
+`musterGewicht` = 200, seit dem 20.10. auch `endspielNetz` = 0,5.
 
 Seit dem 13.10. (Code-Review, Merge `7b05a74`) kennt die Suche den
 Ko-Punkt. Das ändert Züge, ohne dass ein Parameter es abschaltet: Von 240

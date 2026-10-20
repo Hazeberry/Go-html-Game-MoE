@@ -1,0 +1,1 @@
+N: B (mctsFixedSims=120,endspielNetz=0.5) gegen A (mctsFixedSims=120) · 360 Partien in 12 Teilen (Seeds 20261401 bis 20261412) · B gewinnt 299, 83,1 %, 95 %: [78,8 %; 86,6 %], p = 8,2 · 10⁻39 (exakt, zweiseitig) · B als Schwarz 160 von 180, als Weiß 139 von 180 · Aufgaben 279 · Züge Ø 260,8 → signifikant über 50 %
