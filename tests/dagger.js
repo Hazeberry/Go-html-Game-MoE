@@ -25,6 +25,12 @@
      7. Die Zusatzrechnung zum Passen (orakel-nachspiel.js): erster Pass,
         Zählung aus Sicht der KI, Zusammenfassung. Das Nachspielen in GNU Go
         prüft tests/gnugo-bruecke.js.
+     8. Die Parameter-Reihe (docs/parameter-reihe.md): Workflow, Arme in
+        Skript, Workflow und Dokument stimmen überein, jeder geänderte
+        Parameter steht in index.html; der Bericht urteilt nach der vorab
+        festgelegten Regel und prüft die Negativkontrolle; 16 Teile je Arm
+        (N: 2) werden zu einem Bericht, unvollständige Teile abgelehnt. Die
+        Pass-Sonde (pass-sonde.js) findet ihre Stelle in index.html.
 
    Aufruf:  node tests/dagger.js */
 'use strict';
@@ -36,6 +42,8 @@ const B = require('../auswertung/endspiel-pilot-bericht.js');
 const Z = require('../auswertung/messung-zusatz.js');
 const O = require('../auswertung/orakel-bericht.js');
 const N = require('../auswertung/orakel-nachspiel.js');
+const P = require('../auswertung/parameter-bericht.js');
+const PS = require('../auswertung/pass-sonde.js');
 
 const wurzel = path.join(__dirname, '..');
 const temp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'dagger-'));
@@ -117,6 +125,13 @@ test('Skripte lehnen falsche Eingaben ab, ehe sie etwas tun', () => {
   pruefeGleich(lauf('orakel-ergebnis.sh').status, 1, 'orakel-ergebnis.sh: Seed fehlt');
   pruefeGleich(lauf('orakel-ergebnis.sh', '206', 'gibt-es-nicht.jsonl.gz').status, 2, 'orakel-ergebnis.sh: Kontrolldatei fehlt');
   pruefeGleich(lauf('orakel-ergebnis.sh', '206').status, 1, 'orakel-ergebnis.sh: keine Teile');
+  pruefeGleich(lauf('parameter-spielen.sh', 'X9', '1', '206', 'x.jsonl').status, 2, 'parameter-spielen.sh: unbekannter Arm');
+  pruefeGleich(lauf('parameter-spielen.sh', 'A', 'a', '206', 'x.jsonl').status, 2, 'parameter-spielen.sh: Zahl erwartet');
+  pruefeGleich(lauf('parameter-spielen.sh', 'A', '1', '206').status, 1, 'parameter-spielen.sh: Argument fehlt');
+  pruefeGleich(lauf('parameter-spielen.sh', '--ki', 'X9').status, 2, 'parameter-spielen.sh --ki: unbekannter Arm');
+  pruefeGleich(lauf('parameter-ergebnis.sh').status, 1, 'parameter-ergebnis.sh: Seed fehlt');
+  pruefeGleich(lauf('parameter-ergebnis.sh', '206', 'gibt-es-nicht.jsonl.gz').status, 2, 'parameter-ergebnis.sh: Kontrolldatei fehlt');
+  pruefeGleich(lauf('parameter-ergebnis.sh', '206').status, 1, 'parameter-ergebnis.sh: keine Teile');
 });
 
 /* Workflows: Eingaben des Dispatch-Formulars nur in env-Blöcken, in run-Blöcken kein ${{ }} */
@@ -144,6 +159,7 @@ function pruefeShellZeilen(datei, mindestensRun, eingaben) {
 test('Workflow endspiel-dagger.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-dagger.yml', 15, 8));
 test('Workflow endspiel-messung.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-messung.yml', 6, 4));
 test('Workflow endspiel-orakel.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-orakel.yml', 5, 2));
+test('Workflow parameter-reihe.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('parameter-reihe.yml', 5, 2));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
 
@@ -393,6 +409,157 @@ test('Nachspiel-Zusatz: erster Pass, Zählung aus Sicht der KI, Zusammenfassung'
   pruefeNah(a.endeMittel, 40 / 3, 1e-12, 'Endstand Ø über alle Partien');
   const t = N.text('X', a);
   pruefe(/^X: 3 Partien · Nachrechnung gleich der Aufzeichnung: 2 von 3/.test(t) && /\+2,00/.test(t) && /1 Partien ohne Pass/.test(t), 'Textzeile: ' + t);
+});
+/* ── Parameter-Reihe (docs/parameter-reihe.md) ─────────────────────────── */
+
+/* Arme aus parameter-arme.sh: Reihenfolge und geänderte Parameter */
+function parameterArme() {
+  const t = fs.readFileSync(path.join(wurzel, 'auswertung', 'dagger', 'parameter-arme.sh'), 'utf8');
+  const reihe = (/^ARM_REIHE=\(([^)]*)\)/m.exec(t) || [])[1].trim().split(/\s+/);
+  const ki = {};
+  for (const m of t.matchAll(/^\s+\[([A-Za-z0-9]+)\]="([^"]*)"/gm)) ki[m[1]] = m[2];
+  return {reihe, ki};
+}
+
+test('Workflow parameter-reihe.yml: Aufbau, Arme und Vorgaben wie in der Vorabfestlegung', () => {
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'parameter-reihe.yml'), 'utf8');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'parameter-reihe.md'), 'utf8');
+  const {reihe, ki} = parameterArme();
+  pruefe(/^on:\n  workflow_dispatch:/m.test(t), 'nur manuell gestartet');
+  for (const job of ['pruefen', 'spielen', 'ergebnis']) pruefe(new RegExp(`^  ${job}:$`, 'm').test(t), `Job ${job}`);
+  pruefe(/^permissions:\n  contents: read$/m.test(t), 'Standard: nur lesen');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefe(/ergebnis:[\s\S]*permissions:\n      contents: write/.test(t), 'das Schreibrecht hat der Ergebnisjob');
+  /* Arme der Matrix = Arme des Skripts, die Negativkontrolle N nur mit zwei Teilen */
+  const matrixArme = (/arm: \[([A-Za-z0-9, ]+)\]/.exec(t) || [])[1].split(',').map(a => a.trim());
+  pruefeGleich(matrixArme.join(','), reihe.filter(a => a !== 'N').join(','), 'Arme der Matrix = Arme von parameter-arme.sh ohne N');
+  pruefeGleich((/von: \[([0-9, ]+)\]/.exec(t) || [])[1].split(',').map(Number).join(','), TEILE.join(','), '16 Teile zu je 15 Partien (Partien 1 bis 240)');
+  pruefe(/include:\n\s+- arm: N\n\s+von: 1\n\s+- arm: N\n\s+von: 16\n/.test(t), 'N spielt nur die Teile 1 und 16');
+  const jobs = matrixArme.length * TEILE.length + 2;
+  pruefe(doc.includes(`${jobs} Jobs`) && t.includes(`${jobs} Jobs`), `${jobs} Jobs im Dokument und im Workflow`);
+  pruefe(/parameter-spielen\.sh "\$ARM" "\$VON" "\$SEED" /.test(t), 'ein Teil je Arm und Beginn');
+  const tests = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'tests.yml'), 'utf8');
+  for (const a of ['actions/checkout', 'actions/setup-node']) {
+    const ver = x => (x.match(new RegExp(a + '@(v[0-9]+)')) || [])[1];
+    pruefe(ver(t) && ver(t) === ver(tests), `${a} in derselben Version wie tests.yml`);
+  }
+  /* Vorgaben des Formulars = Eingaben in docs/parameter-reihe.md §7 */
+  for (const name of ['seed', 'kontrolle']) {
+    const imDoc = (new RegExp('^\\| `' + name + '` \\| `?([^` |]+)', 'm').exec(doc) || [])[1];
+    const imFlow = (new RegExp('^      ' + name + ':\\n(?:        .*\\n)*?        default: \'([^\']*)\'', 'm').exec(t) || [])[1];
+    pruefe(imDoc !== undefined && imDoc === imFlow, `Vorgabe ${name}: Dokument „${imDoc}“, Workflow „${imFlow}“`);
+  }
+  /* die Arme im Skript sind die Arme im Dokument, und jeder geänderte Parameter gibt es in index.html */
+  const html = fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8');
+  pruefeGleich(reihe.join(','), 'A,N,RAUS,R30,R3000,S0,S1,S9,B0,B24,P300,PNIE', 'zwölf Arme in der Reihenfolge der Tabelle');
+  for (const arm of reihe) {
+    const zeile = new RegExp('^\\| \\*\\*' + arm + '\\*\\* \\| (.*?) \\|', 'm').exec(doc);
+    pruefe(zeile, `Arm ${arm} steht im Dokument`);
+    pruefeGleich(zeile[1] === 'nichts' ? '' : zeile[1].replace(/`/g, ''), ki[arm], `Arm ${arm}: Parameter im Dokument = Skript`);
+    const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-spielen.sh'), '--ki', arm], {encoding: 'utf8'});
+    pruefeGleich(r.status, 0, `Arm ${arm}: --ki läuft`);
+    pruefeGleich(r.stdout.trim(), 'mctsFixedSims=120,resignEnabled=0' + (ki[arm] ? ',' + ki[arm] : ''), `Arm ${arm}: --ki-Angabe`);
+    for (const kv of ki[arm].split(',').filter(Boolean)) {
+      const key = kv.split('=')[0];
+      pruefe(new RegExp('^  ' + key + ':\\s', 'm').test(html), `${key} (Arm ${arm}) ist ein Parameter in index.html`);
+    }
+  }
+});
+
+test('Parameter-Bericht: Urteil nach der vorab festgelegten Regel, Negativkontrolle', () => {
+  const g = (diff, p, hi) => ({diff, p, hi});
+  pruefeGleich(P.urteil(g(12, 0.001, 20), 0.005), 'besser: Kandidat', 'besser unter alpha');
+  pruefeGleich(P.urteil(g(-12, 0.001, -4), 0.005), 'schlechter', 'schlechter unter alpha');
+  pruefeGleich(P.urteil(g(9, 0.02, 16), 0.005), 'Hinweis: besser', 'besser, nur unter 0,05');
+  pruefeGleich(P.urteil(g(-9, 0.02, -1), 0.005), 'Hinweis: schlechter', 'schlechter, nur unter 0,05');
+  pruefeGleich(P.urteil(g(9, 0.005, 16), 0.005), 'Hinweis: besser', 'p genau alpha ist noch kein Kandidat');
+  pruefeGleich(P.urteil(g(2, 0.5, 9.9), 0.005), 'verworfen: kein Gewinn von 10', 'Obergrenze unter +10');
+  pruefeGleich(P.urteil(g(2, 0.5, 10.1), 0.005), 'nicht belegt', 'Obergrenze über +10');
+  pruefeGleich(P.urteil(g(-30, 0.5, 5), 0.005), 'verworfen: kein Gewinn von 10', 'ein schlechter, aber nicht belegter Arm mit niedriger Obergrenze');
+  pruefeGleich(P.urteil(null, 0.005), 'zu wenige Paare', 'ohne Paare');
+  /* Negativkontrolle: gleiche Zugfolge und gleicher Endstand */
+  const rec = (nr, endstand, zuege) => [nr, {nr, endstand, zuegeAnzahl: zuege.length, zuege}];
+  const ref = new Map([rec(1, 5, ['a', 'b']), rec(2, 6, ['a', 'c']), rec(3, 7, ['x'])]);
+  const arm = new Map([rec(1, 5, ['a', 'b']), rec(2, 6, ['a', 'd']), rec(3, 7, ['x']), rec(4, 1, ['y'])]);
+  const k = P.gleiche(ref, arm);
+  pruefeGleich(k.n, 3, 'drei Partien in beiden'); pruefeGleich(k.gleich, 2, 'zwei gleich, bei einer weicht ein Zug ab');
+});
+
+/* Synthetische Partien: Endstand von A = ((nr·37) mod 101) − 50; ein Arm liegt um sein delta darüber, dazu ein Rauschen (nr mod 5) − 2 mit Mittel 0 über 240 Partien; N ist eine Kopie von A */
+const PARAMETER_DELTA = {RAUS: -20, R30: 0, R3000: 20, S0: 0, S1: 0, S9: 0, B0: 0, B24: 0, P300: 0, PNIE: 0};
+function parameterTeile(verzeichnis, ohne) {
+  const dir = path.join(verzeichnis, 'parameter');
+  fs.mkdirSync(dir, {recursive: true});
+  for (const arm of parameterArme().reihe) for (const von of arm === 'N' ? TEILE.slice(0, 2) : TEILE) {
+    if (ohne === `${arm}-${von}`) continue;
+    const zeilen = [];
+    for (let nr = von; nr < von + 15; nr++) {
+      const a = ((nr * 37) % 101) - 50, endstand = PARAMETER_DELTA[arm] === undefined ? a : a + PARAMETER_DELTA[arm] + ((nr % 5) - 2);
+      zeilen.push(JSON.stringify({nr, beginnt: 'W', wirFarbe: 'S', endstand, gewonnen: endstand > 0, zuegeAnzahl: 4, zuege: ['a' + nr, 'b' + nr, 'pass', 'pass'], schaetzung: {120: endstand / 2, 200: endstand}}));
+    }
+    if (ohne === `${arm}-${von}-kurz`) zeilen.pop();
+    fs.writeFileSync(path.join(dir, `${arm}-${von}.jsonl`), zeilen.join('\n') + '\n');
+  }
+}
+
+test('Bericht der Parameter-Reihe: 16 Teile je Arm zu einem Bericht, Kontrolle, Negativkontrolle, Rohdaten gepackt', () => {
+  const d = temp();
+  parameterTeile(d);
+  /* Kontrolle gegen sich selbst: Arm A der Partien 1 bis 240, gepackt */
+  const a = []; for (const v of TEILE) a.push(fs.readFileSync(path.join(d, 'parameter', `A-${v}.jsonl`), 'utf8'));
+  fs.writeFileSync(path.join(d, 'kontrolle.jsonl.gz'), require('zlib').gzipSync(a.join('')));
+  const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-ergebnis.sh'), '206', 'kontrolle.jsonl.gz'], {cwd: d, encoding: 'utf8'});
+  pruefeGleich(r.status, 0, 'Bericht läuft durch: ' + (r.stderr || '').slice(0, 300));
+  const lies = f => fs.readFileSync(path.join(d, 'ergebnisse', f), 'utf8');
+  pruefe(/Parameter-Reihe: 240 Paare je Arm/.test(lies('bericht.md')) && /Seed 206/.test(lies('bericht.md')), 'Kopf des Berichts');
+  const md = lies('parameter.md');
+  pruefe(/\| RAUS \| `raveEnabled=0` \| 240 \| 0 \|/.test(md), 'Tabelle der Arme mit Parameter');
+  pruefe(/\| \*\*RAUS\*\* \| 240 \| \*\*−20,0\*\* .* \| schlechter \|/.test(md), 'RAUS: schlechter');
+  pruefe(/\| \*\*R3000\*\* \| 240 \| \*\*\+20,0\*\* .* \| besser: Kandidat \|/.test(md), 'R3000: Kandidat');
+  pruefe(/\| \*\*PNIE\*\* \| 240 \| \*\*\+0,0\*\* .* \| verworfen: kein Gewinn von 10 \|/.test(md), 'PNIE: verworfen');
+  pruefe(/\| \*\*PNIE\*\* .* \| 48 von 240 \| verworfen/.test(md), 'Spalte „Zug für Zug gleich A“: nur die 48 Partien ohne Rauschen sind gleich');
+  pruefe(!/\| \*\*N\*\* \|/.test(md), 'N steht nicht unter den Vergleichen');
+  pruefe(/Negativkontrolle N: 30 von 30 Partien Zug für Zug gleich Arm A/.test(md), 'Negativkontrolle 30 von 30');
+  pruefe(/Kontrolle gegen kontrolle\.jsonl\.gz, Arm A: 240 von 240/.test(md), 'Kontrolle 240 von 240');
+  const z = lies('zusatz.txt');
+  pruefe(/== RAUS gegen A/.test(z) && /== PNIE gegen A/.test(z) && !/== N gegen A/.test(z) && /Median der Differenz B − A: −20,0/.test(z), 'Zusatzzahlen je Arm, ohne N');
+  for (const arm of parameterArme().reihe) {
+    const roh = require('zlib').gunzipSync(fs.readFileSync(path.join(d, 'ergebnisse', `${arm}.jsonl.gz`))).toString().trim().split('\n');
+    pruefeGleich(roh.length, arm === 'N' ? 30 : 240, `Rohdaten von ${arm}: ${arm === 'N' ? 30 : 240} Partien`);
+  }
+  /* fehlende oder unvollständige Teile */
+  for (const [ohne, muster] of [['S9-61', /S9-61\.jsonl fehlt/], ['R30-226-kurz', /R30-226\.jsonl hat nicht 15 Partien/], ['N-16', /N-16\.jsonl fehlt/]]) {
+    const e = temp();
+    parameterTeile(e, ohne);
+    const x = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-ergebnis.sh'), '206'], {cwd: e, encoding: 'utf8'});
+    pruefeGleich(x.status, 1, `${ohne}: Abbruch`);
+    pruefe(muster.test(x.stderr), `${ohne}: Meldung „${(x.stderr || '').trim()}“`);
+    pruefe(!fs.existsSync(path.join(e, 'ergebnisse', 'bericht.md')), `${ohne}: kein Bericht`);
+  }
+  /* weicht eine Partie von N ab, steht das im Bericht */
+  const f = temp();
+  parameterTeile(f);
+  const nDatei = path.join(f, 'parameter', 'N-1.jsonl');
+  fs.writeFileSync(nDatei, fs.readFileSync(nDatei, 'utf8').replace('"zuege":["a3","b3"', '"zuege":["a3","zzz"'));
+  const y = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-ergebnis.sh'), '206'], {cwd: f, encoding: 'utf8'});
+  pruefeGleich(y.status, 0, 'Bericht läuft auch bei abweichender Negativkontrolle');
+  pruefe(/Negativkontrolle N: 29 von 30 Partien/.test(fs.readFileSync(path.join(f, 'ergebnisse', 'parameter.md'), 'utf8')), 'abweichende Partie in N wird gezählt');
+});
+
+test('Pass-Sonde: Protokollzeile an der Pass-Prüfung, Zählung der Werte', () => {
+  const html = fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8');
+  const g = PS.gepatcht(html);
+  pruefe(g.length > html.length && g.includes("console.error('BEST '"), 'die Kopie bekommt die Protokollzeile');
+  pruefeGleich(g.replace(/  if \(mc > 40 && diff === 'hard'\) console\.error\('BEST ' \+ mc \+ ' ' \+ best \+ ' ' \+ scored\.length\);\n/, ''), html, 'sonst bleibt index.html unverändert');
+  let fehler = '';
+  try { PS.gepatcht('kein index.html'); } catch (e) { fehler = e.message; }
+  pruefe(/nicht genau einmal/.test(fehler), 'fehlt die Stelle, bricht die Sonde ab');
+  pruefeGleich(PS.lies('BEST 90 120.5 60\nanderes\nBEST 200 -60 40\n').map(z => `${z.mc}:${z.best}:${z.kandidaten}`).join(' '), '90:120.5:60 200:-60:40', 'Zeilen lesen');
+  const st = PS.statistik([{mc: 79, best: 5}, {mc: 81, best: 10}, {mc: 82, best: 100}, {mc: 90, best: 400}, {mc: 100, best: 1000}]);
+  pruefeGleich(st.n, 4, 'nur Züge nach Zug 80'); pruefeGleich(st.median, 400, 'Median'); pruefeGleich(st.min, 10, 'Minimum'); pruefeGleich(st.max, 1000, 'Maximum');
+  const an = s => st.anteil.find(x => x.schwelle === s).anteil;
+  pruefeGleich(an(20), 0.25, 'Anteil unter 20'); pruefeGleich(an(100), 0.25, 'Anteil unter 100 (100 selbst nicht)'); pruefeGleich(an(200), 0.5, 'Anteil unter 200'); pruefeGleich(an(500), 0.75, 'Anteil unter 500');
+  pruefeGleich(PS.statistik([{mc: 50, best: 1}]), null, 'keine Züge nach Zug 80');
 });
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));
