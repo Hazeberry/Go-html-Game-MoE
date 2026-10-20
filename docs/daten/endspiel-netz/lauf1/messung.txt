@@ -1,0 +1,4 @@
+Arm A (Default): 240 Partien, 0 abgebrochen, Endstand Ø +18,9, Siege 149, Züge Ø 242,0
+Arm N (endspielNetz=0.5): 240 Partien, 0 abgebrochen, Endstand Ø +65,9, Siege 227, Züge Ø 253,4
+
+N − A: 240 Paare · Differenz +46,9 (SD 51,0), 95 %: [+40,4; +53,4], p = 1,0 · 10⁻33 · Hälften +43,8 / +50,1 · Siege 227 gegen 149 · nach Zug 120: +7,5 (p = 5,1 · 10⁻8) · Zug für Zug gleich A: 0 von 240 → besser: Kandidat
