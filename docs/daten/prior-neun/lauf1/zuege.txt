@@ -1,0 +1,3 @@
+nach Zug 120: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 81.3 · B Ø 79.8 · Differenz B − A -1.5 (SD 35.8) · t = -0.66, p = 0.5095
+nach Zug 200: 192 Paare (48 ohne Partner/abgebrochen) · A Ø 66.8 · B Ø 56.9 · Differenz B − A -9.9 (SD 52.5) · t = -2.61, p = 0.0098
+Endstand: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 63.4 · B Ø 52.0 · Differenz B − A -11.4 (SD 54.8) · t = -3.23, p = 0.0014

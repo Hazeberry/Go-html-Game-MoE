@@ -117,3 +117,52 @@ Jobs: `pruefen`, `spielen` (A und S9 × 16 Teile), `kontrolle` (ein Teil),
 `auswertung/dagger/prior-neun-ergebnis.sh`). Die Ergebnisse legt der Workflow auf
 den Branch `ergebnisse/prior-neun-lauf<N>` unter `docs/daten/prior-neun/lauf<N>/`.
 Erwartet werden 25 bis 45 Minuten.
+
+## 8. Nachtrag: Ergebnis der Prüfung, verworfen (20.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #1 des Workflows `prior-neun.yml`
+([Run 39388959861](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/39388959861)),
+auf dem Merge-Commit `76a0e28` von `main`, mit den Eingaben aus §7, in 34 Minuten
+(07:48 bis 08:22 UTC). Alle 495 Partien gegen GNU Go und 720 im Selbstspiel
+ausgespielt, keine abgebrochen. Daten:
+[`daten/prior-neun/lauf1/`](daten/prior-neun/lauf1/). Der Workflow legte sie
+wegen eines Fehlers im Pfad unter `daten/endspiel-neun/` ab; sie sind hierher
+verschoben, und der Pfad im Workflow ist korrigiert.
+
+**Kontrolle.** Arm A gibt Arm N der Messung des Endspiel-Netzes in **15 von 15**
+Partien wieder. Der heutige Default ist also genau der gemessene.
+
+| Messung | Ergebnis | 95 % | p |
+|---|---|---|---:|
+| **M1:** S9 − A gegen GNU Go (240 Paare) | **−11,4**, Siege 197 gegen 222 | [−18,4; −4,5] | 0,0014 |
+| **M2:** S9 im Selbstspiel ohne Aufgabe | **26,4 %** (95 von 360) | [22,1 %; 31,2 %] | 1,1 · 10⁻¹⁹ |
+| **M3:** S9 im Selbstspiel mit Aufgabe | **18,6 %** (67 von 360) | [14,9 %; 23,0 %] | 8,0 · 10⁻³⁵ |
+
+**Entscheidung nach §4: Default bleibt 3.** S9 ist gegen GNU Go signifikant
+**schlechter**, nicht besser. Die Obergrenze (−4,5) liegt unter 0. Schärfe 9 ist
+damit verworfen.
+
+**Die Vermutung zur Aufgabe ist widerlegt.** In der Nachmessung
+([`prior-nachmessung.md`](prior-nachmessung.md) §8) lag nahe, dass S9 im
+Selbstspiel nur zu früh aufgibt. Ohne Aufgabe gewinnt S9 aber nur 26,4 %, fast
+so wenig wie mit Aufgabe in der Nachmessung (25,6 %). S9 spielt gegen den
+Default im Selbstspiel schwächer, unabhängig von der Aufgabe. Die 45 zu 55 in
+den ausgezählten Partien der Nachmessung waren eine verzerrte Auswahl: Ausgezählt
+wurden nur die Partien, die S9 nicht vorher aufgegeben hatte.
+
+**Gegen die Erwartung aus §5.** Erwartet waren M1 +2 bis +8 und M2 nicht
+signifikant. Beides lag daneben. Getroffen haben M3 (deutlich unter 50 %) und die
+Kontrolle.
+
+**Was das heißt, ohne Anspruch.** Ohne Netz war S9 gegen GNU Go besser (+7,3, in
+zwei Seeds), mit Netz ist es schlechter (−11,4). Die Schärfe und das Netz wirken
+offenbar auf dieselbe Schwäche, den zu flachen Prior im Endspiel. Das Netz behebt
+sie besser, und die zusätzliche Schärfe schadet dann. Nach Zug 120 liegen beide
+Arme noch gleich (−1,5), der Rückstand entsteht danach (−9,9 nach Zug 200), also
+dort, wo das Netz wirkt. Belegt ist diese Erklärung nicht. Gegen den Default
+im Selbstspiel war S9 schon ohne Netz schwächer. GNU Go Stufe 1 hat diese
+Schwäche nur nicht ausgenutzt.
+
+**Sekundär.** Median der Differenz −4, Vorzeichentest 104 gegen 126 (p = 0,17).
+S9 spielt kürzere Partien (230,9 gegen 255,4 Züge). In M3 gibt S9 in 256 Partien
+auf, A in 31; ausgezählt gewinnt S9 36 von 73.
