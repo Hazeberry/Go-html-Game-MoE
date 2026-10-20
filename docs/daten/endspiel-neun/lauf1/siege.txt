@@ -1,0 +1,1 @@
+S9 gegen A: Siege 197 gegen 222 · nur S9 gewinnt 13, nur A gewinnt 38, beide 184, keiner 5 · McNemar (exakt) p = 0,0006
