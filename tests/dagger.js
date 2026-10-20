@@ -36,6 +36,14 @@
         der Schalter steht in index.html mit Default 0; der Bericht urteilt
         mit alpha 0,05, unvollständige Teile werden abgelehnt; die Treppen-
         Sonde (treppe-sonde.js) findet ihre vier Stellen in index.html.
+    10. Die Nachmessung der Prior-Schärfe und von bensonDeathTransfer
+        (docs/prior-nachmessung.md): Workflow, Arme in Skript, Workflow und
+        Dokument stimmen überein, die Vorgaben auch; die Skripte lehnen falsche
+        Eingaben ab; der Bericht prüft Stufe 1 mit alpha 0,05, Stufe 2 gegen S9
+        mit alpha 0,0167, die Umschaltung von PH, die Kontrolle und M2;
+        unvollständige Teile werden abgelehnt. Der Bericht des Selbstspiels
+        (selbstspiel-bericht.js) zählt richtig und lehnt unvollständige,
+        doppelte und fremde Teile ab.
 
    Aufruf:  node tests/dagger.js */
 'use strict';
@@ -50,6 +58,7 @@ const N = require('../auswertung/orakel-nachspiel.js');
 const P = require('../auswertung/parameter-bericht.js');
 const PS = require('../auswertung/pass-sonde.js');
 const TS = require('../auswertung/treppe-sonde.js');
+const SB = require('../auswertung/selbstspiel-bericht.js');
 
 const wurzel = path.join(__dirname, '..');
 const temp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'dagger-'));
@@ -172,6 +181,7 @@ test('Workflow endspiel-messung.yml: keine Ausdrücke in Shell-Zeilen', () => pr
 test('Workflow endspiel-orakel.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-orakel.yml', 5, 2));
 test('Workflow parameter-reihe.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('parameter-reihe.yml', 5, 2));
 test('Workflow benson-lebend.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('benson-lebend.yml', 5, 2));
+test('Workflow prior-nachmessung.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('prior-nachmessung.yml', 10, 4));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
 
@@ -675,6 +685,175 @@ test('Treppen-Sonde: vier Zähler an den Stellen von evaluateBoard, Auswertung',
   const s = TS.summe([z, z]);
   pruefeGleich(s.calls, 20, 'Summe der Aufrufe'); pruefeGleich(s.dtAlive, 120, 'Summe der Abzüge auf lebenden Ketten');
   pruefe(/davon mit lebender Treppen-Kette 4 \(50,0 %\)/.test(TS.zeile('Zusammen', s)) && /Anteil am Abzug 20,0 %/.test(TS.zeile('Zusammen', s)), 'Zeile: ' + TS.zeile('Zusammen', s));
+});
+
+/* ── Nachmessung Prior-Schärfe und bensonDeathTransfer (docs/prior-nachmessung.md) ── */
+
+const LANG = Array.from({length: 32}, (_, k) => 1 + 15 * k);   /* Partien 1 bis 480 */
+
+test('Workflow prior-nachmessung.yml: Aufbau, Arme und Vorgaben wie in der Vorabfestlegung', () => {
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'prior-nachmessung.yml'), 'utf8');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'prior-nachmessung.md'), 'utf8');
+  const armeDatei = path.join(wurzel, 'auswertung', 'dagger', 'prior-arme.sh');
+  const a = fs.readFileSync(armeDatei, 'utf8');
+  const reihe = (/^ARM_REIHE=\(([^)]*)\)/m.exec(a) || [])[1].trim().split(/\s+/);
+  pruefeGleich(reihe.join(','), 'A,S9,S15,S30,PH,BT', 'sechs Arme');
+  pruefe(/^on:\n  workflow_dispatch:/m.test(t), 'nur manuell gestartet');
+  for (const job of ['pruefen', 'spielen', 'spielen-weitere', 'kontrolle', 'selbstspiel', 'ergebnis']) pruefe(new RegExp(`^  ${job}:$`, 'm').test(t), `Job ${job}`);
+  pruefe(/^permissions:\n  contents: read$/m.test(t), 'Standard: nur lesen');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefe(/ergebnis:[\s\S]*permissions:\n      contents: write/.test(t), 'das Schreibrecht hat der Ergebnisjob');
+  pruefe(/needs: \[pruefen, spielen, spielen-weitere, kontrolle, selbstspiel\]/.test(t), 'der Bericht wartet auf alle Spieljobs');
+  const matrizen = [...t.matchAll(/arm: \[([A-Za-z0-9, ]+)\]\n        (von|teil): \[([0-9, ]+)\]/g)].map(m => ({arme: m[1].split(',').map(x => x.trim()), art: m[2], werte: m[3].split(',').map(Number)}));
+  pruefeGleich(matrizen.length, 3, 'drei Matrizen');
+  const [lang, kurz, selbst] = matrizen;
+  pruefeGleich(lang.arme.join(','), 'A,S9', 'A und S9 spielen 480 Partien');
+  pruefeGleich(lang.werte.join(','), LANG.join(','), '32 Teile zu je 15 Partien (1 bis 480)');
+  pruefeGleich(kurz.arme.join(','), 'S15,S30,PH,BT', 'die übrigen Arme spielen 240 Partien');
+  pruefeGleich(kurz.werte.join(','), TEILE.join(','), '16 Teile zu je 15 Partien (1 bis 240)');
+  pruefeGleich([...lang.arme, ...kurz.arme].join(','), reihe.join(','), 'jeder Arm der Datei spielt, genau einmal');
+  pruefeGleich(selbst.art, 'teil', 'Selbstspiel in Teilen');
+  pruefeGleich(selbst.arme.join(','), 'S9,BT', 'M2 für S9 und BT');
+  pruefeGleich(selbst.werte.join(','), '1,2,3,4,5,6,7,8,9,10,11,12', 'zwölf Teile');
+  const jobs = lang.arme.length * lang.werte.length + kurz.arme.length * kurz.werte.length + 1 + selbst.arme.length * selbst.werte.length;
+  pruefeGleich(jobs, 153, '153 Jobs zum Spielen');
+  pruefe(doc.includes(`${jobs} Jobs`) && t.includes(`${jobs} Jobs`), `${jobs} Jobs im Dokument und im Workflow`);
+  pruefeGleich((t.match(/ARME_DATEI: auswertung\/dagger\/prior-arme\.sh\n/g) || []).length, 4, 'alle vier Spieljobs lesen prior-arme.sh');
+  pruefeGleich((t.match(/parameter-spielen\.sh "\$ARM" "\$VON" "\$SEED" "prior\/\$ARM-\$VON\.jsonl"/g) || []).length, 2, 'ein Teil je Arm und Beginn');
+  pruefe(/parameter-spielen\.sh A 1 "\$SEED" prior\/K-1\.jsonl/.test(t) && /SEED: \$\{\{ needs\.pruefen\.outputs\.kontrolle_seed \}\}/.test(t), 'Kontrolle: Arm A, Partien 1 bis 15, mit dem Seed der Kontrolldatei');
+  pruefe(/selbstspiel-spielen\.sh "\$ARM" "\$TEIL" "\$SEED_BASIS" "prior\/m2-\$ARM-\$TEIL\.json"/.test(t), 'Selbstspiel: ein Teil je Arm');
+  pruefe(/prior-ergebnis\.sh "\$SEED" "\$KONTROLLE" "\$SELBSTSPIEL_SEED"/.test(t), 'Bericht mit Seed, Kontrolle und Seed des Selbstspiels');
+  const tests = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'tests.yml'), 'utf8');
+  for (const x of ['actions/checkout', 'actions/setup-node']) {
+    const ver = y => (y.match(new RegExp(x + '@(v[0-9]+)')) || [])[1];
+    pruefe(ver(t) && ver(t) === ver(tests), `${x} in derselben Version wie tests.yml`);
+  }
+  for (const name of ['seed', 'selbstspiel_seed', 'kontrolle', 'kontrolle_seed']) {
+    const imDoc = (new RegExp('^\\| `' + name + '` \\| `?([^` |]+)', 'm').exec(doc) || [])[1];
+    const imFlow = (new RegExp('^      ' + name + ':\\n(?:        .*\\n)*?        default: \'([^\']*)\'', 'm').exec(t) || [])[1];
+    pruefe(imDoc !== undefined && imDoc === imFlow, `Vorgabe ${name}: Dokument „${imDoc}“, Workflow „${imFlow}“`);
+  }
+  pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'parameter-reihe', 'lauf1', 'A.jsonl.gz')), 'die Kontrolldatei liegt im Repo');
+  /* Jeder Arm: im Dokument, in der Datei und in der --ki-Angabe; die Parameter stehen in index.html */
+  const html = fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8');
+  for (const arm of reihe) {
+    const ki = (new RegExp(`\\[${arm}\\]="([^"]*)"`).exec(a) || [])[1];
+    pruefe(ki !== undefined, `Arm ${arm} in der Datei`);
+    const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-spielen.sh'), '--ki', arm], {encoding: 'utf8', env: {...process.env, ARME_DATEI: armeDatei}});
+    pruefeGleich(r.stdout.trim(), 'mctsFixedSims=120,resignEnabled=0' + (ki ? ',' + ki : ''), `--ki-Angabe von Arm ${arm}`);
+    if (!ki) continue;
+    pruefe(doc.includes(`| **${arm}** | \`${ki}\` |`), `Arm ${arm} steht im Dokument mit ${ki}`);
+    const name = ki.split(/[@=]/)[0];
+    pruefe(new RegExp(`^  ${name}:\\s+[0-9.]+,`, 'm').test(html), `${name} steht in index.html`);
+  }
+  pruefe(/^  mctsPriorSharp:\s+3,$/m.test(html) && /^  bensonDeathTransfer: 0,$/m.test(html), 'Defaults 3 und 0 in index.html');
+});
+
+test('Skripte der Nachmessung lehnen falsche Eingaben ab', () => {
+  const s = (...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', x[0]), ...x.slice(1)], {cwd: temp(), encoding: 'utf8'});
+  pruefeGleich(s('selbstspiel-spielen.sh', 'X9', '1', '20261201', 'x.json').status, 2, 'selbstspiel-spielen.sh: unbekannter Arm');
+  pruefeGleich(s('selbstspiel-spielen.sh', 'A', '1', '20261201', 'x.json').status, 2, 'selbstspiel-spielen.sh: A gegen sich selbst');
+  pruefeGleich(s('selbstspiel-spielen.sh', 'S9', '13', '20261201', 'x.json').status, 2, 'selbstspiel-spielen.sh: Teil 13');
+  pruefeGleich(s('selbstspiel-spielen.sh', 'S9', '0', '20261201', 'x.json').status, 2, 'selbstspiel-spielen.sh: Teil 0');
+  pruefeGleich(s('selbstspiel-spielen.sh', 'S9', 'a', '20261201', 'x.json').status, 2, 'selbstspiel-spielen.sh: Zahl erwartet');
+  pruefeGleich(s('selbstspiel-spielen.sh', 'S9', '1', '20261201').status, 1, 'selbstspiel-spielen.sh: Argument fehlt');
+  pruefeGleich(s('prior-ergebnis.sh').status, 1, 'prior-ergebnis.sh: Seed fehlt');
+  pruefeGleich(s('prior-ergebnis.sh', '212', 'gibt-es-nicht.jsonl.gz', '20261201').status, 2, 'prior-ergebnis.sh: Kontrolldatei fehlt');
+  pruefeGleich(s('prior-ergebnis.sh', '212', path.join(wurzel, 'docs', 'daten', 'parameter-reihe', 'lauf1', 'A.jsonl.gz')).status, 1, 'prior-ergebnis.sh: Seed des Selbstspiels fehlt');
+  pruefeGleich(s('prior-ergebnis.sh', '212', path.join(wurzel, 'docs', 'daten', 'parameter-reihe', 'lauf1', 'A.jsonl.gz'), '20261201').status, 1, 'prior-ergebnis.sh: keine Teile');
+  /* Phasenstufen in --ki von gnugo-duell.js: falsche Angaben scheitern, ehe GNU Go startet */
+  for (const k of ['mctsPriorSharp@x=9', 'mctsPriorSharp@=9', '@5=9', 'mctsPriorSharp@5=', 'mctsPriorSharp@-1=9', 'mctsPriorSharp@5']) {
+    const r = spawnSync(process.execPath, [path.join(wurzel, 'gnugo-duell.js'), '--partien', '1', '--gnugo', '/gibt/es/nicht', '--ki', k], {encoding: 'utf8'});
+    pruefeGleich(r.status, 2, `gnugo-duell.js --ki ${k}: abgelehnt`);
+    pruefe(/ungültige Phasenstufe/.test(r.stderr), `gnugo-duell.js --ki ${k}: Meldung`);
+  }
+});
+
+/* Synthetische Teile: Endstand von A = ((nr·37) mod 101) − 50; S9 liegt um 20 darüber, S15 um 20, S30 um 0,
+   PH um 30, BT um 1, dazu je ein Rauschen ±((nr mod 5) − 2) mit dem Vorzeichen des Arms (Mittel 0; sonst wären
+   die Differenzen zweier Arme konstant). PH beginnt wie A; M2: B gewinnt 20 von 30 je Teil. */
+const VERSATZ = {A: 0, S9: 20, S15: 20, S30: 0, PH: 30, BT: 1, K: 0};
+const VORZEICHEN = {S9: 1, S15: 1, S30: -1, PH: -1, BT: 1};
+function priorTeile(verzeichnis, ohne) {
+  const dir = path.join(verzeichnis, 'prior');
+  fs.mkdirSync(dir, {recursive: true});
+  const teile = {A: LANG, S9: LANG, S15: TEILE, S30: TEILE, PH: TEILE, BT: TEILE, K: [1]};
+  for (const [arm, liste] of Object.entries(teile)) for (const von of liste) {
+    if (ohne === `${arm}-${von}`) continue;
+    const zeilen = [];
+    for (let nr = von; nr < von + 15; nr++) {
+      const a = ((nr * 37) % 101) - 50, endstand = arm === 'A' || arm === 'K' ? a : a + VERSATZ[arm] + VORZEICHEN[arm] * ((nr % 5) - 2);
+      const zuege = arm === 'A' || arm === 'K' || arm === 'PH' ? ['a' + nr, 'b' + nr, 'pass', 'pass'] : [arm + nr, 'b' + nr, 'pass', 'pass'];
+      zeilen.push(JSON.stringify({nr, beginnt: 'W', wirFarbe: 'S', endstand, gewonnen: endstand > 0, zuegeAnzahl: 4, zuege, schaetzung: {120: endstand / 2, 200: endstand}}));
+    }
+    if (ohne === `${arm}-${von}-kurz`) zeilen.pop();
+    fs.writeFileSync(path.join(dir, `${arm}-${von}.jsonl`), zeilen.join('\n') + '\n');
+  }
+  for (const arm of ['S9', 'BT']) for (let k = 1; k <= 12; k++) {
+    if (ohne === `m2-${arm}-${k}`) continue;
+    const partien = Array.from({length: 30}, (_, g) => ({partie: g + 1, aIst: g % 2 === 0 ? 'Schwarz' : 'Weiß', sieger: g % 3 === 2 ? 'A' : 'B', zuege: 200, aufgabe: g % 4 === 0 ? 'W' : null}));
+    fs.writeFileSync(path.join(dir, `m2-${arm}-${k}.json`), JSON.stringify({partien, konfig: {A: 'mctsFixedSims=120', B: 'mctsFixedSims=120,' + (arm === 'S9' ? 'mctsPriorSharp=9' : 'bensonDeathTransfer=1'), seed: 20261200 + k, abgeschlossen: true}}));
+  }
+}
+
+test('Bericht der Nachmessung: Stufe 1, Stufe 2, Umschaltung von PH, Frage 2, Kontrolle, M2', () => {
+  const d = temp();
+  priorTeile(d);
+  fs.writeFileSync(path.join(d, 'kontrolle.jsonl.gz'), require('zlib').gzipSync(fs.readFileSync(path.join(d, 'prior', 'K-1.jsonl'))));
+  const skript = path.join(wurzel, 'auswertung', 'dagger', 'prior-ergebnis.sh');
+  const r = spawnSync('bash', [skript, '212', 'kontrolle.jsonl.gz', '20261201'], {cwd: d, encoding: 'utf8'});
+  pruefeGleich(r.status, 0, 'Bericht läuft durch: ' + (r.stderr || '').slice(0, 300));
+  const lies = f => fs.readFileSync(path.join(d, 'ergebnisse', f), 'utf8');
+  pruefe(/Seed 212 gegen GNU Go, Seeds ab 20261201 im Selbstspiel/.test(lies('bericht.md')), 'Kopf des Berichts');
+  pruefe(/\| \*\*S9\*\* \| 480 \| \*\*\+20,0\*\* .* \| besser: Kandidat \|/.test(lies('stufe1.md')) && /alpha 0,05\)/.test(lies('stufe1.md')), 'Stufe 1: 480 Paare, +20,0, Kandidat bei alpha 0,05');
+  pruefe(/\| \*\*PH\*\* \| 240 \| \*\*\+10,0\*\* .* \| besser: Kandidat \|/.test(lies('stufe2.md')) && /alpha 0,0167/.test(lies('stufe2.md')), 'Stufe 2: PH gegen S9 +10,0 auf 240 Paaren, alpha 0,0167');
+  pruefe(/\| \*\*S30\*\* \| 240 \| \*\*−20,0\*\* .* \| schlechter \|/.test(lies('stufe2.md')), 'Stufe 2: S30 gegen S9 −20,0');
+  pruefe(/PH: in 240 von 240 Paaren die ersten 120 Züge gleich A/.test(lies('dosis.md')) && /S9: in 0 von 480 Paaren/.test(lies('dosis.md')), 'Probe der Umschaltung: PH beginnt wie A');
+  pruefe(/\| \*\*BT\*\* \| 240 \| \*\*\+1,0\*\* /.test(lies('transfer.md')), 'Frage 2: BT gegen A +1,0');
+  pruefe(/Kontrolle gegen kontrolle\.jsonl\.gz, Arm K: 15 von 15/.test(lies('kontrolle.md')), 'Kontrolle 15 von 15');
+  pruefe(/S9: B \(mctsFixedSims=120,mctsPriorSharp=9\) gegen A \(mctsFixedSims=120\) · 360 Partien in 12 Teilen \(Seeds 20261201 bis 20261212\) · B gewinnt 240, 66,7 %/.test(lies('selbstspiel.txt')), 'M2 von S9: 240 von 360');
+  pruefe(/signifikant über 50 %/.test(lies('selbstspiel.md')) && /\| \*\*BT\*\* \|/.test(lies('selbstspiel.md')), 'M2: Urteil, beide Arme');
+  pruefe(/== PH gegen A/.test(lies('zuege.txt')) && /== BT gegen A/.test(lies('zusatz.txt')), 'Zugzahlen und Zusatzzahlen je Arm');
+  for (const [arm, n] of [['A', 480], ['S9', 480], ['S15', 240], ['S30', 240], ['PH', 240], ['BT', 240], ['K', 15], ['m2-S9', 360], ['m2-BT', 360]]) {
+    const roh = require('zlib').gunzipSync(fs.readFileSync(path.join(d, 'ergebnisse', `${arm}.jsonl.gz`))).toString().trim().split('\n');
+    pruefeGleich(roh.length, n, `Rohdaten von ${arm}: ${n}`);
+  }
+  for (const [ohne, muster] of [['S9-466', /S9-466\.jsonl fehlt/], ['PH-226-kurz', /PH-226\.jsonl hat nicht 15 Partien/], ['K-1', /K-1\.jsonl fehlt/], ['m2-BT-7', /m2-BT-7\.json fehlt/]]) {
+    const e = temp();
+    priorTeile(e, ohne);
+    const x = spawnSync('bash', [skript, '212', path.join(d, 'kontrolle.jsonl.gz'), '20261201'], {cwd: e, encoding: 'utf8'});
+    pruefeGleich(x.status, 1, `${ohne}: Abbruch`);
+    pruefe(muster.test(x.stderr), `${ohne}: Meldung „${(x.stderr || '').trim()}“`);
+    pruefe(!fs.existsSync(path.join(e, 'ergebnisse', 'bericht.md')), `${ohne}: kein Bericht`);
+  }
+});
+
+test('Bericht des Selbstspiels: Siegrate, Intervall, Farben; unvollständige, doppelte und fremde Teile abgelehnt', () => {
+  const teil = (seed, siegeB, extra = {}) => ({datei: `t${seed}.json`, daten: {konfig: {A: 'a', B: 'b', seed, abgeschlossen: true, ...extra},
+    partien: Array.from({length: 30}, (_, g) => ({aIst: g % 2 === 0 ? 'Schwarz' : 'Weiß', sieger: g < siegeB ? 'B' : 'A', zuege: 100 + g, aufgabe: null}))}});
+  const r = SB.auswertung(Array.from({length: 12}, (_, k) => teil(k + 1, 13)), 360);
+  pruefeGleich(r.n, 360, '360 Partien'); pruefeGleich(r.b, 156, 'B gewinnt 13 je Teil');
+  pruefeGleich(r.urteil, 'signifikant unter 50 %', 'Urteil bei 43,3 %');
+  pruefeNah(r.p, Z.vorzeichenP(156, 204), 1e-12, 'p aus dem exakten Test');
+  pruefeGleich(r.bSchwarz.siege + r.bWeiss.siege, 156, 'Farben zusammen'); pruefeGleich(r.bSchwarz.n, 180, 'B 180-mal Schwarz');
+  pruefe(r.ci[0] < 156 / 360 && r.ci[1] > 156 / 360, 'Intervall um die Rate');
+  const w = SB.wilson(180, 360);
+  pruefeNah(w[0], 0.4485, 0.001, 'Wilson unten bei 50 %'); pruefeNah(w[1], 0.5515, 0.001, 'Wilson oben bei 50 %');
+  pruefeGleich(SB.auswertung([teil(1, 15), teil(2, 15)], 60).urteil, 'nicht signifikant', '30 von 60');
+  const fehler = f => { try { f(); return ''; } catch (e) { return e.message; } };
+  pruefe(/nicht abgeschlossen/.test(fehler(() => SB.auswertung([teil(1, 15, {abgeschlossen: false})], 30))), 'unvollständiger Teil');
+  pruefe(/Seed 1 doppelt/.test(fehler(() => SB.auswertung([teil(1, 15), teil(1, 15)], 60))), 'doppelter Seed');
+  pruefe(/andere Konfiguration/.test(fehler(() => SB.auswertung([teil(1, 15), teil(2, 15, {B: 'c'})], 60))), 'fremder Teil');
+  pruefe(/30 Partien statt 360/.test(fehler(() => SB.auswertung([teil(1, 15)], 360))), 'falsche Zahl');
+  pruefeGleich(SB.rohZeilen([teil(5, 1)]).trim().split('\n').length, 30, 'Rohdaten: eine Zeile je Partie');
+});
+
+test('Bericht: gleicher Anfang zweier Arme', () => {
+  const m = z => new Map(z.map((zuege, i) => [i + 1, {nr: i + 1, zuege}]));
+  const ref = m([['a', 'b', 'c'], ['a', 'b'], ['x', 'y', 'z']]);
+  const g = P.gleicherAnfang(ref, m([['a', 'b', 'd'], ['a', 'b'], ['x', 'q', 'z']]), 2);
+  pruefeGleich(`${g.gleich}/${g.n}`, '2/3', 'zwei Paare mit gleichen ersten zwei Zügen');
+  pruefeGleich(P.gleicherAnfang(ref, m([['a', 'b', 'd']]), 3).gleich, 0, 'der dritte Zug weicht ab');
 });
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));

@@ -304,3 +304,15 @@ Gewicht von Prior und RAVE anders aussehen kann. Gemessen ist der Einzeleffekt j
 Parameter. Ein Nullergebnis heißt bei RAUS „nicht belegt“, bei den übrigen „kein
 Gewinn von 10“; kleinere Effekte sind mit 240 Paaren unmessbar. Der Befund zu S9
 stammt aus einem Seed und gehört nachgemessen, ehe er eine Änderung trägt.
+
+## 9. Nachtrag: Entscheidungen zu S9 und P300 (20.10.2026)
+
+Hazeberry ist beiden Empfehlungen aus §8 gefolgt:
+
+- **P300 wird nicht Default.** `passMinMc80` bleibt 20. Die 11,5 % kürzeren
+  Partien kosten rund 1,6 Punkte (Vorzeichentest p = 0,0005) und bringen keine
+  Stärke.
+- **S9 wird nachgemessen**, mit frischem Seed, höheren Dosen (15 und 30), einem
+  Prior, der erst ab Zug 120 schärfer wird, und dem Selbstspiel als Wächter.
+  Vorab festgelegt in [`prior-nachmessung.md`](prior-nachmessung.md). Bis dahin
+  bleibt der Default 3.

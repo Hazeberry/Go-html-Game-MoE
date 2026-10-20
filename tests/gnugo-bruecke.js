@@ -14,6 +14,11 @@
    ANTEIL 1 wird jeder Zug ab AB ersetzt, mit ANTEIL 0,5 ein Teil; falsche
    Angaben werden abgelehnt.
 
+   Phasenstufen in --ki (docs/prior-nachmessung.md §2): name@N=wert gilt ab
+   Zug N. Eine nicht erreichte Stufe ändert die Partie nicht, @0 spielt wie
+   ohne @, eine Stufe mitten in der Partie lässt die Züge davor gleich und
+   zählt einen Wechsel.
+
    auswertung/orakel-nachspiel.js (Zusatzrechnung zum Passen): Eine
    aufgezeichnete Partie aus docs/daten/endspiel-orakel/lauf1/ nachgespielt
    ergibt in GNU Go denselben Endstand wie in der Aufzeichnung, und die
@@ -116,6 +121,21 @@ test('--orakel-zug AB:ANTEIL: nur ein Teil der Gelegenheiten, falsche Angaben ab
     catch (e) { status = e.status; }
     pruefeGleich(status, 2, `--orakel-zug ${falsch} wird abgelehnt`);
   }
+});
+
+test('--ki name@N=wert: nicht erreichte Stufe ändert nichts, @0 wie ohne @, Wechsel mitten in der Partie', () => {
+  const basis = k => ['--partien', '1', '--seed', '3', '--stufe', '1', '--maxzuege', '30', '--ki', 'mctsFixedSims=20' + k];
+  const ohne = partie([], basis('')), spaet = partie([], basis(',mctsPriorSharp@200=9'));
+  pruefeGleich(spaet.zuege.join(' '), ohne.zuege.join(' '), 'Stufe ab Zug 200 in 30 Zügen: dieselbe Partie');
+  pruefeGleich(JSON.stringify(spaet.kiStufen), '{"mctsPriorSharp":[[200,9]]}', 'Stufen im Datensatz');
+  pruefeGleich(spaet.phasenwechsel, 0, 'kein Wechsel');
+  pruefe(!('kiStufen' in ohne) && !('phasenwechsel' in ohne), 'ohne @ keine neuen Felder');
+  const neun = partie([], basis(',mctsPriorSharp=9')), null9 = partie([], basis(',mctsPriorSharp@0=9'));
+  pruefeGleich(null9.zuege.join(' '), neun.zuege.join(' '), '@0 spielt wie ohne @');
+  pruefeGleich(null9.phasenwechsel, 0, '@0: kein Wechsel');
+  const mitte = partie([], basis(',mctsPriorSharp@10=30'));
+  pruefeGleich(mitte.zuege.slice(0, 10).join(' '), ohne.zuege.slice(0, 10).join(' '), 'die ersten 10 Züge wie ohne Stufe');
+  pruefeGleich(mitte.phasenwechsel, 1, 'ein Wechsel');
 });
 
 test('orakel-nachspiel.js: eine aufgezeichnete Partie nachgespielt ergibt den aufgezeichneten Endstand', async () => {
