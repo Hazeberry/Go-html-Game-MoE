@@ -2494,6 +2494,13 @@ Spiel bringt es **+46,9 Punkte** [+40,4; +53,4] und 227 statt 149 Siege von
 240, im Selbstspiel 83,1 % ([`docs/endspiel-netz.md`](docs/endspiel-netz.md)).
 Seitdem ist `endspielNetz` = 0,5 Default. Alles lief in GitHub Actions.
 
+**Neuer Prüfstand: sechs Vorgabesteine (20.10.).** Mit dem Netz gewinnt die KI
+mit neun Steinen 95 % der Partien gegen GNU Go Stufe 1. Je 60 Partien mit 9, 6,
+4 und 2 Steinen ergaben 95, 53, 43 und 3 %. Nach der vorab festgelegten Regel
+spielen neue Messungen ab jetzt mit **sechs Vorgabesteinen**. Das Netz kostet
+im Spiel 41 ms je Zug und keine Suchzeit: 102 % der Simulationen bei 1,8 s
+Budget ([`docs/teststaerke.md`](docs/teststaerke.md) §9).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
 09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1, seit dem 11.10. auch

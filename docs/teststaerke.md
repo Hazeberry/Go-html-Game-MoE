@@ -161,3 +161,56 @@ es hier nicht.
 
 **Erwartung vorab:** 9 Steine rund 90 bis 95 %, 6 Steine 50 bis 75 %, 4 Steine
 15 bis 40 %, 2 Steine unter 15 %. Die Wahl fiele damit auf 6 oder 4.
+
+## 9. Nachtrag: sechs Vorgabesteine, das Netz kostet 41 ms (20.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #1 des Workflows `pruefstand.yml`
+([Run 39395430856](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/39395430856)),
+auf dem Merge-Commit `ddc4e4f` von `main`, mit Seed 215, in 8 Minuten (08:43
+bis 08:51 UTC). Alle 240 Partien ausgespielt, keine abgebrochen. Daten:
+[`daten/pruefstand/lauf1/`](daten/pruefstand/lauf1/).
+
+| Vorgabe | Partien | Siege der KI | Endstand Ø | SD | nach Zug 120 |
+|---:|---:|---:|---:|---:|---:|
+| 9 | 60 | 57 (95 %) | +61,1 | 29,9 | +83,8 |
+| **6** | 60 | **32 (53 %)** | +11,1 | 57,0 | +28,8 |
+| 4 | 60 | 26 (43 %) | −11,3 | 51,1 | +8,4 |
+| 2 | 60 | 2 (3 %) | −65,4 | 40,7 | −20,7 |
+
+**Wahl nach §8: sechs Vorgabesteine.** Sechs und vier liegen im Bereich von 25
+bis 75 %; sechs liegt mit 53 % näher an 50 % als vier mit 43 %. **Ab jetzt
+spielen neue Messungen gegen GNU Go mit sechs Vorgabesteinen**, also mit
+`gnugo-duell.js --vorgabe 6`. Das legt jede Vorabfestlegung in ihrem eigenen
+Skript fest. Die Skripte früherer Läufe bleiben bei neun, damit sie sich
+wiederholen lassen.
+
+**Gegen die Erwartung aus §8.** Getroffen haben 9 Steine (95 %), 6 Steine
+(53 %) und 2 Steine (3 %). Vier Steine lagen mit 43 % über dem erwarteten
+Bereich von 15 bis 40 %. Zwischen vier und sechs Steinen liegen nur 10
+Prozentpunkte. Mit je 60 Partien ist der Unterschied nicht gesichert.
+
+**Was das für die Teststärke heißt, ohne Anspruch.** Mit sechs Steinen streut
+der Endstand eines Arms mit 57 Punkten fast doppelt so stark wie mit neun (30).
+Die Streuung der Paardifferenz ist hier nicht gemessen. Liegt sie wie bisher bei
+55 bis 65, bleiben mit 240 Paaren rund 10 bis 12 Punkte erkennbar. Dafür können
+die Siege wieder in beide Richtungen ausschlagen.
+
+**Laufzeit des Endspiel-Netzes.** An 22 Stellungen (Zug 100, 150 und 200 aus 8
+Partien; zwei Partien endeten vor Zug 200), Zeitbudget 1,8 s:
+
+| | Median | |
+|---|---:|---|
+| Netz allein (Ebenen + Vorwärtsrechnung) | 43 ms | größter Wert 76 ms |
+| ganzer Zug ohne Netz | 1 814 ms | 4 527 Simulationen |
+| ganzer Zug mit Netz | 1 855 ms | 4 619 Simulationen |
+
+Erwartet waren gleich viele Simulationen und ein Zug, der um 0,1 bis 0,2 s
+länger dauert. Die Simulationen stimmen: Mit Netz sind es 102 % von ohne Netz,
+die Suche verliert also keine Zeit. Der Zug dauert aber nur **41 ms** länger,
+weniger als erwartet. Die Annahme von rund 0,1 s „die der Suche an Zeit
+fehlen“ ([`endspiel-netz.md`](endspiel-netz.md) §6 und §8) ist damit überholt:
+Das Netz kostet im Spiel rund 0,04 s Wartezeit je Zug ab Zug 81, und keine
+Suchzeit. Gemessen ist das in Node auf dem Rechner von GitHub Actions, nicht in
+einem Browser. Im Browser läuft die Suche im Worker mit derselben Engine. Ein
+langsamerer Rechner verlängert die Wartezeit im selben Verhältnis, die Suche
+bleibt unberührt.
