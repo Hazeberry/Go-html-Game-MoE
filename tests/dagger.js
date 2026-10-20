@@ -190,6 +190,7 @@ test('Workflow benson-lebend.yml: keine Ausdrücke in Shell-Zeilen', () => pruef
 test('Workflow prior-nachmessung.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('prior-nachmessung.yml', 10, 4));
 test('Workflow endspiel-lerner.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-lerner.yml', 5, 4));
 test('Workflow endspiel-netz.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-netz.yml', 8, 4));
+test('Workflow prior-neun.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('prior-neun.yml', 8, 5));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
 
@@ -854,6 +855,9 @@ test('Bericht des Selbstspiels: Siegrate, Intervall, Farben; unvollständige, do
   pruefe(/andere Konfiguration/.test(fehler(() => SB.auswertung([teil(1, 15), teil(2, 15, {B: 'c'})], 60))), 'fremder Teil');
   pruefe(/30 Partien statt 360/.test(fehler(() => SB.auswertung([teil(1, 15)], 360))), 'falsche Zahl');
   pruefeGleich(SB.rohZeilen([teil(5, 1)]).trim().split('\n').length, 30, 'Rohdaten: eine Zeile je Partie');
+  const mitAufgabe = teil(9, 10); mitAufgabe.daten.partien.forEach((p, g) => { if (g < 4) p.aufgabe = p.aIst === 'Weiß' ? 'S' : 'W'; });
+  const ra = SB.auswertung([mitAufgabe], 30);
+  pruefeGleich(`${ra.aufgabenB}/${ra.aufgabenA}/${ra.ausgezaehlt.n}`, '4/0/26', 'Aufgaben je Seite, ausgezählte Partien');
 });
 
 test('Bericht: gleicher Anfang zweier Arme', () => {
@@ -934,6 +938,30 @@ test('Workflow endspiel-netz.yml: Arme, Jobs und Vorgaben wie in der Vorabfestle
   const s = (...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'endspiel-netz-ergebnis.sh'), ...x], {cwd: temp(), encoding: 'utf8'});
   pruefeGleich(s('213', 'gibt-es-nicht.gz', '20261401').status, 2, 'endspiel-netz-ergebnis.sh: Kontrolldatei fehlt');
   pruefeGleich(s('213', path.join(wurzel, 'docs', 'daten', 'parameter-reihe', 'lauf1', 'A.jsonl.gz'), '20261401').status, 1, 'endspiel-netz-ergebnis.sh: keine Teile');
+});
+
+test('Workflow prior-neun.yml: Arme, Jobs und Vorgaben wie in der Vorabfestlegung', () => {
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'prior-neun.yml'), 'utf8');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'prior-neun.md'), 'utf8');
+  const armeDatei = path.join(wurzel, 'auswertung', 'dagger', 'prior-neun-arme.sh');
+  for (const job of ['pruefen', 'spielen', 'kontrolle', 'selbstspiel', 'ergebnis']) pruefe(new RegExp(`^  ${job}:$`, 'm').test(t), `Job ${job}`);
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefeGleich((/arm: \[([A-Za-z0-9, ]+)\]/.exec(t) || [])[1], 'A, S9', 'Arme A und S9');
+  pruefeGleich((/modus: \[([a-z0-9, ]+)\]/.exec(t) || [])[1], 'm2, m3', 'M2 und M3');
+  pruefe(doc.includes('57 Jobs') && t.includes('57 Jobs'), '57 Jobs im Dokument und im Workflow');
+  pruefe(/export OHNE_AUFGABE=1/.test(t), 'M2 ohne Aufgabe');
+  const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-spielen.sh'), '--ki', 'S9'], {encoding: 'utf8', env: {...process.env, ARME_DATEI: armeDatei}});
+  pruefeGleich(r.stdout.trim(), 'mctsFixedSims=120,resignEnabled=0,mctsPriorSharp=9', '--ki-Angabe von Arm S9');
+  pruefe(/\| \*\*S9\*\* \| `mctsPriorSharp=9` \|/.test(doc), 'Arm S9 im Dokument');
+  for (const name of ['seed', 'selbstspiel_seed', 'aufgabe_seed', 'kontrolle', 'kontrolle_seed']) {
+    const imDoc = (new RegExp('^\\| `' + name + '` \\| `?([^` |]+)', 'm').exec(doc) || [])[1];
+    const imFlow = (new RegExp('^      ' + name + ':\\n(?:        .*\\n)*?        default: \'([^\']*)\'', 'm').exec(t) || [])[1];
+    pruefe(imDoc !== undefined && imDoc === imFlow, `Vorgabe ${name}: Dokument „${imDoc}“, Workflow „${imFlow}“`);
+  }
+  pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-netz', 'lauf1', 'N.jsonl.gz')), 'die Kontrolldatei liegt im Repo');
+  const s = (...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'prior-neun-ergebnis.sh'), ...x], {cwd: temp(), encoding: 'utf8'});
+  pruefeGleich(s('214', 'gibt-es-nicht.gz', '1', '2').status, 2, 'prior-neun-ergebnis.sh: Kontrolldatei fehlt');
+  pruefeGleich(s('214', path.join(wurzel, 'docs', 'daten', 'endspiel-netz', 'lauf1', 'N.jsonl.gz'), '1').status, 1, 'prior-neun-ergebnis.sh: Seed von M3 fehlt');
 });
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));
