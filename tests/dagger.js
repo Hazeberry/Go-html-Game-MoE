@@ -495,6 +495,13 @@ test('Parameter-Bericht: Urteil nach der vorab festgelegten Regel, Negativkontro
   const arm = new Map([rec(1, 5, ['a', 'b']), rec(2, 6, ['a', 'd']), rec(3, 7, ['x']), rec(4, 1, ['y'])]);
   const k = P.gleiche(ref, arm);
   pruefeGleich(k.n, 3, 'drei Partien in beiden'); pruefeGleich(k.gleich, 2, 'zwei gleich, bei einer weicht ein Zug ab');
+  /* Siege gepaart: nur der Arm 3, nur die Referenz 1, beide 2, keiner 1, eine abgebrochene Partie fällt heraus */
+  const sp = (nr, gewonnen, abgebrochen) => [nr, {nr, gewonnen, abgebrochen}];
+  const s = P.siege(new Map([sp(1, false), sp(2, false), sp(3, false), sp(4, true), sp(5, true), sp(6, true), sp(7, false), sp(8, true)]),
+                    new Map([sp(1, true), sp(2, true), sp(3, true), sp(4, false), sp(5, true), sp(6, true), sp(7, false), sp(8, true, true)]));
+  pruefeGleich(s.b, 3, 'nur der Arm gewinnt'); pruefeGleich(s.c, 1, 'nur die Referenz gewinnt'); pruefeGleich(s.beide, 2, 'beide'); pruefeGleich(s.keiner, 1, 'keiner');
+  pruefeGleich(s.siegeArm, 5, 'Siege des Arms'); pruefeGleich(s.siegeRef, 3, 'Siege der Referenz');
+  pruefeNah(s.p, 0.625, 1e-9, 'McNemar exakt bei 3 gegen 1: 2 · (4 + 1) / 16 = 0,625');
 });
 
 /* Synthetische Partien: Endstand von A = ((nr·37) mod 101) − 50; ein Arm liegt um sein delta darüber, dazu ein Rauschen (nr mod 5) − 2 mit Mittel 0 über 240 Partien; N ist eine Kopie von A */
@@ -531,6 +538,8 @@ test('Bericht der Parameter-Reihe: 16 Teile je Arm zu einem Bericht, Kontrolle, 
   pruefe(/\| \*\*PNIE\*\* \| 240 \| \*\*\+0,0\*\* .* \| verworfen: kein Gewinn von 10 \|/.test(md), 'PNIE: verworfen');
   pruefe(/\| \*\*PNIE\*\* .* \| 48 von 240 \| verworfen/.test(md), 'Spalte „Zug für Zug gleich A“: nur die 48 Partien ohne Rauschen sind gleich');
   pruefe(!/\| \*\*N\*\* \|/.test(md), 'N steht nicht unter den Vergleichen');
+  pruefe(/\| \*\*R3000\*\* \| \d+ \| \d+ \| \d+ \| \d+ \| \d+ \| \d+ \| /.test(lies('siege.md')) && /R3000 gegen A: Siege \d+ gegen \d+ · nur R3000 gewinnt/.test(lies('siege.txt')), 'Siege gepaart als Tabelle und als Text');
+  pruefe(/## Siege, gepaart \(McNemar, sekundär\)/.test(lies('bericht.md')), 'Siege im Bericht');
   pruefe(/Negativkontrolle N: 30 von 30 Partien Zug für Zug gleich Arm A/.test(md), 'Negativkontrolle 30 von 30');
   pruefe(/Kontrolle gegen kontrolle\.jsonl\.gz, Arm A: 240 von 240/.test(md), 'Kontrolle 240 von 240');
   const z = lies('zusatz.txt');

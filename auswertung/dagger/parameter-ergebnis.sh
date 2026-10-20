@@ -40,6 +40,9 @@ kargs=(); [ -z "$kontrolle" ] || kargs=(--kontrolle "$kontrolle")
 # 10 Vergleiche gegen A: alpha je Vergleich nach Bonferroni = 0,05 / 10
 node "$wurzel/auswertung/parameter-bericht.js" --ref A "${args[@]}" "${texte[@]}" --gleich N --alpha 0.005 ${kargs[@]+"${kargs[@]}"} > ergebnisse/parameter.txt
 node "$wurzel/auswertung/parameter-bericht.js" --ref A "${args[@]}" "${texte[@]}" --gleich N --alpha 0.005 ${kargs[@]+"${kargs[@]}"} --markdown > ergebnisse/parameter.md
+# Siege gepaart (McNemar), sekundär
+node "$wurzel/auswertung/parameter-bericht.js" --ref A "${args[@]}" --gleich N --siege > ergebnisse/siege.txt
+node "$wurzel/auswertung/parameter-bericht.js" --ref A "${args[@]}" --gleich N --siege --markdown > ergebnisse/siege.md
 for a in "${ARM_REIHE[@]}"; do
   [ "$a" = A ] || [ "$a" = N ] && continue
   echo "== $a gegen A"; node "$wurzel/auswertung/messung-zusatz.js" --A zw/A.jsonl --B "zw/$a.jsonl"
@@ -53,6 +56,10 @@ done > ergebnisse/zusatz.txt
   echo "## Endstand, gepaart nach Partienummer"
   echo
   cat ergebnisse/parameter.md
+  echo
+  echo "## Siege, gepaart (McNemar, sekundär)"
+  echo
+  cat ergebnisse/siege.md
   echo
   echo "## Median und Vorzeichentest"
   echo

@@ -1,0 +1,10 @@
+RAUS gegen A: Siege 152 gegen 149 · nur RAUS gewinnt 48, nur A gewinnt 45, beide 104, keiner 43 · McNemar (exakt) p = 0,8358
+R30 gegen A: Siege 153 gegen 149 · nur R30 gewinnt 48, nur A gewinnt 44, beide 105, keiner 43 · McNemar (exakt) p = 0,7547
+R3000 gegen A: Siege 145 gegen 149 · nur R3000 gewinnt 39, nur A gewinnt 43, beide 106, keiner 52 · McNemar (exakt) p = 0,7407
+S0 gegen A: Siege 72 gegen 149 · nur S0 gewinnt 27, nur A gewinnt 104, beide 45, keiner 64 · McNemar (exakt) p = 7,4 · 10⁻12
+S1 gegen A: Siege 100 gegen 149 · nur S1 gewinnt 37, nur A gewinnt 86, beide 63, keiner 54 · McNemar (exakt) p = 1,2 · 10⁻5
+S9 gegen A: Siege 189 gegen 149 · nur S9 gewinnt 58, nur A gewinnt 18, beide 131, keiner 33 · McNemar (exakt) p = 4,7 · 10⁻6
+B0 gegen A: Siege 146 gegen 149 · nur B0 gewinnt 42, nur A gewinnt 45, beide 104, keiner 49 · McNemar (exakt) p = 0,8304
+B24 gegen A: Siege 152 gegen 149 · nur B24 gewinnt 48, nur A gewinnt 45, beide 104, keiner 43 · McNemar (exakt) p = 0,8358
+P300 gegen A: Siege 146 gegen 149 · nur P300 gewinnt 6, nur A gewinnt 9, beide 140, keiner 85 · McNemar (exakt) p = 0,6072
+PNIE gegen A: Siege 148 gegen 149 · nur PNIE gewinnt 0, nur A gewinnt 1, beide 148, keiner 91 · McNemar (exakt) p = 1,0000

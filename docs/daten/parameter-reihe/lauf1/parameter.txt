@@ -1,0 +1,26 @@
+Arm A (Default): 240 Partien, 0 abgebrochen, Endstand Ø +20,8, Siege 149, Züge Ø 241,6
+Arm N (passMinMc120=-1000,passMinMc150=-1000): 30 Partien, 0 abgebrochen, Endstand Ø +21,4, Siege 19, Züge Ø 236,9
+Arm RAUS (raveEnabled=0): 240 Partien, 0 abgebrochen, Endstand Ø +24,3, Siege 152, Züge Ø 236,3
+Arm R30 (raveK=30): 240 Partien, 0 abgebrochen, Endstand Ø +19,3, Siege 153, Züge Ø 236,5
+Arm R3000 (raveK=3000): 240 Partien, 0 abgebrochen, Endstand Ø +20,3, Siege 145, Züge Ø 241,7
+Arm S0 (mctsPriorSharp=0): 240 Partien, 0 abgebrochen, Endstand Ø −37,8, Siege 72, Züge Ø 283,2
+Arm S1 (mctsPriorSharp=1): 240 Partien, 0 abgebrochen, Endstand Ø −21,5, Siege 100, Züge Ø 272,2
+Arm S9 (mctsPriorSharp=9): 240 Partien, 0 abgebrochen, Endstand Ø +28,1, Siege 189, Züge Ø 222,6
+Arm B0 (phaseBlendWidth=0): 240 Partien, 0 abgebrochen, Endstand Ø +18,1, Siege 146, Züge Ø 240,9
+Arm B24 (phaseBlendWidth=24): 240 Partien, 0 abgebrochen, Endstand Ø +21,1, Siege 152, Züge Ø 243,0
+Arm P300 (passMinMc80=300): 240 Partien, 0 abgebrochen, Endstand Ø +19,1, Siege 146, Züge Ø 213,7
+Arm PNIE (passMinMc80=-50,passMinMc120=-50,passMinMc150=-50): 240 Partien, 0 abgebrochen, Endstand Ø +20,9, Siege 148, Züge Ø 255,8
+
+RAUS − A: 240 Paare · Differenz +3,6 (SD 64,1), 95 %: [−4,6; +11,7], p = 0,3876 · Hälften +2,1 / +5,0 · Siege 152 gegen 149 · nach Zug 120: −4,2 (p = 0,0990) · Zug für Zug gleich A: 0 von 240 → nicht belegt
+R30 − A: 240 Paare · Differenz −1,4 (SD 66,2), 95 %: [−9,8; +7,0], p = 0,7428 · Hälften −2,1 / −0,7 · Siege 153 gegen 149 · nach Zug 120: −1,6 (p = 0,4537) · Zug für Zug gleich A: 0 von 240 → verworfen: kein Gewinn von 10
+R3000 − A: 240 Paare · Differenz −0,4 (SD 60,2), 95 %: [−8,1; +7,2], p = 0,9156 · Hälften −6,3 / +5,5 · Siege 145 gegen 149 · nach Zug 120: +2,0 (p = 0,2953) · Zug für Zug gleich A: 0 von 240 → verworfen: kein Gewinn von 10
+S0 − A: 240 Paare · Differenz −58,6 (SD 92,6), 95 %: [−70,4; −46,8], p = 2,7 · 10⁻19 · Hälften −49,9 / −67,3 · Siege 72 gegen 149 · nach Zug 120: −15,6 (p = 3,7 · 10⁻6) · Zug für Zug gleich A: 0 von 240 → schlechter
+S1 − A: 240 Paare · Differenz −42,2 (SD 95,1), 95 %: [−54,3; −30,1], p = 5,2 · 10⁻11 · Hälften −44,3 / −40,1 · Siege 100 gegen 149 · nach Zug 120: −6,1 (p = 0,0353) · Zug für Zug gleich A: 0 von 240 → schlechter
+S9 − A: 240 Paare · Differenz +7,3 (SD 56,3), 95 %: [+0,2; +14,5], p = 0,0451 · Hälften +9,1 / +5,6 · Siege 189 gegen 149 · nach Zug 120: −9,6 (p = 0,0003) · Zug für Zug gleich A: 1 von 240 → Hinweis: besser
+B0 − A: 240 Paare · Differenz −2,7 (SD 54,5), 95 %: [−9,6; +4,3], p = 0,4493 · Hälften −5,9 / +0,6 · Siege 146 gegen 149 · nach Zug 120: −0,1 (p = 0,9360) · Zug für Zug gleich A: 1 von 240 → verworfen: kein Gewinn von 10
+B24 − A: 240 Paare · Differenz +0,3 (SD 69,1), 95 %: [−8,5; +9,1], p = 0,9420 · Hälften −0,9 / +1,6 · Siege 152 gegen 149 · nach Zug 120: +0,0 (p = 0,9940) · Zug für Zug gleich A: 0 von 240 → verworfen: kein Gewinn von 10
+P300 − A: 240 Paare · Differenz −1,6 (SD 17,2), 95 %: [−3,8; +0,6], p = 0,1505 · Hälften −3,5 / +0,3 · Siege 146 gegen 149 · nach Zug 120: −0,0 (p = 0,3183) · Zug für Zug gleich A: 7 von 240 → verworfen: kein Gewinn von 10
+PNIE − A: 240 Paare · Differenz +0,2 (SD 6,2), 95 %: [−0,6; +1,0], p = 0,6465 · Hälften −0,1 / +0,5 · Siege 148 gegen 149 · nach Zug 120: +0,0 (p = 1,0000) · Zug für Zug gleich A: 126 von 240 → verworfen: kein Gewinn von 10
+
+Negativkontrolle N: 30 von 30 Partien Zug für Zug gleich Arm A
+ Kontrolle gegen docs/daten/endspiel-messung/lauf1/A.jsonl.gz, Arm A: 240 von 240 Partien mit gleichem Endstand und gleicher Zugzahl

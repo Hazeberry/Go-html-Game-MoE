@@ -198,3 +198,109 @@ Branch `ergebnisse/parameter-reihe-lauf<N>` unter
 letzte Job darf ins Repo schreiben, und nur auf einen neuen Branch. Erwartet
 werden 50 bis 70 Minuten für den ganzen Lauf (20 Jobs gleichzeitig, ein Teil
 dauert 4 bis 8 Minuten).
+
+## 8. Nachtrag: Ergebnis der Messreihe (20.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #1 des Workflows `parameter-reihe.yml`
+([Run 39353518498](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/39353518498)),
+auf dem Merge-Commit `c14831c` von `main`, mit den Eingaben aus §7, in 49
+Minuten (01:27 bis 02:16 UTC). Alle 2 670 Partien ausgespielt (11 Arme zu 240 und
+N zu 30), keine abgebrochen. Die Ergebnisse legte der Workflow auf den Branch
+`ergebnisse/parameter-reihe-lauf1`; sie stehen hier unter
+[`daten/parameter-reihe/lauf1/`](daten/parameter-reihe/lauf1/): der Bericht, die
+Partien aller Arme und die Zusatzzahlen. Die Tabelle der Siege (`siege.md`) kam
+danach dazu, aus denselben Partien mit `parameter-bericht.js --siege`.
+
+**Kontrollen.** Die Negativkontrolle N spielt in **30 von 30** Partien Zug für Zug
+dasselbe wie A: Die Einträge `passMinMc120` und `passMinMc150` sind bei den
+Defaults wirkungslos, wie §1 aus dem Code gelesen hatte. Arm A gibt Arm A der
+Messung M1 in **240 von 240** Partien wieder.
+
+**Endpunkt** (240 Paare je Arm, Endstand nach GNU Gos Zählung, gepaart, Seed 206;
+Schwelle je Vergleich α = 0,005):
+
+| Arm | Parameter | Endstand Ø | Siege | Züge Ø |
+|---|---|---:|---:|---:|
+| A | Default | +20,8 | 149 | 241,6 |
+| RAUS | `raveEnabled=0` | +24,3 | 152 | 236,3 |
+| R30 | `raveK=30` | +19,3 | 153 | 236,5 |
+| R3000 | `raveK=3000` | +20,3 | 145 | 241,7 |
+| S0 | `mctsPriorSharp=0` | −37,8 | 72 | 283,2 |
+| S1 | `mctsPriorSharp=1` | −21,5 | 100 | 272,2 |
+| S9 | `mctsPriorSharp=9` | +28,1 | 189 | 222,6 |
+| B0 | `phaseBlendWidth=0` | +18,1 | 146 | 240,9 |
+| B24 | `phaseBlendWidth=24` | +21,1 | 152 | 243,0 |
+| P300 | `passMinMc80=300` | +19,1 | 146 | 213,7 |
+| PNIE | `passMinMc80/120/150=-50` | +20,9 | 148 | 255,8 |
+
+| Arm − A | Differenz | 95 % | p | Hälfte 1 / 2 | nach Zug 120 | Zug für Zug gleich A | Urteil nach §4 |
+|---|---:|---|---:|---|---:|---:|---|
+| RAUS | +3,6 | [−4,6; +11,7] | 0,39 | +2,1 / +5,0 | −4,2 | 0 | nicht belegt |
+| R30 | −1,4 | [−9,8; +7,0] | 0,74 | −2,1 / −0,7 | −1,6 | 0 | verworfen |
+| R3000 | −0,4 | [−8,1; +7,2] | 0,92 | −6,3 / +5,5 | +2,0 | 0 | verworfen |
+| **S0** | **−58,6** | [−70,4; −46,8] | 2,7 · 10⁻¹⁹ | −49,9 / −67,3 | −15,6 | 0 | **schlechter** |
+| **S1** | **−42,2** | [−54,3; −30,1] | 5,2 · 10⁻¹¹ | −44,3 / −40,1 | −6,1 | 0 | **schlechter** |
+| **S9** | **+7,3** | [+0,2; +14,5] | 0,045 | +9,1 / +5,6 | −9,6 | 1 | **Hinweis: besser** |
+| B0 | −2,7 | [−9,6; +4,3] | 0,45 | −5,9 / +0,6 | −0,1 | 1 | verworfen |
+| B24 | +0,3 | [−8,5; +9,1] | 0,94 | −0,9 / +1,6 | +0,0 | 0 | verworfen |
+| P300 | −1,6 | [−3,8; +0,6] | 0,15 | −3,5 / +0,3 | −0,0 | 7 | verworfen |
+| PNIE | +0,2 | [−0,6; +1,0] | 0,65 | −0,1 / +0,5 | +0,0 | 126 | verworfen |
+
+„Verworfen“ heißt nach §4: Die Obergrenze des 95-%-Intervalls liegt unter +10, ein
+Gewinn von 10 Punkten ist ausgeschlossen. **Kein Arm erreicht die Schwelle für
+einen Kandidaten**; S9 liegt bei p = 0,045, also im Bereich „Hinweis“.
+
+**Die vier Punkte.**
+
+- **`raveK`: ohne Wirkung.** Ein Faktor 10 nach unten (−1,4) und nach oben (−0,4)
+  verändert den Endstand nicht, und RAVE ganz abzuschalten kostet nichts
+  (+3,6 [−4,6; +11,7], nicht belegt). Bei 120 Simulationen nützt RAVE also
+  höchstens rund 5 Punkte; ob es schadet, bleibt offen (Obergrenze +11,7). Der
+  Default 300 bleibt.
+- **`phaseBlendWidth`: ohne Wirkung.** Harte Umschaltung (−2,7) und dreifache
+  Breite (+0,3) liegen beide im Rauschen. Der Default 8 bleibt.
+- **`passMinMc`: wirkungslos, was die Stärke angeht.** Die Einträge für Zug 120 und
+  150 tun nichts (N: 30 von 30). Auch die Höhe der Schwelle ändert den Endstand
+  nicht: Pass-Prüfung nur unter −50 +0,2 [−0,6; +1,0], schon unter 300 −1,6
+  [−3,8; +0,6]. Sie bestimmt nur, wann die KI aufhört: PNIE spielt 14 Züge länger
+  (255,8 gegen 241,6), P300 28 kürzer (213,7). Die Kurve bleibt; im Code steht
+  jetzt, was sie tut.
+- **`mctsPriorSharp`: der Prior trägt, und der Default ist nicht das Optimum.**
+  Die Siegrate steigt monoton mit der Schärfe: 72 (Rang-Prior), 100 (1), 149
+  (Default 3), 189 (9) von 240, also 30 %, 42 %, 62 %, 79 %; der Endstand −58,6,
+  −42,2, 0, +7,3. Dass S0 und S1 deutlich schlechter sind, ist belegt (p < 10⁻¹⁰).
+  S9 ist nach der vorab festgelegten Regel ein **Hinweis** (Endstand p = 0,045,
+  Schwelle 0,005). Die Siege, nur sekundär, sind deutlicher: In 58 Paaren gewinnt
+  nur S9, in 18 nur A (McNemar, exakt, p = 4,7 · 10⁻⁶). Der Endstand bewegt sich
+  weniger, weil S9 Partien enger gewinnt (Ø der Siege +44,7 gegen +52,2) und
+  Niederlagen etwas höher verliert (−33,6 gegen −30,7). Nach Zug 120 liegt S9
+  schlechter (−9,6, p = 0,0003), am Ende besser: Der Gewinn entsteht nach Zug 120.
+  Nach §4 bleibt der Default 3; **eine Nachmessung von S9 und höheren Dosen mit
+  frischem Seed ist die naheliegende Folge** und wird Hazeberry vorgeschlagen.
+
+**Pass-Arme (§4).** P300 spart 27,9 Züge je Partie (11,5 %), und die Untergrenze
+des Intervalls (−3,8) liegt nicht unter −10: Die Bedingung aus §4 ist erfüllt,
+Hazeberry entscheidet, ob P300 Default werden soll. Zu bedenken ist: Der
+Vorzeichentest sieht B schlechter in 66 und besser in 31 Paaren (143 gleich,
+p = 0,0005), also einen kleinen, systematischen Verlust von rund 1,6 Punkten; die
+Siege ändern sich nicht (146 gegen 149, McNemar p = 0,61). Empfehlung: nein, die
+Ersparnis sind Züge am Ende der Partie, keine Stärke.
+
+**Gegen die Erwartung aus §5.** Die Erwartung stand vor dem Lauf und bleibt stehen.
+Abweichungen gab es bei den Armen mit dem Prior: S0 liegt mit −58,6 unter dem
+erwarteten Bereich (−10 bis −40), und S1 (−42,2) sollte innerhalb von ±10 liegen.
+R30, R3000, B0, B24, RAUS (+3,6 im Bereich −15 bis +5), P300 (−1,6 im Bereich −15
+bis +3), PNIE und N trafen die Erwartung.
+
+**Sekundär, ohne Anspruch.** Siege gepaart in
+[`siege.md`](daten/parameter-reihe/lauf1/siege.md); Median der Differenz in allen
+Armen 0 bis auf RAUS (+1,0), S0 (−59,0) und S1 (−38,0). Vorzeichentest: P300 31 gegen 66
+(p = 0,0005), alle anderen Arme außer S0 und S1 ohne Auffälligkeit. Keine Partie
+abgebrochen.
+
+**Grenzen der Aussage.** Die Messung läuft mit 120 Simulationen je Zug und gegen
+GNU Go Stufe 1; im Spiel gilt ein Zeitbudget mit mehr Simulationen, bei dem das
+Gewicht von Prior und RAVE anders aussehen kann. Gemessen ist der Einzeleffekt je
+Parameter. Ein Nullergebnis heißt bei RAUS „nicht belegt“, bei den übrigen „kein
+Gewinn von 10“; kleinere Effekte sind mit 240 Paaren unmessbar. Der Befund zu S9
+stammt aus einem Seed und gehört nachgemessen, ehe er eine Änderung trägt.
