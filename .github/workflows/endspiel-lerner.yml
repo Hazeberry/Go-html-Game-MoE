@@ -1,0 +1,186 @@
+name: Endspiel-Lerner, Prüfung an gespielten Zügen
+
+# Manueller Lauf der Prüfung aus docs/endspiel-lerner.md §4: Die Partien der
+# Prüfdatei (Arm A der Parameter-Reihe, Seed 206, heutige Standard-KI) werden
+# von GNU Go Stufe 10 beschriftet (nur Züge der KI ab Zug 81), dann zieht die
+# KI in jeder beschrifteten Stellung einmal ohne und einmal mit dem Lerner
+# (Netz docs/daten/endspiel-lerner/netz.json.gz, unverändert). Gezählt wird,
+# wie oft der gespielte Zug GNU Gos Zug trifft.
+#
+# Ablauf:
+#   pruefen   Eingaben prüfen
+#   teil      16 Teile zu je 15 Partien: beschriften, ziehen lassen (16 Jobs)
+#   ergebnis  Bericht mit Tor, Rohdaten gepackt, Branch ergebnisse/endspiel-lerner-lauf<N>
+#
+# Reproduzierbar: GNU Go auf Stufe 10 ist deterministisch, die Suche hat feste
+# 120 Simulationen und einen festen Zufallsstrom je Stellung.
+
+on:
+  workflow_dispatch:
+    inputs:
+      pruefdatei:
+        description: 'Partien der heutigen Standard-KI im Repo (jsonl.gz)'
+        required: true
+        default: 'docs/daten/parameter-reihe/lauf1/A.jsonl.gz'
+      ohne_nr:
+        description: 'Partienummern, die nicht zählen (durch Komma getrennt)'
+        required: false
+        default: '1'
+      lambda:
+        description: 'Anteil des Netzes am Prior der Wurzelkinder'
+        required: true
+        default: '0.5'
+      top:
+        description: 'So viele beste Netzzüge kommen in die Kandidaten der Wurzel'
+        required: true
+        default: '4'
+
+concurrency:
+  group: endspiel-lerner
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    name: Eingaben prüfen
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      pruefdatei: ${{ steps.p.outputs.pruefdatei }}
+      ohne_nr: ${{ steps.p.outputs.ohne_nr }}
+      lambda: ${{ steps.p.outputs.lambda }}
+      top: ${{ steps.p.outputs.top }}
+    steps:
+      - uses: actions/checkout@v7
+
+      # Eingaben nur über env und geprüft, nie in die Shell-Zeile interpoliert
+      - name: Eingaben prüfen
+        id: p
+        env:
+          IN_PRUEFDATEI: ${{ inputs.pruefdatei }}
+          IN_OHNE_NR: ${{ inputs.ohne_nr }}
+          IN_LAMBDA: ${{ inputs.lambda }}
+          IN_TOP: ${{ inputs.top }}
+        run: |
+          set -euo pipefail
+          case "$IN_PRUEFDATEI" in ''|/*|*..*|*[!A-Za-z0-9_./-]*) echo "::error::ungültiger Pfad: '$IN_PRUEFDATEI'"; exit 2;; esac
+          [ -f "$IN_PRUEFDATEI" ] || { echo "::error::Datei fehlt im Repo: $IN_PRUEFDATEI"; exit 2; }
+          case "$IN_OHNE_NR" in *[!0-9,]*) echo "::error::ohne_nr: nur Zahlen und Kommas: '$IN_OHNE_NR'"; exit 2;; esac
+          printf '%s' "$IN_LAMBDA" | grep -Eq '^(0(\.[0-9]+)?|1(\.0+)?)$' || { echo "::error::lambda zwischen 0 und 1: '$IN_LAMBDA'"; exit 2; }
+          case "$IN_TOP" in ''|*[!0-9]*) echo "::error::top: ganze Zahl: '$IN_TOP'"; exit 2;; esac
+          {
+            echo "pruefdatei=$IN_PRUEFDATEI"
+            echo "ohne_nr=$IN_OHNE_NR"
+            echo "lambda=$IN_LAMBDA"
+            echo "top=$IN_TOP"
+          } >> "$GITHUB_OUTPUT"
+          echo "## Endspiel-Lerner: \`$IN_PRUEFDATEI\` ohne Partien $IN_OHNE_NR, λ $IN_LAMBDA, top $IN_TOP, Commit \`${GITHUB_SHA:0:7}\`" >> "$GITHUB_STEP_SUMMARY"
+
+  teil:
+    name: Partien ab ${{ matrix.von }}
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        von: [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+          gnugo --version | head -n 1
+
+      - name: Beschriften und ziehen lassen
+        env:
+          VON: ${{ matrix.von }}
+          PRUEF: ${{ needs.pruefen.outputs.pruefdatei }}
+          OHNE_NR: ${{ needs.pruefen.outputs.ohne_nr }}
+          LAMBDA: ${{ needs.pruefen.outputs.lambda }}
+          TOP: ${{ needs.pruefen.outputs.top }}
+        run: bash auswertung/dagger/lerner-teil.sh "$VON" "$PRUEF" docs/daten/endspiel-lerner/netz.json.gz "$LAMBDA" "$TOP" lerner
+
+      - name: Ergebnisse sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lerner-${{ matrix.von }}
+          path: lerner/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [pruefen, teil]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: lerner-*
+          path: lerner
+          merge-multiple: true
+
+      - name: Bericht
+        run: |
+          set -euo pipefail
+          mkdir -p ergebnisse
+          for v in 1 16 31 46 61 76 91 106 121 136 151 166 181 196 211 226; do
+            [ -s "lerner/ergebnis-$v.jsonl" ] || { echo "::error::Teil ab $v fehlt"; exit 1; }
+          done
+          node auswertung/lerner-bericht.js lerner/ergebnis-*.jsonl > ergebnisse/bericht.txt
+          node auswertung/lerner-bericht.js lerner/ergebnis-*.jsonl --markdown > ergebnisse/bericht.md
+          cat lerner/ergebnis-*.jsonl | gzip -9 > ergebnisse/ergebnisse.jsonl.gz
+          cat lerner/lehr-*.jsonl | gzip -9 > ergebnisse/lehr.jsonl.gz
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Ergebnisse sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ergebnisse-lerner
+          path: ergebnisse/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/endspiel-lerner-lauf${LAUF}"
+          ziel="docs/daten/endspiel-lerner/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Endspiel-Lerner, Prüfung: Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"

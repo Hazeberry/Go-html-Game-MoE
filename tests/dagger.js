@@ -36,6 +36,9 @@
         der Schalter steht in index.html mit Default 0; der Bericht urteilt
         mit alpha 0,05, unvollständige Teile werden abgelehnt; die Treppen-
         Sonde (treppe-sonde.js) findet ihre vier Stellen in index.html.
+    11. Der Endspiel-Lerner (docs/endspiel-lerner.md): Workflow und Vorgaben
+        wie in der Vorabfestlegung, das Netz liegt im Repo, lerner-teil.sh
+        lehnt falsche Eingaben ab; Merkmale, Vorwärtsrechnung und Tor.
     10. Die Nachmessung der Prior-Schärfe und von bensonDeathTransfer
         (docs/prior-nachmessung.md): Workflow, Arme in Skript, Workflow und
         Dokument stimmen überein, die Vorgaben auch; die Skripte lehnen falsche
@@ -59,6 +62,9 @@ const P = require('../auswertung/parameter-bericht.js');
 const PS = require('../auswertung/pass-sonde.js');
 const TS = require('../auswertung/treppe-sonde.js');
 const SB = require('../auswertung/selbstspiel-bericht.js');
+const LB = require('../auswertung/lerner-bericht.js');
+const LM = require('../auswertung/lerner-merkmale.js');
+const LN = require('../auswertung/lerner-netz.js');
 
 const wurzel = path.join(__dirname, '..');
 const temp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'dagger-'));
@@ -182,6 +188,7 @@ test('Workflow endspiel-orakel.yml: keine Ausdrücke in Shell-Zeilen', () => pru
 test('Workflow parameter-reihe.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('parameter-reihe.yml', 5, 2));
 test('Workflow benson-lebend.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('benson-lebend.yml', 5, 2));
 test('Workflow prior-nachmessung.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('prior-nachmessung.yml', 10, 4));
+test('Workflow endspiel-lerner.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-lerner.yml', 5, 4));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
 
@@ -854,6 +861,54 @@ test('Bericht: gleicher Anfang zweier Arme', () => {
   const g = P.gleicherAnfang(ref, m([['a', 'b', 'd'], ['a', 'b'], ['x', 'q', 'z']]), 2);
   pruefeGleich(`${g.gleich}/${g.n}`, '2/3', 'zwei Paare mit gleichen ersten zwei Zügen');
   pruefeGleich(P.gleicherAnfang(ref, m([['a', 'b', 'd']]), 3).gleich, 0, 'der dritte Zug weicht ab');
+});
+
+/* ── Endspiel-Lerner (docs/endspiel-lerner.md) ──────────────────────────── */
+
+test('Workflow endspiel-lerner.yml: Aufbau und Vorgaben wie in der Vorabfestlegung', () => {
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'endspiel-lerner.yml'), 'utf8');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'endspiel-lerner.md'), 'utf8');
+  pruefe(/^on:\n  workflow_dispatch:/m.test(t), 'nur manuell gestartet');
+  for (const job of ['pruefen', 'teil', 'ergebnis']) pruefe(new RegExp(`^  ${job}:$`, 'm').test(t), `Job ${job}`);
+  pruefe(/^permissions:\n  contents: read$/m.test(t), 'Standard: nur lesen');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefeGleich((/von: \[([0-9, ]+)\]/.exec(t) || [])[1].split(',').map(Number).join(','), TEILE.join(','), '16 Teile zu je 15 Partien');
+  pruefe(/lerner-teil\.sh "\$VON" "\$PRUEF" docs\/daten\/endspiel-lerner\/netz\.json\.gz "\$LAMBDA" "\$TOP" lerner/.test(t), 'ein Teil je Beginn, mit dem festen Netz');
+  pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-lerner', 'netz.json.gz')), 'das Netz liegt im Repo');
+  for (const name of ['pruefdatei', 'ohne_nr', 'lambda', 'top']) {
+    const imDoc = (new RegExp('^\\| `' + name + '` \\| `?([^` |]+)', 'm').exec(doc) || [])[1];
+    const imFlow = (new RegExp('^      ' + name + ':\\n(?:        .*\\n)*?        default: \'([^\']*)\'', 'm').exec(t) || [])[1];
+    pruefe(imDoc !== undefined && imDoc === imFlow, `Vorgabe ${name}: Dokument „${imDoc}“, Workflow „${imFlow}“`);
+  }
+  const s = (...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'lerner-teil.sh'), ...x], {cwd: temp(), encoding: 'utf8'});
+  pruefeGleich(s('a', 'x.gz', 'n.gz', '0.5', '4', 'aus').status, 2, 'lerner-teil.sh: Zahl erwartet');
+  pruefeGleich(s('1', 'gibt-es-nicht.gz', 'n.gz', '0.5', '4', 'aus').status, 2, 'lerner-teil.sh: Datei fehlt');
+  pruefeGleich(s('1', 'x.gz').status, 1, 'lerner-teil.sh: Argument fehlt');
+});
+
+test('Lerner: Merkmale, Vorwärtsrechnung und Tor', () => {
+  const E = require('./rahmen').ladeKI({mitNetz: false});
+  const b = new Uint8Array(361);
+  b[1] = 2; b[2] = 1; b[20] = 1;   /* weißer Stein B19 mit einer Freiheit (A19), Schwarz am Zug */
+  const x = LM.ebenen(E, b, 1, 2, -1, -1, 100, new Uint8Array(LM.EBENEN * 361));
+  const e = (k, i) => x[k * 361 + i];
+  pruefeGleich(e(0, 2) + e(1, 1) + e(2, 0), 3, 'eigener, fremder Stein, leerer Punkt');
+  pruefeGleich(e(7, 1), 1, 'fremde Kette mit einer Freiheit');
+  pruefeGleich(e(15, 0), 1, 'A19 schlägt'); pruefeGleich(e(14, 0), 1, 'A19 ist legal');
+  pruefeGleich(e(11, 2), 1, 'letzter Zug'); pruefeGleich(e(27, 0), 0, 'vor Zug 160');
+  pruefeGleich(e(26, 180), 1, 'Ebene überall 1');
+  const netz = LN.netzAus({ebenen: LM.EBENEN, kanaele: 1, schichten: 1,
+    ein: {w: [[Array.from({length: LM.EBENEN}, (_, c) => Array.from({length: 5}, (_, y) => Array.from({length: 5}, (_, z) => c === 15 && y === 2 && z === 2 ? 1 : 0)))]], b: [0]},
+    mitte: [], aus: {w: [[[[1]]]], b: [0]}});
+  const p = LN.softmax(LN.vorwaerts(netz, x));
+  pruefe(p[0] > p[5] && Math.abs(p.reduce((s, v) => s + v, 0) - 1) < 1e-9, 'das Netz bevorzugt den Schlag, Summe 1');
+  pruefeGleich(p[1], 0, 'besetzte Punkte haben Wahrscheinlichkeit 0');
+  const r = (y, ohne, mit, k = 100) => ({y, ohne, mit, z: ohne, netz: mit, k});
+  const viele = [...Array(60)].map(() => r(1, 2, 1)).concat([...Array(40)].map(() => r(1, 2, 2)));
+  pruefeGleich(LB.tor({diff: 0.6, p: 1e-10, nurMit: 60, nurOhne: 0}), 'bestanden', 'deutlicher Gewinn');
+  pruefe(/Tor .*: bestanden/.test(LB.bericht(viele)), 'Bericht: bestanden');
+  pruefeGleich(LB.tor({diff: 0.03, p: 0.001, nurMit: 30, nurOhne: 0}), 'nicht bestanden', 'unter +4,0');
+  pruefeGleich(LB.tor({diff: 0.05, p: 0.2, nurMit: 5, nurOhne: 0}), 'nicht bestanden', 'nicht signifikant');
 });
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));
