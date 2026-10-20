@@ -1,0 +1,176 @@
+name: Prüfstand und Laufzeit des Endspiel-Netzes
+
+# Manueller Lauf aus docs/teststaerke.md §8: Die heutige Standard-KI (mit
+# Endspiel-Netz) spielt gegen GNU Go Stufe 1 mit 9, 6, 4 und 2 Vorgabesteinen,
+# je 60 Partien; daraus folgt die Vorgabe künftiger Messungen. Dazu misst ein
+# Job, was das Endspiel-Netz im Spiel mit Zeitbudget kostet (netz-zeit.js).
+#
+# Ablauf:
+#   pruefen   Eingaben prüfen
+#   spielen   4 Vorgaben × 4 Teile zu je 15 Partien (16 Jobs)
+#   zeit      Laufzeit des Netzes mit Zeitbudget (1 Job)
+#   ergebnis  Bericht, Rohdaten gepackt, Branch ergebnisse/pruefstand-lauf<N>
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: 'Seed der Partien (215: noch nie benutzt)'
+        required: true
+        default: '215'
+
+concurrency:
+  group: pruefstand
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    name: Eingaben prüfen
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      seed: ${{ steps.p.outputs.seed }}
+    steps:
+      - name: Eingaben prüfen
+        id: p
+        env:
+          IN_SEED: ${{ inputs.seed }}
+        run: |
+          set -euo pipefail
+          case "$IN_SEED" in ''|*[!0-9]*) echo "::error::seed muss eine nicht-negative ganze Zahl sein: '$IN_SEED'"; exit 2;; esac
+          echo "seed=$IN_SEED" >> "$GITHUB_OUTPUT"
+          echo "## Prüfstand: Seed $IN_SEED, Commit \`${GITHUB_SHA:0:7}\`" >> "$GITHUB_STEP_SUMMARY"
+
+  spielen:
+    name: Vorgabe ${{ matrix.vorgabe }}, Partien ab ${{ matrix.von }}
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        vorgabe: [9, 6, 4, 2]
+        von: [1, 16, 31, 46]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+          gnugo --version | head -n 1
+
+      - name: 15 Partien spielen
+        env:
+          VORGABE: ${{ matrix.vorgabe }}
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed }}
+        run: bash auswertung/dagger/pruefstand-spielen.sh "$VORGABE" "$VON" "$SEED" "stand/v$VORGABE-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-${{ matrix.vorgabe }}-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  zeit:
+    name: Laufzeit des Endspiel-Netzes
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Messen
+        run: |
+          set -euo pipefail
+          mkdir -p stand
+          node auswertung/netz-zeit.js --partien 8 | tee stand/zeit.txt
+
+      - name: Ergebnis sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-zeit
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [pruefen, spielen, zeit]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: stand-*
+          path: stand
+          merge-multiple: true
+
+      - name: Bericht
+        run: |
+          set -euo pipefail
+          mkdir -p ergebnisse
+          args=()
+          for v in 9 6 4 2; do
+            teile=()
+            for t in 1 16 31 46; do
+              [ -s "stand/v$v-$t.jsonl" ] || { echo "::error::Teil v$v-$t fehlt"; exit 1; }
+              teile+=("stand/v$v-$t.jsonl")
+            done
+            args+=("$v=$(IFS=,; echo "${teile[*]}")")
+            cat "${teile[@]}" | gzip -9 > "ergebnisse/vorgabe-$v.jsonl.gz"
+          done
+          node auswertung/pruefstand-bericht.js "${args[@]}" > ergebnisse/pruefstand.txt
+          node auswertung/pruefstand-bericht.js "${args[@]}" --markdown > ergebnisse/pruefstand.md
+          cp stand/zeit.txt ergebnisse/zeit.txt
+          { echo "## Prüfstand"; echo; cat ergebnisse/pruefstand.md; echo; echo "## Laufzeit des Endspiel-Netzes"; echo; echo '```'; cat ergebnisse/zeit.txt; echo '```'; } | tee ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/pruefstand-lauf${LAUF}"
+          ziel="docs/daten/pruefstand/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Prüfstand und Laufzeit des Endspiel-Netzes: Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"
