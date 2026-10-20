@@ -18,12 +18,18 @@
    der Referenzarm gegen eine frühere Messung desselben Seeds geprüft: gleicher
    Endstand und gleiche Zugzahl je Partienummer.
 
+   Mit --siege statt der Endstand-Tabellen die Siege gepaart: wie oft gewinnt
+   nur der Arm, wie oft nur der Referenzarm, wie oft beide oder keiner, dazu der
+   exakte McNemar-Test (der Vorzeichentest auf den Paaren, in denen die Sieger
+   wechseln). Sekundär, nicht der Endpunkt.
+
    Aufruf:
      node auswertung/parameter-bericht.js --ref A --arm A=a.jsonl --arm R30=r.jsonl ...
-          [--text R30=raveK=30 ...] [--gleich N] [--alpha 0.005] [--kontrolle frueher.jsonl.gz] [--markdown] */
+          [--text R30=raveK=30 ...] [--gleich N] [--alpha 0.005] [--kontrolle frueher.jsonl.gz] [--siege] [--markdown] */
 'use strict';
 const B = require('./endspiel-pilot-bericht.js');
 const O = require('./orakel-bericht.js');
+const Z = require('./messung-zusatz.js');
 
 const mittel = a => a.reduce((s, x) => s + x, 0) / a.length;
 const f1 = v => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1).replace('.', ',');
@@ -48,6 +54,29 @@ function gleiche(ref, arm) {
     if (a.endstand === r.endstand && a.zuegeAnzahl === r.zuegeAnzahl && JSON.stringify(a.zuege) === JSON.stringify(r.zuege)) gleich++;
   }
   return {n, gleich};
+}
+
+/* Siege gepaart nach Partienummer; abgebrochene Partien fallen samt Partner heraus.
+   b: nur der Arm gewinnt, c: nur der Referenzarm, McNemar exakt = Vorzeichentest auf b und c */
+function siege(ref, arm) {
+  let b = 0, c = 0, beide = 0, keiner = 0;
+  for (const [nr, a] of ref) {
+    const x = arm.get(nr); if (!x || a.abgebrochen || x.abgebrochen) continue;
+    if (x.gewonnen && !a.gewonnen) b++; else if (!x.gewonnen && a.gewonnen) c++; else if (x.gewonnen) beide++; else keiner++;
+  }
+  return {b, c, beide, keiner, siegeArm: b + beide, siegeRef: c + beide, p: Z.vorzeichenP(b, c)};
+}
+
+function siegeText(arme, ref, gleichArme, opt) {
+  const aus = [];
+  const namen = Object.keys(arme).filter(n => n !== ref && !gleichArme.includes(n));
+  if (opt.markdown) aus.push(`| Arm | Siege | Siege ${ref} | nur Arm | nur ${ref} | beide | keiner | McNemar p |`, '|---|---:|---:|---:|---:|---:|---:|---:|');
+  for (const n of namen) {
+    const s = siege(arme[ref], arme[n]);
+    if (opt.markdown) aus.push(`| **${n}** | ${s.siegeArm} | ${s.siegeRef} | ${s.b} | ${s.c} | ${s.beide} | ${s.keiner} | ${fp(s.p)} |`);
+    else aus.push(`${n} gegen ${ref}: Siege ${s.siegeArm} gegen ${s.siegeRef} · nur ${n} gewinnt ${s.b}, nur ${ref} gewinnt ${s.c}, beide ${s.beide}, keiner ${s.keiner} · McNemar (exakt) p = ${fp(s.p)}`);
+  }
+  return aus.join('\n');
 }
 
 function auswertung(arme, ref, gleichArme, alpha) {
@@ -93,7 +122,7 @@ function text(a, texte, opt) {
 }
 
 function main() {
-  const a = process.argv.slice(2), opt = {arme: {}, texte: {}, ref: 'A', gleich: [], alpha: 0.005, kontrolle: null, markdown: false};
+  const a = process.argv.slice(2), opt = {arme: {}, texte: {}, ref: 'A', gleich: [], alpha: 0.005, kontrolle: null, markdown: false, siege: false};
   for (let i = 0; i < a.length; i++) {
     if (a[i] === '--arm') { const [n, f] = a[++i].split('='); opt.arme[n] = B.liesArm(f.split(',')); }
     else if (a[i] === '--text') { const s = a[++i], k = s.indexOf('='); opt.texte[s.slice(0, k)] = s.slice(k + 1); }
@@ -102,10 +131,12 @@ function main() {
     else if (a[i] === '--alpha') opt.alpha = +a[++i];
     else if (a[i] === '--kontrolle') opt.kontrolle = a[++i];
     else if (a[i] === '--markdown') opt.markdown = true;
+    else if (a[i] === '--siege') opt.siege = true;
   }
   if (!opt.arme[opt.ref] || !(opt.alpha > 0 && opt.alpha <= 0.05)) {
     console.error('Aufruf: node auswertung/parameter-bericht.js --ref A --arm A=a.jsonl --arm R30=r.jsonl ... [--alpha 0.005]'); process.exit(1);
   }
+  if (opt.siege) { console.log(siegeText(opt.arme, opt.ref, opt.gleich, opt)); return; }
   console.log(text(auswertung(opt.arme, opt.ref, opt.gleich, opt.alpha), opt.texte, opt));
   if (opt.kontrolle) {
     const k = O.kontrolle(opt.arme[opt.ref], opt.kontrolle);
@@ -114,4 +145,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = {urteil, gleiche, auswertung, text};
+module.exports = {urteil, gleiche, siege, siegeText, auswertung, text};

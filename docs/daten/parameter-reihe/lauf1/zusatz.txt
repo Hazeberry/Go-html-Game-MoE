@@ -1,0 +1,50 @@
+== RAUS gegen A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 241.6, B Ø 236.3
+Median der Differenz B − A: +1,0
+Vorzeichentest: B besser in 120 Paaren, schlechter in 110, gleich in 10 · p = 0,5530 (zweiseitig, exakt)
+== R30 gegen A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 241.6, B Ø 236.5
+Median der Differenz B − A: +0,0
+Vorzeichentest: B besser in 115 Paaren, schlechter in 112, gleich in 13 · p = 0,8944 (zweiseitig, exakt)
+== R3000 gegen A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 241.6, B Ø 241.7
+Median der Differenz B − A: +0,0
+Vorzeichentest: B besser in 109 Paaren, schlechter in 118, gleich in 13 · p = 0,5955 (zweiseitig, exakt)
+== S0 gegen A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 241.6, B Ø 283.2
+Median der Differenz B − A: −59,0
+Vorzeichentest: B besser in 63 Paaren, schlechter in 176, gleich in 1 · p = 0,0000 (zweiseitig, exakt)
+== S1 gegen A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 241.6, B Ø 272.2
+Median der Differenz B − A: −38,0
+Vorzeichentest: B besser in 83 Paaren, schlechter in 153, gleich in 4 · p = 0,0000 (zweiseitig, exakt)
+== S9 gegen A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 241.6, B Ø 222.6
+Median der Differenz B − A: +0,0
+Vorzeichentest: B besser in 119 Paaren, schlechter in 114, gleich in 7 · p = 0,7934 (zweiseitig, exakt)
+== B0 gegen A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 241.6, B Ø 240.9
+Median der Differenz B − A: +0,0
+Vorzeichentest: B besser in 109 Paaren, schlechter in 117, gleich in 14 · p = 0,6416 (zweiseitig, exakt)
+== B24 gegen A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 241.6, B Ø 243.0
+Median der Differenz B − A: +0,0
+Vorzeichentest: B besser in 115 Paaren, schlechter in 115, gleich in 10 · p = 1,0000 (zweiseitig, exakt)
+== P300 gegen A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 241.6, B Ø 213.7
+Median der Differenz B − A: +0,0
+Vorzeichentest: B besser in 31 Paaren, schlechter in 66, gleich in 143 · p = 0,0005 (zweiseitig, exakt)
+== PNIE gegen A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 241.6, B Ø 255.8
+Median der Differenz B − A: +0,0
+Vorzeichentest: B besser in 7 Paaren, schlechter in 2, gleich in 231 · p = 0,1797 (zweiseitig, exakt)

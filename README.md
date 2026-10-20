@@ -267,6 +267,10 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | Endspiel-Muster, Datenaggregation Runde 3, die letzte (in GitHub Actions): Tabelle T3 spielt, GNU Go beschriftet 240 Partien, daraus T4 | Pilot gegen GNU Go, 60 ausgespielte Paare, Seed 210: T4 gegenüber dem Default −5,7 Punkte (95 %: [−20,4; +9,0], p = 0,44), T3 −7,0 ([−25,2; +11,2]); alle drei Piloten zusammen NEU − A −0,2 ([−9,4; +9,0], 180 Paare, p = 0,96); offline auf neuen Stellungen T4 vor T3 (Rang ≤ 16: 86,6 gegen 78,9 %), im Spiel nicht | negatives Ergebnis, die Reihe endet nach der vorab festgelegten Regel: kein Schalter auf `main`, keine Messung (`docs/muster-endspiel-dagger.md` §7, §8) |
 | Endspiel-Muster, Messung mit 240 Paaren gegen GNU Go (in GitHub Actions): letzte Tabelle T4, Gewicht 200 gegen Default, Seed 206 | Endstand B − A **−3,7** (95 %: [−10,7; +3,3], p = 0,30), Siege 132 gegen 149, nach Zug 120 +0,1; Median +6, Vorzeichentest B besser in 135 gegen 102 (p = 0,037), Mittelwert von wenigen großen Verlusten bestimmt | verworfen (Obergrenze unter +10): T4 wird nicht übernommen, die Reihe zum Endspiel-Muster ist abgeschlossen (`docs/muster-endspiel-messung.md` §4, §8) |
 | Endspiel-Muster, Orakel-Test (in GitHub Actions): GNU Go Stufe 10 zieht für die KI ab Zug 81 (in 25 %, 50 % oder allen Zügen) oder ab Zug 161 (in allen), 120 Paare je Arm gegen GNU Go, Seed 206 | Endstand gegenüber Arm A (+22,9, 79 Siege): **D100 +78,7** (95 %: [+68,5; +88,9], 120 Siege), D50 +32,8, D25 +21,3, E100 +34,4, alle p < 0,001; ein geänderter Zug ist im Mittel +1,60 Punkte wert (vorab erwartet 0,6), die KI trifft den Orakelzug in rund 25 % ihrer Züge; der Gewinn hängt nicht am früheren Passen (die Stellung nach dem ersten Pass ergibt den Endstand auf ±1 Punkt) | Spielraum belegt, keine Änderung an der Engine: Messlatte für einen stärkeren Lerner ist ein Zuwachs von 4,0 Prozentpunkten bei den gespielten Zügen für +5 Punkte; T4 mit 2 bis 3 Prozentpunkten wäre rund +3 Punkte wert gewesen, unter der Nachweisgrenze von M1 (`docs/muster-endspiel-orakel.md` §4, §8) |
+| `raveK` 30 und 3000 gegen 300, RAVE ganz aus (je 240 Paare gegen GNU Go, 20.10.) | Endstand −1,4 [−9,8; +7,0], −0,4 [−8,1; +7,2], RAVE aus +3,6 [−4,6; +11,7]; Siege 153, 145, 152 gegen 149 | verworfen: kein Hebel bei 120 Simulationen, Default 300 bleibt (`docs/parameter-reihe.md` §8) |
+| `mctsPriorSharp` 0, 1, 9 gegen 3 (je 240 Paare gegen GNU Go, 20.10.) | Endstand −58,6, −42,2, **+7,3** [+0,2; +14,5, p = 0,045]; Siege 72, 100, **189** gegen 149 von 240 (McNemar für 9: p = 5 · 10⁻⁶) | der Prior trägt, schärfer ist besser; 9 ist nach der vorab festgelegten Regel (α = 0,005) nur ein Hinweis, Default bleibt 3 bis zur Nachmessung (`docs/parameter-reihe.md` §8) |
+| `phaseBlendWidth` 0 und 24 gegen 8 (je 240 Paare gegen GNU Go, 20.10.) | Endstand −2,7 [−9,6; +4,3] und +0,3 [−8,5; +9,1] | verworfen: kein Hebel, Default 8 bleibt (`docs/parameter-reihe.md` §8) |
+| Pass-Kurve `passMinMc*`: Negativkontrolle (120 und 150 auf −1000), Stufe 80 auf 300, alle Stufen auf −50 (je 240 Paare gegen GNU Go, 20.10.) | 30 von 30 Partien Zug für Zug gleich; Endstand −1,6 [−3,8; +0,6] und +0,2 [−0,6; +1,0]; Partien 28 Züge kürzer und 14 länger | die Einträge für Zug 120 und 150 sind wirkungslos; die Höhe ändert nur, wann die KI aufhört; die Kurve bleibt, im Code steht jetzt, was sie tut (`docs/parameter-reihe.md` §8) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2420,6 +2424,29 @@ am früheren Passen des Orakels (die Stellung nach dem ersten Pass ergibt den
 Endstand auf einen Punkt genau). Das sagt, dass es etwas zu holen gibt, nicht
 dass sich ein Lerner es holt; die Engine bleibt unverändert, der nächste Schritt
 wäre ein stärkerer Lerner offline, mit der Messlatte als Tor.
+
+**Die vier offenen Parameter (20.10.).** `raveK`, `mctsPriorSharp`,
+`phaseBlendWidth` und die Pass-Kurve `passMinMc` standen seit dem ersten Commit
+im Code (`mctsPriorSharp` seit dem Softmax-Prior) und waren nie gemessen. Jetzt
+sind sie es, in einem Lauf in GitHub Actions
+([`docs/parameter-reihe.md`](docs/parameter-reihe.md), 49 Minuten, 2 670 Partien
+gegen GNU Go: zehn Arme zu 240 Paaren und eine Negativkontrolle, Schwelle je
+Vergleich α = 0,005). **`raveK` und `phaseBlendWidth` sind kein Hebel:** Ein
+Faktor 10 bei `raveK` ändert den Endstand um −1,4 und −0,4, RAVE ganz
+abzuschalten um +3,6 [−4,6; +11,7], die harte Umschaltung der Experten um −2,7, die
+dreifache Breite um +0,3. **Die Pass-Kurve ist wirkungslos, wo sie wirken
+sollte:** Die Einträge für Zug 120 und 150 tun nichts (Negativkontrolle: 30 von 30
+Partien Zug für Zug gleich, weil 8 und 10 unter 20 liegen), und auch die Höhe
+ändert den Endstand nicht (+0,2 [−0,6; +1,0] bei −50, −1,6 [−3,8; +0,6] bei 300),
+nur, wann die KI aufhört (14 Züge länger, 28 kürzer). Der Grund: Die Schwellen
+stammen aus einer Zeit mit Zugwerten in den Zehnern; heute liegt der beste
+Kandidat nach Zug 80 im Median bei 906 und fällt nur im letzten Zug unter 20.
+**`mctsPriorSharp` ist der Treffer:** Der Prior trägt (der alte Rang-Prior −58,6,
+Schärfe 1 −42,2 gegen den Default 3), und schärfer ist besser. Mit 9 gewinnt die
+KI 189 statt 149 von 240 Partien (McNemar p = 5 · 10⁻⁶), und der Endstand steigt
+um 7,3 [+0,2; +14,5], nach der vorab festgelegten Regel nur ein Hinweis (p = 0,045
+bei Schwelle 0,005). Der Default bleibt 3, bis eine Nachmessung mit frischem Seed
+vorliegt.
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem

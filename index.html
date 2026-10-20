@@ -1596,6 +1596,19 @@ globalThis.PARAMS = {
   crisisDragonSize:   8,
   /* Pass & Suche */
   passGainThreshold: 60,
+  /* Pass-Schwellen. wantsToPass (getAIMove) ist eine ODER-Verknüpfung: Zug > 40
+     und bester Kandidatenwert < passMinMc40, oder Zug > 80 und < passMinMc80,
+     oder Zug > 120 und < passMinMc120, oder Zug > 150 und < passMinMc150. Mit
+     −50 / 20 / 8 / 10 sind 120 und 150 wirkungslos: Was sie auslösen, löst die
+     Stufe bei 80 schon aus (8 und 10 liegen unter 20). Belegt durch eine
+     Negativkontrolle, beide auf −1000: 30 von 30 Partien Zug für Zug gleich.
+     Die Werte stammen aus einer Zeit mit Zugwerten in den Zehnern. Heute liegt
+     der beste Kandidat nach Zug 80 im Median bei 906 und fällt nur im letzten
+     Zug einer Partie unter 20 (auswertung/pass-sonde.js).
+     GEMESSEN, 240 Paare gegen GNU Go (docs/parameter-reihe.md): die Stufe bei
+     80 auf 300 −1,6 [−3,8; +0,6], alle Schwellen auf −50 +0,2 [−0,6; +1,0].
+     Die Höhe ändert den Endstand nicht, nur wann die KI aufhört (28 Züge
+     kürzer bzw. 14 länger). Bleibt, wie sie ist. */
   passMinMc40:      -50,
   passMinMc80:       20,
   passMinMc120:       8,
@@ -1669,7 +1682,9 @@ globalThis.PARAMS = {
   candMidMax: 12, rollMidMin: 2, depthMidMax: 30,
   candEnd: 8, rollEndMin: 4, rollEnd: 6, depthEnd: 20, depthEndMax: 50,
   crisisCand: 4, crisisRoll: 5, crisisDepth: 20,
-  /* MoE Soft-Gating: Experten überblenden statt hart umschalten */
+  /* MoE Soft-Gating: Experten überblenden statt hart umschalten.
+     GEMESSEN, 240 Paare gegen GNU Go (docs/parameter-reihe.md): 0 (harte
+     Umschaltung) −2,7 [−9,6; +4,3], 24 +0,3 [−8,5; +9,1]. Kein Hebel; bleibt 8. */
   phaseBlendWidth:    8,
   /* MCTS-PUCT (Schwer-KI) — alternativer Such-Ansatz, A/B via useMCTS */
   useMCTS:            1,
@@ -1712,7 +1727,11 @@ globalThis.PARAMS = {
      von −641 auf −366). Gemessen: kostet nichts. */
   mctsValueScale:   200,
   mctsMaxDepth:      60,
-  /* RAVE/AMAF + Tree-Reuse — Statistik-Hebel ohne Training */
+  /* RAVE/AMAF + Tree-Reuse — Statistik-Hebel ohne Training.
+     GEMESSEN, 240 Paare gegen GNU Go bei 120 Simulationen (docs/parameter-
+     reihe.md): raveK 30 −1,4 [−9,8; +7,0], 3000 −0,4 [−8,1; +7,2]; RAVE ganz
+     aus (raveEnabled 0) +3,6 [−4,6; +11,7]. Kein Hebel; RAVE nützt hier
+     höchstens rund 5 Punkte. */
   raveEnabled:         1,    // 0 = aus, reines PUCT wie vorher
   raveK:             300,    // AMAF-Einfluss; höher = länger stark gewichtet
   mctsTreeReuse:       1,    // 0 = aus, immer frischer Baum
@@ -1786,7 +1805,13 @@ globalThis.PARAMS = {
   /* First-Play-Urgency: Startwert für unbesuchte MCTS-Knoten (Fix #5) */
   mctsFPU:         0.45,
   /* Schärfe des PUCT-Priors. 0 = alter Rang-Prior (fast flach, verwirft Scores).
-     Höher = Softmax über die tatsächlichen Heuristik-Scores. */
+     Höher = Softmax über die tatsächlichen Heuristik-Scores.
+     GEMESSEN, 240 Paare gegen GNU Go (docs/parameter-reihe.md): 0 −58,6, 1
+     −42,2 und 9 +7,3 [+0,2; +14,5] gegen den Default 3; Siege 72, 100, 149
+     (Default), 189 von 240. Der Prior trägt, und schärfer ist besser. 9 ist
+     nach der vorab festgelegten Regel nur ein Hinweis (Endstand p = 0,045;
+     Siege McNemar p = 5 · 10⁻⁶, sekundär). Der Default bleibt 3, bis eine
+     Nachmessung mit frischem Seed vorliegt. */
   mctsPriorSharp:    3,
   /* Lokalität: Go ist überwiegend ein Antwortspiel. Ohne diesen Term bewertet
      die Heuristik einen Zug in der leeren Ecke exakt wie eine Antwort auf die

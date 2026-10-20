@@ -32,6 +32,8 @@ kargs=(); [ -z "$kontrolle" ] || kargs=(--kontrolle "$kontrolle")
 # Ein Vergleich, eine Hypothese: alpha 0,05
 node "$wurzel/auswertung/parameter-bericht.js" --ref A --arm A=zw/A.jsonl --arm B=zw/B.jsonl --text B=bensonAliveExempt=1 --alpha 0.05 ${kargs[@]+"${kargs[@]}"} > ergebnisse/messung.txt
 node "$wurzel/auswertung/parameter-bericht.js" --ref A --arm A=zw/A.jsonl --arm B=zw/B.jsonl --text B=bensonAliveExempt=1 --alpha 0.05 ${kargs[@]+"${kargs[@]}"} --markdown > ergebnisse/messung.md
+node "$wurzel/auswertung/parameter-bericht.js" --ref A --arm A=zw/A.jsonl --arm B=zw/B.jsonl --siege > ergebnisse/siege.txt
+node "$wurzel/auswertung/parameter-bericht.js" --ref A --arm A=zw/A.jsonl --arm B=zw/B.jsonl --siege --markdown > ergebnisse/siege.md
 node "$wurzel/auswertung/gnugo-vergleich.js" --A zw/A.jsonl --B zw/B.jsonl --zug 120,200,ende > ergebnisse/zuege.txt
 node "$wurzel/auswertung/messung-zusatz.js" --A zw/A.jsonl --B zw/B.jsonl > ergebnisse/zusatz.txt
 
@@ -47,6 +49,10 @@ node "$wurzel/auswertung/messung-zusatz.js" --A zw/A.jsonl --B zw/B.jsonl > erge
   echo "Als Text:"
   echo
   echo '```'; cat ergebnisse/messung.txt; echo '```'
+  echo
+  echo "## Siege, gepaart (McNemar, sekundär)"
+  echo
+  cat ergebnisse/siege.md
   echo
   echo "## Nach Zug 120, nach Zug 200 und am Ende (gnugo-vergleich.js)"
   echo
