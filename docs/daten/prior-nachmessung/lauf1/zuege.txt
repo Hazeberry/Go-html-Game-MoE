@@ -1,0 +1,20 @@
+== S9 gegen A
+nach Zug 120: 480 Paare (0 ohne Partner/abgebrochen) · A Ø 73.8 · B Ø 63.4 · Differenz B − A -10.4 (SD 37.9) · t = -6.04, p = 3.0e-9
+nach Zug 200: 263 Paare (217 ohne Partner/abgebrochen) · A Ø 17.3 · B Ø 25.5 · Differenz B − A 8.2 (SD 55.6) · t = 2.39, p = 0.0174
+Endstand: 480 Paare (0 ohne Partner/abgebrochen) · A Ø 19.1 · B Ø 26.4 · Differenz B − A 7.3 (SD 58.4) · t = 2.74, p = 0.0064
+== S15 gegen A
+nach Zug 120: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 70.5 · B Ø 72.4 · Differenz B − A 1.9 (SD 40.0) · t = 0.73, p = 0.4645
+nach Zug 200: 155 Paare (85 ohne Partner/abgebrochen) · A Ø 14.2 · B Ø 26.9 · Differenz B − A 12.7 (SD 64.0) · t = 2.47, p = 0.0147
+Endstand: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 15.3 · B Ø 28.0 · Differenz B − A 12.7 (SD 66.8) · t = 2.96, p = 0.0034
+== S30 gegen A
+nach Zug 120: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 70.5 · B Ø 78.9 · Differenz B − A 8.4 (SD 34.0) · t = 3.84, p = 0.0002
+nach Zug 200: 174 Paare (66 ohne Partner/abgebrochen) · A Ø 17.5 · B Ø 21.7 · Differenz B − A 4.1 (SD 58.9) · t = 0.92, p = 0.3564
+Endstand: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 15.3 · B Ø 19.2 · Differenz B − A 3.9 (SD 77.1) · t = 0.78, p = 0.4349
+== PH gegen A
+nach Zug 120: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 70.5 · B Ø 70.5 · Differenz B − A 0.0 (SD 0.0) · t = NaN, p = NaN
+nach Zug 200: 181 Paare (59 ohne Partner/abgebrochen) · A Ø 14.7 · B Ø 12.5 · Differenz B − A -2.2 (SD 28.7) · t = -1.02, p = 0.3078
+Endstand: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 15.3 · B Ø 14.9 · Differenz B − A -0.3 (SD 34.0) · t = -0.16, p = 0.8735
+== BT gegen A
+nach Zug 120: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 70.5 · B Ø 70.5 · Differenz B − A 0.0 (SD 0.0) · t = NaN, p = NaN
+nach Zug 200: 195 Paare (45 ohne Partner/abgebrochen) · A Ø 17.2 · B Ø 17.7 · Differenz B − A 0.6 (SD 5.7) · t = 1.40, p = 0.1624
+Endstand: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 15.3 · B Ø 14.5 · Differenz B − A -0.8 (SD 12.3) · t = -1.05, p = 0.2948

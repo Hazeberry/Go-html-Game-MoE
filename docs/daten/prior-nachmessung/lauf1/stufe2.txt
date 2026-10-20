@@ -1,0 +1,8 @@
+Arm S9 (mctsPriorSharp=9): 480 Partien, 0 abgebrochen, Endstand Ø +26,4, Siege 365, Züge Ø 223,5
+Arm S15 (mctsPriorSharp=15): 240 Partien, 0 abgebrochen, Endstand Ø +28,0, Siege 165, Züge Ø 230,2
+Arm S30 (mctsPriorSharp=30): 240 Partien, 0 abgebrochen, Endstand Ø +19,2, Siege 160, Züge Ø 237,1
+Arm PH (mctsPriorSharp@120=9): 240 Partien, 0 abgebrochen, Endstand Ø +14,9, Siege 135, Züge Ø 241,4
+
+S15 − S9: 240 Paare · Differenz +1,1 (SD 49,4), 95 %: [−5,2; +7,4], p = 0,7343 · Hälften −1,6 / +3,7 · Siege 165 gegen 182 · nach Zug 120: +10,3 (p = 3,1 · 10⁻5) · Zug für Zug gleich S9: 10 von 240 → verworfen: kein Gewinn von 10
+S30 − S9: 240 Paare · Differenz −7,8 (SD 67,6), 95 %: [−16,4; +0,8], p = 0,0763 · Hälften −11,8 / −3,8 · Siege 160 gegen 182 · nach Zug 120: +16,8 (p = 3,7 · 10⁻16) · Zug für Zug gleich S9: 1 von 240 → verworfen: kein Gewinn von 10
+PH − S9: 240 Paare · Differenz −12,0 (SD 56,4), 95 %: [−19,2; −4,8], p = 0,0011 · Hälften −19,5 / −4,5 · Siege 135 gegen 182 · nach Zug 120: +8,4 (p = 0,0008) · Zug für Zug gleich S9: 0 von 240 → schlechter

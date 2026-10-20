@@ -1810,8 +1810,12 @@ globalThis.PARAMS = {
      −42,2 und 9 +7,3 [+0,2; +14,5] gegen den Default 3; Siege 72, 100, 149
      (Default), 189 von 240. Der Prior trägt, und schärfer ist besser. 9 ist
      nach der vorab festgelegten Regel nur ein Hinweis (Endstand p = 0,045;
-     Siege McNemar p = 5 · 10⁻⁶, sekundär). Der Default bleibt 3, bis eine
-     Nachmessung mit frischem Seed vorliegt. */
+     Siege McNemar p = 5 · 10⁻⁶, sekundär).
+     NACHGEMESSEN (docs/prior-nachmessung.md §8, Seed 212, 480 Paare): 9 gegen 3
+     +7,3 [+2,1; +12,5], p = 0,0064, Siege 365 gegen 304. Im Selbstspiel
+     gewinnt 9 aber nur 25,6 % (213 der 268 Niederlagen sind eigene
+     Aufgaben). Nach der Regel kein Default, untersuchen; der Default bleibt 3.
+     15 lag gegen GNU Go bei +12,7, 30 bei +3,9; 9 erst ab Zug 120 bringt nichts. */
   mctsPriorSharp:    3,
   /* Lokalität: Go ist überwiegend ein Antwortspiel. Ohne diesen Term bewertet
      die Heuristik einen Zug in der leeren Ecke exakt wie eine Antwort auf die
@@ -2065,8 +2069,9 @@ globalThis.PARAMS = {
      0,346 -> 0,247, tote Steine je Partie 12,85 -> 9,59; die Wiederholung
      bestaetigt es mit halbem Effekt. Die Siegrate bewegt sich nicht (51,7 %
      und 48,3 %, gepoolt 360 von 720). Der Defekt ist belegt, ein
-     Staerkegewinn nicht, deshalb bleibt der Default 0. Nicht gemessen: gegen
-     GNU Go. Nachweise: docs/pilot-benson-defense.md, Abschnitte 12 und 15;
+     Staerkegewinn nicht, deshalb bleibt der Default 0. Gegen GNU Go (240
+     Paare, docs/prior-nachmessung.md §8): -0,8 [-2,4; +0,7], verworfen.
+     Nachweise: docs/pilot-benson-defense.md, Abschnitte 12 und 15;
      README, "Der Benson-Uebertrag". */
   bensonDeathTransfer: 0,
   /* Sterbe-Abschlag auf große Gruppen mit wenigen Freiheiten.
