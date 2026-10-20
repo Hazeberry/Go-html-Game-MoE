@@ -163,3 +163,57 @@ Branch `ergebnisse/benson-lebend-lauf<N>` unter
 `docs/daten/benson-lebend/lauf<N>/`, dazu als Artefakt (90 Tage). Nur der letzte
 Job darf ins Repo schreiben, und nur auf einen neuen Branch. Erwartet werden 10 bis
 15 Minuten für den ganzen Lauf.
+
+## 8. Nachtrag: Ergebnis der Messung (20.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #1 des Workflows `benson-lebend.yml`
+([Run 39355220031](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/39355220031)),
+auf dem Merge-Commit `0594571` von `main`, mit den Eingaben aus §7, in 22 Minuten
+(01:45 bis 02:07 UTC; der Lauf teilte sich die Runner mit der Parameter-Reihe).
+Alle 480 Partien ausgespielt (240 je Arm), keine abgebrochen. Die Ergebnisse legte
+der Workflow auf den Branch `ergebnisse/benson-lebend-lauf1`; sie stehen hier unter
+[`daten/benson-lebend/lauf1/`](daten/benson-lebend/lauf1/): der Bericht, die
+Partien beider Arme und die Zusatzzahlen. Die Tabelle der Siege (`siege.md`) kam
+danach dazu, aus denselben Partien mit `parameter-bericht.js --siege`.
+
+**Kontrolle.** Arm A gibt Arm A der Messung M1 in **240 von 240** Partien wieder: Der
+Schalter bei 0 lässt den alten Stand auch in ganzen Partien unverändert.
+
+**Endpunkt** (240 Paare, Endstand nach GNU Gos Zählung, gepaart nach Partienummer,
+Seed 206):
+
+| Arm | Endstand Ø | Siege | Züge Ø |
+|---|---:|---:|---:|
+| A (Default) | +20,8 | 149 | 241,6 |
+| B (`bensonAliveExempt` 1) | +22,1 | 152 | 241,1 |
+
+| Vergleich | Differenz | 95 % | p | Hälfte 1 / 2 | Siege | nach Zug 120 | Zug für Zug gleich A |
+|---|---:|---|---:|---|---|---:|---:|
+| **B − A** | **+1,3** | [−1,3; +4,0] | 0,32 | −0,1 / +2,7 | 152 gegen 149 | +0,0 | 77 von 240 |
+
+**Entscheidung nach §4: verworfen.** B − A ist nicht signifikant, und die Obergrenze
+des Intervalls (+4,0) liegt unter +10: Ein relevanter Gewinn ist ausgeschlossen. Der
+Default bleibt 0, die Selbstspiel-Messung M2 entfällt. Die Erwartung aus §5 hat sich
+bestätigt: B − A innerhalb von ±8 Punkten, nicht signifikant.
+
+**Sekundär, ohne Anspruch**
+
+- Die Streuung der Paardifferenz liegt bei 20,9, weit unter den üblichen 55 bis 65,
+  weil der Eingriff erst im Spätspiel wirkt: Nach Zug 120 sind beide Arme in allen
+  240 Paaren gleich. Das Intervall ist deshalb schmal. Ein Gewinn von mehr als rund
+  4 Punkten ist ausgeschlossen; einer von ein bis zwei Punkten bleibt möglich.
+- Nach Zug 200 liegt B bei +1,1 (187 Paare, 53 enden vorher; p = 0,14). Siege: In 10
+  Paaren gewinnt nur B, in 7 nur A, in 142 beide, in 81 keiner (McNemar, exakt,
+  p = 0,63). Median der Differenz 0; Vorzeichentest B besser in 46 Paaren, schlechter
+  in 37, gleich in 157 (p = 0,38).
+- Die Partien laufen mit der Ausnahme anders: Nur 77 von 240 sind Zug für Zug
+  gleich wie in A. Die Länge ändert sich nicht (241,1 gegen 241,6 Züge).
+
+**Was die Messung sagt.** Der Defekt ist belegt (§1), und die Ausnahme ändert den
+Wert der betroffenen Stellungen und in zwei von drei Partien auch Züge. Ein Gewinn an
+Spielstärke entsteht daraus nicht, höchstens +4,0 bei einem Punktschätzer von +1,3.
+Das ist dasselbe Bild wie bei `bensonDeathTransfer`: Der Defekt ist belegt, ein
+Stärkegewinn nicht. Warum die Wirkung ausbleibt, ist nicht untersucht. Naheliegend
+ist, dass die Verschiebung meist eine Konstante ist (dieselbe Kette steht in allen
+Ästen der Suche) und die Wahl zwischen den Zügen kaum ändert; belegt ist das nicht.
+Die Treppe selbst, `deathTransfer` 1,0, ist davon nicht berührt.

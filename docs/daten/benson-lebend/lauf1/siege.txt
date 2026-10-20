@@ -1,0 +1,1 @@
+B gegen A: Siege 152 gegen 149 · nur B gewinnt 10, nur A gewinnt 7, beide 142, keiner 81 · McNemar (exakt) p = 0,6291

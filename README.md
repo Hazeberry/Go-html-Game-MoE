@@ -271,6 +271,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | `mctsPriorSharp` 0, 1, 9 gegen 3 (je 240 Paare gegen GNU Go, 20.10.) | Endstand −58,6, −42,2, **+7,3** [+0,2; +14,5, p = 0,045]; Siege 72, 100, **189** gegen 149 von 240 (McNemar für 9: p = 5 · 10⁻⁶) | der Prior trägt, schärfer ist besser; 9 ist nach der vorab festgelegten Regel (α = 0,005) nur ein Hinweis, Default bleibt 3 bis zur Nachmessung (`docs/parameter-reihe.md` §8) |
 | `phaseBlendWidth` 0 und 24 gegen 8 (je 240 Paare gegen GNU Go, 20.10.) | Endstand −2,7 [−9,6; +4,3] und +0,3 [−8,5; +9,1] | verworfen: kein Hebel, Default 8 bleibt (`docs/parameter-reihe.md` §8) |
 | Pass-Kurve `passMinMc*`: Negativkontrolle (120 und 150 auf −1000), Stufe 80 auf 300, alle Stufen auf −50 (je 240 Paare gegen GNU Go, 20.10.) | 30 von 30 Partien Zug für Zug gleich; Endstand −1,6 [−3,8; +0,6] und +0,2 [−0,6; +1,0]; Partien 28 Züge kürzer und 14 länger | die Einträge für Zug 120 und 150 sind wirkungslos; die Höhe ändert nur, wann die KI aufhört; die Kurve bleibt, im Code steht jetzt, was sie tut (`docs/parameter-reihe.md` §8) |
+| `bensonAliveExempt` 1 gegen 0 (die Sterbe-Treppe in `evaluateBoard` nimmt Benson-lebende Ketten aus; 240 Paare gegen GNU Go, 20.10.) | Defekt belegt: in vier ganzen Partien trifft die Treppe in 38 % der Bewertungen mit Benson-Analyse eine bewiesen lebende Kette (13 % des Abzugs, meist die des Gegners); Endstand B − A **+1,3** (95 %: [−1,3; +4,0], p = 0,32), Siege 152 gegen 149 (McNemar p = 0,63); Arm A gibt M1-A in 240 von 240 Partien wieder | verworfen (Obergrenze unter +10): Schalter bleibt, Default 0; der Defekt ist belegt, ein Stärkegewinn nicht (`docs/benson-lebend-treppe.md` §8) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2447,6 +2448,22 @@ KI 189 statt 149 von 240 Partien (McNemar p = 5 · 10⁻⁶), und der Endstand s
 um 7,3 [+0,2; +14,5], nach der vorab festgelegten Regel nur ein Hinweis (p = 0,045
 bei Schwelle 0,005). Der Default bleibt 3, bis eine Nachmessung mit frischem Seed
 vorliegt.
+
+**Die Sterbe-Treppe und lebende Ketten (20.10.).** `bensonClassify` kennt die
+pass-alive-Ketten (`_bnAlive`), `evaluateBoard` fragt aber nur die toten
+(`_bnDead`), und die Sterbe-Treppe zieht bei jeder Kette mit weniger als vier
+Freiheiten und mindestens sechs Steinen ab, auch bei einer bewiesen lebenden mit
+zwei Einzelaugen (nachgebaut: aus +56 wird −44). Der Befund stimmt und ist
+häufig: In vier ganzen Partien trifft die Treppe in 38 % der Bewertungen mit
+Benson-Analyse eine lebende Kette, 13 % des Abzugs, meist die des Gegners. Der
+Schalter `bensonAliveExempt` (Default 0, bitgleich zum alten Stand: 240 von 240
+Partien) nimmt solche Ketten aus
+([`docs/benson-lebend-treppe.md`](docs/benson-lebend-treppe.md)). Gemessen in
+GitHub Actions, 240 Paare gegen GNU Go, 22 Minuten: **B − A +1,3** (95 %: [−1,3;
++4,0], p = 0,32), Siege 152 gegen 149. Ein Gewinn über +4,0 ist ausgeschlossen,
+also **verworfen**, der Default bleibt 0, und das Selbstspiel entfällt nach der
+vorab festgelegten Regel. Wie bei `bensonDeathTransfer`: Der Defekt ist belegt,
+ein Stärkegewinn nicht.
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
