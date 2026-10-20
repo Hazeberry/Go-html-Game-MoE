@@ -251,3 +251,85 @@ gepackt). Die Ergebnisse legt der Workflow auf den Branch
 `ergebnisse/prior-nachmessung-lauf<N>` unter `docs/daten/prior-nachmessung/lauf<N>/`,
 dazu als Artefakt (90 Tage). Nur der letzte Job darf ins Repo schreiben, und nur
 auf einen neuen Branch. Erwartet werden 40 bis 70 Minuten.
+
+## 8. Nachtrag: Ergebnis der Messung (20.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #1 des Workflows `prior-nachmessung.yml`
+([Run 39369713828](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/39369713828)),
+auf dem Merge-Commit `489dbd9` von `main`, mit den Eingaben aus §7, in 39 Minuten
+(04:28 bis 05:07 UTC). Alle 1 935 Partien gegen GNU Go und alle 720 Partien im
+Selbstspiel ausgespielt, keine abgebrochen. Die Ergebnisse legte der Workflow
+auf den Branch `ergebnisse/prior-nachmessung-lauf1`; sie stehen hier unter
+[`daten/prior-nachmessung/lauf1/`](daten/prior-nachmessung/lauf1/).
+
+**Kontrollen.** Arm K gibt Arm A der Parameter-Reihe in **15 von 15** Partien
+wieder (gleicher Endstand, gleiche Zugzahl). PH spielt in **240 von 240** Paaren
+die ersten 120 Züge wie A; nach Zug 120 liegt PH − A bei genau 0,0.
+
+### Frage 1: `mctsPriorSharp`
+
+**Stufe 1** (480 Paare, Seed 212):
+
+| Vergleich | Differenz | 95 % | p | Hälfte 1 / 2 | Siege | nach Zug 120 |
+|---|---:|---|---:|---|---|---:|
+| **S9 − A** | **+7,3** | [+2,1; +12,5] | **0,0064** | +11,7 / +2,9 | 365 gegen 304 | −10,4 |
+
+S9 ist signifikant besser als A. Die Siege bestätigen es: In 120 Paaren gewinnt
+nur S9, in 59 nur A (McNemar, exakt, p = 6,0 · 10⁻⁶).
+
+**M2** (S9 gegen A im Selbstspiel, 360 Partien): S9 gewinnt **92, also 25,6 %**
+[21,3 %; 30,3 %], p = 4,5 · 10⁻²¹. **Signifikant unter 50 %.**
+
+**Entscheidung nach §4: kein Default; untersuchen.** M1 und M2 widersprechen sich.
+Der Default bleibt 3. Stufe 2 wird nach der Regel nicht geprüft, weil Stufe 1
+keinen Default 9 ergibt.
+
+**Was den Widerspruch erklärt, nachträglich und ohne Anspruch.** Im Selbstspiel
+ist die Aufgabe an (§3), gegen GNU Go aus. Von den 268 Niederlagen von S9 sind
+**213 Aufgaben von S9**. In den 100 Partien, die ausgezählt wurden, gewinnt S9 45
+und verliert 55 (exakter Test p = 0,37). Der schärfere Prior lässt die Suche die
+eigene Lage offenbar zu schlecht einschätzen, und die KI gibt auf, wo sie noch
+spielen könnte. Belegt ist das nicht: Ob S9 die aufgegebenen Partien gewonnen
+hätte, sagt diese Messung nicht. Die naheliegende Nachprüfung ist M2 ohne
+Aufgabe auf beiden Seiten, vorab festgelegt.
+
+**Beschreibend, ohne Anspruch** (gegen A, Bonferroni über vier, α = 0,0125):
+
+| Arm | Differenz zu A | 95 % | p | Siege (A: 149) | nach Zug 120 |
+|---|---:|---|---:|---|---:|
+| S15 | +12,7 | [+4,3; +21,2] | 0,0034 | 165 | +1,9 |
+| S30 | +3,9 | [−5,9; +13,7] | 0,43 | 160 | +8,4 |
+| PH | −0,3 | [−4,7; +4,0] | 0,87 | 135 | +0,0 |
+
+Gegen S9 (Partien 1 bis 240): S15 +1,1 [−5,2; +7,4], S30 −7,8 [−16,4; +0,8], PH
+−12,0 [−19,2; −4,8]. Die Kurve steigt von 3 bis 9 oder 15 und fällt bei 30. **Der
+phasenabhängige Prior trägt nicht:** PH liegt auf Höhe von A und deutlich unter
+S9. Der Gewinn von S9 entsteht also nicht erst nach Zug 120, auch wenn GNU Gos
+Schätzung S9 dort hinten sieht (−10,4, nach Zug 200 +8,2). Die Schätzung bei Zug
+120 liest den Stil von S9 offenbar anders, als die Partien ausgehen.
+
+**Beide Seeds zusammen** (Seed 206: +7,3 bei 240 Paaren; Seed 212: +7,3 bei 480;
+nach der inversen Varianz gewichtet): **+7,3 [+3,1; +11,5]**.
+
+### Frage 2: `bensonDeathTransfer`
+
+| Vergleich | Differenz | 95 % | p | Siege | Zug für Zug gleich A |
+|---|---:|---|---:|---|---:|
+| **BT − A** | **−0,8** | [−2,4; +0,7] | 0,29 | 144 gegen 149 | 100 von 240 |
+
+M2: BT gewinnt 183 von 360, 50,8 % (p = 0,79). **Entscheidung nach §4:
+verworfen.** Die Obergrenze liegt mit +0,7 weit unter +10, der Default bleibt 0.
+Damit ist der Übertrag gegen GNU Go und im Selbstspiel gemessen: Der Defekt ist
+belegt, ein Stärkegewinn nicht.
+
+### Gegen die Erwartung aus §5
+
+Die Erwartung stand vor dem Lauf und bleibt stehen. S9 − A lag im erwarteten
+Bereich (+3 bis +8), ebenso BT und die Kontrollen. Daneben lagen: M2 für S9
+(erwartet: über 50 % oder nicht signifikant), S15 (erwartet ungefähr wie S9,
+gemessen +12,7 gegen A und +1,1 gegen S9: im Rahmen) und PH (erwartet zwischen A
+und S9, gemessen auf Höhe von A).
+
+**Sekundär.** Median der Differenz S9 − A +2,0, Vorzeichentest 244 gegen 226
+(p = 0,43). S9 spielt kürzere Partien (223,5 gegen 241,1 Züge). Alle Zahlen in
+[`bericht.md`](daten/prior-nachmessung/lauf1/bericht.md).

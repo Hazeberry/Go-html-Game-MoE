@@ -1,0 +1,5 @@
+S9 gegen A: Siege 365 gegen 304 · nur S9 gewinnt 120, nur A gewinnt 59, beide 245, keiner 56 · McNemar (exakt) p = 6,0 · 10⁻6
+S15 gegen A: Siege 165 gegen 149 · nur S15 gewinnt 61, nur A gewinnt 45, beide 104, keiner 30 · McNemar (exakt) p = 0,1448
+S30 gegen A: Siege 160 gegen 149 · nur S30 gewinnt 65, nur A gewinnt 54, beide 95, keiner 26 · McNemar (exakt) p = 0,3594
+PH gegen A: Siege 135 gegen 149 · nur PH gewinnt 15, nur A gewinnt 29, beide 120, keiner 76 · McNemar (exakt) p = 0,0488
+BT gegen A: Siege 144 gegen 149 · nur BT gewinnt 3, nur A gewinnt 8, beide 141, keiner 88 · McNemar (exakt) p = 0,2266

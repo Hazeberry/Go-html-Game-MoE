@@ -1,0 +1,15 @@
+Arm A (Default): 480 Partien, 0 abgebrochen, Endstand Ø +19,1, Siege 304, Züge Ø 241,1
+Arm S9 (mctsPriorSharp=9): 480 Partien, 0 abgebrochen, Endstand Ø +26,4, Siege 365, Züge Ø 223,5
+Arm S15 (mctsPriorSharp=15): 240 Partien, 0 abgebrochen, Endstand Ø +28,0, Siege 165, Züge Ø 230,2
+Arm S30 (mctsPriorSharp=30): 240 Partien, 0 abgebrochen, Endstand Ø +19,2, Siege 160, Züge Ø 237,1
+Arm PH (mctsPriorSharp@120=9): 240 Partien, 0 abgebrochen, Endstand Ø +14,9, Siege 135, Züge Ø 241,4
+
+S9 − A: 480 Paare · Differenz +7,3 (SD 58,4), 95 %: [+2,1; +12,5], p = 0,0064 · Hälften +11,7 / +2,9 · Siege 365 gegen 304 · nach Zug 120: −10,4 (p = 3,0 · 10⁻9) · Zug für Zug gleich A: 0 von 480 → besser: Kandidat
+S15 − A: 240 Paare · Differenz +12,7 (SD 66,8), 95 %: [+4,3; +21,2], p = 0,0034 · Hälften +17,3 / +8,2 · Siege 165 gegen 149 · nach Zug 120: +1,9 (p = 0,4645) · Zug für Zug gleich A: 0 von 240 → besser: Kandidat
+S30 − A: 240 Paare · Differenz +3,9 (SD 77,1), 95 %: [−5,9; +13,7], p = 0,4349 · Hälften +7,1 / +0,7 · Siege 160 gegen 149 · nach Zug 120: +8,4 (p = 0,0002) · Zug für Zug gleich A: 0 von 240 → nicht belegt
+PH − A: 240 Paare · Differenz −0,3 (SD 34,0), 95 %: [−4,7; +4,0], p = 0,8735 · Hälften −0,7 / −0,1 · Siege 135 gegen 149 · nach Zug 120: +0,0 (p = 1,0000) · Zug für Zug gleich A: 1 von 240 → verworfen: kein Gewinn von 10
+
+S9: in 1 von 480 Paaren die ersten 120 Züge gleich A
+S15: in 0 von 240 Paaren die ersten 120 Züge gleich A
+S30: in 1 von 240 Paaren die ersten 120 Züge gleich A
+PH: in 240 von 240 Paaren die ersten 120 Züge gleich A

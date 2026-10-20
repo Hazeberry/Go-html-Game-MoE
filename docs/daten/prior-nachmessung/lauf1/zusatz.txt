@@ -1,0 +1,25 @@
+== S9 gegen A
+Paare: 480 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 241.1, B Ø 223.5
+Median der Differenz B − A: +2,0
+Vorzeichentest: B besser in 244 Paaren, schlechter in 226, gleich in 10 · p = 0,4330 (zweiseitig, exakt)
+== S15 gegen A
+Paare: 240 (240 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 242.5, B Ø 230.2
+Median der Differenz B − A: +7,0
+Vorzeichentest: B besser in 132 Paaren, schlechter in 107, gleich in 1 · p = 0,1204 (zweiseitig, exakt)
+== S30 gegen A
+Paare: 240 (240 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 242.5, B Ø 237.1
+Median der Differenz B − A: +10,0
+Vorzeichentest: B besser in 137 Paaren, schlechter in 99, gleich in 4 · p = 0,0158 (zweiseitig, exakt)
+== PH gegen A
+Paare: 240 (240 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 242.5, B Ø 241.4
+Median der Differenz B − A: +0,0
+Vorzeichentest: B besser in 116 Paaren, schlechter in 97, gleich in 27 · p = 0,2174 (zweiseitig, exakt)
+== BT gegen A
+Paare: 240 (240 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 242.5, B Ø 243.5
+Median der Differenz B − A: +0,0
+Vorzeichentest: B besser in 38 Paaren, schlechter in 39, gleich in 163 · p = 1,0000 (zweiseitig, exakt)

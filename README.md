@@ -272,6 +272,8 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | `phaseBlendWidth` 0 und 24 gegen 8 (je 240 Paare gegen GNU Go, 20.10.) | Endstand −2,7 [−9,6; +4,3] und +0,3 [−8,5; +9,1] | verworfen: kein Hebel, Default 8 bleibt (`docs/parameter-reihe.md` §8) |
 | Pass-Kurve `passMinMc*`: Negativkontrolle (120 und 150 auf −1000), Stufe 80 auf 300, alle Stufen auf −50 (je 240 Paare gegen GNU Go, 20.10.) | 30 von 30 Partien Zug für Zug gleich; Endstand −1,6 [−3,8; +0,6] und +0,2 [−0,6; +1,0]; Partien 28 Züge kürzer und 14 länger | die Einträge für Zug 120 und 150 sind wirkungslos; die Höhe ändert nur, wann die KI aufhört; die Kurve bleibt, im Code steht jetzt, was sie tut (`docs/parameter-reihe.md` §8) |
 | `bensonAliveExempt` 1 gegen 0 (die Sterbe-Treppe in `evaluateBoard` nimmt Benson-lebende Ketten aus; 240 Paare gegen GNU Go, 20.10.) | Defekt belegt: in vier ganzen Partien trifft die Treppe in 38 % der Bewertungen mit Benson-Analyse eine bewiesen lebende Kette (13 % des Abzugs, meist die des Gegners); Endstand B − A **+1,3** (95 %: [−1,3; +4,0], p = 0,32), Siege 152 gegen 149 (McNemar p = 0,63); Arm A gibt M1-A in 240 von 240 Partien wieder | verworfen (Obergrenze unter +10): Schalter bleibt, Default 0; der Defekt ist belegt, ein Stärkegewinn nicht (`docs/benson-lebend-treppe.md` §8) |
+| `mctsPriorSharp` 9 nachgemessen, frischer Seed (480 Paare gegen GNU Go, dazu 15, 30 und 9 erst ab Zug 120; Selbstspiel 360 Partien, 20.10.) | gegen GNU Go **+7,3** [+2,1; +12,5], p = 0,0064, Siege 365 gegen 304; 15: +12,7, 30: +3,9, ab Zug 120: −0,3; **im Selbstspiel 25,6 %** (p = 4 · 10⁻²¹), 213 der 268 Niederlagen eigene Aufgaben | kein Default nach der vorab festgelegten Regel (M1 und M2 widersprechen sich); untersuchen, vermutlich gibt der schärfere Prior zu früh auf (`docs/prior-nachmessung.md` §8) |
+| `bensonDeathTransfer` 1 gegen GNU Go (240 Paare, Selbstspiel 360, 20.10.) | −0,8 [−2,4; +0,7], 50,8 % im Selbstspiel | verworfen, Default 0 (`docs/prior-nachmessung.md` §8) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2464,6 +2466,17 @@ GitHub Actions, 240 Paare gegen GNU Go, 22 Minuten: **B − A +1,3** (95 %: [−
 also **verworfen**, der Default bleibt 0, und das Selbstspiel entfällt nach der
 vorab festgelegten Regel. Wie bei `bensonDeathTransfer`: Der Defekt ist belegt,
 ein Stärkegewinn nicht.
+
+**Die Nachmessung der Prior-Schärfe (20.10.).** Mit frischem Seed und 480
+Paaren hält der Befund gegen GNU Go: Schärfe 9 statt 3 bringt **+7,3** [+2,1;
++12,5] (p = 0,0064) und 365 statt 304 Siege, genau der Wert der ersten Reihe.
+Der Selbstspiel-Wächter schlägt aber an: Gegen den Default gewinnt 9 nur 25,6 %
+der Partien, und 213 der 268 Niederlagen sind eigene Aufgaben; ausgezählt steht
+es 45 zu 55. Nach der vorab festgelegten Regel heißt das: kein neuer Default,
+untersuchen ([`docs/prior-nachmessung.md`](docs/prior-nachmessung.md) §8).
+Schärfe 15 lag bei +12,7, 30 bei +3,9; die Idee, erst ab Zug 120 schärfer zu
+werden, trägt nicht (−0,3). `bensonDeathTransfer` ist jetzt auch gegen GNU Go
+gemessen: −0,8 [−2,4; +0,7], verworfen.
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
