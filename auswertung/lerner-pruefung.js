@@ -18,7 +18,7 @@
 
    Aufruf:
      node auswertung/lerner-pruefung.js <lehr.jsonl[.gz]> [...] --netz netz.json
-          [--lambda 0.5] [--top 4] [--ab 80] [--jede 1] [--rest 0] [--aus ergebnis.jsonl]
+          [--lambda 0.5] [--top 4] (netz.json oder netz.json.gz) [--ab 80] [--jede 1] [--rest 0] [--aus ergebnis.jsonl]
           [--ohne-nr 1,2] [--ki k=v,...]
    --jede n --rest r: nur jede n-te Stellung (Index mod n = r), für Teilläufe. */
 'use strict';
@@ -70,6 +70,8 @@ function haken(E, netz, opt, zustand) {
     if (!netz || mc < opt.ab) return;
     M.ebenen(E, board, aiColor, zustand.letzt, zustand.vorletzt, zustand.ko, mc, ebenen, 0);
     const p = LN.softmax(LN.vorwaerts(netz, ebenen));
+    let best = -1; for (let i = 0; i < 361; i++) if (best < 0 || p[i] > p[best]) best = i;
+    zustand.netzBest = best;
     const K = E.PARAMS.mctsRootChildren;
     if (opt.top > 0 && scored.length > K) {
       const kopf = scored.slice(0, K), drin = new Set(kopf.map(s => s.m.idx));
@@ -94,7 +96,7 @@ function pruefe(dateien, opt) {
   const E = ladeKI({htmlPfad: tmp, mitNetz: false});
   fs.unlinkSync(tmp);
   const DEFAULT = JSON.parse(JSON.stringify(E.PARAMS));
-  const netz = opt.netz ? LN.netzAus(JSON.parse(fs.readFileSync(opt.netz, 'utf8'))) : null;
+  const netz = opt.netz ? LN.netzAus(JSON.parse(liesText(opt.netz))) : null;
   const zustand = {letzt: -1, vorletzt: -1, ko: -1, aufgenommen: 0};
   const h = haken(E, netz, opt, zustand);
   const ergebnisse = [];
@@ -113,8 +115,9 @@ function pruefe(dateien, opt) {
         const r = E.getAIMove(new Uint8Array(s.b), s.c, s.hist, {...s.caps}, s.k, 'hard', 1, s.ko >= 0 ? s.ko : null, s.letzt >= 0 ? s.letzt : null);
         return r.type === 'stone' ? r.y * 19 + r.x : PASS;
       };
+      zustand.netzBest = null;
       const ohne = zug(false), mit = netz ? zug(true) : null;
-      ergebnisse.push({seed: s.seed, nr: s.nr, k: s.k, y: s.y, z: s.z, ohne, mit});
+      ergebnisse.push({seed: s.seed, nr: s.nr, k: s.k, y: s.y, z: s.z, ohne, mit, netz: zustand.netzBest});
     }
     if (opt.fortschritt) process.stderr.write(`Partie ${p.nr}: ${ergebnisse.length} Stellungen\n`);
   }
@@ -126,14 +129,14 @@ function pruefe(dateien, opt) {
 function zusammenfassung(ergebnisse) {
   const {vorzeichenP} = require('./messung-zusatz.js');
   const n = ergebnisse.length;
-  let ohne = 0, mit = 0, partie = 0, nurMit = 0, nurOhne = 0, geaendert = 0;
+  let ohne = 0, mit = 0, partie = 0, nurMit = 0, nurOhne = 0, geaendert = 0, netz = 0;
   for (const e of ergebnisse) {
     const a = e.ohne === e.y, b = e.mit === e.y;
-    if (a) ohne++; if (b) mit++; if (e.z === e.y) partie++;
+    if (a) ohne++; if (b) mit++; if (e.z === e.y) partie++; if (e.netz === e.y) netz++;
     if (b && !a) nurMit++; if (a && !b) nurOhne++;
     if (e.mit !== e.ohne) geaendert++;
   }
-  return {n, ohne: ohne / n, mit: mit / n, partie: partie / n, diff: (mit - ohne) / n, nurMit, nurOhne, geaendert: geaendert / n,
+  return {n, ohne: ohne / n, mit: mit / n, partie: partie / n, netz: netz / n, diff: (mit - ohne) / n, nurMit, nurOhne, geaendert: geaendert / n,
           p: vorzeichenP(nurMit, nurOhne)};
 }
 
