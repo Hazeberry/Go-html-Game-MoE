@@ -1,0 +1,3 @@
+nach Zug 120: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 73.7 · B Ø 73.7 · Differenz B − A 0.0 (SD 0.0) · t = NaN, p = NaN
+nach Zug 200: 187 Paare (53 ohne Partner/abgebrochen) · A Ø 22.7 · B Ø 23.8 · Differenz B − A 1.1 (SD 10.3) · t = 1.50, p = 0.1354
+Endstand: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 20.8 · B Ø 22.1 · Differenz B − A 1.3 (SD 20.9) · t = 0.99, p = 0.3236
