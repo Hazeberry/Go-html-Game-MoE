@@ -11,6 +11,8 @@
 #         bash auswertung/dagger/parameter-spielen.sh --ki <arm>   (nur die --ki-Angabe ausgeben)
 # Die Arme stehen in parameter-arme.sh; ARME_DATEI nennt eine andere Datei mit
 # demselben Aufbau (benson-lebend-arme.sh für docs/benson-lebend-treppe.md).
+# VORGABE nennt die Zahl der Vorgabesteine (2 bis 9, Standard 9; seit
+# docs/teststaerke.md §9 spielen neue Messungen mit 6).
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 arme_datei=${ARME_DATEI:-$here/parameter-arme.sh}
@@ -30,10 +32,12 @@ ki_von() {
 if [ "${1:-}" = "--ki" ]; then ki_von "${2:?Arm fehlt}"; exit 0; fi
 
 arm=${1:?Arm fehlt}; von=${2:?Beginn fehlt}; seed=${3:?Seed fehlt}; roh=${4:?Ausgabedatei fehlt}
-for v in "$von" "$seed"; do case "$v" in ''|*[!0-9]*) echo "keine Zahl: '$v'" >&2; exit 2;; esac; done
+vorgabe=${VORGABE:-9}
+for v in "$von" "$seed" "$vorgabe"; do case "$v" in ''|*[!0-9]*) echo "keine Zahl: '$v'" >&2; exit 2;; esac; done
+[ "$vorgabe" -ge 2 ] && [ "$vorgabe" -le 9 ] || { echo "Vorgabe zwischen 2 und 9: $vorgabe" >&2; exit 2; }
 ki=$(ki_von "$arm")
 mkdir -p "$(dirname "$roh")"
 rm -f "$roh"
-node "$here/../../gnugo-duell.js" --partien 15 --von "$von" --seed "$seed" --stufe 1 --vorgabe 9 \
+node "$here/../../gnugo-duell.js" --partien 15 --von "$von" --seed "$seed" --stufe 1 --vorgabe "$vorgabe" \
   --maxzuege 600 --schaetzung 120,200 --gnugo-aufgabe 0 \
   --ki "$ki" --roh "$roh"
