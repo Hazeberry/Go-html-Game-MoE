@@ -2414,6 +2414,29 @@ globalThis.PARAMS = {
      gepaart je Partie erleidet er die kleinsten Einzelschlaege. Ein Deckel,
      der den Abzug auf den Gruppenwert begrenzt, haette also genau das
      weggenommen, was der beste Arm am meisten tut. Nicht bauen. */
+  /* Benson-lebende Ketten von der Sterbe-Treppe ausnehmen. 0 = aus (Default),
+     dann bitgenau der alte Stand: kein Zweig, keine Berechnung.
+
+     Befund (20.10.): bensonClassify liefert neben _bnDead auch _bnAlive, aber
+     evaluateBoard fragt nur _bnDead. Die Treppe (libs < 4 und size >=
+     deathDiscountSize) kennt kein „lebend“: Eine pass-alive Kette mit zwei
+     Einzelaugen hat zwei Freiheiten, STERBE_RAMPE gibt 0,5, und deathTransfer
+     (Default 1,0) zieht 0,5 × Größe × captureWeight ab. Nachgebaut, zehn Steine
+     mit zwei Einzelaugen, von bensonClassify als pass-alive erkannt: der Wert
+     +56 wird zu −44, ein Abzug von 100 (tests/benson-lebend-treppe.js). In
+     vier Partien gegen GNU Go (Seed 206, Partien 1 bis 4) enthielten 1 %, 28 %,
+     100 % und 98 % der Bewertungen mit Benson-Analyse mindestens eine solche
+     Kette, bis zu 28 % des Abzugs der ganzen Treppe entfielen auf sie, meist
+     auf Ketten des Gegners (docs/benson-lebend-treppe.md §1).
+
+     1 = eine Kette, die _bnAlive trägt, wird weder von deathDiscount noch von
+     deathTransfer noch vom Raumrisiko (raumGewicht) belastet. Beweisbasiert:
+     Was nicht gefangen werden kann, braucht keinen Sterbe-Abschlag. Für alle
+     anderen Ketten bleibt die Treppe, wie sie ist; deathTransfer 1,0 ist
+     belegt (siehe oben, vor allem „Nicht bauen“ für einen Deckel).
+
+     Default 0, bis gemessen ist (docs/benson-lebend-treppe.md). */
+  bensonAliveExempt: 0,
   /* Benson-Zugfilter: todgeborene Züge (Stein wäre beweisbar tot) fliegen
      aus der Kandidatenliste; bleibt nichts übrig → passen. Beendet das
      endlose Steine-Füttern in gegnerisches pass-alive-Gebiet (beobachtet:
@@ -3967,11 +3990,14 @@ function evaluateBoard(board, color, captures) {
       }
     }
     let v = size * 5 + libs * 3;
+    /* Benson-lebende Kette (PARAMS.bensonAliveExempt): bewiesen nicht zu
+       fangen, also ohne Sterbe-Abschlag. Bei 0 ist das immer false. */
+    const lebend = PARAMS.bensonAliveExempt >= 1 && bEpoch >= 0 && _bnAlive[i] === bEpoch;
     /* Vor der Vorzeichenzuweisung, damit Abschlag und Übertragung für eigene
        und fremde Gruppen gleich gelten. Bei deathDiscount 0 und
        deathTransfer 0 wird kein Zweig betreten und v bleibt bitgenau der
        alte Ausdruck. */
-    if (libs < STERBE_RAMPE.length && size >= PARAMS.deathDiscountSize) {
+    if (libs < STERBE_RAMPE.length && size >= PARAMS.deathDiscountSize && !lebend) {
       const anteil = STERBE_RAMPE[libs];
       if (PARAMS.deathDiscount > 0) v *= 1 - PARAMS.deathDiscount * anteil;
       /* Übertragung: die Gruppe gilt anteilig als bereits geschlagen, also
@@ -3999,7 +4025,7 @@ function evaluateBoard(board, color, captures) {
     }
     /* Raumrisiko: nur 4-7 Freiheiten und nur Ketten mit mindestens einem
        Wurzelstein (k3 >= 0); neue Steine allein tragen kein K3. */
-    if (raum && libs >= 4 && libs <= 7 && k3 >= 0 && size >= PARAMS.deathDiscountSize) {
+    if (raum && libs >= 4 && libs <= 7 && k3 >= 0 && size >= PARAMS.deathDiscountSize && !lebend) {
       const r = RAUM_RISIKO[libs - 4][k3 === 0 ? 0 : k3 <= 4 ? 1 : k3 <= 14 ? 2 : 3];
       if (r > 0) { v -= PARAMS.raumGewicht * r * size * PARAMS.captureWeight; _raumGriff++; }
     }

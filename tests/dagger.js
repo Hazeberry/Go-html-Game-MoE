@@ -31,6 +31,11 @@
         festgelegten Regel und prüft die Negativkontrolle; 16 Teile je Arm
         (N: 2) werden zu einem Bericht, unvollständige Teile abgelehnt. Die
         Pass-Sonde (pass-sonde.js) findet ihre Stelle in index.html.
+     9. Die Messung zu bensonAliveExempt (docs/benson-lebend-treppe.md):
+        Workflow, Arme in Skript, Workflow und Dokument stimmen überein,
+        der Schalter steht in index.html mit Default 0; der Bericht urteilt
+        mit alpha 0,05, unvollständige Teile werden abgelehnt; die Treppen-
+        Sonde (treppe-sonde.js) findet ihre vier Stellen in index.html.
 
    Aufruf:  node tests/dagger.js */
 'use strict';
@@ -44,6 +49,7 @@ const O = require('../auswertung/orakel-bericht.js');
 const N = require('../auswertung/orakel-nachspiel.js');
 const P = require('../auswertung/parameter-bericht.js');
 const PS = require('../auswertung/pass-sonde.js');
+const TS = require('../auswertung/treppe-sonde.js');
 
 const wurzel = path.join(__dirname, '..');
 const temp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'dagger-'));
@@ -132,6 +138,11 @@ test('Skripte lehnen falsche Eingaben ab, ehe sie etwas tun', () => {
   pruefeGleich(lauf('parameter-ergebnis.sh').status, 1, 'parameter-ergebnis.sh: Seed fehlt');
   pruefeGleich(lauf('parameter-ergebnis.sh', '206', 'gibt-es-nicht.jsonl.gz').status, 2, 'parameter-ergebnis.sh: Kontrolldatei fehlt');
   pruefeGleich(lauf('parameter-ergebnis.sh', '206').status, 1, 'parameter-ergebnis.sh: keine Teile');
+  pruefeGleich(lauf('benson-lebend-ergebnis.sh').status, 1, 'benson-lebend-ergebnis.sh: Seed fehlt');
+  pruefeGleich(lauf('benson-lebend-ergebnis.sh', '206', 'gibt-es-nicht.jsonl.gz').status, 2, 'benson-lebend-ergebnis.sh: Kontrolldatei fehlt');
+  pruefeGleich(lauf('benson-lebend-ergebnis.sh', '206').status, 1, 'benson-lebend-ergebnis.sh: keine Teile');
+  const x = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-spielen.sh'), '--ki', 'B'], {cwd: temp(), encoding: 'utf8', env: {...process.env, ARME_DATEI: 'gibt-es-nicht.sh'}});
+  pruefeGleich(x.status, 2, 'parameter-spielen.sh: Datei der Arme fehlt');
 });
 
 /* Workflows: Eingaben des Dispatch-Formulars nur in env-Blöcken, in run-Blöcken kein ${{ }} */
@@ -160,6 +171,7 @@ test('Workflow endspiel-dagger.yml: keine Ausdrücke in Shell-Zeilen', () => pru
 test('Workflow endspiel-messung.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-messung.yml', 6, 4));
 test('Workflow endspiel-orakel.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-orakel.yml', 5, 2));
 test('Workflow parameter-reihe.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('parameter-reihe.yml', 5, 2));
+test('Workflow benson-lebend.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('benson-lebend.yml', 5, 2));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
 
@@ -560,6 +572,100 @@ test('Pass-Sonde: Protokollzeile an der Pass-Prüfung, Zählung der Werte', () =
   const an = s => st.anteil.find(x => x.schwelle === s).anteil;
   pruefeGleich(an(20), 0.25, 'Anteil unter 20'); pruefeGleich(an(100), 0.25, 'Anteil unter 100 (100 selbst nicht)'); pruefeGleich(an(200), 0.5, 'Anteil unter 200'); pruefeGleich(an(500), 0.75, 'Anteil unter 500');
   pruefeGleich(PS.statistik([{mc: 50, best: 1}]), null, 'keine Züge nach Zug 80');
+});
+
+/* ── bensonAliveExempt (docs/benson-lebend-treppe.md) ──────────────────── */
+
+test('Workflow benson-lebend.yml: Aufbau, Arme und Vorgaben wie in der Vorabfestlegung', () => {
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'benson-lebend.yml'), 'utf8');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'benson-lebend-treppe.md'), 'utf8');
+  const armeDatei = path.join(wurzel, 'auswertung', 'dagger', 'benson-lebend-arme.sh');
+  const a = fs.readFileSync(armeDatei, 'utf8');
+  const reihe = (/^ARM_REIHE=\(([^)]*)\)/m.exec(a) || [])[1].trim().split(/\s+/);
+  pruefe(/^on:\n  workflow_dispatch:/m.test(t), 'nur manuell gestartet');
+  for (const job of ['pruefen', 'spielen', 'ergebnis']) pruefe(new RegExp(`^  ${job}:$`, 'm').test(t), `Job ${job}`);
+  pruefe(/^permissions:\n  contents: read$/m.test(t), 'Standard: nur lesen');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefe(/ergebnis:[\s\S]*permissions:\n      contents: write/.test(t), 'das Schreibrecht hat der Ergebnisjob');
+  pruefeGleich((/arm: \[([A-Za-z0-9, ]+)\]/.exec(t) || [])[1].split(',').map(x => x.trim()).join(','), reihe.join(','), 'Arme der Matrix = Arme der Datei');
+  pruefeGleich(reihe.join(','), 'A,B', 'zwei Arme');
+  pruefeGleich((/von: \[([0-9, ]+)\]/.exec(t) || [])[1].split(',').map(Number).join(','), TEILE.join(','), '16 Teile zu je 15 Partien (Partien 1 bis 240)');
+  pruefe(doc.includes(`${reihe.length * TEILE.length} Jobs`) && t.includes(`${reihe.length * TEILE.length} Jobs`), `${reihe.length * TEILE.length} Jobs im Dokument und im Workflow`);
+  pruefe(/ARME_DATEI: auswertung\/dagger\/benson-lebend-arme\.sh\n/.test(t), 'die Arme kommen aus benson-lebend-arme.sh');
+  pruefe(/parameter-spielen\.sh "\$ARM" "\$VON" "\$SEED" "benson-lebend\/\$ARM-\$VON\.jsonl"/.test(t), 'ein Teil je Arm und Beginn');
+  const tests = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'tests.yml'), 'utf8');
+  for (const x of ['actions/checkout', 'actions/setup-node']) {
+    const ver = y => (y.match(new RegExp(x + '@(v[0-9]+)')) || [])[1];
+    pruefe(ver(t) && ver(t) === ver(tests), `${x} in derselben Version wie tests.yml`);
+  }
+  for (const name of ['seed', 'kontrolle']) {
+    const imDoc = (new RegExp('^\\| `' + name + '` \\| `?([^` |]+)', 'm').exec(doc) || [])[1];
+    const imFlow = (new RegExp('^      ' + name + ':\\n(?:        .*\\n)*?        default: \'([^\']*)\'', 'm').exec(t) || [])[1];
+    pruefe(imDoc !== undefined && imDoc === imFlow, `Vorgabe ${name}: Dokument „${imDoc}“, Workflow „${imFlow}“`);
+  }
+  /* Arm B: im Dokument, in der Datei, in der --ki-Angabe, und der Schalter steht in index.html mit Default 0 */
+  pruefe(/\| \*\*B\*\* \| `bensonAliveExempt=1` \|/.test(doc) && /\[B\]="bensonAliveExempt=1"/.test(a), 'Arm B: bensonAliveExempt=1');
+  const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-spielen.sh'), '--ki', 'B'], {encoding: 'utf8', env: {...process.env, ARME_DATEI: armeDatei}});
+  pruefeGleich(r.stdout.trim(), 'mctsFixedSims=120,resignEnabled=0,bensonAliveExempt=1', '--ki-Angabe von Arm B');
+  pruefe(/^  bensonAliveExempt: 0,$/m.test(fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8')), 'bensonAliveExempt steht in index.html mit Default 0');
+});
+
+/* Synthetische Partien: Endstand von A = ((nr·37) mod 101) − 50; B liegt um 20 Punkte darüber, dazu ein Rauschen (nr mod 5) − 2 */
+function bensonLebendTeile(verzeichnis, ohne) {
+  const dir = path.join(verzeichnis, 'benson-lebend');
+  fs.mkdirSync(dir, {recursive: true});
+  for (const arm of ['A', 'B']) for (const von of TEILE) {
+    if (ohne === `${arm}-${von}`) continue;
+    const zeilen = [];
+    for (let nr = von; nr < von + 15; nr++) {
+      const a = ((nr * 37) % 101) - 50, endstand = arm === 'A' ? a : a + 20 + ((nr % 5) - 2);
+      zeilen.push(JSON.stringify({nr, beginnt: 'W', wirFarbe: 'S', endstand, gewonnen: endstand > 0, zuegeAnzahl: 4, zuege: ['a' + nr, 'b' + nr, 'pass', 'pass'], schaetzung: {120: endstand / 2, 200: endstand}}));
+    }
+    if (ohne === `${arm}-${von}-kurz`) zeilen.pop();
+    fs.writeFileSync(path.join(dir, `${arm}-${von}.jsonl`), zeilen.join('\n') + '\n');
+  }
+}
+
+test('Bericht zu bensonAliveExempt: 16 Teile je Arm zu einem Bericht, Kontrolle, Rohdaten gepackt', () => {
+  const d = temp();
+  bensonLebendTeile(d);
+  const a = []; for (const v of TEILE) a.push(fs.readFileSync(path.join(d, 'benson-lebend', `A-${v}.jsonl`), 'utf8'));
+  fs.writeFileSync(path.join(d, 'kontrolle.jsonl.gz'), require('zlib').gzipSync(a.join('')));
+  const skript = path.join(wurzel, 'auswertung', 'dagger', 'benson-lebend-ergebnis.sh');
+  const r = spawnSync('bash', [skript, '206', 'kontrolle.jsonl.gz'], {cwd: d, encoding: 'utf8'});
+  pruefeGleich(r.status, 0, 'Bericht läuft durch: ' + (r.stderr || '').slice(0, 300));
+  const lies = f => fs.readFileSync(path.join(d, 'ergebnisse', f), 'utf8');
+  pruefe(/Messung zu bensonAliveExempt: 240 Paare gegen GNU Go/.test(lies('bericht.md')) && /Seed 206/.test(lies('bericht.md')), 'Kopf des Berichts');
+  pruefe(/\| \*\*B\*\* \| 240 \| \*\*\+20,0\*\* .* \| besser: Kandidat \|/.test(lies('messung.md')), 'B − A = +20,0, Kandidat bei alpha 0,05');
+  pruefe(/alpha 0,05/.test(lies('messung.md')), 'alpha 0,05 im Bericht');
+  pruefe(/Kontrolle gegen kontrolle\.jsonl\.gz, Arm A: 240 von 240/.test(lies('messung.md')), 'Kontrolle 240 von 240');
+  pruefe(/Median der Differenz B − A: \+20,0/.test(lies('zusatz.txt')), 'Zusatzzahlen');
+  for (const arm of ['A', 'B']) {
+    const roh = require('zlib').gunzipSync(fs.readFileSync(path.join(d, 'ergebnisse', `${arm}.jsonl.gz`))).toString().trim().split('\n');
+    pruefeGleich(roh.length, 240, `Rohdaten von ${arm}: 240 Partien`);
+  }
+  for (const [ohne, muster] of [['B-61', /B-61\.jsonl fehlt/], ['A-226-kurz', /A-226\.jsonl hat nicht 15 Partien/]]) {
+    const e = temp();
+    bensonLebendTeile(e, ohne);
+    const x = spawnSync('bash', [skript, '206'], {cwd: e, encoding: 'utf8'});
+    pruefeGleich(x.status, 1, `${ohne}: Abbruch`);
+    pruefe(muster.test(x.stderr), `${ohne}: Meldung „${(x.stderr || '').trim()}“`);
+    pruefe(!fs.existsSync(path.join(e, 'ergebnisse', 'bericht.md')), `${ohne}: kein Bericht`);
+  }
+});
+
+test('Treppen-Sonde: vier Zähler an den Stellen von evaluateBoard, Auswertung', () => {
+  const html = fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8');
+  const g = TS.gepatcht(html);
+  pruefe(g.length > html.length && g.includes('globalThis.__z.calls++') && g.includes('globalThis.__z.mitBenson++') && g.includes('z.alive++') && g.includes('aufrufeMitAlive++'), 'alle vier Zähler sind eingebaut');
+  let fehler = '';
+  try { TS.gepatcht('kein index.html'); } catch (e) { fehler = e.message; }
+  pruefe(/nicht genau einmal/.test(fehler), 'fehlt eine Stelle, bricht die Sonde ab');
+  const z = TS.zaehler('rauschen\nZAEHLER {"calls":10,"mitBenson":4,"treppe":6,"alive":3,"dtAlle":300,"dtAlive":60,"aufrufeMitAlive":2,"eigen":1,"fremd":2}\n');
+  pruefeGleich(z.alive, 3, 'Zähler aus der Fehlerausgabe'); pruefeGleich(TS.zaehler('nichts'), null, 'ohne Zähler');
+  const s = TS.summe([z, z]);
+  pruefeGleich(s.calls, 20, 'Summe der Aufrufe'); pruefeGleich(s.dtAlive, 120, 'Summe der Abzüge auf lebenden Ketten');
+  pruefe(/davon mit lebender Treppen-Kette 4 \(50,0 %\)/.test(TS.zeile('Zusammen', s)) && /Anteil am Abzug 20,0 %/.test(TS.zeile('Zusammen', s)), 'Zeile: ' + TS.zeile('Zusammen', s));
 });
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));
