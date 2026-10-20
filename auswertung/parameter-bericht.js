@@ -23,9 +23,13 @@
    exakte McNemar-Test (der Vorzeichentest auf den Paaren, in denen die Sieger
    wechseln). Sekundär, nicht der Endpunkt.
 
+   Mit --anfang N zusätzlich je Arm: in wie vielen Paaren die ersten N Züge
+   gleich denen des Referenzarms sind. Die Probe für einen Arm, der erst ab
+   Zug N umschaltet (docs/prior-nachmessung.md §3): Dort müssen es alle sein.
+
    Aufruf:
      node auswertung/parameter-bericht.js --ref A --arm A=a.jsonl --arm R30=r.jsonl ...
-          [--text R30=raveK=30 ...] [--gleich N] [--alpha 0.005] [--kontrolle frueher.jsonl.gz] [--siege] [--markdown] */
+          [--text R30=raveK=30 ...] [--gleich N] [--alpha 0.005] [--kontrolle frueher.jsonl.gz] [--siege] [--anfang 120] [--markdown] */
 'use strict';
 const B = require('./endspiel-pilot-bericht.js');
 const O = require('./orakel-bericht.js');
@@ -54,6 +58,17 @@ function gleiche(ref, arm) {
     if (a.endstand === r.endstand && a.zuegeAnzahl === r.zuegeAnzahl && JSON.stringify(a.zuege) === JSON.stringify(r.zuege)) gleich++;
   }
   return {n, gleich};
+}
+
+/* In wie vielen Paaren sind die ersten n Züge gleich? Abgebrochene Partien fallen samt Partner heraus. */
+function gleicherAnfang(ref, arm, n) {
+  let paare = 0, gleich = 0;
+  for (const [nr, r] of arm) {
+    const a = ref.get(nr); if (!a || a.abgebrochen || r.abgebrochen) continue;
+    paare++;
+    if (JSON.stringify((a.zuege || []).slice(0, n)) === JSON.stringify((r.zuege || []).slice(0, n))) gleich++;
+  }
+  return {n: paare, gleich};
 }
 
 /* Siege gepaart nach Partienummer; abgebrochene Partien fallen samt Partner heraus.
@@ -122,7 +137,7 @@ function text(a, texte, opt) {
 }
 
 function main() {
-  const a = process.argv.slice(2), opt = {arme: {}, texte: {}, ref: 'A', gleich: [], alpha: 0.005, kontrolle: null, markdown: false, siege: false};
+  const a = process.argv.slice(2), opt = {arme: {}, texte: {}, ref: 'A', gleich: [], alpha: 0.005, kontrolle: null, markdown: false, siege: false, anfang: 0};
   for (let i = 0; i < a.length; i++) {
     if (a[i] === '--arm') { const [n, f] = a[++i].split('='); opt.arme[n] = B.liesArm(f.split(',')); }
     else if (a[i] === '--text') { const s = a[++i], k = s.indexOf('='); opt.texte[s.slice(0, k)] = s.slice(k + 1); }
@@ -132,6 +147,7 @@ function main() {
     else if (a[i] === '--kontrolle') opt.kontrolle = a[++i];
     else if (a[i] === '--markdown') opt.markdown = true;
     else if (a[i] === '--siege') opt.siege = true;
+    else if (a[i] === '--anfang') opt.anfang = +a[++i];
   }
   if (!opt.arme[opt.ref] || !(opt.alpha > 0 && opt.alpha <= 0.05)) {
     console.error('Aufruf: node auswertung/parameter-bericht.js --ref A --arm A=a.jsonl --arm R30=r.jsonl ... [--alpha 0.005]'); process.exit(1);
@@ -142,7 +158,14 @@ function main() {
     const k = O.kontrolle(opt.arme[opt.ref], opt.kontrolle);
     console.log('', `${opt.markdown ? '- ' : ''}Kontrolle gegen ${opt.kontrolle}, Arm ${opt.ref}: ${k.gleich} von ${k.n} Partien mit gleichem Endstand und gleicher Zugzahl`);
   }
+  if (opt.anfang > 0) {
+    console.log('');
+    for (const n of Object.keys(opt.arme).filter(x => x !== opt.ref && !opt.gleich.includes(x))) {
+      const g = gleicherAnfang(opt.arme[opt.ref], opt.arme[n], opt.anfang);
+      console.log(`${opt.markdown ? '- ' : ''}${n}: in ${g.gleich} von ${g.n} Paaren die ersten ${opt.anfang} Züge gleich ${opt.ref}`);
+    }
+  }
 }
 
 if (require.main === module) main();
-module.exports = {urteil, gleiche, siege, siegeText, auswertung, text};
+module.exports = {urteil, gleiche, gleicherAnfang, siege, siegeText, auswertung, text};

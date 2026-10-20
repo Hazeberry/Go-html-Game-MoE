@@ -47,6 +47,14 @@
                           den Zug, der statt unseres gespielt wird. getAIMove
                           läuft trotzdem; seine Wahl wird nur verglichen)
                          [--orakel-zug-stufe S] (Stufe dieses GNU Go, Standard 10)
+   --ki nimmt auch Phasenstufen wie ab-harness.js: name@N=wert setzt den
+   Parameter ab der Zugzahl N (mc ≥ N, gezählt ab dem ersten gespielten Zug),
+   davor gilt der Wert ohne @ oder der Default. Beispiel: --ki
+   mctsPriorSharp@120=9 spielt bis Zug 120 mit 3 und danach mit 9
+   (docs/prior-nachmessung.md). Beim Wechsel wird der gespeicherte Suchbaum
+   verworfen, wie im Harness; sonst trügen wiederverwendete Knoten noch die
+   Priors der alten Stufe. Der Datensatz bekommt dann `kiStufen` und
+   `phasenwechsel`; ohne @ bleibt alles wie bisher.
    Jede Partie bekommt zusätzlich `endstand`: GNU Gos final_score der
    Schlussstellung aus unserer Sicht, auch bei Aufgabe und Zuglimit.
    Bei Aufgabe ist das die Stellung, wie sie stehen blieb, oft weit vor dem
@@ -68,7 +76,7 @@ const {spawn} = require('child_process');
 
 /* ── Optionen ─────────────────────────────────────────────────────── */
 const a = process.argv.slice(2);
-const opt = {partien: 10, seed: 1, stufe: 10, ki: {}, roh: null, gnugo: '/usr/games/gnugo',
+const opt = {partien: 10, seed: 1, stufe: 10, ki: {}, kiStufen: {}, roh: null, gnugo: '/usr/games/gnugo',
              maxZuege: 400, von: 1, vorgabe: 0, schaetzung: [], gnugoAufgabe: 1, orakel: 0,
              orakelZug: null, orakelZugStufe: 10};
 for (let i = 0; i < a.length; i++) {
@@ -94,7 +102,18 @@ for (let i = 0; i < a.length; i++) {
       i++; break;
     }
     case '--orakel-zug-stufe': opt.orakelZugStufe = +v; i++; break;
-    case '--ki': for (const kv of v.split(',')) { const [k, w] = kv.split('='); opt.ki[k] = +w; } i++; break;
+    case '--ki':
+      for (const kv of v.split(',')) {
+        const [k, w] = kv.split('='), at = k.indexOf('@');
+        if (at < 0) { opt.ki[k] = +w; continue; }
+        const name = k.slice(0, at), ab = k.slice(at + 1);
+        if (!name || !/^\d+$/.test(ab) || !Number.isFinite(+w) || w === undefined || w === '') {
+          console.error(`--ki: ungültige Phasenstufe ${kv} (erwartet name@N=wert mit N ≥ 0)`); process.exit(2);
+        }
+        (opt.kiStufen[name] = opt.kiStufen[name] || []).push([+ab, +w]);
+      }
+      for (const l of Object.values(opt.kiStufen)) l.sort((x, y) => x[0] - y[0]);
+      i++; break;
     default: console.error('Unbekannte Option ' + a[i]); process.exit(2);
   }
 }
@@ -109,12 +128,21 @@ globalThis.document = {getElementById: () => null};
   + ';globalThis.__D={PARAMS,getAIMove,computeZobrist,removeDeadGroups,floodFill,'
   + 'bensonClassify,_bnDead,BOARD_SIZE,NEIGHBORS,setzeKrisenDauer,setzeLebensurteil,'
   + 'neuePartie(){_mctsSavedRoot=null;_hopelessStreak=0;_allDeadStreak=0;_lastMsPerSim=null;},'
+  + 'baumVerwerfen(){_mctsSavedRoot=null;},'
   + 'wurzel:typeof leseWurzelWaechter==="function"?leseWurzelWaechter:null};');
 const E = globalThis.__D;
 const {urteilAusGtp} = require('./auswertung/lebensurteil.js');
 const DEFAULT = JSON.parse(JSON.stringify(E.PARAMS));
 const N = E.BOARD_SIZE;
 const KOMI = opt.vorgabe >= 2 ? 0.5 : 7.5;
+const MIT_STUFEN = Object.keys(opt.kiStufen).length > 0;
+
+/* Die Phasenstufen aus --ki, die beim Zug mc gelten (mc ≥ N) */
+function stufenFuer(mc) {
+  const aus = {};
+  for (const [k, liste] of Object.entries(opt.kiStufen)) for (const [ab, w] of liste) if (mc >= ab) aus[k] = w;
+  return aus;
+}
 
 function mulberry32(seed) {
   let s = seed >>> 0;
@@ -258,6 +286,7 @@ async function partieSpielen(nr) {
   const board = new Uint8Array(N), caps = {1: 0, 2: 0};
   const hist = new Set([E.computeZobrist(board)]);
   let ko = null, last = null, mc = 0, paesse = 0, aufgabe = null;
+  let stufenSig = null, phasenwechsel = 0;
   const zuege = [], sims = [], schaetzung = {};
   const mitspielen = async (farbe, i) => {
     const befehl = `play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`;
@@ -281,6 +310,12 @@ async function partieSpielen(nr) {
       let i;
       if (f === wir) {
         Object.assign(E.PARAMS, DEFAULT, {adaptiveBudgetEnabled: 0}, opt.ki);
+        if (MIT_STUFEN) {
+          const stufen = stufenFuer(mc), sig = JSON.stringify(stufen);
+          if (stufenSig !== null && sig !== stufenSig) { E.baumVerwerfen(); phasenwechsel++; }
+          stufenSig = sig;
+          Object.assign(E.PARAMS, stufen);
+        }
         let u = null;
         if (o) {
           u = urteilAusGtp(await o.frage('dragon_status'), await o.frage('dragon_stones'), board, vonGtp);
@@ -356,6 +391,7 @@ async function partieSpielen(nr) {
             gnugoStand, endstand, unsereZaehlung: unsereZaehlung(board), zuegeAnzahl: mc,
             simsMittel: sims.length ? Math.round(sims.reduce((x, y) => x + y, 0) / sims.length) : null,
             neustarts: g.neustarts(), schaetzung,
+            ...(MIT_STUFEN ? {kiStufen: opt.kiStufen, phasenwechsel} : {}),
             ...(o ? {orakel: {stufe: opt.orakel, ...orakel, neustarts: o.neustarts()}} : {}),
             ...(oz ? {orakelZug: {ab: opt.orakelZug.ab, anteil: opt.orakelZug.anteil, stufe: opt.orakelZugStufe, ...orakelZug, neustarts: oz.neustarts()}} : {}),
             wurzel: E.wurzel ? E.wurzel(true) : undefined,
