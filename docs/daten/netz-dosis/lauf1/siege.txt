@@ -1,0 +1,2 @@
+L8 gegen A: Siege 154 gegen 123 · nur L8 gewinnt 55, nur A gewinnt 24, beide 99, keiner 62 · McNemar (exakt) p = 0,0006
+T8 gegen A: Siege 120 gegen 123 · nur T8 gewinnt 36, nur A gewinnt 39, beide 84, keiner 81 · McNemar (exakt) p = 0,8176
