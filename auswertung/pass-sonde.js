@@ -14,18 +14,13 @@
      node auswertung/pass-sonde.js [--partien 4] [--von 1] [--seed 206] [--gnugo /usr/games/gnugo]
    Braucht GNU Go; vier Partien parallel dauern rund zwei Minuten. */
 'use strict';
-const fs = require('fs'), os = require('os'), path = require('path');
-const {spawn} = require('child_process');
+const {ersetzeEinmal, sondeSpielen, optionen} = require('./sonde-lauf.js');
 
-const wurzel = path.join(__dirname, '..');
 const ANKER = "  const best = scored[0].score;\n\n  const PASS_GAIN_THRESHOLD = PARAMS.passGainThreshold;";
 const SONDE = "  const best = scored[0].score;\n  if (mc > 40 && diff === 'hard') console.error('BEST ' + mc + ' ' + best + ' ' + scored.length);\n\n  const PASS_GAIN_THRESHOLD = PARAMS.passGainThreshold;";
 
 /* index.html mit der Protokollzeile; bricht ab, wenn die Stelle nicht genau einmal vorkommt */
-function gepatcht(html) {
-  if (html.split(ANKER).length !== 2) throw new Error('Stelle der Pass-Prüfung in index.html nicht genau einmal gefunden');
-  return html.replace(ANKER, SONDE);
-}
+function gepatcht(html) { return ersetzeEinmal(html, ANKER, SONDE, 'Pass-Prüfung'); }
 
 /* Zeilen „BEST <mc> <best> <Kandidaten>" aus der Fehlerausgabe */
 function lies(err) {
@@ -44,39 +39,16 @@ function statistik(zeilen, ab = 80) {
           anteil: SCHWELLEN.map(t => ({schwelle: t, anteil: w.filter(x => x < t).length / w.length}))};
 }
 
-function spiele(nr, dir, opt) {
-  return new Promise((ok, fehler) => {
-    const p = spawn(process.execPath, [path.join(dir, 'gnugo-duell.js'), '--partien', '1', '--von', String(nr), '--seed', String(opt.seed),
-      '--stufe', '1', '--vorgabe', '9', '--maxzuege', '600', '--gnugo-aufgabe', '0', '--gnugo', opt.gnugo,
-      '--ki', 'mctsFixedSims=120,resignEnabled=0', '--roh', path.join(dir, `sonde-${nr}.jsonl`)], {stdio: ['ignore', 'ignore', 'pipe']});
-    let err = '';
-    p.stderr.on('data', d => { err += d; });
-    p.on('exit', c => c === 0 ? ok(lies(err)) : fehler(new Error(`Partie ${nr}: Exit ${c}\n${err.slice(-300)}`)));
-  });
-}
-
 async function main() {
-  const a = process.argv.slice(2), opt = {partien: 4, von: 1, seed: 206, gnugo: '/usr/games/gnugo'};
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] === '--partien') opt.partien = +a[++i];
-    else if (a[i] === '--von') opt.von = +a[++i];
-    else if (a[i] === '--seed') opt.seed = +a[++i];
-    else if (a[i] === '--gnugo') opt.gnugo = a[++i];
-  }
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pass-sonde-'));
-  fs.mkdirSync(path.join(dir, 'auswertung'));
-  fs.copyFileSync(path.join(wurzel, 'gnugo-duell.js'), path.join(dir, 'gnugo-duell.js'));
-  fs.copyFileSync(path.join(wurzel, 'auswertung', 'lebensurteil.js'), path.join(dir, 'auswertung', 'lebensurteil.js'));
-  fs.writeFileSync(path.join(dir, 'index.html'), gepatcht(fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8')));
-  const nummern = Array.from({length: opt.partien}, (_, i) => opt.von + i);
-  const alle = await Promise.all(nummern.map(nr => spiele(nr, dir, opt)));
+  const opt = optionen(process.argv.slice(2));
+  const {nummern, fehler} = await sondeSpielen({...opt, patch: gepatcht});
+  const alle = fehler.map(lies);
   const f0 = v => Math.round(v);
   alle.forEach((z, i) => console.log(`Partie ${nummern[i]}: letzte Werte von best (Zug:Wert/Kandidaten): `
     + z.slice(-6).map(x => `${x.mc}:${f0(x.best)}/${x.kandidaten}`).join('  ')));
   const s = statistik(alle.flat());
   console.log(`\nbest bei Zug > 80, ${s.n} Züge der KI aus ${alle.length} Partien: Min ${f0(s.min)} · 5 % ${f0(s.p5)} · 25 % ${f0(s.p25)} · Median ${f0(s.median)} · 75 % ${f0(s.p75)} · Max ${f0(s.max)}`);
   for (const t of s.anteil) console.log(`  Anteil best < ${t.schwelle}: ${(100 * t.anteil).toFixed(1).replace('.', ',')} %`);
-  fs.rmSync(dir, {recursive: true, force: true});
 }
 
 if (require.main === module) main().catch(e => { console.error(e.message); process.exit(1); });

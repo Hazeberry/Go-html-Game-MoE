@@ -9,10 +9,14 @@
 #
 # Aufruf: bash auswertung/dagger/parameter-spielen.sh <arm> <von> <seed> <roh.jsonl>
 #         bash auswertung/dagger/parameter-spielen.sh --ki <arm>   (nur die --ki-Angabe ausgeben)
+# Die Arme stehen in parameter-arme.sh; ARME_DATEI nennt eine andere Datei mit
+# demselben Aufbau (benson-lebend-arme.sh für docs/benson-lebend-treppe.md).
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
+arme_datei=${ARME_DATEI:-$here/parameter-arme.sh}
+[ -f "$arme_datei" ] || { echo "Datei der Arme fehlt: $arme_datei" >&2; exit 2; }
 # shellcheck source=parameter-arme.sh
-source "$here/parameter-arme.sh"
+source "$arme_datei"
 
 ki_von() {
   local a=$1 bekannt=0 x
