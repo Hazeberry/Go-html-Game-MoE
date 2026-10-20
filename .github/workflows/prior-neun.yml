@@ -1,0 +1,264 @@
+name: Prior-Schärfe 9 auf dem neuen Default
+
+# Manueller Lauf der Prüfung aus docs/prior-neun.md: Arm A (Default, seit dem
+# 20.10. mit Endspiel-Netz) gegen Arm S9 (mctsPriorSharp 9), 240 Paare gegen
+# GNU Go Stufe 1 mit neun Vorgabesteinen (M1), dazu S9 gegen A im Selbstspiel
+# ohne Aufgabe (M2) und mit Aufgabe (M3), je 360 Partien.
+#
+# Ablauf:
+#   pruefen      Eingaben prüfen
+#   spielen      A und S9 × 16 Teile zu je 15 Partien
+#   kontrolle    Arm A mit dem Seed der Kontrolldatei, Partien 1 bis 15
+#   selbstspiel  M2 und M3 × 12 Teile zu je 30 Partien
+#   ergebnis     Bericht, Rohdaten gepackt, Branch ergebnisse/prior-neun-lauf<N>
+# Zusammen 57 Jobs zum Spielen.
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: 'Seed der Partien gegen GNU Go (214: noch nie benutzt)'
+        required: true
+        default: '214'
+      selbstspiel_seed:
+        description: 'M2 (ohne Aufgabe): Seed des ersten Teils; Teil k spielt mit diesem Seed + k − 1'
+        required: true
+        default: '20261501'
+      aufgabe_seed:
+        description: 'M3 (mit Aufgabe): Seed des ersten Teils'
+        required: true
+        default: '20261601'
+      kontrolle:
+        description: 'Arm A einer früheren Messung im Repo (jsonl oder jsonl.gz); die Kontrolle spielt deren Partien 1 bis 15 nach'
+        required: true
+        default: 'docs/daten/endspiel-netz/lauf1/N.jsonl.gz'
+      kontrolle_seed:
+        description: 'Seed, mit dem die Kontrolldatei gespielt wurde'
+        required: true
+        default: '213'
+
+concurrency:
+  group: prior-neun
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    name: Eingaben prüfen
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      seed: ${{ steps.p.outputs.seed }}
+      selbstspiel_seed: ${{ steps.p.outputs.selbstspiel_seed }}
+      aufgabe_seed: ${{ steps.p.outputs.aufgabe_seed }}
+      kontrolle: ${{ steps.p.outputs.kontrolle }}
+      kontrolle_seed: ${{ steps.p.outputs.kontrolle_seed }}
+    steps:
+      - uses: actions/checkout@v7
+
+      # Eingaben nur über env und geprüft, nie in die Shell-Zeile interpoliert
+      - name: Eingaben prüfen
+        id: p
+        env:
+          IN_SEED: ${{ inputs.seed }}
+          IN_SELBSTSPIEL_SEED: ${{ inputs.selbstspiel_seed }}
+          IN_AUFGABE_SEED: ${{ inputs.aufgabe_seed }}
+          IN_KONTROLLE: ${{ inputs.kontrolle }}
+          IN_KONTROLLE_SEED: ${{ inputs.kontrolle_seed }}
+        run: |
+          set -euo pipefail
+          for v in "$IN_SEED" "$IN_SELBSTSPIEL_SEED" "$IN_AUFGABE_SEED" "$IN_KONTROLLE_SEED"; do
+            case "$v" in ''|*[!0-9]*) echo "::error::Seeds müssen nicht-negative ganze Zahlen sein: '$v'"; exit 2;; esac
+          done
+          case "$IN_KONTROLLE" in ''|/*|*..*|*[!A-Za-z0-9_./-]*) echo "::error::ungültiger Pfad: '$IN_KONTROLLE'"; exit 2;; esac
+          [ -f "$IN_KONTROLLE" ] || { echo "::error::Datei fehlt im Repo: $IN_KONTROLLE"; exit 2; }
+          {
+            echo "seed=$IN_SEED"
+            echo "selbstspiel_seed=$IN_SELBSTSPIEL_SEED"
+            echo "aufgabe_seed=$IN_AUFGABE_SEED"
+            echo "kontrolle=$IN_KONTROLLE"
+            echo "kontrolle_seed=$IN_KONTROLLE_SEED"
+          } >> "$GITHUB_OUTPUT"
+          echo "## Prior-Schärfe 9: Seed $IN_SEED, M2 ab $IN_SELBSTSPIEL_SEED, M3 ab $IN_AUFGABE_SEED, Commit \`${GITHUB_SHA:0:7}\`" >> "$GITHUB_STEP_SUMMARY"
+
+  spielen:
+    name: Arm ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [A, S9]
+        von: [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+          gnugo --version | head -n 1
+
+      - name: 15 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed }}
+          ARME_DATEI: auswertung/dagger/prior-neun-arme.sh
+        run: bash auswertung/dagger/parameter-spielen.sh "$ARM" "$VON" "$SEED" "neun/$ARM-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: neun-${{ matrix.arm }}-${{ matrix.von }}
+          path: neun/
+          if-no-files-found: warn
+          retention-days: 90
+
+  kontrolle:
+    name: Kontrolle, Arm A mit dem Seed der Kontrolldatei
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+          gnugo --version | head -n 1
+
+      - name: Partien 1 bis 15 spielen
+        env:
+          SEED: ${{ needs.pruefen.outputs.kontrolle_seed }}
+          ARME_DATEI: auswertung/dagger/prior-neun-arme.sh
+        run: bash auswertung/dagger/parameter-spielen.sh A 1 "$SEED" neun/K-1.jsonl
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: neun-K-1
+          path: neun/
+          if-no-files-found: warn
+          retention-days: 90
+
+  selbstspiel:
+    name: Selbstspiel S9 gegen A, ${{ matrix.modus }}, Teil ${{ matrix.teil }}
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        modus: [m2, m3]
+        teil: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      # M2 ohne Aufgabe (OHNE_AUFGABE=1, bis 600 Züge), M3 mit Aufgabe wie bisher
+      - name: 30 Partien spielen
+        env:
+          MODUS: ${{ matrix.modus }}
+          TEIL: ${{ matrix.teil }}
+          SEED_M2: ${{ needs.pruefen.outputs.selbstspiel_seed }}
+          SEED_M3: ${{ needs.pruefen.outputs.aufgabe_seed }}
+          ARME_DATEI: auswertung/dagger/prior-neun-arme.sh
+        run: |
+          set -euo pipefail
+          if [ "$MODUS" = m2 ]; then basis="$SEED_M2"; export OHNE_AUFGABE=1; else basis="$SEED_M3"; export OHNE_AUFGABE=0; fi
+          bash auswertung/dagger/selbstspiel-spielen.sh S9 "$TEIL" "$basis" "neun/$MODUS-S9-$TEIL.json"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: neun-${{ matrix.modus }}-${{ matrix.teil }}
+          path: neun/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [pruefen, spielen, kontrolle, selbstspiel]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: neun-*
+          path: neun
+          merge-multiple: true
+
+      - name: Bericht
+        env:
+          SEED: ${{ needs.pruefen.outputs.seed }}
+          SELBSTSPIEL_SEED: ${{ needs.pruefen.outputs.selbstspiel_seed }}
+          AUFGABE_SEED: ${{ needs.pruefen.outputs.aufgabe_seed }}
+          KONTROLLE: ${{ needs.pruefen.outputs.kontrolle }}
+        run: |
+          set -euo pipefail
+          bash auswertung/dagger/prior-neun-ergebnis.sh "$SEED" "$KONTROLLE" "$SELBSTSPIEL_SEED" "$AUFGABE_SEED"
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Ergebnisse sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ergebnisse-neun
+          path: ergebnisse/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/prior-neun-lauf${LAUF}"
+          ziel="docs/daten/endspiel-neun/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Prior-Schärfe 9 auf dem neuen Default: Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"

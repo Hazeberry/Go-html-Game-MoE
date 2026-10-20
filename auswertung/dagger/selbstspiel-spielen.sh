@@ -9,6 +9,8 @@
 #
 # Aufruf: bash auswertung/dagger/selbstspiel-spielen.sh <arm> <teil> <seed-basis> <aus.json>
 # ARME_DATEI nennt die Datei der Arme (Standard: prior-arme.sh).
+# OHNE_AUFGABE=1: beide Seiten ohne Aufgabe (resignEnabled=0), bis 600 Züge
+# (docs/prior-neun.md §3); sonst Aufgabe an, bis 400 Züge.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 arme_datei=${ARME_DATEI:-$here/prior-arme.sh}
@@ -24,5 +26,7 @@ bekannt=0; for x in "${ARM_REIHE[@]}"; do [ "$x" = "$arm" ] && bekannt=1; done
 [ -n "${ARM_KI[$arm]}" ] || { echo "Arm $arm ist der Default, gegen sich selbst wird nicht gespielt" >&2; exit 2; }
 mkdir -p "$(dirname "$aus")"
 rm -f "$aus"
+zusatz=""; zuege=400
+if [ "${OHNE_AUFGABE:-0}" = "1" ]; then zusatz=",resignEnabled=0"; zuege=600; fi
 node "$here/../../ab-harness.js" --html "$here/../../index.html" --games 30 --seed "$((basis + teil - 1))" \
-  --A mctsFixedSims=120 --B "mctsFixedSims=120,${ARM_KI[$arm]}" --json "$aus"
+  --maxmoves "$zuege" --A "mctsFixedSims=120$zusatz" --B "mctsFixedSims=120,${ARM_KI[$arm]}$zusatz" --json "$aus"

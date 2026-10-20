@@ -36,7 +36,7 @@ function auswertung(teile, erwartet) {
   if (!teile.length) throw new Error('keine Teile');
   const k0 = teile[0].daten.konfig || {};
   const seeds = new Set();
-  let n = 0, b = 0, bS = 0, nBS = 0, bW = 0, nBW = 0, aufgaben = 0, zuege = 0;
+  let n = 0, b = 0, bS = 0, nBS = 0, bW = 0, nBW = 0, aufgaben = 0, zuege = 0, aufgabenB = 0, ausgezaehlt = 0, ausgezaehltB = 0;
   for (const {datei, daten} of teile) {
     const k = daten.konfig || {};
     if (k.abgeschlossen !== true) throw new Error(`${datei}: Lauf nicht abgeschlossen`);
@@ -46,6 +46,8 @@ function auswertung(teile, erwartet) {
     for (const p of daten.partien || []) {
       n++; zuege += p.zuege; if (p.aufgabe) aufgaben++;
       const bGewinnt = p.sieger === 'B', bSchwarz = p.aIst === 'Weiß';
+      if (p.aufgabe) { if (p.aufgabe === (bSchwarz ? 'S' : 'W')) aufgabenB++; }
+      else { ausgezaehlt++; if (bGewinnt) ausgezaehltB++; }
       if (bGewinnt) b++;
       if (bSchwarz) { nBS++; if (bGewinnt) bS++; } else { nBW++; if (bGewinnt) bW++; }
     }
@@ -54,7 +56,8 @@ function auswertung(teile, erwartet) {
   const p = vorzeichenP(b, n - b), rate = n ? b / n : NaN;
   const urteil = p < 0.05 ? (rate < 0.5 ? 'signifikant unter 50 %' : 'signifikant über 50 %') : 'nicht signifikant';
   return {A: k0.A, B: k0.B, teile: teile.length, seeds: [...seeds].sort((x, y) => x - y), n, b, rate, ci: wilson(b, n), p, urteil,
-          bSchwarz: {siege: bS, n: nBS}, bWeiss: {siege: bW, n: nBW}, aufgaben, zuegeMittel: n ? zuege / n : NaN};
+          bSchwarz: {siege: bS, n: nBS}, bWeiss: {siege: bW, n: nBW}, aufgaben, aufgabenB, aufgabenA: aufgaben - aufgabenB,
+          ausgezaehlt: {n: ausgezaehlt, siegeB: ausgezaehltB, p: vorzeichenP(ausgezaehltB, ausgezaehlt - ausgezaehltB)}, zuegeMittel: n ? zuege / n : NaN};
 }
 
 function text(name, r, opt) {
@@ -63,9 +66,10 @@ function text(name, r, opt) {
     '| Arm | A | B | Partien | Siege B | Rate B | 95 % | p | B als Schwarz | B als Weiß | Aufgaben | Züge Ø | Urteil |',
     '|---|---|---|---:|---:|---:|---|---:|---|---|---:|---:|---|',
     `| **${name}** | \`${r.A}\` | \`${r.B}\` | ${r.n} | ${r.b} | **${pz(r.rate)}** | [${pz(r.ci[0])}; ${pz(r.ci[1])}] | ${fp(r.p)} | ${r.bSchwarz.siege} von ${r.bSchwarz.n} | ${r.bWeiss.siege} von ${r.bWeiss.n} | ${r.aufgaben} | ${r.zuegeMittel.toFixed(1).replace('.', ',')} | ${r.urteil} |`,
-    '', `- ${r.teile} Teile, Seeds ${seeds}`].join('\n');
+    '', `- ${r.teile} Teile, Seeds ${seeds}`,
+    `- Aufgaben: B ${r.aufgabenB}, A ${r.aufgabenA} · ausgezählt: B gewinnt ${r.ausgezaehlt.siegeB} von ${r.ausgezaehlt.n} (p = ${fp(r.ausgezaehlt.p)})`].join('\n');
   return `${name}: B (${r.B}) gegen A (${r.A}) · ${r.n} Partien in ${r.teile} Teilen (Seeds ${seeds}) · B gewinnt ${r.b}, ${pz(r.rate)}, 95 %: [${pz(r.ci[0])}; ${pz(r.ci[1])}], p = ${fp(r.p)} (exakt, zweiseitig)`
-    + ` · B als Schwarz ${r.bSchwarz.siege} von ${r.bSchwarz.n}, als Weiß ${r.bWeiss.siege} von ${r.bWeiss.n} · Aufgaben ${r.aufgaben} · Züge Ø ${r.zuegeMittel.toFixed(1).replace('.', ',')} → ${r.urteil}`;
+    + ` · B als Schwarz ${r.bSchwarz.siege} von ${r.bSchwarz.n}, als Weiß ${r.bWeiss.siege} von ${r.bWeiss.n} · Aufgaben ${r.aufgaben} (B ${r.aufgabenB}, A ${r.aufgabenA}), ausgezählt B ${r.ausgezaehlt.siegeB} von ${r.ausgezaehlt.n} · Züge Ø ${r.zuegeMittel.toFixed(1).replace('.', ',')} → ${r.urteil}`;
 }
 
 /* Eine Zeile je Partie, mit Seed und Konfiguration des Teils */
