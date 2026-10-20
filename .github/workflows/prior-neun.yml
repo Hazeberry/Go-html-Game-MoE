@@ -251,7 +251,7 @@ jobs:
         run: |
           set -euo pipefail
           zweig="ergebnisse/prior-neun-lauf${LAUF}"
-          ziel="docs/daten/endspiel-neun/lauf${LAUF}"
+          ziel="docs/daten/prior-neun/lauf${LAUF}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$zweig"

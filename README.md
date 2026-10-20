@@ -272,7 +272,8 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | `phaseBlendWidth` 0 und 24 gegen 8 (je 240 Paare gegen GNU Go, 20.10.) | Endstand −2,7 [−9,6; +4,3] und +0,3 [−8,5; +9,1] | verworfen: kein Hebel, Default 8 bleibt (`docs/parameter-reihe.md` §8) |
 | Pass-Kurve `passMinMc*`: Negativkontrolle (120 und 150 auf −1000), Stufe 80 auf 300, alle Stufen auf −50 (je 240 Paare gegen GNU Go, 20.10.) | 30 von 30 Partien Zug für Zug gleich; Endstand −1,6 [−3,8; +0,6] und +0,2 [−0,6; +1,0]; Partien 28 Züge kürzer und 14 länger | die Einträge für Zug 120 und 150 sind wirkungslos; die Höhe ändert nur, wann die KI aufhört; die Kurve bleibt, im Code steht jetzt, was sie tut (`docs/parameter-reihe.md` §8) |
 | `bensonAliveExempt` 1 gegen 0 (die Sterbe-Treppe in `evaluateBoard` nimmt Benson-lebende Ketten aus; 240 Paare gegen GNU Go, 20.10.) | Defekt belegt: in vier ganzen Partien trifft die Treppe in 38 % der Bewertungen mit Benson-Analyse eine bewiesen lebende Kette (13 % des Abzugs, meist die des Gegners); Endstand B − A **+1,3** (95 %: [−1,3; +4,0], p = 0,32), Siege 152 gegen 149 (McNemar p = 0,63); Arm A gibt M1-A in 240 von 240 Partien wieder | verworfen (Obergrenze unter +10): Schalter bleibt, Default 0; der Defekt ist belegt, ein Stärkegewinn nicht (`docs/benson-lebend-treppe.md` §8) |
-| `mctsPriorSharp` 9 nachgemessen, frischer Seed (480 Paare gegen GNU Go, dazu 15, 30 und 9 erst ab Zug 120; Selbstspiel 360 Partien, 20.10.) | gegen GNU Go **+7,3** [+2,1; +12,5], p = 0,0064, Siege 365 gegen 304; 15: +12,7, 30: +3,9, ab Zug 120: −0,3; **im Selbstspiel 25,6 %** (p = 4 · 10⁻²¹), 213 der 268 Niederlagen eigene Aufgaben | kein Default nach der vorab festgelegten Regel (M1 und M2 widersprechen sich); untersuchen, vermutlich gibt der schärfere Prior zu früh auf (`docs/prior-nachmessung.md` §8) |
+| `mctsPriorSharp` 9 nachgemessen, frischer Seed (480 Paare gegen GNU Go, dazu 15, 30 und 9 erst ab Zug 120; Selbstspiel 360 Partien, 20.10.) | gegen GNU Go **+7,3** [+2,1; +12,5], p = 0,0064, Siege 365 gegen 304; 15: +12,7, 30: +3,9, ab Zug 120: −0,3; **im Selbstspiel 25,6 %** (p = 4 · 10⁻²¹), 213 der 268 Niederlagen eigene Aufgaben | kein Default nach der vorab festgelegten Regel (M1 und M2 widersprechen sich); untersuchen (`docs/prior-nachmessung.md` §8) |
+| `mctsPriorSharp` 9 auf dem Default mit Endspiel-Netz (240 Paare gegen GNU Go, Selbstspiel ohne und mit Aufgabe je 360, 20.10.) | gegen GNU Go **−11,4** [−18,4; −4,5], p = 0,0014, Siege 197 gegen 222; Selbstspiel ohne Aufgabe 26,4 %, mit Aufgabe 18,6 % | **verworfen**, Default 3 bleibt; die Schwäche im Selbstspiel lag nicht an der Aufgabe (`docs/prior-neun.md` §8) |
 | `bensonDeathTransfer` 1 gegen GNU Go (240 Paare, Selbstspiel 360, 20.10.) | −0,8 [−2,4; +0,7], 50,8 % im Selbstspiel | verworfen, Default 0 (`docs/prior-nachmessung.md` §8) |
 | Endspiel-Lerner, Schritt 1 (offline, GitHub Actions): ein kleines Faltungsnetz greift an der Wurzel ab Zug 81 ein (4 beste Netzzüge in die Kandidaten, Prior zur Hälfte vom Netz) | 19 222 frische Stellungen (Seed 206): die gespielten Züge treffen GNU Gos Zug (Stufe 10) in **34,9 % statt 18,1 %**, +16,8 Prozentpunkte (Zug 81–160: +23,2, ab 161: +10,5); 48 % der Züge ändern sich | Tor (+4,0) bestanden: Schritt 2 folgt, Schalter in `index.html` und Messung im Spiel; ob Treffer Punkte werden, ist offen (`docs/endspiel-lerner.md` §8) |
 | **`endspielNetz` 0,5 (Endspiel-Netz im Spiel, Schritt 2; 240 Paare gegen GNU Go, Selbstspiel 360, 20.10.)** | **Endstand +46,9** [+40,4; +53,4], p = 10⁻³³, Siege 227 gegen 149 von 240; Selbstspiel 83,1 %; Kontrolle 15 von 15 | **Default 0,5** (`docs/endspiel-netz.md` §8) |
@@ -2478,7 +2479,11 @@ es 45 zu 55. Nach der vorab festgelegten Regel heißt das: kein neuer Default,
 untersuchen ([`docs/prior-nachmessung.md`](docs/prior-nachmessung.md) §8).
 Schärfe 15 lag bei +12,7, 30 bei +3,9; die Idee, erst ab Zug 120 schärfer zu
 werden, trägt nicht (−0,3). `bensonDeathTransfer` ist jetzt auch gegen GNU Go
-gemessen: −0,8 [−2,4; +0,7], verworfen.
+gemessen: −0,8 [−2,4; +0,7], verworfen. **Nachtrag:** Auf dem neuen Default
+mit Endspiel-Netz ist Schärfe 9 schlechter, −11,4 [−18,4; −4,5], und im
+Selbstspiel ohne Aufgabe gewinnt sie nur 26,4 %. Die Aufgabe war also nicht der
+Grund. Schärfe 9 ist verworfen
+([`docs/prior-neun.md`](docs/prior-neun.md) §8).
 
 **Das Endspiel-Netz (20.10.).** Ein kleines Faltungsnetz, gelernt an 80 474
 von GNU Go Stufe 10 beschrifteten Endspielstellungen, greift ab Zug 81 an der
