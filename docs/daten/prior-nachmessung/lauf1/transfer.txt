@@ -1,0 +1,4 @@
+Arm A (Default): 480 Partien, 0 abgebrochen, Endstand Ø +19,1, Siege 304, Züge Ø 241,1
+Arm BT (bensonDeathTransfer=1): 240 Partien, 0 abgebrochen, Endstand Ø +14,5, Siege 144, Züge Ø 243,5
+
+BT − A: 240 Paare · Differenz −0,8 (SD 12,3), 95 %: [−2,4; +0,7], p = 0,2948 · Hälften −1,9 / +0,3 · Siege 144 gegen 149 · nach Zug 120: +0,0 (p = 1,0000) · Zug für Zug gleich A: 100 von 240 → verworfen: kein Gewinn von 10

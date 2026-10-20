@@ -1,0 +1,4 @@
+Arm A (Default): 480 Partien, 0 abgebrochen, Endstand Ø +19,1, Siege 304, Züge Ø 241,1
+Arm S9 (mctsPriorSharp=9): 480 Partien, 0 abgebrochen, Endstand Ø +26,4, Siege 365, Züge Ø 223,5
+
+S9 − A: 480 Paare · Differenz +7,3 (SD 58,4), 95 %: [+2,1; +12,5], p = 0,0064 · Hälften +11,7 / +2,9 · Siege 365 gegen 304 · nach Zug 120: −10,4 (p = 3,0 · 10⁻9) · Zug für Zug gleich A: 0 von 480 → besser: Kandidat
