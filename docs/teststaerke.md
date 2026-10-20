@@ -127,3 +127,37 @@ je 30 ausgespielte Partien gegen GNU Go Stufe 1, 120 Simulationen, Seed
   die neue KI im Schnitt so da wie die alte mit neun (−78,5 gegen −78,3 im
   Arm A der Messung in `muster.md` §8; andere Seeds, also eine grobe
   Schätzung).
+
+## 8. Vorgabe nach dem Endspiel-Netz und Laufzeit (vorab festgelegt, 20.10.2026)
+
+Seit `endspielNetz` Default ist ([`endspiel-netz.md`](endspiel-netz.md) §8),
+gewinnt die KI gegen GNU Go mit neun Vorgabesteinen 227 von 240 Partien (95 %).
+Damit ist der Prüfstand fast gesättigt: Die Siege können kaum noch steigen, und
+der Endstand misst vor allem, wie hoch gewonnen wird. Wie in §7 wird die Vorgabe
+neu eingestellt.
+
+**Messung** (GitHub Actions, [`pruefstand.yml`](../.github/workflows/pruefstand.yml)):
+Die heutige Standard-KI spielt gegen GNU Go Stufe 1 mit **9, 6, 4 und 2**
+Vorgabesteinen, je **60 Partien**, Seed 215 (noch nie benutzt). Die Bedingungen
+sind die der Messungen: 120 Simulationen, Aufgabe aus, GNU Go gibt nicht auf,
+bis 600 Züge.
+
+**Wahl, vorab festgelegt** (`auswertung/pruefstand-bericht.js`): Künftige
+Messungen spielen mit der Vorgabe, deren Siegrate am nächsten an 50 % liegt,
+sofern sie zwischen 25 und 75 % liegt. Bei Gleichstand gilt die Vorgabe mit mehr
+Steinen. Liegt keine Vorgabe in diesem Bereich, bleiben es 9. Frühere Messungen
+bleiben gültig, weil beide Arme jeder Messung dieselbe Vorgabe hatten. Die
+Vorgabe ändert sich mit dem Nachtrag zu dieser Messung, erst in den Messungen
+danach.
+
+**Laufzeit** (`auswertung/netz-zeit.js`, im selben Lauf): An 24 Stellungen
+(Zug 100, 150 und 200 aus 8 Partien) zieht die KI mit den Einstellungen des
+Spiels, also mit Zeitbudget statt fester Simulationen, einmal ohne und einmal
+mit Netz. Die Suche setzt ihre Zeitgrenze erst beim Start von `mctsPUCT`, das
+Netz rechnet davor. **Erwartet:** gleich viele Simulationen, und der Zug dauert
+um die Rechenzeit des Netzes länger, rund 0,1 bis 0,2 s bei einem Budget von 1,8
+s. Geprüft wird, ob das stimmt. Einen Schwellenwert für eine Entscheidung gibt
+es hier nicht.
+
+**Erwartung vorab:** 9 Steine rund 90 bis 95 %, 6 Steine 50 bis 75 %, 4 Steine
+15 bis 40 %, 2 Steine unter 15 %. Die Wahl fiele damit auf 6 oder 4.

@@ -191,6 +191,7 @@ test('Workflow prior-nachmessung.yml: keine Ausdrücke in Shell-Zeilen', () => p
 test('Workflow endspiel-lerner.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-lerner.yml', 5, 4));
 test('Workflow endspiel-netz.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-netz.yml', 8, 4));
 test('Workflow prior-neun.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('prior-neun.yml', 8, 5));
+test('Workflow pruefstand.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('pruefstand.yml', 5, 1));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
 
@@ -962,6 +963,24 @@ test('Workflow prior-neun.yml: Arme, Jobs und Vorgaben wie in der Vorabfestlegun
   const s = (...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'prior-neun-ergebnis.sh'), ...x], {cwd: temp(), encoding: 'utf8'});
   pruefeGleich(s('214', 'gibt-es-nicht.gz', '1', '2').status, 2, 'prior-neun-ergebnis.sh: Kontrolldatei fehlt');
   pruefeGleich(s('214', path.join(wurzel, 'docs', 'daten', 'endspiel-netz', 'lauf1', 'N.jsonl.gz'), '1').status, 1, 'prior-neun-ergebnis.sh: Seed von M3 fehlt');
+});
+
+test('Prüfstand: Wahl der Vorgabe nach der vorab festgelegten Regel, Skript lehnt falsche Eingaben ab', () => {
+  const PB = require('../auswertung/pruefstand-bericht.js');
+  const z = (vorgabe, rate) => ({vorgabe, rate});
+  pruefeGleich(PB.wahl([z(9, 0.95), z(6, 0.6), z(4, 0.3), z(2, 0.05)]), 6, '60 % liegt näher an 50 als 30 %');
+  pruefeGleich(PB.wahl([z(9, 0.95), z(6, 0.55), z(4, 0.45), z(2, 0.05)]), 6, 'Gleichstand: mehr Steine');
+  pruefeGleich(PB.wahl([z(9, 0.95), z(6, 0.8), z(4, 0.1)]), 9, 'keine im Bereich: 9 bleibt');
+  const p = n => Array.from({length: n}, (_, i) => ({gewonnen: i % 2 === 0, endstand: i % 2 ? -10 : 10, schaetzung: {120: 5}}));
+  const zl = PB.zeile(6, p(60));
+  pruefeGleich(`${zl.siege}/${zl.n}`, '30/60', 'Siege gezählt'); pruefeGleich(zl.z120, 5, 'Schätzung nach Zug 120');
+  const s = (...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'pruefstand-spielen.sh'), ...x], {cwd: temp(), encoding: 'utf8'});
+  pruefeGleich(s('10', '1', '215', 'x.jsonl').status, 2, 'Vorgabe 10 abgelehnt');
+  pruefeGleich(s('a', '1', '215', 'x.jsonl').status, 2, 'Zahl erwartet');
+  pruefeGleich(s('6', '1', '215').status, 1, 'Argument fehlt');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'pruefstand.yml'), 'utf8');
+  pruefeGleich((/vorgabe: \[([0-9, ]+)\]/.exec(t) || [])[1], '9, 6, 4, 2', 'Vorgaben 9, 6, 4, 2');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
 });
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));
