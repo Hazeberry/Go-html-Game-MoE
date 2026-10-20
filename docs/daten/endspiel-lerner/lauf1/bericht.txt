@@ -1,0 +1,5 @@
+alle Stellungen: 19222 Stellungen · trifft GNU Go ohne Lerner 18,1 %, mit 34,9 % · Differenz +16,8 Prozentpunkte · nur mit 3676, nur ohne 443, McNemar p = 0,0e+0 · geändert 48,0 % · bester Netzzug 39,3 % · Zug in der Partie 17,9 %
+Zug 81–160: 9550 Stellungen · trifft GNU Go ohne Lerner 18,6 %, mit 41,9 % · Differenz +23,2 Prozentpunkte · nur mit 2444, nur ohne 226, McNemar p = 0,0e+0 · geändert 49,1 % · bester Netzzug 48,1 % · Zug in der Partie 18,6 %
+ab Zug 161: 9672 Stellungen · trifft GNU Go ohne Lerner 17,5 %, mit 28,0 % · Differenz +10,5 Prozentpunkte · nur mit 1232, nur ohne 217, McNemar p = 2,5 · 10⁻172 · geändert 47,0 % · bester Netzzug 30,6 % · Zug in der Partie 17,2 %
+
+Tor (≥ +4,0 Prozentpunkte und p < 0,05): bestanden
