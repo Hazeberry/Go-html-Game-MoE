@@ -24,7 +24,7 @@ const pfad = argv.find(a => !a.startsWith('--'));
 const HTML = pfad ? [path.resolve(pfad)] : [];
 
 const ALLE = ['regeln.js', 'nan-guards.js', 'resign-criterion.js', 'transfer-telemetry.js',
-              'benson-transfer.js', 'benson-lebend-treppe.js', 'feste-sims.js', 'roh-dump.js',
+              'benson-transfer.js', 'benson-lebend-treppe.js', 'endspiel-netz.js', 'feste-sims.js', 'roh-dump.js',
               'influence.js', 'endspiel-gleichstand.js', 'epochen.js', 'raumrisiko.js', 'gebiet.js', 'endspiel-augen.js', 'gegnerwert.js', 'lesen.js', 'wurzel.js', 'quick-rettung.js', 'atari-verzicht.js', 'muster.js', 'gebiet-sicher.js', 'zaehlung.js', 'extern.js', 'lizenz.js', 'ko-suche.js', 'muster-endspiel.js', 'dagger.js', 'gnugo-bruecke.js',
               'training-stability.js', 'harness-smoke.js', 'browser-nan.js', 'browser-ui.js'];
 const SUITEN = OHNE_BROWSER ? ALLE.filter(s => !s.startsWith('browser-')) : ALLE;

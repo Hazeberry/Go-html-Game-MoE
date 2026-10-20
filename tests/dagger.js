@@ -189,6 +189,7 @@ test('Workflow parameter-reihe.yml: keine Ausdrücke in Shell-Zeilen', () => pru
 test('Workflow benson-lebend.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('benson-lebend.yml', 5, 2));
 test('Workflow prior-nachmessung.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('prior-nachmessung.yml', 10, 4));
 test('Workflow endspiel-lerner.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-lerner.yml', 5, 4));
+test('Workflow endspiel-netz.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-netz.yml', 8, 4));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
 
@@ -909,6 +910,30 @@ test('Lerner: Merkmale, Vorwärtsrechnung und Tor', () => {
   pruefe(/Tor .*: bestanden/.test(LB.bericht(viele)), 'Bericht: bestanden');
   pruefeGleich(LB.tor({diff: 0.03, p: 0.001, nurMit: 30, nurOhne: 0}), 'nicht bestanden', 'unter +4,0');
   pruefeGleich(LB.tor({diff: 0.05, p: 0.2, nurMit: 5, nurOhne: 0}), 'nicht bestanden', 'nicht signifikant');
+});
+
+test('Workflow endspiel-netz.yml: Arme, Jobs und Vorgaben wie in der Vorabfestlegung', () => {
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'endspiel-netz.yml'), 'utf8');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'endspiel-netz.md'), 'utf8');
+  const armeDatei = path.join(wurzel, 'auswertung', 'dagger', 'endspiel-netz-arme.sh');
+  const a = fs.readFileSync(armeDatei, 'utf8');
+  for (const job of ['pruefen', 'spielen', 'kontrolle', 'selbstspiel', 'ergebnis']) pruefe(new RegExp(`^  ${job}:$`, 'm').test(t), `Job ${job}`);
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefeGleich((/arm: \[([A-Za-z0-9, ]+)\]/.exec(t) || [])[1], 'A, N', 'Arme A und N');
+  pruefeGleich((/von: \[([0-9, ]+)\]/.exec(t) || [])[1].split(',').map(Number).join(','), TEILE.join(','), '16 Teile');
+  pruefe(doc.includes('45 Jobs') && t.includes('45 Jobs'), '45 Jobs im Dokument und im Workflow');
+  pruefe(/\| \*\*N\*\* \| `endspielNetz=0\.5` \|/.test(doc) && /\[N\]="endspielNetz=0\.5"/.test(a), 'Arm N im Dokument und in der Datei');
+  const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-spielen.sh'), '--ki', 'N'], {encoding: 'utf8', env: {...process.env, ARME_DATEI: armeDatei}});
+  pruefeGleich(r.stdout.trim(), 'mctsFixedSims=120,resignEnabled=0,endspielNetz=0.5', '--ki-Angabe von Arm N');
+  pruefe(/^  endspielNetz:      0,$/m.test(fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8')), 'endspielNetz steht in index.html mit Default 0');
+  for (const name of ['seed', 'selbstspiel_seed', 'kontrolle', 'kontrolle_seed']) {
+    const imDoc = (new RegExp('^\\| `' + name + '` \\| `?([^` |]+)', 'm').exec(doc) || [])[1];
+    const imFlow = (new RegExp('^      ' + name + ':\\n(?:        .*\\n)*?        default: \'([^\']*)\'', 'm').exec(t) || [])[1];
+    pruefe(imDoc !== undefined && imDoc === imFlow, `Vorgabe ${name}: Dokument „${imDoc}“, Workflow „${imFlow}“`);
+  }
+  const s = (...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'endspiel-netz-ergebnis.sh'), ...x], {cwd: temp(), encoding: 'utf8'});
+  pruefeGleich(s('213', 'gibt-es-nicht.gz', '20261401').status, 2, 'endspiel-netz-ergebnis.sh: Kontrolldatei fehlt');
+  pruefeGleich(s('213', path.join(wurzel, 'docs', 'daten', 'parameter-reihe', 'lauf1', 'A.jsonl.gz'), '20261401').status, 1, 'endspiel-netz-ergebnis.sh: keine Teile');
 });
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));
