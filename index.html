@@ -1983,7 +1983,10 @@ globalThis.PARAMS = {
      statt 18,1 %.
      GEMESSEN (docs/endspiel-netz.md §8, 240 Paare gegen GNU Go, Seed 213):
      0,5 gegen 0 +46,9 [+40,4; +53,4], Siege 227 gegen 149 von 240; im
-     Selbstspiel 83,1 % von 360. Deshalb Default 0,5. */
+     Selbstspiel 83,1 % von 360. Deshalb Default 0,5.
+     Laufzeit (docs/teststaerke.md §9): das Netz rechnet vor mctsPUCT, also
+     vor der Zeitgrenze der Suche. Bei 1,8 s Budget dauert ein Zug 41 ms
+     laenger (Median), die Suche behaelt ihre Simulationen (102 %). */
   endspielNetz:      0.5,
   endspielNetzTop:   4,
   endspielNetzAb:   80,

@@ -1,0 +1,6 @@
+Vorgabe 9: 60 Partien (0 abgebrochen) · Siege 57 (95 %) · Endstand Ø +61,1, SD 29.9 · nach Zug 120 +83,8
+Vorgabe 6: 60 Partien (0 abgebrochen) · Siege 32 (53 %) · Endstand Ø +11,1, SD 57.0 · nach Zug 120 +28,8
+Vorgabe 4: 60 Partien (0 abgebrochen) · Siege 26 (43 %) · Endstand Ø −11,3, SD 51.1 · nach Zug 120 +8,4
+Vorgabe 2: 60 Partien (0 abgebrochen) · Siege 2 (3 %) · Endstand Ø −65,4, SD 40.7 · nach Zug 120 −20,7
+
+Wahl nach §8: 6 Vorgabesteine
