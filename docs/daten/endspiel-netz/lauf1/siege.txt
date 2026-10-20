@@ -1,0 +1,1 @@
+N gegen A: Siege 227 gegen 149 · nur N gewinnt 81, nur A gewinnt 3, beide 146, keiner 10 · McNemar (exakt) p = 1,0 · 10⁻20

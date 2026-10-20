@@ -161,9 +161,12 @@ function schluessel(E, b, c, k, letzt, m, kt) {
 /* Feste Simulationen, keine Baumwiederverwendung, keine Aufgabe; die
    Pass-Schwellen aus, damit auch Stellungen kurz vor dem Passen eine Liste
    haben. */
+/* endspielNetz aus: Die Liste ist die der Heuristik, wie zur Zeit der
+   Studie (docs/muster-endspiel.md); das Netz (Default seit dem 20.10.,
+   docs/endspiel-netz.md) würde seine besten Punkte hineinsetzen. */
 function stelleEin(E) {
   Object.assign(E.PARAMS, {mctsFixedSims: 120, adaptiveBudgetEnabled: 0, mctsTreeReuse: 0, resignEnabled: 0,
-    passMinMc40: -1e9, passMinMc80: -1e9, passMinMc120: -1e9, passMinMc150: -1e9});
+    passMinMc40: -1e9, passMinMc80: -1e9, passMinMc120: -1e9, passMinMc150: -1e9, endspielNetz: 0});
 }
 function kandidatenListe(E, b, c, k, letzt) {
   const STOPP = {};

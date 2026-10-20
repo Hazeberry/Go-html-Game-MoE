@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Endspiel-Netz in index.html (PARAMS.endspielNetz, docs/endspiel-netz.md).
 
-     1. Default 0: endspielNetzWurzel lässt die Kandidatenliste unberührt.
+     1. Default 0,5 (seit docs/endspiel-netz.md §8); bei 0 lässt
+        endspielNetzWurzel die Kandidatenliste unberührt.
      2. Die Ebenen der Engine (_enEbenen) sind dieselben wie in
         auswertung/lerner-merkmale.js, an echten Stellungen.
      3. Die eingebetteten Float32-Gewichte geben dieselben Wahrscheinlichkeiten
@@ -35,10 +36,12 @@ const NETZ = LN.netzAus(JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(wur
 const PARTIE = JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(wurzel, 'docs', 'daten', 'muster-endspiel-pruef.jsonl.gz'))).toString('utf8').split('\n')[0]);
 const STELLUNGEN = LD.stellungen(E, PARTIE, 80, true).filter((_, i) => i % 5 === 0);
 
-test('Default 0: der Haken lässt die Kandidaten unberührt', () => {
-  pruefeGleich(E.PARAMS.endspielNetz, 0, 'endspielNetz ist 0');
+test('Default 0,5 seit der Messung; bei 0 lässt der Haken die Kandidaten unberührt', () => {
+  pruefeGleich(E.PARAMS.endspielNetz, 0.5, 'endspielNetz ist 0,5 (docs/endspiel-netz.md §8)');
   const s = STELLUNGEN[0], liste = [{m: {idx: 1}, score: 2}, {m: {idx: 2}, score: 1}];
+  E.PARAMS.endspielNetz = 0;
   globalThis.endspielNetzWurzel(s.b, s.c, s.k, liste, null);
+  E.PARAMS.endspielNetz = DEFAULT.endspielNetz;
   pruefe(!liste.__pNetz && liste.length === 2 && liste[0].m.idx === 1, 'keine Markierung, keine Umordnung');
 });
 
