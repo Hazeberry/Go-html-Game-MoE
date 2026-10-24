@@ -193,6 +193,7 @@ test('Workflow endspiel-netz.yml: keine Ausdrücke in Shell-Zeilen', () => pruef
 test('Workflow prior-neun.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('prior-neun.yml', 8, 5));
 test('Workflow pruefstand.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('pruefstand.yml', 5, 1));
 test('Workflow netz-dosis.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('netz-dosis.yml', 8, 5));
+test('Workflow netz-hoch.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('netz-hoch.yml', 8, 5));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
 
@@ -1017,6 +1018,40 @@ test('Workflow netz-dosis.yml: Arme, Jobs, Vorgabe und Eingaben wie in der Vorab
   const v = (vorgabe, ...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-spielen.sh'), ...x], {cwd: temp(), encoding: 'utf8', env: {...process.env, ARME_DATEI: armeDatei, VORGABE: vorgabe}});
   pruefeGleich(v('10', 'A', '1', '216', 'x.jsonl').status, 2, 'parameter-spielen.sh: Vorgabe 10 abgelehnt');
   pruefeGleich(v('x', 'A', '1', '216', 'x.jsonl').status, 2, 'parameter-spielen.sh: Vorgabe keine Zahl');
+});
+
+test('Workflow netz-hoch.yml: Arme, Jobs, Vorgabe und Eingaben wie in der Vorabfestlegung', () => {
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'netz-hoch.yml'), 'utf8');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'netz-hoch.md'), 'utf8');
+  const armeDatei = path.join(wurzel, 'auswertung', 'dagger', 'netz-hoch-arme.sh');
+  for (const job of ['pruefen', 'spielen', 'kontrolle', 'selbstspiel', 'ergebnis']) pruefe(new RegExp(`^  ${job}:$`, 'm').test(t), `Job ${job}`);
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefeGleich((/arm: \[([A-Za-z0-9, ]+)\]/.exec(t) || [])[1], 'A, L9, L10', 'Arme A, L9 und L10 gegen GNU Go');
+  pruefeGleich((/arm: \[([A-Za-z0-9, ]+)\]\n        teil:/.exec(t) || [])[1], 'L9, L10', 'Selbstspiel L9 und L10');
+  pruefeGleich((t.match(/VORGABE: '6'/g) || []).length, 2, 'Spielen und Kontrolle mit sechs Vorgabesteinen');
+  pruefe(/OHNE_AUFGABE: '1'/.test(t), 'M2 ohne Aufgabe');
+  pruefe(/if \[ "\$ARM" = L9 \]; then basis="\$SEED_L9"; else basis="\$SEED_L10"; fi/.test(t), 'Seeds von M2 je Arm');
+  pruefe(doc.includes('73 Jobs') && t.includes('73 Jobs'), '73 Jobs im Dokument und im Workflow');
+  pruefe(/--alpha 0\.025/.test(fs.readFileSync(path.join(wurzel, 'auswertung', 'dagger', 'netz-hoch-ergebnis.sh'), 'utf8')) && doc.includes('α = 0,025'), 'Bonferroni: alpha 0,025');
+  const ki = arm => spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-spielen.sh'), '--ki', arm], {encoding: 'utf8', env: {...process.env, ARME_DATEI: armeDatei}}).stdout.trim();
+  pruefeGleich(ki('A'), 'mctsFixedSims=120,resignEnabled=0', '--ki-Angabe von Arm A');
+  pruefeGleich(ki('L9'), 'mctsFixedSims=120,resignEnabled=0,endspielNetz=0.9', '--ki-Angabe von Arm L9');
+  pruefeGleich(ki('L10'), 'mctsFixedSims=120,resignEnabled=0,endspielNetz=1', '--ki-Angabe von Arm L10');
+  pruefe(/\| \*\*L9\*\* \| `endspielNetz=0\.9` \|/.test(doc) && /\| \*\*L10\*\* \| `endspielNetz=1` \|/.test(doc), 'Arme L9 und L10 im Dokument');
+  pruefe(/^  endspielNetz:      0\.8,$/m.test(fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8')), 'Arm A ist der Default 0,8');
+  for (const name of ['seed', 'seed_neun', 'seed_eins', 'kontrolle', 'kontrolle_seed']) {
+    const imDoc = (new RegExp('^\\| `' + name + '` \\| `?([^` |]+)', 'm').exec(doc) || [])[1];
+    const imFlow = (new RegExp('^      ' + name + ':\\n(?:        .*\\n)*?        default: \'([^\']*)\'', 'm').exec(t) || [])[1];
+    pruefe(imDoc !== undefined && imDoc === imFlow, `Vorgabe ${name}: Dokument „${imDoc}“, Workflow „${imFlow}“`);
+  }
+  const kontrolle = path.join(wurzel, 'docs', 'daten', 'netz-dosis', 'lauf1', 'L8.jsonl.gz');
+  pruefe(fs.existsSync(kontrolle), 'die Kontrolldatei liegt im Repo');
+  const erste = JSON.parse(require('zlib').gunzipSync(fs.readFileSync(kontrolle)).toString('utf8').split('\n')[0]);
+  pruefeGleich(`${erste.vorgabe} ${erste.seed} ${JSON.stringify(erste.ki)}`, '6 21600001 {"mctsFixedSims":120,"resignEnabled":0,"endspielNetz":0.8}', 'Kontrolldatei: sechs Steine, Seed 216, Arm L8');
+  const s = (...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'netz-hoch-ergebnis.sh'), ...x], {cwd: temp(), encoding: 'utf8'});
+  pruefeGleich(s('217', 'gibt-es-nicht.gz', '1', '2').status, 2, 'netz-hoch-ergebnis.sh: Kontrolldatei fehlt');
+  pruefeGleich(s('217', kontrolle, '1').status, 1, 'netz-hoch-ergebnis.sh: Seed von M2 für L10 fehlt');
+  pruefeGleich(s('217', kontrolle, '1', '2').status, 1, 'netz-hoch-ergebnis.sh: keine Teile');
 });
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));
