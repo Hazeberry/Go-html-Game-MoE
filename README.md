@@ -278,6 +278,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | Endspiel-Lerner, Schritt 1 (offline, GitHub Actions): ein kleines Faltungsnetz greift an der Wurzel ab Zug 81 ein (4 beste Netzzüge in die Kandidaten, Prior zur Hälfte vom Netz) | 19 222 frische Stellungen (Seed 206): die gespielten Züge treffen GNU Gos Zug (Stufe 10) in **34,9 % statt 18,1 %**, +16,8 Prozentpunkte (Zug 81–160: +23,2, ab 161: +10,5); 48 % der Züge ändern sich | Tor (+4,0) bestanden: Schritt 2 folgt, Schalter in `index.html` und Messung im Spiel; ob Treffer Punkte werden, ist offen (`docs/endspiel-lerner.md` §8) |
 | **`endspielNetz` 0,5 (Endspiel-Netz im Spiel, Schritt 2; 240 Paare gegen GNU Go, Selbstspiel 360, 20.10.)** | **Endstand +46,9** [+40,4; +53,4], p = 10⁻³³, Siege 227 gegen 149 von 240; Selbstspiel 83,1 %; Kontrolle 15 von 15 | **Default 0,5** (`docs/endspiel-netz.md` §8) |
 | **`endspielNetz` 0,8 (Dosis des Endspiel-Netzes; 240 Paare gegen GNU Go mit sechs Vorgabesteinen, Selbstspiel 360 ohne Aufgabe, 20.10.)** | **Endstand +15,5** [+7,9; +23,1] gegen 0,5, p = 7,5 · 10⁻⁵, Siege 154 gegen 123; Selbstspiel 56,4 %; `endspielNetzTop` 8 statt 4: +1,3 [−6,0; +8,6]; Kontrolle 15 von 15 | **Default 0,8**, Top 8 verworfen (`docs/netz-dosis.md` §8) |
+| `endspielNetz` 0,9 und 1 (höhere Dosis; 240 Paare gegen GNU Go mit sechs Vorgabesteinen, Selbstspiel 360 ohne Aufgabe, 24.10.) | gegen 0,8: 0,9 −1,9 [−9,3; +5,6], 1 −4,1 [−11,4; +3,2]; Selbstspiel 49,7 % und 53,1 %; Kontrolle 15 von 15 | verworfen — Default bleibt 0,8 (`docs/netz-hoch.md` §8) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2507,7 +2508,9 @@ Netz den Prior der Wurzel ab Zug 81 zu 80 % statt zur Hälfte, gewinnt die KI
 gegen GNU Go **+15,5 Punkte** [+7,9; +23,1] und 154 statt 123 von 240 Partien,
 im Selbstspiel ohne Aufgabe 56,4 %. Acht statt vier Netzpunkte unter den
 Kandidaten bringen nichts (+1,3). Seitdem ist `endspielNetz` = 0,8 Default
-([`docs/netz-dosis.md`](docs/netz-dosis.md)).
+([`docs/netz-dosis.md`](docs/netz-dosis.md)). Noch mehr Netz bringt nichts mehr:
+λ 0,9 −1,9 und λ 1 −4,1, beide verworfen
+([`docs/netz-hoch.md`](docs/netz-hoch.md)).
 
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem

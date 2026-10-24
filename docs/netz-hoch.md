@@ -108,3 +108,42 @@ Jobs: `pruefen`, `spielen` (A, L9 und L10 × 16 Teile), `kontrolle` (ein Teil),
 `auswertung/dagger/netz-hoch-ergebnis.sh`). Die Ergebnisse legt der Workflow auf
 den Branch `ergebnisse/netz-hoch-lauf<N>` unter `docs/daten/netz-hoch/lauf<N>/`.
 Nur der letzte Job darf ins Repo schreiben. Erwartet werden 30 bis 50 Minuten.
+
+## 8. Nachtrag: Ergebnis der Messung, Default bleibt 0,8 (24.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #1 des Workflows `netz-hoch.yml`
+([Run 40104450559](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40104450559)),
+auf dem Merge-Commit `910fce2` von `main`, mit den Eingaben aus §7, in 37 Minuten
+(14:52 bis 15:29 UTC). Alle 735 Partien gegen GNU Go und 720 im Selbstspiel
+ausgespielt, keine abgebrochen. Daten:
+[`daten/netz-hoch/lauf1/`](daten/netz-hoch/lauf1/).
+
+**Kontrolle.** Arm A gibt Arm L8 der Dosis-Messung in **15 von 15** Partien
+wieder.
+
+| Vergleich (240 Paare) | Differenz | 95 % | p | Siege | Selbstspiel ohne Aufgabe |
+|---|---:|---|---:|---|---:|
+| L9 − A (λ 0,9) | −1,9 | [−9,3; +5,6] | 0,62 | 161 gegen 157 | 49,7 % (p = 0,96) |
+| L10 − A (λ 1) | −4,1 | [−11,4; +3,2] | 0,27 | 159 gegen 157 | 53,1 % (p = 0,27) |
+
+Arm A (λ 0,8) kommt im Mittel auf +24,1 bei 157 Siegen von 240.
+
+**Entscheidung nach §4: Default bleibt `endspielNetz` = 0,8.** Keiner der Arme
+ist signifikant besser. **Beide sind verworfen**, denn beide Obergrenzen (+5,6
+und +3,2) liegen unter +10.
+
+**Gegen die Erwartung aus §5.** Erwartet waren für L9 −3 bis +6 und für L10 −8
+bis +5, dazu M2 nicht signifikant und die Kontrolle 15 von 15. Alles ist so
+eingetroffen. Die Dosis hat damit ihr Maß gefunden: Von 0 auf 0,5 kamen +46,9,
+von 0,5 auf 0,8 +15,5, darüber nichts mehr. Ob λ 0,8 genau der beste Wert ist,
+misst die Reihe nicht. Zwischen 0,8 und 1 ist die Kurve aber flach.
+
+**Sekundär, ohne Anspruch.** Nach Zug 120 liegen die Arme gleich (−0,4 und
+−0,6), nach Zug 200 leicht vorn (+1,2 und +2,1), am Ende leicht hinten. Median
+der Differenz +2 und 0, Vorzeichentest 123 gegen 115 und 114 gegen 118. Die
+Paardifferenz streut mit 57 bis 59 Punkten wie bisher.
+
+**Was das für den Ausbau heißt.** Mehr Gewicht für dasselbe Netz bringt nichts
+mehr. Mehr kann nur ein besseres Netz bringen: mehr und eigene Lehrdaten
+(Datenaggregation) oder ein Netz fürs Mittelspiel. Den Gewinn auch gegen einen
+zweiten Gegner zu prüfen ([`fuego.md`](fuego.md)), bleibt offen.

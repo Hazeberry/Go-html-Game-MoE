@@ -1,0 +1,2 @@
+L9 gegen A: Siege 161 gegen 157 · nur L9 gewinnt 34, nur A gewinnt 30, beide 127, keiner 49 · McNemar (exakt) p = 0,7080
+L10 gegen A: Siege 159 gegen 157 · nur L10 gewinnt 26, nur A gewinnt 24, beide 133, keiner 57 · McNemar (exakt) p = 0,8877
