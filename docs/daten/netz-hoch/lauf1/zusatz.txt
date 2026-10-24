@@ -1,0 +1,12 @@
+== L9 − A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 300.7, B Ø 303.5
+Median der Differenz B − A: +2,0
+Vorzeichentest: B besser in 123 Paaren, schlechter in 115, gleich in 2 · p = 0,6501 (zweiseitig, exakt)
+
+== L10 − A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 300.7, B Ø 308.0
+Median der Differenz B − A: +0,0
+Vorzeichentest: B besser in 114 Paaren, schlechter in 118, gleich in 8 · p = 0,8439 (zweiseitig, exakt)
+

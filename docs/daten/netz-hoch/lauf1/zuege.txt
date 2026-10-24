@@ -1,0 +1,10 @@
+== L9 − A
+nach Zug 120: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 36.3 · B Ø 35.9 · Differenz B − A -0.4 (SD 24.5) · t = -0.26, p = 0.7978
+nach Zug 200: 231 Paare (9 ohne Partner/abgebrochen) · A Ø 25.6 · B Ø 26.9 · Differenz B − A 1.2 (SD 50.5) · t = 0.37, p = 0.7099
+Endstand: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 24.1 · B Ø 22.3 · Differenz B − A -1.9 (SD 58.7) · t = -0.49, p = 0.6241
+
+== L10 − A
+nach Zug 120: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 36.3 · B Ø 35.7 · Differenz B − A -0.6 (SD 25.6) · t = -0.33, p = 0.7395
+nach Zug 200: 231 Paare (9 ohne Partner/abgebrochen) · A Ø 26.2 · B Ø 28.3 · Differenz B − A 2.1 (SD 52.2) · t = 0.60, p = 0.5509
+Endstand: 240 Paare (0 ohne Partner/abgebrochen) · A Ø 24.1 · B Ø 20.1 · Differenz B − A -4.1 (SD 57.4) · t = -1.10, p = 0.2741
+
