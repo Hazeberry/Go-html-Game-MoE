@@ -931,7 +931,7 @@ test('Workflow endspiel-netz.yml: Arme, Jobs und Vorgaben wie in der Vorabfestle
   pruefe(/\| \*\*N\*\* \| `endspielNetz=0\.5` \|/.test(doc) && /\[N\]="endspielNetz=0\.5"/.test(a), 'Arm N im Dokument und in der Datei');
   const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-spielen.sh'), '--ki', 'N'], {encoding: 'utf8', env: {...process.env, ARME_DATEI: armeDatei}});
   pruefeGleich(r.stdout.trim(), 'mctsFixedSims=120,resignEnabled=0,endspielNetz=0.5', '--ki-Angabe von Arm N');
-  pruefe(/^  endspielNetz:      0\.5,$/m.test(fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8')), 'endspielNetz steht in index.html, seit der Messung mit Default 0,5');
+  pruefe(/^  endspielNetz:      0\.8,$/m.test(fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8')), 'endspielNetz steht in index.html, seit der Messung der Dosis mit Default 0,8 (docs/netz-dosis.md §8)');
   for (const name of ['seed', 'selbstspiel_seed', 'kontrolle', 'kontrolle_seed']) {
     const imDoc = (new RegExp('^\\| `' + name + '` \\| `?([^` |]+)', 'm').exec(doc) || [])[1];
     const imFlow = (new RegExp('^      ' + name + ':\\n(?:        .*\\n)*?        default: \'([^\']*)\'', 'm').exec(t) || [])[1];
