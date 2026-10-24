@@ -193,6 +193,7 @@ test('Workflow endspiel-netz.yml: keine Ausdrücke in Shell-Zeilen', () => pruef
 test('Workflow prior-neun.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('prior-neun.yml', 8, 5));
 test('Workflow pruefstand.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('pruefstand.yml', 5, 1));
 test('Workflow netz-dosis.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('netz-dosis.yml', 8, 5));
+test('Workflow fuego-probe.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('fuego-probe.yml', 3, 0));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
 
@@ -1017,6 +1018,19 @@ test('Workflow netz-dosis.yml: Arme, Jobs, Vorgabe und Eingaben wie in der Vorab
   const v = (vorgabe, ...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'dagger', 'parameter-spielen.sh'), ...x], {cwd: temp(), encoding: 'utf8', env: {...process.env, ARME_DATEI: armeDatei, VORGABE: vorgabe}});
   pruefeGleich(v('10', 'A', '1', '216', 'x.jsonl').status, 2, 'parameter-spielen.sh: Vorgabe 10 abgelehnt');
   pruefeGleich(v('x', 'A', '1', '216', 'x.jsonl').status, 2, 'parameter-spielen.sh: Vorgabe keine Zahl');
+});
+
+test('Fuego: Bau- und Probeskript lehnen falsche Eingaben ab, Stand und Prüfsumme fest', () => {
+  const s = (datei, ...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'fuego', datei), ...x], {cwd: temp(), encoding: 'utf8'});
+  pruefeGleich(s('bauen.sh', 'git', 'gnu++14', 'ziel').status, 2, 'bauen.sh: unbekannte Quelle');
+  pruefeGleich(s('bauen.sh', 'svn', 'gnu++99', 'ziel').status, 2, 'bauen.sh: unbekannter Standard');
+  pruefeGleich(s('bauen.sh', 'svn', 'gnu++14').status, 1, 'bauen.sh: Zielordner fehlt');
+  pruefeGleich(s('probe.sh', 'gibt-es-nicht').status, 2, 'probe.sh: Programm fehlt');
+  const b = fs.readFileSync(path.join(wurzel, 'auswertung', 'fuego', 'bauen.sh'), 'utf8');
+  pruefe(/^REV=2038$/m.test(b) && /^TAR_SHA=c61d18293670c3cde8cc8b7b28ae037a85a4b8018827f2a0f93e34b165bc16ce$/m.test(b), 'fester SVN-Stand und feste Prüfsumme');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'fuego-probe.yml'), 'utf8');
+  pruefe(!/contents: write/.test(t), 'die Probe schreibt nicht ins Repo');
+  pruefeGleich((/quelle: \[([a-z, ]+)\]/.exec(t) || [])[1], 'svn, tarball', 'zwei Quellen');
 });
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));
