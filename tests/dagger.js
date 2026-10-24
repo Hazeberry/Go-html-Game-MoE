@@ -1032,6 +1032,8 @@ test('Fuego: Bau- und Probeskript lehnen falsche Eingaben ab, Stand und Prüfsum
   const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'fuego-probe.yml'), 'utf8');
   pruefe(!/contents: write/.test(t), 'die Probe schreibt nicht ins Repo');
   pruefeGleich((/quelle: \[([a-z, ]+)\]/.exec(t) || [])[1], 'svn, tarball', 'zwei Quellen');
+});
+
 test('Workflow netz-hoch.yml: Arme, Jobs, Vorgabe und Eingaben wie in der Vorabfestlegung', () => {
   const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'netz-hoch.yml'), 'utf8');
   const doc = fs.readFileSync(path.join(wurzel, 'docs', 'netz-hoch.md'), 'utf8');
