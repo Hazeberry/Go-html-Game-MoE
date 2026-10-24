@@ -277,6 +277,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | `bensonDeathTransfer` 1 gegen GNU Go (240 Paare, Selbstspiel 360, 20.10.) | −0,8 [−2,4; +0,7], 50,8 % im Selbstspiel | verworfen, Default 0 (`docs/prior-nachmessung.md` §8) |
 | Endspiel-Lerner, Schritt 1 (offline, GitHub Actions): ein kleines Faltungsnetz greift an der Wurzel ab Zug 81 ein (4 beste Netzzüge in die Kandidaten, Prior zur Hälfte vom Netz) | 19 222 frische Stellungen (Seed 206): die gespielten Züge treffen GNU Gos Zug (Stufe 10) in **34,9 % statt 18,1 %**, +16,8 Prozentpunkte (Zug 81–160: +23,2, ab 161: +10,5); 48 % der Züge ändern sich | Tor (+4,0) bestanden: Schritt 2 folgt, Schalter in `index.html` und Messung im Spiel; ob Treffer Punkte werden, ist offen (`docs/endspiel-lerner.md` §8) |
 | **`endspielNetz` 0,5 (Endspiel-Netz im Spiel, Schritt 2; 240 Paare gegen GNU Go, Selbstspiel 360, 20.10.)** | **Endstand +46,9** [+40,4; +53,4], p = 10⁻³³, Siege 227 gegen 149 von 240; Selbstspiel 83,1 %; Kontrolle 15 von 15 | **Default 0,5** (`docs/endspiel-netz.md` §8) |
+| **`endspielNetz` 0,8 (Dosis des Endspiel-Netzes; 240 Paare gegen GNU Go mit sechs Vorgabesteinen, Selbstspiel 360 ohne Aufgabe, 20.10.)** | **Endstand +15,5** [+7,9; +23,1] gegen 0,5, p = 7,5 · 10⁻⁵, Siege 154 gegen 123; Selbstspiel 56,4 %; `endspielNetzTop` 8 statt 4: +1,3 [−6,0; +8,6]; Kontrolle 15 von 15 | **Default 0,8**, Top 8 verworfen (`docs/netz-dosis.md` §8) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
@@ -2501,10 +2502,18 @@ spielen neue Messungen ab jetzt mit **sechs Vorgabesteinen**. Das Netz kostet
 im Spiel 41 ms je Zug und keine Suchzeit: 102 % der Simulationen bei 1,8 s
 Budget ([`docs/teststaerke.md`](docs/teststaerke.md) §9).
 
+**Mehr Netz: λ 0,8 (24.10.).** Mit sechs Vorgabesteinen gemessen: Bestimmt das
+Netz den Prior der Wurzel ab Zug 81 zu 80 % statt zur Hälfte, gewinnt die KI
+gegen GNU Go **+15,5 Punkte** [+7,9; +23,1] und 154 statt 123 von 240 Partien,
+im Selbstspiel ohne Aufgabe 56,4 %. Acht statt vier Netzpunkte unter den
+Kandidaten bringen nichts (+1,3). Seitdem ist `endspielNetz` = 0,8 Default
+([`docs/netz-dosis.md`](docs/netz-dosis.md)).
+
 **Für ältere Läufe:** Ein Arm „Default" heißt seit dem 04.10. auch
 `gebietZug` = 80, `augenSchutz` = 2 und `passUnabwendbar` = 1, seit dem
 09.10. auch `leseVerzicht` = 1 und `wurzelFrisch` = 1, seit dem 11.10. auch
-`musterGewicht` = 200, seit dem 20.10. auch `endspielNetz` = 0,5.
+`musterGewicht` = 200, seit dem 20.10. auch `endspielNetz` = 0,5, seit dem
+24.10. `endspielNetz` = 0,8.
 
 Seit dem 13.10. (Code-Review, Merge `7b05a74`) kennt die Suche den
 Ko-Punkt. Das ändert Züge, ohne dass ein Parameter es abschaltet: Von 240

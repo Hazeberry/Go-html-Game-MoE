@@ -1,0 +1,12 @@
+== L8 − A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 265.8, B Ø 296.3
+Median der Differenz B − A: +12,0
+Vorzeichentest: B besser in 144 Paaren, schlechter in 92, gleich in 4 · p = 0,0009 (zweiseitig, exakt)
+
+== T8 − A
+Paare: 240 (0 ohne Partner oder abgebrochen), abgebrochene Partien: A 0, B 0
+Züge je Partie: A Ø 265.8, B Ø 265.0
+Median der Differenz B − A: +1,0
+Vorzeichentest: B besser in 120 Paaren, schlechter in 117, gleich in 3 · p = 0,8967 (zweiseitig, exakt)
+

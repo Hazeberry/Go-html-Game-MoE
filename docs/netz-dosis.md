@@ -122,3 +122,63 @@ Jobs: `pruefen`, `spielen` (A, L8 und T8 × 16 Teile), `kontrolle` (ein Teil),
 auf den Branch `ergebnisse/netz-dosis-lauf<N>` unter
 `docs/daten/netz-dosis/lauf<N>/`. Nur der letzte Job darf ins Repo schreiben.
 Erwartet werden 30 bis 50 Minuten.
+
+## 8. Nachtrag: Ergebnis der Messung, Default 0,8 (24.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #1 des Workflows `netz-dosis.yml`
+([Run 39398039531](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/39398039531)),
+auf dem Merge-Commit `8d37bf0` von `main`, mit den Eingaben aus §7, in 36 Minuten
+(20.10., 09:04 bis 09:40 UTC). Alle 735 Partien gegen GNU Go und 720 im
+Selbstspiel ausgespielt, keine abgebrochen. Daten:
+[`daten/netz-dosis/lauf1/`](daten/netz-dosis/lauf1/).
+
+**Kontrolle.** Arm A gibt die Partien mit sechs Steinen des Prüfstands in
+**15 von 15** Partien wieder.
+
+**M1** (240 Paare, Seed 216, sechs Vorgabesteine):
+
+| Arm | Endstand Ø | Siege | Züge Ø |
+|---|---:|---:|---:|
+| A (Default, λ 0,5, Top 4) | +3,3 | 123 | 265,8 |
+| L8 (`endspielNetz` 0,8) | **+18,8** | **154** | 296,3 |
+| T8 (`endspielNetzTop` 8) | +4,6 | 120 | 265,0 |
+
+| Vergleich | Differenz | 95 % | p | Hälfte 1 / 2 | nach Zug 120 | nach Zug 200 |
+|---|---:|---|---:|---|---:|---:|
+| **L8 − A** | **+15,5** | [+7,9; +23,1] | 7,5 · 10⁻⁵ | +16,3 / +14,7 | +5,0 | +8,3 |
+| T8 − A | +1,3 | [−6,0; +8,6] | 0,73 | +5,4 / −2,8 | +1,5 | −3,0 |
+
+**M2** (Selbstspiel ohne Aufgabe gegen A, je 360 Partien):
+
+| Arm | Siege | Rate | 95 % | p |
+|---|---:|---:|---|---:|
+| L8 | 203 | **56,4 %** | [51,2 %; 61,4 %] | 0,018 |
+| T8 | 184 | 51,1 % | [46,0 %; 56,2 %] | 0,71 |
+
+**Entscheidung nach §4: Default `endspielNetz` = 0,8.** Genau ein Arm ist
+signifikant besser: L8 mit p = 7,5 · 10⁻⁵, weit unter α = 0,025. Im Selbstspiel
+liegt L8 nicht unter 50 %, sondern signifikant darüber. **T8 ist verworfen:**
+Die Obergrenze des Intervalls (+8,6) liegt unter +10. `endspielNetzTop` bleibt 4.
+
+**Gegen die Erwartung aus §5.** Erwartet war für L8 0 bis +10, gemessen sind
++15,5. Der zweite Schritt der Dosis bringt also mehr als erwartet, rund ein
+Drittel des ersten (+46,9 von 0 auf 0,5). Getroffen haben T8 (−3 bis +5), M2 und
+die Kontrolle. Die Tabelle aus §4 hatte die letzte Zeile als wahrscheinlich
+angesehen; eingetreten ist die erste.
+
+**Sekundär, ohne Anspruch.**
+- Siege: In 55 Paaren gewinnt nur L8, in 24 nur A (McNemar p = 0,0006). Median
+  der Differenz +12, Vorzeichentest 144 gegen 92 (p = 0,0009).
+- Der Vorsprung wächst über die Partie: +5,0 nach Zug 120, +8,3 nach Zug 200,
+  +15,5 am Ende. Das Muster ist dasselbe wie beim ersten Schritt.
+- L8 spielt gegen GNU Go 30 Züge längere Partien (296,3 gegen 265,8). Warum,
+  misst diese Prüfung nicht.
+- Mit sechs Steinen streut die Paardifferenz mit 58 bis 60 Punkten, so wie mit
+  neun. Die Annahme aus §5 (60 bis 70) war etwas zu vorsichtig.
+
+**Was offen bleibt.**
+- Ob noch mehr Netz hilft (λ = 0,9 oder 1), ist nicht gemessen. λ = 1 hieße,
+  dass die Heuristik im Prior der Wurzel ab Zug 81 gar nicht mehr zählt.
+- Für ältere Läufe heißt „Default“ seit diesem Commit auch `endspielNetz` = 0,8.
+  Die Kontrollen künftiger Messungen können deshalb nicht mehr gegen Arm A des
+  Prüfstands oder dieser Messung laufen, sondern gegen Arm L8 hier.
