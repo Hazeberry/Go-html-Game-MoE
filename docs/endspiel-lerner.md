@@ -211,3 +211,12 @@ Entwicklungsdaten blieb aus.
   bringt.
 - Im frühen Endspiel (Zug 81–160) ist der Vorsprung doppelt so groß wie danach.
   Der beste Netzzug allein trifft dort in 48 % der Stellungen.
+
+## 9. Nachtrag: Im Spiel (26.10.2026)
+
+Schritt 2 hat das Netz ins Spiel gebracht: +46,9 Punkte gegen GNU Go
+([`endspiel-netz.md`](endspiel-netz.md) §8), mit λ 0,8 weitere +15,5
+([`netz-dosis.md`](netz-dosis.md) §8). Die Vorwärtsrechnung aus §6 dauert in
+der Engine 43 ms im Median (größter Wert 76 ms), nicht rund 0,1 s
+([`teststaerke.md`](teststaerke.md) §9).
+

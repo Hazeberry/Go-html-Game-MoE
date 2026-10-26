@@ -175,3 +175,22 @@ Partien so, dass die KI weniger Gebiet verschenkt, und die Wirkung summiert sich
 - Lehrer und Gegner sind GNU Go. Ein Teil des Gewinns kann daher kommen, dass
   die KI GNU Gos Züge vorwegnimmt.
 - Für ältere Läufe heißt „Default“ seit diesem Commit auch `endspielNetz` = 0,5.
+
+## 9. Nachtrag: Was seitdem geklärt ist (26.10.2026)
+
+Zwei offene Punkte aus §6 und §8 sind inzwischen gemessen:
+
+- **Laufzeit.** Das Netz kostet nicht rund 0,1 s Suchzeit, sondern im Median
+  41 ms Wartezeit je Zug. Die Suche behält ihre Simulationen (102 %), weil das
+  Netz vor dem Start der Suche rechnet ([`teststaerke.md`](teststaerke.md) §9).
+- **Andere Einstellungen.** λ 0,8 bringt gegen 0,5 weitere +15,5 Punkte und ist
+  seit dem 24.10. Default. Acht statt vier Netzpunkte unter den Kandidaten
+  bringen nichts (+1,3, verworfen) ([`netz-dosis.md`](netz-dosis.md) §8). λ 0,9
+  und 1 bringen gegen 0,8 nichts mehr (−1,9 und −4,1, beide verworfen;
+  [`netz-hoch.md`](netz-hoch.md) §8).
+
+Auf dem Default mit Netz ist die Prior-Schärfe 9 schlechter als 3
+([`prior-neun.md`](prior-neun.md) §8). Offen bleibt, wie viel des Gewinns daher
+kommt, dass Lehrer und Gegner dasselbe Programm sind. Dafür ist Fuego als
+zweiter Gegner in Arbeit.
+
