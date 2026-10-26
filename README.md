@@ -38,8 +38,9 @@ nichts zu installieren.
 - Endspiel-Netz an der Wurzel ab Zug 81 (`endspielNetz` 0,8): ein kleines
   Faltungsnetz, gelernt an Zügen von GNU Go Stufe 10. Gegen GNU Go +46,9
   Punkte (λ 0,5 gegen aus) und weitere +15,5 (λ 0,8 gegen 0,5); mehr Gewicht
-  bringt nichts mehr. Im Spiel kostet es 41 ms je Zug und keine Suchzeit
-  (`docs/endspiel-netz.md`, `docs/netz-dosis.md`, `docs/netz-hoch.md`)
+  bringt nichts mehr. Es kostet 41 ms je Zug und keine Suchzeit (gemessen in
+  Node auf einem Rechner von GitHub Actions, nicht im Browser;
+  `docs/endspiel-netz.md`, `docs/netz-dosis.md`, `docs/netz-hoch.md`)
 - Aufgabe bei aussichtsloser Stellung, sowohl über Q als auch strukturell
   („alle legalen Züge wären todgeboren")
 - Worker-Fallback-Kette `data:` → `blob:` → Hauptthread, damit die KI auch
@@ -2510,8 +2511,9 @@ Seitdem ist `endspielNetz` = 0,5 Default. Alles lief in GitHub Actions.
 mit neun Steinen 95 % der Partien gegen GNU Go Stufe 1. Je 60 Partien mit 9, 6,
 4 und 2 Steinen ergaben 95, 53, 43 und 3 %. Nach der vorab festgelegten Regel
 spielen neue Messungen ab jetzt mit **sechs Vorgabesteinen**. Das Netz kostet
-im Spiel 41 ms je Zug und keine Suchzeit: 102 % der Simulationen bei 1,8 s
-Budget ([`docs/teststaerke.md`](docs/teststaerke.md) §9).
+41 ms je Zug und keine Suchzeit: 102 % der Simulationen bei 1,8 s Budget.
+Gemessen ist das in Node auf einem Rechner von GitHub Actions, nicht im Browser
+([`docs/teststaerke.md`](docs/teststaerke.md) §9).
 
 **Mehr Netz: λ 0,8 (24.10.).** Mit sechs Vorgabesteinen gemessen: Bestimmt das
 Netz den Prior der Wurzel ab Zug 81 zu 80 % statt zur Hälfte, gewinnt die KI
