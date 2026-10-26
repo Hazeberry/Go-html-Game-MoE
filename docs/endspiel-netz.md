@@ -183,6 +183,10 @@ Zwei offene Punkte aus §6 und §8 sind inzwischen gemessen:
 - **Laufzeit.** Das Netz kostet nicht rund 0,1 s Suchzeit, sondern im Median
   41 ms Wartezeit je Zug. Die Suche behält ihre Simulationen (102 %), weil das
   Netz vor dem Start der Suche rechnet ([`teststaerke.md`](teststaerke.md) §9).
+  Gemessen ist das in Node auf einem Rechner von GitHub Actions, mit λ 0,5. Die
+  Rechenzeit hängt nicht von λ ab, denn das Netz rechnet einmal je Zug. Im
+  Browser und auf langsameren Rechnern dauert es länger; die Suche bleibt auch
+  dort unberührt.
 - **Andere Einstellungen.** λ 0,8 bringt gegen 0,5 weitere +15,5 Punkte und ist
   seit dem 24.10. Default. Acht statt vier Netzpunkte unter den Kandidaten
   bringen nichts (+1,3, verworfen) ([`netz-dosis.md`](netz-dosis.md) §8). λ 0,9
