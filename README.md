@@ -35,6 +35,11 @@ nichts zu installieren.
 - Muster aus GNU-Go-Zügen in der Zugbewertung (`musterGewicht`): gegen GNU
   Go mit neun Vorgabesteinen +103 Punkte im Endstand, die KI gewinnt dort
   jetzt 156 von 240 Partien statt 13
+- Endspiel-Netz an der Wurzel ab Zug 81 (`endspielNetz` 0,8): ein kleines
+  Faltungsnetz, gelernt an Zügen von GNU Go Stufe 10. Gegen GNU Go +46,9
+  Punkte (λ 0,5 gegen aus) und weitere +15,5 (λ 0,8 gegen 0,5); mehr Gewicht
+  bringt nichts mehr. Im Spiel kostet es 41 ms je Zug und keine Suchzeit
+  (`docs/endspiel-netz.md`, `docs/netz-dosis.md`, `docs/netz-hoch.md`)
 - Aufgabe bei aussichtsloser Stellung, sowohl über Q als auch strukturell
   („alle legalen Züge wären todgeboren")
 - Worker-Fallback-Kette `data:` → `blob:` → Hauptthread, damit die KI auch
@@ -52,6 +57,11 @@ nichts zu installieren.
   Entscheidungsspanne. Am nominellen 50/50-Punkt trägt es bereits 81 % der
   Varianz. Ob das schädlich ist, ist offen — ein Normierungsversuch hat nicht
   geholfen.
+- **Nur ein fremder Gegner.** Alle Stärkemessungen laufen gegen GNU Go, und
+  GNU Go ist auch Lehrer der Muster und des Endspiel-Netzes. Ein Teil des
+  Gewinns kann daher kommen, dass die KI GNU Gos Züge vorwegnimmt. Das
+  Selbstspiel prüft das nur gegen die eigene KI. Seit dem 20.10. wird mit
+  sechs statt neun Vorgabesteinen gemessen (`docs/teststaerke.md` §9).
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl
