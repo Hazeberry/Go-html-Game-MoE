@@ -1,0 +1,15 @@
+Partie 1: wir S → verloren (W+43.5; unsere Zählung S 170 : W 187.5) · Schätzung nach 60: +44.5, nach 120: +31, nach 200: -25 · 388 Züge · 3.9 min · Stand 0/1
+Partie 2: wir S → verloren (W+59.5; unsere Zählung S 191 : W 161.5) · Schätzung nach 60: +86.8, nach 120: -9.1, nach 200: -72.1 · 339 Züge · 3.2 min · Stand 0/2
+Partie 3: wir S → verloren (W+15.5; unsere Zählung S 208 : W 141.5) · Schätzung nach 60: +62.8, nach 120: -7.5, nach 200: -35.6 · 360 Züge · 3.8 min · Stand 0/3
+Partie 4: wir S → verloren (W+15.5; unsere Zählung S 194 : W 167.5) · Schätzung nach 60: +44.4, nach 120: -3.9, nach 200: -39 · 479 Züge · 3.9 min · Stand 0/4
+Partie 5: wir S → verloren (W+77.5; unsere Zählung S 185 : W 166.5) · Schätzung nach 60: +44.1, nach 120: +4.6, nach 200: -37.4 · 370 Züge · 3.4 min · Stand 0/5
+Partie 11: wir S → verloren (W+57.5; unsere Zählung S 186 : W 173.5) · Schätzung nach 60: +86.5, nach 120: +100.2, nach 200: -26 · 286 Züge · 2.5 min · Stand 0/1
+Partie 12: wir S → verloren (W+67.5; unsere Zählung S 195 : W 158.5) · Schätzung nach 60: +39, nach 120: -23.7, nach 200: -81.6 · 335 Züge · 3.0 min · Stand 0/2
+Partie 13: wir S → verloren (W+35.5; unsere Zählung S 181 : W 172.5) · Schätzung nach 60: +94.9, nach 120: +2.5, nach 200: -23.1 · 362 Züge · 3.4 min · Stand 0/3
+Partie 14: wir S → verloren (W+11.5; unsere Zählung S 199 : W 157.5) · Schätzung nach 60: +28.4, nach 120: -6.6, nach 200: -28.8 · 548 Züge · 5.1 min · Stand 0/4
+Partie 15: wir S → verloren (W+41.5; unsere Zählung S 178 : W 175.5) · Schätzung nach 60: +91.2, nach 120: -36.3, nach 200: -66.2 · 330 Züge · 3.1 min · Stand 0/5
+Partie 6: wir S → verloren (W+79.5; unsere Zählung S 169 : W 189.5) · Schätzung nach 60: +18.2, nach 120: -39.9, nach 200: -64 · 352 Züge · 3.2 min · Stand 0/1
+Partie 7: wir S → verloren (W+65.5; unsere Zählung S 203 : W 152.5) · Schätzung nach 60: +71.1, nach 120: +40.1, nach 200: -76.8 · 343 Züge · 3.2 min · Stand 0/2
+Partie 8: wir S → verloren (W+27.5; unsere Zählung S 174 : W 178.5) · Schätzung nach 60: +66.3, nach 120: +10.1, nach 200: -31.9 · 303 Züge · 2.9 min · Stand 0/3
+Partie 9: wir S → verloren (W+47.5; unsere Zählung S 163 : W 194.5) · Schätzung nach 60: +36.6, nach 120: -16.1, nach 200: -56 · 408 Züge · 3.7 min · Stand 0/4
+Partie 10: wir S → verloren (W+97.5; unsere Zählung S 195 : W 128.5) · Schätzung nach 60: +58.4, nach 120: -6.5, nach 200: -61.9 · 304 Züge · 2.7 min · Stand 0/5
