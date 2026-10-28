@@ -81,3 +81,19 @@ auf dem Merge-Commit `3277739` von `main`, in rund 2 Minuten.
 
 Die Probe wird mit dem behobenen Skript wiederholt. Ihr Ergebnis kommt als
 weiterer Nachtrag.
+
+## 5. Nachtrag: Lauf #2 der Probe (28.10.2026)
+
+Lauf #2 ([Run 40667269651](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40667269651),
+Merge-Commit `3b8d44f`) hat Fuego wieder in beiden Fassungen gebaut, und das
+Programm lag jetzt am richtigen Ort. Fuego hat aber auf keinen GTP-Befehl
+geantwortet. Der Grund: Fuego liest seine Optionen mit `boost::program_options`
+und kennt lange Optionen nur mit zwei Strichen (`--srand`, `--nobook`,
+`--quiet`). Die Probe übergab sie mit einem Strich. Fuego zeigte darauf nur
+seine Hilfe und beendete sich (`FuegoMain.cpp`, `Help` mit `exit(0)`).
+Danach brach die Probe ohne Meldung ab, weil ein leeres Suchergebnis unter
+`set -o pipefail` als Fehler zählt.
+
+Behoben: Die Probe übergibt die Optionen mit zwei Strichen. Antwortet Fuego
+nicht, bricht sie mit Meldung und dem Anfang der Fehlerausgabe ab. Zwei Tests
+prüfen beides. Die Probe wird ein drittes Mal gestartet.

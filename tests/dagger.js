@@ -1027,6 +1027,12 @@ test('Fuego: Bau- und Probeskript lehnen falsche Eingaben ab, Stand und Prüfsum
   pruefeGleich(s('bauen.sh', 'svn', 'gnu++99', 'ziel').status, 2, 'bauen.sh: unbekannter Standard');
   pruefeGleich(s('bauen.sh', 'svn', 'gnu++14').status, 1, 'bauen.sh: Zielordner fehlt');
   pruefeGleich(s('probe.sh', 'gibt-es-nicht').status, 2, 'probe.sh: Programm fehlt');
+  const pr = fs.readFileSync(path.join(wurzel, 'auswertung', 'fuego', 'probe.sh'), 'utf8');
+  pruefe(/"\$bin" --srand "\$1" --nobook --quiet/.test(pr), 'probe.sh: Optionen mit zwei Strichen (sonst zeigt Fuego nur die Hilfe)');
+  const stumm = temp(), attr = path.join(stumm, 'fuego');
+  fs.writeFileSync(attr, '#!/bin/sh\necho "Usage: fuego" >&2\nexit 0\n', {mode: 0o755});
+  const ps = spawnSync('bash', [path.join(wurzel, 'auswertung', 'fuego', 'probe.sh'), attr], {cwd: stumm, encoding: 'utf8'});
+  pruefe(ps.status === 1 && /Abbruch:.*antwortet nicht/.test(ps.stdout) && /Usage: fuego/.test(ps.stdout), 'probe.sh: bricht mit Meldung und Fehlerausgabe ab, wenn Fuego nicht antwortet');
   const b = fs.readFileSync(path.join(wurzel, 'auswertung', 'fuego', 'bauen.sh'), 'utf8');
   pruefe(/^REV=2038$/m.test(b) && /^TAR_SHA=c61d18293670c3cde8cc8b7b28ae037a85a4b8018827f2a0f93e34b165bc16ce$/m.test(b), 'fester SVN-Stand und feste Prüfsumme');
   const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'fuego-probe.yml'), 'utf8');
