@@ -66,7 +66,9 @@ nichts zu installieren.
   zweiter Gegner lässt sich seit dem 28.10. Fuego einsetzen
   (`gnugo-duell.js --gegner fuego`, `docs/fuego.md`). Der Prüfstand gegen
   Fuego wählte sechs Steine und 100 Spiele je Zug für Fuego (53 % Siege der
-  KI, §12). Gemessen ist damit noch nichts.
+  KI, §12). Gemessen ist damit noch nichts. Vorab festgelegt ist Stufe A der
+  Komponentenmessung (`docs/komponenten.md`): Netz, Muster, beide und RAVE
+  abgeschaltet, gegen GNU Go und Fuego mit demselben Seed.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl
@@ -2623,6 +2625,7 @@ distillation/                   Überwachtes Training fürs Policy-Netz
 docs/                           Versuchsprotokolle, die zu lang für den README sind
 auswertung/                     Auswertung der Rohdumps (--roh), Rechenweg der Protokolle
 auswertung/fuego/               Fuego bauen (SVN r2038) und prüfen; Fuego liegt nicht im Repo
+auswertung/komponenten/         Stufe A der Komponentenmessung: Arme, Spielskript, Bericht (docs/komponenten.md)
 tests/                          Regressionstests (node tests/run.js)
 tests/stellungen/               echte Partien als Testvorlage (SGF)
 .github/workflows/tests.yml       Regressionstests bei jedem Push und PR
