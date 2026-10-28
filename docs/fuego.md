@@ -255,3 +255,43 @@ Partien mit sechs Vorgabesteinen und 1 000 Spielen je Zug, Seed 218. Er prüft n
 ob alles zusammenläuft, wie viele Partien abbrechen und wie lange eine Partie
 dauert. Danach folgt der Prüfstand gegen Fuego (§3, Schritt 2) mit eigener
 Vorabfestlegung.
+
+## 9. Kurzer Lauf gegen das echte Fuego (vorab festgelegt, 28.10.2026)
+
+**Zweck.** Das Werkzeug hat bisher nur gegen eine Attrappe gespielt (§8). Dieser
+Lauf prüft, ob es mit dem echten Fuego zusammenläuft, wie viele Partien
+abbrechen und wie lange eine Partie dauert. Er misst nichts an der KI, und
+aus ihm folgt keine Änderung an `index.html`. Hazeberry hat ihn am 28.10.2026
+beauftragt.
+
+**Bedingungen.** Die heutige Standard-KI (`endspielNetz` 0,8) gegen Fuego aus
+SVN r2038 (C++14) mit 1 000 Spielen je Zug, sechs Vorgabesteine für die KI,
+GNU Go Stufe 1 als Schiedsrichter, 120 Simulationen, Aufgabe der KI aus, bis
+600 Züge, Schätzung nach Zug 60, 120 und 200. Seed **218**, noch nie benutzt.
+15 Partien in drei Teilen zu fünf
+([`fuego-kurz.yml`](../.github/workflows/fuego-kurz.yml),
+[`auswertung/fuego/spielen.sh`](../auswertung/fuego/spielen.sh)).
+
+| Eingabe | Wert |
+|---|---|
+| `seed` | 218 |
+| `spiele` | 1000 |
+| `vorgabe` | 6 |
+
+**Die eine Frage, vorab festgelegt.** Der Lauf gilt als „läuft zusammen“, wenn
+höchstens eine der 15 Partien abbricht und kein Teil mit Fehler endet. Dann
+folgt der Prüfstand gegen Fuego (§3, Schritt 2) mit eigener Vorabfestlegung.
+Sonst werden zuerst die Gründe der Abbrüche geklärt.
+
+**Beschrieben, ohne Anspruch**
+([`auswertung/fuego/kurz-bericht.js`](../auswertung/fuego/kurz-bericht.js)):
+Siege der KI, Endstand, Schätzung nach Zug 60, 120 und 200, Züge je Partie,
+wie oft und wie früh Fuego passt und Minuten je Partie. Mit 15 Partien sind
+das grobe Hinweise. Sie dienen nur dazu, den Prüfstand zu planen: welche
+Vorgaben und Spielzahlen er braucht und wie lange er dauert.
+
+**Erwartung vorab.** Partien dauern 3 bis 6 Minuten, mit der Zeit unserer KI.
+Abgebrochen werden 0 oder 1 Partien. Wie stark Fuego mit 1 000 Spielen gegen
+sechs Vorgabesteine ist, ist offen. Vermutet: Die KI liegt nach Zug 60 vorn,
+weil Fuego ohne Eröffnungsbuch und ohne dynamisches Komi aus einer verlorenen
+Lage spielt. Ob sie vorn bleibt, ist die Frage, die der Prüfstand klären soll.

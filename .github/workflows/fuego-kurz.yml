@@ -1,0 +1,172 @@
+name: Kurzer Lauf gegen Fuego
+
+# Manueller Lauf aus docs/fuego.md §9: Die heutige Standard-KI spielt 15
+# Partien gegen das echte Fuego, GNU Go Stufe 1 zählt als Schiedsrichter.
+# Der Lauf prüft nur, ob alles zusammenläuft, wie viele Partien abbrechen und
+# wie lange eine Partie dauert; gemessen wird damit nichts.
+#
+# Ablauf:
+#   pruefen   Eingaben prüfen
+#   spielen   3 Teile zu je 5 Partien; jeder Teil baut Fuego selbst (SVN r2038, C++14)
+#   ergebnis  Bericht, Rohdaten gepackt, Branch ergebnisse/fuego-kurz-lauf<N>
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: 'Seed der Partien (218: noch nie benutzt)'
+        required: true
+        default: '218'
+      spiele:
+        description: 'Spiele je Zug für Fuego'
+        required: true
+        default: '1000'
+      vorgabe:
+        description: 'Vorgabesteine für die KI (0 oder 2 bis 9)'
+        required: true
+        default: '6'
+
+concurrency:
+  group: fuego-kurz
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    name: Eingaben prüfen
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      seed: ${{ steps.p.outputs.seed }}
+      spiele: ${{ steps.p.outputs.spiele }}
+      vorgabe: ${{ steps.p.outputs.vorgabe }}
+    steps:
+      # Eingaben nur über env und geprüft, nie in die Shell-Zeile interpoliert
+      - name: Eingaben prüfen
+        id: p
+        env:
+          IN_SEED: ${{ inputs.seed }}
+          IN_SPIELE: ${{ inputs.spiele }}
+          IN_VORGABE: ${{ inputs.vorgabe }}
+        run: |
+          set -euo pipefail
+          for v in "$IN_SEED" "$IN_SPIELE" "$IN_VORGABE"; do
+            case "$v" in ''|*[!0-9]*) echo "::error::Eingaben müssen nicht-negative ganze Zahlen sein: '$v'"; exit 2;; esac
+          done
+          [ "$IN_SPIELE" -ge 1 ] && [ "$IN_SPIELE" -le 1000000 ] || { echo "::error::Spiele je Zug 1 bis 1000000: $IN_SPIELE"; exit 2; }
+          { [ "$IN_VORGABE" -eq 0 ] || { [ "$IN_VORGABE" -ge 2 ] && [ "$IN_VORGABE" -le 9 ]; }; } || { echo "::error::Vorgabe 0 oder 2 bis 9: $IN_VORGABE"; exit 2; }
+          { echo "seed=$IN_SEED"; echo "spiele=$IN_SPIELE"; echo "vorgabe=$IN_VORGABE"; } >> "$GITHUB_OUTPUT"
+          echo "## Kurzer Lauf gegen Fuego: Seed $IN_SEED, $IN_SPIELE Spiele je Zug, Vorgabe $IN_VORGABE, Commit \`${GITHUB_SHA:0:7}\`" >> "$GITHUB_STEP_SUMMARY"
+
+  spielen:
+    name: Partien ab ${{ matrix.von }}
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        von: [1, 6, 11]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go und Werkzeuge installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo build-essential autoconf automake libtool subversion libboost-all-dev
+          gnugo --version | head -n 1
+
+      - name: Fuego bauen
+        run: bash auswertung/fuego/bauen.sh svn gnu++14 fuego-bin
+
+      - name: 5 Partien spielen
+        env:
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed }}
+          SPIELE: ${{ needs.pruefen.outputs.spiele }}
+          VORGABE: ${{ needs.pruefen.outputs.vorgabe }}
+        run: |
+          set -euo pipefail
+          mkdir -p kurz
+          t0=$(date +%s)
+          bash auswertung/fuego/spielen.sh "$VON" 5 "$SEED" "$SPIELE" "$VORGABE" "kurz/teil-$VON.jsonl" | tee "kurz/log-$VON.txt"
+          echo "$VON $(( $(date +%s) - t0 )) 5" > "kurz/zeit-$VON.txt"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kurz-${{ matrix.von }}
+          path: kurz/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [pruefen, spielen]
+    # Auch wenn ein Teil scheitert: Bei einem Probelauf ist ein Teilergebnis die Auskunft.
+    if: always() && needs.pruefen.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: kurz-*
+          path: kurz
+          merge-multiple: true
+
+      - name: Bericht
+        run: |
+          set -euo pipefail
+          mkdir -p ergebnisse
+          teile=(); zeiten=(); fehlt=()
+          for v in 1 6 11; do
+            if [ -s "kurz/teil-$v.jsonl" ]; then teile+=("kurz/teil-$v.jsonl"); else fehlt+=("$v"); fi
+            [ -s "kurz/zeit-$v.txt" ] && zeiten+=(--zeit "kurz/zeit-$v.txt")
+          done
+          [ "${#teile[@]}" -gt 0 ] || { echo "::error::kein Teil hat Partien geliefert"; exit 1; }
+          [ "${#fehlt[@]}" -eq 0 ] || echo "::warning::Teile ohne Partien: ${fehlt[*]}"
+          cat "${teile[@]}" | gzip -9 > ergebnisse/partien.jsonl.gz
+          cat kurz/log-*.txt > ergebnisse/log.txt 2>/dev/null || true
+          [ "${#fehlt[@]}" -eq 0 ] || echo "Teile ohne Partien (ab Partie): ${fehlt[*]}" > ergebnisse/fehlende-teile.txt
+          node auswertung/fuego/kurz-bericht.js "${teile[@]}" "${zeiten[@]}" > ergebnisse/bericht.txt
+          { echo "## Kurzer Lauf gegen Fuego"; echo; node auswertung/fuego/kurz-bericht.js "${teile[@]}" "${zeiten[@]}" --markdown; } | tee ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/fuego-kurz-lauf${LAUF}"
+          ziel="docs/daten/fuego-kurz/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Kurzer Lauf gegen Fuego: Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"
