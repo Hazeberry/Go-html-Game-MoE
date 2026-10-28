@@ -47,6 +47,10 @@
                           den Zug, der statt unseres gespielt wird. getAIMove
                           läuft trotzdem; seine Wahl wird nur verglichen)
                          [--orakel-zug-stufe S] (Stufe dieses GNU Go, Standard 10)
+                         [--gegner gnugo|fuego] (Standard gnugo; fuego: siehe unten)
+                         [--fuego pfad] (Standard fuego-bin/fuego, gebaut mit
+                          auswertung/fuego/bauen.sh)
+                         [--fuego-spiele N] (Spiele je Zug, Standard 1000)
    --ki nimmt auch Phasenstufen wie ab-harness.js: name@N=wert setzt den
    Parameter ab der Zugzahl N (mc ≥ N, gezählt ab dem ersten gespielten Zug),
    davor gilt der Wert ohne @ oder der Default. Beispiel: --ki
@@ -64,6 +68,21 @@
    Ohne die Option bleibt alles wie bisher, alte Läufe sind wiederholbar.
    GTP_DEBUG=1 in der Umgebung zeigt jeden GTP-Befehl und jede Antwort.
 
+   Gegner Fuego (--gegner fuego, docs/fuego.md): Fuego zieht für den Gegner,
+   GNU Go bleibt Schiedsrichter. Es bekommt jeden Zug mit play, zählt am
+   Ende (final_score), schätzt (estimate_score) und liefert die Bretter zum
+   Vergleich; so sind die Endstände gegen Fuego und gegen GNU Go gleich
+   gezählt. --stufe gilt dann für den Schiedsrichter (wie bisher 1). Fuego
+   läuft mit deterministic_mode und je Partie festem Seed (dasselbe Seed
+   gibt dieselben Züge), einem Thread, --fuego-spiele Spielen je Zug und
+   ohne Aufgabe (resign_threshold 0); alles andere sind seine
+   Voreinstellungen, auch early_pass und forced_opening_moves, ohne
+   Eröffnungsbuch (--nobook). Vorgabesteine setzt GNU Go (fixed_handicap),
+   Fuego bekommt dieselben Punkte (set_free_handicap). Weist der Schiedsrichter
+   einen Zug zurück, zählt die Partie als abgebrochen. Der Datensatz bekommt
+   dann `gegner` {name, spiele, schiedsrichterStufe}; ohne die Option bleibt
+   alles wie bisher.
+
    Vorgabe (--vorgabe N ≥ 2): Wir spielen in jeder Partie Schwarz mit N
    Steinen auf den Standardpunkten (GTP fixed_handicap), GNU Go Weiß, Komi
    0,5, Weiß zieht zuerst. Ohne Vorgabe wechseln die Farben je Partie, Komi
@@ -78,7 +97,8 @@ const {spawn} = require('child_process');
 const a = process.argv.slice(2);
 const opt = {partien: 10, seed: 1, stufe: 10, ki: {}, kiStufen: {}, roh: null, gnugo: '/usr/games/gnugo',
              maxZuege: 400, von: 1, vorgabe: 0, schaetzung: [], gnugoAufgabe: 1, orakel: 0,
-             orakelZug: null, orakelZugStufe: 10};
+             orakelZug: null, orakelZugStufe: 10,
+             gegner: 'gnugo', fuego: path.join(__dirname, 'fuego-bin', 'fuego'), fuegoSpiele: 1000};
 for (let i = 0; i < a.length; i++) {
   const v = a[i + 1];
   switch (a[i]) {
@@ -102,6 +122,13 @@ for (let i = 0; i < a.length; i++) {
       i++; break;
     }
     case '--orakel-zug-stufe': opt.orakelZugStufe = +v; i++; break;
+    case '--gegner':
+      if (v !== 'gnugo' && v !== 'fuego') { console.error(`--gegner erwartet gnugo oder fuego: ${v}`); process.exit(2); }
+      opt.gegner = v; i++; break;
+    case '--fuego': opt.fuego = v; i++; break;
+    case '--fuego-spiele':
+      if (!/^\d+$/.test(String(v)) || +v < 1 || +v > 1e6) { console.error(`--fuego-spiele erwartet eine ganze Zahl von 1 bis 1000000: ${v}`); process.exit(2); }
+      opt.fuegoSpiele = +v; i++; break;
     case '--ki':
       for (const kv of v.split(',')) {
         const [k, w] = kv.split('='), at = k.indexOf('@');
@@ -164,15 +191,14 @@ function vonGtp(s) {
 }
 
 /* ── GTP: eine Anfrage, eine Antwort (endet mit Leerzeile) ──────────── */
-function gnugoStarten(seed, stufe = opt.stufe) {
-  const p = spawn(opt.gnugo, ['--mode', 'gtp', '--level', String(stufe), '--chinese-rules',
-                              '--komi', String(KOMI), '--seed', String(seed),
-                              ...(opt.gnugoAufgabe ? [] : ['--never-resign'])], {stdio: ['pipe', 'pipe', 'pipe']});
+function gtpStarten(programm, argumente, name) {
+  const p = spawn(programm, argumente, {stdio: ['pipe', 'pipe', 'pipe']});
+  const vor = name === 'GNU Go' ? '' : `[${name}] `;
   let puffer = '', warte = [], stderr = '';
   p.stderr.on('data', d => { stderr += d.toString(); });
-  /* Stirbt GNU Go, darf keine Anfrage ewig warten. */
+  /* Stirbt das Programm, darf keine Anfrage ewig warten. */
   p.on('exit', (code, sig) => {
-    for (const w of warte.splice(0)) w(`? GNU Go beendet (code ${code}, signal ${sig}) ${stderr.slice(-300)}`);
+    for (const w of warte.splice(0)) w(`? ${name} beendet (code ${code}, signal ${sig}) ${stderr.slice(-300)}`);
   });
   p.stdout.on('data', d => {
     puffer += d.toString();
@@ -184,14 +210,38 @@ function gnugoStarten(seed, stufe = opt.stufe) {
   });
   const frage = befehl => new Promise((ok, fehler) => {
     warte.push(antwort => {
-      if (process.env.GTP_DEBUG) console.error('<< ' + antwort);
+      if (process.env.GTP_DEBUG) console.error(vor + '<< ' + antwort);
       if (antwort.startsWith('=')) ok(antwort.slice(1).trim());
-      else fehler(new Error(`GNU Go: ${befehl} → ${antwort}`));
+      else fehler(new Error(`${name}: ${befehl} → ${antwort}`));
     });
-    if (process.env.GTP_DEBUG) console.error('>> ' + befehl);
+    if (process.env.GTP_DEBUG) console.error(vor + '>> ' + befehl);
     p.stdin.write(befehl + '\n');
   });
   return {frage, ende: () => { try { p.stdin.write('quit\n'); } catch (e) {} p.kill(); }};
+}
+function gnugoStarten(seed, stufe = opt.stufe) {
+  return gtpStarten(opt.gnugo, ['--mode', 'gtp', '--level', String(stufe), '--chinese-rules',
+                                '--komi', String(KOMI), '--seed', String(seed),
+                                ...(opt.gnugoAufgabe ? [] : ['--never-resign'])], 'GNU Go');
+}
+
+/* Fuego als Gegner (docs/fuego.md §7): ein Prozess je Partie. Lange Optionen nur
+   mit zwei Strichen. Die Einstellungen kommen nach den Vorgabesteinen, in der
+   Reihenfolge, die die Probe geprüft hat; deterministic_mode setzt den Seed
+   auf 1, deshalb folgt set_random_seed. */
+function fuegoStarten(seed) {
+  const f = gtpStarten(opt.fuego, ['--srand', String(seed), '--nobook', '--quiet'], 'Fuego');
+  const einrichten = async () => {
+    await f.frage('boardsize 19'); await f.frage('clear_board'); await f.frage('komi ' + KOMI);
+  };
+  const einstellen = async () => {
+    await f.frage(`uct_param_player max_games ${opt.fuegoSpiele}`);
+    await f.frage('uct_param_player ponder 0');
+    await f.frage('uct_param_player resign_threshold 0');
+    await f.frage('deterministic_mode');
+    await f.frage('set_random_seed ' + Math.max(1, seed % 2147483647));
+  };
+  return {...f, einrichten, einstellen};
 }
 
 /* ── Unsere Zählung, wie im Harness: Benson-tote Ketten weg, Fläche ── */
@@ -257,7 +307,9 @@ function gnugoMitNeustart(seed, stufe = opt.stufe) {
 async function partie(nr) {
   try { return await partieSpielen(nr); }
   catch (e) {
-    if (!/GNU Go beendet/.test(e.message)) throw e;
+    const weich = /(GNU Go|Fuego) beendet/.test(e.message)
+      || (opt.gegner === 'fuego' && /^(GNU Go|Fuego): (play|genmove|set_free_handicap) /.test(e.message));
+    if (!weich) throw e;
     return {nr, stufe: opt.stufe, ki: opt.ki, abgebrochen: e.message.slice(0, 120)};
   }
 }
@@ -280,6 +332,12 @@ async function partieSpielen(nr) {
   E.setzeLebensurteil(null);
   if (o) await o.starte();
   if (oz) await oz.starte();
+  /* Fuego: eigener Prozess; scheitert der Start, wird nichts liegen gelassen. */
+  const fu = opt.gegner === 'fuego' ? fuegoStarten(seed) : null;
+  if (fu) {
+    try { await fu.einrichten(); }
+    catch (e) { fu.ende(); g.ende(); if (o) o.ende(); if (oz) oz.ende(); throw e; }
+  }
   Math.random = mulberry32(seed);
   E.neuePartie(); E.setzeKrisenDauer(null);
   if (E.wurzel) E.wurzel(true);
@@ -300,11 +358,13 @@ async function partieSpielen(nr) {
     g.merke(befehl);   /* für einen Neustart mit nachzuspielen */
     if (o) { await o.frage(befehl); o.merke(befehl); }
     if (oz) { await oz.frage(befehl); oz.merke(befehl); }
+    if (fu) await fu.frage('set_free_handicap ' + vorgabeSteine.join(' '));
     for (const v of vorgabeSteine) board[vonGtp(v)] = 1;
     hist.add(E.computeZobrist(board));
   }
   const zuerst = opt.vorgabe >= 2 ? 2 : 1;
   try {
+    if (fu) await fu.einstellen();
     while (mc < opt.maxZuege && paesse < 2 && !aufgabe) {
       const f = mc % 2 === 0 ? zuerst : 3 - zuerst, farbe = f === 1 ? 'B' : 'W';
       let i;
@@ -336,17 +396,20 @@ async function partieSpielen(nr) {
           }
         }
         await g.frage(`play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`);
+        if (fu) await fu.frage(`play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`);
         await mitspielen(farbe, i);
         if (u) for (const k of u.krit) {
           if (k.farbe === f && i === k.verteidigung) orakel.verteidigt++;
           if (k.farbe !== f && i === k.angriff) orakel.angegriffen++;
         }
       } else {
-        i = vonGtp(await g.frage(`genmove ${farbe}`));
+        i = vonGtp(await (fu || g).frage(`genmove ${farbe}`));
         if (i === -2) { aufgabe = f; break; }
-        /* genmove legt den Zug bei GNU Go selbst; für einen Neustart muss er
-           als play im Verlauf stehen. */
-        g.merke(`play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`);
+        /* genmove legt den Zug beim Ziehenden selbst; GNU Go als Schiedsrichter
+           bekommt ihn als play. Für einen Neustart muss er auch dann als play im
+           Verlauf stehen. */
+        if (fu) await g.frage(`play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`);
+        else g.merke(`play ${farbe} ${i < 0 ? 'pass' : zuGtp(i)}`);
         await mitspielen(farbe, i);
       }
       if (i < 0) { paesse++; ko = null; zuege.push('pass'); }
@@ -369,6 +432,11 @@ async function partieSpielen(nr) {
       const bei = new Set((await g.frage(`list_stones ${farbe}`)).split(/\s+/).filter(Boolean).map(vonGtp));
       for (let k = 0; k < N; k++)
         if ((board[k] === f) !== bei.has(k)) throw new Error(`Partie ${nr}: Bretter weichen ab an ${zuGtp(k)}`);
+      if (fu) {
+        const beiF = new Set((await fu.frage(`list_stones ${farbe}`)).split(/\s+/).filter(Boolean).map(vonGtp));
+        for (let k = 0; k < N; k++)
+          if ((board[k] === f) !== beiF.has(k)) throw new Error(`Partie ${nr}: Bretter weichen bei Fuego ab an ${zuGtp(k)}`);
+      }
     }
     let gnugoStand = null, sieger;
     /* Endstand: GNU Gos Auszählung der Schlussstellung, aus unserer Sicht,
@@ -391,16 +459,18 @@ async function partieSpielen(nr) {
             gnugoStand, endstand, unsereZaehlung: unsereZaehlung(board), zuegeAnzahl: mc,
             simsMittel: sims.length ? Math.round(sims.reduce((x, y) => x + y, 0) / sims.length) : null,
             neustarts: g.neustarts(), schaetzung,
+            ...(fu ? {gegner: {name: 'fuego', spiele: opt.fuegoSpiele, schiedsrichterStufe: opt.stufe}} : {}),
             ...(MIT_STUFEN ? {kiStufen: opt.kiStufen, phasenwechsel} : {}),
             ...(o ? {orakel: {stufe: opt.orakel, ...orakel, neustarts: o.neustarts()}} : {}),
             ...(oz ? {orakelZug: {ab: opt.orakelZug.ab, anteil: opt.orakelZug.anteil, stufe: opt.orakelZugStufe, ...orakelZug, neustarts: oz.neustarts()}} : {}),
             wurzel: E.wurzel ? E.wurzel(true) : undefined,
             zuege};
-  } finally { g.ende(); if (o) o.ende(); if (oz) oz.ende(); E.setzeLebensurteil(null); }
+  } finally { g.ende(); if (fu) fu.ende(); if (o) o.ende(); if (oz) oz.ende(); E.setzeLebensurteil(null); }
 }
 
 (async () => {
   if (!fs.existsSync(opt.gnugo)) { console.error(`GNU Go nicht gefunden: ${opt.gnugo}`); process.exit(2); }
+  if (opt.gegner === 'fuego' && !fs.existsSync(opt.fuego)) { console.error(`Fuego nicht gefunden: ${opt.fuego} (bauen mit auswertung/fuego/bauen.sh)`); process.exit(2); }
   let siege = 0, n = 0;
   for (let nr = opt.von; nr < opt.von + opt.partien; nr++) {
     const t0 = Date.now();

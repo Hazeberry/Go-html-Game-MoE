@@ -180,3 +180,78 @@ Schritt 2).
 
 **Die Probe ist damit abgeschlossen.** Als Nächstes kommt Schritt 1 aus §3:
 Fuego als Gegner im Duell-Skript, GNU Go zählt als Schiedsrichter.
+
+## 8. Nachtrag: Fuego als Gegner im Duell-Skript (28.10.2026)
+
+Schritt 1 aus §3 ist gebaut: `gnugo-duell.js --gegner fuego`. Gemessen ist damit
+noch nichts, und das Werkzeug hat noch keine Partie mit dem echten Fuego
+gespielt. Das ist der Zweck des nächsten Schritts.
+
+**Aufruf.**
+
+```
+node gnugo-duell.js --gegner fuego [--fuego fuego-bin/fuego] [--fuego-spiele 1000]
+                    --vorgabe 6 --stufe 1 --schaetzung 60,120,200 ...
+```
+
+`--fuego` nennt das Programm (Standard `fuego-bin/fuego`, gebaut mit
+`auswertung/fuego/bauen.sh svn gnu++14 fuego-bin`), `--fuego-spiele` die Spiele
+je Zug (ganze Zahl von 1 bis 1 000 000, Standard 1 000).
+
+**Was wer macht.**
+
+| | GNU Go | Fuego |
+|---|---|---|
+| zieht für den Gegner | nein | **ja** (`genmove`) |
+| bekommt die Züge der KI | ja (`play`) | ja (`play`) |
+| bekommt Fuegos Züge | ja (`play`) | – |
+| Vorgabesteine | setzt sie (`fixed_handicap`) | bekommt dieselben Punkte (`set_free_handicap`) |
+| `estimate_score`, `final_score` | **ja, Schiedsrichter** | nein |
+| Brett am Ende (`list_stones`) | verglichen | verglichen |
+
+- **Zählung wie bisher.** Weil GNU Go zählt, sind die Endstände gegen Fuego und
+  gegen GNU Go gleich gezählt. `--stufe` gilt dann für den Schiedsrichter, also
+  weiter 1; die Stufe verändert seine Auszählung, deshalb wird sie nicht
+  geändert, damit die Zahlen vergleichbar bleiben.
+- **Fuego-Einstellungen**, in der Reihenfolge, die die Probe geprüft hat:
+  `boardsize`, `clear_board`, `komi`, Vorgabesteine, dann `max_games`,
+  `ponder 0`, `resign_threshold 0`, `deterministic_mode` und
+  `set_random_seed` mit dem Seed der Partie (`--seed` · 100 000 + Partienummer).
+  Ein neuer Prozess je Partie, `--srand` mit demselben Seed, `--nobook`,
+  `--quiet`. **Alles andere sind Fuegos Voreinstellungen**, darunter
+  `early_pass` (an) und `forced_opening_moves` (an; laut Fuego erzwingt es
+  Eröffnungszüge in den Ecken auf großen Brettern, ob es bei sechs Vorgabesteinen
+  noch greift, ist nicht geprüft). Wer
+  Fuego härter oder weicher machen will, ändert das mit einer eigenen
+  Vorabfestlegung.
+- **Zurückweisung.** Weist GNU Go einen Zug ab (Fuego nennt einen Zug, den der
+  Schiedsrichter nach seinen Regeln für illegal hält, etwa wegen des Ko, oder
+  umgekehrt), zählt die Partie als abgebrochen und das Werkzeug läuft weiter.
+  Die Auswertung nimmt abgebrochene Paare nicht mit und nennt ihre Zahl. Bei
+  GNU Go als Gegner bleibt es beim alten Verhalten.
+- **Datensatz.** Neu ist das Feld `gegner` {`name`, `spiele`,
+  `schiedsrichterStufe`}, nur mit `--gegner fuego`. Ohne die Option sind die
+  Datensätze unverändert, alte Läufe bleiben wiederholbar.
+- **Falsche Angaben** (`--gegner` außer `gnugo` und `fuego`, `--fuego-spiele`
+  keine ganze Zahl in 1 bis 1 000 000, `--fuego` zeigt auf keine Datei) lehnt
+  das Werkzeug mit Fehlercode 2 ab.
+
+**Tests** ([`tests/fuego-gegner.js`](../tests/fuego-gegner.js), 6 Tests ohne
+GNU Go und ohne Fuego): [`tests/gtp-attrappe.js`](../tests/gtp-attrappe.js)
+spielt beide Rollen über GTP, mit den Regeln aus `index.html`, und schreibt
+jeden Befehl mit. Damit ist belegt, wer wem was schickt: die Einrichtung von
+Fuego in der Reihenfolge oben, `genmove` nur an Fuego, `play` für jeden Zug an
+den Schiedsrichter, gleiche Angaben gleiche Partie, ohne Option alles wie
+bisher, abgewiesener Zug gleich abgebrochene Partie.
+
+**Was die Tests nicht belegen.** Die Attrappe antwortet, wie Fuego laut Probe
+antwortet; ob das echte Fuego in einer ganzen Partie so antwortet, zeigt erst
+der nächste Lauf. Mögliche Stolpersteine sind Regelunterschiede zwischen Fuego
+und GNU Go (Ko, Selbstmord), die zu abgebrochenen Partien führen, und ein
+Fuego, das früh passt.
+
+**Nächster Schritt:** ein kurzer Lauf in GitHub Actions mit dem echten Fuego, 15
+Partien mit sechs Vorgabesteinen und 1 000 Spielen je Zug, Seed 218. Er prüft nur,
+ob alles zusammenläuft, wie viele Partien abbrechen und wie lange eine Partie
+dauert. Danach folgt der Prüfstand gegen Fuego (§3, Schritt 2) mit eigener
+Vorabfestlegung.
