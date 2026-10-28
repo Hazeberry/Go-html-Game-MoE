@@ -137,3 +137,46 @@ auch den Seed auf 1. Deshalb muss danach `set_random_seed` folgen.
 Spielen, ob zweimal derselbe Seed dieselben Züge gibt, ob ein anderer Seed
 andere Züge gibt und ab welchem Zug zwei Läufe auseinandergehen. Die Zeit je
 Zug misst sie mit `deterministic_mode`, so wie später gespielt wird.
+
+## 7. Nachtrag: Lauf #4 der Probe, Fuego ist reproduzierbar (28.10.2026)
+
+Lauf #4 ([Run 40671405713](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40671405713),
+Merge-Commit `13eda05`) ist mit C++14 und C++17 durchgelaufen.
+
+**Gleicher Seed, gleiche Züge?** (40 Züge, sechs Vorgabesteine)
+
+| `deterministic_mode` | Spiele je Zug | Seed 11 zweimal | Seed 11 gegen 12 | erster Unterschied |
+|---:|---:|---|---|---:|
+| aus | 1 000 | verschieden | verschieden | Zug 7 (C++14), 4 (C++17) |
+| aus | 3 000 | verschieden | verschieden | Zug 2 |
+| **an** | 1 000 | **gleich** | verschieden | – |
+| **an** | 3 000 | **gleich** | verschieden | – |
+
+Mit `deterministic_mode` und danach `set_random_seed` ist Fuego
+reproduzierbar: Derselbe Seed gibt dieselben Züge, ein anderer Seed andere.
+Beide Fassungen ziehen dabei dieselben Züge (letzter Zug F3, H4 und K11 in
+beiden). Ohne den Befehl gehen zwei Läufe schon nach 2 bis 7 Zügen
+auseinander. Damit sind gepaarte Messungen gegen Fuego möglich wie gegen GNU
+Go.
+
+**Zeit je Zug** mit `deterministic_mode` (20 Züge, ein Thread, Rechner von
+GitHub Actions):
+
+| Spiele je Zug | C++14 | C++17 |
+|---:|---:|---:|
+| 1 000 | 0,77 s | 0,97 s |
+| 3 000 | 1,88 s | 2,35 s |
+| 10 000 | 4,20 s | 5,21 s |
+
+Die Fassung mit C++14 ist rund 20 % schneller und wird künftig verwendet.
+
+**Was das für die Messungen heißt, ohne Anspruch.** Eine Partie dauert gegen
+GNU Go Stufe 1 rund 270 bis 300 Züge, die Hälfte davon zieht der Gegner. Mit
+1 000 Spielen je Zug braucht Fuego dann rund 2 Minuten je Partie, mit 3 000
+rund 5 Minuten, dazu die Zeit unserer KI. Ein Teil zu 15 Partien kostet
+also 30 bis 75 Minuten statt rund 15 gegen GNU Go. Welche Spielzahl die KI
+fordert, ohne sie zu überfahren, klärt erst der Prüfstand gegen Fuego (§3,
+Schritt 2).
+
+**Die Probe ist damit abgeschlossen.** Als Nächstes kommt Schritt 1 aus §3:
+Fuego als Gegner im Duell-Skript, GNU Go zählt als Schiedsrichter.
