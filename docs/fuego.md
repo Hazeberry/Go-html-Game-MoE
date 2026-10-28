@@ -295,3 +295,66 @@ Abgebrochen werden 0 oder 1 Partien. Wie stark Fuego mit 1 000 Spielen gegen
 sechs Vorgabesteine ist, ist offen. Vermutet: Die KI liegt nach Zug 60 vorn,
 weil Fuego ohne Eröffnungsbuch und ohne dynamisches Komi aus einer verlorenen
 Lage spielt. Ob sie vorn bleibt, ist die Frage, die der Prüfstand klären soll.
+
+## 10. Nachtrag: Kurzer Lauf, Ergebnis (28.10.2026)
+
+[Workflow-Lauf 40692606429](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40692606429)
+auf Merge `6919114`, Eingaben wie in §9 (Seed 218, 1 000 Spiele, Vorgabe 6).
+Alle drei Teile und der Bericht sind grün. Daten:
+[`docs/daten/fuego-kurz/lauf1/`](daten/fuego-kurz/lauf1/) (Bericht, Log, alle
+Partien gepackt).
+
+**Die eine Frage: läuft zusammen, ja.** 15 von 15 Partien fertig, keine
+abgebrochen, kein Teil mit Fehler. Damit folgt nach §9 der Prüfstand gegen
+Fuego mit eigener Vorabfestlegung.
+
+**Beschrieben, ohne Anspruch** (15 Partien, die KI spielt immer Schwarz mit
+sechs Steinen):
+
+| | gegen Fuego, 1 000 Spiele | zum Vergleich: GNU Go Stufe 1, Prüfstand |
+|---|---|---|
+| Partien | 15 | 60 |
+| Siege der KI | **0** | 32 |
+| Endstand Ø (SD) | −49,5 (25,7) | +11,1 |
+| Schätzung nach Zug 60 | +58,2 | nicht erhoben |
+| Schätzung nach Zug 120 | +2,6 | +28,8 |
+| Schätzung nach Zug 200 | −48,4 | +21,7 |
+| Züge je Partie Ø | 367 | 264 |
+| Minuten je Partie | 3,4 | – |
+
+Die Vergleichsspalte ist der Arm mit sechs Steinen aus dem Prüfstand
+([`teststaerke.md`](teststaerke.md) §9, Daten
+[`pruefstand/lauf1`](daten/pruefstand/lauf1/)). Er lief noch mit
+`endspielNetz` 0,5 und mit anderen Seeds. Die Spalten sind also kein gepaarter
+Vergleich, nur eine Einordnung.
+
+- **Siege.** 0 von 15. Die Obergrenze des exakten 95-%-Intervalls liegt bei
+  22 %. Mit sechs Steinen und 1 000 Spielen ist Fuego für die KI klar zu stark.
+  Gegen GNU Go Stufe 1 gewinnt sie mit sechs Steinen rund die Hälfte.
+- **Verlauf.** Nach Zug 60 liegt die KI in allen 15 Partien vorn (+18 bis
+  +95). Nach Zug 120 steht es im Mittel ausgeglichen, nach Zug 200 liegt sie in
+  allen 15 Partien hinten. Gegen GNU Go liegt sie nach Zug 120 und 200 im
+  Mittel noch vorn. Der Rückstand gegen Fuego entsteht also zwischen Zug 60 und 200, im
+  Mittelspiel.
+- **Was das nicht zeigt.** Die +58 nach Zug 60 sind ungefähr der Wert der
+  sechs Vorgabesteine. Dass Fuego die Eröffnung schwach spielt, folgt daraus
+  nicht. Dafür fehlt ein Vergleich nach Zug 60 gegen GNU Go oder ohne Vorgabe.
+- **Pässe.** Fuego passt zum ersten Mal frühestens bei Zug 229, im Median bei
+  Zug 305. Danach passt es im Mittel 31-mal, während die KI weiterspielt. Die
+  Partien werden dadurch rund 100 Züge länger als gegen GNU Go. Gezählt wird
+  trotzdem richtig: GNU Go zählt nach chinesischen Regeln und nimmt tote
+  Steine heraus. Unsere eigene Zählung ohne tote Steine weicht vom Endstand ab,
+  gegen Fuego im Mittel um 69 Punkte, gegen GNU Go im Prüfstand um 104. Das
+  ist also nicht neu mit Fuego.
+- **Dauer.** 3,4 Minuten je Partie (2,5 bis 5,1), wie vorab erwartet (3 bis
+  6). Ein Teil mit fünf Partien braucht mit dem Bau von Fuego rund 20 Minuten.
+
+**Folgen für den Prüfstand.** Mit sechs Steinen und 1 000 Spielen liegt die
+Siegquote weit unter der Hälfte. Der Prüfstand muss also mehr Steine oder
+weniger Spiele für Fuego prüfen. Ein Vorschlag, noch nicht festgelegt:
+Vorgabe 6 und 9 mit 100, 300 und 1 000 Spielen, je 30 Partien. Die Regel zur
+Wahl wäre wie in [`teststaerke.md`](teststaerke.md) §8: nächste Siegquote an
+50 % innerhalb von 25 bis 75 %; bei Gleichstand gewinnt die höhere Spielzahl,
+damit Fuego möglichst stark bleibt. Weniger Spiele machen Fuego auch
+schneller, die Dauer sinkt also eher. Festgelegt wird das in einem eigenen
+Abschnitt vor dem Lauf.
