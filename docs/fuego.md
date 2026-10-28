@@ -425,3 +425,62 @@ Spielen. Der Arm 6/1000 liegt wie im kurzen Lauf nahe 0 %. Ob ein Arm die
 Hälfte erreicht, ist offen. Am ehesten erwartet: 9/100 oder 9/300. Dauer: eine
 Partie mit 1 000 Spielen 3 bis 4 Minuten (§10), mit weniger Spielen kürzer.
 Der längste Teil braucht also rund 40 Minuten mit dem Bau von Fuego.
+
+## 12. Nachtrag: Prüfstand gegen Fuego, Ergebnis (28.10.2026)
+
+[Workflow-Lauf 40730089492](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40730089492)
+auf Merge `cfdb463`, Seed 219. Alle 18 Teile, die Kontrolle und der Bericht
+sind grün. Daten:
+[`docs/daten/fuego-pruefstand/lauf1/`](daten/fuego-pruefstand/lauf1/)
+(Bericht, Log, Partien je Arm und Kontrolle gepackt).
+
+| Vorgabe | Spiele | Partien (abgebr.) | Siege der KI | 95-%-Intervall | Endstand Ø (SD) | nach Zug 60 / 120 / 200 | Min. je Partie |
+|---:|---:|---:|---:|---|---:|---|---:|
+| 9 | 100 | 30 (0) | 19 (63 %) | 44 bis 80 % | +55,6 (78,5) | +147 / +115 / +87 | 0,5 |
+| 9 | 300 | 30 (0) | 8 (27 %) | 12 bis 46 % | +2,7 (71,5) | +129 / +105 / +48 | 1,1 |
+| 9 | 1 000 | 30 (0) | 0 (0 %) | 0 bis 12 % | −36,5 (19,5) | +112 / +62 / −29 | 3,4 |
+| **6** | **100** | 30 (0) | **16 (53 %)** | 34 bis 72 % | +30,4 (66,2) | +84 / +68 / +51 | 0,5 |
+| 6 | 300 | 30 (0) | 3 (10 %) | 2 bis 27 % | −28,9 (42,0) | +69 / +39 / −17 | 1,0 |
+| 6 | 1 000 | 30 (0) | 0 (0 %) | 0 bis 12 % | −55,2 (42,7) | +62 / +13 / −51 | 3,2 |
+
+**Wahl nach §11: sechs Steine, 100 Spiele je Zug.** In Frage kamen 9/100
+(63 %), 9/300 (27 %) und 6/100 (53 %). Am nächsten an 50 % liegt 6/100. Gegen
+Fuego wird künftig also mit sechs Steinen gemessen, wie gegen GNU Go, und Fuego
+bekommt 100 Spiele je Zug.
+
+**Kontrolle: bestanden.** Die Partien 1 bis 5 des kurzen Laufs gingen auf einem
+anderen Runner Zug für Zug gleich aus. Messungen gegen Fuego sind also Partie
+für Partie wiederholbar, wie die gegen GNU Go.
+
+**Beschrieben, ohne Anspruch:**
+
+- **Abbrüche.** Keine von 185 Partien ist abgebrochen, keine lief bis
+  600 Züge.
+- **Spielzahl.** Fuego wird mit der Spielzahl schnell stärker. Von 100 auf 300
+  Spiele fällt die Siegquote um 36 bzw. 43 Punkte, bei 1 000 gewinnt die KI
+  auch mit neun Steinen nicht mehr. 6/100 ist für unsere KI etwa so stark wie GNU Go
+  Stufe 1 mit sechs Steinen (53 % gegen 53 % im Prüfstand von
+  [`teststaerke.md`](teststaerke.md) §9). Wie stark Fuego mit 100 Spielen für
+  Menschen ist, sagt das nicht.
+- **Verlauf.** In allen Armen liegt die KI nach Zug 60 vorn und verliert danach
+  Punkte, je mehr Spiele Fuego hat, desto mehr. Mit 100 Spielen und in 9/300
+  liegt sie nach Zug 200 im Mittel noch vorn.
+- **Vorsprünge gehen spät verloren.** Gegen GNU Go (Prüfstand, sechs Steine)
+  gewann die KI 28 von 29 Partien, in denen sie nach Zug 200 mit mehr als
+  20 Punkten vorn lag. Gegen Fuego mit 100 Spielen gewann sie solche Partien
+  16 von 23 (sechs Steine) und 19 von 26 (neun Steine), mit 300 Spielen 8 von
+  18. Nach Zug 200 verliert sie gegen Fuego also deutlich öfter einen
+  Vorsprung als gegen GNU Go. Ob das an ihrem Endspiel liegt oder an der
+  Schätzung von GNU Go nach Zug 200, zeigen diese Daten nicht. Es ist aber ein
+  Hinweis, wo eine Messung gegen Fuego mehr sehen kann als eine gegen GNU Go.
+- **Dauer.** Mit 100 Spielen dauert eine Partie 0,5 Minuten, mit 1 000 rund
+  3,3. Eine Messung gegen Fuego mit 6/100 kostet also wenig Zeit.
+- **Streuung.** Die SD des Endstands ist mit 100 Spielen groß (66 bis 79
+  Punkte). Für gepaarte Messungen zählt aber die Streuung der Differenzen; die
+  kennt erst die erste Messung.
+
+**Wie es weitergeht (§3, Schritt 3).** Die erste Messung gegen Fuego bekommt
+eine eigene Vorabfestlegung. Naheliegend ist `endspielNetz` 0,8 gegen 0 unter
+6/100: Das Netz hat direkt von GNU Go gelernt, und
+der späte Verlust von Vorsprüngen betrifft gerade das Endspiel. Was gilt, wenn
+die Gegner sich widersprechen, legt diese Vorabfestlegung fest.

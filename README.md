@@ -64,9 +64,9 @@ nichts zu installieren.
   Selbstspiel prüft das nur gegen die eigene KI. Seit dem 20.10. wird mit
   sechs statt neun Vorgabesteinen gemessen (`docs/teststaerke.md` §9). Als
   zweiter Gegner lässt sich seit dem 28.10. Fuego einsetzen
-  (`gnugo-duell.js --gegner fuego`, `docs/fuego.md`). Ein kurzer Lauf mit 15
-  Partien lief zusammen; mit sechs Steinen gewann die KI keine (§10). Gemessen
-  ist damit noch nichts.
+  (`gnugo-duell.js --gegner fuego`, `docs/fuego.md`). Der Prüfstand gegen
+  Fuego wählte sechs Steine und 100 Spiele je Zug für Fuego (53 % Siege der
+  KI, §12). Gemessen ist damit noch nichts.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl
