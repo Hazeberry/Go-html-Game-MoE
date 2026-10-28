@@ -174,7 +174,7 @@ Die Fassung mit C++14 ist rund 20 % schneller und wird künftig verwendet.
 GNU Go Stufe 1 rund 270 bis 300 Züge, die Hälfte davon zieht der Gegner. Mit
 1 000 Spielen je Zug braucht Fuego dann rund 2 Minuten je Partie, mit 3 000
 rund 5 Minuten, dazu die Zeit unserer KI. Ein Teil zu 15 Partien kostet
-also 30 bis 75 Minuten statt rund 15 gegen GNU Go. Welche Spielzahl die KI
+allein für Fuegos Züge also rund 30 oder 70 Minuten. Welche Spielzahl die KI
 fordert, ohne sie zu überfahren, klärt erst der Prüfstand gegen Fuego (§3,
 Schritt 2).
 
