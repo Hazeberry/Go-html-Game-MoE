@@ -1,0 +1,377 @@
+name: Komponenten Stufe A
+
+# Manueller Lauf aus docs/komponenten.md: der volle Default D gegen die
+# reduzierte Engine B und gegen D ohne Netz (N0), ohne Muster (M0), ohne beide
+# (NM0) und ohne RAVE (R0), gegen GNU Go Stufe 1 und gegen Fuego mit 100
+# Spielen, beide mit sechs Vorgabesteinen und demselben Seed. D, N0, M0 und
+# NM0 spielen 480 Partien je Gegner, B und R0 240. Zwei Kontrollen spielen
+# Partien früherer Messungen nach. Stufe A wählt keinen Default.
+#
+# Ablauf:
+#   pruefen       Eingaben prüfen
+#   fuego-bauen   Fuego einmal bauen (SVN r2038, C++14), für alle Fuego-Jobs
+#   gnugo-gross   D, N0, M0, NM0 gegen GNU Go × 24 Teile zu 20 Partien
+#   gnugo-klein   B, R0 gegen GNU Go × 12 Teile zu 20 Partien
+#   fuego-gross   D, N0, M0, NM0 gegen Fuego × 12 Teile zu 40 Partien
+#   fuego-klein   B, R0 gegen Fuego × 6 Teile zu 40 Partien
+#   kontrolle-g   D gegen GNU Go, Seed 216, Partien 1 bis 15 (wie L8 in netz-dosis/lauf1)
+#   kontrolle-f   D gegen Fuego, Seed 219, Partien 1 bis 10 (wie 6/100 in fuego-pruefstand/lauf1)
+#   ergebnis      Bericht, Rohdaten gepackt, Branch ergebnisse/komponenten-lauf<N>
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: 'Seed der Partien (220: noch nie benutzt)'
+        required: true
+        default: '220'
+
+concurrency:
+  group: komponenten
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    name: Eingaben prüfen
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      seed: ${{ steps.p.outputs.seed }}
+    steps:
+      # Eingaben nur über env und geprüft, nie in die Shell-Zeile interpoliert
+      - name: Eingaben prüfen
+        id: p
+        env:
+          IN_SEED: ${{ inputs.seed }}
+        run: |
+          set -euo pipefail
+          case "$IN_SEED" in ''|*[!0-9]*) echo "::error::seed muss eine nicht-negative ganze Zahl sein: '$IN_SEED'"; exit 2;; esac
+          echo "seed=$IN_SEED" >> "$GITHUB_OUTPUT"
+          echo "## Komponenten Stufe A: Seed $IN_SEED, Commit \`${GITHUB_SHA:0:7}\`" >> "$GITHUB_STEP_SUMMARY"
+
+  fuego-bauen:
+    name: Fuego bauen
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Werkzeuge installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential autoconf automake libtool subversion libboost-all-dev
+
+      - name: Bauen
+        run: bash auswertung/fuego/bauen.sh svn gnu++14 fuego-bin
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin/
+          retention-days: 7
+
+  gnugo-gross:
+    name: GNU Go, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [D, N0, M0, NM0]
+        von: [1, 21, 41, 61, 81, 101, 121, 141, 161, 181, 201, 221, 241, 261, 281, 301, 321, 341, 361, 381, 401, 421, 441, 461]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: 20 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed }}
+        run: bash auswertung/komponenten/spielen.sh g "$ARM" "$VON" 20 "$SEED" "stand/g-$ARM-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-g-${{ matrix.arm }}-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  gnugo-klein:
+    name: GNU Go, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [B, R0]
+        von: [1, 21, 41, 61, 81, 101, 121, 141, 161, 181, 201, 221]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: 20 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed }}
+        run: bash auswertung/komponenten/spielen.sh g "$ARM" "$VON" 20 "$SEED" "stand/g-$ARM-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-g-${{ matrix.arm }}-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  fuego-gross:
+    name: Fuego, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    needs: [pruefen, fuego-bauen]
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [D, N0, M0, NM0]
+        von: [1, 41, 81, 121, 161, 201, 241, 281, 321, 361, 401, 441]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go und Bibliotheken installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo libboost-all-dev
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin
+
+      - name: 40 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed }}
+        run: |
+          set -euo pipefail
+          chmod +x fuego-bin/fuego
+          bash auswertung/komponenten/spielen.sh f "$ARM" "$VON" 40 "$SEED" "stand/f-$ARM-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-f-${{ matrix.arm }}-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  fuego-klein:
+    name: Fuego, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    needs: [pruefen, fuego-bauen]
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [B, R0]
+        von: [1, 41, 81, 121, 161, 201]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go und Bibliotheken installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo libboost-all-dev
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin
+
+      - name: 40 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed }}
+        run: |
+          set -euo pipefail
+          chmod +x fuego-bin/fuego
+          bash auswertung/komponenten/spielen.sh f "$ARM" "$VON" 40 "$SEED" "stand/f-$ARM-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-f-${{ matrix.arm }}-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  kontrolle-g:
+    name: Kontrolle GNU Go (Seed 216, Partien 1 bis 15)
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      # Schätzung wie in der früheren Messung, damit GNU Go dieselben Befehle bekommt
+      - name: 15 Partien nachspielen
+        env:
+          SCHAETZUNG: '120,200'
+        run: bash auswertung/komponenten/spielen.sh g D 1 15 216 stand/kontrolle-g.jsonl
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-kontrolle-g
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  kontrolle-f:
+    name: Kontrolle Fuego (Seed 219, Partien 1 bis 10)
+    needs: [pruefen, fuego-bauen]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go und Bibliotheken installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo libboost-all-dev
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin
+
+      - name: 10 Partien nachspielen
+        env:
+          SCHAETZUNG: '60,120,200'
+        run: |
+          set -euo pipefail
+          chmod +x fuego-bin/fuego
+          bash auswertung/komponenten/spielen.sh f D 1 10 219 stand/kontrolle-f.jsonl
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-kontrolle-f
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [pruefen, gnugo-gross, gnugo-klein, fuego-gross, fuego-klein, kontrolle-g, kontrolle-f]
+    # Auch wenn ein Teil scheitert: Der Bericht nennt die Paare, die da sind,
+    # und fehlende-teile.txt die, die fehlen.
+    if: always() && needs.pruefen.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: stand-*
+          path: stand
+          merge-multiple: true
+
+      - name: Bericht
+        run: bash auswertung/komponenten/ergebnis.sh
+
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/komponenten-lauf${LAUF}"
+          ziel="docs/daten/komponenten/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Komponenten Stufe A: Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
