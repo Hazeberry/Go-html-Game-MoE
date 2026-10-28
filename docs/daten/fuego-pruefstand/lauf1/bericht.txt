@@ -1,0 +1,10 @@
+Vorgabe 9, 100 Spiele: 30 fertig (0 abgebrochen) · Siege 19 (63 %, 95 % 44 % bis 80 %) · Endstand Ø +55,6 · nach Zug 60/120/200 +147,4 / +114,6 / +86,7 · 0.5 min je Partie
+Vorgabe 9, 300 Spiele: 30 fertig (0 abgebrochen) · Siege 8 (27 %, 95 % 12 % bis 46 %) · Endstand Ø +2,7 · nach Zug 60/120/200 +129,3 / +105,2 / +48,0 · 1.1 min je Partie
+Vorgabe 9, 1000 Spiele: 30 fertig (0 abgebrochen) · Siege 0 (0 %, 95 % 0 % bis 12 %) · Endstand Ø −36,5 · nach Zug 60/120/200 +112,2 / +62,1 / −28,9 · 3.4 min je Partie
+Vorgabe 6, 100 Spiele: 30 fertig (0 abgebrochen) · Siege 16 (53 %, 95 % 34 % bis 72 %) · Endstand Ø +30,4 · nach Zug 60/120/200 +83,6 / +68,3 / +51,4 · 0.5 min je Partie
+Vorgabe 6, 300 Spiele: 30 fertig (0 abgebrochen) · Siege 3 (10 %, 95 % 2 % bis 27 %) · Endstand Ø −28,9 · nach Zug 60/120/200 +69,0 / +39,2 / −16,7 · 1.0 min je Partie
+Vorgabe 6, 1000 Spiele: 30 fertig (0 abgebrochen) · Siege 0 (0 %, 95 % 0 % bis 12 %) · Endstand Ø −55,2 · nach Zug 60/120/200 +62,1 / +12,5 / −50,5 · 3.2 min je Partie
+
+Wahl nach §11: 6 Vorgabesteine, 100 Spiele je Zug
+
+Kontrolle: 5 von 5 Partien gleich wie im kurzen Lauf (bestanden)
