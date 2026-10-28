@@ -194,6 +194,7 @@ test('Workflow prior-neun.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeSh
 test('Workflow pruefstand.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('pruefstand.yml', 5, 1));
 test('Workflow netz-dosis.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('netz-dosis.yml', 8, 5));
 test('Workflow fuego-probe.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('fuego-probe.yml', 3, 0));
+test('Workflow fuego-kurz.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('fuego-kurz.yml', 6, 3));
 test('Workflow netz-hoch.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('netz-hoch.yml', 8, 5));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
@@ -1077,6 +1078,41 @@ test('Workflow netz-hoch.yml: Arme, Jobs, Vorgabe und Eingaben wie in der Vorabf
   pruefeGleich(s('217', 'gibt-es-nicht.gz', '1', '2').status, 2, 'netz-hoch-ergebnis.sh: Kontrolldatei fehlt');
   pruefeGleich(s('217', kontrolle, '1').status, 1, 'netz-hoch-ergebnis.sh: Seed von M2 für L10 fehlt');
   pruefeGleich(s('217', kontrolle, '1', '2').status, 1, 'netz-hoch-ergebnis.sh: keine Teile');
+});
+
+test('Kurzer Lauf gegen Fuego: Bericht, Spielskript und Workflow wie in der Vorabfestlegung', () => {
+  const KB = require('../auswertung/fuego/kurz-bericht.js');
+  const g = {name: 'fuego', spiele: 1000, schiedsrichterStufe: 1};
+  const p = [
+    {nr: 1, gewonnen: true, endstand: 10, schaetzung: {60: 5, 120: 6, 200: 7}, zuegeAnzahl: 4, zuege: ['C3', 'D4', 'pass', 'E5'], wirFarbe: 'S', beginnt: 'W', gegner: g},
+    {nr: 2, gewonnen: false, endstand: -4, schaetzung: {60: -1}, zuegeAnzahl: 2, zuege: ['pass', 'D4'], wirFarbe: 'S', beginnt: 'W', gegner: g},
+    {nr: 3, gewonnen: null, endstand: 3, schaetzung: {}, zuegeAnzahl: 600, zuege: ['D4', 'pass'], wirFarbe: 'S', beginnt: 'W', gegner: g},
+    {nr: 4, abgebrochen: 'GNU Go: play W D4 → ? illegal move'}];
+  const a = KB.auswertung(p, [{teil: 1, sekunden: 600, partien: 5}]);
+  pruefeGleich(`${a.n} ${a.fertig} ${a.abgebrochen} ${a.laeuft}`, '4 3 1 true', 'eine abgebrochene Partie: läuft noch zusammen');
+  pruefeGleich(`${a.siege} ${a.zuglimit}`, '1 1', 'ein Sieg, eine am Zuglimit');
+  pruefeGleich(a.endstand, 3, 'Endstand Ø');
+  pruefeGleich(`${a.nach60} ${a.nach120}`, '2 6', 'Schätzungen nur, wo vorhanden');
+  pruefeGleich(a.fuegoPaesse, 2 / 3, 'Fuego (Weiß, beginnt) passt in Zug 3 und Zug 1; der Pass von Schwarz zählt nicht');
+  pruefeGleich(`${a.ersterPass} ${a.minutenJePartie}`, '1 2', 'frühester Pass von Fuego, Minuten je Partie');
+  pruefe(/Partie 4: .*illegal move/.test(KB.text(a, true)), 'Grund des Abbruchs im Bericht');
+  pruefeGleich(KB.auswertung(p.concat([{nr: 5, abgebrochen: 'x'}])).laeuft, false, 'zwei abgebrochen: läuft nicht zusammen');
+  const s = (...x) => spawnSync('bash', [path.join(wurzel, 'auswertung', 'fuego', 'spielen.sh'), ...x], {cwd: temp(), encoding: 'utf8'});
+  pruefeGleich(s('1', '5', '218', '1000', '1', 'x.jsonl').status, 2, 'spielen.sh: Vorgabe 1 abgelehnt');
+  pruefeGleich(s('1', '5', '218', 'viel', '6', 'x.jsonl').status, 2, 'spielen.sh: Spiele keine Zahl');
+  pruefeGleich(s('1', '5', '218', '1000', '6').status, 1, 'spielen.sh: Ausgabedatei fehlt');
+  const sp = fs.readFileSync(path.join(wurzel, 'auswertung', 'fuego', 'spielen.sh'), 'utf8');
+  pruefe(/--gegner fuego/.test(sp) && /--stufe 1/.test(sp) && /--schaetzung 60,120,200/.test(sp) && /--gnugo-aufgabe 0/.test(sp) && /mctsFixedSims=120,resignEnabled=0/.test(sp) && /--maxzuege 600/.test(sp), 'Bedingungen wie in den Messungen');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'fuego-kurz.yml'), 'utf8');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'fuego.md'), 'utf8');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefeGleich((/von: \[([0-9, ]+)\]/.exec(t) || [])[1], '1, 6, 11', 'drei Teile zu fünf Partien');
+  pruefe(/bauen\.sh svn gnu\+\+14 fuego-bin/.test(t), 'Fuego aus SVN mit C++14');
+  for (const name of ['seed', 'spiele', 'vorgabe']) {
+    const imDoc = (new RegExp('^\\| `' + name + '` \\| `?([^` |]+)', 'm').exec(doc) || [])[1];
+    const imFlow = (new RegExp('^      ' + name + ':\\n(?:        .*\\n)*?        default: \'([^\']*)\'', 'm').exec(t) || [])[1];
+    pruefe(imDoc !== undefined && imDoc === imFlow, `Vorgabe ${name}: Dokument „${imDoc}“, Workflow „${imFlow}“`);
+  }
 });
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));
