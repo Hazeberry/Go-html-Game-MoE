@@ -31,12 +31,16 @@ partie() {   # <spiele> <züge>: Vorgabe 6, Weiß beginnt, abwechselnd genmove
   for i in $(seq 1 "$2"); do if [ $((i % 2)) -eq 1 ]; then f=w; else f=b; fi; echo "genmove $f"; done
   echo "list_stones black"; echo "final_score"; echo "quit"
 }
-lauf() { "$bin" -srand "$1" -nobook -quiet < "$2" 2>> "$arbeit/stderr.txt"; }
+# Fuego liest lange Optionen nur mit zwei Strichen (boost::program_options);
+# mit einem Strich zeigt es die Hilfe und beendet sich ohne GTP (Lauf #2).
+lauf() { "$bin" --srand "$1" --nobook --quiet < "$2" 2>> "$arbeit/stderr.txt"; }
+abbruch() { echo; echo "**Abbruch:** $1"; echo; echo '```'; head -n 30 "$arbeit/stderr.txt"; echo '```'; exit 1; }
 
 echo "## Fuego-Probe"
 echo
 printf 'name\nversion\nlist_commands\nquit\n' > "$arbeit/info.gtp"
 lauf 1 "$arbeit/info.gtp" > "$arbeit/info.txt"
+grep -q '^= ' "$arbeit/info.txt" || abbruch "Fuego antwortet nicht auf GTP"
 echo "- Name und Version: $(grep '^= ' "$arbeit/info.txt" | head -2 | sed 's/^= //' | tr '\n' ' ')"
 echo
 echo "### Befehle, die das Duell-Skript braucht"
@@ -59,8 +63,8 @@ for n in 1000 3000 10000; do
   partie "$n" 20 > "$arbeit/p$n.gtp"
   t0=$(date +%s.%N); lauf 7 "$arbeit/p$n.gtp" > "$arbeit/p$n.txt"; t1=$(date +%s.%N)
   zuege=$(grep -Eic '^= ([A-HJ-T][0-9]{1,2}|pass|resign)$' "$arbeit/p$n.txt" || true)
-  letzt=$(grep -Ei '^= ([A-HJ-T][0-9]{1,2}|pass|resign)$' "$arbeit/p$n.txt" | tail -1 | sed 's/^= //')
-  score=$(grep '^[=?]' "$arbeit/p$n.txt" | tail -2 | head -1)
+  letzt=$(grep -Ei '^= ([A-HJ-T][0-9]{1,2}|pass|resign)$' "$arbeit/p$n.txt" | tail -1 | sed 's/^= //' || true)
+  score=$(grep '^[=?]' "$arbeit/p$n.txt" | tail -2 | head -1 || true)
   echo "| $n | $(awk -v a="$t0" -v b="$t1" 'BEGIN { printf "%.2f", (b - a) / 20 }') | $letzt ($zuege Züge) | \`$score\` |"
 done
 echo
