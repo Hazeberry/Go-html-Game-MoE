@@ -97,3 +97,43 @@ Danach brach die Probe ohne Meldung ab, weil ein leeres Suchergebnis unter
 Behoben: Die Probe übergibt die Optionen mit zwei Strichen. Antwortet Fuego
 nicht, bricht sie mit Meldung und dem Anfang der Fehlerausgabe ab. Zwei Tests
 prüfen beides. Die Probe wird ein drittes Mal gestartet.
+
+## 6. Nachtrag: Lauf #3 der Probe (28.10.2026)
+
+Lauf #3 ([Run 40669268951](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40669268951),
+Merge-Commit `cc8b1f8`) ist durchgelaufen, mit C++14 und mit C++17.
+
+- **Befehle:** Fuego („Fuego 1.1.SVN“) kennt alle GTP-Befehle, die das
+  Duell-Skript braucht: `fixed_handicap`, `play`, `genmove`, `final_score`,
+  `list_stones`, `final_status_list` und die Parameter-Befehle.
+- **Einstellungen:** Alle sechs werden angenommen (ein Thread, feste Spielzahl,
+  keine Uhr, kein Weiterverwenden des Baums, kein Nachdenken in der Zeit des
+  Gegners, keine Aufgabe).
+- **Zeit je Zug** (19×19, sechs Vorgabesteine, 20 Züge, ein Thread, Rechner von
+  GitHub Actions):
+
+| Spiele je Zug | C++14 | C++17 |
+|---:|---:|---:|
+| 1 000 | 0,53 s | 0,80 s |
+| 3 000 | 1,29 s | 1,86 s |
+| 10 000 | 3,65 s | 4,77 s |
+
+  `final_score` nach 20 Zügen antwortet meist (`B+5.5`, `B+7.5`), manchmal mit
+  „cannot score“. Für die Messungen zählt ohnehin GNU Go (§3).
+- **Reproduzierbarkeit: nein.** Zweimal Seed 11 gab verschiedene Züge, ebenso
+  dieselbe Partie in beiden Fassungen.
+
+**Ursache, aus dem Quelltext.** Fuego bricht die Suche nicht nur nach der Zahl
+der Spiele ab, sondern prüft in Abständen, ob sich der beste Zug noch ändern
+kann (`SgUctSearch::CheckAbortSearch`). Wie oft es prüft, passt es an die
+gemessene Zeit an (`UpdateCheckTimeInterval`). Damit hängt der Abbruch von der
+Rechnergeschwindigkeit ab. Fuego hat dafür den GTP-Befehl `deterministic_mode`.
+Er hält den Prüfabstand fest (1 500 Spiele), legt einen Thread, keine Uhr und
+kein Weiterverwenden des Baums fest und sperrt diese Parameter. Er setzt aber
+auch den Seed auf 1. Deshalb muss danach `set_random_seed` folgen.
+
+**Nächster Lauf.** Die Probe stellt jetzt `deterministic_mode` und danach
+`set_random_seed` ein. Sie prüft ohne und mit dem Befehl, je bei 1 000 und 3 000
+Spielen, ob zweimal derselbe Seed dieselben Züge gibt, ob ein anderer Seed
+andere Züge gibt und ab welchem Zug zwei Läufe auseinandergehen. Die Zeit je
+Zug misst sie mit `deterministic_mode`, so wie später gespielt wird.

@@ -1029,6 +1029,7 @@ test('Fuego: Bau- und Probeskript lehnen falsche Eingaben ab, Stand und Prüfsum
   pruefeGleich(s('probe.sh', 'gibt-es-nicht').status, 2, 'probe.sh: Programm fehlt');
   const pr = fs.readFileSync(path.join(wurzel, 'auswertung', 'fuego', 'probe.sh'), 'utf8');
   pruefe(/"\$bin" --srand "\$1" --nobook --quiet/.test(pr), 'probe.sh: Optionen mit zwei Strichen (sonst zeigt Fuego nur die Hilfe)');
+  pruefe(/deterministic_mode\nset_random_seed \$2\n/.test(pr), 'probe.sh: deterministic_mode, danach set_random_seed (der Befehl setzt den Seed auf 1)');
   const stumm = temp(), attr = path.join(stumm, 'fuego');
   fs.writeFileSync(attr, '#!/bin/sh\necho "Usage: fuego" >&2\nexit 0\n', {mode: 0o755});
   const ps = spawnSync('bash', [path.join(wurzel, 'auswertung', 'fuego', 'probe.sh'), attr], {cwd: stumm, encoding: 'utf8'});
