@@ -1,0 +1,209 @@
+name: Prüfstand gegen Fuego
+
+# Manueller Lauf aus docs/fuego.md §11: Die heutige Standard-KI spielt gegen
+# Fuego mit 9 und 6 Vorgabesteinen und 100, 300 und 1 000 Spielen je Zug,
+# je 30 Partien; GNU Go Stufe 1 zählt als Schiedsrichter. Daraus folgt nach
+# der vorab festgelegten Regel, mit welcher Vorgabe und Spielzahl künftig
+# gegen Fuego gemessen wird. Eine Kontrolle spielt fünf Partien des kurzen
+# Laufs (§10) nach; sie müssen gleich ausgehen.
+#
+# Ablauf:
+#   pruefen    Eingaben prüfen
+#   spielen    2 Vorgaben × 3 Spielzahlen × 3 Teile zu je 10 Partien (18 Jobs)
+#   kontrolle  Partien 1 bis 5 des kurzen Laufs (Seed 218, Vorgabe 6, 1 000 Spiele)
+#   ergebnis   Bericht, Rohdaten gepackt, Branch ergebnisse/fuego-pruefstand-lauf<N>
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: 'Seed der Partien (219: noch nie benutzt)'
+        required: true
+        default: '219'
+
+concurrency:
+  group: fuego-pruefstand
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    name: Eingaben prüfen
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      seed: ${{ steps.p.outputs.seed }}
+    steps:
+      # Eingaben nur über env und geprüft, nie in die Shell-Zeile interpoliert
+      - name: Eingaben prüfen
+        id: p
+        env:
+          IN_SEED: ${{ inputs.seed }}
+        run: |
+          set -euo pipefail
+          case "$IN_SEED" in ''|*[!0-9]*) echo "::error::seed muss eine nicht-negative ganze Zahl sein: '$IN_SEED'"; exit 2;; esac
+          echo "seed=$IN_SEED" >> "$GITHUB_OUTPUT"
+          echo "## Prüfstand gegen Fuego: Seed $IN_SEED, Commit \`${GITHUB_SHA:0:7}\`" >> "$GITHUB_STEP_SUMMARY"
+
+  spielen:
+    name: Vorgabe ${{ matrix.vorgabe }}, ${{ matrix.spiele }} Spiele, Partien ab ${{ matrix.von }}
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        vorgabe: [9, 6]
+        spiele: [100, 300, 1000]
+        von: [1, 11, 21]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go und Werkzeuge installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo build-essential autoconf automake libtool subversion libboost-all-dev
+          gnugo --version | head -n 1
+
+      - name: Fuego bauen
+        run: bash auswertung/fuego/bauen.sh svn gnu++14 fuego-bin
+
+      - name: 10 Partien spielen
+        env:
+          VORGABE: ${{ matrix.vorgabe }}
+          SPIELE: ${{ matrix.spiele }}
+          VON: ${{ matrix.von }}
+          SEED: ${{ needs.pruefen.outputs.seed }}
+        run: |
+          set -euo pipefail
+          mkdir -p stand
+          t0=$(date +%s)
+          bash auswertung/fuego/spielen.sh "$VON" 10 "$SEED" "$SPIELE" "$VORGABE" "stand/v$VORGABE-s$SPIELE-$VON.jsonl" | tee "stand/log-v$VORGABE-s$SPIELE-$VON.txt"
+          echo "$VORGABE/$SPIELE $(( $(date +%s) - t0 )) 10" > "stand/zeit-v$VORGABE-s$SPIELE-$VON.txt"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-${{ matrix.vorgabe }}-${{ matrix.spiele }}-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  kontrolle:
+    name: Kontrolle (Partien 1 bis 5 des kurzen Laufs)
+    needs: pruefen
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go und Werkzeuge installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo build-essential autoconf automake libtool subversion libboost-all-dev
+
+      - name: Fuego bauen
+        run: bash auswertung/fuego/bauen.sh svn gnu++14 fuego-bin
+
+      - name: 5 Partien nachspielen
+        run: |
+          set -euo pipefail
+          mkdir -p stand
+          bash auswertung/fuego/spielen.sh 1 5 218 1000 6 stand/kontrolle.jsonl | tee stand/log-kontrolle.txt
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-kontrolle
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [pruefen, spielen, kontrolle]
+    # Auch wenn ein Teil scheitert: Arme mit weniger als 27 fertigen Partien
+    # kommen für die Wahl nicht in Frage, der Bericht zeigt sie trotzdem.
+    if: always() && needs.pruefen.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: stand-*
+          path: stand
+          merge-multiple: true
+
+      - name: Bericht
+        run: |
+          set -euo pipefail
+          mkdir -p ergebnisse
+          args=(); fehlt=()
+          for v in 9 6; do
+            for s in 100 300 1000; do
+              teile=()
+              for t in 1 11 21; do
+                if [ -s "stand/v$v-s$s-$t.jsonl" ]; then teile+=("stand/v$v-s$s-$t.jsonl"); else fehlt+=("v$v-s$s-$t"); fi
+                [ -s "stand/zeit-v$v-s$s-$t.txt" ] && args+=(--zeit "stand/zeit-v$v-s$s-$t.txt")
+              done
+              args+=("$v/$s=$(IFS=,; echo "${teile[*]}")")
+              [ "${#teile[@]}" -gt 0 ] && cat "${teile[@]}" | gzip -9 > "ergebnisse/v$v-s$s.jsonl.gz"
+            done
+          done
+          [ "${#fehlt[@]}" -eq 0 ] || { echo "::warning::Teile ohne Partien: ${fehlt[*]}"; echo "Teile ohne Partien: ${fehlt[*]}" > ergebnisse/fehlende-teile.txt; }
+          if [ -s stand/kontrolle.jsonl ]; then
+            args+=(--kontrolle stand/kontrolle.jsonl docs/daten/fuego-kurz/lauf1/partien.jsonl.gz)
+            gzip -9 -c stand/kontrolle.jsonl > ergebnisse/kontrolle.jsonl.gz
+          else
+            echo "::warning::Kontrolle ohne Partien"; echo "Kontrolle ohne Partien" >> ergebnisse/fehlende-teile.txt
+          fi
+          cat stand/log-*.txt > ergebnisse/log.txt 2>/dev/null || true
+          node auswertung/fuego/pruefstand-bericht.js "${args[@]}" > ergebnisse/bericht.txt
+          { echo "## Prüfstand gegen Fuego"; echo; node auswertung/fuego/pruefstand-bericht.js "${args[@]}" --markdown; } | tee ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/fuego-pruefstand-lauf${LAUF}"
+          ziel="docs/daten/fuego-pruefstand/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Prüfstand gegen Fuego: Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"

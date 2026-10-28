@@ -358,3 +358,70 @@ Wahl wäre wie in [`teststaerke.md`](teststaerke.md) §8: nächste Siegquote an
 damit Fuego möglichst stark bleibt. Weniger Spiele machen Fuego auch
 schneller, die Dauer sinkt also eher. Festgelegt wird das in einem eigenen
 Abschnitt vor dem Lauf.
+
+## 11. Prüfstand gegen Fuego (vorab festgelegt, 28.10.2026)
+
+**Zweck.** Mit sechs Steinen und 1 000 Spielen gewann die KI keine von 15
+Partien (§10). Der Prüfstand sucht Vorgabe und Spielzahl, bei denen sie gegen
+Fuego rund die Hälfte gewinnt. Mit diesen Bedingungen werden danach Eingriffe
+auch gegen Fuego gemessen (§3, Schritte 2 und 3). Wie der Prüfstand gegen
+GNU Go ([`teststaerke.md`](teststaerke.md) §8) misst er nichts an der KI, und
+aus ihm folgt keine Änderung an `index.html`. Hazeberry hat ihn am 28.10.2026
+beauftragt.
+
+**Bedingungen.** Wie im kurzen Lauf (§9): die heutige Standard-KI
+(`endspielNetz` 0,8), Fuego aus SVN r2038 (C++14), GNU Go Stufe 1 als
+Schiedsrichter, 120 Simulationen, Aufgabe der KI aus, bis 600 Züge, Schätzung
+nach Zug 60, 120 und 200
+([`fuego-pruefstand.yml`](../.github/workflows/fuego-pruefstand.yml),
+[`auswertung/fuego/spielen.sh`](../auswertung/fuego/spielen.sh)).
+
+| Arm | Vorgabe | Spiele je Zug | Partien |
+|---|---:|---:|---:|
+| 9/100 | 9 | 100 | 30 |
+| 9/300 | 9 | 300 | 30 |
+| 9/1000 | 9 | 1 000 | 30 |
+| 6/100 | 6 | 100 | 30 |
+| 6/300 | 6 | 300 | 30 |
+| 6/1000 | 6 | 1 000 | 30 |
+
+Alle Arme spielen dieselben Partienummern mit demselben Seed. Je Arm laufen drei
+Teile zu zehn Partien, zusammen 18 Jobs.
+
+| Eingabe | Wert |
+|---|---|
+| `seed` | 219 |
+
+Seed **219** ist noch nie benutzt.
+
+**Kontrolle.** Ein eigener Job spielt die Partien 1 bis 5 des kurzen Laufs nach
+(Seed 218, Vorgabe 6, 1 000 Spiele). Erwartet: 5 von 5 mit denselben Zügen wie
+in [`fuego-kurz/lauf1`](daten/fuego-kurz/lauf1/). So zeigt sich, ob Fuego auch
+auf einem anderen Runner gleich spielt. Weicht eine Partie ab, gilt der
+Prüfstand trotzdem. Dann sind Messungen gegen Fuego aber nicht Partie für
+Partie wiederholbar, und das steht im Nachtrag.
+
+**Die Wahl, vorab festgelegt**
+([`auswertung/fuego/pruefstand-bericht.js`](../auswertung/fuego/pruefstand-bericht.js)):
+
+1. In Frage kommt ein Arm mit mindestens 27 fertigen Partien und einer
+   Siegquote der KI zwischen 25 und 75 %. Die Quote ist Siege durch fertige
+   Partien.
+2. Gewählt wird der Arm mit der Quote am nächsten an 50 %.
+3. Bei Gleichstand gewinnt die höhere Spielzahl, damit Fuego möglichst stark
+   bleibt. Danach gewinnt die kleinere Vorgabe, weil sie näher an den
+   Messungen gegen GNU Go liegt (sechs Steine).
+4. Kommt kein Arm in Frage, gibt es keine Wahl. Dann folgt ein eigener
+   Abschnitt mit neuen Armen, vorab festgelegt.
+
+**Beschrieben, ohne Anspruch.** Je Arm: Siegquote mit exaktem 95-%-Intervall
+(Clopper-Pearson), Endstand, Schätzung nach Zug 60, 120 und 200, Pässe von
+Fuego, Minuten je Partie, abgebrochene Partien mit Grund. Mit 30 Partien je Arm
+ist das Intervall breit (bei 15 Siegen 31 bis 69 %). Der Prüfstand wählt also
+eine brauchbare Bedingung, nicht die genaue Stärke von Fuego.
+
+**Erwartung vorab.** Die Siegquote steigt mit mehr Steinen und mit weniger
+Spielen. Der Arm 6/1000 liegt wie im kurzen Lauf nahe 0 %. Ob ein Arm die
+Hälfte erreicht, ist offen. Am ehesten erwartet: 9/100 oder 9/300. Dauer: eine
+Partie mit 1 000 Spielen 3 bis 4 Minuten (§10), mit weniger Spielen kürzer.
+Der längste Teil braucht also rund 40 Minuten mit dem Bau von Fuego.
