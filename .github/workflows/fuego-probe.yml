@@ -3,9 +3,10 @@ name: Fuego bauen und prüfen
 # Probe aus docs/fuego.md §2: Lässt sich Fuego als zweiter Gegner neben GNU Go
 # in GitHub Actions bauen, spricht es die GTP-Befehle des Duell-Skripts, wie
 # lange braucht ein Zug, und ist es mit festem Seed reproduzierbar? Gebaut wird
-# aus zwei Quellen (SVN r2038, Version 1.1) mit zwei C++-Standards. Nichts wird
+# aus SVN r2038 mit zwei C++-Standards. Nichts wird
 # gemessen und nichts ins Repo geschrieben; der Bericht steht in der
-# Zusammenfassung des Laufs, das Programm als Artefakt.
+# Zusammenfassung des Laufs, das Programm als Artefakt. Version 1.1 baut mit
+# heutigem Boost nicht (Lauf #1, docs/fuego.md §4); gebaut wird nur noch SVN.
 
 on:
   workflow_dispatch:
@@ -25,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        quelle: [svn, tarball]
+        quelle: [svn]
         std: [gnu++14, gnu++17]
     steps:
       - uses: actions/checkout@v7
