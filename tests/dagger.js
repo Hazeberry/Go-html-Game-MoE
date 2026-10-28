@@ -1031,7 +1031,11 @@ test('Fuego: Bau- und Probeskript lehnen falsche Eingaben ab, Stand und Prüfsum
   pruefe(/^REV=2038$/m.test(b) && /^TAR_SHA=c61d18293670c3cde8cc8b7b28ae037a85a4b8018827f2a0f93e34b165bc16ce$/m.test(b), 'fester SVN-Stand und feste Prüfsumme');
   const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'fuego-probe.yml'), 'utf8');
   pruefe(!/contents: write/.test(t), 'die Probe schreibt nicht ins Repo');
-  pruefeGleich((/quelle: \[([a-z, ]+)\]/.exec(t) || [])[1], 'svn, tarball', 'zwei Quellen');
+  pruefeGleich((/quelle: \[([a-z, ]+)\]/.exec(t) || [])[1], 'svn', 'nur SVN (1.1 baut nicht, docs/fuego.md §4)');
+  const z = temp(), attrappe = path.join(z, 'bin');
+  fs.mkdirSync(attrappe); fs.writeFileSync(path.join(attrappe, 'svn'), '#!/bin/sh\nexit 1\n', {mode: 0o755});   /* kein Download */
+  const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'fuego', 'bauen.sh'), 'svn', 'gnu++14', 'rel/ziel'], {cwd: z, encoding: 'utf8', env: {...process.env, PATH: attrappe + path.delimiter + process.env.PATH}});
+  pruefe(r.status !== 0 && fs.existsSync(path.join(z, 'rel', 'ziel')), 'bauen.sh legt den Zielordner relativ zum Aufruf an, bevor es ins Bauverzeichnis wechselt');
 });
 
 test('Workflow netz-hoch.yml: Arme, Jobs, Vorgabe und Eingaben wie in der Vorabfestlegung', () => {

@@ -54,3 +54,30 @@ GNU Go: Gleiche Partienummer heißt dort gleiche Bedingungen für beide Arme.
 3. **Messungen.** Neue Eingriffe werden gegen beide Gegner gemessen. Was
    gilt, wenn die Gegner sich widersprechen, legt die erste Vorabfestlegung mit
    Fuego fest.
+
+## 4. Nachtrag: Lauf #1 der Probe (28.10.2026)
+
+Gelaufen in GitHub Actions, Lauf #1 von `fuego-probe.yml`
+([Run 40664655973](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40664655973)),
+auf dem Merge-Commit `3277739` von `main`, in rund 2 Minuten.
+
+| Quelle | C++14 | C++17 |
+|---|---|---|
+| SVN r2038 (2019) | **gebaut** | **gebaut** |
+| Version 1.1 (2011) | Fehler beim Bauen | Fehler beim Bauen |
+
+- **SVN r2038 baut** mit dem Compiler und dem Boost von Ubuntu 24.04, ohne
+  Änderung am Code von Fuego. Der Bau dauert unter 2 Minuten.
+- **Version 1.1 baut nicht:** `GtpEngine.cpp` bricht mit „reference to ‘mutex’
+  is ambiguous“ ab. Der alte Code holt `std` und `boost` zugleich in den
+  Namensraum, und das heutige Boost kennt ein eigenes `mutex`. Da SVN läuft,
+  wird 1.1 nicht weiter verfolgt. Der Workflow baut nur noch SVN; das Skript
+  kennt 1.1 weiter, zum Nachvollziehen.
+- **Die Probe selbst lief nicht.** Das lag an einem Fehler in `bauen.sh`: Das
+  Skript wechselte ins Bauverzeichnis, bevor es den Zielordner anlegte, und
+  legte das Programm deshalb im Bauverzeichnis ab statt im Arbeitsordner. Die
+  Probe fand dann kein Programm. Behoben: Der Zielordner wird jetzt angelegt
+  und absolut gemacht, bevor das Skript wechselt. Ein Test prüft das.
+
+Die Probe wird mit dem behobenen Skript wiederholt. Ihr Ergebnis kommt als
+weiterer Nachtrag.
