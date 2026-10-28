@@ -195,6 +195,7 @@ test('Workflow pruefstand.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeSh
 test('Workflow netz-dosis.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('netz-dosis.yml', 8, 5));
 test('Workflow fuego-probe.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('fuego-probe.yml', 3, 0));
 test('Workflow fuego-kurz.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('fuego-kurz.yml', 6, 3));
+test('Workflow fuego-pruefstand.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('fuego-pruefstand.yml', 9, 1));
 test('Workflow netz-hoch.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('netz-hoch.yml', 8, 5));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
@@ -1113,6 +1114,47 @@ test('Kurzer Lauf gegen Fuego: Bericht, Spielskript und Workflow wie in der Vora
     const imFlow = (new RegExp('^      ' + name + ':\\n(?:        .*\\n)*?        default: \'([^\']*)\'', 'm').exec(t) || [])[1];
     pruefe(imDoc !== undefined && imDoc === imFlow, `Vorgabe ${name}: Dokument „${imDoc}“, Workflow „${imFlow}“`);
   }
+});
+
+test('Prüfstand gegen Fuego: Wahl, Intervall, Kontrolle und Workflow wie in der Vorabfestlegung', () => {
+  const PB = require('../auswertung/fuego/pruefstand-bericht.js');
+  const g = {name: 'fuego', spiele: 100, schiedsrichterStufe: 1};
+  /* n fertige Partien, davon k gewonnen, dazu a abgebrochene */
+  const partien = (k, n, a = 0) => Array.from({length: n + a}, (_, i) => i >= n ? {nr: i + 1, abgebrochen: 'x'}
+    : {nr: i + 1, gewonnen: i < k, endstand: i < k ? 5 : -5, schaetzung: {}, zuegeAnzahl: 2, zuege: ['D4', 'pass'], wirFarbe: 'S', beginnt: 'W', gegner: g});
+  const [u, o] = PB.intervall(15, 30);
+  pruefe(Math.abs(u - 0.3130) < 1e-3 && Math.abs(o - 0.6870) < 1e-3, `15 von 30: ${u} bis ${o}`);
+  pruefe(Math.abs(PB.intervall(0, 15)[1] - 0.2180) < 1e-3 && PB.intervall(0, 15)[0] === 0, '0 von 15: 0 bis 22 %');
+  pruefe(PB.intervall(30, 30)[1] === 1, '30 von 30: bis 100 %');
+  const w = l => { const r = PB.wahl(l); return r ? `${r.vorgabe}/${r.spiele}` : 'keine'; };
+  pruefeGleich(w([PB.arm(9, 100, partien(20, 30)), PB.arm(9, 300, partien(14, 30)), PB.arm(6, 100, partien(3, 30))]), '9/300', 'Quote am nächsten an 50 %');
+  pruefeGleich(w([PB.arm(9, 100, partien(16, 30)), PB.arm(9, 300, partien(14, 30))]), '9/300', 'gleich weit: höhere Spielzahl');
+  pruefeGleich(w([PB.arm(9, 300, partien(15, 30)), PB.arm(6, 300, partien(15, 30))]), '6/300', 'gleich weit und gleiche Spielzahl: kleinere Vorgabe');
+  pruefeGleich(w([PB.arm(9, 100, partien(13, 26, 4)), PB.arm(9, 300, partien(8, 30))]), '9/300', 'unter 27 fertigen Partien nicht in Frage');
+  pruefeGleich(w([PB.arm(9, 100, partien(7, 30)), PB.arm(6, 100, partien(0, 30))]), 'keine', 'unter 25 %: keine Wahl');
+  pruefeGleich(w([PB.arm(9, 100, partien(23, 30))]), 'keine', 'über 75 %: keine Wahl');
+  pruefeGleich(w([PB.arm(9, 100, [])]), 'keine', 'Arm ohne Partien: keine Wahl');
+  const alt = partien(2, 5), neu = JSON.parse(JSON.stringify(alt));
+  pruefeGleich(PB.kontrolle(neu, alt).ok, true, 'gleiche Züge: Kontrolle bestanden');
+  neu[3].zuege = ['D4', 'C3'];
+  const k = PB.kontrolle(neu, alt);
+  pruefeGleich(`${k.gleich} ${k.ok}`, '4 false', 'ein Zug anders: nicht bestanden');
+  pruefe(/Wahl nach §11:\*\* 9 Vorgabesteine, 300 Spiele/.test(PB.text([PB.arm(9, 300, partien(14, 30))], true, k)) && /NICHT bestanden/.test(PB.text([], false, k)), 'Bericht nennt Wahl und Kontrolle');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'fuego-pruefstand.yml'), 'utf8');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'fuego.md'), 'utf8');
+  const abschnitt = doc.slice(doc.indexOf('## 11. '));
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefeGleich(`${(/vorgabe: \[([0-9, ]+)\]/.exec(t) || [])[1]} | ${(/spiele: \[([0-9, ]+)\]/.exec(t) || [])[1]} | ${(/von: \[([0-9, ]+)\]/.exec(t) || [])[1]}`,
+    '9, 6 | 100, 300, 1000 | 1, 11, 21', 'Arme und Teile im Workflow');
+  const arme = [...abschnitt.matchAll(/^\| (\d)\/(\d+) \| (\d) \| ([\d ]+) \| 30 \|$/gm)].map(m => `${m[1]}/${m[2]}`);
+  pruefeGleich(arme.join(' '), '9/100 9/300 9/1000 6/100 6/300 6/1000', 'Arme im Dokument');
+  pruefe(/spielen\.sh "\$VON" 10 /.test(t), 'zehn Partien je Teil');
+  pruefe(/spielen\.sh 1 5 218 1000 6 /.test(t) && /fuego-kurz\/lauf1\/partien\.jsonl\.gz/.test(t), 'Kontrolle: Partien 1 bis 5 des kurzen Laufs');
+  pruefe(/bauen\.sh svn gnu\+\+14 fuego-bin/.test(t), 'Fuego aus SVN mit C++14');
+  pruefeGleich(PB.MINDESTENS, 27, 'mindestens 27 fertige Partien');
+  const imDoc = (/^\| `seed` \| `?([^` |]+)/m.exec(abschnitt) || [])[1];
+  const imFlow = (/^      seed:\n(?:        .*\n)*?        default: '([^']*)'/m.exec(t) || [])[1];
+  pruefe(imDoc !== undefined && imDoc === imFlow, `Seed: Dokument „${imDoc}“, Workflow „${imFlow}“`);
 });
 
 laufeTests('Datenaggregation, Messung und Orakel-Test: Werkzeuge und Workflows').then(ok => process.exit(ok ? 0 : 1));
