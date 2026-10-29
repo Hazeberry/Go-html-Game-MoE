@@ -1981,7 +1981,12 @@ globalThis.PARAMS = {
      Zug oefter voraus (ab Zug 81 27,7 % statt 19,3 %), spielte gegen GNU Go
      aber schlechter: -11,0 Punkte ueber 240 Paare (p = 0,04). Bessere
      Vorhersage ist nicht bessere Zugwahl. Code und Tabelle stehen in Commit
-     6edae5d (Schalter musterTabelle), docs/muster-ausbau.md. */
+     6edae5d (Schalter musterTabelle), docs/muster-ausbau.md.
+     OHNE VORGABE GEMESSEN (docs/leeres-brett.md §9, 480 Paare gegen GNU Go
+     Stufe 1, 120 Simulationen, Seed 222): Muster aus +14,3 [+7,8; +20,8]
+     (98,3 %), vor allem als Weiss; mit sechs Steinen +2,0. Gegen GNU Go
+     schaden die Muster ohne Vorgabe, im Selbstspiel helfen sie. Kein Default
+     geaendert; eine eigene Vorabfestlegung steht aus. */
   musterGewicht:    200,
   /* Muster erst ab dieser Zugzahl (mc >= musterAb), davor zaehlt nur
      evaluateMove. Anlass: In Stufe A der Komponentenmessung lag die KI ohne
