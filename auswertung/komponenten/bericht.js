@@ -2,9 +2,13 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Bericht der Komponentenmessung, Stufe A (docs/komponenten.md §4) und
    Stufe B (docs/komponenten-b.md §4), und der Muster-Eröffnung
-   (--stufe M, docs/muster-eroeffnung.md §4). Stufe A und B urteilen nicht,
-   sie nennen Intervalle; M nennt dazu das vorab festgelegte Urteil über M1
-   (besser gegen beide Gegner, schlechter gegen einen, sonst nicht belegt).
+   (--stufe M, docs/muster-eroeffnung.md §4) und der Baum-Übernahme
+   (--stufe T bei 120, --stufe T6 bei 600 Simulationen,
+   docs/baum-uebernahme.md §4). Stufe A und B urteilen nicht, sie nennen
+   Intervalle; M nennt dazu das vorab festgelegte Urteil über M1 (besser
+   gegen beide Gegner, schlechter gegen einen, sonst nicht belegt); T und T6
+   prüfen Nichtunterlegenheit: Untergrenze des 95-%-Intervalls gegen beide
+   Gegner über der Grenze (T −10; T6 −20 und dazu der Mittelwert über −5).
    Je Gegner (g: GNU Go, f: Fuego):
 
      1. jeder Arm gegen D, Endstand nach GNU Gos Zählung, gepaart nach
@@ -34,7 +38,7 @@
    Partner heraus.
 
    Aufruf:
-     node auswertung/komponenten/bericht.js [--stufe A|B|M] --arm g:D=a.jsonl,b.jsonl --arm g:N0=... --arm f:D=... ...
+     node auswertung/komponenten/bericht.js [--stufe A|B|M|T|T6] --arm g:D=a.jsonl,b.jsonl --arm g:N0=... --arm f:D=... ...
           [--kontrolle g=neu.jsonl,alt.jsonl.gz] [--kontrolle f=...]
    Die Ausgabe ist Markdown. */
 'use strict';
@@ -47,7 +51,9 @@ const SIEBEN = ['R0', 'T0', 'W0', 'E0', 'P0', 'BE0', 'BF0'];
 const STUFEN = {
   A: {vergleiche: ['B', 'N0', 'M0', 'NM0', 'R0'], wechsel: ['NM0', ['N0', 'M0']], probe: 'N0'},
   B: {vergleiche: [...SIEBEN, 'O7'], wechsel: ['O7', SIEBEN], probe: null},
-  M: {vergleiche: ['A40', 'A80'], wechsel: null, probe: null, proben: [['A40', 'M0', 40], ['A80', 'M0', 80]], urteil: true}
+  M: {vergleiche: ['A40', 'A80'], wechsel: null, probe: null, proben: [['A40', 'M0', 40], ['A80', 'M0', 80]], urteil: true},
+  T: {vergleiche: ['T0'], wechsel: null, probe: null, ni: {grenze: -10}},
+  T6: {vergleiche: ['T0'], wechsel: null, probe: null, ni: {grenze: -20, punkt: -5}}
 };
 for (const s of Object.values(STUFEN)) s.alpha = 0.05 / s.vergleiche.length;
 const ALPHA = STUFEN.A.alpha, ALPHA_I = 0.05 / 2;
@@ -128,6 +134,16 @@ function urteilM(gegner, arm) {
   return 'nicht belegt';
 }
 
+/* Nichtunterlegenheit (docs/baum-uebernahme.md §4): gegen beide Gegner liegt
+   die Untergrenze über der Grenze und, falls verlangt, der Mittelwert über
+   der Punktgrenze */
+function urteilNI(gegner, arm, ni) {
+  const v = ['g', 'f'].map(o => gegner[o] && gegner[o].vergleiche && gegner[o].vergleiche.find(x => x.arm === arm));
+  if (v.some(x => !x || !x.g)) return 'unvollständig';
+  const ok = v.every(x => x.g.lo > ni.grenze && (ni.punkt === undefined || x.g.m > ni.punkt));
+  return ok ? 'nicht unterlegen gegen beide Gegner' : 'Nichtunterlegenheit nicht gezeigt';
+}
+
 /* Unterschied der Gegner Δ_f − Δ_g (unabhängige Partien, Welch) */
 function gegnerUnterschied(vg, vf, alpha = ALPHA) {
   if (!vg.g || !vf.g) return null;
@@ -163,7 +179,8 @@ function auswertung(daten, stufe = 'A') {
       if (vf) unterschied.push({arm: vg.arm, ...gegnerUnterschied(vg, vf, st.alpha)});
     }
   }
-  const urteile = st.urteil ? st.vergleiche.map(a => ({arm: a, urteil: urteilM(aus, a)})) : [];
+  const urteile = st.urteil ? st.vergleiche.map(a => ({arm: a, urteil: urteilM(aus, a)}))
+    : st.ni ? st.vergleiche.map(a => ({arm: a, urteil: urteilNI(aus, a, st.ni)})) : [];
   return {stufe, alpha: st.alpha, gegner: aus, unterschied, urteile};
 }
 
@@ -202,7 +219,8 @@ function text(a, kontrollen = {}) {
     for (const u of a.unterschied) aus.push(`| ${u.arm} | ${z1(u.m)} | ${Number.isFinite(u.lo) ? `[${z1(u.lo)}; ${z1(u.hi)}]` : '–'} | ${z2(u.std)} |`);
   }
   if (a.urteile && a.urteile.length) {
-    aus.push('', '## Urteil über M1 (vorab festgelegt)', '');
+    const ni = STUFEN[a.stufe].ni;
+    aus.push('', ni ? `## Urteil: Nichtunterlegenheit (Grenze ${z1(ni.grenze)}${ni.punkt !== undefined ? `, Mittelwert über ${z1(ni.punkt)}` : ''}; vorab festgelegt)` : '## Urteil über M1 (vorab festgelegt)', '');
     for (const u of a.urteile) aus.push(`- ${u.arm}: **${u.urteil}**`);
   }
   return aus.join('\n');
@@ -232,11 +250,11 @@ function main() {
     } else { fehler = true; break; }
   }
   if (fehler || !Object.keys(daten).length) {
-    console.error('Aufruf: node auswertung/komponenten/bericht.js [--stufe A|B|M] --arm g:D=a.jsonl,... --arm g:N0=... [--kontrolle g=neu.jsonl,alt.jsonl.gz]');
+    console.error('Aufruf: node auswertung/komponenten/bericht.js [--stufe A|B|M|T|T6] --arm g:D=a.jsonl,... --arm g:N0=... [--kontrolle g=neu.jsonl,alt.jsonl.gz]');
     process.exit(2);
   }
   console.log(text(auswertung(daten, stufe), kontrollen));
 }
 
 if (require.main === module) main();
-module.exports = {auswertung, text, vergleich, wechselwirkung, gegnerUnterschied, ersteAbweichung, probe, urteilM, stat, tKrit, STUFEN, ALPHA, ALPHA_I, NETZ_AB};
+module.exports = {auswertung, text, vergleich, wechselwirkung, gegnerUnterschied, ersteAbweichung, probe, urteilM, urteilNI, stat, tKrit, STUFEN, ALPHA, ALPHA_I, NETZ_AB};

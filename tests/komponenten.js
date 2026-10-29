@@ -25,6 +25,10 @@
         (fester Seed 220, Selbstspiel ohne Aufgabe) und Ergebnisskript stimmen
         überein; der Bericht rechnet mit alpha 0,05/2, prüft A40 und A80
         gegen M0 und urteilt über M1 nach der vorab festgelegten Regel.
+     7. Baum-Übernahme (docs/baum-uebernahme.md): Arme in arme-t.sh, SIMS
+        in spielen.sh, Teile und Seeds in Dokument, Workflow und
+        Ergebnisskript; der Bericht prüft Nichtunterlegenheit (Grenze −10,
+        bei 600 Simulationen −20 und Mittelwert über −5).
 
    Aufruf:  node tests/komponenten.js */
 'use strict';
@@ -85,7 +89,7 @@ test('Arme und Partien: Dokument, Workflow und Bericht stimmen überein', () => 
   pruefe(e.includes('netz-dosis/lauf1/L8.jsonl.gz') && e.includes('fuego-pruefstand/lauf1/v6-s100.jsonl.gz'), 'Kontrolldateien im Ergebnisskript');
   for (const d of ['docs/daten/netz-dosis/lauf1/L8.jsonl.gz', 'docs/daten/fuego-pruefstand/lauf1/v6-s100.jsonl.gz']) pruefe(fs.existsSync(path.join(wurzel, d)), `${d} liegt im Repo`);
   const sp = fs.readFileSync(SPIELEN, 'utf8');
-  pruefe(/--vorgabe 6/.test(sp) && /--fuego-spiele 100/.test(sp) && /--stufe 1/.test(sp) && /--gnugo-aufgabe 0/.test(sp) && /mctsFixedSims=120,resignEnabled=0/.test(sp) && /--maxzuege 600/.test(sp) && /40,80,120,200/.test(sp), 'Bedingungen in spielen.sh');
+  pruefe(/--vorgabe 6/.test(sp) && /--fuego-spiele 100/.test(sp) && /--stufe 1/.test(sp) && /--gnugo-aufgabe 0/.test(sp) && /sims=\$\{SIMS:-120\}/.test(sp) && /mctsFixedSims=\$sims,resignEnabled=0/.test(sp) && /--maxzuege 600/.test(sp) && /40,80,120,200/.test(sp), 'Bedingungen in spielen.sh');
   const imDoc = (/^\| `seed` \| `?([^` |]+)/m.exec(doc) || [])[1];
   const imFlow = (/^      seed:\n(?:        .*\n)*?        default: '([^']*)'/m.exec(t) || [])[1];
   pruefe(imDoc !== undefined && imDoc === imFlow, `Seed: Dokument „${imDoc}“, Workflow „${imFlow}“`);
@@ -279,4 +283,51 @@ test('Muster-Eröffnung, Bericht: alpha 0,05/2, Probe gegen M0, Urteil über M1'
   pruefe(/0,05\/2 \(97,5 %\)/.test(md) && /Urteil über M1/.test(md) && !/Wechselwirkung/.test(md), 'Bericht: alpha, Urteil, keine Wechselwirkung');
 });
 
-laufeTests('Komponenten Stufe A, B und Muster-Eröffnung').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
+/* ── Baum-Übernahme (docs/baum-uebernahme.md) ────────────────────────── */
+test('Baum-Übernahme: Arme, Dokument, Workflow und Ergebnisskript stimmen überein', () => {
+  const ARME_T = path.join(wurzel, 'auswertung', 'komponenten', 'arme-t.sh');
+  const ki = arm => execFileSync('bash', [SPIELEN, '--ki', arm], {encoding: 'utf8', env: {...process.env, ARME: ARME_T}}).trim();
+  pruefeGleich(`${ki('D')} | ${ki('T0')}`, 'mctsFixedSims=120,resignEnabled=0 | mctsFixedSims=120,resignEnabled=0,mctsTreeReuse=0', 'Arme D und T0');
+  pruefeGleich(execFileSync('bash', [SPIELEN, '--ki', 'T0'], {encoding: 'utf8', env: {...process.env, ARME: ARME_T, SIMS: '600'}}).trim(), 'mctsFixedSims=600,resignEnabled=0,mctsTreeReuse=0', 'SIMS 600');
+  for (const v of ['0', 'x', '200000']) pruefeGleich(spawnSync('bash', [SPIELEN, '--ki', 'D'], {encoding: 'utf8', env: {...process.env, SIMS: v}}).status, 2, `SIMS ${v} abgelehnt`);
+  pruefeGleich(standard('mctsTreeReuse'), 1, 'Default heute 1');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'baum-uebernahme.md'), 'utf8');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'baum-uebernahme.yml'), 'utf8');
+  const e = fs.readFileSync(path.join(wurzel, 'auswertung', 'komponenten', 'ergebnis-t.sh'), 'utf8');
+  const liste = (name, was) => { const x = t.slice(t.indexOf(`\n  ${name}:\n`)); return (new RegExp(`${was}: \\[([^\\]]+)\\]`).exec(x) || [])[1].split(',').map(v => v.trim()); };
+  const zeile = sims => (new RegExp(`^\\| [^|]+ \\| ${sims} \\| (\\d+) \\| GNU Go (\\d+) zu (\\d+), Fuego (\\d+) zu (\\d+) \\|$`, 'm').exec(doc) || []).slice(1).map(Number);
+  for (const [sims, gn, fn] of [[120, 'gnugo-120', 'fuego-120'], [600, 'gnugo-600', 'fuego-600']]) {
+    const [paare, gt, gg, ft, fg] = zeile(sims);
+    pruefe(gt * gg === paare && ft * fg === paare, `${sims} Simulationen: Teile im Dokument ergeben ${paare} Paare`);
+    for (const [name, teile, gr] of [[gn, gt, gg], [fn, ft, fg]]) {
+      pruefeGleich(liste(name, 'arm').join(' '), 'D T0', `${name}: Arme`);
+      const von = liste(name, 'von').map(Number);
+      pruefe(von.length === teile && von.every((v, i) => v === 1 + i * gr), `${name}: ${teile} Teile zu ${gr}`);
+      const x = t.slice(t.indexOf(`\n  ${name}:\n`));
+      pruefe(new RegExp(`spielen\\.sh ${name[0]} "\\$ARM" "\\$VON" ${gr} "\\$SEED" "stand/s${sims}-`).test(x), `${name}: ${gr} Partien je Teil, Dateien s${sims}`);
+      pruefe(sims === 600 ? /SIMS: '600'/.test(x.slice(0, x.indexOf('Partien sichern'))) : !/SIMS:/.test(x.slice(0, x.indexOf('Partien sichern'))), `${name}: Simulationen ${sims}`);
+    }
+  }
+  pruefe(!/inputs:/.test(t) && /^  SEED: '221'$/m.test(t) && /^  SEED_M2: '20262401'$/m.test(t) && doc.includes('**221**') && doc.includes('**20262401**'), 'Seeds 221 und 20262401 in Workflow und Dokument');
+  pruefe(/spielen\.sh g D 1 20 220 /.test(t) && /spielen\.sh f D 1 20 220 /.test(t), 'Kontrollen mit Seed 220');
+  pruefe(/selbstspiel-spielen\.sh T0 "\$TEIL" "\$SEED_M2"/.test(t) && /ARME_DATEI: auswertung\/komponenten\/arme-t\.sh/.test(t), 'Selbstspiel T0 gegen D');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefe(/sammle 120 g 30 32/.test(e) && /sammle 120 f 60 16/.test(e) && /sammle 600 g 8 30/.test(e) && /sammle 600 f 15 16/.test(e) && /--stufe T /.test(e) && /--stufe T6 /.test(e), 'Ergebnisskript sammelt die Teile wie der Workflow');
+});
+
+test('Baum-Übernahme, Bericht: Nichtunterlegenheit mit Grenze −10, bei 600 Simulationen −20 und Mittelwert über −5', () => {
+  pruefeGleich(`${K.STUFEN.T.alpha} ${K.STUFEN.T.ni.grenze} ${K.STUFEN.T6.ni.grenze} ${K.STUFEN.T6.ni.punkt}`, '0.05 -10 -20 -5', 'Stufen T und T6');
+  const v = (lo, m) => ({vergleiche: [{arm: 'T0', g: {lo, m, hi: m + 5}}]});
+  pruefeGleich(K.urteilNI({g: v(-9, -4), f: v(-8, 0)}, 'T0', K.STUFEN.T.ni), 'nicht unterlegen gegen beide Gegner', 'beide über −10');
+  pruefeGleich(K.urteilNI({g: v(-11, -6), f: v(-8, 0)}, 'T0', K.STUFEN.T.ni), 'Nichtunterlegenheit nicht gezeigt', 'GNU Go unter −10');
+  pruefeGleich(K.urteilNI({g: v(-15, -6), f: v(-12, -2)}, 'T0', K.STUFEN.T6.ni), 'Nichtunterlegenheit nicht gezeigt', '600: Mittelwert −6 unter −5');
+  pruefeGleich(K.urteilNI({g: v(-15, -4), f: v(-12, -2)}, 'T0', K.STUFEN.T6.ni), 'nicht unterlegen gegen beide Gegner', '600: über −20, Mittel über −5');
+  pruefeGleich(K.urteilNI({g: v(-9, -4)}, 'T0', K.STUFEN.T.ni), 'unvollständig', 'ein Gegner fehlt');
+  const r = nr => ((nr * 13) % 7) - 3;
+  const arm = f => new Map(Array.from({length: 30}, (_, i) => i + 1).map(nr => [nr, {nr, endstand: f(nr), gewonnen: f(nr) > 0, schaetzung: {}, zuege: ['D4']}]));
+  const D = arm(nr => 4 * r(nr)), T0 = arm(nr => 4 * r(nr) + r(nr + 1));
+  const md = K.text(K.auswertung({g: {D, T0}, f: {D, T0}}, 'T'));
+  pruefe(/\(95 %\)/.test(md) && /Nichtunterlegenheit \(Grenze −10,0; vorab festgelegt\)/.test(md) && /nicht unterlegen gegen beide Gegner/.test(md), 'Bericht nennt Grenze und Urteil');
+});
+
+laufeTests('Komponenten Stufe A, B und Muster-Eröffnung, Baum-Übernahme').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
