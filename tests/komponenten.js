@@ -1,6 +1,7 @@
 // Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
-/* Stufe A der Komponentenmessung (docs/komponenten.md).
+/* Stufe A (docs/komponenten.md) und Stufe B (docs/komponenten-b.md) der
+   Komponentenmessung.
 
      1. Die Arme in auswertung/komponenten/arme.sh: jeder Parameter steht mit
         Default in index.html, jede Abschaltung ändert den Default, B schaltet
@@ -14,6 +15,11 @@
         Partienummer mit alpha 0,05/2, Unterschied der Gegner nach Welch,
         Probe der ersten 80 Züge, Kontrolle.
      4. spielen.sh lehnt falsche Eingaben ab.
+     5. Stufe B: die Arme in arme-b.sh (je einer der sieben Zusätze, O7 alle
+        sieben, D und R0 wie in Stufe A), Dokument, Workflow (fester Seed
+        220, keine Eingaben) und Ergebnisskript stimmen überein; der Bericht
+        rechnet mit alpha 0,05/8, die Wechselwirkung über die sieben und die
+        erste Abweichung von D.
 
    Aufruf:  node tests/komponenten.js */
 'use strict';
@@ -144,4 +150,71 @@ test('spielen.sh lehnt falsche Eingaben ab', () => {
   pruefeGleich(execFileSync('bash', [SPIELEN, '--ki', 'R0'], {encoding: 'utf8'}).trim(), 'mctsFixedSims=120,resignEnabled=0,raveEnabled=0', '--ki R0');
 });
 
-laufeTests('Komponenten Stufe A').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
+/* ── Stufe B (docs/komponenten-b.md) ─────────────────────────────────── */
+const ARME_B = path.join(wurzel, 'auswertung', 'komponenten', 'arme-b.sh');
+const armKiB = Object.fromEntries(execFileSync('bash', ['-c', `source "${ARME_B}"; for a in "\${ARM_REIHE[@]}"; do echo "$a=\${ARM_KI[$a]}"; done`], {encoding: 'utf8'})
+  .trim().split('\n').map(z => [z.slice(0, z.indexOf('=')), z.slice(z.indexOf('=') + 1)]));
+const SIEBEN = NEUN.filter(k => k !== 'musterGewicht' && k !== 'endspielNetz');
+
+test('Stufe B, Arme: jeder Einzelarm schaltet genau einen der sieben ab, O7 alle sieben, D und R0 wie in Stufe A', () => {
+  pruefeGleich(Object.keys(armKiB).join(' '), 'D R0 T0 W0 E0 P0 BE0 BF0 O7', 'Reihe der Arme');
+  pruefeGleich(`${armKiB.D}|${armKiB.R0}`, `${armKi.D}|${armKi.R0}`, 'D und R0 wie in Stufe A');
+  const einzeln = ['R0', 'T0', 'W0', 'E0', 'P0', 'BE0', 'BF0'].map(a => zerlege(armKiB[a]));
+  for (const [i, e] of einzeln.entries()) {
+    pruefeGleich(Object.keys(e).length, 1, `${Object.keys(armKiB)[i + 1]}: genau eine Abschaltung`);
+    for (const [k, w] of Object.entries(e)) pruefe(SIEBEN.includes(k) && +w === 0 && standard(k) > 0, `${k}=${w} ist einer der sieben und schaltet ab (Default ${standard(k)})`);
+  }
+  pruefeGleich(einzeln.map(e => Object.keys(e)[0]).sort().join(' '), SIEBEN.slice().sort().join(' '), 'die Einzelarme decken die sieben ab');
+  const b = zerlege(armKi.B); delete b.musterGewicht; delete b.endspielNetz;
+  pruefeGleich(JSON.stringify(zerlege(armKiB.O7), Object.keys(b).sort()), JSON.stringify(b, Object.keys(b).sort()), 'O7 = B aus Stufe A ohne Netz und Muster');
+  pruefeGleich(execFileSync('bash', [SPIELEN, '--ki', 'P0'], {encoding: 'utf8', env: {...process.env, ARME: ARME_B}}).trim(), 'mctsFixedSims=120,resignEnabled=0,mctsPriorSharp=0', 'spielen.sh liest ARME');
+  pruefeGleich(spawnSync('bash', [SPIELEN, '--ki', 'D'], {encoding: 'utf8', env: {...process.env, ARME: path.join(ordner, 'fehlt.sh')}}).status, 2, 'fehlende Datei der Arme');
+});
+
+test('Stufe B, Dokument, Workflow und Ergebnisskript stimmen überein', () => {
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'komponenten-b.md'), 'utf8');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'komponenten-b.yml'), 'utf8');
+  const e = fs.readFileSync(path.join(wurzel, 'auswertung', 'komponenten', 'ergebnis-b.sh'), 'utf8');
+  const zeilen = [...doc.matchAll(/^\| (D|R0|T0|W0|E0|P0|BE0|BF0|O7) \| (?:`([^`]*)`|–) \| (\d+) \|/gm)];
+  pruefeGleich(zeilen.map(m => m[1]).join(' '), Object.keys(armKiB).join(' '), 'Arme im Dokument');
+  for (const m of zeilen) pruefeGleich(m[2] || '', armKiB[m[1]], `${m[1]}: Abschaltung wie in arme-b.sh`);
+  const partien = Object.fromEntries(zeilen.map(m => [m[1], +m[3]]));
+  pruefeGleich(`${partien.D} ${partien.R0}`, '480 240', 'D und R0 so viele Partien wie in Stufe A');
+  const liste = (name, was) => { const x = t.slice(t.indexOf(`\n  ${name}:\n`)); return (new RegExp(`${was}: \\[([^\\]]+)\\]`).exec(x) || [])[1].split(',').map(v => v.trim()); };
+  for (const [name, gr] of [['gnugo', 20], ['fuego', 40]]) {
+    pruefeGleich(liste(name, 'arm').join(' '), 'T0 W0 E0 P0 BE0 BF0 O7', `${name}: die sieben neuen Arme, nicht D und R0`);
+    const von = liste(name, 'von').map(Number);
+    pruefe(von.every((v, i) => v === 1 + i * gr) && von.length * gr === 480, `${name}: Teile zu ${gr}, zusammen 480`);
+    pruefe(new RegExp(`spielen\\.sh ${name[0]} "\\$ARM" "\\$VON" ${gr} "\\$SEED"`).test(t), `${name}: ${gr} Partien je Teil mit dem festen Seed`);
+  }
+  pruefe(!/inputs:/.test(t) && /^  SEED: '220'$/m.test(t) && /^  ARME: auswertung\/komponenten\/arme-b\.sh$/m.test(t), 'fester Seed 220, keine Eingaben, Arme aus arme-b.sh');
+  const seedB = (/^\| `seed` \| `?([^` |]+)/m.exec(doc) || [])[1];
+  const seedA = (/^\| `seed` \| `?([^` |]+)/m.exec(fs.readFileSync(path.join(wurzel, 'docs', 'komponenten.md'), 'utf8')) || [])[1];
+  pruefe(seedB === '220' && seedA === '220', `Seed im Dokument ${seedB}, in Stufe A ${seedA}`);
+  pruefe(/spielen\.sh g D 1 20 "\$SEED" /.test(t) && /spielen\.sh f D 1 20 "\$SEED" /.test(t), 'Kontrollen: D, Partien 1 bis 20');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefe(/for alt in D R0/.test(e) && /--stufe B/.test(e), 'Ergebnisskript nimmt D und R0 aus Stufe A und rechnet Stufe B');
+  for (const o of ['g', 'f']) for (const a of ['D', 'R0']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'komponenten', 'lauf1', `${o}-${a}.jsonl.gz`)), `Stufe A: ${o}-${a} liegt im Repo`);
+});
+
+test('Stufe B, Bericht: alpha 0,05/8, Wechselwirkung über die sieben, erste Abweichung', () => {
+  pruefeGleich(K.STUFEN.B.alpha, 0.05 / 8, 'alpha 0,05/8');
+  pruefeGleich(K.STUFEN.B.vergleiche.join(' '), 'R0 T0 W0 E0 P0 BE0 BF0 O7', 'acht Vergleiche');
+  pruefeGleich(`${K.ersteAbweichung(['a', 'b', 'c'], ['a', 'x', 'c'])} ${K.ersteAbweichung(['a', 'b'], ['a', 'b'])} ${K.ersteAbweichung(['a'], ['a', 'b'])}`, '2 null 2', 'erste Abweichung');
+  const zuege = n => Array.from({length: 10}, (_, i) => i < n ? 'D4' : 'Q16');
+  const arm = (f, ab = 10) => new Map(Array.from({length: 30}, (_, i) => i + 1).map(nr => [nr, {nr, endstand: f(nr), gewonnen: f(nr) > 0, schaetzung: {}, zuege: zuege(ab)}]));
+  const r = nr => ((nr * 13) % 7) - 3;
+  const D = arm(nr => 10 + 4 * r(nr));
+  const daten = {D};
+  const sieben = ['R0', 'T0', 'W0', 'E0', 'P0', 'BE0', 'BF0'];
+  sieben.forEach((a, i) => { daten[a] = arm(nr => 10 + 4 * r(nr) - (i + 1), 3 + i); });
+  daten.O7 = arm(nr => 10 + 4 * r(nr) - 40, 2);   /* Summe der sieben: −28, zusammen −40 → I = −12 */
+  const a = K.auswertung({g: daten}, 'B');
+  pruefe(Math.abs(a.gegner.g.wechselwirkung.m - (-12)) < 1e-9, `I = −40 − (−28) = −12: ${a.gegner.g.wechselwirkung.m}`);
+  const p0 = a.gegner.g.vergleiche.find(v => v.arm === 'P0');
+  pruefe(Math.abs(p0.g.m - (-5)) < 1e-9 && p0.abweichung === 8, `P0: −5, weicht ab Zug 8 ab: ${p0.g.m}, ${p0.abweichung}`);
+  pruefe(/0,05\/8 \(99,4 %\)/.test(K.text(a)) && /Δ_O7 − Δ_R0 − Δ_T0/.test(K.text(a)), 'Bericht nennt alpha und die Wechselwirkung');
+  pruefeGleich(K.auswertung({g: daten}).gegner.g.vergleiche.map(v => v.arm).join(' '), 'R0', 'ohne Stufe B: nur die Arme von Stufe A (hier R0)');
+});
+
+laufeTests('Komponenten Stufe A und B').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });

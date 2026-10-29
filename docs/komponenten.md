@@ -325,7 +325,7 @@ Stufe A urteilt nicht und wählt keinen Default. Was die Intervalle zeigen:
   sitzt aber gerade bei diesen sieben. Stufe B sollte sie deshalb gegen beide
   Gegner einzeln abschalten, auf D und nicht auf B. Bisher ist ihr Beitrag nur
   auf der Engine ohne Netz und Muster bekannt. Sie bekommt eine eigene
-  Vorabfestlegung.
+  Vorabfestlegung: [`komponenten-b.md`](komponenten-b.md).
 - **Die Muster in der Eröffnung** wären ein eigener Versuch: Muster erst ab Zug
   40 oder 80 (`musterGewicht@N`). Auch das nur mit Vorabfestlegung.
 - **Für die Planung** ist die SD der Differenzen gegen Fuego bei 74 bis 83

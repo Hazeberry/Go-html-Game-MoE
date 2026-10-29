@@ -11,14 +11,18 @@
 # Beide: sechs Vorgabesteine, 120 Simulationen, Aufgabe der KI aus, GNU Go
 # gibt nicht auf, bis 600 Züge, Schätzung nach Zug 40, 80, 120 und 200
 # (SCHAETZUNG ändert die Liste, für die Kontrollen). GNUGO nennt GNU Go
-# (Standard /usr/games/gnugo). Die Arme stehen in arme.sh.
+# (Standard /usr/games/gnugo). Die Arme stehen in arme.sh (Stufe A); ARME
+# nennt eine andere Datei mit demselben Aufbau (arme-b.sh für Stufe B,
+# docs/komponenten-b.md).
 #
 # Aufruf: bash auswertung/komponenten/spielen.sh <g|f> <arm> <von> <anzahl> <seed> <roh.jsonl>
 #         bash auswertung/komponenten/spielen.sh --ki <arm>   (nur die --ki-Angabe ausgeben)
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
+arme=${ARME:-$here/arme.sh}
+[ -f "$arme" ] || { echo "Datei der Arme fehlt: $arme" >&2; exit 2; }
 # shellcheck source=arme.sh
-source "$here/arme.sh"
+source "$arme"
 
 ki_von() {
   local a=$1 bekannt=0 x

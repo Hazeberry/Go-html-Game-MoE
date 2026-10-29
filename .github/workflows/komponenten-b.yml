@@ -1,0 +1,260 @@
+name: Komponenten Stufe B
+
+# Manueller Lauf aus docs/komponenten-b.md: auf dem vollen Default D je einer
+# der sieben Zusätze aus (T0, W0, E0, P0, BE0, BF0) und alle sieben zusammen
+# (O7), gegen GNU Go Stufe 1 und gegen Fuego mit 100 Spielen, sechs
+# Vorgabesteine, je 480 Partien. Seed 220 wie in Stufe A: D und R0 werden
+# nicht neu gespielt, ihre Partien kommen aus docs/daten/komponenten/lauf1.
+# Zwei Kontrollen spielen je 20 Partien von D nach; sie müssen Zug für Zug
+# gleich ausgehen wie in Stufe A. Stufe B wählt keinen Default.
+#
+# Ablauf:
+#   fuego-bauen   Fuego einmal bauen (SVN r2038, C++14), für alle Fuego-Jobs
+#   gnugo         7 Arme gegen GNU Go × 24 Teile zu 20 Partien
+#   fuego         7 Arme gegen Fuego × 12 Teile zu 40 Partien
+#   kontrolle-g   D gegen GNU Go, Partien 1 bis 20 (wie in Stufe A)
+#   kontrolle-f   D gegen Fuego, Partien 1 bis 20 (wie in Stufe A)
+#   ergebnis      Bericht, Rohdaten gepackt, Branch ergebnisse/komponenten-b-lauf<N>
+
+# Keine Eingaben: Der Seed muss der von Stufe A sein, sonst passen die Partien
+# von D und R0 nicht zu den neuen Armen.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: komponenten-b
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  SEED: '220'
+  ARME: auswertung/komponenten/arme-b.sh
+
+jobs:
+  fuego-bauen:
+    name: Fuego bauen
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Werkzeuge installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential autoconf automake libtool subversion libboost-all-dev
+
+      - name: Bauen
+        run: bash auswertung/fuego/bauen.sh svn gnu++14 fuego-bin
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin/
+          retention-days: 7
+
+  gnugo:
+    name: GNU Go, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [T0, W0, E0, P0, BE0, BF0, O7]
+        von: [1, 21, 41, 61, 81, 101, 121, 141, 161, 181, 201, 221, 241, 261, 281, 301, 321, 341, 361, 381, 401, 421, 441, 461]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: 20 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+        run: bash auswertung/komponenten/spielen.sh g "$ARM" "$VON" 20 "$SEED" "stand/g-$ARM-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-g-${{ matrix.arm }}-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  fuego:
+    name: Fuego, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    needs: fuego-bauen
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [T0, W0, E0, P0, BE0, BF0, O7]
+        von: [1, 41, 81, 121, 161, 201, 241, 281, 321, 361, 401, 441]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go und Bibliotheken installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo libboost-all-dev
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin
+
+      - name: 40 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+        run: |
+          set -euo pipefail
+          chmod +x fuego-bin/fuego
+          bash auswertung/komponenten/spielen.sh f "$ARM" "$VON" 40 "$SEED" "stand/f-$ARM-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-f-${{ matrix.arm }}-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  kontrolle-g:
+    name: Kontrolle GNU Go (D, Partien 1 bis 20 wie in Stufe A)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: 20 Partien nachspielen
+        run: bash auswertung/komponenten/spielen.sh g D 1 20 "$SEED" stand/kontrolle-g.jsonl
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-kontrolle-g
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  kontrolle-f:
+    name: Kontrolle Fuego (D, Partien 1 bis 20 wie in Stufe A)
+    needs: fuego-bauen
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go und Bibliotheken installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo libboost-all-dev
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin
+
+      - name: 20 Partien nachspielen
+        run: |
+          set -euo pipefail
+          chmod +x fuego-bin/fuego
+          bash auswertung/komponenten/spielen.sh f D 1 20 "$SEED" stand/kontrolle-f.jsonl
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-kontrolle-f
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [gnugo, fuego, kontrolle-g, kontrolle-f]
+    # Auch wenn ein Teil scheitert: Der Bericht nennt die Paare, die da sind,
+    # und fehlende-teile.txt die, die fehlen.
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: stand-*
+          path: stand
+          merge-multiple: true
+
+      - name: Bericht
+        run: bash auswertung/komponenten/ergebnis-b.sh
+
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/komponenten-b-lauf${LAUF}"
+          ziel="docs/daten/komponenten-b/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Komponenten Stufe B: Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"

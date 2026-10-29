@@ -197,6 +197,7 @@ test('Workflow fuego-probe.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeS
 test('Workflow fuego-kurz.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('fuego-kurz.yml', 6, 3));
 test('Workflow fuego-pruefstand.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('fuego-pruefstand.yml', 9, 1));
 test('Workflow komponenten.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('komponenten.yml', 17, 1));
+test('Workflow komponenten-b.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('komponenten-b.yml', 12, 0));
 test('Workflow netz-hoch.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('netz-hoch.yml', 8, 5));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];
