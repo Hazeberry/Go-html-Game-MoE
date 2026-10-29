@@ -131,3 +131,64 @@ Laufzeit**, bestimmt von M2.
 
 Der Nachtrag wendet das Urteil aus §4 an und ordnet es ein. Kein Default
 ändert sich.
+
+## 9. Nachtrag: Ergebnis von Lauf 1 (29.10.2026)
+
+[Workflow-Lauf 40957619160](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40957619160)
+auf Merge `1777a60`, von 21:25 bis 23:00 UTC (26 Runner-Stunden, wie
+geschätzt). Die Laufzeit lag mit gut eineinhalb Stunden über der Schätzung
+(§7), weil höchstens 20 Jobs gleichzeitig laufen und ein Teil von M2 auf die
+Jobs von M1 warten musste. Ein Job von M2 brauchte im Mittel 66 Minuten.
+Alle 38 Jobs sind grün, es fehlt kein Teil. Daten:
+[`docs/daten/pwa-vergleich/lauf1/`](daten/pwa-vergleich/lauf1/), der volle
+Bericht in [`bericht.md`](daten/pwa-vergleich/lauf1/bericht.md).
+
+**Der Lauf ist sauber.** Keine Partie ist abgebrochen, keine lief bis zum
+Zuglimit. Die Kontrolle ist bestanden (20 von 20 Partien Zug für Zug gleich),
+die Gleichstandsprobe K1 auch.
+
+| Teil | Siege N | Rate | 95 % | Endstand aus Sicht von N | Urteil nach §4 |
+|---|---:|---:|---|---|---|
+| **M1** (120 Simulationen) | 305 von 360 | **84,7 %** | [80,6 %; 88,3 %] | +40,4 [+35,9; +44,8] | **neu stärker** |
+| **M2** (1,8 s je Zug) | 86 von 120 | **71,7 %** | [62,7 %; 79,5 %] | +28,7 [+20,1; +37,3] | **neu stärker** |
+| K1 (N gegen N) | 62 von 120 | 51,7 % | [42,4 %; 60,9 %] | +0,2 [−6,5; +6,9] | bestanden |
+
+**Korrektur am Bericht.** In `bericht.md` steht für M1 die Obergrenze 87,4 %.
+Richtig ist **88,3 %**. Die Funktion `binomVerteilung` in
+[`pruefstand-bericht.js`](../auswertung/fuego/pruefstand-bericht.js) rechnete
+`(1 − p)^n` direkt. Bei 360 Partien wird das ab p ≈ 0,86 kleiner als die
+kleinste darstellbare Zahl und damit 0, und die Suche nach der Obergrenze
+hielt zu früh an. Sie rechnet jetzt über Logarithmen, ein Test prüft 305 von
+360. Die Untergrenze, M2, K1 und das Urteil sind davon nicht berührt. Der
+Fuego-Prüfstand, die einzige frühere Nutzung, hatte höchstens 30 Partien je
+Arm. Dort tritt der Fehler nicht auf.
+
+### Was das heißt
+
+- **Die aktuelle Engine ist klar stärker als die PWA**, bei 120 Simulationen
+  wie mit dem Zeitbudget des Browsers. Bei 1,8 s je Zug kam N auf rund 4 700
+  Simulationen je Zug.
+- **Der Vorsprung entsteht nach der Eröffnung.** Nach GNU Gos Schätzung
+  stehen beide bis Zug 80 gleich (M1: −0,7 nach Zug 40, −0,1 nach Zug 80).
+  Danach wächst der Vorsprung von N auf +6,2 nach Zug 120 und +27,3 nach Zug
+  200. Das passt zum Endspiel-Netz, das ab Zug 80 eingreift und der PWA
+  fehlt.
+- **Mit mehr Simulationen ist der Abstand kleiner**, 71,7 % statt 84,7 %. Die
+  beiden Intervalle überschneiden sich knapp nicht (Untergrenze M1 80,6 %,
+  Obergrenze M2 79,5 %). Ein Test dieses Unterschieds war nicht vorab
+  festgelegt, er ist nur beschreibend. Eine naheliegende Erklärung, nicht
+  geprüft: Mit vielen Simulationen findet die Suche der PWA im Endspiel
+  selbst mehr von dem, was das Netz beiträgt.
+- **Der Adapter ist fair.** N gegen N über `gtp-ki.js` ergibt 51,7 % und
+  einen mittleren Endstand von +0,2.
+- **Zur Frage aus §1:** Schlechter geworden ist die Engine nicht. Der
+  Eindruck kam aus einer Partie auf „Mittel“, die nicht sucht.
+
+### Abgleich mit der Erwartung (§6)
+
+| Erwartung | eingetreten? |
+|---|---|
+| M1: neu stärker, rund 80 % | ja: 84,7 % |
+| M2: neu stärker, ähnlich deutlich | stärker ja, aber weniger deutlich: 71,7 % |
+| K1: nahe 50 %, bestanden | ja: 51,7 % |
+| Kontrolle 20 von 20 | ja |
