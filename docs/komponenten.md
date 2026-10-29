@@ -326,6 +326,11 @@ Stufe A urteilt nicht und wählt keinen Default. Was die Intervalle zeigen:
   Gegner einzeln abschalten, auf D und nicht auf B. Bisher ist ihr Beitrag nur
   auf der Engine ohne Netz und Muster bekannt. Sie bekommt eine eigene
   Vorabfestlegung: [`komponenten-b.md`](komponenten-b.md).
+- **Nachtrag aus Stufe B (29.10.):** Auf dem vollen Default bringen die sieben
+  zusammen gegen beide Gegner nichts Messbares (O7 −4,7 und −2,0, Unterschied
+  der Gegner +2,7 [−12,1; +17,5]). Die Gegnerabhängigkeit von B gehört also zur
+  reduzierten Engine, nicht zum Default ([`komponenten-b.md`](komponenten-b.md)
+  §9).
 - **Die Muster in der Eröffnung** wären ein eigener Versuch: Muster erst ab Zug
   40 oder 80 (`musterGewicht@N`). Auch das nur mit Vorabfestlegung.
 - **Für die Planung** ist die SD der Differenzen gegen Fuego bei 74 bis 83
