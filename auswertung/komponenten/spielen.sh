@@ -11,7 +11,9 @@
 # Beide: sechs Vorgabesteine, 120 Simulationen, Aufgabe der KI aus, GNU Go
 # gibt nicht auf, bis 600 Züge, Schätzung nach Zug 40, 80, 120 und 200
 # (SCHAETZUNG ändert die Liste, für die Kontrollen). SIMS ändert die 120
-# Simulationen (docs/baum-uebernahme.md: 600). GNUGO nennt GNU Go
+# Simulationen (docs/baum-uebernahme.md: 600). VORGABE ändert die sechs
+# Vorgabesteine (0 ohne Vorgabe, Farben wechseln, Komi 7,5; sonst 2 bis 9;
+# docs/leeres-brett.md: 0). GNUGO nennt GNU Go
 # (Standard /usr/games/gnugo). Die Arme stehen in arme.sh (Stufe A); ARME
 # nennt eine andere Datei mit demselben Aufbau (arme-b.sh für Stufe B,
 # docs/komponenten-b.md).
@@ -44,6 +46,8 @@ seed=${5:?Seed fehlt}; roh=${6:?Ausgabedatei fehlt}
 for v in "$von" "$anzahl" "$seed"; do case "$v" in ''|*[!0-9]*) echo "keine Zahl: '$v'" >&2; exit 2;; esac; done
 schaetzung=${SCHAETZUNG:-40,80,120,200}
 case "$schaetzung" in ''|*[!0-9,]*) echo "Schätzung: Zugzahlen mit Komma: '$schaetzung'" >&2; exit 2;; esac
+vorgabe=${VORGABE:-6}
+case "$vorgabe" in 0|2|3|4|5|6|7|8|9) ;; *) echo "VORGABE 0 oder 2 bis 9: '$vorgabe'" >&2; exit 2;; esac
 ki=$(ki_von "$arm")
 case "$gegner" in
   g) wer=() ;;
@@ -53,6 +57,6 @@ esac
 mkdir -p "$(dirname "$roh")"
 rm -f "$roh"
 node "$here/../../gnugo-duell.js" "${wer[@]}" --gnugo "${GNUGO:-/usr/games/gnugo}" \
-  --partien "$anzahl" --von "$von" --seed "$seed" --stufe 1 --vorgabe 6 \
+  --partien "$anzahl" --von "$von" --seed "$seed" --stufe 1 --vorgabe "$vorgabe" \
   --maxzuege 600 --schaetzung "$schaetzung" --gnugo-aufgabe 0 \
   --ki "$ki" --roh "$roh"

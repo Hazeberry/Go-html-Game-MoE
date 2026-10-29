@@ -33,6 +33,15 @@
         selbstspiel-diagnose.js rechnet Komi, knappe Niederlagen, Farbe und
         Verlauf aus Sicht von B richtig, und die Tabellen im Dokument sind
         genau die Ausgabe des Skripts für die gespeicherten Daten.
+     9. Leeres Brett (docs/leeres-brett.md): Arme in arme-l.sh, VORGABE in
+        spielen.sh, Dokument, Workflow (Seed 222, VORGABE 0) und
+        Ergebnisskript stimmen überein; ohne Vorgabe wechseln die Farben, N0
+        spielt die ersten 80 Züge wie D und A80 wie M0, jeder Datensatz nennt
+        die geschlagenen Steine (Attrappe); der Bericht rechnet mit alpha
+        0,05/3, zeigt die Verteilung des Endstands und den Unterschied der
+        Bedingungen und urteilt nach der vorab festgelegten Regel; das
+        Ergebnisskript fügt Teile, Bedingung mit sechs Steinen und Kontrolle
+        zusammen.
 
    Aufruf:  node tests/komponenten.js */
 'use strict';
@@ -93,7 +102,7 @@ test('Arme und Partien: Dokument, Workflow und Bericht stimmen überein', () => 
   pruefe(e.includes('netz-dosis/lauf1/L8.jsonl.gz') && e.includes('fuego-pruefstand/lauf1/v6-s100.jsonl.gz'), 'Kontrolldateien im Ergebnisskript');
   for (const d of ['docs/daten/netz-dosis/lauf1/L8.jsonl.gz', 'docs/daten/fuego-pruefstand/lauf1/v6-s100.jsonl.gz']) pruefe(fs.existsSync(path.join(wurzel, d)), `${d} liegt im Repo`);
   const sp = fs.readFileSync(SPIELEN, 'utf8');
-  pruefe(/--vorgabe 6/.test(sp) && /--fuego-spiele 100/.test(sp) && /--stufe 1/.test(sp) && /--gnugo-aufgabe 0/.test(sp) && /sims=\$\{SIMS:-120\}/.test(sp) && /mctsFixedSims=\$sims,resignEnabled=0/.test(sp) && /--maxzuege 600/.test(sp) && /40,80,120,200/.test(sp), 'Bedingungen in spielen.sh');
+  pruefe(/vorgabe=\$\{VORGABE:-6\}/.test(sp) && /--vorgabe "\$vorgabe"/.test(sp) && /--fuego-spiele 100/.test(sp) && /--stufe 1/.test(sp) && /--gnugo-aufgabe 0/.test(sp) && /sims=\$\{SIMS:-120\}/.test(sp) && /mctsFixedSims=\$sims,resignEnabled=0/.test(sp) && /--maxzuege 600/.test(sp) && /40,80,120,200/.test(sp), 'Bedingungen in spielen.sh');
   const imDoc = (/^\| `seed` \| `?([^` |]+)/m.exec(doc) || [])[1];
   const imFlow = (/^      seed:\n(?:        .*\n)*?        default: '([^']*)'/m.exec(t) || [])[1];
   pruefe(imDoc !== undefined && imDoc === imFlow, `Seed: Dokument „${imDoc}“, Workflow „${imFlow}“`);
@@ -358,4 +367,97 @@ test('Selbstspiel-Diagnose: Sicht von B, Komi, knappe Niederlagen, Farbe; Tabell
   pruefeGleich(fehlt.length, 0, 'Tabellen im Dokument = Ausgabe des Skripts' + (fehlt.length ? ': ' + fehlt[0] : ''));
 });
 
-laufeTests('Komponenten Stufe A, B und Muster-Eröffnung, Baum-Übernahme').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
+/* ── Leeres Brett (docs/leeres-brett.md) ─────────────────────────────── */
+const ARME_L = path.join(wurzel, 'auswertung', 'komponenten', 'arme-l.sh');
+const kiL = arm => execFileSync('bash', [SPIELEN, '--ki', arm], {encoding: 'utf8', env: {...process.env, ARME: ARME_L}}).trim();
+
+test('Leeres Brett: Arme, Dokument, Workflow und Ergebnisskript stimmen überein', () => {
+  pruefeGleich(['D', 'M0', 'N0', 'A80'].map(kiL).join(' | '), 'mctsFixedSims=120,resignEnabled=0 | mctsFixedSims=120,resignEnabled=0,musterGewicht=0 | mctsFixedSims=120,resignEnabled=0,endspielNetz=0 | mctsFixedSims=120,resignEnabled=0,musterAb=80', 'Arme');
+  pruefe(standard('musterGewicht') > 0 && standard('endspielNetz') > 0 && standard('musterAb') === 0, 'Defaults: Muster und Netz an, musterAb 0');
+  for (const v of ['1', '10', 'x']) pruefeGleich(spawnSync('bash', [SPIELEN, 'g', 'D', '1', '20', '222', 'a.jsonl'], {cwd: ordner, encoding: 'utf8', env: {...process.env, VORGABE: v}}).status, 2, `VORGABE ${v} abgelehnt`);
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'leeres-brett.md'), 'utf8');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'leeres-brett.yml'), 'utf8');
+  const e = fs.readFileSync(path.join(wurzel, 'auswertung', 'komponenten', 'ergebnis-l.sh'), 'utf8');
+  const zeilen = [...doc.matchAll(/^\| (D|M0|N0|A80) \| (?:`([^`]*)`|–) \| (\d+) \|/gm)];
+  pruefeGleich(zeilen.map(m => m[1]).join(' '), 'D M0 N0 A80', 'Arme im Dokument');
+  for (const m of zeilen) pruefeGleich(`mctsFixedSims=120,resignEnabled=0${m[2] ? ',' + m[2] : ''}`, kiL(m[1]), `${m[1]}: wie in arme-l.sh`);
+  const liste = was => (new RegExp(`${was}: \\[([^\\]]+)\\]`).exec(t) || [])[1].split(',').map(x => x.trim());
+  pruefeGleich(liste('arm').join(' '), 'D M0 N0 A80', 'Arme im Workflow');
+  const von = liste('von').map(Number);
+  pruefe(von.length === 16 && von.every((v, i) => v === 1 + i * 30), '16 Teile zu 30 lückenlos ab 1');
+  for (const m of zeilen) pruefeGleich(+m[3], von.length * 30, `${m[1]}: Partien wie im Dokument`);
+  pruefe(/spielen\.sh g "\$ARM" "\$VON" 30 "\$SEED" "stand\/g-\$ARM-\$VON\.jsonl"/.test(t), '30 Partien je Teil');
+  pruefe(!/inputs:/.test(t) && /^  SEED: '222'$/m.test(t) && /^  VORGABE: '0'$/m.test(t) && /^  ARME: auswertung\/komponenten\/arme-l\.sh$/m.test(t), 'Seed 222, VORGABE 0 und arme-l.sh im Workflow');
+  pruefe(/^\| `seed` \| 222 \|$/m.test(doc) && doc.includes('Seed **222**') && doc.includes('98,3 %'), 'Seed und Niveau im Dokument');
+  pruefe(/spielen\.sh g D 1 20 "\$SEED" stand\/kontrolle-g\.jsonl/.test(t), 'Kontrolle: D, Partien 1 bis 20, gleicher Seed');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefe(/for arm in D M0 N0 A80/.test(e) && /i < 16; i\+\+/.test(e) && /1 \+ i \* 30/.test(e) && /--stufe L /.test(e), 'Ergebnisskript sammelt die Teile wie der Workflow');
+  pruefe(/komponenten\/lauf1/.test(e) && /muster-eroeffnung\/lauf1/.test(e) && /v:A80=\$m\/g-A80\.jsonl\.gz/.test(e), 'Bedingung mit sechs Steinen aus Stufe A und der Muster-Eröffnung');
+  for (const d of ['komponenten/lauf1/g-D.jsonl.gz', 'komponenten/lauf1/g-M0.jsonl.gz', 'komponenten/lauf1/g-N0.jsonl.gz', 'muster-eroeffnung/lauf1/g-A80.jsonl.gz']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', d)), `${d} liegt im Repo`);
+});
+
+test('Leeres Brett, Attrappe: Farben wechseln, N0 wie D und A80 wie M0 in den ersten 80 Zügen, geschlagene Steine', () => {
+  const spiel = (arm, nr) => {
+    const aus = path.join(ordner, `leer-${arm}-${nr}.jsonl`);
+    execFileSync(process.execPath, [path.join(wurzel, 'gnugo-duell.js'), '--gnugo', programm, '--partien', '1', '--von', String(nr), '--seed', '222',
+      '--stufe', '1', '--vorgabe', '0', '--maxzuege', '84', '--schaetzung', '40,80', '--gnugo-aufgabe', '0', '--ki', kiL(arm) + ',mctsFixedSims=20', '--roh', aus],
+      {stdio: 'pipe', timeout: 300000});
+    return JSON.parse(fs.readFileSync(aus, 'utf8').trim());
+  };
+  const d = spiel('D', 2), n = spiel('N0', 2), m = spiel('M0', 2), a = spiel('A80', 2), w = spiel('D', 3);
+  for (const r of [d, n, m, a, w]) pruefe(!r.abgebrochen && r.zuege.length === 84 && r.vorgabe === 0 && r.komi === 7.5, `ohne Vorgabe, Komi 7,5, 84 Züge: ${r.abgebrochen || r.zuege.length}`);
+  pruefeGleich(`${d.wirFarbe} ${w.wirFarbe}`, 'S W', 'gerade Partie Schwarz, ungerade Weiß');
+  pruefeGleich(n.zuege.slice(0, 80).join(' '), d.zuege.slice(0, 80).join(' '), 'N0 wie D bis Zug 80');
+  pruefeGleich(a.zuege.slice(0, 80).join(' '), m.zuege.slice(0, 80).join(' '), 'A80 wie M0 bis Zug 80');
+  pruefe(m.zuege.slice(0, 80).join(' ') !== d.zuege.slice(0, 80).join(' '), 'M0 weicht vor Zug 80 von D ab');
+  pruefe([d, n, m, a, w].every(r => r.gefangen && Number.isInteger(r.gefangen.wir) && Number.isInteger(r.gefangen.gegner)), 'jeder Datensatz nennt die geschlagenen Steine');
+});
+
+test('Leeres Brett, Bericht: alpha 0,05/3, Verteilung, Unterschied der Bedingungen, Urteil', () => {
+  pruefeGleich(`${K.STUFEN.L.alpha} ${K.STUFEN.L.vergleiche.join(' ')} ${K.STUFEN.L.leer.selbstspiel}`, `${0.05 / 3} M0 N0 A80 -16.7`, 'Stufe L');
+  const v = (arm, lo, hi) => ({g: {vergleiche: [{arm, g: {lo, hi, m: (lo + hi) / 2}}]}});
+  pruefeGleich(K.urteilL(v('N0', -80, -60), 'N0'), 'trägt ohne Vorgabe', 'Obergrenze unter 0');
+  pruefeGleich(K.urteilL(v('M0', 1, 15), 'M0'), 'Abschalten hilft ohne Vorgabe', 'Untergrenze über 0');
+  pruefeGleich(K.urteilL(v('M0', -8, 6), 'M0'), 'kein Beitrag belegt', 'Intervall enthält 0');
+  pruefeGleich(K.urteilL(v('A80', -12, -1), 'A80'), 'Schaden auch gegen GNU Go ohne Vorgabe', 'A80: Obergrenze unter 0 geht vor');
+  pruefeGleich(K.urteilL(v('A80', -9, 7), 'A80'), 'kein Schaden in der Größe des Selbstspiels', 'A80: Untergrenze über −16,7');
+  pruefeGleich(K.urteilL(v('A80', -20, 3), 'A80'), 'offen', 'A80: Untergrenze unter −16,7');
+  pruefeGleich(K.urteilL({}, 'A80'), 'unvollständig', 'ohne Daten');
+  pruefeGleich([0, 0.25, 0.5, 1].map(q => K.quantil([1, 2, 3, 4, 5], q)).join(' '), '1 2 3 5', 'Quantile');
+  const r = nr => ((nr * 13) % 7) - 3;
+  const arm = (f, g) => new Map(Array.from({length: 30}, (_, i) => i + 1).map(nr => [nr, {nr, endstand: f(nr), gewonnen: f(nr) > 0, schaetzung: {}, zuege: ['D4'], ...(g ? {gefangen: {wir: 2, gegner: g}} : {})}]));
+  const leer = {D: arm(nr => -100 + 4 * r(nr), 10), M0: arm(nr => -110 + 4 * r(nr) + r(nr + 1), 12), N0: arm(nr => -160 + 4 * r(nr), 20), A80: arm(nr => -100 + 4 * r(nr) + r(nr + 2), 11)};
+  const sechs = {D: arm(nr => 20 + 4 * r(nr)), M0: arm(nr => 22 + 4 * r(nr) + r(nr + 1)), N0: arm(nr => -50 + 4 * r(nr)), A80: arm(nr => 23 + 4 * r(nr) + r(nr + 2))};
+  const a = K.auswertung({g: leer, v: sechs}, 'L');
+  const u = Object.fromEntries(a.unterschied.map(x => [x.arm, x]));
+  pruefe(Math.abs(u.M0.m - (-10 - 2)) < 0.5 && Math.abs(u.N0.m - (-60 + 70)) < 0.5, `Δ_g − Δ_v: M0 ${u.M0.m}, N0 ${u.N0.m}`);
+  const vt = Object.fromEntries(a.gegner.g.verteilung.map(x => [x.arm, x]));
+  pruefeGleich(`${vt.D.n} ${vt.D.verloren} ${vt.N0.verloren} ${vt.D.geschlagen}`, '30 10 20 2', 'Verteilung: Partien, verlorene und geschlagene Steine');
+  pruefe(Number.isNaN(a.gegner.v.verteilung[0].verloren), 'ohne Feld gefangen: keine Zahl');
+  const md = K.text(a, {g: {gleich: 20, erwartet: 20, ok: true}});
+  pruefe(/alpha 0,05\/3 \(98,3 %\)/.test(md) && /## GNU Go Stufe 1, ohne Vorgabe/.test(md) && /## GNU Go Stufe 1, sechs Vorgabesteine/.test(md), 'Niveau und beide Bedingungen');
+  pruefe(/\| Arm \| Partien \| Min \| 10 % \| 25 % \| Median \| 75 % \| 90 % \| Max \| SD \| verloren Ø \| geschlagen Ø \|/.test(md), 'Tabelle der Verteilung');
+  pruefe(/## Unterschied der Bedingungen/.test(md) && !/Unterschied der Gegner/.test(md) && /## Urteil ohne Vorgabe \(vorab festgelegt\)/.test(md), 'Unterschied der Bedingungen und Urteil');
+  pruefe(/Kontrolle: 20 von 20 Partien gleich wie in den Partien von D dieses Laufs \(bestanden\)/.test(md), 'Kontrolle im selben Lauf');
+});
+
+test('Leeres Brett: Ergebnisskript fügt Teile, Bedingung mit sechs Steinen und Kontrolle zusammen', () => {
+  const ort = fs.mkdtempSync(path.join(ordner, 'leer-'));
+  fs.mkdirSync(path.join(ort, 'stand'));
+  const rec = (nr, endstand) => JSON.stringify({nr, endstand, gewonnen: endstand > 0, schaetzung: {}, zuege: ['D4', 'Q16', String(nr)], gefangen: {wir: 1, gegner: 3}});
+  for (const [arm, off] of [['D', -100], ['M0', -105], ['N0', -150], ['A80', -101]]) for (const von of [1, 31]) {
+    fs.writeFileSync(path.join(ort, 'stand', `g-${arm}-${von}.jsonl`), Array.from({length: 30}, (_, i) => rec(von + i, off + ((von + i) * 7) % 11)).join('\n') + '\n');
+  }
+  fs.writeFileSync(path.join(ort, 'stand', 'kontrolle-g.jsonl'), Array.from({length: 20}, (_, i) => rec(i + 1, -100 + ((i + 1) * 7) % 11)).join('\n') + '\n');
+  const p = spawnSync('bash', [path.join(wurzel, 'auswertung', 'komponenten', 'ergebnis-l.sh')], {cwd: ort, encoding: 'utf8'});
+  pruefeGleich(p.status, 0, 'Ergebnisskript läuft: ' + p.stderr.slice(-300));
+  const md = fs.readFileSync(path.join(ort, 'ergebnisse', 'bericht.md'), 'utf8');
+  const fehlt = fs.readFileSync(path.join(ort, 'ergebnisse', 'fehlende-teile.txt'), 'utf8').trim().split('\n');
+  pruefeGleich(fehlt.length, 4 * 14, 'je Arm 14 von 16 Teilen fehlen');
+  pruefe(fehlt.includes('g-A80-451') && !fehlt.includes('g-D-31'), 'fehlende Teile benannt');
+  pruefe(/\| D \| 60 \|/.test(md) && /\| D \| 480 \|/.test(md), 'ohne Vorgabe 60 Partien, mit sechs Steinen 480');
+  pruefe(/Kontrolle: 20 von 20 Partien gleich wie in den Partien von D dieses Laufs \(bestanden\)/.test(md), 'Kontrolle bestanden');
+  pruefe(['g-D', 'g-M0', 'g-N0', 'g-A80', 'kontrolle-g'].every(n => fs.existsSync(path.join(ort, 'ergebnisse', `${n}.jsonl.gz`))), 'Rohdaten gepackt');
+});
+
+laufeTests('Komponenten Stufe A, B und Muster-Eröffnung, Baum-Übernahme, leeres Brett').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });

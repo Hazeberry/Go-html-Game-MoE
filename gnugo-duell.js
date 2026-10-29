@@ -87,6 +87,9 @@
    Steinen auf den Standardpunkten (GTP fixed_handicap), GNU Go Weiß, Komi
    0,5, Weiß zieht zuerst. Ohne Vorgabe wechseln die Farben je Partie, Komi
    7,5. Für getAIMove zählt die Zugnummer ab dem ersten gespielten Zug.
+
+   Der Datensatz einer Partie (--roh) nennt in `gefangen` die Steine, die wir
+   ({wir}) und der Gegner ({gegner}) geschlagen haben, ohne Schlussauszählung.
 */
 'use strict';
 const fs = require('fs');
@@ -456,7 +459,7 @@ async function partieSpielen(nr) {
             sieger: sieger === null ? null : sieger === 1 ? 'S' : 'W',
             vorgabe: opt.vorgabe, komi: KOMI, vorgabeSteine, beginnt: zuerst === 1 ? 'S' : 'W',
             aufgabe: aufgabe ? (aufgabe === 1 ? 'S' : 'W') : null, gnugoDarfAufgeben: !!opt.gnugoAufgabe,
-            gnugoStand, endstand, unsereZaehlung: unsereZaehlung(board), zuegeAnzahl: mc,
+            gnugoStand, endstand, unsereZaehlung: unsereZaehlung(board), gefangen: {wir: caps[wir], gegner: caps[3 - wir]}, zuegeAnzahl: mc,
             simsMittel: sims.length ? Math.round(sims.reduce((x, y) => x + y, 0) / sims.length) : null,
             neustarts: g.neustarts(), schaetzung,
             ...(fu ? {gegner: {name: 'fuego', spiele: opt.fuegoSpiele, schiedsrichterStufe: opt.stufe}} : {}),

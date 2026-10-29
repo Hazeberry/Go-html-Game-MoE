@@ -86,7 +86,11 @@ nichts zu installieren.
   (`docs/baum-uebernahme.md` §9) kostet bei 120 Simulationen gegen keinen der
   beiden Gegner etwas Messbares (−2,9 und −0,2 bei je 960 Paaren). Bei 600
   Simulationen liegt es gegen GNU Go mit −5,8 knapp unter der vorab
-  festgelegten Schwelle −5; `mctsTreeReuse` bleibt deshalb 1.
+  festgelegten Schwelle −5; `mctsTreeReuse` bleibt deshalb 1. Alle diese
+  Messungen liefen mit Vorgabe. Vorab festgelegt ist eine Messung ohne
+  Vorgabe gegen GNU Go (`docs/leeres-brett.md`): ob Muster, Netz und der
+  spätere Einsatz der Muster auf dem leeren Brett so wirken wie mit sechs
+  Steinen.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl
@@ -2656,7 +2660,7 @@ distillation/                   Überwachtes Training fürs Policy-Netz
 docs/                           Versuchsprotokolle, die zu lang für den README sind
 auswertung/                     Auswertung der Rohdumps (--roh), Rechenweg der Protokolle
 auswertung/fuego/               Fuego bauen (SVN r2038) und prüfen; Fuego liegt nicht im Repo
-auswertung/komponenten/         Komponentenmessung, Stufe A und B: Arme, Spielskript, Bericht (docs/komponenten*.md)
+auswertung/komponenten/         Komponentenmessung und Folgeversuche: Arme, Spielskript, Berichte (docs/komponenten*.md u. a.)
 tests/                          Regressionstests (node tests/run.js)
 tests/stellungen/               echte Partien als Testvorlage (SGF)
 .github/workflows/tests.yml       Regressionstests bei jedem Push und PR
