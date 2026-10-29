@@ -38,9 +38,14 @@ nichts zu installieren.
 - Endspiel-Netz an der Wurzel ab Zug 81 (`endspielNetz` 0,8): ein kleines
   Faltungsnetz, gelernt an Zügen von GNU Go Stufe 10. Gegen GNU Go +46,9
   Punkte (λ 0,5 gegen aus) und weitere +15,5 (λ 0,8 gegen 0,5); mehr Gewicht
-  bringt nichts mehr. Es kostet 41 ms je Zug und keine Suchzeit (gemessen in
+  bringt nichts mehr. Auf dem heutigen Default kostet es abgeschaltet 71
+  Punkte gegen GNU Go und 68 gegen Fuego (sechs Vorgabesteine, je 480 Paare,
+  `docs/komponenten.md` §9). Es ist damit der größte der bisher einzeln
+  abgeschalteten Teile. Es kostet 41 ms je Zug und keine Suchzeit (gemessen in
   Node auf einem Rechner von GitHub Actions, nicht im Browser;
-  `docs/endspiel-netz.md`, `docs/netz-dosis.md`, `docs/netz-hoch.md`)
+  `docs/endspiel-netz.md`, `docs/netz-dosis.md`, `docs/netz-hoch.md`).
+  Nicht zu verwechseln mit dem Policy-Netz hinter `netMaxBlend`, das nicht
+  hilft und auf 0 steht (unten unter „Offen“)
 - Aufgabe bei aussichtsloser Stellung, sowohl über Q als auch strukturell
   („alle legalen Züge wären todgeboren")
 - Worker-Fallback-Kette `data:` → `blob:` → Hauptthread, damit die KI auch
@@ -95,8 +100,10 @@ nichts zu installieren.
   gemeinsame Eröffnung weiter mit `PARAMS_DEFAULT` und Zeitbudget; dort laufen
   zwei Läufe trotz gleichem Seed auseinander — gemessen: drei Läufe, drei
   verschiedene Ergebnisse.
-- **Das Policy-Netz lernt, aber zu wenig, um zu helfen.** Ein kleines
-  Dense-Netz (3971→128→361) kann Wurzelzüge mitgewichten. Bis August 2026 war
+- **Das Policy-Netz lernt, aber zu wenig, um zu helfen.** Gemeint ist das
+  Policy-Netz hinter `netMaxBlend`, nicht das Endspiel-Netz (`endspielNetz`,
+  oben unter „Funktioniert“), das deutlich gewinnt. Es sind zwei verschiedene
+  Netze. Ein kleines Dense-Netz (3971→128→361) kann Wurzelzüge mitgewichten. Bis August 2026 war
   es doppelt tot: im Messrahmen gar nicht vorhanden, und im Spiel in einem
   geschlossenen Kreis gefangen, der `gamesPlayed` nie über 0 kommen ließ — es
   hat also nie gelernt, bei niemandem. Beides ist behoben. Danach gemessen:
@@ -152,8 +159,8 @@ im Browser *und* im Messrahmen identisch läuft:
 | Block | Inhalt |
 |---|---|
 | `<script id="shared-go-logic">` | Regeln, Zobrist-Hashing, Freiheiten, Benson — DOM-frei |
-| `<script id="worker-ai">` | MCTS, Bewertungsfunktionen, Rollouts — DOM-frei |
-| `<script id="policy-net">` | Policy-Netz: Features, Forward, REINFORCE-Training |
+| `<script id="worker-ai">` | MCTS, Bewertungsfunktionen, Rollouts, Muster-Tabelle und Endspiel-Netz — DOM-frei |
+| `<script id="policy-net">` | Policy-Netz (`netMaxBlend`, steht auf 0): Features, Forward, REINFORCE-Training |
 | Haupt-Skript | UI, Rendering, Worker-Verwaltung, Dashboard |
 
 Alle drei ID-Blöcke werden vom Messrahmen zur Laufzeit aus der `index.html`
@@ -182,6 +189,13 @@ Heuristiken, keine trainierten Netze. In der ML-Literatur, wo Gate und
 Experten gemeinsam gelernt werden, hieße das eine MoE mit fester
 Gating-Funktion. Darüber liegt Benson als beweisbare Schicht: Was als
 bedingungslos lebend erkannt ist, wird nicht mehr heuristisch bewertet.
+
+Gelernt sind zwei Teile, beide nur an der Wurzel der KI und beide aus Zügen
+von GNU Go: die Muster-Tabelle (`musterGewicht`), die zur Zugbewertung addiert
+wird, und das Endspiel-Netz (`endspielNetz`), das ab Zug 81 den Prior der
+Wurzelkinder zu 80 % bestimmt. Beide tragen viel (zusammen rund 113 Punkte
+gegen GNU Go und gegen Fuego, `docs/komponenten.md` §9). Das Policy-Netz
+(`netMaxBlend`) ist ein drittes, anderes Netz und steht auf 0.
 
 So wird daraus ein Zug, Schritt für Schritt durch `getAIMove`:
 
@@ -301,12 +315,13 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | **`endspielNetz` 0,5 (Endspiel-Netz im Spiel, Schritt 2; 240 Paare gegen GNU Go, Selbstspiel 360, 20.10.)** | **Endstand +46,9** [+40,4; +53,4], p = 10⁻³³, Siege 227 gegen 149 von 240; Selbstspiel 83,1 %; Kontrolle 15 von 15 | **Default 0,5** (`docs/endspiel-netz.md` §8) |
 | **`endspielNetz` 0,8 (Dosis des Endspiel-Netzes; 240 Paare gegen GNU Go mit sechs Vorgabesteinen, Selbstspiel 360 ohne Aufgabe, 20.10.)** | **Endstand +15,5** [+7,9; +23,1] gegen 0,5, p = 7,5 · 10⁻⁵, Siege 154 gegen 123; Selbstspiel 56,4 %; `endspielNetzTop` 8 statt 4: +1,3 [−6,0; +8,6]; Kontrolle 15 von 15 | **Default 0,8**, Top 8 verworfen (`docs/netz-dosis.md` §8) |
 | `endspielNetz` 0,9 und 1 (höhere Dosis; 240 Paare gegen GNU Go mit sechs Vorgabesteinen, Selbstspiel 360 ohne Aufgabe, 24.10.) | gegen 0,8: 0,9 −1,9 [−9,3; +5,6], 1 −4,1 [−11,4; +3,2]; Selbstspiel 49,7 % und 53,1 %; Kontrolle 15 von 15 | verworfen — Default bleibt 0,8 (`docs/netz-hoch.md` §8) |
+| Komponenten Stufe A: Teile des Defaults abgeschaltet, gegen GNU Go und Fuego (6 Steine, je 480 bzw. 240 Paare, Seed 220, 29.10.) | ohne Netz −70,8 / −68,4, ohne Muster +2,0 / −10,1, ohne beide −113,6 / −112,1, ohne RAVE −5,5 / −1,1, reduzierte Engine −149,4 / −111,4 (gegen GNU Go / Fuego, 99 %); Wechselwirkung Netz × Muster −44,9 / −33,6; Kontrollen 15/15 und 10/10 | kein Default geändert; Netz und Muster übertragen sich auf Fuego, gegnerabhängig ist der Rest (`docs/komponenten.md` §9) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
 | `rolloutSample`, `evaluateMove`-Expansion, FPU-Vorzeichen | 60 %, 61 %, ±0,005 ΔQ | abgelehnt bzw. ohne Stärkeeffekt eingebaut |
-| Policy-Netz, Rang des Suchzugs | 4 von 4 Initialisierungen besser (111,7 → 90,3), Top-10 aber auf Zufallsniveau | `netMaxBlend` bleibt 0 — kein A/B, es gibt nichts zu blenden |
-| KataGo-Distillation, `netMaxBlend` 0,30 gegen 0 | vier Läufe über 250-fache Skalenspanne, monoton von unten gegen 50 %: 35,0 % (5000, p = 0,003), 41,7 % (800), 46,7 % (20→1000, p = 0,82) | verworfen — `netMaxBlend` bleibt 0. Keine Dosis über 50 %, also **kein** Kalibrierungsproblem; Engpass ist die Kopfgüte |
+| Policy-Netz (`netMaxBlend`, nicht das Endspiel-Netz), Rang des Suchzugs | 4 von 4 Initialisierungen besser (111,7 → 90,3), Top-10 aber auf Zufallsniveau | `netMaxBlend` bleibt 0 — kein A/B, es gibt nichts zu blenden |
+| KataGo-Distillation fürs Policy-Netz, `netMaxBlend` 0,30 gegen 0 | vier Läufe über 250-fache Skalenspanne, monoton von unten gegen 50 %: 35,0 % (5000, p = 0,003), 41,7 % (800), 46,7 % (20→1000, p = 0,82) | verworfen — `netMaxBlend` bleibt 0. Keine Dosis über 50 %, also **kein** Kalibrierungsproblem; Engpass ist die Kopfgüte |
 | Entscheidungsspanne von `evaluateMove`, gemessen | Spanne zum Median 45–1206, Gap zum Zweitbesten aber 0,0–0,5 in Eröffnung und Mittelspiel | Jeder Prior kippt dort die Zugwahl, unabhängig von `netScoreScale` — Kalibrierung allein kann das nicht steuern |
 
 Zwei der Nullergebnisse sind **gehaltvoll, nicht leer**: Bei beiden ist per
@@ -325,7 +340,7 @@ Grenze dieser ganzen Messreihe. Die Partie lief mit:
 | Parameter | Default im Repo | im Spiel | Messlage |
 |---|---|---|---|
 | `mctsValueScale` | 200 | **350** | 200 schlägt 350 mit 65:35, p = 0,0035 (≈ +108 Elo) |
-| `netMaxBlend` | 0,00 | **0,3** | 0,3 verliert mit 35 % über 120 Partien, p = 0,003 |
+| `netMaxBlend` | 0,00 | **0,3** | Policy-Netz: 0,3 verliert mit 35 % über 120 Partien, p = 0,003 |
 | `resignQ` | 0,95 | **0,9** | — |
 
 Beide belegten Verschlechterungen waren gleichzeitig aktiv. Die KI spielte
