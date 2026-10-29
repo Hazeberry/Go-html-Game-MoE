@@ -171,3 +171,107 @@ Runner-Stunden, unter einer Stunde Laufzeit**.
 
 Der Nachtrag wendet das Urteil aus §4 an und ordnet die beschreibenden Zahlen
 ein. Kein Default ändert sich.
+
+## 9. Nachtrag: Ergebnis von Lauf 1 (29.10.2026)
+
+[Workflow-Lauf 40943994425](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40943994425)
+auf Merge `443724e`, in knapp 50 Minuten (19:52 bis 20:42 UTC, 14 Runner-Stunden).
+Alle 66 Jobs sind grün, es fehlt kein Teil. Daten:
+[`docs/daten/leeres-brett/lauf1/`](daten/leeres-brett/lauf1/), der volle
+Bericht in [`bericht.md`](daten/leeres-brett/lauf1/bericht.md).
+
+**Der Lauf ist sauber.** Eine Partie ist abgebrochen (A80, Partie 268: GNU Go
+stürzte beim ersten Zug ab, SIGSEGV). Sie fällt samt Partner heraus, A80 hat
+479 Paare. Keine Partie lief bis zum Zuglimit. Die Kontrolle ist bestanden (20
+von 20 Partien Zug für Zug gleich), die Proben auch: N0 spielt in 480 von 480
+Paaren die ersten 80 Züge wie D, A80 in 479 von 479 wie M0.
+
+### Arm − D ohne Vorgabe (98,3 %)
+
+| Arm | Paare | Differenz | 98,3 % | Siege Arm / D | Urteil nach §4 |
+|---|---:|---:|---|---|---|
+| M0 | 480 | **+14,3** | [+7,8; +20,8] | 16 / 8 | **Abschalten hilft ohne Vorgabe** |
+| N0 | 480 | −46,9 | [−53,0; −40,7] | 2 / 8 | **trägt ohne Vorgabe** |
+| A80 | 479 | **+17,1** | [+10,6; +23,5] | 19 / 8 | kein Schaden in der Größe des Selbstspiels |
+
+D verliert 472 von 480 Partien, im Mittel mit −78,8.
+
+### Unterschied zu sechs Vorgabesteinen (Welch, 98,3 %)
+
+| Arm | sechs Steine | ohne Vorgabe | ohne − mit |
+|---|---:|---:|---|
+| M0 | +2,0 | +14,3 | +12,3 [+1,9; +22,6] |
+| N0 | −70,8 | −46,9 | +23,9 [+14,6; +33,2] |
+| A80 | +3,5 | +17,1 | +13,6 [+3,4; +23,7] |
+
+### Verteilung des Endstands
+
+| Arm | 10 % | Median | 90 % | SD | verloren Ø | geschlagen Ø |
+|---|---:|---:|---:|---:|---:|---:|
+| D | −132,5 | −76,5 | −27,4 | 43,0 | 20,7 | 14,4 |
+| M0 | −109,6 | −64,5 | −19,5 | 39,0 | 20,5 | 13,8 |
+| N0 | −193,5 | −120,0 | −64,4 | 50,3 | 20,4 | 11,8 |
+| A80 | −104,7 | −62,5 | −20,3 | 38,6 | 18,2 | 13,8 |
+
+Der Endstand klebt an keiner Grenze. Er streut mit SD 39 bis 50 über rund 100
+Punkte zwischen dem 10- und dem 90-%-Quantil. Die Sorge, er reagiere bei fast
+nur verlorenen Partien nicht mehr (§4), trifft nicht zu. Die SD der
+Paardifferenzen liegt bei 56 bis 59, unter dem, womit §5 gerechnet hat.
+
+### Was das heißt
+
+Kein Default ändert sich (§4). Die Befunde:
+
+- **Das Netz trägt auch ohne Vorgabe**, mit −46,9 aber weniger als mit sechs
+  Steinen (−70,8). Wie erwartet (§6: −40 bis −80).
+- **Die Muster schaden ohne Vorgabe gegen GNU Go.** Ohne sie (M0) steht die
+  KI um 14,3 Punkte besser, mit ihnen erst ab Zug 80 (A80) um 17,1. Mit sechs
+  Steinen brachten sie nichts Messbares (+2,0). Der Unterschied der
+  Bedingungen ist für beide Arme gesichert (Untergrenzen +1,9 und +3,4).
+  **Das war nicht erwartet** (§6: „kein Beitrag belegt“).
+- **Der Schaden des Selbstspiels tritt gegen GNU Go nicht auf, im Gegenteil.**
+  Im Selbstspiel gewann A80 nur 27,8 % gegen D. Gegen GNU Go auf dem leeren
+  Brett steht A80 deutlich besser als D. Gegen sich selbst helfen die Muster
+  in der Eröffnung, gegen GNU Go schaden sie dort. Der Befund aus dem
+  Selbstspiel überträgt sich also nicht auf einen fremden Gegner.
+
+**Beschreibend, nachgerechnet je Farbe der KI** (nicht vorab festgelegt, 95 %):
+
+| Arm − D | KI Schwarz (240 Paare) | KI Weiß (240 Paare) |
+|---|---|---|
+| M0 | +6,9 ± 7,0 | +21,6 ± 7,8 |
+| N0 | −38,0 ± 6,3 | −55,8 ± 7,6 |
+| A80 | +8,8 ± 6,5 | +25,3 ± 8,1 |
+
+Der Schaden der Muster entsteht vor allem, wenn die KI Weiß spielt. Mit
+Vorgabe spielt sie immer Schwarz. Auch die Lehrdaten der Mustertabelle
+stammen aus 120 Partien mit neun Vorgabesteinen (GNU Go Stufe 10 wurde dort
+für beide Farben gefragt). [`muster.md`](muster.md) §2 hat schon darauf
+hingewiesen, dass die Merkmale die Eigenheiten dieser Partien tragen. Ob das
+der Grund ist, ist nicht geprüft.
+
+Nach GNU Gos Schätzung liegen M0 und A80 schon nach Zug 40 rund 30 Punkte
+vorn. Bei sechs Steinen war ein solcher früher Vorsprung bis zum Ende
+verschwunden (Muster-Eröffnung §9). Hier bleibt die Hälfte davon im Endstand.
+
+### Abgleich mit der Erwartung (§6)
+
+| Erwartung | eingetreten? |
+|---|---|
+| D verliert fast alle Partien, Ø −80 bis −140 | ja: 472 von 480, Ø −78,8 (knapp darüber) |
+| N0 klar negativ, −40 bis −80, „trägt ohne Vorgabe“ | ja: −46,9 |
+| M0 offen, am wahrscheinlichsten „kein Beitrag belegt“ | **nein**: +14,3, „Abschalten hilft“ |
+| A80 nahe 0, „kein Schaden in der Größe des Selbstspiels“ | Urteil ja, aber nicht nahe 0: **+17,1** |
+| Proben 480 von 480, Kontrolle 20 von 20 | ja (A80: 479 von 479 nach einem Absturz von GNU Go) |
+
+### Wie es weitergehen kann
+
+§4 sagt: Zeigt sich ein Unterschied zur Messung mit Vorgabe, folgt eine
+eigene Vorabfestlegung. Er hat sich gezeigt. Bevor die Muster für Partien
+ohne Vorgabe geändert werden, sind zwei Dinge offen:
+
+- **Ein zweiter Gegner.** Bisher spricht nur GNU Go gegen die Muster, und im
+  Selbstspiel sprechen sie dafür. Im Browser ist der Gegner ein Mensch.
+- **Ein Schalter, der nur ohne Vorgabe greift**, zum Beispiel Muster aus oder
+  schwächer, wenn die Partie ohne Vorgabe beginnt. Mit Vorgabe brachten die
+  Muster nichts Messbares, kosteten dort aber auch nichts.

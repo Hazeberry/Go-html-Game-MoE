@@ -87,10 +87,12 @@ nichts zu installieren.
   beiden Gegner etwas Messbares (−2,9 und −0,2 bei je 960 Paaren). Bei 600
   Simulationen liegt es gegen GNU Go mit −5,8 knapp unter der vorab
   festgelegten Schwelle −5; `mctsTreeReuse` bleibt deshalb 1. Alle diese
-  Messungen liefen mit Vorgabe. Vorab festgelegt ist eine Messung ohne
-  Vorgabe gegen GNU Go (`docs/leeres-brett.md`): ob Muster, Netz und der
-  spätere Einsatz der Muster auf dem leeren Brett so wirken wie mit sechs
-  Steinen.
+  Messungen liefen mit Vorgabe. **Ohne Vorgabe** (`docs/leeres-brett.md` §9,
+  gegen GNU Go) trägt das Netz weiter (ohne Netz −46,9), aber die Muster
+  **schaden**: Ohne sie steht die KI um 14,3 Punkte besser, mit ihnen erst ab
+  Zug 80 um 17,1, vor allem als Weiß. Mit sechs Steinen brachten sie nichts
+  Messbares, im Selbstspiel helfen sie. Kein Default ist geändert, eine
+  eigene Vorabfestlegung steht aus.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl
@@ -331,6 +333,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | Komponenten Stufe B: die sieben übrigen Zusätze auf dem vollen Default einzeln und zusammen abgeschaltet, gegen GNU Go und Fuego (je 480 Paare, Seed 220, 29.10.) | alle sieben zusammen −4,7 / −2,0; ohne frische Wurzel −34,7 / −29,6 (ohne Baum-Übernahme dagegen −5,0 / +2,1); scharfer Prior −6,4 / −1,9; übrige nahe 0 (gegen GNU Go / Fuego, 99,4 %); kein Unterschied der Gegner schließt 0 aus; Kontrollen 20/20 und 20/20 | kein Default geändert; die sieben sind auf dem Default überflüssig, die frische Wurzel verhindert nur einen Defekt der Baum-Übernahme (`docs/komponenten-b.md` §9) |
 | `musterAb` 40 und 80 (Muster erst ab Zug 40 bzw. 80; je 480 Paare gegen GNU Go und Fuego, Seed 220, Selbstspiel 360 ohne Aufgabe, 29.10.) | 40: −3,7 / +0,8; 80: +3,5 / −3,1 (gegen GNU Go / Fuego, 97,5 %); Selbstspiel 44,4 % und 27,8 %, beide signifikant unter 50 %; Probe 480/480, Kontrollen 20/20 | verworfen — Default bleibt 0; der frühe Vorsprung nach GNU Gos Schätzung war ein Merkmal der Schätzung (`docs/muster-eroeffnung.md` §9) |
 | `mctsTreeReuse` 0 (Baum nicht übernehmen; Nichtunterlegenheit mit Grenze −10, je 960 Paare bei 120 und 240 bei 600 Simulationen gegen GNU Go und Fuego, Seed 221, Selbstspiel 360 ohne Aufgabe, 29.10.) | 120 Sim.: −2,9 [−7,3; +1,4] / −0,2 [−5,6; +5,2], nicht unterlegen; 600 Sim.: −5,8 [−14,7; +3,1] / +0,1 [−12,1; +12,3] (gegen GNU Go / Fuego, 95 %); Selbstspiel 46,9 %; Kontrollen 20/20 | Default bleibt 1 — bei 600 Simulationen gegen GNU Go knapp unter der Schwelle −5 für den Mittelwert (`docs/baum-uebernahme.md` §9) |
+| Leeres Brett: D, ohne Muster (M0), ohne Netz (N0) und Muster erst ab Zug 80 (A80) gegen GNU Go Stufe 1 ohne Vorgabe (je 480 Paare, 120 Simulationen, Seed 222, 29.10.) | M0 **+14,3** [+7,8; +20,8], N0 −46,9 [−53,0; −40,7], A80 **+17,1** [+10,6; +23,5] (98,3 %); mit sechs Steinen +2,0, −70,8 und +3,5; D verliert 472 von 480, Ø −78,8; Proben und Kontrolle bestanden | kein Default geändert; ohne Vorgabe schaden die Muster gegen GNU Go, das Netz trägt (`docs/leeres-brett.md` §9) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
