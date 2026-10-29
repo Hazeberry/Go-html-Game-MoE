@@ -161,3 +161,108 @@ Der Nachtrag ordnet die Intervalle ein, ohne Urteil über Defaults. Trägt ein
 einzelner Zusatz einen großen Teil des Unterschieds der Gegner, bekommt er eine
 eigene Messung. Die Muster in der Eröffnung (`musterGewicht@N`, Stufe A §9)
 bleiben ein eigener Versuch mit eigener Vorabfestlegung.
+
+## 9. Nachtrag: Ergebnis von Lauf 1 (29.10.2026)
+
+[Workflow-Lauf 40836193651](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40836193651)
+auf Merge `ab974ba`, in knapp drei Stunden (07:33 bis 10:30 UTC). Alle 255
+Jobs sind grün, es fehlt kein Teil. Daten:
+[`docs/daten/komponenten-b/lauf1/`](daten/komponenten-b/lauf1/).
+
+**Der Lauf ist sauber.** Keine der 6 760 Partien ist abgebrochen, keine lief bis
+zum Zuglimit. Beide Kontrollen sind bestanden: Je 20 von 20 Partien von D gingen
+gegen GNU Go und gegen Fuego Zug für Zug gleich aus wie in Stufe A. Die
+Paarung mit D und R0 aus Stufe A gilt also.
+
+### Arm − D, Endstand (99,4 %)
+
+| Arm | gegen GNU Go | gegen Fuego | Δ_f − Δ_g (99,4 %) | erste Abweichung (Median, g / f) |
+|---|---|---|---|---|
+| R0 | −5,5 [−18,6; +7,5] | −1,1 [−15,6; +13,3] | +4,4 [−15,0; +23,8] | Zug 24 / 34 |
+| T0 | −5,0 [−14,2; +4,2] | +2,1 [−8,6; +12,7] | +7,1 [−7,0; +21,1] | Zug 44 / 54 |
+| **W0** | **−34,7 [−44,0; −25,4]** | **−29,6 [−40,5; −18,7]** | +5,1 [−9,2; +19,4] | Zug 28 / 22 |
+| E0 | −3,1 [−9,8; +3,7] | +6,8 [−2,4; +16,0] | +9,9 [−1,5; +21,2] | Zug 100 / 96 |
+| P0 | −6,4 [−15,8; +3,1] | −1,9 [−13,6; +9,7] | +4,5 [−10,5; +19,4] | Zug 20 / 14 |
+| BE0 | −1,2 [−3,6; +1,3] | +3,5 [−1,2; +8,1] | +4,6 [−0,6; +9,9] | Zug 210 / 222 |
+| BF0 | +0,0 [+0,0; +0,0] | +0,0 [−0,1; +0,2] | +0,0 [−0,1; +0,2] | Zug 394 / 406 |
+| **O7** | −4,7 [−14,4; +5,0] | −2,0 [−13,3; +9,2] | +2,7 [−12,1; +17,5] | Zug 20 / 14 |
+
+Wechselwirkung I = Δ_O7 − Σ Δ_i (97,5 %, 240 Partienummern): gegen GNU Go
+**+43,8 [+10,3; +77,2]**, gegen Fuego +15,1 [−24,3; +54,5].
+
+BF0 spielt in 474 von 480 Partien gegen GNU Go und in 420 von 480 gegen Fuego
+Zug für Zug wie D. BE0 tut das in 65 bzw. 55 Partien und weicht sonst erst um
+Zug 210 ab. Der volle Bericht steht in
+[`bericht.md`](daten/komponenten-b/lauf1/bericht.md).
+
+### Einordnung
+
+Stufe B urteilt nicht und wählt keinen Default. Was die Intervalle zeigen:
+
+- **Auf dem vollen Default bringen die sieben zusammen nichts Messbares.** O7
+  liegt gegen GNU Go bei −4,7 und gegen Fuego bei −2,0, beide Intervalle
+  enthalten 0. Auf der Engine ohne Netz und Muster waren es in Stufe A gegen
+  GNU Go noch −39,0 (B − NM0). Mit Netz und Mustern werden die sieben also
+  überflüssig. Die beiden gelernten Teile übernehmen, was die sieben auf der
+  reduzierten Engine leisten.
+- **Damit fällt der Befund aus Stufe A zur Gegnerabhängigkeit auf dem Default
+  weg.** Dort hieß es, gegnerabhängig sei eher der Rest (B: +38,0). Auf D ist
+  der Unterschied der Gegner für O7 +2,7 [−12,1; +17,5], und für keinen
+  Einzelarm schließt das Intervall 0 aus. Die Abhängigkeit vom Gegner gehört
+  also zur reduzierten Engine, nicht zum Default. Für den Default gilt, soweit
+  die Auflösung reicht (rund 17 Punkte): Kein Teil wirkt gegen GNU Go messbar
+  anders als gegen Fuego. Alle Unterschiede sind leicht positiv (+0 bis +10).
+  Sie hängen aber alle an denselben Partien von D und sind einzeln Rauschen.
+- **Der scharfe Prior trägt auf dem Default kaum noch.** P0 kostet gegen GNU Go
+  −6,4 [−15,8; +3,1]. Früher, ohne Netz und Muster, waren es −58,6. Die
+  Vermutung, P0 trage den Unterschied der Gegner, trifft nicht zu.
+- **W0 ist kein Abschalten, sondern ein Defekt.** Ohne frische Wurzel bei
+  übernommenem Baum verliert die KI 35 Punkte gegen GNU Go und 30 gegen Fuego.
+  Den Baum gar nicht zu übernehmen (T0) kostet dagegen nichts Messbares (−5,0
+  und +2,1). Wahrscheinliche Erklärung, nicht geprüft: Mit W0 stammen die
+  Wurzelkinder eines übernommenen Baums aus `quickEval`. Muster und Netz wirken
+  aber nur auf die frisch gebildete Wurzel. In rund 13 % der Suchen wird der
+  Baum übernommen (9 015 von 69 643 gegen GNU Go), dort fehlen dann beide.
+  Das passt auch zur Wechselwirkung: I = +43,8 gegen GNU Go entsteht vor allem,
+  weil die −34,7 von W0 in O7 nicht noch einmal auftreten. T0 schaltet W0 mit
+  ab (§2).
+- **Gleichstandsbrecher, Benson-Bewertung und Benson-Zugfilter** greifen spät
+  oder fast nie ein und wirken auf dem Default nicht messbar. BE0 und BF0 haben
+  sehr enge Intervalle (±2,5 bzw. 0). E0 liegt gegen Fuego bei +6,8
+  [−2,4; +16,0], also eher besser ohne, aber im Rauschen.
+- **Phasen.** W0 liegt nach Zug 80 schon deutlich zurück (−13 gegen GNU Go,
+  −16 gegen Fuego), also bevor das Netz wirkt. Das passt dazu, dass mit W0 in
+  übernommenen Bäumen auch die Muster fehlen. P0 und O7 liegen gegen GNU Go
+  nach Zug 40 leicht vorn (+5) und verlieren das bis zum Ende wieder.
+
+### Abgleich mit der Erwartung (§6)
+
+| Erwartung | eingetreten? |
+|---|---|
+| P0 gegen GNU Go klar unter D | nein (−6,4, Intervall enthält 0) |
+| W0 gegen GNU Go unter D | ja, stärker als erwartet (−34,7) |
+| E0 gegen GNU Go nahe 0 | ja (−3,1) |
+| E0, BE0, BF0 weichen erst spät ab | ja (Zug 100, 210, 394) |
+| T0, BE0, BF0 klein | ja |
+| R0 nahe 0 | ja |
+| O7 gegen GNU Go deutlich unter D, gegen Fuego weniger, Unterschied positiv | **nein** (−4,7 und −2,0, Unterschied +2,7) |
+| Träger des Unterschieds am ehesten P0 | **nein** |
+| Wechselwirkung: Vorzeichen offen, T0 und W0 überlappen | positiv gegen GNU Go (+43,8), wie die Überlappung erwarten ließ |
+
+### Was daraus folgt
+
+- `index.html` bleibt, wie es ist (§1).
+- **Gesamtbild aus Stufe A und B:** Die Spielstärke des Defaults hängt vor allem
+  am Netz (rund 70 Punkte) und an Netz und Mustern zusammen (rund 113). Beide
+  wirken gegen Fuego wie gegen GNU Go. Die sieben übrigen Zusätze tragen auf
+  dem Default zusammen nichts Messbares bei, die frische Wurzel ausgenommen,
+  die nur einen Defekt der Baum-Übernahme verhindert. Ein Hinweis auf eine
+  Spezialisierung des Defaults auf GNU Go bleibt nicht übrig, soweit die
+  Auflösung reicht.
+- **Vereinfachen wäre möglich, ist aber keine Wahl dieser Stufe.** Tree-Reuse
+  samt frischer Wurzel, Gleichstandsbrecher und die beiden Benson-Teile ließen
+  sich vermutlich ohne Verlust abschalten. Das wäre ein eigener Versuch mit
+  eigener Vorabfestlegung, auch wegen der Laufzeit im Browser, die hier nicht
+  gemessen ist.
+- **Die Muster in der Eröffnung** bleiben der nächste offene Versuch
+  ([`komponenten.md`](komponenten.md) §9).
