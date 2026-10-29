@@ -138,3 +138,61 @@ den Kontrollen. Erwartet werden **1,5 bis 2 Stunden**.
 Der Nachtrag wendet die Regel aus §4 an. Wird ein Arm Default, ändert sich nur
 `musterAb` in `index.html`, samt Kommentar und README. Sonst bleibt der Schalter
 mit 0 im Code, und das Ergebnis steht beim Schalter.
+
+## 9. Nachtrag: Ergebnis von Lauf 1 (29.10.2026)
+
+[Workflow-Lauf 40866993818](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40866993818)
+auf Merge `d6e3ddb`, in knapp anderthalb Stunden (11:38 bis 13:02 UTC). Alle
+99 Jobs sind grün, es fehlt kein Teil. Daten:
+[`docs/daten/muster-eroeffnung/lauf1/`](daten/muster-eroeffnung/lauf1/).
+
+**Der Lauf ist sauber.** Keine Partie ist abgebrochen, keine lief bis zum
+Zuglimit. Beide Kontrollen sind bestanden (je 20 von 20 Partien gleich wie in
+Stufe A), der neue Schalter ändert mit 0 also nichts. Die Probe trifft in allen
+Paaren zu: A40 spielt in 480 von 480 Paaren die ersten 40 Züge wie M0, A80 die
+ersten 80, gegen beide Gegner.
+
+### M1: Arm − D, Endstand (97,5 %)
+
+| Arm | gegen GNU Go | gegen Fuego | Urteil |
+|---|---|---|---|
+| A40 | −3,7 [−11,2; +3,7] | +0,8 [−8,3; +9,9] | nicht belegt |
+| A80 | +3,5 [−3,8; +10,9] | −3,1 [−11,9; +5,6] | nicht belegt |
+
+### M2: Selbstspiel gegen D, ohne Aufgabe (360 Partien)
+
+| Arm | Siege | Rate | 95 % | p |
+|---|---:|---:|---|---:|
+| A40 | 160 | 44,4 % | [39,4; 49,6] | 0,040 |
+| A80 | 100 | **27,8 %** | [23,4; 32,6] | 1,5 · 10⁻¹⁷ |
+
+### Entscheidung nach §4
+
+Kein Arm ist gegen beide Gegner besser, und beide liegen im Selbstspiel
+signifikant unter 50 %. **`musterAb` bleibt 0**, die Muster zählen weiter von
+Anfang an. Der Schalter bleibt im Code, das Ergebnis steht bei ihm.
+
+### Einordnung
+
+- **Gegen GNU Go und Fuego ändert der spätere Einsatz nichts Messbares.** Alle
+  vier Intervalle enthalten 0. Ein Gewinn von mehr als rund 11 Punkten ist
+  gegen beide Gegner ausgeschlossen.
+- **Im Selbstspiel schadet er klar,** am stärksten mit A80: Nur 28 % der
+  Partien gegen den Default gewinnt die KI, wenn die Muster erst ab Zug 80
+  zählen. Die Muster tragen in der Eröffnung also doch etwas bei. Gegen die
+  eigene Engine wird das sichtbar, gegen die beiden fremden Gegner nicht.
+- **Der frühe Vorsprung war eine Täuschung des Richters.** Nach Zug 40 liegen
+  beide Arme wieder +27 (GNU Go) bzw. +35 (Fuego) vorn, genau wie M0. Bis Zug
+  200 ist das gegen beide Gegner aufgebraucht, und am Ende bleibt nichts.
+  GNU Gos `estimate_score` bewertet die Eröffnung ohne Muster besser, als sie
+  ist. Das Phasenprofil aus Stufe A war damit kein Beleg für einen Schaden der
+  Muster, sondern ein Merkmal der Schätzung.
+
+### Abgleich mit der Erwartung (§6)
+
+| Erwartung | eingetreten? |
+|---|---|
+| A80 nach Zug 40 und 80, A40 nach Zug 40 wie M0 vorn | ja, genau (Probe 480 von 480) |
+| Endstand eher 0 bis +10, wahrscheinlich nicht belegt | ja, beide nicht belegt |
+| A40 eher besser als A80 | gemischt: gegen Fuego und im Selbstspiel ja, gegen GNU Go nein |
+| M2 nahe 50 % | **nein**: 44,4 % und 27,8 %, beide signifikant darunter |

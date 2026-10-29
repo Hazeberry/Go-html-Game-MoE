@@ -1979,8 +1979,13 @@ globalThis.PARAMS = {
   /* Muster erst ab dieser Zugzahl (mc >= musterAb), davor zaehlt nur
      evaluateMove. Anlass: In Stufe A der Komponentenmessung lag die KI ohne
      Muster nach Zug 40 nach GNU Gos Schaetzung rund 30 Punkte besser, am
-     Ende aber nicht (docs/komponenten.md §9). Gemessen wird 40 und 80 gegen
-     0 (docs/muster-eroeffnung.md). 0 = altes Verhalten, bitgenau. */
+     Ende aber nicht (docs/komponenten.md §9). 0 = altes Verhalten, bitgenau.
+     GEMESSEN UND VERWORFEN (docs/muster-eroeffnung.md §9, Seed 220, je 480
+     Paare, 97,5 %): 40 gegen 0 -3,7 [-11,2; +3,7] gegen GNU Go, +0,8
+     [-8,3; +9,9] gegen Fuego; 80 gegen 0 +3,5 [-3,8; +10,9] und -3,1
+     [-11,9; +5,6]. Im Selbstspiel ohne Aufgabe gewinnt 40 nur 44,4 % und 80
+     nur 27,8 % von 360 (beide signifikant unter 50 %). Der fruehe Vorsprung
+     nach GNU Gos Schaetzung war ein Merkmal der Schaetzung. Default bleibt 0. */
   musterAb:           0,
   /* Endspiel-Netz an der Wurzel (docs/endspiel-netz.md): Anteil des Netzes am
      Prior der Wurzelkinder (0 = aus), so viele beste Netzpunkte kommen unter

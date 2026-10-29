@@ -265,4 +265,5 @@ Stufe B urteilt nicht und wählt keinen Default. Was die Intervalle zeigen:
   eigener Vorabfestlegung, auch wegen der Laufzeit im Browser, die hier nicht
   gemessen ist.
 - **Die Muster in der Eröffnung** bleiben der nächste offene Versuch
-  ([`komponenten.md`](komponenten.md) §9).
+  ([`komponenten.md`](komponenten.md) §9). *Nachtrag:* gemessen und verworfen
+  ([`muster-eroeffnung.md`](muster-eroeffnung.md) §9).

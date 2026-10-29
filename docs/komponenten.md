@@ -333,6 +333,10 @@ Stufe A urteilt nicht und wählt keinen Default. Was die Intervalle zeigen:
   §9).
 - **Die Muster in der Eröffnung** wären ein eigener Versuch: Muster erst ab Zug
   40 oder 80 (`musterGewicht@N`). Auch das nur mit Vorabfestlegung.
+  *Nachtrag 29.10.:* gemessen und verworfen
+  ([`muster-eroeffnung.md`](muster-eroeffnung.md) §9). Gegen beide Gegner
+  ändert es nichts Messbares, im Selbstspiel verliert es. Der Vorsprung nach
+  Zug 40 im Phasenprofil oben war ein Merkmal von GNU Gos Schätzung.
 - **Für die Planung** ist die SD der Differenzen gegen Fuego bei 74 bis 83
   Punkten. Mit 480 Paaren und alpha 0,01 sind gegen Fuego also rund 12 Punkte
   sichtbar, gegen GNU Go rund 11.
