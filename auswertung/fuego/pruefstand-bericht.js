@@ -28,10 +28,19 @@ const komma = (x, n = 1) => Number.isFinite(x) ? x.toFixed(n).replace('.', ',').
 const pz = x => Number.isFinite(x) ? (100 * x).toFixed(0) + ' %' : '–';
 
 /* P(X ≤ k) für X ~ Bin(n, p) */
+/* P(X ≤ k) für X ~ Bin(n, p), gerechnet über Logarithmen: (1 − p)^n allein
+   wird für große n und p nahe 1 zu 0 (unter 1e-308; bei n = 360 schon ab
+   p ≈ 0,86), und dann wäre jede Summe 0 (docs/pwa-vergleich.md §9). */
 function binomVerteilung(k, n, p) {
-  let s = 0, t = Math.pow(1 - p, n);
-  for (let i = 0; i <= k; i++) { s += t; t *= (n - i) / (i + 1) * p / (1 - p); }
-  return s;
+  if (p <= 0) return 1;
+  if (p >= 1) return k >= n ? 1 : 0;
+  const lp = Math.log(p), lq = Math.log(1 - p);
+  let lf = 0;
+  const lfak = [0];
+  for (let i = 1; i <= n; i++) lfak[i] = (lf += Math.log(i));
+  let s = 0;
+  for (let i = 0; i <= Math.min(k, n); i++) s += Math.exp(lfak[n] - lfak[i] - lfak[n - i] + i * lp + (n - i) * lq);
+  return Math.min(1, s);
 }
 /* exaktes zweiseitiges 95-%-Intervall nach Clopper-Pearson */
 function intervall(k, n) {

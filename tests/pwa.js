@@ -12,8 +12,9 @@
      3. Die PWA-Datei ist die aus dem Dokument (sha256), die Teile, Seeds
         und Bedenkzeiten stimmen in Dokument, Spielskript, Workflow und
         Ergebnisskript überein, pwa-spielen.sh lehnt falsche Eingaben ab.
-     4. pwa-bericht.js: Siegrate mit exaktem Intervall, Urteil nach der
-        vorab festgelegten Regel, Gleichstandsprobe, Kontrolle.
+     4. pwa-bericht.js: Siegrate mit exaktem Intervall (auch bei 360
+        Partien und Raten nahe 90 %), Urteil nach der vorab festgelegten
+        Regel, Gleichstandsprobe, Kontrolle.
      5. pwa-ergebnis.sh fügt Teile und Kontrolle zusammen und nennt fehlende.
 
    Aufruf:  node tests/pwa.js */
@@ -122,6 +123,8 @@ test('pwa-bericht.js: Siegrate, exaktes Intervall, Urteil, Gleichstandsprobe, Ko
   const t = P.teil([...partien(3, 4), {nr: 9, abgebrochen: 'x'}, {nr: 10, gewonnen: null, endstand: 5}]);
   pruefeGleich(`${t.partien} ${t.abgebrochen} ${t.zuglimit} ${t.n} ${t.siege}`, '6 1 1 4 3', 'Abbruch und Zuglimit zählen nicht');
   pruefe(Math.abs(t.lo - 0.1941) < 0.001 && Math.abs(t.hi - 0.9937) < 0.001, `Clopper-Pearson 3 von 4: ${t.lo} bis ${t.hi}`);
+  const g = P.teil(partien(305, 360));
+  pruefe(Math.abs(g.lo - 0.8058) < 0.001 && Math.abs(g.hi - 0.8828) < 0.001, `Clopper-Pearson 305 von 360 (ohne Unterlauf von (1 − p)^n): ${g.lo} bis ${g.hi}`);
   const a = P.auswertung({M1: partien(300, 360), K1: partien(90, 120)});
   pruefe(!a.k1.bestanden && a.urteile.length === 1 && a.urteile[0].urteil === 'neu stärker', 'K1 mit 75 % nicht bestanden');
   const md = P.text(a, {gleich: 20, erwartet: 20, ok: true});
