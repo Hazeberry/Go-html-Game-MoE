@@ -29,6 +29,10 @@
         in spielen.sh, Teile und Seeds in Dokument, Workflow und
         Ergebnisskript; der Bericht prüft Nichtunterlegenheit (Grenze −10,
         bei 600 Simulationen −20 und Mittelwert über −5).
+     8. Diagnose der Selbstspiel-Niederlagen (docs/muster-eroeffnung.md §9):
+        selbstspiel-diagnose.js rechnet Komi, knappe Niederlagen, Farbe und
+        Verlauf aus Sicht von B richtig, und die Tabellen im Dokument sind
+        genau die Ausgabe des Skripts für die gespeicherten Daten.
 
    Aufruf:  node tests/komponenten.js */
 'use strict';
@@ -328,6 +332,30 @@ test('Baum-Übernahme, Bericht: Nichtunterlegenheit mit Grenze −10, bei 600 Si
   const D = arm(nr => 4 * r(nr)), T0 = arm(nr => 4 * r(nr) + r(nr + 1));
   const md = K.text(K.auswertung({g: {D, T0}, f: {D, T0}}, 'T'));
   pruefe(/\(95 %\)/.test(md) && /Nichtunterlegenheit \(Grenze −10,0; vorab festgelegt\)/.test(md) && /nicht unterlegen gegen beide Gegner/.test(md), 'Bericht nennt Grenze und Urteil');
+});
+
+test('Selbstspiel-Diagnose: Sicht von B, Komi, knappe Niederlagen, Farbe; Tabellen im Dokument', () => {
+  const S = require('../auswertung/komponenten/selbstspiel-diagnose.js');
+  pruefeGleich(S.differenz('B 188 : W 180.5'), 7.5, 'Stand lesen');
+  const g = (b, w) => ({b, w});
+  const p = (aIst, stand, stand0, sieger, sieger0, m150) => ({aIst, stand, standKomi0: stand0, sieger, siegerKomi0: sieger0,
+    gebietOhneKomi: {M150: m150, M200: m150, M250: m150}, verlust: {A: {summe: 10}, B: {summe: 20}}});
+  const d = S.diagnose([
+    p('Weiß', 'B 190 : W 180.5', 'B 190 : W 173.0', 'B', 'B', g(80, 70)),    // B Schwarz, +9,5
+    p('Schwarz', 'B 185 : W 176.5', 'B 185 : W 169.0', 'A', 'A', g(80, 70)), // B Weiß, −8,5
+    p('Schwarz', 'B 180 : W 181.5', 'B 180 : W 174.0', 'B', 'A', g(70, 80)), // B Weiß, +1,5; kippt gegen B
+    p('Weiß', 'B 178 : W 183.5', 'B 178 : W 176.0', 'A', 'B', g(70, 80))     // B Schwarz, −5,5; kippt für B
+  ]);
+  pruefeGleich(`${d.siege} ${d.siegeKomi0} ${d.gekippt} ${d.gekipptFuerB}`, '2 2 2 1', 'Komi');
+  pruefeGleich(`${d.niederlagen} ${d.knapp} ${d.medianNiederlage} ${d.schranke}`, '2 1 -7 0.75', 'knappe Niederlagen und Schranke');
+  pruefeGleich(`${d.farbe.Schwarz.siege} ${d.farbe.Schwarz.mittel} ${d.farbe.Weiß.mittel} ${d.schwarzWeiss.m}`, '1 2 -3.5 5.5', 'Farbe');
+  pruefeGleich(`${d.verlauf.M150.mittel} ${d.verlauf.M150.vorn} ${d.verlust.B}`, '0 2 20', 'Verlauf');
+  const daten = path.join(wurzel, 'docs/daten/muster-eroeffnung/lauf1');
+  const aus = execFileSync('node', [path.join(wurzel, 'auswertung/komponenten/selbstspiel-diagnose.js'),
+    `A40=${daten}/m2-A40.jsonl.gz`, `A80=${daten}/m2-A80.jsonl.gz`], {encoding: 'utf8'});
+  const doc = fs.readFileSync(path.join(wurzel, 'docs/muster-eroeffnung.md'), 'utf8');
+  const fehlt = aus.split('\n').filter(z => z.trim() && !doc.includes(z));
+  pruefeGleich(fehlt.length, 0, 'Tabellen im Dokument = Ausgabe des Skripts' + (fehlt.length ? ': ' + fehlt[0] : ''));
 });
 
 laufeTests('Komponenten Stufe A, B und Muster-Eröffnung, Baum-Übernahme').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });

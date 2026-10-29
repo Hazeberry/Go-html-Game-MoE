@@ -196,3 +196,62 @@ Anfang an. Der Schalter bleibt im Code, das Ergebnis steht bei ihm.
 | Endstand eher 0 bis +10, wahrscheinlich nicht belegt | ja, beide nicht belegt |
 | A40 eher besser als A80 | gemischt: gegen Fuego und im Selbstspiel ja, gegen GNU Go nein |
 | M2 nahe 50 % | **nein**: 44,4 % und 27,8 %, beide signifikant darunter |
+
+### Nachträgliche Diagnose der Selbstspiel-Niederlagen (ohne Anspruch)
+
+Nachgetragen am 29.10.2026, nach dem Lauf und an schon bekannten Daten. Es
+wurde keine Partie neu gespielt. Die Zahlen beschreiben nur, sie begründen
+keine Entscheidung. Gerechnet mit
+[`selbstspiel-diagnose.js`](../auswertung/komponenten/selbstspiel-diagnose.js)
+aus `m2-A40.jsonl.gz` und `m2-A80.jsonl.gz`. Alles aus Sicht des Arms mit
+späten Mustern (B), gewertet wie im Harness: Fläche, Benson-tote Steine
+entfernt.
+
+Geprüft wird, ob die Niederlagen im Selbstspiel an der Wertung hängen
+könnten: an der Komi, an knappen Partien oder an einer Farbe.
+
+| Arm | Siege, Komi 7,5 | Komi 0 | Sieger kippt | davon für B | Niederlagen | Median | knapp (über −7,5) | Schranke |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| A40 | 160 | 155 | 39 | 17 | 200 | −18,5 | 33 | 53,6 % |
+| A80 | 100 | 99 | 33 | 16 | 260 | −26,5 | 31 | 36,4 % |
+
+| Arm | B als Schwarz: Siege, Endstand Ø | B als Weiß: Siege, Endstand Ø | Schwarz − Weiß (95 %) |
+|---|---|---|---|
+| A40 | 68 von 180, −5,4 | 92 von 180, +0,1 | −5,5 [−11,9; +0,8] |
+| A80 | 40 von 180, −19,6 | 60 von 180, −13,7 | −5,9 [−12,5; +0,6] |
+
+| Arm | Zug 150 | Zug 200 | Zug 250 | Ende | B vorn nach Zug 150 | geschlagene Steine B / A |
+|---|---:|---:|---:|---:|---:|---|
+| A40 | −4,3 | −4,1 | −1,0 | −2,7 | 105 von 360 | 31,8 / 30,8 |
+| A80 | −11,7 | −11,1 | −5,3 | −16,7 | 35 von 360 | 36,9 / 28,4 |
+
+Die Spalten „Zug 150“ bis „Ende“ zeigen den Gebietsstand ohne Komi, Mittel
+über alle 360 Partien.
+
+- **Die Komi erklärt nichts.** Die Engine spielt komi-blind (die Suche
+  kennt keine Komi; `KOMI` steht in `index.html` nur in der Anzeige, im SGF
+  und im Ergebnis, mit dem das Policy-Netz im Browser nach der Partie
+  lernt). Mit Komi 0 ändert sich die Zahl der Siege kaum, und die gekippten
+  Partien verteilen sich etwa gleich auf beide Seiten.
+- **Knappe Partien erklären es auch nicht.** Selbst wenn eine andere Wertung
+  alle 31 knappen Niederlagen von A80 kippte, läge A80 bei 36,4 %, also
+  weiter klar unter 50 %. Die Hälfte der Niederlagen geht mit mehr als 26
+  Punkten verloren.
+- **Keine Farbe ist schwach.** B schneidet als Schwarz in beiden Armen gleich
+  viel schlechter ab als als Weiß (−5,5 und −5,9; beide Intervalle enthalten
+  0). Das liegt also nicht am Arm, sondern eher daran, dass Komi 7,5 Schwarz
+  in diesem Selbstspiel um etwa 3 Punkte benachteiligt. Daher kommen auch die
+  40 gegen 60 Siege von A80 je Farbe.
+- **Der Rückstand entsteht früh.** Nach Zug 150 liegt B bei A80 nur in 35
+  von 360 Partien vorn. Ab Zug 80 spielen beide Seiten gleich, der Rückstand
+  stammt also aus den Zügen ohne Muster. Der Gebietsstand während der Partie
+  ist grob (tote Steine erkennt nur Benson). Dass er bei Zug 250 kleiner ist
+  als bei Zug 200 und am Ende, ist eher Rauschen der Zählung als ein
+  Aufholen.
+- **Was das nicht zeigt:** Die Dosis (A40 schwächer als A80) belegt, dass
+  der Effekt im Selbstspiel echt ist. Ob er gegen einen fremden Gegner auf
+  dem leeren Brett auftritt, zeigt sie nicht. Eine Verstärkung durch das
+  Selbstspiel würde mit der Länge des Fensters genauso wachsen. Gemessen
+  wurde gegen fremde Gegner nur mit sechs Vorgabesteinen (M1: nichts
+  Messbares). Für `musterAb` ändert das nichts: Der Schalter bleibt 0 bei
+  jedem Ausgang, weil M1 gegen beide Gegner keinen Gewinn zeigt.
