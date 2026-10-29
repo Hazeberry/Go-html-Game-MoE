@@ -156,3 +156,73 @@ etwa fünfmal so lang. Erwartet werden **3 bis 4 Stunden**.
 Der Nachtrag wendet die Regel aus §4 an. Wird T0 Default, ändert sich nur
 `mctsTreeReuse` in `index.html` auf 0, samt Kommentar und README. Bleibt es
 bei 1, steht das Ergebnis beim Schalter.
+
+## 9. Nachtrag: Ergebnis von Lauf 1 (29.10.2026)
+
+[Workflow-Lauf 40897158345](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40897158345)
+auf Merge `c9ef4a5`, in gut drei Stunden (15:00 bis 18:09 UTC). Alle 204 Jobs
+sind grün, es fehlt kein Teil. Daten:
+[`docs/daten/baum-uebernahme/lauf1/`](daten/baum-uebernahme/lauf1/), der
+volle Bericht in [`bericht.md`](daten/baum-uebernahme/lauf1/bericht.md).
+
+**Der Lauf ist sauber.** Keine der 4 800 Partien gegen die Gegner ist
+abgebrochen, keine lief bis zum Zuglimit. Beide Kontrollen sind bestanden (je
+20 von 20 Partien Zug für Zug gleich wie D in Stufe A).
+
+### Hauptmessung: 120 Simulationen, 960 Paare (95 %)
+
+| | gegen GNU Go | gegen Fuego |
+|---|---|---|
+| T0 − D | −2,9 [−7,3; +1,4] | −0,2 [−5,6; +5,2] |
+| Siege T0 / D | 581 / 595 | 461 / 486 |
+| erste Abweichung (Median) | Zug 50 | Zug 54 |
+
+Beide Untergrenzen liegen über −10: **nicht unterlegen gegen beide Gegner.**
+
+### Zweite Messung: 600 Simulationen, 240 Paare (95 %)
+
+| | gegen GNU Go | gegen Fuego |
+|---|---|---|
+| T0 − D | **−5,8** [−14,7; +3,1] | +0,1 [−12,1; +12,3] |
+| Siege T0 / D | 128 / 137 | 123 / 130 |
+
+Beide Untergrenzen liegen über −20. Gegen GNU Go liegt die Differenz selbst
+aber mit −5,8 unter −5: **Trend zum Schaden nach der Regel.**
+
+### Selbstspiel: T0 gegen D, 360 Partien ohne Aufgabe
+
+T0 gewinnt 169 von 360, **46,9 %** [41,8 %; 52,1 %], p = 0,27. Die Obergrenze
+liegt über 45 %: kein Veto.
+
+### Entscheidung nach §4
+
+Hauptmessung nicht unterlegen, zweite Messung mit Trend zum Schaden: Das ist
+die dritte Zeile der Tabelle. **Der Default `mctsTreeReuse` bleibt 1.** Der
+Schalter bleibt im Code, das Ergebnis steht bei ihm.
+
+### Einordnung
+
+- **Bei 120 Simulationen kostet das Abschalten nichts Messbares.** Ein Verlust
+  von mehr als 7,3 Punkten gegen GNU Go und 5,6 gegen Fuego ist
+  ausgeschlossen. Das passt zu Stufe B mit anderem Seed (−5,0 und +2,1, §2).
+- **Bei 600 Simulationen ist die Regel knapp gerissen, nicht klar.** Der
+  Mittelwert gegen GNU Go verfehlt −5 um 0,8 Punkte, das Intervall enthält 0
+  und reicht bis +3,1. Gegen Fuego liegt T0 genau bei D. Dass die Übernahme
+  mit mehr Simulationen hilft, wie die Tabelle in §4 die Folge benennt, zeigt
+  der Lauf also nicht. Er schließt es nur nicht aus. Die Messung war als
+  Warnsignal gedacht (§5), und als solches greift sie.
+- **Die Richtung passt zur Erwartung (§6), die Größe ist klein.** Gegen GNU Go
+  liegt T0 bei 120 und bei 600 Simulationen leicht unter D (−2,9 und −5,8),
+  gegen Fuego beide Male bei 0. Im Phasenprofil bei 600 Simulationen entsteht
+  der Abstand gegen GNU Go erst nach Zug 120 (−5,9 bei Zug 200).
+- **Das Selbstspiel ist neutral.** 46,9 % liegt unter 50 %, aber nicht
+  signifikant, und deutlich über der Vetogrenze.
+- **Nebenbefund im Phasenprofil:** Bei 120 Simulationen liegt T0 gegen GNU Go
+  bei Zug 40 nach GNU Gos Schätzung +2,5 [+1,9; +3,1] vorn, bei Zug 80 schon
+  −2,6 hinten. Gegen Fuego gibt es den Vorsprung nicht (+0,2). Wie bei der
+  Muster-Eröffnung ([`muster-eroeffnung.md`](muster-eroeffnung.md) §9) wird
+  aus einem frühen Vorsprung nach GNU Gos Schätzung kein Endstand.
+
+**Was offen bleibt.** Ob die Übernahme bei vielen Simulationen hilft, wie im
+Browser (rund 4 500 je Zug), klärt nur eine größere Messung bei mehr
+Simulationen. Die Laufzeit im Browser misst dieser Versuch nicht (§4).
