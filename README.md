@@ -79,7 +79,9 @@ nichts zu installieren.
   dort gegen keinen der beiden Gegner etwas Messbares (−4,7 und −2,0), und
   kein Teil wirkt gegen GNU Go messbar anders als gegen Fuego. Ein Hinweis
   auf eine Spezialisierung des Defaults auf GNU Go bleibt nicht übrig, soweit
-  die Auflösung reicht (rund 14 bis 17 Punkte).
+  die Auflösung reicht (rund 14 bis 17 Punkte). Vorab festgelegt ist die
+  Muster-Eröffnung (`docs/muster-eroeffnung.md`): Muster erst ab Zug 40 oder
+  80 (`musterAb`, Default 0), gegen beide Gegner und im Selbstspiel.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl

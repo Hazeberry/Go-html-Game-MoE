@@ -1,8 +1,11 @@
 // Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /* Bericht der Komponentenmessung, Stufe A (docs/komponenten.md §4) und
-   Stufe B (docs/komponenten-b.md §4). Er urteilt nicht, er nennt
-   Intervalle. Je Gegner (g: GNU Go, f: Fuego):
+   Stufe B (docs/komponenten-b.md §4), und der Muster-Eröffnung
+   (--stufe M, docs/muster-eroeffnung.md §4). Stufe A und B urteilen nicht,
+   sie nennen Intervalle; M nennt dazu das vorab festgelegte Urteil über M1
+   (besser gegen beide Gegner, schlechter gegen einen, sonst nicht belegt).
+   Je Gegner (g: GNU Go, f: Fuego):
 
      1. jeder Arm gegen D, Endstand nach GNU Gos Zählung, gepaart nach
         Partienummer: Differenz, SD der Differenzen, Intervall mit
@@ -19,6 +22,9 @@
         Intervall mit alpha 0,05/2 (97,5 %), weil sie für beide Gegner
         gerechnet wird.
 
+   In M zusätzlich die Probe: A40 und A80 spielen die ersten 40 bzw. 80 Züge
+   wie M0 (Muster aus) aus Stufe A.
+
    Dazu, wenn beide Gegner da sind, je Arm der Unterschied der Gegner
    Δ_f − Δ_g (Welch, alpha 0,05/k) und der Unterschied der standardisierten
    Wirkungen. Kontrollen: Partien eines zweiten Laufs gegen eine frühere
@@ -28,7 +34,7 @@
    Partner heraus.
 
    Aufruf:
-     node auswertung/komponenten/bericht.js [--stufe A|B] --arm g:D=a.jsonl,b.jsonl --arm g:N0=... --arm f:D=... ...
+     node auswertung/komponenten/bericht.js [--stufe A|B|M] --arm g:D=a.jsonl,b.jsonl --arm g:N0=... --arm f:D=... ...
           [--kontrolle g=neu.jsonl,alt.jsonl.gz] [--kontrolle f=...]
    Die Ausgabe ist Markdown. */
 'use strict';
@@ -40,7 +46,8 @@ const {kontrolle} = require('../fuego/pruefstand-bericht.js');
 const SIEBEN = ['R0', 'T0', 'W0', 'E0', 'P0', 'BE0', 'BF0'];
 const STUFEN = {
   A: {vergleiche: ['B', 'N0', 'M0', 'NM0', 'R0'], wechsel: ['NM0', ['N0', 'M0']], probe: 'N0'},
-  B: {vergleiche: [...SIEBEN, 'O7'], wechsel: ['O7', SIEBEN], probe: null}
+  B: {vergleiche: [...SIEBEN, 'O7'], wechsel: ['O7', SIEBEN], probe: null},
+  M: {vergleiche: ['A40', 'A80'], wechsel: null, probe: null, proben: [['A40', 'M0', 40], ['A80', 'M0', 80]], urteil: true}
 };
 for (const s of Object.values(STUFEN)) s.alpha = 0.05 / s.vergleiche.length;
 const ALPHA = STUFEN.A.alpha, ALPHA_I = 0.05 / 2;
@@ -92,12 +99,33 @@ function vergleich(D, X, arm, alpha = ALPHA, probe = 'N0') {
 }
 
 /* Wechselwirkung je Partienummer: I = X − Σ A_i + (n − 1)·D = Δ_X − Σ Δ_i */
-function wechselwirkung(arme, [ziel, teile] = STUFEN.A.wechsel) {
+function wechselwirkung(arme, wechsel = STUFEN.A.wechsel) {
+  if (!wechsel) return null;
+  const [ziel, teile] = wechsel;
   const X = arme[ziel], D = arme.D, A = teile.map(t => arme[t]);
   if (!D || !X || A.some(a => !a)) return null;
   const nrs = [...X.keys()].filter(nr => [D, X, ...A].every(a => fertig(a.get(nr))));
   const w = stat(nrs.map(nr => X.get(nr).endstand - A.reduce((s, a) => s + a.get(nr).endstand, 0) + (A.length - 1) * D.get(nr).endstand), ALPHA_I);
   return w && {...w, ziel, teile};
+}
+
+/* Spielt Arm X in jedem Paar die ersten n Züge wie Arm R? */
+function probe(arme, x, r, n) {
+  const X = arme[x], R = arme[r];
+  if (!X || !R) return null;
+  const nrs = [...X.keys()].filter(nr => fertig(X.get(nr)) && fertig(R.get(nr)));
+  const gleich = nrs.filter(nr => JSON.stringify((X.get(nr).zuege || []).slice(0, n)) === JSON.stringify((R.get(nr).zuege || []).slice(0, n))).length;
+  return {arm: x, ref: r, zuege: n, n: nrs.length, gleich};
+}
+
+/* Urteil über M1 (docs/muster-eroeffnung.md §4): besser heißt, die Untergrenze
+   des Intervalls liegt gegen beide Gegner über 0 */
+function urteilM(gegner, arm) {
+  const v = ['g', 'f'].map(o => gegner[o] && gegner[o].vergleiche && gegner[o].vergleiche.find(x => x.arm === arm));
+  if (v.some(x => !x || !x.g)) return 'unvollständig';
+  if (v.some(x => x.g.hi < 0)) return 'schlechter';
+  if (v.every(x => x.g.lo > 0)) return 'besser gegen beide Gegner';
+  return 'nicht belegt';
 }
 
 /* Unterschied der Gegner Δ_f − Δ_g (unabhängige Partien, Welch) */
@@ -124,7 +152,8 @@ function auswertung(daten, stufe = 'A') {
     aus[o] = {
       arme: Object.keys(arme).map(a => beschreibung(a, arme[a])),
       vergleiche: st.vergleiche.filter(a => arme[a]).map(a => vergleich(arme.D, arme[a], a, st.alpha, st.probe)),
-      wechselwirkung: wechselwirkung(arme, st.wechsel)
+      wechselwirkung: wechselwirkung(arme, st.wechsel),
+      proben: (st.proben || []).map(([x, r, n]) => probe(arme, x, r, n)).filter(Boolean)
     };
   }
   const unterschied = [];
@@ -134,7 +163,8 @@ function auswertung(daten, stufe = 'A') {
       if (vf) unterschied.push({arm: vg.arm, ...gegnerUnterschied(vg, vf, st.alpha)});
     }
   }
-  return {stufe, alpha: st.alpha, gegner: aus, unterschied};
+  const urteile = st.urteil ? st.vergleiche.map(a => ({arm: a, urteil: urteilM(aus, a)})) : [];
+  return {stufe, alpha: st.alpha, gegner: aus, unterschied, urteile};
 }
 
 const z1 = v => Number.isFinite(v) ? (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1).replace('.', ',') : '–';
@@ -160,8 +190,9 @@ function text(a, kontrollen = {}) {
     aus.push('', `Phasenprofil, Arm − D nach GNU Gos Schätzung (${nv}):`, '',
       `| Arm − D | ${MARKEN.map(z => `Zug ${z}`).join(' | ')} | Ende |`, `|---|${MARKEN.map(() => '---').join('|')}|---|`);
     for (const v of e.vergleiche) aus.push(`| ${v.arm} | ${[...MARKEN, 'ende'].map(z => v.phasen[z] ? `${z1(v.phasen[z].m)} ${iv(v.phasen[z])}` : '–').join(' | ')} |`);
+    for (const p of e.proben || []) aus.push('', `${p.arm}: in ${p.gleich} von ${p.n} Paaren sind die ersten ${p.zuege} Züge gleich denen von ${p.ref}${p.gleich === p.n ? '' : ' (NICHT alle: Fehler suchen)'}.`);
     const w = e.wechselwirkung;
-    aus.push('', `Wechselwirkung I = Δ_${w ? w.ziel : '…'} − ${w ? w.teile.map(t => `Δ_${t}`).join(' − ') : '…'}: ${w ? `${z1(w.m)} ${iv(w)} (97,5 %, ${w.n} Partienummern)` : '–'}`);
+    if (w || STUFEN[a.stufe || 'A'].wechsel) aus.push('', `Wechselwirkung I = Δ_${w ? w.ziel : '…'} − ${w ? w.teile.map(t => `Δ_${t}`).join(' − ') : '…'}: ${w ? `${z1(w.m)} ${iv(w)} (97,5 %, ${w.n} Partienummern)` : '–'}`);
     if (kontrollen[o]) aus.push('', `Kontrolle: ${kontrollen[o].gleich} von ${kontrollen[o].erwartet} Partien gleich wie in der früheren Messung (${kontrollen[o].ok ? 'bestanden' : 'NICHT bestanden'})`);
     aus.push('');
   }
@@ -169,6 +200,10 @@ function text(a, kontrollen = {}) {
     aus.push('## Unterschied der Gegner', '', `Δ_Fuego − Δ_GNU Go je Arm (Welch, ${nv}); positiv: das Abschalten kostet gegen Fuego weniger.`, '',
       `| Arm | Δ_f − Δ_g | ${nv} | standardisiert f − g |`, '|---|---:|---|---:|');
     for (const u of a.unterschied) aus.push(`| ${u.arm} | ${z1(u.m)} | ${Number.isFinite(u.lo) ? `[${z1(u.lo)}; ${z1(u.hi)}]` : '–'} | ${z2(u.std)} |`);
+  }
+  if (a.urteile && a.urteile.length) {
+    aus.push('', '## Urteil über M1 (vorab festgelegt)', '');
+    for (const u of a.urteile) aus.push(`- ${u.arm}: **${u.urteil}**`);
   }
   return aus.join('\n');
 }
@@ -197,11 +232,11 @@ function main() {
     } else { fehler = true; break; }
   }
   if (fehler || !Object.keys(daten).length) {
-    console.error('Aufruf: node auswertung/komponenten/bericht.js [--stufe A|B] --arm g:D=a.jsonl,... --arm g:N0=... [--kontrolle g=neu.jsonl,alt.jsonl.gz]');
+    console.error('Aufruf: node auswertung/komponenten/bericht.js [--stufe A|B|M] --arm g:D=a.jsonl,... --arm g:N0=... [--kontrolle g=neu.jsonl,alt.jsonl.gz]');
     process.exit(2);
   }
   console.log(text(auswertung(daten, stufe), kontrollen));
 }
 
 if (require.main === module) main();
-module.exports = {auswertung, text, vergleich, wechselwirkung, gegnerUnterschied, ersteAbweichung, stat, tKrit, STUFEN, ALPHA, ALPHA_I, NETZ_AB};
+module.exports = {auswertung, text, vergleich, wechselwirkung, gegnerUnterschied, ersteAbweichung, probe, urteilM, stat, tKrit, STUFEN, ALPHA, ALPHA_I, NETZ_AB};

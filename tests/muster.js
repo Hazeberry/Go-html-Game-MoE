@@ -12,6 +12,9 @@
         Spiegelungen des Bretts.
      5. Bei > 0 ist jeder Kandidatenwert an der Wurzel genau evaluateMove +
         musterGewicht × musterWert.
+     6. musterAb (docs/muster-eroeffnung.md): Default 0; vor Zug musterAb
+        spielt getAIMove bitgenau wie mit musterGewicht 0, ab musterAb
+        bitgenau wie ohne den Schalter.
      Die zweite Tabelle (musterTabelle, docs/muster-ausbau.md) ist gemessen,
      verworfen und wieder entfernt; ihre Tests stehen in Commit 6edae5d.
 
@@ -124,6 +127,16 @@ test('musterGewicht > 0: Wurzelwert = Wert bei 0 + Gewicht × musterWert', () =>
     }
     pruefe(gemeinsam > 0, 'gemeinsame Kandidaten');
   } finally { globalThis.mctsPUCT = echt; }
+});
+
+test('musterAb: vor der Zugzahl wie Gewicht 0, ab der Zugzahl wie ohne Schalter', () => {
+  pruefeGleich(PARAMS.musterAb, 0, 'Default 0');
+  const b = stellungen()[1];
+  const z = kv => JSON.stringify(zug(new Uint8Array(b), 1, 120, kv));
+  pruefeGleich(z({musterAb: 0}), z({}), 'musterAb 0 = heutiges Verhalten');
+  pruefeGleich(z({musterAb: 121}), z({musterGewicht: 0}), 'Zug 120 vor musterAb 121: wie Gewicht 0');
+  pruefeGleich(z({musterAb: 120}), z({}), 'Zug 120 ab musterAb 120: wie ohne Schalter');
+  pruefe(z({musterGewicht: 0}) !== z({}), 'die Probe sieht den Unterschied (Gewicht 0 spielt hier anders)');
 });
 
 laufeTests('Muster aus GNU-Go-Zügen (musterGewicht)').then(ok => process.exit(ok ? 0 : 1));
