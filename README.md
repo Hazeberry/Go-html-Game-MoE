@@ -82,11 +82,11 @@ nichts zu installieren.
   die Auflösung reicht (rund 14 bis 17 Punkte). Die Muster erst ab Zug 40
   oder 80 einzusetzen (`musterAb`, `docs/muster-eroeffnung.md` §9) bringt
   gegen keinen der beiden Gegner etwas und verliert im Selbstspiel (44 % und
-  28 %); `musterAb` bleibt 0. Vorab festgelegt ist eine Prüfung auf
-  Nichtunterlegenheit für die Baum-Übernahme (`docs/baum-uebernahme.md`):
-  abschalten nur, wenn es gegen beide Gegner höchstens 10 Punkte kostet, auch
-  bei 600 Simulationen kein Schaden sichtbar wird und das Selbstspiel nicht
-  klar verliert.
+  28 %); `musterAb` bleibt 0. Die Baum-Übernahme abzuschalten
+  (`docs/baum-uebernahme.md` §9) kostet bei 120 Simulationen gegen keinen der
+  beiden Gegner etwas Messbares (−2,9 und −0,2 bei je 960 Paaren). Bei 600
+  Simulationen liegt es gegen GNU Go mit −5,8 knapp unter der vorab
+  festgelegten Schwelle −5; `mctsTreeReuse` bleibt deshalb 1.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl
@@ -326,6 +326,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | Komponenten Stufe A: Teile des Defaults abgeschaltet, gegen GNU Go und Fuego (6 Steine, je 480 bzw. 240 Paare, Seed 220, 29.10.) | ohne Netz −70,8 / −68,4, ohne Muster +2,0 / −10,1, ohne beide −113,6 / −112,1, ohne RAVE −5,5 / −1,1, reduzierte Engine −149,4 / −111,4 (gegen GNU Go / Fuego, 99 %); Wechselwirkung Netz × Muster −44,9 / −33,6; Kontrollen 15/15 und 10/10 | kein Default geändert; Netz und Muster übertragen sich auf Fuego (`docs/komponenten.md` §9) |
 | Komponenten Stufe B: die sieben übrigen Zusätze auf dem vollen Default einzeln und zusammen abgeschaltet, gegen GNU Go und Fuego (je 480 Paare, Seed 220, 29.10.) | alle sieben zusammen −4,7 / −2,0; ohne frische Wurzel −34,7 / −29,6 (ohne Baum-Übernahme dagegen −5,0 / +2,1); scharfer Prior −6,4 / −1,9; übrige nahe 0 (gegen GNU Go / Fuego, 99,4 %); kein Unterschied der Gegner schließt 0 aus; Kontrollen 20/20 und 20/20 | kein Default geändert; die sieben sind auf dem Default überflüssig, die frische Wurzel verhindert nur einen Defekt der Baum-Übernahme (`docs/komponenten-b.md` §9) |
 | `musterAb` 40 und 80 (Muster erst ab Zug 40 bzw. 80; je 480 Paare gegen GNU Go und Fuego, Seed 220, Selbstspiel 360 ohne Aufgabe, 29.10.) | 40: −3,7 / +0,8; 80: +3,5 / −3,1 (gegen GNU Go / Fuego, 97,5 %); Selbstspiel 44,4 % und 27,8 %, beide signifikant unter 50 %; Probe 480/480, Kontrollen 20/20 | verworfen — Default bleibt 0; der frühe Vorsprung nach GNU Gos Schätzung war ein Merkmal der Schätzung (`docs/muster-eroeffnung.md` §9) |
+| `mctsTreeReuse` 0 (Baum nicht übernehmen; Nichtunterlegenheit mit Grenze −10, je 960 Paare bei 120 und 240 bei 600 Simulationen gegen GNU Go und Fuego, Seed 221, Selbstspiel 360 ohne Aufgabe, 29.10.) | 120 Sim.: −2,9 [−7,3; +1,4] / −0,2 [−5,6; +5,2], nicht unterlegen; 600 Sim.: −5,8 [−14,7; +3,1] / +0,1 [−12,1; +12,3] (gegen GNU Go / Fuego, 95 %); Selbstspiel 46,9 %; Kontrollen 20/20 | Default bleibt 1 — bei 600 Simulationen gegen GNU Go knapp unter der Schwelle −5 für den Mittelwert (`docs/baum-uebernahme.md` §9) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |

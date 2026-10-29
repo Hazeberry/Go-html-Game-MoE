@@ -1734,6 +1734,13 @@ globalThis.PARAMS = {
      höchstens rund 5 Punkte. */
   raveEnabled:         1,    // 0 = aus, reines PUCT wie vorher
   raveK:             300,    // AMAF-Einfluss; höher = länger stark gewichtet
+  /* Baum-Uebernahme abschalten (0) GEMESSEN (docs/baum-uebernahme.md §9,
+     Seed 221, Nichtunterlegenheit mit Grenze −10): bei 120 Simulationen je 960
+     Paare gegen GNU Go −2,9 [−7,3; +1,4] und gegen Fuego −0,2 [−5,6; +5,2],
+     nicht unterlegen; bei 600 Simulationen je 240 Paare −5,8 [−14,7; +3,1]
+     und +0,1 [−12,1; +12,3], gegen GNU Go knapp unter der vorab festgelegten
+     Schwelle −5 fuer den Mittelwert; Selbstspiel 46,9 % von 360. Nach der
+     Regel bleibt der Default 1. */
   mctsTreeReuse:       1,    // 0 = aus, immer frischer Baum
   /* Frische Wurzel bei Tree-Reuse: Uebernimmt die Suche den Teilbaum des
      vorigen Zuges, stammen dessen Wurzelkinder aus quickEval (mctsChildren
