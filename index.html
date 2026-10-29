@@ -1976,6 +1976,12 @@ globalThis.PARAMS = {
      Vorhersage ist nicht bessere Zugwahl. Code und Tabelle stehen in Commit
      6edae5d (Schalter musterTabelle), docs/muster-ausbau.md. */
   musterGewicht:    200,
+  /* Muster erst ab dieser Zugzahl (mc >= musterAb), davor zaehlt nur
+     evaluateMove. Anlass: In Stufe A der Komponentenmessung lag die KI ohne
+     Muster nach Zug 40 nach GNU Gos Schaetzung rund 30 Punkte besser, am
+     Ende aber nicht (docs/komponenten.md §9). Gemessen wird 40 und 80 gegen
+     0 (docs/muster-eroeffnung.md). 0 = altes Verhalten, bitgenau. */
+  musterAb:           0,
   /* Endspiel-Netz an der Wurzel (docs/endspiel-netz.md): Anteil des Netzes am
      Prior der Wurzelkinder (0 = aus), so viele beste Netzpunkte kommen unter
      die Kandidaten, ab dieser Zugzahl. Offline geprüft (docs/endspiel-
@@ -4988,8 +4994,9 @@ function _getAIMoveKern(board, aiColor, histHashes, captures, mc, diff, reqId, k
   if (PARAMS.influenceInvade > 0 || PARAMS.influenceOwn > 0) primeInfluenceCache(board);
   if (PARAMS.endTieBreak > 0 || PARAMS.gebietZug > 0) primeEndTieBreak(board);
   if (PARAMS.raumGewicht > 0 || PARAMS.raumZug > 0) primeRaum(board);
-  /* Muster (PARAMS.musterGewicht) nur hier, an der Wurzel der KI. */
-  const mg = PARAMS.musterGewicht;
+  /* Muster (PARAMS.musterGewicht) nur hier, an der Wurzel der KI, und erst
+     ab Zug PARAMS.musterAb. */
+  const mg = mc >= PARAMS.musterAb ? PARAMS.musterGewicht : 0;
   const scored = legal.map(m => ({m, score: evaluateMove(board, m.idx, aiColor, mc, empty)
     + (mg > 0 ? mg * musterWert(board, m.idx, aiColor) : 0)}));
   scored.sort((a,b) => b.score - a.score);

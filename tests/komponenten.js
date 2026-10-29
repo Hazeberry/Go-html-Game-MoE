@@ -20,6 +20,11 @@
         220, keine Eingaben) und Ergebnisskript stimmen überein; der Bericht
         rechnet mit alpha 0,05/8, die Wechselwirkung über die sieben und die
         erste Abweichung von D.
+     6. Muster-Eröffnung (docs/muster-eroeffnung.md): Arme in arme-m.sh,
+        Schalter musterAb mit Default 0 in index.html, Dokument, Workflow
+        (fester Seed 220, Selbstspiel ohne Aufgabe) und Ergebnisskript stimmen
+        überein; der Bericht rechnet mit alpha 0,05/2, prüft A40 und A80
+        gegen M0 und urteilt über M1 nach der vorab festgelegten Regel.
 
    Aufruf:  node tests/komponenten.js */
 'use strict';
@@ -217,4 +222,61 @@ test('Stufe B, Bericht: alpha 0,05/8, Wechselwirkung über die sieben, erste Abw
   pruefeGleich(K.auswertung({g: daten}).gegner.g.vergleiche.map(v => v.arm).join(' '), 'R0', 'ohne Stufe B: nur die Arme von Stufe A (hier R0)');
 });
 
-laufeTests('Komponenten Stufe A und B').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
+/* ── Muster-Eröffnung (docs/muster-eroeffnung.md) ─────────────────────── */
+const ARME_M = path.join(wurzel, 'auswertung', 'komponenten', 'arme-m.sh');
+const armKiM = Object.fromEntries(execFileSync('bash', ['-c', `source "${ARME_M}"; for a in "\${ARM_REIHE[@]}"; do echo "$a=\${ARM_KI[$a]}"; done`], {encoding: 'utf8'})
+  .trim().split('\n').map(z => [z.slice(0, z.indexOf('=')), z.slice(z.indexOf('=') + 1)]));
+
+test('Muster-Eröffnung: Arme, Schalter, Dokument, Workflow und Ergebnisskript stimmen überein', () => {
+  pruefeGleich(Object.keys(armKiM).join(' '), 'D M0 A40 A80', 'Reihe der Arme');
+  pruefeGleich(`${armKiM.D}|${armKiM.M0}`, `${armKi.D}|${armKi.M0}`, 'D und M0 wie in Stufe A');
+  pruefeGleich(`${armKiM.A40}|${armKiM.A80}`, 'musterAb=40|musterAb=80', 'A40 und A80');
+  pruefeGleich(standard('musterAb'), 0, 'musterAb steht mit Default 0 in index.html');
+  pruefe(/const mg = mc >= PARAMS\.musterAb \? PARAMS\.musterGewicht : 0;/.test(html), 'der Schalter wirkt an der Wurzel');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'muster-eroeffnung.md'), 'utf8');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'muster-eroeffnung.yml'), 'utf8');
+  const e = fs.readFileSync(path.join(wurzel, 'auswertung', 'komponenten', 'ergebnis-m.sh'), 'utf8');
+  const zeilen = [...doc.matchAll(/^\| (D|M0|A40|A80) \| (?:`([^`]*)`|–) \| (\d+) \|/gm)];
+  pruefeGleich(zeilen.map(m => m[1]).join(' '), 'D M0 A40 A80', 'Arme im Dokument');
+  for (const m of zeilen) pruefe((m[2] || '') === armKiM[m[1]] && +m[3] === 480, `${m[1]}: Angabe und 480 Partien wie in arme-m.sh`);
+  const liste = (name, was) => { const x = t.slice(t.indexOf(`\n  ${name}:\n`)); return (new RegExp(`${was}: \\[([^\\]]+)\\]`).exec(x) || [])[1].split(',').map(v => v.trim()); };
+  for (const [name, gr] of [['gnugo', 20], ['fuego', 40]]) {
+    pruefeGleich(liste(name, 'arm').join(' '), 'A40 A80', `${name}: nur die neuen Arme`);
+    const von = liste(name, 'von').map(Number);
+    pruefe(von.every((v, i) => v === 1 + i * gr) && von.length * gr === 480, `${name}: Teile zu ${gr}, zusammen 480`);
+  }
+  pruefeGleich(`${liste('selbstspiel', 'arm').join(' ')} | ${liste('selbstspiel', 'teil').length}`, 'A40 A80 | 12', 'Selbstspiel: beide Arme, zwölf Teile');
+  pruefe(/OHNE_AUFGABE: '1'/.test(t) && /ARME_DATEI: auswertung\/komponenten\/arme-m\.sh/.test(t), 'Selbstspiel ohne Aufgabe, Arme aus arme-m.sh');
+  pruefe(!/inputs:/.test(t) && /^  SEED: '220'$/m.test(t) && /^  ARME: auswertung\/komponenten\/arme-m\.sh$/m.test(t), 'fester Seed 220, keine Eingaben');
+  for (const [arm, seed] of [['A40', '20262201'], ['A80', '20262301']]) {
+    pruefe(new RegExp(`SEED_M2_${arm}: '${seed}'`).test(t) && doc.includes(`**${seed}**`), `M2-Seed von ${arm}: ${seed} in Workflow und Dokument`);
+  }
+  pruefe(/spielen\.sh g D 1 20 "\$SEED" /.test(t) && /spielen\.sh f D 1 20 "\$SEED" /.test(t), 'Kontrollen: D, Partien 1 bis 20');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefe(/for alt in D M0/.test(e) && /--stufe M/.test(e) && /--partien 360/.test(e), 'Ergebnisskript: D und M0 aus Stufe A, Stufe M, 360 Partien im Selbstspiel');
+  pruefeGleich(execFileSync('bash', [SPIELEN, '--ki', 'A40'], {encoding: 'utf8', env: {...process.env, ARME: ARME_M}}).trim(), 'mctsFixedSims=120,resignEnabled=0,musterAb=40', 'spielen.sh --ki A40');
+});
+
+test('Muster-Eröffnung, Bericht: alpha 0,05/2, Probe gegen M0, Urteil über M1', () => {
+  pruefeGleich(K.STUFEN.M.alpha, 0.025, 'alpha 0,05/2');
+  const zuege = n => Array.from({length: 100}, (_, i) => i < n ? 'D4' : 'Q16');
+  const arm = (f, ab = 100) => new Map(Array.from({length: 40}, (_, i) => i + 1).map(nr => [nr, {nr, endstand: f(nr), gewonnen: f(nr) > 0, schaetzung: {}, zuege: zuege(ab)}]));
+  const r = nr => ((nr * 13) % 7) - 3;
+  const D = arm(nr => 10 + 4 * r(nr), 100), M0 = arm(nr => 12 + 4 * r(nr), 10);
+  const A40 = arm(nr => 30 + 4 * r(nr) + r(nr + 1), 60), A80 = arm(nr => 12 + 4 * r(nr) + 6 * r(nr + 2), 5);
+  /* M0 spielt nur bis Zug 10 wie A40 und A80: die Probe muss jedes Paar als abweichend zählen */
+  const daten = {g: {D, M0, A40, A80}, f: {D, M0, A40: arm(nr => 25 + 4 * r(nr) + r(nr + 3), 60), A80}};
+  const a = K.auswertung(daten, 'M');
+  pruefeGleich(a.urteile.map(u => `${u.arm}:${u.urteil}`).join(' '), 'A40:besser gegen beide Gegner A80:nicht belegt', 'Urteile');
+  const p = a.gegner.g.proben;
+  pruefeGleich(p.map(x => `${x.arm}/${x.ref}/${x.zuege}:${x.gleich}`).join(' '), 'A40/M0/40:0 A80/M0/80:0', 'Probe zählt Abweichungen');
+  const gleichM0 = arm(nr => 30 + 4 * r(nr) + r(nr + 1), 10);
+  pruefeGleich(K.probe({A40: gleichM0, M0}, 'A40', 'M0', 40).gleich, 40, 'gleiche erste 40 Züge: alle Paare');
+  const schlecht = K.auswertung({g: {D, A40: arm(nr => -10 + 4 * r(nr) + r(nr + 1))}, f: {D, A40}}, 'M');
+  pruefeGleich(schlecht.urteile[0].urteil, 'schlechter', 'gegen einen Gegner schlechter: schlechter');
+  pruefeGleich(K.auswertung({g: {D, A40}}, 'M').urteile[0].urteil, 'unvollständig', 'ein Gegner fehlt: unvollständig');
+  const md = K.text(a);
+  pruefe(/0,05\/2 \(97,5 %\)/.test(md) && /Urteil über M1/.test(md) && !/Wechselwirkung/.test(md), 'Bericht: alpha, Urteil, keine Wechselwirkung');
+});
+
+laufeTests('Komponenten Stufe A, B und Muster-Eröffnung').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
