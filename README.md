@@ -66,9 +66,12 @@ nichts zu installieren.
   zweiter Gegner lässt sich seit dem 28.10. Fuego einsetzen
   (`gnugo-duell.js --gegner fuego`, `docs/fuego.md`). Der Prüfstand gegen
   Fuego wählte sechs Steine und 100 Spiele je Zug für Fuego (53 % Siege der
-  KI, §12). Gemessen ist damit noch nichts. Vorab festgelegt ist Stufe A der
-  Komponentenmessung (`docs/komponenten.md`): Netz, Muster, beide und RAVE
-  abgeschaltet, gegen GNU Go und Fuego mit demselben Seed.
+  KI, §12). Stufe A der Komponentenmessung (`docs/komponenten.md` §9) hat
+  denselben Default gegen beide Gegner zerlegt: Netz und Muster bringen gegen
+  Fuego fast genauso viel wie gegen GNU Go (Unterschied +2,4 und +1,5 Punkte,
+  Obergrenzen rund +14). Gegnerabhängig sind eher die sieben übrigen Zusätze:
+  Auf einer Engine ohne Netz und Muster bringen sie gegen GNU Go rund 39
+  Punkte, gegen Fuego nichts Messbares.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl

@@ -221,3 +221,113 @@ bekommt eine eigene Vorabfestlegung: die übrigen Komponenten einzeln
 abschalten, nur gegen Fuego, nur mit Intervallen. Den Unterschied der Gegner
 messen wir danach nur für die drei bis vier größten Komponenten, weil er für
 kleine nicht auflösbar ist (§5).
+
+## 9. Nachtrag: Ergebnis von Lauf 1 (29.10.2026)
+
+[Workflow-Lauf 40817469584](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/40817469584)
+auf Merge `916cac8`, Seed 220, in rund zwei Stunden (04:23 bis 06:22 UTC). Alle
+184 Jobs sind grün, es fehlt kein Teil. Daten:
+[`docs/daten/komponenten/lauf1/`](daten/komponenten/lauf1/) (Bericht, alle
+Partien je Gegner und Arm, Kontrollen).
+
+**Der Lauf ist sauber.** Keine der 4 825 Partien ist abgebrochen, keine lief bis
+zum Zuglimit. Beide Kontrollen sind bestanden: 15 von 15 Partien gegen GNU Go
+und 10 von 10 gegen Fuego gingen Zug für Zug gleich aus wie früher. Die Probe
+der ersten 80 Züge trifft gegen beide Gegner in 480 von 480 Paaren zu.
+
+### Arm − D, Endstand (99 %)
+
+| Arm | gegen GNU Go | gegen Fuego | Δ_f − Δ_g (99 %, Welch) |
+|---|---|---|---|
+| B | −149,4 [−161,2; −137,6] | −111,4 [−124,7; −98,0] | **+38,0 [+20,3; +55,7]** |
+| N0 | −70,8 [−78,4; −63,2] | −68,4 [−77,1; −59,7] | +2,4 [−9,1; +13,9] |
+| M0 | +2,0 [−6,7; +10,7] | −10,1 [−19,9; −0,4] | −12,1 [−25,2; +0,9] |
+| NM0 | −113,6 [−122,5; −104,8] | −112,1 [−121,9; −102,2] | +1,5 [−11,7; +14,8] |
+| R0 | −5,5 [−17,8; +6,8] | −1,1 [−14,8; +12,5] | +4,4 [−13,9; +22,7] |
+
+Wechselwirkung I = Δ_NM0 − Δ_N0 − Δ_M0 (97,5 %): gegen GNU Go
+**−44,9 [−54,2; −35,6]**, gegen Fuego **−33,6 [−44,0; −23,2]**.
+
+Siege von D: 302 von 480 gegen GNU Go (63 %), 211 von 480 gegen Fuego (44 %).
+Die SD der gepaarten Differenzen liegt gegen GNU Go bei 64 bis 75 Punkten, gegen
+Fuego bei 74 bis 83. Der volle Bericht mit Phasenprofil und Siegen steht in
+[`bericht.md`](daten/komponenten/lauf1/bericht.md).
+
+### Einordnung
+
+Stufe A urteilt nicht und wählt keinen Default. Was die Intervalle zeigen:
+
+- **Gesamtspanne.** Die reduzierte Engine B liegt gegen GNU Go 149 Punkte unter
+  D, gegen Fuego 111. Sie gewinnt eine von 480 Partien.
+- **Das Netz trägt viel, gegen beide Gegner gleich.** Ohne Netz verliert die KI
+  71 Punkte gegen GNU Go und 68 gegen Fuego. Erwartet waren gegen GNU Go 40 bis
+  60, es ist also mehr. Der Unterschied der Gegner ist +2,4, und das Intervall
+  reicht bis +13,9. Von den rund 70 Punkten des Netzes sind also höchstens etwa
+  14 an GNU Go gebunden, wahrscheinlich viel weniger.
+- **Die Muster sind verdeckt, nicht wertlos.** Allein abgeschaltet kosten sie
+  gegen GNU Go nichts Messbares (+2,0) und gegen Fuego 10 Punkte. Die
+  Wechselwirkung ist aber stark negativ: Fehlen beide, fehlt viel mehr als die
+  Summe. Das Netz springt für die Muster ein. Ohne Netz sind die Muster gegen
+  beide Gegner rund 43 Punkte wert. Das ist nachgerechnet, nicht vorab
+  festgelegt: NM0 − N0, 99 %, gegen GNU Go −42,9 [−51,6; −34,1], gegen Fuego
+  −43,7 [−52,6; −34,8]. Die Erwartung „M0 liegt unter D“ trifft gegen GNU Go
+  nicht zu.
+- **Netz und Muster zusammen** sind gegen beide Gegner rund 113 Punkte wert. Der
+  Unterschied der Gegner ist +1,5 [−11,7; +14,8].
+- **RAVE** wirkt gegen keinen der beiden Gegner messbar, wie erwartet.
+- **Die Hypothese zur Zirkularität bestätigt sich für Netz und Muster nicht.**
+  Erwartet war, dass beide gegen Fuego weniger helfen (Δ_f − Δ_g > 0). Für N0
+  und NM0 liegt der Unterschied nahe 0, für M0 sogar eher in der anderen
+  Richtung. In Punkten übertragen sich die beiden aus GNU-Go-Zügen gelernten
+  Teile also fast vollständig auf Fuego. Standardisiert ist der Unterschied
+  leicht positiv (+0,17 und +0,24), weil der Endstand von D gegen Fuego stärker
+  streut. Ein Intervall dafür ist nicht festgelegt, und die Zahl ist klein.
+- **Gegnerabhängig ist dagegen der Rest.** Der einzige Unterschied der Gegner,
+  dessen Intervall 0 ausschließt, ist der von B: +38,0. Da NM0 fast gleich ist,
+  liegt er bei den sieben übrigen Zusätzen (RAVE, Tree-Reuse, frische Wurzel,
+  Gleichstandsbrecher, scharfer Prior, Benson-Bewertung, Benson-Zugfilter).
+  Nachgerechnet, nicht vorab festgelegt: B − NM0 (99 %) ist gegen GNU Go
+  −39,0 [−49,2; −28,8], gegen Fuego −1,7 [−13,4; +9,9]. Diese sieben bringen,
+  gemessen auf einer Engine ohne Netz und Muster, gegen GNU Go rund 39 Punkte und
+  gegen Fuego nichts Messbares. Sie wurden gegen GNU Go ausgewählt und
+  abgestimmt. Der Hinweis auf eine Spezialisierung auf GNU Go steckt also eher
+  in diesen von Hand gebauten Teilen als in den gelernten.
+- **Keine Stauchung als Erklärung.** Gewinnt Fuego klar, könnte es den Abstand
+  nicht weiter ausbauen und große Rückstände stauchen. Das passt nicht zu den
+  Daten: NM0 hat gegen Fuego dieselbe Verteilung wie gegen GNU Go (Median −95
+  und −94, 5-%-Quantil −190 und −186, tiefster Wert −290 gegen Fuego).
+- **Phasenprofil.** Ohne Muster liegt die KI nach Zug 40 nach GNU Gos Schätzung
+  besser: +27 gegen GNU Go, +35 gegen Fuego (M0 und NM0). Mit Netz ist der
+  Vorteil bis Zug 200 aufgebraucht, ohne Netz kippt er bis Zug 200 auf −79 bzw.
+  −69. Die Muster machen die Eröffnung in GNU Gos Augen also schlechter und
+  zahlen sich erst später aus. Das gilt gegen beide Gegner gleich. Es betrifft
+  die Eröffnung der KI, nicht die von Fuego. Der Richter ist hier GNU Gos
+  Schätzung, früh in der Partie grob. N0 ist bis Zug 80 genau gleich D, wie
+  vorhergesagt.
+
+### Abgleich mit der Erwartung (§6)
+
+| Erwartung | eingetreten? |
+|---|---|
+| B weit unter D, ≤ −100, kaum Siege | ja (−149 und −111, 0 und 1 Sieg) |
+| N0 gegen GNU Go −40 bis −60 | stärker: −71 |
+| M0 gegen GNU Go unter D, weniger als +102,8 | weniger ja, unter D nein (+2,0) |
+| NM0 unter N0 und M0, Wechselwirkung negativ | ja (I −45 und −34) |
+| R0 nahe 0 | ja |
+| N0 bis Zug 80 gleich D | ja (Differenz nach Zug 40 und 80 genau 0) |
+| Netz und Muster helfen gegen Fuego weniger | **nein** (+2,4 und +1,5, M0 −12,1) |
+
+### Was daraus folgt
+
+- `index.html` bleibt, wie es ist (§1).
+- **Stufe B ändert ihren Plan gegenüber §8.** Geplant war, die übrigen
+  Komponenten nur gegen Fuego einzeln abzuschalten. Der gegnerabhängige Teil
+  sitzt aber gerade bei diesen sieben. Stufe B sollte sie deshalb gegen beide
+  Gegner einzeln abschalten, auf D und nicht auf B. Bisher ist ihr Beitrag nur
+  auf der Engine ohne Netz und Muster bekannt. Sie bekommt eine eigene
+  Vorabfestlegung.
+- **Die Muster in der Eröffnung** wären ein eigener Versuch: Muster erst ab Zug
+  40 oder 80 (`musterGewicht@N`). Auch das nur mit Vorabfestlegung.
+- **Für die Planung** ist die SD der Differenzen gegen Fuego bei 74 bis 83
+  Punkten. Mit 480 Paaren und alpha 0,01 sind gegen Fuego also rund 12 Punkte
+  sichtbar, gegen GNU Go rund 11.
