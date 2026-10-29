@@ -1,0 +1,147 @@
+name: Leeres Brett
+
+# Manueller Lauf aus docs/leeres-brett.md: der Default D, ohne Muster (M0),
+# ohne Endspiel-Netz (N0) und mit Mustern erst ab Zug 80 (A80) gegen GNU Go
+# Stufe 1 ohne Vorgabe (Farben wechseln je Partie, Komi 7,5), 120
+# Simulationen, je 480 Partien, Seed 222. Eine Kontrolle spielt die Partien 1
+# bis 20 von D noch einmal.
+#
+# Ablauf:
+#   gnugo       D, M0, N0 und A80 gegen GNU Go × 16 Teile zu 30 Partien
+#   kontrolle   D gegen GNU Go, Partien 1 bis 20, noch einmal
+#   ergebnis    Bericht, Rohdaten gepackt, Branch ergebnisse/leeres-brett-lauf<N>
+
+# Keine Eingaben: Seed und Bedingungen stehen in der Vorabfestlegung.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: leeres-brett
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  SEED: '222'
+  ARME: auswertung/komponenten/arme-l.sh
+  VORGABE: '0'
+
+jobs:
+  gnugo:
+    name: GNU Go ohne Vorgabe, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [D, M0, N0, A80]
+        von: [1, 31, 61, 91, 121, 151, 181, 211, 241, 271, 301, 331, 361, 391, 421, 451]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: 30 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+        run: bash auswertung/komponenten/spielen.sh g "$ARM" "$VON" 30 "$SEED" "stand/g-$ARM-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-g-${{ matrix.arm }}-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  kontrolle:
+    name: Kontrolle (D, Partien 1 bis 20, noch einmal)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: 20 Partien noch einmal spielen
+        run: bash auswertung/komponenten/spielen.sh g D 1 20 "$SEED" stand/kontrolle-g.jsonl
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-kontrolle-g
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [gnugo, kontrolle]
+    # Auch wenn ein Teil scheitert: Der Bericht nennt die Paare, die da sind,
+    # und fehlende-teile.txt die, die fehlen.
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: stand-*
+          path: stand
+          merge-multiple: true
+
+      - name: Bericht
+        run: bash auswertung/komponenten/ergebnis-l.sh
+
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/leeres-brett-lauf${LAUF}"
+          ziel="docs/daten/leeres-brett/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Leeres Brett: Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"

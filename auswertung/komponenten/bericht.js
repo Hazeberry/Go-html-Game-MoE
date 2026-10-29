@@ -4,7 +4,8 @@
    Stufe B (docs/komponenten-b.md §4), und der Muster-Eröffnung
    (--stufe M, docs/muster-eroeffnung.md §4) und der Baum-Übernahme
    (--stufe T bei 120, --stufe T6 bei 600 Simulationen,
-   docs/baum-uebernahme.md §4). Stufe A und B urteilen nicht, sie nennen
+   docs/baum-uebernahme.md §4) und der Messung auf dem leeren Brett (--stufe L,
+   docs/leeres-brett.md §4). Stufe A und B urteilen nicht, sie nennen
    Intervalle; M nennt dazu das vorab festgelegte Urteil über M1 (besser
    gegen beide Gegner, schlechter gegen einen, sonst nicht belegt); T und T6
    prüfen Nichtunterlegenheit: Untergrenze des 95-%-Intervalls gegen beide
@@ -29,6 +30,17 @@
    In M zusätzlich die Probe: A40 und A80 spielen die ersten 40 bzw. 80 Züge
    wie M0 (Muster aus) aus Stufe A.
 
+   In L ist g GNU Go ohne Vorgabe, v dieselben Arme mit sechs Vorgabesteinen
+   aus früheren Läufen (Stufe A, Muster-Eröffnung). Dazu je Bedingung die
+   Verteilung des Endstands je Arm (Quantile) und die Steine, die die KI
+   verliert (Feld gefangen), statt des Unterschieds der Gegner der
+   Unterschied der Bedingungen Δ_g − Δ_v (Welch) und das vorab festgelegte
+   Urteil je Arm ohne Vorgabe: M0 und N0 „trägt ohne Vorgabe“, wenn die
+   Obergrenze unter 0 liegt, „Abschalten hilft“, wenn die Untergrenze über 0
+   liegt, sonst „kein Beitrag belegt“; A80 „Schaden auch gegen GNU Go“, wenn
+   die Obergrenze unter 0 liegt, „kein Schaden in der Größe des
+   Selbstspiels“, wenn die Untergrenze über −16,7 liegt, sonst „offen“.
+
    Dazu, wenn beide Gegner da sind, je Arm der Unterschied der Gegner
    Δ_f − Δ_g (Welch, alpha 0,05/k) und der Unterschied der standardisierten
    Wirkungen. Kontrollen: Partien eines zweiten Laufs gegen eine frühere
@@ -38,7 +50,7 @@
    Partner heraus.
 
    Aufruf:
-     node auswertung/komponenten/bericht.js [--stufe A|B|M|T|T6] --arm g:D=a.jsonl,b.jsonl --arm g:N0=... --arm f:D=... ...
+     node auswertung/komponenten/bericht.js [--stufe A|B|M|T|T6|L] --arm g:D=a.jsonl,b.jsonl --arm g:N0=... --arm f:D=... ...
           [--kontrolle g=neu.jsonl,alt.jsonl.gz] [--kontrolle f=...]
    Die Ausgabe ist Markdown. */
 'use strict';
@@ -53,7 +65,10 @@ const STUFEN = {
   B: {vergleiche: [...SIEBEN, 'O7'], wechsel: ['O7', SIEBEN], probe: null},
   M: {vergleiche: ['A40', 'A80'], wechsel: null, probe: null, proben: [['A40', 'M0', 40], ['A80', 'M0', 80]], urteil: true},
   T: {vergleiche: ['T0'], wechsel: null, probe: null, ni: {grenze: -10}},
-  T6: {vergleiche: ['T0'], wechsel: null, probe: null, ni: {grenze: -20, punkt: -5}}
+  T6: {vergleiche: ['T0'], wechsel: null, probe: null, ni: {grenze: -20, punkt: -5}},
+  L: {vergleiche: ['M0', 'N0', 'A80'], wechsel: null, probe: 'N0', proben: [['A80', 'M0', 80]], verteilung: true,
+      paar: ['v', 'g'], leer: {selbstspiel: -16.7},
+      namen: {g: 'GNU Go Stufe 1, ohne Vorgabe', v: 'GNU Go Stufe 1, sechs Vorgabesteine (Stufe A und Muster-Eröffnung, Seed 220)'}}
 };
 for (const s of Object.values(STUFEN)) s.alpha = 0.05 / s.vergleiche.length;
 const ALPHA = STUFEN.A.alpha, ALPHA_I = 0.05 / 2;
@@ -144,6 +159,35 @@ function urteilNI(gegner, arm, ni) {
   return ok ? 'nicht unterlegen gegen beide Gegner' : 'Nichtunterlegenheit nicht gezeigt';
 }
 
+/* Urteil ohne Vorgabe (docs/leeres-brett.md §4), nur gegen GNU Go ohne
+   Vorgabe (g) */
+function urteilL(gegner, arm, leer = STUFEN.L.leer) {
+  const v = gegner.g && gegner.g.vergleiche && gegner.g.vergleiche.find(x => x.arm === arm);
+  if (!v || !v.g) return 'unvollständig';
+  if (arm === 'A80') {
+    if (v.g.hi < 0) return 'Schaden auch gegen GNU Go ohne Vorgabe';
+    return v.g.lo > leer.selbstspiel ? 'kein Schaden in der Größe des Selbstspiels' : 'offen';
+  }
+  if (v.g.hi < 0) return 'trägt ohne Vorgabe';
+  return v.g.lo > 0 ? 'Abschalten hilft ohne Vorgabe' : 'kein Beitrag belegt';
+}
+
+/* Quantil (linear zwischen den Rangplätzen) einer sortierten Liste */
+function quantil(s, q) {
+  const h = (s.length - 1) * q, i = Math.floor(h);
+  return i + 1 < s.length ? s[i] + (h - i) * (s[i + 1] - s[i]) : s[i];
+}
+
+/* Verteilung des Endstands eines Arms und die Steine, die die KI verliert */
+function verteilung(name, A) {
+  const ok = [...A.values()].filter(fertig);
+  const s = ok.map(r => r.endstand).sort((a, b) => a - b);
+  const g = ok.filter(r => r.gefangen && Number.isFinite(r.gefangen.gegner));
+  return {arm: name, n: s.length, sd: s.length > 1 ? sdVon(s) : NaN,
+          q: s.length ? [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1].map(q => quantil(s, q)) : [],
+          verloren: g.length ? mittel(g.map(r => r.gefangen.gegner)) : NaN, geschlagen: g.length ? mittel(g.map(r => r.gefangen.wir)) : NaN};
+}
+
 /* Unterschied der Gegner Δ_f − Δ_g (unabhängige Partien, Welch) */
 function gegnerUnterschied(vg, vf, alpha = ALPHA) {
   if (!vg.g || !vf.g) return null;
@@ -169,18 +213,20 @@ function auswertung(daten, stufe = 'A') {
       arme: Object.keys(arme).map(a => beschreibung(a, arme[a])),
       vergleiche: st.vergleiche.filter(a => arme[a]).map(a => vergleich(arme.D, arme[a], a, st.alpha, st.probe)),
       wechselwirkung: wechselwirkung(arme, st.wechsel),
-      proben: (st.proben || []).map(([x, r, n]) => probe(arme, x, r, n)).filter(Boolean)
+      proben: (st.proben || []).map(([x, r, n]) => probe(arme, x, r, n)).filter(Boolean),
+      verteilung: st.verteilung ? Object.keys(arme).map(a => verteilung(a, arme[a])) : null
     };
   }
-  const unterschied = [];
-  if (aus.g && aus.f && aus.g.vergleiche && aus.f.vergleiche) {
-    for (const vg of aus.g.vergleiche) {
-      const vf = aus.f.vergleiche.find(v => v.arm === vg.arm);
+  const unterschied = [], [p0, p1] = st.paar || ['g', 'f'];
+  if (aus[p0] && aus[p1] && aus[p0].vergleiche && aus[p1].vergleiche) {
+    for (const vg of aus[p0].vergleiche) {
+      const vf = aus[p1].vergleiche.find(v => v.arm === vg.arm);
       if (vf) unterschied.push({arm: vg.arm, ...gegnerUnterschied(vg, vf, st.alpha)});
     }
   }
   const urteile = st.urteil ? st.vergleiche.map(a => ({arm: a, urteil: urteilM(aus, a)}))
-    : st.ni ? st.vergleiche.map(a => ({arm: a, urteil: urteilNI(aus, a, st.ni)})) : [];
+    : st.ni ? st.vergleiche.map(a => ({arm: a, urteil: urteilNI(aus, a, st.ni)}))
+    : st.leer ? st.vergleiche.map(a => ({arm: a, urteil: urteilL(aus, a, st.leer)})) : [];
   return {stufe, alpha: st.alpha, gegner: aus, unterschied, urteile};
 }
 
@@ -193,9 +239,9 @@ const niveau = alpha => `${String(+(100 * (1 - alpha)).toFixed(1)).replace('.', 
 const bruch = alpha => `0,05/${Math.round(0.05 / alpha)}`;
 
 function text(a, kontrollen = {}) {
-  const aus = [], alpha = a.alpha || ALPHA, nv = niveau(alpha);
+  const aus = [], alpha = a.alpha || ALPHA, nv = niveau(alpha), st = STUFEN[a.stufe || 'A'], namen = st.namen || GEGNER;
   for (const [o, e] of Object.entries(a.gegner)) {
-    aus.push(`## ${GEGNER[o] || o}`, '');
+    aus.push(`## ${namen[o] || o}`, '');
     if (e.fehlt) { aus.push(e.fehlt, ''); continue; }
     aus.push('| Arm | Partien | abgebr. | Zuglimit | Siege | Endstand Ø |', '|---|---:|---:|---:|---:|---:|');
     for (const b of e.arme) aus.push(`| ${b.arm} | ${b.n} | ${b.abgebrochen} | ${b.zuglimit} | ${pz(b.siege, b.fertig)} | ${z1(b.endstand)} |`);
@@ -208,19 +254,28 @@ function text(a, kontrollen = {}) {
       `| Arm − D | ${MARKEN.map(z => `Zug ${z}`).join(' | ')} | Ende |`, `|---|${MARKEN.map(() => '---').join('|')}|---|`);
     for (const v of e.vergleiche) aus.push(`| ${v.arm} | ${[...MARKEN, 'ende'].map(z => v.phasen[z] ? `${z1(v.phasen[z].m)} ${iv(v.phasen[z])}` : '–').join(' | ')} |`);
     for (const p of e.proben || []) aus.push('', `${p.arm}: in ${p.gleich} von ${p.n} Paaren sind die ersten ${p.zuege} Züge gleich denen von ${p.ref}${p.gleich === p.n ? '' : ' (NICHT alle: Fehler suchen)'}.`);
+    if (e.verteilung) {
+      aus.push('', 'Verteilung des Endstands je Arm (aus Sicht der KI) und Steine, die die KI im Mittel verliert bzw. schlägt:', '',
+        '| Arm | Partien | Min | 10 % | 25 % | Median | 75 % | 90 % | Max | SD | verloren Ø | geschlagen Ø |', '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
+      const f1 = v => Number.isFinite(v) ? v.toFixed(1).replace('.', ',') : '–';
+      for (const d of e.verteilung) aus.push(`| ${d.arm} | ${d.n} | ${d.q.length ? d.q.map(z1).join(' | ') : '– | – | – | – | – | – | –'} | ${f1(d.sd)} | ${f1(d.verloren)} | ${f1(d.geschlagen)} |`);
+    }
     const w = e.wechselwirkung;
     if (w || STUFEN[a.stufe || 'A'].wechsel) aus.push('', `Wechselwirkung I = Δ_${w ? w.ziel : '…'} − ${w ? w.teile.map(t => `Δ_${t}`).join(' − ') : '…'}: ${w ? `${z1(w.m)} ${iv(w)} (97,5 %, ${w.n} Partienummern)` : '–'}`);
-    if (kontrollen[o]) aus.push('', `Kontrolle: ${kontrollen[o].gleich} von ${kontrollen[o].erwartet} Partien gleich wie in der früheren Messung (${kontrollen[o].ok ? 'bestanden' : 'NICHT bestanden'})`);
+    if (kontrollen[o]) aus.push('', `Kontrolle: ${kontrollen[o].gleich} von ${kontrollen[o].erwartet} Partien gleich wie ${st.paar ? 'in den Partien von D dieses Laufs' : 'in der früheren Messung'} (${kontrollen[o].ok ? 'bestanden' : 'NICHT bestanden'})`);
     aus.push('');
   }
   if (a.unterschied.length) {
-    aus.push('## Unterschied der Gegner', '', `Δ_Fuego − Δ_GNU Go je Arm (Welch, ${nv}); positiv: das Abschalten kostet gegen Fuego weniger.`, '',
+    if (st.paar) aus.push('## Unterschied der Bedingungen', '', `Δ_ohne Vorgabe − Δ_sechs Steine je Arm (Welch, ${nv}); positiv: ohne Vorgabe kostet das Abschalten weniger.`, '',
+      `| Arm | Δ_${st.paar[1]} − Δ_${st.paar[0]} | ${nv} | standardisiert ${st.paar[1]} − ${st.paar[0]} |`, '|---|---:|---|---:|');
+    else aus.push('## Unterschied der Gegner', '', `Δ_Fuego − Δ_GNU Go je Arm (Welch, ${nv}); positiv: das Abschalten kostet gegen Fuego weniger.`, '',
       `| Arm | Δ_f − Δ_g | ${nv} | standardisiert f − g |`, '|---|---:|---|---:|');
     for (const u of a.unterschied) aus.push(`| ${u.arm} | ${z1(u.m)} | ${Number.isFinite(u.lo) ? `[${z1(u.lo)}; ${z1(u.hi)}]` : '–'} | ${z2(u.std)} |`);
   }
   if (a.urteile && a.urteile.length) {
     const ni = STUFEN[a.stufe].ni;
-    aus.push('', ni ? `## Urteil: Nichtunterlegenheit (Grenze ${z1(ni.grenze)}${ni.punkt !== undefined ? `, Mittelwert über ${z1(ni.punkt)}` : ''}; vorab festgelegt)` : '## Urteil über M1 (vorab festgelegt)', '');
+    aus.push('', ni ? `## Urteil: Nichtunterlegenheit (Grenze ${z1(ni.grenze)}${ni.punkt !== undefined ? `, Mittelwert über ${z1(ni.punkt)}` : ''}; vorab festgelegt)`
+      : st.leer ? '## Urteil ohne Vorgabe (vorab festgelegt)' : '## Urteil über M1 (vorab festgelegt)', '');
     for (const u of a.urteile) aus.push(`- ${u.arm}: **${u.urteil}**`);
   }
   return aus.join('\n');
@@ -236,7 +291,7 @@ function main() {
   let fehler = false, stufe = 'A';
   for (let i = 0; i < arg.length; i++) {
     if (arg[i] === '--stufe' && STUFEN[arg[i + 1]]) { stufe = arg[++i]; continue; }
-    const m = arg[i] === '--arm' && /^([gf]):([A-Z0-9]+)=(.+)$/.exec(arg[i + 1] || '');
+    const m = arg[i] === '--arm' && /^([gfv]):([A-Z0-9]+)=(.+)$/.exec(arg[i + 1] || '');
     const k = arg[i] === '--kontrolle' && /^([gf])=([^,]+),([^,]+)$/.exec(arg[i + 1] || '');
     if (m) {
       const [, o, arm, dateien] = m;
@@ -250,11 +305,11 @@ function main() {
     } else { fehler = true; break; }
   }
   if (fehler || !Object.keys(daten).length) {
-    console.error('Aufruf: node auswertung/komponenten/bericht.js [--stufe A|B|M|T|T6] --arm g:D=a.jsonl,... --arm g:N0=... [--kontrolle g=neu.jsonl,alt.jsonl.gz]');
+    console.error('Aufruf: node auswertung/komponenten/bericht.js [--stufe A|B|M|T|T6|L] --arm g:D=a.jsonl,... --arm g:N0=... [--kontrolle g=neu.jsonl,alt.jsonl.gz]');
     process.exit(2);
   }
   console.log(text(auswertung(daten, stufe), kontrollen));
 }
 
 if (require.main === module) main();
-module.exports = {auswertung, text, vergleich, wechselwirkung, gegnerUnterschied, ersteAbweichung, probe, urteilM, urteilNI, stat, tKrit, STUFEN, ALPHA, ALPHA_I, NETZ_AB};
+module.exports = {auswertung, text, vergleich, wechselwirkung, gegnerUnterschied, ersteAbweichung, probe, urteilM, urteilNI, urteilL, verteilung, quantil, stat, tKrit, STUFEN, ALPHA, ALPHA_I, NETZ_AB};
