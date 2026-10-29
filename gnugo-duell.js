@@ -47,10 +47,15 @@
                           den Zug, der statt unseres gespielt wird. getAIMove
                           läuft trotzdem; seine Wahl wird nur verglichen)
                          [--orakel-zug-stufe S] (Stufe dieses GNU Go, Standard 10)
-                         [--gegner gnugo|fuego] (Standard gnugo; fuego: siehe unten)
+                         [--gegner gnugo|fuego|ki] (Standard gnugo; fuego und ki:
+                          siehe unten)
                          [--fuego pfad] (Standard fuego-bin/fuego, gebaut mit
                           auswertung/fuego/bauen.sh)
                          [--fuego-spiele N] (Spiele je Zug, Standard 1000)
+                         [--gegner-html pfad] (für --gegner ki: die index.html
+                          des Gegners)
+                         [--gegner-ki k=v,...] (für --gegner ki: Änderungen am
+                          Default des Gegners, wie --ki)
    --ki nimmt auch Phasenstufen wie ab-harness.js: name@N=wert setzt den
    Parameter ab der Zugzahl N (mc ≥ N, gezählt ab dem ersten gespielten Zug),
    davor gilt der Wert ohne @ oder der Default. Beispiel: --ki
@@ -83,6 +88,13 @@
    dann `gegner` {name, spiele, schiedsrichterStufe}; ohne die Option bleibt
    alles wie bisher.
 
+   Gegner KI (--gegner ki, docs/pwa-vergleich.md): die KI aus --gegner-html
+   zieht für den Gegner, über gtp-ki.js in einem eigenen Prozess, sonst wie
+   Fuego (GNU Go bleibt Schiedsrichter und zählt). Ihr Zufall ist je Partie
+   geseedet (Seed der Partie + 80 000), sie spielt auf 'hard' mit ihrem
+   eigenen Default, ohne adaptives Zeitbudget und mit --gegner-ki. Der
+   Datensatz bekommt `gegner` {name, html, sha256, ki, schiedsrichterStufe}.
+
    Vorgabe (--vorgabe N ≥ 2): Wir spielen in jeder Partie Schwarz mit N
    Steinen auf den Standardpunkten (GTP fixed_handicap), GNU Go Weiß, Komi
    0,5, Weiß zieht zuerst. Ohne Vorgabe wechseln die Farben je Partie, Komi
@@ -101,7 +113,8 @@ const a = process.argv.slice(2);
 const opt = {partien: 10, seed: 1, stufe: 10, ki: {}, kiStufen: {}, roh: null, gnugo: '/usr/games/gnugo',
              maxZuege: 400, von: 1, vorgabe: 0, schaetzung: [], gnugoAufgabe: 1, orakel: 0,
              orakelZug: null, orakelZugStufe: 10,
-             gegner: 'gnugo', fuego: path.join(__dirname, 'fuego-bin', 'fuego'), fuegoSpiele: 1000};
+             gegner: 'gnugo', fuego: path.join(__dirname, 'fuego-bin', 'fuego'), fuegoSpiele: 1000,
+             gegnerHtml: null, gegnerKi: ''};
 for (let i = 0; i < a.length; i++) {
   const v = a[i + 1];
   switch (a[i]) {
@@ -126,9 +139,13 @@ for (let i = 0; i < a.length; i++) {
     }
     case '--orakel-zug-stufe': opt.orakelZugStufe = +v; i++; break;
     case '--gegner':
-      if (v !== 'gnugo' && v !== 'fuego') { console.error(`--gegner erwartet gnugo oder fuego: ${v}`); process.exit(2); }
+      if (v !== 'gnugo' && v !== 'fuego' && v !== 'ki') { console.error(`--gegner erwartet gnugo, fuego oder ki: ${v}`); process.exit(2); }
       opt.gegner = v; i++; break;
     case '--fuego': opt.fuego = v; i++; break;
+    case '--gegner-html': opt.gegnerHtml = v; i++; break;
+    case '--gegner-ki':
+      if (!/^([A-Za-z]\w*=-?[\d.]+)(,[A-Za-z]\w*=-?[\d.]+)*$/.test(String(v))) { console.error(`--gegner-ki erwartet name=zahl,...: ${v}`); process.exit(2); }
+      opt.gegnerKi = v; i++; break;
     case '--fuego-spiele':
       if (!/^\d+$/.test(String(v)) || +v < 1 || +v > 1e6) { console.error(`--fuego-spiele erwartet eine ganze Zahl von 1 bis 1000000: ${v}`); process.exit(2); }
       opt.fuegoSpiele = +v; i++; break;
@@ -146,6 +163,10 @@ for (let i = 0; i < a.length; i++) {
       i++; break;
     default: console.error('Unbekannte Option ' + a[i]); process.exit(2);
   }
+}
+
+if (opt.gegner === 'ki' && !(opt.gegnerHtml && fs.existsSync(opt.gegnerHtml))) {
+  console.error(`--gegner ki braucht --gegner-html mit einer vorhandenen Datei: ${opt.gegnerHtml}`); process.exit(2);
 }
 
 /* ── Engine laden, wie weiterspielen.js; dazu ein Setzer für die
@@ -247,6 +268,19 @@ function fuegoStarten(seed) {
   return {...f, einrichten, einstellen};
 }
 
+/* Eine andere KI als Gegner (gtp-ki.js): ein Prozess je Partie, wie Fuego */
+const GEGNER_SHA = opt.gegner === 'ki'
+  ? require('crypto').createHash('sha256').update(fs.readFileSync(opt.gegnerHtml)).digest('hex') : null;
+function kiStarten(seed) {
+  const f = gtpStarten(process.execPath, [path.join(__dirname, 'gtp-ki.js'), '--html', opt.gegnerHtml,
+    ...(opt.gegnerKi ? ['--ki', opt.gegnerKi] : [])], 'KI-Gegner');
+  const einrichten = async () => {
+    await f.frage('boardsize 19'); await f.frage('clear_board'); await f.frage('komi ' + KOMI);
+  };
+  const einstellen = async () => { await f.frage('set_random_seed ' + ((seed + 80000) % 2147483647)); };
+  return {...f, einrichten, einstellen};
+}
+
 /* ── Unsere Zählung, wie im Harness: Benson-tote Ketten weg, Fläche ── */
 function unsereZaehlung(board) {
   const b = new Uint8Array(board);
@@ -310,8 +344,9 @@ function gnugoMitNeustart(seed, stufe = opt.stufe) {
 async function partie(nr) {
   try { return await partieSpielen(nr); }
   catch (e) {
-    const weich = /(GNU Go|Fuego) beendet/.test(e.message)
-      || (opt.gegner === 'fuego' && /^(GNU Go|Fuego): (play|genmove|set_free_handicap) /.test(e.message));
+    const weich = /(GNU Go|Fuego|KI-Gegner) beendet/.test(e.message)
+      || (opt.gegner === 'fuego' && /^(GNU Go|Fuego): (play|genmove|set_free_handicap) /.test(e.message))
+      || (opt.gegner === 'ki' && /^(GNU Go|KI-Gegner): (play|genmove|set_free_handicap) /.test(e.message));
     if (!weich) throw e;
     return {nr, stufe: opt.stufe, ki: opt.ki, abgebrochen: e.message.slice(0, 120)};
   }
@@ -336,7 +371,7 @@ async function partieSpielen(nr) {
   if (o) await o.starte();
   if (oz) await oz.starte();
   /* Fuego: eigener Prozess; scheitert der Start, wird nichts liegen gelassen. */
-  const fu = opt.gegner === 'fuego' ? fuegoStarten(seed) : null;
+  const fu = opt.gegner === 'fuego' ? fuegoStarten(seed) : opt.gegner === 'ki' ? kiStarten(seed) : null;
   if (fu) {
     try { await fu.einrichten(); }
     catch (e) { fu.ende(); g.ende(); if (o) o.ende(); if (oz) oz.ende(); throw e; }
@@ -438,7 +473,7 @@ async function partieSpielen(nr) {
       if (fu) {
         const beiF = new Set((await fu.frage(`list_stones ${farbe}`)).split(/\s+/).filter(Boolean).map(vonGtp));
         for (let k = 0; k < N; k++)
-          if ((board[k] === f) !== beiF.has(k)) throw new Error(`Partie ${nr}: Bretter weichen bei Fuego ab an ${zuGtp(k)}`);
+          if ((board[k] === f) !== beiF.has(k)) throw new Error(`Partie ${nr}: Bretter weichen bei ${opt.gegner === 'ki' ? 'der Gegner-KI' : 'Fuego'} ab an ${zuGtp(k)}`);
       }
     }
     let gnugoStand = null, sieger;
@@ -462,7 +497,9 @@ async function partieSpielen(nr) {
             gnugoStand, endstand, unsereZaehlung: unsereZaehlung(board), gefangen: {wir: caps[wir], gegner: caps[3 - wir]}, zuegeAnzahl: mc,
             simsMittel: sims.length ? Math.round(sims.reduce((x, y) => x + y, 0) / sims.length) : null,
             neustarts: g.neustarts(), schaetzung,
-            ...(fu ? {gegner: {name: 'fuego', spiele: opt.fuegoSpiele, schiedsrichterStufe: opt.stufe}} : {}),
+            ...(opt.gegner === 'fuego' ? {gegner: {name: 'fuego', spiele: opt.fuegoSpiele, schiedsrichterStufe: opt.stufe}} : {}),
+            ...(opt.gegner === 'ki' ? {gegner: {name: 'ki', html: path.basename(opt.gegnerHtml), sha256: GEGNER_SHA,
+                                                 ki: opt.gegnerKi, schiedsrichterStufe: opt.stufe}} : {}),
             ...(MIT_STUFEN ? {kiStufen: opt.kiStufen, phasenwechsel} : {}),
             ...(o ? {orakel: {stufe: opt.orakel, ...orakel, neustarts: o.neustarts()}} : {}),
             ...(oz ? {orakelZug: {ab: opt.orakelZug.ab, anteil: opt.orakelZug.anteil, stufe: opt.orakelZugStufe, ...orakelZug, neustarts: oz.neustarts()}} : {}),

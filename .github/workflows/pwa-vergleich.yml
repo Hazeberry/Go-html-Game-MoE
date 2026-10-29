@@ -1,0 +1,213 @@
+name: Vergleich mit der PWA
+
+# Manueller Lauf aus docs/pwa-vergleich.md: die aktuelle Engine (index.html)
+# gegen die KI der PWA (vergleich/pwa-index.html) über gtp-ki.js, ohne
+# Vorgabe, Farben wechseln je Partie, Komi 7,5, GNU Go Stufe 1 zählt.
+#
+# Ablauf:
+#   m1          M1: beide 120 Simulationen × 12 Teile zu 30 Partien, Seed 223
+#   m2          M2: beide 1,8 s je Zug × 20 Teile zu 6 Partien, Seed 224
+#   k1          K1: die aktuelle Engine gegen sich selbst über den Adapter,
+#               120 Simulationen × 4 Teile zu 30 Partien, Seed 225
+#   kontrolle   M1, Partien 1 bis 20, noch einmal
+#   ergebnis    Bericht, Rohdaten gepackt, Branch ergebnisse/pwa-vergleich-lauf<N>
+
+# Keine Eingaben: Seeds und Bedingungen stehen in auswertung/pwa-spielen.sh.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: pwa-vergleich
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  m1:
+    name: M1 (120 Sim.), Partien ab ${{ matrix.von }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        von: [1, 31, 61, 91, 121, 151, 181, 211, 241, 271, 301, 331]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: 30 Partien spielen
+        env:
+          VON: ${{ matrix.von }}
+        run: bash auswertung/pwa-spielen.sh M1 "$VON" 30 "stand/m1-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-m1-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  m2:
+    name: M2 (1,8 s je Zug), Partien ab ${{ matrix.von }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        von: [1, 7, 13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79, 85, 91, 97, 103, 109, 115]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: 6 Partien spielen
+        env:
+          VON: ${{ matrix.von }}
+        run: bash auswertung/pwa-spielen.sh M2 "$VON" 6 "stand/m2-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-m2-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  k1:
+    name: K1 (N gegen N), Partien ab ${{ matrix.von }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        von: [1, 31, 61, 91]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: 30 Partien spielen
+        env:
+          VON: ${{ matrix.von }}
+        run: bash auswertung/pwa-spielen.sh K1 "$VON" 30 "stand/k1-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-k1-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  kontrolle:
+    name: Kontrolle (M1, Partien 1 bis 20, noch einmal)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: 20 Partien noch einmal spielen
+        run: bash auswertung/pwa-spielen.sh M1 1 20 stand/kontrolle.jsonl
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-kontrolle
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [m1, m2, k1, kontrolle]
+    # Auch wenn ein Teil scheitert: Der Bericht nennt die Paare, die da sind,
+    # und fehlende-teile.txt die, die fehlen.
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: stand-*
+          path: stand
+          merge-multiple: true
+
+      - name: Bericht
+        run: bash auswertung/pwa-ergebnis.sh
+
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/pwa-vergleich-lauf${LAUF}"
+          ziel="docs/daten/pwa-vergleich/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Vergleich mit der PWA: Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
