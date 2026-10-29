@@ -10,7 +10,8 @@
 #
 # Beide: sechs Vorgabesteine, 120 Simulationen, Aufgabe der KI aus, GNU Go
 # gibt nicht auf, bis 600 Züge, Schätzung nach Zug 40, 80, 120 und 200
-# (SCHAETZUNG ändert die Liste, für die Kontrollen). GNUGO nennt GNU Go
+# (SCHAETZUNG ändert die Liste, für die Kontrollen). SIMS ändert die 120
+# Simulationen (docs/baum-uebernahme.md: 600). GNUGO nennt GNU Go
 # (Standard /usr/games/gnugo). Die Arme stehen in arme.sh (Stufe A); ARME
 # nennt eine andere Datei mit demselben Aufbau (arme-b.sh für Stufe B,
 # docs/komponenten-b.md).
@@ -28,7 +29,10 @@ ki_von() {
   local a=$1 bekannt=0 x
   for x in "${ARM_REIHE[@]}"; do [ "$x" = "$a" ] && bekannt=1; done
   [ "$bekannt" -eq 1 ] || { echo "unbekannter Arm: '$a'" >&2; exit 2; }
-  local ki="mctsFixedSims=120,resignEnabled=0"
+  local sims=${SIMS:-120}
+  case "$sims" in ''|*[!0-9]*) echo "SIMS keine Zahl: '$sims'" >&2; exit 2;; esac
+  [ "$sims" -ge 1 ] && [ "$sims" -le 100000 ] || { echo "SIMS 1 bis 100000: $sims" >&2; exit 2; }
+  local ki="mctsFixedSims=$sims,resignEnabled=0"
   [ -z "${ARM_KI[$a]}" ] || ki="$ki,${ARM_KI[$a]}"
   echo "$ki"
 }

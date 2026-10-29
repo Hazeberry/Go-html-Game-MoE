@@ -82,7 +82,11 @@ nichts zu installieren.
   die Auflösung reicht (rund 14 bis 17 Punkte). Die Muster erst ab Zug 40
   oder 80 einzusetzen (`musterAb`, `docs/muster-eroeffnung.md` §9) bringt
   gegen keinen der beiden Gegner etwas und verliert im Selbstspiel (44 % und
-  28 %); `musterAb` bleibt 0.
+  28 %); `musterAb` bleibt 0. Vorab festgelegt ist eine Prüfung auf
+  Nichtunterlegenheit für die Baum-Übernahme (`docs/baum-uebernahme.md`):
+  abschalten nur, wenn es gegen beide Gegner höchstens 10 Punkte kostet, auch
+  bei 600 Simulationen kein Schaden sichtbar wird und das Selbstspiel nicht
+  klar verliert.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl
