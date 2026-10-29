@@ -92,7 +92,9 @@ nichts zu installieren.
   **schaden**: Ohne sie steht die KI um 14,3 Punkte besser, mit ihnen erst ab
   Zug 80 um 17,1, vor allem als Weiß. Mit sechs Steinen brachten sie nichts
   Messbares, im Selbstspiel helfen sie. Kein Default ist geändert, eine
-  eigene Vorabfestlegung steht aus.
+  eigene Vorabfestlegung steht aus. Vorab festgelegt ist ein direkter
+  Vergleich mit der älteren Fassung aus der PWA (`docs/pwa-vergleich.md`):
+  ohne Vorgabe, bei 120 Simulationen und bei 1,8 s je Zug.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl
@@ -2658,7 +2660,9 @@ fallen zweimal an.
 ```
 index.html                      Spiel und Engine, eine Datei
 ab-harness.js                   Messrahmen; Kopfkommentar = Versuchsprotokoll
-gnugo-duell.js                  KI gegen GNU Go oder Fuego über GTP; GNU Go zählt
+gnugo-duell.js                  KI gegen GNU Go, Fuego oder eine andere KI über GTP; GNU Go zählt
+gtp-ki.js                       die KI einer beliebigen index.html als GTP-Programm (docs/pwa-vergleich.md)
+vergleich/pwa-index.html        ältere Fassung aus der PWA, Gegner im Vergleich (docs/pwa-vergleich.md)
 distillation/                   Überwachtes Training fürs Policy-Netz
 docs/                           Versuchsprotokolle, die zu lang für den README sind
 auswertung/                     Auswertung der Rohdumps (--roh), Rechenweg der Protokolle

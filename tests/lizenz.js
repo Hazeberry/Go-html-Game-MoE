@@ -5,7 +5,9 @@
    Die Lizenz verlangt, dass jeder, der einen Teil der Software bekommt, auch
    die Zeilen bekommt, die mit „Required Notice:“ beginnen. Geprüft wird:
    jede versionierte Quelldatei (.html, .js, .py, .sh) trägt genau die Zeile
-   aus LICENSE und die SPDX-Kennung; index.html dazu die Lizenz-URL,
+   aus LICENSE und die SPDX-Kennung, Dateien unter vergleich/ (unverändert
+   übernommene Fassungen aus anderen Repos von Hazeberry) die Zeile ihres
+   Herkunftsrepos; index.html dazu die Lizenz-URL,
    <link rel="license">, <meta name="author"> und die Kennung (Kommentar
    und Konstante PROJEKT_KENNUNG gleich).
 
@@ -30,7 +32,8 @@ test('jede Quelldatei trägt Required Notice und SPDX-Kennung', () => {
   pruefe(dateien.length > 0, 'Quelldateien gefunden');
   for (const f of dateien) {
     const t = fs.readFileSync(path.join(wurzel, f), 'utf8');
-    pruefe(t.includes(notiz), `${f}: Required Notice fehlt`);
+    if (f.startsWith('vergleich/')) pruefe(/Required Notice: Copyright \(c\) 2026 Hazeberry \(https:\/\/github\.com\/Hazeberry\/[\w.-]+\)/.test(t), `${f}: Required Notice des Herkunftsrepos fehlt`);
+    else pruefe(t.includes(notiz), `${f}: Required Notice fehlt`);
     pruefe(t.includes('SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0'), `${f}: SPDX-Kennung fehlt`);
   }
 });

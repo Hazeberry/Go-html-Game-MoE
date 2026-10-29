@@ -114,7 +114,7 @@ test('Zurückweisung durch den Schiedsrichter: Partie abgebrochen, Werkzeug läu
 test('falsche Angaben werden mit Fehlercode 2 abgelehnt', () => {
   const lauf2 = extra => spawnSync(process.execPath, [WERKZEUG, '--partien', '1', '--gnugo', programm, ...extra], {encoding: 'utf8', timeout: 60000});
   const a = lauf2(['--gegner', 'pachi']);
-  pruefeGleich(a.status, 2, '--gegner pachi'); pruefe(/gnugo oder fuego/.test(a.stderr), a.stderr);
+  pruefeGleich(a.status, 2, '--gegner pachi'); pruefe(/gnugo, fuego oder ki/.test(a.stderr), a.stderr);
   for (const v of ['0', 'abc', '-5', '2000000', '1.5']) pruefeGleich(lauf2(['--fuego-spiele', v]).status, 2, `--fuego-spiele ${v}`);
   const b = lauf2(['--gegner', 'fuego', '--fuego', path.join(ordner, 'gibt-es-nicht')]);
   pruefeGleich(b.status, 2, 'Fuego nicht gefunden'); pruefe(/Fuego nicht gefunden/.test(b.stderr) && /bauen\.sh/.test(b.stderr), b.stderr);
