@@ -98,7 +98,8 @@
    Vorgabe (--vorgabe N ≥ 2): Wir spielen in jeder Partie Schwarz mit N
    Steinen auf den Standardpunkten (GTP fixed_handicap), GNU Go Weiß, Komi
    0,5, Weiß zieht zuerst. Ohne Vorgabe wechseln die Farben je Partie, Komi
-   7,5. Für getAIMove zählt die Zugnummer ab dem ersten gespielten Zug.
+   7,5. Die Engine bekommt die Zahl der Steine als vorgabeSteine (ohne
+   Vorgabe 0), wie sie im Browser nie gesetzt wird. Für getAIMove zählt die Zugnummer ab dem ersten gespielten Zug.
 
    Der Datensatz einer Partie (--roh) nennt in `gefangen` die Steine, die wir
    ({wir}) und der Gegner ({gegner}) geschlagen haben, ohne Schlussauszählung.
@@ -407,7 +408,7 @@ async function partieSpielen(nr) {
       const f = mc % 2 === 0 ? zuerst : 3 - zuerst, farbe = f === 1 ? 'B' : 'W';
       let i;
       if (f === wir) {
-        Object.assign(E.PARAMS, DEFAULT, {adaptiveBudgetEnabled: 0}, opt.ki);
+        Object.assign(E.PARAMS, DEFAULT, {adaptiveBudgetEnabled: 0, vorgabeSteine: opt.vorgabe >= 2 ? opt.vorgabe : 0}, opt.ki);
         if (MIT_STUFEN) {
           const stufen = stufenFuer(mc), sig = JSON.stringify(stufen);
           if (stufenSig !== null && sig !== stufenSig) { E.baumVerwerfen(); phasenwechsel++; }

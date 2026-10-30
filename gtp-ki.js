@@ -6,7 +6,8 @@
    docs/pwa-vergleich.md). Geladen werden die Blöcke shared-go-logic und
    worker-ai wie in gnugo-duell.js; gezogen wird mit getAIMove auf der Stufe
    'hard', mit dem Default der Datei, ohne adaptives Zeitbudget und mit den
-   Änderungen aus --ki.
+   Änderungen aus --ki. Kennt die Datei vorgabeSteine, bekommt sie die Zahl
+   der Steine aus set_free_handicap (sonst 0).
 
    Befehle: protocol_version, name, version, list_commands, known_command,
    boardsize 19, clear_board, komi, set_random_seed, play, genmove,
@@ -71,10 +72,10 @@ function vonGtp(s) {
 }
 const farbeVon = s => { const t = String(s || '').toLowerCase(); if (t === 'b' || t === 'black') return 1; if (t === 'w' || t === 'white') return 2; throw new Error('Farbe unlesbar: ' + s); };
 
-let board, caps, hist, ko, last, mc;
+let board, caps, hist, ko, last, mc, vorgabe;
 function neu() {
   board = new Uint8Array(E.BOARD_SIZE); caps = {1: 0, 2: 0}; hist = new Set([E.computeZobrist(board)]);
-  ko = null; last = null; mc = 0; E.neuePartie();
+  ko = null; last = null; mc = 0; vorgabe = 0; E.neuePartie();
 }
 neu();
 Math.random = mulberry32(1);
@@ -109,11 +110,11 @@ function antworte(zeile) {
       Math.random = mulberry32(+rest[0]); return '';
     }
     case 'play': setze(vonGtp(rest[1]), farbeVon(rest[0])); return '';
-    case 'set_free_handicap': for (const s of rest) { board[vonGtp(s)] = 1; } hist.add(E.computeZobrist(board)); return '';
+    case 'set_free_handicap': for (const s of rest) { board[vonGtp(s)] = 1; } vorgabe = rest.length; hist.add(E.computeZobrist(board)); return '';
     case 'list_stones': { const f = farbeVon(rest[0]); const z = []; for (let i = 0; i < E.BOARD_SIZE; i++) if (board[i] === f) z.push(zuGtp(i)); return z.join(' '); }
     case 'genmove': {
       const f = farbeVon(rest[0]);
-      Object.assign(E.PARAMS, DEFAULT, {adaptiveBudgetEnabled: 0}, opt.ki);
+      Object.assign(E.PARAMS, DEFAULT, {adaptiveBudgetEnabled: 0}, 'vorgabeSteine' in DEFAULT ? {vorgabeSteine: vorgabe} : {}, opt.ki);
       const r = E.getAIMove(board, f, Array.from(hist), {...caps}, mc, 'hard', 1, ko, last);
       if (r.type === 'resign') return 'resign';
       const i = r.type === 'stone' ? r.y * 19 + r.x : -1;

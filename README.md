@@ -95,7 +95,10 @@ nichts zu installieren.
   eigene Vorabfestlegung steht aus. Gegen die ältere Fassung aus der PWA
   (`docs/pwa-vergleich.md` §9, ohne Vorgabe, ohne Endspiel-Netz) gewinnt die
   aktuelle Engine 84,7 % bei 120 Simulationen und 71,7 % bei 1,8 s je Zug;
-  gegen sich selbst über denselben Aufbau 51,7 %.
+  gegen sich selbst über denselben Aufbau 51,7 %. Vorab festgelegt ist, ob
+  die Muster ohne Vorgabe schwächer oder gar nicht zählen sollen
+  (`docs/muster-ohne-vorgabe.md`): gegen GNU Go und Fuego ohne Vorgabe, mit
+  Selbstspiel als Veto; die neuen Schalter greifen nur ohne Vorgabe.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl

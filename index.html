@@ -1999,6 +1999,16 @@ globalThis.PARAMS = {
      nur 27,8 % von 360 (beide signifikant unter 50 %). Der fruehe Vorsprung
      nach GNU Gos Schaetzung war ein Merkmal der Schaetzung. Default bleibt 0. */
   musterAb:           0,
+  /* Muster in Partien ohne Vorgabe (docs/muster-ohne-vorgabe.md): Faktor auf
+     musterGewicht, wenn vorgabeSteine unter 2 liegt, und ein weiterer, wenn
+     die KI dort Weiss spielt. Anlass: ohne Vorgabe gegen GNU Go kostet das
+     Muster-Gewicht 14,3 Punkte, vor allem als Weiss (docs/leeres-brett.md
+     §9); mit Vorgabe nichts Messbares. 1 = wie bisher, bitgenau. */
+  musterOhneVorgabe:      1,
+  musterWeissOhneVorgabe: 1,
+  /* Zahl der Vorgabesteine der laufenden Partie. Der Browser kennt keine
+     Vorgabe und laesst 0 stehen; gnugo-duell.js und gtp-ki.js setzen sie. */
+  vorgabeSteine:          0,
   /* Endspiel-Netz an der Wurzel (docs/endspiel-netz.md): Anteil des Netzes am
      Prior der Wurzelkinder (0 = aus), so viele beste Netzpunkte kommen unter
      die Kandidaten, ab dieser Zugzahl. Offline geprüft (docs/endspiel-
@@ -5013,7 +5023,8 @@ function _getAIMoveKern(board, aiColor, histHashes, captures, mc, diff, reqId, k
   if (PARAMS.raumGewicht > 0 || PARAMS.raumZug > 0) primeRaum(board);
   /* Muster (PARAMS.musterGewicht) nur hier, an der Wurzel der KI, und erst
      ab Zug PARAMS.musterAb. */
-  const mg = mc >= PARAMS.musterAb ? PARAMS.musterGewicht : 0;
+  let mg = mc >= PARAMS.musterAb ? PARAMS.musterGewicht : 0;
+  if (PARAMS.vorgabeSteine < 2) mg *= PARAMS.musterOhneVorgabe * (aiColor === 2 ? PARAMS.musterWeissOhneVorgabe : 1);
   const scored = legal.map(m => ({m, score: evaluateMove(board, m.idx, aiColor, mc, empty)
     + (mg > 0 ? mg * musterWert(board, m.idx, aiColor) : 0)}));
   scored.sort((a,b) => b.score - a.score);

@@ -42,6 +42,12 @@
         Bedingungen und urteilt nach der vorab festgelegten Regel; das
         Ergebnisskript fügt Teile, Bedingung mit sechs Steinen und Kontrolle
         zusammen.
+    10. Muster ohne Vorgabe (docs/muster-ohne-vorgabe.md): Schalter mit
+        Default 1 bzw. 0 in index.html, Arme in arme-o.sh, Dokument, Workflow
+        (Seed 226, VORGABE 0, Seeds des Selbstspiels) und Ergebnisskript
+        stimmen überein; mit sechs Vorgabesteinen spielt M0 wie D, ohne
+        Vorgabe nicht, MW0 spielt als Schwarz wie D (Attrappe); der Bericht
+        urteilt nur über M0 und M50 und zeigt die Wirkung je Farbe.
 
    Aufruf:  node tests/komponenten.js */
 'use strict';
@@ -249,7 +255,7 @@ test('Muster-Eröffnung: Arme, Schalter, Dokument, Workflow und Ergebnisskript s
   pruefeGleich(`${armKiM.D}|${armKiM.M0}`, `${armKi.D}|${armKi.M0}`, 'D und M0 wie in Stufe A');
   pruefeGleich(`${armKiM.A40}|${armKiM.A80}`, 'musterAb=40|musterAb=80', 'A40 und A80');
   pruefeGleich(standard('musterAb'), 0, 'musterAb steht mit Default 0 in index.html');
-  pruefe(/const mg = mc >= PARAMS\.musterAb \? PARAMS\.musterGewicht : 0;/.test(html), 'der Schalter wirkt an der Wurzel');
+  pruefe(/let mg = mc >= PARAMS\.musterAb \? PARAMS\.musterGewicht : 0;/.test(html), 'der Schalter wirkt an der Wurzel');
   const doc = fs.readFileSync(path.join(wurzel, 'docs', 'muster-eroeffnung.md'), 'utf8');
   const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'muster-eroeffnung.yml'), 'utf8');
   const e = fs.readFileSync(path.join(wurzel, 'auswertung', 'komponenten', 'ergebnis-m.sh'), 'utf8');
@@ -460,4 +466,84 @@ test('Leeres Brett: Ergebnisskript fügt Teile, Bedingung mit sechs Steinen und 
   pruefe(['g-D', 'g-M0', 'g-N0', 'g-A80', 'kontrolle-g'].every(n => fs.existsSync(path.join(ort, 'ergebnisse', `${n}.jsonl.gz`))), 'Rohdaten gepackt');
 });
 
-laufeTests('Komponenten Stufe A, B und Muster-Eröffnung, Baum-Übernahme, leeres Brett').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
+/* ── Muster ohne Vorgabe (docs/muster-ohne-vorgabe.md) ──────────────── */
+const ARME_O = path.join(wurzel, 'auswertung', 'komponenten', 'arme-o.sh');
+const kiO = arm => execFileSync('bash', [SPIELEN, '--ki', arm], {encoding: 'utf8', env: {...process.env, ARME: ARME_O}}).trim();
+
+test('Muster ohne Vorgabe: Schalter, Arme, Dokument, Workflow und Ergebnisskript stimmen überein', () => {
+  pruefeGleich(`${standard('musterOhneVorgabe')} ${standard('musterWeissOhneVorgabe')} ${standard('vorgabeSteine')}`, '1 1 0', 'Defaults der Schalter');
+  pruefe(/let mg = mc >= PARAMS\.musterAb \? PARAMS\.musterGewicht : 0;\n  if \(PARAMS\.vorgabeSteine < 2\) mg \*= PARAMS\.musterOhneVorgabe \* \(aiColor === 2 \? PARAMS\.musterWeissOhneVorgabe : 1\);/.test(html), 'Schalter wirken nur ohne Vorgabe, der zweite nur als Weiß');
+  pruefeGleich(['D', 'M0', 'M50', 'MW0'].map(kiO).join(' | '), 'mctsFixedSims=120,resignEnabled=0 | mctsFixedSims=120,resignEnabled=0,musterOhneVorgabe=0 | mctsFixedSims=120,resignEnabled=0,musterOhneVorgabe=0.5 | mctsFixedSims=120,resignEnabled=0,musterWeissOhneVorgabe=0', 'Arme');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'muster-ohne-vorgabe.md'), 'utf8');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'muster-ohne-vorgabe.yml'), 'utf8');
+  const e = fs.readFileSync(path.join(wurzel, 'auswertung', 'komponenten', 'ergebnis-o.sh'), 'utf8');
+  const zeilen = [...doc.matchAll(/^\| (D|M0|M50|MW0) \| (?:`([^`]*)`|–) \| (\d+) \|/gm)];
+  pruefeGleich(zeilen.map(m => m[1]).join(' '), 'D M0 M50 MW0', 'Arme im Dokument');
+  for (const m of zeilen) pruefeGleich(`mctsFixedSims=120,resignEnabled=0${m[2] ? ',' + m[2] : ''}`, kiO(m[1]), `${m[1]}: wie in arme-o.sh`);
+  const liste = (name, was) => { const x = t.slice(t.indexOf(`\n  ${name}:\n`)); return (new RegExp(`${was}: \\[([^\\]]+)\\]`).exec(x) || [])[1].split(',').map(v => v.trim()); };
+  for (const [name, o, gr, teile] of [['gnugo', 'g', 30, 16], ['fuego', 'f', 60, 8]]) {
+    pruefeGleich(liste(name, 'arm').join(' '), 'D M0 M50 MW0', `${name}: Arme`);
+    const von = liste(name, 'von').map(Number);
+    pruefe(von.length === teile && von.every((v, i) => v === 1 + i * gr), `${name}: ${teile} Teile zu ${gr}`);
+    for (const m of zeilen) pruefeGleich(+m[3], von.length * gr, `${name}: ${m[1]} spielt so viele Partien wie im Dokument`);
+    pruefe(new RegExp(`spielen\\.sh ${o} "\\$ARM" "\\$VON" ${gr} "\\$SEED" "stand/${o}-\\$ARM-\\$VON\\.jsonl"`).test(t.slice(t.indexOf(`\n  ${name}:\n`))), `${name}: ${gr} Partien je Teil`);
+    pruefe(e.includes(`if [ "$o" = g ]; then schritt=30; n=16; else schritt=60; n=8; fi`), 'Ergebnisskript sammelt die Teile wie der Workflow');
+  }
+  pruefeGleich(liste('selbstspiel', 'arm').join(' '), 'M0 M50 MW0', 'Selbstspiel: Arme');
+  pruefe(!/inputs:/.test(t) && /^  SEED: '226'$/m.test(t) && /^  VORGABE: '0'$/m.test(t) && /^  ARME: auswertung\/komponenten\/arme-o\.sh$/m.test(t), 'Seed 226, VORGABE 0, arme-o.sh');
+  for (const [arm, seed] of [['M0', '20262501'], ['M50', '20262601'], ['MW0', '20262701']]) pruefe(new RegExp(`^  SEED_M2_${arm}: '${seed}'$`, 'm').test(t) && doc.includes(`**${seed}** (${arm})`), `Seed des Selbstspiels ${arm}`);
+  pruefe(/^\| `seed` \| 226 \|$/m.test(doc) && doc.includes('Seed **226**') && doc.includes('98,3 %'), 'Seed und Niveau im Dokument');
+  pruefe(/spielen\.sh g D 1 20 222 stand\/kontrolle-g\.jsonl/.test(t) && /spielen\.sh f D 1 20 "\$SEED" stand\/kontrolle-f\.jsonl/.test(t), 'Kontrollen: GNU Go mit Seed 222, Fuego mit Seed 226');
+  pruefe(/leeres-brett\/lauf1/.test(e) && /--stufe O /.test(e) && /for arm in M0 M50 MW0/.test(e), 'Ergebnisskript: Kontrolle gegen „Leeres Brett“, Stufe O, Selbstspiel');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+});
+
+test('Muster ohne Vorgabe, Attrappe: mit sechs Steinen M0 wie D, ohne Vorgabe nicht; MW0 als Schwarz wie D', () => {
+  const spiel = (arm, nr, vorgabe) => {
+    const aus = path.join(ordner, `o-${arm}-${nr}-${vorgabe}.jsonl`);
+    fs.rmSync(aus, {force: true});
+    execFileSync(process.execPath, [path.join(wurzel, 'gnugo-duell.js'), '--gnugo', programm, '--partien', '1', '--von', String(nr), '--seed', '226',
+      '--stufe', '1', '--vorgabe', String(vorgabe), '--maxzuege', '40', '--gnugo-aufgabe', '0', '--ki', kiO(arm) + ',mctsFixedSims=20', '--roh', aus],
+      {stdio: 'pipe', timeout: 300000});
+    return JSON.parse(fs.readFileSync(aus, 'utf8').trim()).zuege.join(' ');
+  };
+  pruefeGleich(spiel('M0', 1, 6), spiel('D', 1, 6), 'mit sechs Steinen: M0 spielt wie D');
+  pruefe(spiel('M0', 2, 0) !== spiel('D', 2, 0), 'ohne Vorgabe: M0 weicht von D ab');
+  pruefeGleich(spiel('MW0', 2, 0), spiel('D', 2, 0), 'ohne Vorgabe, KI Schwarz (gerade Partie): MW0 spielt wie D');
+  pruefe(spiel('MW0', 3, 0) !== spiel('D', 3, 0), 'ohne Vorgabe, KI Weiß: MW0 weicht ab');
+});
+
+test('Muster ohne Vorgabe, Bericht: Urteil nur über M0 und M50, Wirkung je Farbe, Kontrolltexte', () => {
+  pruefeGleich(`${K.STUFEN.O.vergleiche.join(' ')} | ${K.STUFEN.O.urteilArme.join(' ')} | ${K.STUFEN.O.alpha}`, `M0 M50 MW0 | M0 M50 | ${0.05 / 3}`, 'Stufe O');
+  const r = nr => ((nr * 13) % 7) - 3;
+  const arm = f => new Map(Array.from({length: 40}, (_, i) => i + 1).map(nr => [nr, {nr, endstand: f(nr), gewonnen: f(nr) > 0, wirFarbe: nr % 2 ? 'W' : 'S', schaetzung: {}, zuege: ['D4']}]));
+  const g = {D: arm(nr => -80 + 4 * r(nr)), M0: arm(nr => -80 + 4 * r(nr) + 20 + r(nr + 1)), M50: arm(nr => -80 + 4 * r(nr) + r(nr + 2)), MW0: arm(nr => -80 + 4 * r(nr) + (nr % 2 ? 30 : 0) + r(nr + 3))};
+  const a = K.auswertung({g, f: g}, 'O');
+  pruefeGleich(a.urteile.map(u => `${u.arm}:${u.urteil}`).join(' '), 'M0:besser gegen beide Gegner M50:nicht belegt', 'Urteile ohne MW0');
+  const mw = a.gegner.g.vergleiche.find(v => v.arm === 'MW0');
+  pruefe(Math.abs(mw.jeFarbe.W.m - 30) < 2 && Math.abs(mw.jeFarbe.S.m) < 2, `MW0 je Farbe: S ${mw.jeFarbe.S.m}, W ${mw.jeFarbe.W.m}`);
+  const md = K.text(a, {g: {gleich: 20, erwartet: 20, ok: true}, f: {gleich: 20, erwartet: 20, ok: true}});
+  pruefe(/Arm − D je Farbe der KI \(98,3 %\)/.test(md) && /MW0 erkundend, ohne Urteil/.test(md) && !/- MW0:/.test(md), 'Bericht: Farben und Urteil');
+  pruefe(/gleich wie im Lauf „Leeres Brett“ \(Seed 222\)/.test(md) && /gleich wie in den Partien von D dieses Laufs/.test(md), 'Kontrolltexte je Gegner');
+});
+
+test('Muster ohne Vorgabe: Ergebnisskript fügt Teile, Kontrollen und Selbstspiel zusammen', () => {
+  const ort = fs.mkdtempSync(path.join(ordner, 'o-'));
+  fs.mkdirSync(path.join(ort, 'stand'));
+  const rec = (nr, endstand) => JSON.stringify({nr, endstand, gewonnen: endstand > 0, wirFarbe: nr % 2 ? 'W' : 'S', schaetzung: {}, zuege: ['D4', String(nr)]});
+  for (const arm of ['D', 'M0', 'M50', 'MW0']) {
+    fs.writeFileSync(path.join(ort, 'stand', `g-${arm}-1.jsonl`), Array.from({length: 30}, (_, i) => rec(i + 1, -60 + ((i * 7) % 11))).join('\n') + '\n');
+    fs.writeFileSync(path.join(ort, 'stand', `f-${arm}-1.jsonl`), Array.from({length: 60}, (_, i) => rec(i + 1, -90 + ((i * 5) % 13))).join('\n') + '\n');
+  }
+  fs.writeFileSync(path.join(ort, 'stand', 'kontrolle-f.jsonl'), Array.from({length: 20}, (_, i) => rec(i + 1, 0)).join('\n') + '\n');
+  const p = spawnSync('bash', [path.join(wurzel, 'auswertung', 'komponenten', 'ergebnis-o.sh')], {cwd: ort, encoding: 'utf8'});
+  pruefeGleich(p.status, 0, 'Ergebnisskript läuft: ' + p.stderr.slice(-300));
+  const md = fs.readFileSync(path.join(ort, 'ergebnisse', 'bericht.md'), 'utf8');
+  const fehlt = fs.readFileSync(path.join(ort, 'ergebnisse', 'fehlende-teile.txt'), 'utf8').trim().split('\n');
+  pruefeGleich(fehlt.length, 4 * 15 + 4 * 7 + 1 + 36, 'fehlende Teile: GNU Go, Fuego, Kontrolle GNU Go, Selbstspiel');
+  pruefe(fehlt.includes('kontrolle-g') && fehlt.includes('m2-MW0-12'), 'fehlende Kontrolle und Selbstspiel benannt');
+  pruefe(/Kontrolle: 20 von 20 Partien gleich wie in den Partien von D dieses Laufs \(bestanden\)/.test(md) && /M0: Selbstspiel unvollständig \(0 von 12 Teilen\)/.test(md), 'Kontrolle Fuego und unvollständiges Selbstspiel');
+  pruefe(['g-D', 'f-MW0', 'kontrolle-f'].every(n => fs.existsSync(path.join(ort, 'ergebnisse', `${n}.jsonl.gz`))), 'Rohdaten gepackt');
+});
+
+laufeTests('Komponenten Stufe A, B und Muster-Eröffnung, Baum-Übernahme, leeres Brett, Muster ohne Vorgabe').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
