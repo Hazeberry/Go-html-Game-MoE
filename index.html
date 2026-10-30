@@ -2003,7 +2003,13 @@ globalThis.PARAMS = {
      musterGewicht, wenn vorgabeSteine unter 2 liegt, und ein weiterer, wenn
      die KI dort Weiss spielt. Anlass: ohne Vorgabe gegen GNU Go kostet das
      Muster-Gewicht 14,3 Punkte, vor allem als Weiss (docs/leeres-brett.md
-     §9); mit Vorgabe nichts Messbares. 1 = wie bisher, bitgenau. */
+     §9); mit Vorgabe nichts Messbares. 1 = wie bisher, bitgenau.
+     GEMESSEN (docs/muster-ohne-vorgabe.md §9, je 480 Paare ohne Vorgabe,
+     Seed 226, 98,3 %): 0 gegen GNU Go +18,1 [+11,9; +24,4], gegen Fuego
+     +0,6 [-5,4; +6,6]; 0,5 +15,2 und -0,3; im Selbstspiel 26,9 % und 45,6 %.
+     Der Schaden haengt an GNU Go, nicht am leeren Brett. Default bleibt 1;
+     nur als Weiss ohne Muster (musterWeissOhneVorgabe 0, erkundend): +13,1
+     gegen GNU Go, -4,1 gegen Fuego, 38,6 % im Selbstspiel. */
   musterOhneVorgabe:      1,
   musterWeissOhneVorgabe: 1,
   /* Zahl der Vorgabesteine der laufenden Partie. Der Browser kennt keine

@@ -165,3 +165,68 @@ gleichzeitig **rund zwei Stunden**.
 
 Der Nachtrag wendet die Regel aus §4 an. Ändert sich der Default, dann nur
 `musterOhneVorgabe` in `index.html`, mit Kommentar und README.
+
+## 9. Nachtrag: Ergebnis von Lauf 1 (30.10.2026)
+
+[Workflow-Lauf 41022192878](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/41022192878)
+auf Merge `e40d82e`, von 07:47 bis 10:08 UTC (41 Runner-Stunden). Alle 136
+Jobs sind grün, es fehlt kein Teil. Daten:
+[`docs/daten/muster-ohne-vorgabe/lauf1/`](daten/muster-ohne-vorgabe/lauf1/),
+der volle Bericht in [`bericht.md`](daten/muster-ohne-vorgabe/lauf1/bericht.md).
+
+**Der Lauf ist sauber.** Keine Partie ist abgebrochen, keine lief bis zum
+Zuglimit. Beide Kontrollen sind bestanden: GNU Go 20 von 20 gleich wie im
+Lauf „Leeres Brett“, die neuen Schalter ändern mit ihren Defaults also
+nichts; Fuego 20 von 20 gleich im selben Lauf. MW0 spielt in allen 240
+Partien als Schwarz Zug für Zug wie D, wie es sein muss.
+
+### Arm − D, Endstand (98,3 %)
+
+| Arm | gegen GNU Go | gegen Fuego | Urteil nach §4 | Selbstspiel gegen D |
+|---|---|---|---|---|
+| M0 | **+18,1** [+11,9; +24,4] | +0,6 [−5,4; +6,6] | nicht belegt | **26,9 %** [22,6; 31,8] |
+| M50 | **+15,2** [+8,5; +22,0] | −0,3 [−6,5; +5,8] | nicht belegt | 45,6 % [40,5; 50,7] |
+| MW0 (erkundend) | +13,1 [+8,5; +17,7] | −4,1 [−8,6; +0,4] | – | 38,6 % [33,7; 43,7] |
+
+### Entscheidung nach §4
+
+Kein Arm ist gegen beide Gegner besser: Gegen Fuego liegen M0 und M50 genau
+bei D. **`musterOhneVorgabe` bleibt 1**, die Muster zählen ohne Vorgabe weiter
+voll. Die Schalter bleiben im Code, das Ergebnis steht bei ihnen. Auf das
+Selbstspiel kommt es nach der Regel nicht mehr an. M0 wäre dort mit 26,9 %
+ohnehin am Veto gescheitert, M50 nicht (Obergrenze 50,7 %).
+
+### Einordnung
+
+- **Der Schaden gegen GNU Go bestätigt sich**, mit neuem Seed: M0 +18,1
+  (vorher +14,3). Er entsteht wieder vor allem als Weiß (+26,2 gegen +10,0
+  als Schwarz).
+- **Gegen Fuego gibt es ihn nicht.** Ohne Muster steht die KI dort genauso
+  wie mit. Als Weiß helfen die Muster gegen Fuego sogar eher (M0 als Weiß
+  −8,2 [−17,2; +0,8], MW0 −4,1 insgesamt). Der Unterschied der Gegner ist
+  gesichert: −17,6 [−26,2; −8,9] für M0.
+- **Der Schaden hängt also an GNU Go**, nicht am leeren Brett. Die Muster sind
+  aus Zügen von GNU Go gelernt ([`muster.md`](muster.md) §2). Eine mögliche
+  Erklärung, nicht geprüft: GNU Go Stufe 1 kennt genau die Formen, die die
+  Muster vorschlagen, und weiß gegen sie zu spielen, Fuego nicht.
+- **Im Selbstspiel helfen die Muster** wie schon in der Muster-Eröffnung:
+  ohne sie 26,9 %, mit halbem Gewicht 45,6 %, nur als Weiß ohne 38,6 %. Das
+  Selbstspiel und Fuego sprechen also beide nicht gegen die Muster.
+- **Gegen Fuego gewinnt D die meisten Partien:** 73 von 480, M0 nur 43, M50
+  49, bei gleichem mittlerem Endstand. Das ist beschreibend und nicht
+  geprüft, passt aber zum Bild, dass die Muster gegen Fuego nicht schaden.
+- **Fuego ohne Vorgabe** spielt deutlich stärker als die KI: D verliert im
+  Mittel mit −25,1 und gewinnt 15 % der Partien. Der Endstand streut aber
+  breit genug (SD 45), um Unterschiede zu messen.
+- Wie schon zweimal liegt der frühe Vorsprung nach GNU Gos Schätzung nicht am
+  Ende: M0 gegen Fuego +33,6 nach Zug 80, +0,6 am Ende.
+
+### Abgleich mit der Erwartung (§6)
+
+| Erwartung | eingetreten? |
+|---|---|
+| GNU Go: M0 rund +14, M50 +5 bis +12, MW0 rund +11 | M0 +18,1, M50 +15,2 (darüber), MW0 +13,1 |
+| Fuego: offen, wahrscheinlich kleiner als gegen GNU Go | ja: rund 0 |
+| Selbstspiel: M0 unter der Vetogrenze, M50 und MW0 näher an 50 % | ja: 26,9 %, 45,6 %, 38,6 % |
+| Am wahrscheinlichsten Default bleibt 1 | ja, weil Fuego nicht mitzieht |
+| Kontrollen 20 von 20 | ja |
