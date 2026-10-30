@@ -601,4 +601,18 @@ test('Prüfstand Fuego ohne Vorgabe: Wahl nach Regel, FUEGO_SPIELE, Dokument, Wo
   pruefe(/\*\*Wahl: 20 Spiele je Zug\*\*/.test(md) && fs.readFileSync(path.join(ort, 'ergebnisse', 'fehlende-teile.txt'), 'utf8').trim().split('\n').length === 3 * 3 + 2 * 4, 'Wahl und fehlende Teile');
 });
 
-laufeTests('Komponenten Stufe A, B und Muster-Eröffnung, Baum-Übernahme, leeres Brett, Muster ohne Vorgabe, Siege gegen Fuego').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
+test('Bericht: Partien am Zuglimit (gewonnen null, aber ein Endstand) werden gezählt und fallen samt Partner heraus', () => {
+  const arm = (f, limit = []) => new Map(Array.from({length: 20}, (_, i) => i + 1).map(nr => [nr, {nr, endstand: f(nr), gewonnen: limit.includes(nr) ? null : f(nr) > 0, schaetzung: {}, zuege: ['D4']}]));
+  const D = arm(nr => 10 - nr), T0 = arm(nr => 10 - nr + 5, [3]);
+  const a = K.auswertung({g: {D, T0}}, 'T');
+  const b = a.gegner.g.arme.find(x => x.arm === 'T0'), d = a.gegner.g.arme.find(x => x.arm === 'D');
+  pruefeGleich(`${b.n} ${b.zuglimit} ${b.fertig} ${d.zuglimit}`, '20 1 19 0', 'Zuglimit gezählt (vorher immer 0), Partien ohne Zuglimit gewertet');
+  const v = a.gegner.g.vergleiche[0];
+  pruefeGleich(`${v.g.n} ${v.g.m}`, '19 5', 'das Paar mit der Zuglimit-Partie fällt heraus, die übrigen 19 bleiben');
+  pruefeGleich(`${v.siegeX} ${v.siegeD}`, '13 8', 'Siege zählen nur gewertete Partien (Partie 3 ist beiden Armen ein Sieg und fällt weg)');
+  pruefe(/\| T0 \| 20 \| 0 \| 1 \| /.test(K.text(a)), 'Bericht zeigt 1 Partie am Zuglimit');
+  const ohne = K.auswertung({g: {D: arm(nr => 10 - nr), T0: arm(nr => 15 - nr)}}, 'T').gegner.g.arme.find(x => x.arm === 'T0');
+  pruefeGleich(`${ohne.zuglimit} ${ohne.fertig}`, '0 20', 'ohne Zuglimit: wie bisher');
+});
+
+laufeTests('Komponenten Stufe A, B und Muster-Eröffnung, Baum-Übernahme, leeres Brett, Muster ohne Vorgabe, Siege gegen Fuego, Zuglimit').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
