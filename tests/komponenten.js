@@ -48,6 +48,12 @@
         stimmen überein; mit sechs Vorgabesteinen spielt M0 wie D, ohne
         Vorgabe nicht, MW0 spielt als Schwarz wie D (Attrappe); der Bericht
         urteilt nur über M0 und M50 und zeigt die Wirkung je Farbe.
+    11. Siege (docs/muster-fuego-siege.md, docs/muster-ohne-vorgabe.md §10):
+        siege-gepaart.js zählt die Paare und urteilt nach McNemar, die
+        Tabelle in §10 ist genau seine Ausgabe; gerade-wahl.js wählt die
+        Spielzahl nach der vorab festgelegten Regel; FUEGO_SPIELE in
+        spielen.sh; Dokument, Workflow und Ergebnisskript des Prüfstands
+        stimmen überein.
 
    Aufruf:  node tests/komponenten.js */
 'use strict';
@@ -108,7 +114,7 @@ test('Arme und Partien: Dokument, Workflow und Bericht stimmen überein', () => 
   pruefe(e.includes('netz-dosis/lauf1/L8.jsonl.gz') && e.includes('fuego-pruefstand/lauf1/v6-s100.jsonl.gz'), 'Kontrolldateien im Ergebnisskript');
   for (const d of ['docs/daten/netz-dosis/lauf1/L8.jsonl.gz', 'docs/daten/fuego-pruefstand/lauf1/v6-s100.jsonl.gz']) pruefe(fs.existsSync(path.join(wurzel, d)), `${d} liegt im Repo`);
   const sp = fs.readFileSync(SPIELEN, 'utf8');
-  pruefe(/vorgabe=\$\{VORGABE:-6\}/.test(sp) && /--vorgabe "\$vorgabe"/.test(sp) && /--fuego-spiele 100/.test(sp) && /--stufe 1/.test(sp) && /--gnugo-aufgabe 0/.test(sp) && /sims=\$\{SIMS:-120\}/.test(sp) && /mctsFixedSims=\$sims,resignEnabled=0/.test(sp) && /--maxzuege 600/.test(sp) && /40,80,120,200/.test(sp), 'Bedingungen in spielen.sh');
+  pruefe(/vorgabe=\$\{VORGABE:-6\}/.test(sp) && /--vorgabe "\$vorgabe"/.test(sp) && /fuego_spiele=\$\{FUEGO_SPIELE:-100\}/.test(sp) && /--fuego-spiele "\$fuego_spiele"/.test(sp) && /--stufe 1/.test(sp) && /--gnugo-aufgabe 0/.test(sp) && /sims=\$\{SIMS:-120\}/.test(sp) && /mctsFixedSims=\$sims,resignEnabled=0/.test(sp) && /--maxzuege 600/.test(sp) && /40,80,120,200/.test(sp), 'Bedingungen in spielen.sh');
   const imDoc = (/^\| `seed` \| `?([^` |]+)/m.exec(doc) || [])[1];
   const imFlow = (/^      seed:\n(?:        .*\n)*?        default: '([^']*)'/m.exec(t) || [])[1];
   pruefe(imDoc !== undefined && imDoc === imFlow, `Seed: Dokument „${imDoc}“, Workflow „${imFlow}“`);
@@ -546,4 +552,53 @@ test('Muster ohne Vorgabe: Ergebnisskript fügt Teile, Kontrollen und Selbstspie
   pruefe(['g-D', 'f-MW0', 'kontrolle-f'].every(n => fs.existsSync(path.join(ort, 'ergebnisse', `${n}.jsonl.gz`))), 'Rohdaten gepackt');
 });
 
-laufeTests('Komponenten Stufe A, B und Muster-Eröffnung, Baum-Übernahme, leeres Brett, Muster ohne Vorgabe').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
+/* ── Siege gegen Fuego (docs/muster-fuego-siege.md) ─────────────────── */
+test('Siege gepaart: Zählung, Urteil nach McNemar, Tabelle in muster-ohne-vorgabe.md §10', () => {
+  const SG = require('../auswertung/komponenten/siege-gepaart.js');
+  const m = l => new Map(l.map(([nr, g]) => [nr, {nr, gewonnen: g}]));
+  const D = m([[1, true], [2, false], [3, true], [4, false], [5, null], [6, true]]);
+  const X = m([[1, false], [2, true], [3, true], [4, false], [5, true], [6, false]]);
+  const r = SG.siege(D, X);
+  pruefeGleich(`${r.n} ${r.b} ${r.c} ${r.beide} ${r.keiner} ${r.siegeArm} ${r.siegeD}`, '5 1 2 1 1 2 3', 'Paare zählen, Partie ohne Sieger fällt heraus');
+  pruefeGleich(`${SG.urteil({n: 960, b: 150, c: 100, p: 0.002}, 0.025)} | ${SG.urteil({n: 960, b: 90, c: 130, p: 0.008}, 0.025)} | ${SG.urteil({n: 960, b: 110, c: 100, p: 0.03}, 0.025)}`,
+    'Arm gewinnt öfter | D gewinnt öfter | kein Unterschied belegt', 'Urteil');
+  const L = path.join(wurzel, 'docs/daten/leeres-brett/lauf1'), O = path.join(wurzel, 'docs/daten/muster-ohne-vorgabe/lauf1');
+  const a = [];
+  for (const arm of ['D', 'M0', 'A80']) a.push(`GNU Go, Leeres Brett (Seed 222):${arm}=${L}/g-${arm}.jsonl.gz`);
+  for (const arm of ['D', 'M0', 'M50', 'MW0']) a.push(`GNU Go (Seed 226):${arm}=${O}/g-${arm}.jsonl.gz`);
+  for (const arm of ['D', 'M0', 'M50', 'MW0']) a.push(`Fuego, 100 Spiele (Seed 226):${arm}=${O}/f-${arm}.jsonl.gz`);
+  const aus = execFileSync('node', [path.join(wurzel, 'auswertung/komponenten/siege-gepaart.js'), ...a], {encoding: 'utf8'});
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'muster-ohne-vorgabe.md'), 'utf8');
+  const fehlt = aus.split('\n').filter(z => z.trim() && !doc.includes(z));
+  pruefeGleich(fehlt.length, 0, 'Tabelle in §10 = Ausgabe des Skripts' + (fehlt.length ? ': ' + fehlt[0] : ''));
+  pruefe(/## 10\. Nachtrag: gepaarter Vergleich der Siege \(explorativ/.test(doc) && /\*\*Explorativ, nicht vorab festgelegt\.\*\*/.test(doc), '§10 ist als explorativ geführt');
+});
+
+test('Prüfstand Fuego ohne Vorgabe: Wahl nach Regel, FUEGO_SPIELE, Dokument, Workflow, Ergebnisskript', () => {
+  const W = require('../auswertung/fuego/gerade-wahl.js');
+  const a = (spiele, siege, n = 120) => W.arm(spiele, Array.from({length: n}, (_, i) => ({nr: i + 1, gewonnen: i < siege, endstand: i < siege ? 5 : -5})));
+  pruefeGleich(JSON.stringify(W.wahl([a(10, 100), a(20, 60), a(30, 48), a(50, 20), a(70, 10)])), JSON.stringify({spiele: 30, stufe: 1}), '50 % (20 Spiele) und 40 % (30 Spiele) gleich weit von 45 %: die höhere Spielzahl');
+  pruefeGleich(JSON.stringify(W.wahl([a(10, 100), a(20, 56), a(30, 50), a(50, 20)])), JSON.stringify({spiele: 20, stufe: 1}), '46,7 % (20 Spiele) liegt näher an 45 % als 41,7 % (30 Spiele)');
+  pruefeGleich(JSON.stringify(W.wahl([a(10, 100), a(20, 70), a(30, 30)])), JSON.stringify({spiele: 20, stufe: 2}), 'keine zwischen 40 und 50 %: Regel 2');
+  pruefeGleich(W.wahl([a(10, 110), a(70, 10)]), null, 'keine zwischen 30 und 60 %: keine Wahl');
+  const p = W.arm(20, [{nr: 1, gewonnen: true}, {nr: 2, abgebrochen: 'x'}, {nr: 3, gewonnen: null}, {nr: 4, gewonnen: false}]);
+  pruefeGleich(`${p.partien} ${p.n} ${p.siege}`, '4 2 1', 'Partien ohne Sieger zählen nicht');
+  for (const v of ['0', 'x', '200000']) pruefeGleich(spawnSync('bash', [SPIELEN, 'f', 'D', '1', '20', '227', 'a.jsonl'], {cwd: ordner, encoding: 'utf8', env: {...process.env, FUEGO_SPIELE: v}}).status, 2, `FUEGO_SPIELE ${v} abgelehnt`);
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'muster-fuego-siege.md'), 'utf8');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'fuego-gerade.yml'), 'utf8');
+  const e = fs.readFileSync(path.join(wurzel, 'auswertung', 'fuego', 'gerade-ergebnis.sh'), 'utf8');
+  pruefe(/spiele: \[10, 20, 30, 50, 70\]/.test(t) && /von: \[1, 31, 61, 91\]/.test(t) && /\*\*10, 20, 30, 50 und\s+70 Spielen je\s+Zug\*\*/.test(doc) && /for s in 10 20 30 50 70; do/.test(e) && /for von in 1 31 61 91; do/.test(e), 'Spielzahlen und Teile in Dokument, Workflow und Ergebnisskript');
+  pruefe(/spielen\.sh f D "\$VON" 30 "\$SEED" "stand\/s\$FUEGO_SPIELE-\$VON\.jsonl"/.test(t) && /FUEGO_SPIELE: \$\{\{ matrix\.spiele \}\}/.test(t), '30 Partien je Teil mit FUEGO_SPIELE');
+  pruefe(!/inputs:/.test(t) && /^  SEED: '227'$/m.test(t) && /^  VORGABE: '0'$/m.test(t) && /Seed \*\*227\*\*/.test(doc) && /Seed\s+\*\*228\*\*/.test(doc), 'Seeds 227 und 228, VORGABE 0');
+  pruefe(/alpha\s+\*\*0,05\/2 = 0,025\*\*/.test(doc) && /je\s+\*\*960 Partien\*\*/.test(doc) && /\| M50 gewinnt öfter \| \*\*Default `musterOhneVorgabe` 0,5\*\* \|/.test(doc), 'Endpunkt, Umfang und Folge im Dokument');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  const ort = fs.mkdtempSync(path.join(ordner, 'fg-'));
+  fs.mkdirSync(path.join(ort, 'stand'));
+  for (const [s, sieg] of [[10, 25], [20, 14], [30, 12]]) fs.writeFileSync(path.join(ort, 'stand', `s${s}-1.jsonl`), Array.from({length: 30}, (_, i) => JSON.stringify({nr: i + 1, gewonnen: i < sieg, endstand: i < sieg ? 3 : -3})).join('\n') + '\n');
+  const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'fuego', 'gerade-ergebnis.sh')], {cwd: ort, encoding: 'utf8'});
+  pruefeGleich(r.status, 0, 'Ergebnisskript läuft: ' + r.stderr.slice(-300));
+  const md = fs.readFileSync(path.join(ort, 'ergebnisse', 'bericht.md'), 'utf8');
+  pruefe(/\*\*Wahl: 20 Spiele je Zug\*\*/.test(md) && fs.readFileSync(path.join(ort, 'ergebnisse', 'fehlende-teile.txt'), 'utf8').trim().split('\n').length === 3 * 3 + 2 * 4, 'Wahl und fehlende Teile');
+});
+
+laufeTests('Komponenten Stufe A, B und Muster-Eröffnung, Baum-Übernahme, leeres Brett, Muster ohne Vorgabe, Siege gegen Fuego').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });

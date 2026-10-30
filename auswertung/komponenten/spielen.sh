@@ -13,7 +13,8 @@
 # (SCHAETZUNG ändert die Liste, für die Kontrollen). SIMS ändert die 120
 # Simulationen (docs/baum-uebernahme.md: 600). VORGABE ändert die sechs
 # Vorgabesteine (0 ohne Vorgabe, Farben wechseln, Komi 7,5; sonst 2 bis 9;
-# docs/leeres-brett.md: 0). GNUGO nennt GNU Go
+# docs/leeres-brett.md: 0). FUEGO_SPIELE ändert die 100 Spiele je Zug von
+# Fuego (docs/muster-fuego-siege.md). GNUGO nennt GNU Go
 # (Standard /usr/games/gnugo). Die Arme stehen in arme.sh (Stufe A); ARME
 # nennt eine andere Datei mit demselben Aufbau (arme-b.sh für Stufe B,
 # docs/komponenten-b.md).
@@ -47,11 +48,14 @@ for v in "$von" "$anzahl" "$seed"; do case "$v" in ''|*[!0-9]*) echo "keine Zahl
 schaetzung=${SCHAETZUNG:-40,80,120,200}
 case "$schaetzung" in ''|*[!0-9,]*) echo "Schätzung: Zugzahlen mit Komma: '$schaetzung'" >&2; exit 2;; esac
 vorgabe=${VORGABE:-6}
+fuego_spiele=${FUEGO_SPIELE:-100}
+case "$fuego_spiele" in ''|*[!0-9]*) echo "FUEGO_SPIELE keine Zahl: '$fuego_spiele'" >&2; exit 2;; esac
+[ "$fuego_spiele" -ge 1 ] && [ "$fuego_spiele" -le 100000 ] || { echo "FUEGO_SPIELE 1 bis 100000: $fuego_spiele" >&2; exit 2; }
 case "$vorgabe" in 0|2|3|4|5|6|7|8|9) ;; *) echo "VORGABE 0 oder 2 bis 9: '$vorgabe'" >&2; exit 2;; esac
 ki=$(ki_von "$arm")
 case "$gegner" in
   g) wer=() ;;
-  f) wer=(--gegner fuego --fuego "${FUEGO:-$here/../../fuego-bin/fuego}" --fuego-spiele 100) ;;
+  f) wer=(--gegner fuego --fuego "${FUEGO:-$here/../../fuego-bin/fuego}" --fuego-spiele "$fuego_spiele") ;;
   *) echo "Gegner g (GNU Go) oder f (Fuego): '$gegner'" >&2; exit 2 ;;
 esac
 mkdir -p "$(dirname "$roh")"

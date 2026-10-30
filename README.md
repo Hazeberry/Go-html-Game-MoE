@@ -99,7 +99,11 @@ nichts zu installieren.
   schwächer zählen sollen (`docs/muster-ohne-vorgabe.md` §9): Gegen GNU Go
   kosten sie auch mit neuem Seed rund 18 Punkte, gegen Fuego nichts (+0,6),
   und im Selbstspiel helfen sie. Der Schaden hängt an GNU Go;
-  `musterOhneVorgabe` bleibt 1.
+  `musterOhneVorgabe` bleibt 1. Nachträglich und explorativ (§10): Gegen
+  Fuego gewinnt die KI mit Mustern deutlich öfter (73 gegen 42 von 480).
+  Vorab festgelegt ist eine Messung mit der Siegquote als Endpunkt, gegen ein
+  Fuego, gegen das der Default ohne Vorgabe 40 bis 50 % gewinnt
+  (`docs/muster-fuego-siege.md`).
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl

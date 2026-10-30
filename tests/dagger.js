@@ -203,6 +203,7 @@ test('Workflow baum-uebernahme.yml: keine Ausdrücke in Shell-Zeilen', () => pru
 test('Workflow leeres-brett.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('leeres-brett.yml', 6, 0));
 test('Workflow pwa-vergleich.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('pwa-vergleich.yml', 10, 0));
 test('Workflow muster-ohne-vorgabe.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('muster-ohne-vorgabe.yml', 13, 0));
+test('Workflow fuego-gerade.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('fuego-gerade.yml', 6, 0));
 test('Workflow netz-hoch.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('netz-hoch.yml', 8, 5));
 
 const TEILE = [1, 16, 31, 46, 61, 76, 91, 106, 121, 136, 151, 166, 181, 196, 211, 226];

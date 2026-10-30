@@ -230,3 +230,39 @@ ohnehin am Veto gescheitert, M50 nicht (Obergrenze 50,7 %).
 | Selbstspiel: M0 unter der Vetogrenze, M50 und MW0 näher an 50 % | ja: 26,9 %, 45,6 %, 38,6 % |
 | Am wahrscheinlichsten Default bleibt 1 | ja, weil Fuego nicht mitzieht |
 | Kontrollen 20 von 20 | ja |
+
+## 10. Nachtrag: gepaarter Vergleich der Siege (explorativ, 30.10.2026)
+
+**Explorativ, nicht vorab festgelegt.** Hazeberry hat am 30.10. gebeten, ohne
+neue Partien auch die Siege gepaart zu vergleichen. Es zählen dieselben Paare
+wie in §9 und im Lauf „Leeres Brett“. Der Test ist der exakte McNemar-Test,
+also der Vorzeichentest auf den Paaren, in denen nur einer der beiden Arme
+gewinnt. Partien ohne Sieger (zwei Partien von Fuego am Zuglimit von 600
+Zügen) fallen samt Partner heraus. Bei neun Tests läge eine Bonferroni-Grenze
+bei 0,05/9 ≈ 0,0056. Die Zahlen sind ein Hinweis, kein Urteil. Gerechnet mit
+[`siege-gepaart.js`](../auswertung/komponenten/siege-gepaart.js):
+
+| Gegner | Arm | Paare | Siege Arm | Siege D | nur Arm | nur D | Differenz (Prozentpunkte) | McNemar p |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| GNU Go, Leeres Brett (Seed 222) | M0 | 480 | 16 (3,3 %) | 8 (1,7 %) | 16 | 8 | +1,7 | 0,1516 |
+| GNU Go, Leeres Brett (Seed 222) | A80 | 479 | 19 (4,0 %) | 8 (1,7 %) | 19 | 8 | +2,3 | 0,0522 |
+| GNU Go (Seed 226) | M0 | 480 | 13 (2,7 %) | 11 (2,3 %) | 13 | 11 | +0,4 | 0,8388 |
+| GNU Go (Seed 226) | M50 | 480 | 21 (4,4 %) | 11 (2,3 %) | 21 | 11 | +2,1 | 0,1102 |
+| GNU Go (Seed 226) | MW0 | 480 | 14 (2,9 %) | 11 (2,3 %) | 5 | 2 | +0,6 | 0,4531 |
+| Fuego, 100 Spiele (Seed 226) | M0 | 478 | 42 (8,8 %) | 73 (15,3 %) | 32 | 63 | −6,5 | 0,0019 |
+| Fuego, 100 Spiele (Seed 226) | M50 | 479 | 49 (10,2 %) | 73 (15,2 %) | 41 | 65 | −5,0 | 0,0250 |
+| Fuego, 100 Spiele (Seed 226) | MW0 | 479 | 44 (9,2 %) | 73 (15,2 %) | 16 | 45 | −6,1 | 0,0003 |
+
+- **Gegen GNU Go gewinnt die KI ohne Vorgabe fast nie**, mit und ohne Muster
+  (2 bis 4 %). Die Siege tragen dort kaum Information, die Endstände in §9
+  sind aussagekräftiger.
+- **Gegen Fuego gewinnt D deutlich öfter als jeder Arm**: 73 von 480 Partien
+  gegen 42 ohne Muster (McNemar p = 0,0019), 49 mit halbem Gewicht
+  (p = 0,025) und 44 nur als Weiß ohne Muster (p = 0,0003). Zwei der drei
+  liegen unter der Bonferroni-Grenze. Der mittlere Endstand war dagegen bei
+  allen gleich (§9). Die Muster verschieben gegen Fuego also eher, wie oft
+  die KI knapp vorn landet, als wie viele Punkte sie im Mittel macht.
+- Das spricht wie das Selbstspiel für die Muster. Weil Fuego mit 100 Spielen
+  je Zug ohne Vorgabe so stark ist, dass D nur 15 % gewinnt, misst es aber
+  am Rand. Eine vorab festgelegte Messung mit neu kalibriertem Fuego folgt
+  ([`muster-fuego-siege.md`](muster-fuego-siege.md)).
