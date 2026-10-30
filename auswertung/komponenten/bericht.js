@@ -51,8 +51,12 @@
    Wirkungen. Kontrollen: Partien eines zweiten Laufs gegen eine frühere
    Datei, gleich, wenn die Züge gleich sind.
 
-   Abgebrochene Partien und Partien ohne Endstand (Zuglimit) fallen samt
-   Partner heraus.
+   Abgebrochene Partien und Partien am Zuglimit fallen samt Partner heraus.
+   Eine Partie am Zuglimit erkennt man an gewonnen === null: gnugo-duell.js
+   rechnet dort trotzdem einen Endstand (GNU Gos final_score der Stellung)
+   und setzt nur den Sieger auf null. Früher galt nur ein fehlender Endstand
+   als Zuglimit, die Spalte „Zuglimit“ zeigte deshalb immer 0 und die
+   Partien gingen mit ihrem Endstand in die Paare ein (docs/zuglimit-zaehlung.md).
 
    Aufruf:
      node auswertung/komponenten/bericht.js [--stufe A|B|M|T|T6|L|O] --arm g:D=a.jsonl,b.jsonl --arm g:N0=... --arm f:D=... ...
@@ -99,7 +103,9 @@ function stat(werte, alpha) {
   const m = mittel(werte), sd = sdVon(werte), se = sd / Math.sqrt(n), tk = tKrit(n - 1, alpha);
   return {n, m, sd, se, lo: m - tk * se, hi: m + tk * se};
 }
-const fertig = r => r && !r.abgebrochen && Number.isFinite(r.endstand);
+/* Zuglimit: gnugo-duell.js lässt den Sieger null, rechnet aber einen Endstand */
+const amZuglimit = r => !r.abgebrochen && r.gewonnen === null;
+const fertig = r => r && !r.abgebrochen && !amZuglimit(r) && Number.isFinite(r.endstand);
 
 /* Index des ersten Zugs, in dem zwei Partien sich unterscheiden */
 function ersteAbweichung(a, b) {
@@ -209,7 +215,7 @@ function gegnerUnterschied(vg, vf, alpha = ALPHA) {
 function beschreibung(name, A) {
   const l = [...A.values()];
   const ok = l.filter(fertig);
-  return {arm: name, n: l.length, abgebrochen: l.filter(r => r.abgebrochen).length, zuglimit: l.filter(r => !r.abgebrochen && !Number.isFinite(r.endstand)).length,
+  return {arm: name, n: l.length, abgebrochen: l.filter(r => r.abgebrochen).length, zuglimit: l.filter(amZuglimit).length,
           siege: ok.filter(r => r.gewonnen).length, fertig: ok.length, endstand: ok.length ? mittel(ok.map(r => r.endstand)) : NaN};
 }
 
