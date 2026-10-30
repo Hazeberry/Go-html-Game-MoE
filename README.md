@@ -95,10 +95,11 @@ nichts zu installieren.
   eigene Vorabfestlegung steht aus. Gegen die ältere Fassung aus der PWA
   (`docs/pwa-vergleich.md` §9, ohne Vorgabe, ohne Endspiel-Netz) gewinnt die
   aktuelle Engine 84,7 % bei 120 Simulationen und 71,7 % bei 1,8 s je Zug;
-  gegen sich selbst über denselben Aufbau 51,7 %. Vorab festgelegt ist, ob
-  die Muster ohne Vorgabe schwächer oder gar nicht zählen sollen
-  (`docs/muster-ohne-vorgabe.md`): gegen GNU Go und Fuego ohne Vorgabe, mit
-  Selbstspiel als Veto; die neuen Schalter greifen nur ohne Vorgabe.
+  gegen sich selbst über denselben Aufbau 51,7 %. Ob die Muster ohne Vorgabe
+  schwächer zählen sollen (`docs/muster-ohne-vorgabe.md` §9): Gegen GNU Go
+  kosten sie auch mit neuem Seed rund 18 Punkte, gegen Fuego nichts (+0,6),
+  und im Selbstspiel helfen sie. Der Schaden hängt an GNU Go;
+  `musterOhneVorgabe` bleibt 1.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl
@@ -341,6 +342,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | `mctsTreeReuse` 0 (Baum nicht übernehmen; Nichtunterlegenheit mit Grenze −10, je 960 Paare bei 120 und 240 bei 600 Simulationen gegen GNU Go und Fuego, Seed 221, Selbstspiel 360 ohne Aufgabe, 29.10.) | 120 Sim.: −2,9 [−7,3; +1,4] / −0,2 [−5,6; +5,2], nicht unterlegen; 600 Sim.: −5,8 [−14,7; +3,1] / +0,1 [−12,1; +12,3] (gegen GNU Go / Fuego, 95 %); Selbstspiel 46,9 %; Kontrollen 20/20 | Default bleibt 1 — bei 600 Simulationen gegen GNU Go knapp unter der Schwelle −5 für den Mittelwert (`docs/baum-uebernahme.md` §9) |
 | Leeres Brett: D, ohne Muster (M0), ohne Netz (N0) und Muster erst ab Zug 80 (A80) gegen GNU Go Stufe 1 ohne Vorgabe (je 480 Paare, 120 Simulationen, Seed 222, 29.10.) | M0 **+14,3** [+7,8; +20,8], N0 −46,9 [−53,0; −40,7], A80 **+17,1** [+10,6; +23,5] (98,3 %); mit sechs Steinen +2,0, −70,8 und +3,5; D verliert 472 von 480, Ø −78,8; Proben und Kontrolle bestanden | kein Default geändert; ohne Vorgabe schaden die Muster gegen GNU Go, das Netz trägt (`docs/leeres-brett.md` §9) |
 | Aktuelle Engine gegen die ältere PWA-Fassung (ohne Endspiel-Netz) über `gtp-ki.js`, ohne Vorgabe, GNU Go zählt (360 Partien bei 120 Simulationen, 120 bei 1,8 s je Zug, Gleichstandsprobe 120, 29.10.) | **84,7 %** [80,6; 88,3] bei 120 Simulationen, Endstand +40,4; **71,7 %** [62,7; 79,5] bei 1,8 s je Zug (rund 4 700 Simulationen), +28,7; gegen sich selbst 51,7 %; Kontrolle 20/20 | kein Default geändert; die aktuelle Engine ist klar stärker, der Vorsprung entsteht nach Zug 80 (`docs/pwa-vergleich.md` §9) |
+| `musterOhneVorgabe` 0 und 0,5, `musterWeissOhneVorgabe` 0 (Muster ohne Vorgabe aus, halb, nur als Weiß aus; je 480 Paare gegen GNU Go und Fuego ohne Vorgabe, Seed 226, Selbstspiel 360, 30.10.) | 0: **+18,1** [+11,9; +24,4] / +0,6 [−5,4; +6,6]; 0,5: +15,2 / −0,3; nur Weiß: +13,1 / −4,1 (gegen GNU Go / Fuego, 98,3 %); Selbstspiel 26,9 %, 45,6 %, 38,6 %; Kontrollen 20/20 | verworfen — Default bleibt 1; gegen Fuego kein Schaden, der Schaden hängt an GNU Go (`docs/muster-ohne-vorgabe.md` §9) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |
