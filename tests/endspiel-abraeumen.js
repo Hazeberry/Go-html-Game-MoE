@@ -103,7 +103,7 @@ test('Pass-Sonde: Verteilung von best, Trennschärfe der Schwellen, Überlappung
   pruefeGleich(`${v.n} ${v.min} ${v.median} ${v.max}`, '10 100 1000 1900', 'W: n, Minimum, Median, Maximum');
   pruefeGleich(v.anteilUnter.map(a => a.anteil).join(' '), '0 0 0.1 0.2 0.5', 'W: Anteil unter 20, 100, 200, 500, 1000');
   const vp = S.verteilung(p);
-  pruefeGleich(vp.anteilUnter[0].anteil, 0.7, 'P: Anteil mit best < 20 (−80 bis 10 sind sieben)');
+  pruefeGleich(vp.anteilUnter[0].anteil, 0.6, 'P: Anteil mit best < 20 (−80 bis 10 sind sechs)');
   const u = S.ueberlappung(w, p);
   pruefeGleich(`${u.wUnterPMax} ${u.pUeberWMin}`, '0 0', 'getrennt: keine Überlappung');
   const u2 = S.ueberlappung(zl([30, 100, 200]), zl([-10, 40, 50]));
