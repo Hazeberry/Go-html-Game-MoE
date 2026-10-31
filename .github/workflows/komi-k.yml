@@ -29,14 +29,16 @@ jobs:
 
       - name: Regression
         run: |
+          # GitHub startet run-Schritte mit bash -e: Exit-Code 1 („trägt nicht“)
+          # muss deshalb mit || abgefangen werden, sonst endet der Schritt dort.
           set -uo pipefail
           mkdir -p ergebnisse
+          status=0
           node auswertung/komi/k-schaetzung.js \
             docs/daten/muster-ohne-vorgabe/lauf1/f-D.jsonl.gz \
             docs/daten/muster-ohne-vorgabe/lauf1/g-D.jsonl.gz \
             docs/daten/leeres-brett/lauf1/g-D.jsonl.gz \
-            docs/daten/fuego-siege/lauf1/D.jsonl.gz > ergebnisse/bericht.md
-          status=$?
+            docs/daten/fuego-siege/lauf1/D.jsonl.gz > ergebnisse/bericht.md || status=$?
           cat ergebnisse/bericht.md
           cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
           echo "Exit-Code des Werkzeugs: $status" >> "$GITHUB_STEP_SUMMARY"

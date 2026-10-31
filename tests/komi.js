@@ -102,6 +102,7 @@ test('Workflow komi-k.yml und Dokument: Zugzahlen, Daten, Regel', () => {
   pruefeGleich(K.ZUGZAHLEN.join(','), '200,240,280', 'Zugzahlen');
   pruefe(/Zug 200, 240 und\s+280/.test(doc) && /R² bei allen drei\s+Zugzahlen mindestens 0,25/.test(doc) && /höchstens 25 %/.test(doc), 'Regel im Dokument');
   pruefe(/-ne 0 \] && \[ "\$status" -ne 1 \]/.test(t), 'rot nur bei Fehlern (2, 3), nicht bei „trägt nicht“');
+  pruefe(/status=0\n\s+node auswertung\/komi\/k-schaetzung\.js[\s\S]*ergebnisse\/bericht\.md \|\| status=\$\?/.test(t), 'Exit-Code 1 wird mit || abgefangen (GitHub startet bash -e)');
   pruefe(!t.includes('${{'), 'keine Ausdrücke im Workflow');
 });
 
