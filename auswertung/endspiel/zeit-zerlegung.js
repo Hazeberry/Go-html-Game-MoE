@@ -21,7 +21,11 @@ function zerlegen(diagnose) {
     const m = /(\d+)[^\d]*Sims/.exec(x.info || '');
     if (x.typ !== 'stone' || !m || typeof x.msProSim !== 'number' || typeof x.dauerMs !== 'number') continue;
     const sims = +m[1], suche = sims * x.msProSim;
-    zeilen.push({zug: x.zug, dauerMs: x.dauerMs, budgetMs: x.budgetMs, sims, sucheMs: Math.round(suche), restMs: Math.round(x.dauerMs - suche)});
+    const z = x.zeiten || null;
+    zeilen.push({zug: x.zug, dauerMs: x.dauerMs, budgetMs: x.budgetMs, sims, sucheMs: Math.round(suche), restMs: Math.round(x.dauerMs - suche),
+      /* Messpunkte (seit der Diagnose mit `zeiten`): fehlen in älteren Berichten */
+      vorMs: z ? z.vorMs : null, netzMs: z ? z.netzMs : null, nachMs: z ? z.nachMs : null,
+      nachrichtMs: typeof x.nachrichtMs === 'number' ? x.nachrichtMs : null, anwendenMs: typeof x.anwendenMs === 'number' ? x.anwendenMs : null});
   }
   return zeilen;
 }
@@ -39,6 +43,7 @@ function auswerten(diagnose, grenze = 80) {
     nach: {n: nach.length, restMedian: med(nach, r => r.restMs), restMin: nach.length ? Math.min(...nach.map(r => r.restMs)) : null,
            restMax: nach.length ? Math.max(...nach.map(r => r.restMs)) : null,
            sucheMedian: med(nach, r => r.sucheMs), dauerMedian: med(nach, r => r.dauerMs)},
+    messpunkte: messpunkte(z, grenze),
     sucheUeberBudget: z.filter(r => r.sucheMs > r.budgetMs * 1.1).length,
     dauerUeberBudget15: z.filter(r => r.dauerMs > r.budgetMs * 1.5).length,
     maxDauer: z.length ? Math.max(...z.map(r => r.dauerMs)) : null,
@@ -46,11 +51,23 @@ function auswerten(diagnose, grenze = 80) {
   };
 }
 
+/* Median der Messpunkte je Teil, vor und nach der Grenze; null, wenn der Bericht sie nicht enthält */
+function messpunkte(z, grenze) {
+  const mit = z.filter(r => r.vorMs !== null);
+  if (!mit.length) return null;
+  const teil = (a, f) => { const v = a.map(f).filter(x => typeof x === 'number'); const m = median(v); return m === null ? null : Math.round(m); };
+  const gruppe = a => ({n: a.length, vorMs: teil(a, r => r.vorMs), netzMs: teil(a, r => r.netzMs), sucheMs: teil(a, r => r.sucheMs),
+                        nachMs: teil(a, r => r.nachMs), nachrichtMs: teil(a, r => r.nachrichtMs), anwendenMs: teil(a, r => r.anwendenMs), restMs: teil(a, r => r.restMs)});
+  return {vor: gruppe(mit.filter(r => r.zug <= grenze)), nach: gruppe(mit.filter(r => r.zug > grenze))};
+}
+
 function text(r) {
   return [
     `${r.zuege} Steinzüge mit Simulationszahl und ms/Sim`,
     `bis Zug ${r.grenze}: ${r.vor.n} Züge, Dauer ${r.vor.dauerMedian} ms (Median), davon Suche ${r.vor.sucheMedian}, Rest ${r.vor.restMedian}`,
     `ab Zug ${r.grenze + 1}: ${r.nach.n} Züge, Dauer ${r.nach.dauerMedian} ms (Median), davon Suche ${r.nach.sucheMedian}, Rest ${r.nach.restMedian} (${r.nach.restMin} bis ${r.nach.restMax})`,
+    ...(r.messpunkte ? ['Messpunkte (Median, ms) vor | nach Zug ' + r.grenze + ':',
+      ...['vorMs', 'netzMs', 'sucheMs', 'nachMs', 'nachrichtMs', 'anwendenMs', 'restMs'].map(k => `  ${k.padEnd(12)} ${String(r.messpunkte.vor[k]).padStart(6)} | ${String(r.messpunkte.nach[k]).padStart(6)}`)] : ['(keine Messpunkte im Bericht: ältere Diagnose ohne `zeiten`)']),
     `erster dauerhafter Sprung des Rests über 1000 ms bei Zug ${r.sprungBeiZug}`,
     `Suche länger als 1,1 × Budget: ${r.sucheUeberBudget} Züge; Dauer länger als 1,5 × Budget: ${r.dauerUeberBudget15} Züge; längster Zug ${r.maxDauer} ms`,
   ].join('\n');
