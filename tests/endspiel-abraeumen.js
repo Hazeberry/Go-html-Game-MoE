@@ -96,11 +96,29 @@ test('Workflow endspiel-abraeumen.yml und Dokument', () => {
   pruefe(/Seki/.test(doc) && /Zählphase/.test(doc) && /kein neuer Lauf|nur Diagnose/i.test(doc), 'Dokument: Seki-Vorbehalt, Zählphase, nur Diagnose');
 });
 
+test('Pass-Sonde: Verteilung von best, Trennschärfe der Schwellen, Überlappung', () => {
+  const zl = werte => werte.map(b => ({best: b}));
+  const w = zl([100, 300, 500, 700, 900, 1100, 1300, 1500, 1700, 1900]), p = zl([-80, -60, -40, -20, 0, 10, 20, 30, 40, 50]);
+  const v = S.verteilung(w);
+  pruefeGleich(`${v.n} ${v.min} ${v.median} ${v.max}`, '10 100 1000 1900', 'W: n, Minimum, Median, Maximum');
+  pruefeGleich(v.anteilUnter.map(a => a.anteil).join(' '), '0 0 0.1 0.2 0.5', 'W: Anteil unter 20, 100, 200, 500, 1000');
+  const vp = S.verteilung(p);
+  pruefeGleich(vp.anteilUnter[0].anteil, 0.7, 'P: Anteil mit best < 20 (−80 bis 10 sind sieben)');
+  const u = S.ueberlappung(w, p);
+  pruefeGleich(`${u.wUnterPMax} ${u.pUeberWMin}`, '0 0', 'getrennt: keine Überlappung');
+  const u2 = S.ueberlappung(zl([30, 100, 200]), zl([-10, 40, 50]));
+  pruefeGleich(`${u2.wUnterPMax.toFixed(3)} ${u2.pUeberWMin.toFixed(3)}`, '0.333 0.667', 'Überlappung: ein W-Wert unter dem größten P-Wert, zwei P-Werte über dem kleinsten W-Wert');
+  const ohne = S.verteilung([{best: undefined}, {best: 5}]);
+  pruefeGleich(`${ohne.n} ${ohne.ohneBest}`, '1 1', 'Stellungen ohne best (früher Pass) werden gezählt, nicht gemittelt');
+  pruefe(/best < 1000/.test(S.textVerteilung({q: {W: w, P: p}})), 'Tabelle nennt die Schwellen');
+});
+
 test('Workflow pass-stellungen.yml und Dokument §7', () => {
   const w = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'pass-stellungen.yml'), 'utf8');
   const doc = fs.readFileSync(path.join(wurzel, 'docs', 'endspiel-abraeumen.md'), 'utf8');
   pruefe(/^on:\n  workflow_dispatch:/m.test(w) && !/inputs:/.test(w) && !w.includes('${{') && /ubuntu-24\.04/.test(w), 'nur manuell, keine Eingaben, Ubuntu 24.04');
-  pruefe(/--max 100 --seed 1/.test(w), 'höchstens 100 je Gruppe, Seed 1');
+  pruefe(/--max 100 --seed 1 --roh ergebnisse\/stellungen\.jsonl/.test(w), 'höchstens 100 je Gruppe, Seed 1, Rohzeilen');
+  pruefe(/## 9\. /.test(doc) && /Verteilung von `best`/.test(doc), 'Dokument §9: Verteilung von best');
   for (const d of ['leeres-brett/lauf1/g-D.jsonl.gz', 'muster-ohne-vorgabe/lauf1/g-D.jsonl.gz', 'muster-ohne-vorgabe/lauf1/f-D.jsonl.gz', 'fuego-siege/lauf1/D.jsonl.gz', 'pwa-vergleich/lauf1/m1.jsonl.gz'])
     pruefe(w.includes(d) && fs.existsSync(path.join(wurzel, 'docs', 'daten', d)), 'Datei ' + d);
   pruefe(/## 7\. Pass-Sonde/.test(doc) && /Höchstens \*\*100 je Gruppe/.test(doc) && /nicht gestartet|erst nach Freigabe/.test(doc) && /Browser/.test(doc), 'Dokument §7: Umfang, Freigabe, Grenze Browser');

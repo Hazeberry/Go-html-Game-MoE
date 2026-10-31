@@ -27,7 +27,7 @@
    Die Sonde ist eine Kopie von index.html im Speicher mit zwei Protokollzeilen
    an der Pass-Prüfung; index.html im Repo bleibt unberührt.
 
-   Aufruf:  node auswertung/endspiel/pass-stellungen.js [--max 100] [--seed 1]
+   Aufruf:  node auswertung/endspiel/pass-stellungen.js [--max 100] [--seed 1] [--roh datei.jsonl]
               --gruppe name=datei[,datei...] ... */
 'use strict';
 const fs = require('fs'), zlib = require('zlib'), path = require('path');
@@ -158,6 +158,40 @@ function zusammenfassen(zeilen) {
           oppBestMedian: quantil(zeilen.map(z => z.oppBest).filter(Number.isFinite), 0.5)};
 }
 
+/* Verteilung von `best` je Gruppe und Trennschärfe der Schwellen (§9): für jede Schwelle T
+   der Anteil der Stellungen mit best < T in W (KI spielte weiter) und in P (KI passte).
+   Eine Schwelle würde gut trennen, wenn der Anteil in P nahe 1 und in W nahe 0 läge. */
+const SCHWELLEN_T = [20, 100, 200, 500, 1000];
+function verteilung(zeilen) {
+  const b = zeilen.map(z => z.best).filter(Number.isFinite).sort((x, y) => x - y);
+  const q = p => quantil(b, p);
+  return {n: b.length, ohneBest: zeilen.length - b.length, min: b[0], p10: q(0.1), p25: q(0.25), median: q(0.5), p75: q(0.75), p90: q(0.9), max: b[b.length - 1],
+          anteilUnter: SCHWELLEN_T.map(t => ({t, anteil: b.length ? b.filter(x => x < t).length / b.length : NaN}))};
+}
+/* Überlappung: Anteil der W-Stellungen, deren best unter dem Maximum von P liegt, und der P-Stellungen über dem Minimum von W */
+function ueberlappung(w, p) {
+  const bw = w.map(z => z.best).filter(Number.isFinite), bp = p.map(z => z.best).filter(Number.isFinite);
+  if (!bw.length || !bp.length) return {wUnterPMax: NaN, pUeberWMin: NaN};
+  const maxP = Math.max(...bp), minW = Math.min(...bw);
+  return {wUnterPMax: bw.filter(x => x <= maxP).length / bw.length, pUeberWMin: bp.filter(x => x >= minW).length / bp.length, maxP, minW};
+}
+
+function textVerteilung(ergebnis) {
+  const pz = v => Number.isFinite(v) ? (100 * v).toFixed(1).replace('.', ',') + ' %' : '–';
+  const o = ['| Quelle | Gruppe | n | Min | 10 % | 25 % | Median | 75 % | 90 % | Max | ' + SCHWELLEN_T.map(t => `best < ${t}`).join(' | ') + ' |',
+    '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|' + SCHWELLEN_T.map(() => '---:').join('|') + '|'];
+  const ueb = ['| Quelle | größtes best in P | kleinstes best in W | Anteil W mit best ≤ größtes best in P | Anteil P mit best ≥ kleinstes best in W |', '|---|---:|---:|---:|---:|'];
+  for (const [quelle, g] of Object.entries(ergebnis)) {
+    for (const [gr, zeilen] of Object.entries({'W (KI spielte weiter)': g.W, 'P (KI passte)': g.P})) {
+      const v = verteilung(zeilen);
+      o.push(`| ${quelle} | ${gr} | ${v.n} | ${f1(v.min)} | ${f1(v.p10)} | ${f1(v.p25)} | ${f1(v.median)} | ${f1(v.p75)} | ${f1(v.p90)} | ${f1(v.max)} | ${v.anteilUnter.map(a => pz(a.anteil)).join(' | ')} |`);
+    }
+    const u = ueberlappung(g.W, g.P);
+    ueb.push(`| ${quelle} | ${f1(u.maxP)} | ${f1(u.minW)} | ${pz(u.wUnterPMax)} | ${pz(u.pUeberWMin)} |`);
+  }
+  return o.join('\n') + '\n\n' + ueb.join('\n') + '\n';
+}
+
 function text(ergebnis) {
   const o = ['| Quelle | Gruppe (in der Partie) | Stellungen | Sonde passt | gleicher Zug wie in der Partie | best Median | oppBest Median | ms Median | ms 90 % | ms Max |', '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|'];
   const gruende = ['| Quelle | Gruppe | Grund, warum die Sonde nicht passt (Anzahl) |', '|---|---|---|'];
@@ -169,14 +203,15 @@ function text(ergebnis) {
   return o.join('\n') + '\n\n' + gruende.join('\n') + '\n';
 }
 
-module.exports = {gepatcht, motor, folge, stelle, aufbau, auswaehlen, frage, grund, zusammenfassen, text, ANKER1, ANKER2};
+module.exports = {verteilung, ueberlappung, textVerteilung, SCHWELLEN_T, gepatcht, motor, folge, stelle, aufbau, auswaehlen, frage, grund, zusammenfassen, text, ANKER1, ANKER2};
 
 if (require.main === module) {
   const a = process.argv.slice(2);
-  let max = 100, seed = 1; const gruppen = [];
+  let max = 100, seed = 1, roh = null; const gruppen = [];
   for (let i = 0; i < a.length; i++) {
     if (a[i] === '--max') max = +a[++i];
     else if (a[i] === '--seed') seed = +a[++i];
+    else if (a[i] === '--roh') roh = a[++i];
     else if (a[i] === '--gruppe') {
       const m = /^([^=]+)=(.+)$/.exec(a[++i] || '');
       if (!m) { console.error('--gruppe name=datei[,datei...] erwartet'); process.exit(2); }
@@ -200,4 +235,10 @@ if (require.main === module) {
     console.error(`${name}: Stellungen W ${wahl.anzahl.W} (gezogen ${wahl.W.length}), P ${wahl.anzahl.P} (gezogen ${wahl.P.length})`);
   }
   process.stdout.write(text(ergebnis));
+  process.stdout.write('\n## Verteilung von best (Gruppen W und P)\n\n' + textVerteilung(ergebnis));
+  if (roh) {
+    const zeilen = [];
+    for (const [quelle, g] of Object.entries(ergebnis)) for (const gr of ['W', 'P']) for (const z of g[gr]) zeilen.push(JSON.stringify({quelle, gruppe: gr, ...z}));
+    fs.writeFileSync(roh, zeilen.join('\n') + '\n');
+  }
 }
