@@ -105,8 +105,12 @@ nichts zu installieren.
   Fuego, gegen das der Default ohne Vorgabe 40 bis 50 % gewinnt
   (`docs/muster-fuego-siege.md`). Der Prüfstand (Stufe 1) ergab: Fuego mit 50
   Spielen je Zug, der Default gewinnt dort 50,8 % (10 Spiele: 100 %, 70
-  Spiele: 28,3 %). Stufe 2 (D, M0, M50 mit je 960 Paaren; ungültige Läufe liefern „kein Urteil“ und werden rot; Gegner ist ein sehr schwacher Fuego) ist vorbereitet und
-  startet erst nach Freigabe.
+  Spiele: 28,3 %). Stufe 2 (D, M0, M50 mit je 960 Paaren, Seed 228; ungültige Läufe
+  liefern „kein Urteil“ und werden rot) ist gelaufen und gültig: D gewinnt
+  48,0 %, ohne Muster 35,2 %, mit halbem Gewicht 39,5 %; D gewinnt öfter als
+  beide (p 2,4 · 10⁻⁸ und 0,0002). `musterOhneVorgabe` bleibt 1. Der Gegner ist
+  ein Fuego mit sehr schwacher Suche (50 Spiele je Zug); das Ergebnis gilt nur
+  für ihn.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl
@@ -350,6 +354,7 @@ Das Diagramm zeigt die Selbstspiel-Messungen aus der Tabelle. Neu zeichnen:
 | Leeres Brett: D, ohne Muster (M0), ohne Netz (N0) und Muster erst ab Zug 80 (A80) gegen GNU Go Stufe 1 ohne Vorgabe (je 480 Paare, 120 Simulationen, Seed 222, 29.10.) | M0 **+14,3** [+7,8; +20,8], N0 −46,9 [−53,0; −40,7], A80 **+17,1** [+10,6; +23,5] (98,3 %); mit sechs Steinen +2,0, −70,8 und +3,5; D verliert 472 von 480, Ø −78,8; Proben und Kontrolle bestanden | kein Default geändert; ohne Vorgabe schaden die Muster gegen GNU Go, das Netz trägt (`docs/leeres-brett.md` §9) |
 | Aktuelle Engine gegen die ältere PWA-Fassung (ohne Endspiel-Netz) über `gtp-ki.js`, ohne Vorgabe, GNU Go zählt (360 Partien bei 120 Simulationen, 120 bei 1,8 s je Zug, Gleichstandsprobe 120, 29.10.) | **84,7 %** [80,6; 88,3] bei 120 Simulationen, Endstand +40,4; **71,7 %** [62,7; 79,5] bei 1,8 s je Zug (rund 4 700 Simulationen), +28,7; gegen sich selbst 51,7 %; Kontrolle 20/20 | kein Default geändert; die aktuelle Engine ist klar stärker, der Vorsprung entsteht nach Zug 80 (`docs/pwa-vergleich.md` §9) |
 | `musterOhneVorgabe` 0 und 0,5, `musterWeissOhneVorgabe` 0 (Muster ohne Vorgabe aus, halb, nur als Weiß aus; je 480 Paare gegen GNU Go und Fuego ohne Vorgabe, Seed 226, Selbstspiel 360, 30.10.) | 0: **+18,1** [+11,9; +24,4] / +0,6 [−5,4; +6,6]; 0,5: +15,2 / −0,3; nur Weiß: +13,1 / −4,1 (gegen GNU Go / Fuego, 98,3 %); Selbstspiel 26,9 %, 45,6 %, 38,6 %; Kontrollen 20/20 | verworfen — Default bleibt 1; gegen Fuego kein Schaden, der Schaden hängt an GNU Go (`docs/muster-ohne-vorgabe.md` §9) |
+| `musterOhneVorgabe` 0 und 0,5, Siege gegen Fuego mit 50 Spielen je Zug (je 960 Paare ohne Vorgabe, Seed 228, McNemar alpha 0,025, 31.10.) | Siegquote D 48,0 %, 0: 35,2 %, 0,5: 39,5 %; nur Arm / nur D: 180 / 303 und 196 / 278; Kontrolle 20/20 | verworfen — D gewinnt öfter (p 2,4e-8 und 0,0002), Default bleibt 1 (`docs/muster-fuego-siege.md` §10) |
 | Phasentausch früh/spät | +12,5 gegen +5,0 Prozentpunkte, Differenz 3 Partien | **nicht entschieden** — Mechanismus offen |
 | `openContactResponse` (neuer Term in `evalOpening`) | 48,8 % über 80 Partien, p = 0,91 | verworfen — Default 0 |
 | `phaseNormalize` (Experten vor dem Blend normieren) | 42,5 % über 80 Partien, p = 0,22 | verworfen — Default 0 |

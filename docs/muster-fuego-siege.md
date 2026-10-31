@@ -184,3 +184,52 @@ je 960 Partien, Kontrolle D Partien 1 bis 20, Endpunkt und Urteil wie in §4
 [`siege-bericht.js`](../auswertung/fuego/siege-bericht.js), 3 × 16 Teile zu 60
 Partien und eine Kontrolle). Die Auflösung in §5 gilt für eine Quote von D um
 50 %. Der Lauf startet erst nach einem eigenen Go.
+
+## 10. Nachtrag: Ergebnis der Stufe 2 (31.10.2026)
+
+Lauf 1 von [`fuego-siege.yml`](../.github/workflows/fuego-siege.yml), Seed 228,
+Fuego mit 50 Spielen je Zug, ohne Vorgabe. Daten:
+`docs/daten/fuego-siege/lauf1/`. **Der Lauf ist gültig** (§4a): alle drei Arme
+mit je 960 Partien, 960 von 960 Paaren gewertet, Kontrolle 20 von 20 Zug für
+Zug gleich, keine fehlenden Teile.
+
+| Arm | gewertet | Siege | Quote | 95 % | KI Schwarz | KI Weiß |
+|---|---:|---:|---:|---|---:|---:|
+| D | 960 | 461 | 48,0 % | 44,8 % bis 51,2 % | 35,4 % | 60,6 % |
+| M0 | 960 | 338 | 35,2 % | 32,2 % bis 38,3 % | 29,4 % | 41,0 % |
+| M50 | 960 | 379 | 39,5 % | 36,4 % bis 42,7 % | 37,1 % | 41,9 % |
+
+Gepaart gegen D (alpha 0,025, exakter McNemar-Test):
+
+| Arm | nur Arm | nur D | Differenz (Prozentpunkte) | p | Urteil | Endstand Arm − D (97,5 %) |
+|---|---:|---:|---:|---:|---|---|
+| M0 | 180 | 303 | −12,8 | 2,4 · 10⁻⁸ | **D gewinnt öfter** | −15,8 (−21,1 bis −10,5) |
+| M50 | 196 | 278 | −8,5 | 0,0002 | **D gewinnt öfter** | −10,2 (−15,8 bis −4,7) |
+
+**Urteil nach §4: Default bleibt 1.** Mit vollen Mustern gewinnt die KI ohne
+Vorgabe gegen dieses Fuego öfter als ohne (12,8 Prozentpunkte) und öfter als mit
+halbem Gewicht (8,5 Prozentpunkte). Auch der Endstand ist mit Mustern besser.
+Das bestätigt den explorativen Befund aus
+[`muster-ohne-vorgabe.md`](muster-ohne-vorgabe.md) §10 (dort 15 % Grundquote,
+hier 48 %) mit vorab festgelegtem Endpunkt.
+
+**Gegen die Erwartung (§6):** Für M0 erwartet war „D gewinnt öfter“, das trat
+ein. Für M50 erwartete ich eher „kein Unterschied belegt“; es kam
+„D gewinnt öfter“, deutlicher als gedacht. Die Quote von D lag mit 48,0 % im
+angepeilten Bereich (Prüfstand 50,8 %).
+
+**Farben:** Die KI gewinnt als Weiß viel öfter als als Schwarz (60,6 % gegen
+35,4 % für D). Das liegt am Komi von 7,5, den die Engine nicht kennt
+([`muster-ohne-vorgabe.md`](muster-ohne-vorgabe.md) §9). Der Unterschied
+zwischen den Armen kommt vor allem von Weiß (D 60,6 %, M0 41,0 %, M50 41,9 %);
+als Schwarz liegt D (35,4 %) hinter M50 (37,1 %) und vor M0 (29,4 %). Je Farbe
+wurde nicht getestet (nur beschreibend).
+
+**Geltung (§4b):** Das Ergebnis gilt für ein Fuego mit 50 Spielen je Zug, also
+mit sehr schwacher Suche, nicht für Fuego bei normaler Stärke.
+
+**Folge:** Keine Änderung am Spiel. `musterOhneVorgabe` bleibt 1; der Kommentar
+im Code nennt das Ergebnis. Zusammen mit [`muster-ohne-vorgabe.md`](muster-ohne-vorgabe.md)
+§9 (Punkte gegen GNU Go: Muster kosten dort 14 bis 18 Punkte) bleibt es bei
+dem Bild: Die Muster kosten Punkte gegen GNU Go, gewinnen aber Partien gegen
+Fuego, und im Selbstspiel helfen sie.

@@ -2009,7 +2009,11 @@ globalThis.PARAMS = {
      +0,6 [-5,4; +6,6]; 0,5 +15,2 und -0,3; im Selbstspiel 26,9 % und 45,6 %.
      Der Schaden haengt an GNU Go, nicht am leeren Brett. Default bleibt 1;
      nur als Weiss ohne Muster (musterWeissOhneVorgabe 0, erkundend): +13,1
-     gegen GNU Go, -4,1 gegen Fuego, 38,6 % im Selbstspiel. */
+     gegen GNU Go, -4,1 gegen Fuego, 38,6 % im Selbstspiel.
+     SIEGE (docs/muster-fuego-siege.md §10, je 960 Paare ohne Vorgabe gegen
+     ein schwaches Fuego mit 50 Spielen je Zug, Seed 228, gepaarter McNemar-
+     Test, alpha 0,025): D gewinnt 48,0 %, 0 nur 35,2 %, 0,5 nur 39,5 %; D
+     gewinnt oefter als beide (p 2,4e-8 und 0,0002). Default bleibt 1. */
   musterOhneVorgabe:      1,
   musterWeissOhneVorgabe: 1,
   /* Zahl der Vorgabesteine der laufenden Partie. Der Browser kennt keine
