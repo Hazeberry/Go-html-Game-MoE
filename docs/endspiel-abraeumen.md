@@ -79,5 +79,56 @@ Jeder Schritt bekommt eine eigene Vorabfestlegung, jeweils ein Eingriff:
 
 ## 5. Stand
 
-Das Werkzeug ist getestet (`tests/endspiel-abraeumen.js`). Der Workflow ist
-vorbereitet und **nicht gestartet**.
+Das Werkzeug ist getestet (`tests/endspiel-abraeumen.js`). Der Workflow lief am
+31.10.2026 (§6).
+
+## 6. Nachtrag: Ergebnis der Diagnose (31.10.2026)
+
+Lauf 1 von [`endspiel-abraeumen.yml`](../.github/workflows/endspiel-abraeumen.yml),
+rein lesend, keine neuen Partien. Zahlen:
+[`daten/endspiel-abraeumen/lauf1/bericht.md`](daten/endspiel-abraeumen/lauf1/bericht.md).
+Beschreibend, ohne Urteil.
+
+| Gruppe | Partien | KI-Züge in der Endphase Ø / Median / 90 % / Max | davon schlagend Ø | über 10 KI-Züge | Gegner spielt nach KI-Pass |
+|---|---:|---|---:|---:|---:|
+| GNU Go (Leeres Brett) | 480 | 1,0 / 0 / 1 / 30 | 0,1 | 4,8 % | 0,2 % |
+| GNU Go (Muster ohne Vorgabe) | 480 | 1,2 / 0 / 3 / 35 | 0,1 | 3,3 % | 0,0 % |
+| Fuego, 100 Spiele | 479 (1 ohne zwei Pässe) | 4,6 / 1 / 16 / 49 | 0,5 | 14,8 % | 25,3 % |
+| Fuego, 50 Spiele | 960 | 6,3 / 2 / 19 / 64 | 0,9 | 24,6 % | 32,6 % |
+| alte PWA | 360 | 3,0 / 0 / 12 / 29 | 0,4 | 13,1 % | 76,1 % |
+| Mensch (zwei SGF) | 2 | 9,5 / 9,5 / – / 19 | 4,0 | – | – |
+
+**Befunde:**
+
+1. **Gegen GNU Go kommt das Weiterspielen selten vor** (Median 0, 3 bis 5 % über 10
+   Züge), gegen **Fuego öfter** (Median 1 bis 2, 15 bis 25 % über 10 Züge, Maximum
+   64). Warum, ist nicht geprüft (denkbar: Fuego passt in der Endphase
+   anders als GNU Go, während die KI weiterspielt).
+2. **Die meisten dieser KI-Züge schlagen nicht** (Fuego: 4,1 und 5,4 ohne Schlag
+   gegen 0,5 und 0,9 mit Schlag im Mittel). Es ist in den Programmpartien also
+   überwiegend Auffüllen, Grenze und Neutral, nicht das Abräumen toter Steine.
+3. **Beides kommt vor:** „KI spielt weiter, der Gegner passt“ (Fuego) und „die KI
+   passt zuerst, der Gegner spielt noch Steine“ (alte PWA 76 %, Fuego 25 bis 33 %,
+   GNU Go fast nie).
+4. **Die zwei Handpartien** zeigen den Fall des Anlasses nur einmal: in
+   `mensch-412zuege.sgf` 19 KI-Steine nach dem letzten Gegnerstein, davon 8
+   schlagend, bei 19 Pässen des Menschen; in `mensch-427zuege.sgf` nichts. Das ist
+   Anekdote, kein Beleg.
+
+**Vorbehalte:**
+
+- „Gegner spielt nach KI-Pass“ zählt vom **ersten** KI-Pass der Partie an. Ein
+  früher KI-Pass mitten in der Partie würde die Zahl erhöhen; ein Teil der 76 % bei
+  der alten PWA kann daran liegen. Das Werkzeug trennt es nicht.
+- Programme sind keine Menschen. Ein Mensch, der viele Male in Folge passt, bringt
+  die KI in eine Lage, die diese Gegner nicht herstellen. Die Zahlen zu Fuego sind
+  die nächste Annäherung, aber keine Aussage über Menschen.
+- Die Diagnose hat keine Schwelle. Sie sagt nicht, ob 6 Züge „zu lang“ sind.
+
+**Was daraus für die Vorbereitung folgt (Vorschlag, nicht beschlossen):** Das
+Weiterspielen ist nach den Programmpartien überwiegend Auffüllen ohne Schlag, und
+es tritt nicht nur bei „Gegner passt“ auf. Bevor ein Eingriff gewählt wird, bleibt
+die Pass-Sonde (§4) der nächste Schritt: an späten Stellungen protokollieren, warum
+die KI nicht passt, und die Laufzeit je Zug messen. Der Beschwerdefall „extrem lange“
+ist bisher nur an einer Handpartie belegt; eine Bedenkzeit je Zug haben die
+Datensätze nicht.
