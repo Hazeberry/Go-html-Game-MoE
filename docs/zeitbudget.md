@@ -168,13 +168,14 @@ Auswertungen unter [`daten/endspiel-abraeumen/territory/`](daten/endspiel-abraeu
   (die Parameter sind in allen Berichten gleich und gleich dem Standard; das Löschen der Chrome-Daten änderte nichts)
   sowie Energiesparmodus (war aus). Das Risiko gemeinsamer Speicherschlüssel (`go_pnet`, `PD_STORE`) beider Projekte bleibt
   davon unberührt.
-- **Bestätigt (Hazeberry):** Der V8-Schalter in Chrome war aus; er wurde eingeschaltet, Chrome neu gestartet und ein neues
-  Spiel begonnen (der Lauf „Chrome, V8-Optimierer an“). Warum er aus war (Voreinstellung des Geräts oder eine Einstellung),
-  ist offen.
-- **Offen:** Das Galaxy A20s zeigt in Chrome früh dieselben Simulationszahlen wie das A17 vorher (ca. 450);
-  dort ist derselbe Zustand möglich, aber nicht geprüft.
+- **Bestätigt (Hazeberry):** Der V8-Schalter in Chrome war auf dem A17 aus; er wurde eingeschaltet, Chrome neu gestartet und
+  ein neues Spiel begonnen (der Lauf „Chrome, V8-Optimierer an“). Hazeberry vermutet, den Schalter selbst ausgeschaltet zu
+  haben; das ist keine gesicherte Angabe, und ob er auf anderen Geräten voreingestellt aus ist, ist unbekannt.
+- **Galaxy A20s:** Dort war der Schalter **an**. Die langsame Suche des A20s (ca. 4 ms pro Simulation, Netz 520 ms) hat also
+  eine andere Ursache als beim A17 und ist mit der Hardware (schwacher, älterer Prozessor) verträglich; gleiche
+  Simulationszahlen wie das A17 vorher waren Zufall. Die V8-Auflösung gilt nur für das A17.
 
-Folge: Option 1 und 2 (§6) sind nicht mehr nötig, um das Handy-Problem zu beheben. Offen bleibt, ob die App einen zu
+Folge für das A17: Option 1 und 2 (§6) sind dort nicht mehr nötig. Auf dem A20s kostet das Netz weiterhin 520 ms von 2,5 s je Zug; ob sich Option 1 dafür lohnt, ist offen. Offen bleibt, ob die App einen zu
 langsamen JavaScript-Pfad erkennen und dem Menschen sagen soll (§6, neu).
 
 ## 6. Mögliche Änderungen (nur nach Entscheidung, nicht gebaut)
