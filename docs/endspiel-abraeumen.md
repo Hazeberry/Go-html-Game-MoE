@@ -241,3 +241,40 @@ erlaubt `best` das Passen, aber der Gegner hätte einen Zug über
 und P ausgeben (Minimum, 10-, 25-, 75-, 90-%-Quantil, Maximum), um zu sehen, ob sich
 die Gruppen überlappen. Erst danach lässt sich beurteilen, ob eine Änderung der
 Passregel überhaupt etwas trennen könnte. Nichts davon ändert das Spiel.
+
+## 9. Verteilung von `best`: Vorabfestlegung (31.10.2026, vor dem Lauf)
+
+Folgt aus §8 (dort nur Mediane). Nur Vorbereitung; der Lauf startet erst nach
+Freigabe, kein Eingriff in das Spiel. Dieselben Stellungen wie in §7 (dieselbe
+Auswahl, Seed 1, höchstens 100 je Gruppe und Quelle), dieselbe Befragung; neu ist
+nur die Ausgabe in [`pass-stellungen.js`](../auswertung/endspiel/pass-stellungen.js):
+
+- **Verteilung von `best`** je Quelle und Gruppe (W: „KI spielte weiter“, P: „KI
+  passte“): Minimum, 10-, 25-, 75-, 90-%-Quantil, Maximum und der Median.
+- **Anteil mit `best` unter 20, 100, 200, 500 und 1000** in jeder Gruppe. Eine
+  Schwelle würde gut trennen, wenn der Anteil in P nahe 100 % und in W nahe 0 %
+  läge.
+- **Überlappung:** Anteil der W-Stellungen mit `best` ≤ dem größten `best` in P
+  und Anteil der P-Stellungen mit `best` ≥ dem kleinsten `best` in W.
+- **Rohzeilen** je Stellung (`stellungen.jsonl` im Ergebnisordner).
+
+Keine Schwelle, kein Urteil. Die Verteilungen sagen, ob **eine** Schwelle auf
+`best` die beiden Gruppen in diesen Stellungen überhaupt trennen könnte.
+
+**Grenzen (vorab):**
+
+1. **Die Gruppen sind durch das Verhalten der KI definiert.** P sind Stellungen, in
+   denen die KI in der Partie passte; ihr `best` ist dort also von vornherein
+   niedrig, sonst hätte sie nicht gepasst. Eine saubere Trennung in diesen Daten ist
+   deshalb **keine Aussage darüber, ob eine geänderte Schwelle gute Partien
+   ergäbe**: Mit anderen Schwellen ändert sich auch, welche Stellungen entstehen.
+2. Die Stellungen sind ein Zeitpunkt (der erste Gegnerpass der Endphase). Spätere
+   Pässe des Gegners bleiben unberücksichtigt.
+3. `oppBest` wird weiterhin nur berechnet, wenn `best` unter einer Schwelle liegt.
+4. Programme sind keine Menschen; die Dauer ist die bei 120 festen Simulationen.
+
+**Was nach dem Lauf entscheidet:** nichts automatisch. Zeigt sich eine große
+Überlappung, spricht das gegen eine reine Schwellenänderung. Zeigt sich eine klare
+Lücke, ist das ein Anlass für eine eigene Vorabfestlegung eines Eingriffs mit
+Messung der Partien (Siegquote, Endstand, Länge der Endphase), nicht dieser
+Auswertung.

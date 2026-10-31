@@ -4,7 +4,8 @@ name: Pass-Sonde Endphase
 # archivierten Partien (die KI ist nach dem ersten Pass des Gegners in der
 # Endphase am Zug) werden der Engine noch einmal vorgelegt; protokolliert wird,
 # was die Pass-Prüfung sieht (best, Schwellen, Atari, Gegnerzug) und wie lange
-# getAIMove braucht. Keine neuen Partien, kein GNU Go, keine Änderung am Spiel.
+# getAIMove braucht; seit §9 auch die Verteilung von best je Gruppe und die
+# Rohzeilen je Stellung. Keine neuen Partien, kein GNU Go, keine Änderung am Spiel.
 
 # Keine Eingaben.
 on:
@@ -31,7 +32,7 @@ jobs:
           set -euo pipefail
           mkdir -p ergebnisse
           d=docs/daten
-          node auswertung/endspiel/pass-stellungen.js --max 100 --seed 1 \
+          node auswertung/endspiel/pass-stellungen.js --max 100 --seed 1 --roh ergebnisse/stellungen.jsonl \
             --gruppe "GNU Go ohne Vorgabe=$d/leeres-brett/lauf1/g-D.jsonl.gz,$d/muster-ohne-vorgabe/lauf1/g-D.jsonl.gz" \
             --gruppe "Fuego 100 Spiele=$d/muster-ohne-vorgabe/lauf1/f-D.jsonl.gz" \
             --gruppe "Fuego 50 Spiele=$d/fuego-siege/lauf1/D.jsonl.gz" \
