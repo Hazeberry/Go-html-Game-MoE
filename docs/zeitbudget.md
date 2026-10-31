@@ -89,19 +89,46 @@ oder Einsetzen im Hauptthread. Es genügt, auf dem Handy eine Partie bis etwa Zu
 Bericht zu exportieren; die Gegenprobe `endspielNetz` = 0 ist danach nur noch nötig, wenn das Netz in den
 Zahlen auffällt.
 
-## 5. Was nicht belegt ist
+## 5. Ergebnis vom Handy (31.10.2026, nachgetragen)
 
-Die Ursache auf dem Handy ist **nicht belegt**. Was die Daten tragen: Der Rest außerhalb der Suche springt bei
-Zug 82; in der Entwicklungsumgebung tritt der Sprung in dieser Größe nicht auf. Offen ist, ob es das Gerät,
-der Nachrichtenweg oder etwas Drittes ist.
+Bericht einer Territory-Partie auf dem Android-Handy (Chrome 156, KI Weiß „hard“, 280 Züge, 140 Steinzüge mit
+Messpunkten): [`handy-bericht-280zuege.json`](daten/endspiel-abraeumen/territory/handy-bericht-280zuege.json),
+Auswertung [`handy-zeit-zerlegung.txt`](daten/endspiel-abraeumen/territory/handy-zeit-zerlegung.txt).
+
+| Median in ms | bis Zug 80 (40 Züge) | ab Zug 81 (100 Züge) |
+|---|---:|---:|
+| Dauer des Zuges | 2022 | 3727 |
+| Vorarbeit im Worker (`vorMs`) | 213 | 1829 |
+| davon Endspiel-Netz (`netzMs`) | 0 | **1627** (Spanne 1604 bis 1717) |
+| Suche (`sucheMs`) | 1802 | 1803 |
+| nach der Suche (`nachMs`) | 0 | 0 |
+| Nachrichtenweg (`nachrichtMs`) | 1 | 1 |
+| Einsetzen im Hauptthread (`anwendenMs`) | 4 | 11 |
+
+- **Das Endspiel-Netz ist auf dem Handy die Ursache des Sprungs**: Es kostet dort rund 1,6 s je Zug (sehr stabil, in jedem
+  der 100 Züge zwischen 1,60 und 1,72 s) gegen 50 bis 90 ms in Chromium auf dem Desktop. Ohne das Netz läge die
+  Dauer ab Zug 81 im Median bei rund 2,1 s.
+- Der übrige Rest ist klein: Vorarbeit ohne Netz rund 200 ms (vorher und nachher gleich), Nachrichtenweg 1 ms, Einsetzen
+  11 ms. Die Vermutung zum Nachrichtenweg (100 ms in der Entwicklungsumgebung) trifft auf dem Handy nicht zu.
+- Das Netz läuft auf dem Handy also etwa 27-mal langsamer als im Container, die Suche etwa 10-mal (4 bis 8 ms je Simulation
+  gegen 0,45) und die übrige Vorarbeit etwa 4-mal. Warum gerade das Netz so viel stärker einbricht, ist **nicht untersucht**
+  (denkbar: Gleitkommarechnung mit `Float64Array` auf diesem Gerät, Speicher, Takt zu Beginn eines Zuges).
+- Die Desktop-Messungen (§3) zeigten das Netz dort nicht als langsam, schlossen es aber auch nicht aus. Die Ursache
+  ist der Aufwand des Netzes auf dem Gerät, nicht die Vorarbeit allgemein.
+
+Damit stützen die Daten jetzt eine Änderung. Welche, ist eine Entscheidung (§6); das Netz ist zugleich der größte
+gemessene Gewinn des Projekts (`endspiel-netz.md`, im Selbstspiel 83,1 %), ein einfaches Abschalten kostet also Spielstärke.
 
 ## 6. Mögliche Änderungen (nur nach Entscheidung, nicht gebaut)
 
-1. Die Vorarbeit auf das Suchbudget anrechnen (Frist ab Beginn des Zuges), damit die Dauer das
-   Budget nicht übersteigt. Kostet etwas Suchzeit, ändert die Spielstärke leicht.
-2. Das Netz schneller machen (Float32 statt Float64, weniger Kanäle). Würde dessen Wirkung
-   verändern und müsste neu gemessen werden (`docs/endspiel-netz.md`).
-3. `budgetMs` im Hauptthread und das Budget im Worker auf dieselbe Rechnung stellen, damit der
+1. Das Netz schneller rechnen, ohne sein Ergebnis zu ändern (gleiche Ausgabe, andere Schleifen oder
+   Zahlenformat). Spielstärke unverändert, Prüfung über `tests/endspiel-netz.js`; ob es auf dem Handy reicht,
+   zeigt nur ein neuer Handy-Bericht.
+2. Die Netzzeit messen und das Netz auf langsamen Geräten überspringen oder seltener rechnen (zum Beispiel,
+   wenn es einmal länger als eine Schwelle braucht). Kostet auf diesen Geräten den Gewinn des Netzes.
+3. Die Vorarbeit auf das Suchbudget anrechnen (Frist ab Beginn des Zuges): hielte die Dauer, würde auf dem Handy
+   aber fast die gesamte Suche streichen (1,8 s Budget, 1,6 s Netz).
+4. `budgetMs` im Hauptthread und das Budget im Worker auf dieselbe Rechnung stellen, damit der
    Bericht das wirkliche Budget zeigt.
 
 Der Watchdog im Hauptthread feuert nach `3 × budgetMs + 3000` ms (Zug 484: 11,6 s). Die längsten Züge in
