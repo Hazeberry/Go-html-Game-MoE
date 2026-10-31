@@ -82,3 +82,47 @@ Grenzen:
   Stellungen aus echten Partien gesammelt werden.
 - Die Dauer ist ein Durchlauf über das Brett (Millisekunden), kein Einfluss auf die
   Bedenkzeit der KI.
+
+## 5. Entscheidungen zur Oberfläche (31.10.2026, Vorabfestlegung vor dem Bau)
+
+Hazeberry hat Name und Platz in meine Hand gegeben (Vorschlag: unter „Neues Spiel“,
+Name „Zughilfe“). Entschieden, mit Begründung:
+
+- **Name: „Zählvorschau“, nicht „Zughilfe“.** „Zughilfe“ klingt nach einem
+  Zugvorschlag der KI („welchen Zug soll ich spielen?“). Die Vorschau zeigt etwas
+  anderes: wie die App die Stellung zählt. Ein Zugvorschlag wäre ein eigenes
+  Merkmal; die Knöpfe sollen nicht dasselbe versprechen wie etwas, das sie nicht
+  tun.
+- **Platz: im Knopffeld mit „Passen“ und „Rückgängig“, zwischen „Rückgängig“ und
+  „Neues Spiel“**, nicht unter „Neues Spiel“. Die Vorschau ist eine
+  Spielhandlung wie Passen und Rückgängig und gehört dazu; „Neues Spiel“ löscht die
+  Partie und soll als letzter, abgesetzter Knopf stehen, damit ein Fehlklick auf dem
+  Handy nichts zerstört. Reihenfolge: Passen, Rückgängig, Zählvorschau, Neues Spiel.
+- **Ergebnis** in einem eigenen kleinen Feld direkt unter dem Knopffeld, nur sichtbar,
+  solange die Vorschau gilt.
+- **Gültigkeit:** Die Vorschau gilt für genau die Stellung, für die sie berechnet
+  wurde (Hash der Stellung). Jeder Zug, Pass, Rückgängig oder „Neues Spiel“ macht sie
+  ungültig und blendet sie aus; kein Zustand wird dabei verändert. „Weiterspielen“
+  (oder erneutes Antippen) blendet sie ebenfalls aus.
+- **Anzeige:**
+  - Zeile 1: „Mit Annahmen: Schwarz +x“ (alle geschätzt toten Steine entfernt),
+    Zeile 2: „Nur Bewiesenes: Schwarz +y“, jeweils „Fläche, Komi 7,5“.
+  - Markierung auf dem Brett: bewiesen tot = rotes Kreuz (wie bisher in der
+    Schlusszählung), geschätzt tot = oranges Kreuz mit Fragezeichen. Unbewiesene
+    Steine bleiben unmarkiert; sie stehen nur als Zahl im Text („n Steine nicht
+    bewiesen lebendig“).
+  - Hinweis immer: „Seki und Ko erkennt die Zählung nicht.“ Bei `gemischtAnteil`
+    über 10 %: „Die Stellung ist noch nicht ausgespielt.“
+- **Verfügbar** solange die Partie läuft (nicht nach dem Spielende, dort zeigt die App
+  das Ergebnis ohnehin) und auch, wenn die KI rechnet; die Berechnung liest nur.
+- **Kein Einfluss auf die KI:** Die Vorschau ändert weder Zustand noch Brett noch
+  Protokoll und wird von der KI nicht gelesen.
+
+**Tests (vor dem Bau festgelegt):** im Browser (wie `browser-ui.js`): Knopf steht
+zwischen „Rückgängig“ und „Neues Spiel“; Klick zeigt zwei Zahlen und den Hinweis;
+das Brett (`state.board`), die Gefangenen, das Protokoll und `deadStones` sind danach
+unverändert; ein Zug blendet die Vorschau aus; Rückgängig und „Neues Spiel“ ebenfalls;
+in einer ausgespielten Stellung (Partie vom 12.10.) erscheint das Fragezeichen-Kreuz an
+den acht Steinen; in einer offenen Stellung der Hinweis „noch nicht ausgespielt“.
+
+Gebaut wird erst auf dein Go.
