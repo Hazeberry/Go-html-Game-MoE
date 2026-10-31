@@ -88,6 +88,21 @@ test('Galaxy A20s (146 Steinzüge mit Messpunkten): Netz im Median 520 ms, Nachr
   pruefe(/kein dauerhafter Sprung/.test(Z.text(r)), 'ohne Sprung wird das gesagt');
 });
 
+test('A17: Chrome mit V8-Optimierer schnell wie Firefox, Chrome davor langsam (gleiche Parameter in allen Berichten)', () => {
+  const T = path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory');
+  const lade = n => JSON.parse(fs.readFileSync(path.join(T, `handy-bericht-${n}.json`), 'utf8'));
+  const langsam = lade('a17-chrome2-356zuege'), firefox = lade('a17-firefox-354zuege'), v8 = lade('a17-chrome-v8-358zuege');
+  const sims2 = d => +/(\d+) Sims/.exec(d.kiDiagnose.find(x => x.zug === 2).info)[1];
+  pruefe(sims2(langsam) < 600, `Chrome vorher: ${sims2(langsam)} Simulationen in 1,8 s`);
+  pruefe(sims2(firefox) > 1800 && sims2(v8) > 1800, `Firefox ${sims2(firefox)} und Chrome mit V8-Optimierer ${sims2(v8)}`);
+  const rv = Z.auswerten(v8), rl = Z.auswerten(langsam);
+  pruefe(rv.messpunkte.nach.netzMs < 200 && rl.messpunkte.nach.netzMs > 1400, `Netz ${rv.messpunkte.nach.netzMs} gegen ${rl.messpunkte.nach.netzMs} ms`);
+  pruefeGleich(rv.dauerUeberBudget15, 0, 'mit V8-Optimierer kein Zug über 1,5 × Budget');
+  const p = JSON.stringify(Object.entries(langsam.reproduktion.params).sort());
+  pruefeGleich(JSON.stringify(Object.entries(firefox.reproduktion.params).sort()), p, 'Firefox: gleiche Parameter');
+  pruefeGleich(JSON.stringify(Object.entries(v8.reproduktion.params).sort()), p, 'Chrome mit V8: gleiche Parameter');
+});
+
 test('Endspiel-Netz: eingeschaltet ab Zug 80 (Deutung der Doku setzt das voraus)', () => {
   const html = fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8');
   pruefe(/endspielNetz:\s+0\.8,/.test(html), 'endspielNetz 0,8');
@@ -98,8 +113,9 @@ test('Endspiel-Netz: eingeschaltet ab Zug 80 (Deutung der Doku setzt das voraus)
 test('Dokument und Archivdaten vorhanden', () => {
   const doc = fs.readFileSync(path.join(wurzel, 'docs', 'zeitbudget.md'), 'utf8');
   pruefe(/Ergebnis vom Handy/.test(doc) && /1627/.test(doc) && /Galaxy A20s/.test(doc), 'Doc nennt beide Handy-Ergebnisse');
+  pruefe(/V8-Optimierer/.test(doc) && /Auflösung/.test(doc), 'Doc nennt die Auflösung');
   pruefe(/Zerlegung auf dem Handy/.test(doc) && /nachrichtMs/.test(doc), 'Doc beschreibt die Messpunkte');
-  for (const f of ['zeit-zerlegung.txt', 'netz-kosten.txt', 'browser-zeit-cpu1.txt', 'browser-zeit-cpu10.txt', 'handy-bericht-280zuege.json', 'handy-zeit-zerlegung.txt', 'handy-bericht-a20s-292zuege.json', 'handy-a20s-zeit-zerlegung.txt', 'chromium-referenz/README.md', 'chromium-referenz/bericht.md', 'chromium-referenz/metadaten.json', 'chromium-referenz/messungen.jsonl']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', f)), f);
+  for (const f of ['zeit-zerlegung.txt', 'netz-kosten.txt', 'browser-zeit-cpu1.txt', 'browser-zeit-cpu10.txt', 'handy-bericht-280zuege.json', 'handy-zeit-zerlegung.txt', 'handy-bericht-a20s-292zuege.json', 'handy-a20s-zeit-zerlegung.txt', 'handy-bericht-a17-chrome2-356zuege.json', 'handy-bericht-a17-firefox-354zuege.json', 'handy-bericht-a17-pwa-340zuege.json', 'handy-bericht-a17-chrome-v8-358zuege.json', 'handy-zeit-zerlegung-a17-chrome-v8-358zuege.txt', 'chromium-referenz/README.md', 'chromium-referenz/bericht.md', 'chromium-referenz/metadaten.json', 'chromium-referenz/messungen.jsonl']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', f)), f);
 });
 
 laufeTests('Zeit-Zerlegung').then(ok => process.exit(ok ? 0 : 1));

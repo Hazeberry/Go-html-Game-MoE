@@ -91,6 +91,9 @@ Zahlen auffällt.
 
 ## 5. Ergebnis vom Handy (31.10.2026, nachgetragen)
 
+> **Stand beim Eintragen, später aufgelöst:** Die Messwerte unten gelten. Die Deutung „das Netz ist die Ursache“ trifft nur
+> bedingt zu: Auf dem A17 war der V8-Optimierer von Chrome aus; mit ihm kostet das Netz 106 ms (siehe „Auflösung“ weiter unten).
+
 Bericht einer Territory-Partie auf dem Android-Handy (Chrome 156, KI Weiß „hard“, 280 Züge, 140 Steinzüge mit
 Messpunkten): [`handy-bericht-280zuege.json`](daten/endspiel-abraeumen/territory/handy-bericht-280zuege.json),
 Auswertung [`handy-zeit-zerlegung.txt`](daten/endspiel-abraeumen/territory/handy-zeit-zerlegung.txt).
@@ -116,7 +119,7 @@ Auswertung [`handy-zeit-zerlegung.txt`](daten/endspiel-abraeumen/territory/handy
 - Die Desktop-Messungen (§3) zeigten das Netz dort nicht als langsam, schlossen es aber auch nicht aus. Die Ursache
   ist der Aufwand des Netzes auf dem Gerät, nicht die Vorarbeit allgemein.
 
-Damit stützen die Daten jetzt eine Änderung. Welche, ist eine Entscheidung (§6); das Netz ist zugleich der größte
+Zum damaligen Stand stützten die Daten eine Änderung (siehe die Auflösung unten, danach nicht mehr). Welche, wäre eine Entscheidung (§6); das Netz ist zugleich der größte
 gemessene Gewinn des Projekts (`endspiel-netz.md`, im Selbstspiel 83,1 %), ein einfaches Abschalten kostet also Spielstärke.
 
 ### Zweites Gerät: Galaxy A20s (Chrome 156, 292 Züge, 146 Steinzüge)
@@ -142,7 +145,43 @@ Der Benutzeragent ist in beiden Berichten derselbe (Android 10, „K“, Chrome 
 - Beide Berichte stützen: Das Netz ist der Teil, der ab Zug 81 die Dauer über das Budget hebt; Nachrichtenweg und
   Einsetzen sind vernachlässigbar.
 
+### Auflösung (nachgetragen): der V8-Optimierer in Chrome
+
+Weitere Läufe auf dem Galaxy A17 (alle mit denselben 161 Parametern, ohne Abweichung vom Standard; Berichte und
+Auswertungen unter [`daten/endspiel-abraeumen/territory/`](daten/endspiel-abraeumen/territory/)):
+
+| Median | Chrome, Lauf 2 (Chrome-Daten gelöscht) | **Firefox** | **Chrome, V8-Optimierer an** | PWA (Go-PWA, ohne Netz) |
+|---|---:|---:|---:|---:|
+| Simulationen in 1,8 s (Zug 2) | 453 | 2187 | **2662** | – |
+| ms pro Simulation (Zug 2) | 3,98 | 0,82 | **0,68** | 4,07 |
+| Endspiel-Netz (ab Zug 81) | 1635 | 242 | **106** | – |
+| Rest außerhalb der Suche (ab Zug 81) | 1796 | 321 | **137** | 186 |
+| Dauer des Zuges (ab Zug 81) | 3798 | 2227 | **2241** | 2125 |
+
+- **Ursache:** Auf dem A17 lief Chrome mit ausgeschaltetem V8-Optimierer. Nach dem Einschalten verhält sich Chrome
+  wie Firefox: Suche und Netz sind um den Faktor 5 bis 15 schneller, der Rest außerhalb der Suche fällt von 1,8 s
+  auf 0,14 s, kein Zug überschreitet mehr das 1,5-Fache des Budgets (vorher alle).
+- Das Endspiel-Netz war also nicht „zu teuer“, sondern nur der Teil der Rechnung, den der fehlende Optimierer am
+  stärksten verlangsamte. Die PWA ohne Netz zeigte keinen Sprung, weil ihr Netzteil fehlt, aber ihre Suche läuft auf
+  demselben Chrome mit 4 ms pro Simulation genauso langsam.
+- **Hypothesen, die sich nicht bestätigt haben:** gemeinsamer Speicher beider Projekte auf `hazeberry.github.io`
+  (die Parameter sind in allen Berichten gleich und gleich dem Standard; das Löschen der Chrome-Daten änderte nichts)
+  sowie Energiesparmodus (war aus). Das Risiko gemeinsamer Speicherschlüssel (`go_pnet`, `PD_STORE`) beider Projekte bleibt
+  davon unberührt.
+- **Offen:** Der Zustand des Schalters vor dem Einschalten ist nur aus den Zahlen erschlossen; ob er „aus“ war, weiß ich
+  nicht aus erster Hand. Das Galaxy A20s zeigt in Chrome früh dieselben Simulationszahlen wie das A17 vorher (ca. 450);
+  dort ist derselbe Zustand möglich, aber nicht geprüft.
+
+Folge: Option 1 und 2 (§6) sind nicht mehr nötig, um das Handy-Problem zu beheben. Offen bleibt, ob die App einen zu
+langsamen JavaScript-Pfad erkennen und dem Menschen sagen soll (§6, neu).
+
 ## 6. Mögliche Änderungen (nur nach Entscheidung, nicht gebaut)
+
+Stand nach der Auflösung: Das Handy-Problem war eine Browser-Einstellung. Was bleibt:
+
+0. **Langsamen Pfad erkennen und melden.** Schafft die Suche beim ersten KI-Zug auf Stufe Schwer weniger als etwa 800 Simulationen in 1,8 s (statt ca. 2000 und mehr), zeigt die App einen Hinweis („Dein Browser rechnet langsam, prüfe die Chrome-Einstellung für den V8-Optimierer“). Eine Anzeige, kein Eingriff in die Suche; die Schwelle wäre vorab festzulegen.
+
+Die folgenden Optionen waren vor der Auflösung gedacht und sind jetzt zurückgestellt:
 
 1. Das Netz schneller rechnen, ohne sein Ergebnis zu ändern (gleiche Ausgabe, andere Schleifen oder
    Zahlenformat). Spielstärke unverändert, Prüfung über `tests/endspiel-netz.js`; ob es auf dem Handy reicht,

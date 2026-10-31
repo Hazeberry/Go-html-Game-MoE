@@ -1,0 +1,13 @@
+178 Steinzüge mit Simulationszahl und ms/Sim
+bis Zug 80: 40 Züge, Dauer 2021 ms (Median), davon Suche 1801, Rest 221
+ab Zug 81: 138 Züge, Dauer 3798 ms (Median), davon Suche 1806, Rest 1796 (1663 bis 2031)
+Messpunkte (Median, ms) vor | nach Zug 80:
+  vorMs           212 |   1784
+  netzMs            0 |   1635
+  sucheMs        1801 |   1806
+  nachMs            0 |      0
+  nachrichtMs       1 |      1
+  anwendenMs        4 |     14
+  restMs          221 |   1796
+erster dauerhafter Sprung des Rests über 1000 ms bei Zug 82
+Suche länger als 1,1 × Budget: 63 Züge; Dauer länger als 1,5 × Budget: 138 Züge; längster Zug 5070 ms
