@@ -78,6 +78,16 @@ test('Handy-Bericht vom 31.10. (140 Steinzüge mit Messpunkten): das Netz kostet
   pruefe(Math.min(...netz) >= 1500 && Math.max(...netz) <= 1800, `Netz in jedem Zug 1,5 bis 1,8 s (${Math.min(...netz)} bis ${Math.max(...netz)})`);
 });
 
+test('Galaxy A20s (146 Steinzüge mit Messpunkten): Netz im Median 520 ms, Nachrichtenweg und Einsetzen vernachlässigbar; kein Sprung-Text „Zug null“', () => {
+  const d = JSON.parse(fs.readFileSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', 'handy-bericht-a20s-292zuege.json'), 'utf8'));
+  const r = Z.auswerten(d);
+  pruefeGleich(r.zuege, 146, '146 Steinzüge');
+  pruefeGleich(r.messpunkte.nach.netzMs, 520, 'Netz im Median 520 ms');
+  pruefe(r.messpunkte.nach.nachrichtMs <= 5 && r.messpunkte.nach.anwendenMs <= 15, 'Nachrichtenweg und Einsetzen klein');
+  pruefe(!/Zug null/.test(Z.text(r)), 'Text sagt nie „Zug null“');
+  pruefe(/kein dauerhafter Sprung/.test(Z.text(r)), 'ohne Sprung wird das gesagt');
+});
+
 test('Endspiel-Netz: eingeschaltet ab Zug 80 (Deutung der Doku setzt das voraus)', () => {
   const html = fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8');
   pruefe(/endspielNetz:\s+0\.8,/.test(html), 'endspielNetz 0,8');
@@ -87,9 +97,9 @@ test('Endspiel-Netz: eingeschaltet ab Zug 80 (Deutung der Doku setzt das voraus)
 
 test('Dokument und Archivdaten vorhanden', () => {
   const doc = fs.readFileSync(path.join(wurzel, 'docs', 'zeitbudget.md'), 'utf8');
-  pruefe(/Ergebnis vom Handy/.test(doc) && /1627/.test(doc), 'Doc nennt das Handy-Ergebnis');
+  pruefe(/Ergebnis vom Handy/.test(doc) && /1627/.test(doc) && /Galaxy A20s/.test(doc), 'Doc nennt beide Handy-Ergebnisse');
   pruefe(/Zerlegung auf dem Handy/.test(doc) && /nachrichtMs/.test(doc), 'Doc beschreibt die Messpunkte');
-  for (const f of ['zeit-zerlegung.txt', 'netz-kosten.txt', 'browser-zeit-cpu1.txt', 'browser-zeit-cpu10.txt', 'handy-bericht-280zuege.json', 'handy-zeit-zerlegung.txt', 'chromium-referenz/README.md', 'chromium-referenz/bericht.md', 'chromium-referenz/metadaten.json', 'chromium-referenz/messungen.jsonl']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', f)), f);
+  for (const f of ['zeit-zerlegung.txt', 'netz-kosten.txt', 'browser-zeit-cpu1.txt', 'browser-zeit-cpu10.txt', 'handy-bericht-280zuege.json', 'handy-zeit-zerlegung.txt', 'handy-bericht-a20s-292zuege.json', 'handy-a20s-zeit-zerlegung.txt', 'chromium-referenz/README.md', 'chromium-referenz/bericht.md', 'chromium-referenz/metadaten.json', 'chromium-referenz/messungen.jsonl']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', f)), f);
 });
 
 laufeTests('Zeit-Zerlegung').then(ok => process.exit(ok ? 0 : 1));

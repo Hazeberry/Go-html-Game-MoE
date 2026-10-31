@@ -119,6 +119,29 @@ Auswertung [`handy-zeit-zerlegung.txt`](daten/endspiel-abraeumen/territory/handy
 Damit stützen die Daten jetzt eine Änderung. Welche, ist eine Entscheidung (§6); das Netz ist zugleich der größte
 gemessene Gewinn des Projekts (`endspiel-netz.md`, im Selbstspiel 83,1 %), ein einfaches Abschalten kostet also Spielstärke.
 
+### Zweites Gerät: Galaxy A20s (Chrome 156, 292 Züge, 146 Steinzüge)
+
+[`handy-bericht-a20s-292zuege.json`](daten/endspiel-abraeumen/territory/handy-bericht-a20s-292zuege.json),
+Auswertung [`handy-a20s-zeit-zerlegung.txt`](daten/endspiel-abraeumen/territory/handy-a20s-zeit-zerlegung.txt).
+Der Benutzeragent ist in beiden Berichten derselbe (Android 10, „K“, Chrome 156) und sagt nichts über das Gerät.
+
+| Median in ms, ab Zug 81 | Bericht 1 (280 Züge) | Galaxy A20s (292 Züge) |
+|---|---:|---:|
+| Dauer des Zuges | 3727 | 2508 |
+| Endspiel-Netz (`netzMs`) | **1627** (1604 bis 1717) | **520** (508 bis 647) |
+| Suche | 1803 | 1804 |
+| Nachrichtenweg | 1 | 2 |
+| Einsetzen im Hauptthread | 11 | 5 |
+
+- **Gleiche Richtung, anderer Betrag:** Auf dem A20s springt der Zug bei Zug 82 ebenfalls, das Netz kostet aber rund
+  520 ms statt 1627 ms, also etwa ein Drittel. Das ist rund das Zehnfache des Desktops (50 bis 90 ms) und damit in der Größe der
+  Suche (ca. 10-mal langsamer), nicht mehr 27-mal.
+- Der Unterschied zwischen den beiden Berichten ist nicht erklärt. Möglich sind ein anderes Gerät mit demselben
+  (gekürzten) Benutzeragenten, Energiesparmodus, Wärme oder Hintergrundlast; das lässt sich aus den Berichten nicht
+  trennen.
+- Beide Berichte stützen: Das Netz ist der Teil, der ab Zug 81 die Dauer über das Budget hebt; Nachrichtenweg und
+  Einsetzen sind vernachlässigbar.
+
 ## 6. Mögliche Änderungen (nur nach Entscheidung, nicht gebaut)
 
 1. Das Netz schneller rechnen, ohne sein Ergebnis zu ändern (gleiche Ausgabe, andere Schleifen oder
