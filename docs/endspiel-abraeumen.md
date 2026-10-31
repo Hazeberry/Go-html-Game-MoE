@@ -372,3 +372,43 @@ Aus einer weiteren Durchsicht (Astra), übernommen als Einordnung, nicht als Bes
   heißt nicht „tot“, und Seki erkennt die Zählung nicht zuverlässig (§1). Gebaut
   ist davon nichts; eine Umsetzung bräuchte eine eigene Vorabfestlegung und
   Teststellungen für Seki, Ko, offene Grenzen und ungewöhnliche Augen.
+
+## 13. Territory-Partie vom 31.10.2026: was kostet das Weiterspielen? (Nachtrag)
+
+Material: [`mensch-494zuege-territory.sgf`](daten/endspiel-abraeumen/territory/mensch-494zuege-territory.sgf)
+(Japanisch/Territory, Mensch Schwarz, KI Weiß „hard“, RE W+200,5) und die zugehörige
+Diagnosedatei [`mensch-494zuege-diagnose.json`](daten/endspiel-abraeumen/territory/mensch-494zuege-diagnose.json).
+Rechnung: [`auswertung/endspiel/territory-fuellen.js`](../auswertung/endspiel/territory-fuellen.js),
+Ausgabe [`territory-fuellen.txt`](daten/endspiel-abraeumen/territory/territory-fuellen.txt) (Archivdaten, keine
+Partie gespielt). Die Nachrechnung endet bei W+200,5 und stimmt damit mit der Anzeige der App überein.
+
+**Frage:** Die Hypothese war, dass das Weiterspielen der KI nach dem Pass des Menschen unter
+Territory Punkte kostet, weil es eigene Gebiete füllt.
+
+**Befund auf dieser einen Partie:**
+
+- Schwarz passt zum ersten Mal nach Zug 354 und danach 49-mal; Weiß setzt in dieser Zeit
+  69 Steine und passt einmal (am Ende).
+- Stand (Territory, Komi 7,5, tote Steine nach `toteSteineAmEnde` als Gefangene): vor dem
+  ersten Pass W+186,5, am Ende W+200,5. Der Stand der KI wurde in diesem Abschnitt also
+  **um 14 Punkte besser**, nicht schlechter.
+- Zerlegung (Gebiet vorher → nachher): Weiß 117 → 79 (−38), Schwarz 29 → 7 (−22). Gefangene
+  Weiß 115 → 145 (davon sind vorher 29 geschätzt tote Steine eingerechnet, am Ende 0 geschätzt:
+  sie wurden real geschlagen). Die Züge nach dem ersten Pass enthalten also sowohl Steine in
+  eigenem Gebiet als auch Züge ins Gebiet des Gegners; ich habe sie nicht je Zug getrennt.
+
+**Einordnung:** Für diese Partie ist „Auffüllen kostet Punkte“ **nicht belegt**; die KI hat
+netto gewonnen. Das Ergebnis sagt nichts darüber, ob die Weiß-Züge in eigenem Gebiet für sich
+genommen Punkte gekostet haben (das Gebiet 117 → 79 ist ein Teil davon, aber ohne Zugtrennung
+nicht eindeutig). Ob der Gegnerpass der Auslöser war oder der Stand ohnehin so gewesen wäre,
+zeigt eine einzelne Partie nicht. Eine Gegenprobe wäre das „erzwungene Passen“ aus §11.
+
+**Nebenbefund Schätzung:** Die Zahl der als tot geschätzten Steine schwankt in der Reihe
+(354: 29, 394: 8, 414: 29, 474: 0), und der Stand springt zwischen Zug 394 und 414 von W+178,5 auf
+W+239,5 (61 Punkte). Während die Partie nicht ausgespielt ist, hängt die Vorschau stark von
+dieser Schätzung ab. Die Spanne „Mit Annahmen / Nur Bewiesenes“ der Zählvorschau zeigt das an.
+
+**Nebenbefund Zeit (Diagnosedatei):** 238 von 281 KI-Steinzügen dauerten länger als das 1,5-Fache
+des Budgets (`budgetMs`, anfangs 1800 ms). Bis etwa Zug 80 liegen die Züge bei ca. 2,0 s, ab Zug 82
+bei ca. 3,8 s, gegen Ende bis 5,7 s; Mittelwert 4,0 s. Gerät: Android-Chrome-Handy. Ursache offen
+(Drosselung des Geräts, Mehrfachsuche oder anderes); Gegenstand eines eigenen Punkts.

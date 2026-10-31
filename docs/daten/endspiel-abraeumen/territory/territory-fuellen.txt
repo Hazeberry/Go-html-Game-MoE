@@ -1,0 +1,12 @@
+Territory-Stand (Komi 7.5), erster Pass von Schwarz nach Zug 354; KI = Weiß
+Zug  Stand          Gebiet S/W   Gefangene S/W  tote
+354  Weiß +186.5     29/117      24/115        29
+374  Weiß +178.5     28/107      24/116        25
+394  Weiß +178.5     18/97       24/116        8
+414  Weiß +239.5      7/118      24/145        29
+434  Weiß +229.5      7/108      24/145        29
+454  Weiß +219.5      7/99       25/145        30
+474  Weiß +209.5      7/88       24/145        0
+494  Weiß +200.5      7/79       24/145        0
+KI-Steine nach dem ersten Pass: 69, Pässe des Gegners danach: 49, KI-Pässe: 1
+Veränderung des KI-Standes vom ersten Pass bis Ende: +14.0 Punkte

@@ -16,6 +16,12 @@
         gemischtAnteil hoch, sicher false.
      5. Der Stand folgt der Fläche mit Komi (komi-Parameter, Vorzeichen).
 
+     6. Territory-Modus (opt.modus 'territory', opt.gefangen): zählt Gebiet plus
+        Gefangene statt Fläche; Standard bleibt Fläche. Die Partie vom 31.10.
+        (Japanisch, W+200,5) kommt auf den Stand, den die App am Ende zeigte,
+        und stimmt mit der Nachrechnung in auswertung/endspiel/territory-fuellen.js
+        überein; die Stellung vor dem ersten Pass ebenso.
+
    Aufruf:  node tests/zaehlvorschau.js [pfad/zur/index.html] */
 'use strict';
 const fs = require('fs'), path = require('path');
@@ -118,6 +124,47 @@ test('Sechs Handpartien (stellungen/hand-*.sgf): Endstand der Vorschau = Ergebni
   /* 117: nach Aufgabe der KI (B+R), nicht ausgespielt */
   const v117 = zaehlVorschau(sgf('hand-117.sgf'), 7.5);
   pruefe(v117.nurBewiesen.gemischtAnteil > 0.9 && !v117.sicher, `117: noch nicht ausgespielt (${v117.nurBewiesen.gemischtAnteil.toFixed(2)})`);
+});
+
+test('Territory: Gebiet + Gefangene statt Fläche; Standard bleibt Fläche; Identität zur Fläche', () => {
+  /* Für jede Farbe X gilt: Territory(X) = Gefangene(X) + tote Gegnersteine + Gebiet(X),
+     Fläche(X) = lebende Steine(X) + Gebiet(X). Geprüft an der Partie vom 12.10. (acht tote schwarze Steine). */
+  const b = sgf('zaehlung-358.sgf');
+  const fl = zaehlVorschau(b, 7.5), gef = {1: 3, 2: 2};
+  const t = zaehlVorschau(b, 7.5, {modus: 'territory', gefangen: gef});
+  pruefeGleich(fl.modus, 'flaeche', 'Standard ist Fläche');
+  pruefeGleich(t.modus, 'territory', 'Modus wird gemeldet');
+  const tot = {1: 0, 2: 0}, lebend = {1: 0, 2: 0};
+  for (let i = 0; i < N; i++) if (b[i]) { if (fl.bewiesenTot[i] || fl.geschaetztTot[i]) tot[b[i]]++; else lebend[b[i]]++; }
+  pruefeGleich(tot[1], 8, 'acht tote schwarze Steine');
+  pruefeGleich(t.mitSchaetzung.schwarz - fl.mitSchaetzung.schwarz, gef[1] + tot[2] - lebend[1], 'Schwarz: Territory − Fläche = Gefangene + tote weiße − lebende schwarze Steine');
+  pruefeGleich(t.mitSchaetzung.weiss - fl.mitSchaetzung.weiss, gef[2] + tot[1] - lebend[2], 'Weiß: dasselbe, die acht toten schwarzen Steine zählen für Weiß');
+  /* Gefangene gehen eins zu eins ein */
+  const t2 = zaehlVorschau(b, 7.5, {modus: 'territory', gefangen: {1: 3 + 5, 2: 2 + 1}});
+  pruefeGleich(t2.mitSchaetzung.stand - t.mitSchaetzung.stand, 4, 'fünf zusätzliche schwarze gegen eine weiße Gefangene: +4 für Schwarz');
+});
+
+test('Partie vom 31.10. (Japanisch, 494 Züge): Territory-Stand wie die App und wie die Nachrechnung', () => {
+  const {parseSgf, nachspielen, territoryStand, auswerten} = require('../auswertung/endspiel/territory-fuellen');
+  const dir = path.join(__dirname, '..', 'docs', 'daten', 'endspiel-abraeumen', 'territory');
+  const zuege = parseSgf(fs.readFileSync(path.join(dir, 'mensch-494zuege-territory.sgf'), 'utf8'));
+  const ersterPass = zuege.findIndex(z => !z.p);
+  const pruefAn = (n, erwarteterStand) => {
+    let ergebnis = null;
+    nachspielen(KI, zuege, 7.5, (k, board, caps) => {
+      if (k !== n) return;
+      const v = zaehlVorschau(board, 7.5, {modus: 'territory', gefangen: caps});
+      const r = territoryStand(KI, board, caps, 7.5);
+      ergebnis = {vorschau: v.mitSchaetzung.stand, nachrechnung: r.stand};
+    });
+    pruefeGleich(ergebnis.vorschau, ergebnis.nachrechnung, `Zug ${n}: Vorschau = Nachrechnung`);
+    if (erwarteterStand !== undefined) pruefeGleich(ergebnis.vorschau, erwarteterStand, `Zug ${n}: Stand`);
+  };
+  pruefAn(zuege.length, -200.5);        /* RE[W+200.5] der App */
+  pruefAn(ersterPass, -186.5);          /* Stellung vor dem ersten Pass */
+  const r = auswerten(KI, zuege, 7.5);
+  pruefeGleich(`${r.passFarbe} ${r.kiFarbe} ${r.ersterPassNach}`, '1 2 354', 'Schwarz passt zuerst nach Zug 354');
+  pruefeGleich(r.kiSteineNachErstemPass, 69, '69 weiße Steine nach dem ersten Pass');
 });
 
 laufeTests('Zählvorschau (zaehlVorschau)').then(ok => process.exit(ok ? 0 : 1));
