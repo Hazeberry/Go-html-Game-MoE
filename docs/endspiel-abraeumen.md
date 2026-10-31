@@ -102,8 +102,8 @@ Beschreibend, ohne Urteil.
 
 1. **Gegen GNU Go kommt das Weiterspielen selten vor** (Median 0, 3 bis 5 % über 10
    Züge), gegen **Fuego öfter** (Median 1 bis 2, 15 bis 25 % über 10 Züge, Maximum
-   64). Fuego passt später oder setzt in der Endphase eigene Pässe zwischen die
-   KI-Züge; die KI antwortet dann weiter.
+   64). Warum, ist nicht geprüft (denkbar: Fuego passt in der Endphase
+   anders als GNU Go, während die KI weiterspielt).
 2. **Die meisten dieser KI-Züge schlagen nicht** (Fuego: 4,1 und 5,4 ohne Schlag
    gegen 0,5 und 0,9 mit Schlag im Mittel). Es ist in den Programmpartien also
    überwiegend Auffüllen, Grenze und Neutral, nicht das Abräumen toter Steine.
