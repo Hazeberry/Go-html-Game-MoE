@@ -78,7 +78,7 @@ test('Dokument und Archivdaten vorhanden', () => {
   const doc = fs.readFileSync(path.join(wurzel, 'docs', 'zeitbudget.md'), 'utf8');
   pruefe(/Vermutung|Hypothese/.test(doc) && /nicht bewiesen|nicht belegt/.test(doc), 'Doc kennzeichnet die Ursache als nicht bewiesen');
   pruefe(/Zerlegung auf dem Handy/.test(doc) && /nachrichtMs/.test(doc), 'Doc beschreibt die Messpunkte');
-  for (const f of ['zeit-zerlegung.txt', 'netz-kosten.txt', 'browser-zeit-cpu1.txt', 'browser-zeit-cpu10.txt']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', f)), f);
+  for (const f of ['zeit-zerlegung.txt', 'netz-kosten.txt', 'browser-zeit-cpu1.txt', 'browser-zeit-cpu10.txt', 'chromium-referenz/README.md', 'chromium-referenz/bericht.md', 'chromium-referenz/metadaten.json', 'chromium-referenz/messungen.jsonl']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', f)), f);
 });
 
 laufeTests('Zeit-Zerlegung').then(ok => process.exit(ok ? 0 : 1));

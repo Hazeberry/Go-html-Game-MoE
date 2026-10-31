@@ -60,6 +60,19 @@ widerlegt: Ein Handy kann sich anders verhalten als eine gedrosselte Desktop-CPU
 Auffällig ist der **Nachrichtenweg** (Hauptthread → Worker → Hauptthread) mit rund 90 bis 110 ms schon ohne
 Drosselung und 210 bis 350 ms mit; auf dem Handy ist er noch nicht gemessen.
 
+### Unabhängige Referenz (Sol 6.1)
+
+Eine zweite, unabhängige Messung im Container-Chromium (anderes Werkzeug, Produktions-Worker, 72 Antworten, 12
+Kontrollen bestanden) ist archiviert unter
+[`chromium-referenz/`](daten/endspiel-abraeumen/territory/chromium-referenz/README.md): Das Netz kostet ab Zug 82
+rund 45 bis 63 ms (davor 0), der Rest außerhalb der Suche liegt bei 20 bis 25 ms ohne und 60 bis 80 ms mit Netz. Der
+zusätzliche Roundtrip-Aufwand gegenüber `getAIMove` beträgt etwa 0,5 ms; der Roundtrip insgesamt enthält die
+Zugberechnung. Die 3,8 s vom Handy werden **nicht** reproduziert.
+
+Einordnung: Die Desktop-Messungen bestätigen das Netz als Ursache nicht. Sie schließen aber einen deutlich höheren
+Aufwand auf dem Handy nicht aus. Bis zum Handy-Bericht mit den Messpunkten (§4) rechtfertigen die Daten keine
+Änderung am Netz.
+
 ## 4. Zerlegung auf dem Handy: jetzt in der Diagnose
 
 Die Diagnose (`kiDiagnose` im Fehlerbericht) trägt seit dieser Änderung je KI-Zug Messpunkte, nur aus `Date.now()`,
