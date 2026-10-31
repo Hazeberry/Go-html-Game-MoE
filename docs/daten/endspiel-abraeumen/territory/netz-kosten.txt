@@ -1,0 +1,10 @@
+Zug  mit Netz   ohne Netz   Netz (ms, günstigster von 3 Läufen, ohne Suche)
+ 60        23         18       5
+ 70        18         17       1
+ 78        20         20       0
+ 80        19         20      -1
+ 82        84         17      67
+ 84        62         18      44
+100        69         17      52
+200        58         12      46
+300        50          6      44

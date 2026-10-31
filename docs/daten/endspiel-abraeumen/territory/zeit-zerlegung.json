@@ -1,0 +1,2272 @@
+{
+ "zuege": 281,
+ "grenze": 80,
+ "sprungBeiZug": 82,
+ "vor": {
+  "n": 43,
+  "restMedian": 191,
+  "sucheMedian": 1802,
+  "dauerMedian": 1992
+ },
+ "nach": {
+  "n": 238,
+  "restMedian": 1759,
+  "restMin": 1628,
+  "restMax": 2079,
+  "sucheMedian": 2353,
+  "dauerMedian": 4144
+ },
+ "sucheUeberBudget": 140,
+ "dauerUeberBudget15": 238,
+ "maxDauer": 5743,
+ "zeilen": [
+  {
+   "zug": 2,
+   "dauerMs": 2125,
+   "budgetMs": 1800,
+   "sims": 452,
+   "sucheMs": 1803,
+   "restMs": 322
+  },
+  {
+   "zug": 4,
+   "dauerMs": 2017,
+   "budgetMs": 1800,
+   "sims": 472,
+   "sucheMs": 1798,
+   "restMs": 219
+  },
+  {
+   "zug": 6,
+   "dauerMs": 1991,
+   "budgetMs": 1800,
+   "sims": 482,
+   "sucheMs": 1803,
+   "restMs": 188
+  },
+  {
+   "zug": 8,
+   "dauerMs": 1975,
+   "budgetMs": 1800,
+   "sims": 471,
+   "sucheMs": 1804,
+   "restMs": 171
+  },
+  {
+   "zug": 10,
+   "dauerMs": 2040,
+   "budgetMs": 1800,
+   "sims": 481,
+   "sucheMs": 1799,
+   "restMs": 241
+  },
+  {
+   "zug": 12,
+   "dauerMs": 1986,
+   "budgetMs": 1800,
+   "sims": 481,
+   "sucheMs": 1799,
+   "restMs": 187
+  },
+  {
+   "zug": 14,
+   "dauerMs": 1981,
+   "budgetMs": 1800,
+   "sims": 472,
+   "sucheMs": 1803,
+   "restMs": 178
+  },
+  {
+   "zug": 16,
+   "dauerMs": 2042,
+   "budgetMs": 1800,
+   "sims": 476,
+   "sucheMs": 1804,
+   "restMs": 238
+  },
+  {
+   "zug": 18,
+   "dauerMs": 1994,
+   "budgetMs": 1800,
+   "sims": 467,
+   "sucheMs": 1803,
+   "restMs": 191
+  },
+  {
+   "zug": 20,
+   "dauerMs": 2010,
+   "budgetMs": 1800,
+   "sims": 463,
+   "sucheMs": 1801,
+   "restMs": 209
+  },
+  {
+   "zug": 22,
+   "dauerMs": 2004,
+   "budgetMs": 1800,
+   "sims": 462,
+   "sucheMs": 1802,
+   "restMs": 202
+  },
+  {
+   "zug": 24,
+   "dauerMs": 2000,
+   "budgetMs": 1800,
+   "sims": 458,
+   "sucheMs": 1800,
+   "restMs": 200
+  },
+  {
+   "zug": 26,
+   "dauerMs": 1998,
+   "budgetMs": 1800,
+   "sims": 462,
+   "sucheMs": 1802,
+   "restMs": 196
+  },
+  {
+   "zug": 28,
+   "dauerMs": 1988,
+   "budgetMs": 1800,
+   "sims": 457,
+   "sucheMs": 1801,
+   "restMs": 187
+  },
+  {
+   "zug": 30,
+   "dauerMs": 1991,
+   "budgetMs": 1800,
+   "sims": 447,
+   "sucheMs": 1801,
+   "restMs": 190
+  },
+  {
+   "zug": 32,
+   "dauerMs": 1989,
+   "budgetMs": 1800,
+   "sims": 459,
+   "sucheMs": 1799,
+   "restMs": 190
+  },
+  {
+   "zug": 34,
+   "dauerMs": 1986,
+   "budgetMs": 1800,
+   "sims": 457,
+   "sucheMs": 1801,
+   "restMs": 185
+  },
+  {
+   "zug": 36,
+   "dauerMs": 1985,
+   "budgetMs": 1800,
+   "sims": 450,
+   "sucheMs": 1800,
+   "restMs": 185
+  },
+  {
+   "zug": 36,
+   "dauerMs": 1990,
+   "budgetMs": 1800,
+   "sims": 454,
+   "sucheMs": 1802,
+   "restMs": 188
+  },
+  {
+   "zug": 38,
+   "dauerMs": 1988,
+   "budgetMs": 1800,
+   "sims": 445,
+   "sucheMs": 1802,
+   "restMs": 186
+  },
+  {
+   "zug": 40,
+   "dauerMs": 1988,
+   "budgetMs": 1800,
+   "sims": 442,
+   "sucheMs": 1803,
+   "restMs": 185
+  },
+  {
+   "zug": 40,
+   "dauerMs": 1992,
+   "budgetMs": 1800,
+   "sims": 450,
+   "sucheMs": 1800,
+   "restMs": 192
+  },
+  {
+   "zug": 42,
+   "dauerMs": 1994,
+   "budgetMs": 1800,
+   "sims": 448,
+   "sucheMs": 1801,
+   "restMs": 193
+  },
+  {
+   "zug": 44,
+   "dauerMs": 1991,
+   "budgetMs": 1800,
+   "sims": 450,
+   "sucheMs": 1800,
+   "restMs": 191
+  },
+  {
+   "zug": 46,
+   "dauerMs": 1993,
+   "budgetMs": 1800,
+   "sims": 448,
+   "sucheMs": 1805,
+   "restMs": 188
+  },
+  {
+   "zug": 48,
+   "dauerMs": 1992,
+   "budgetMs": 1800,
+   "sims": 437,
+   "sucheMs": 1800,
+   "restMs": 192
+  },
+  {
+   "zug": 50,
+   "dauerMs": 2001,
+   "budgetMs": 1800,
+   "sims": 444,
+   "sucheMs": 1803,
+   "restMs": 198
+  },
+  {
+   "zug": 52,
+   "dauerMs": 2006,
+   "budgetMs": 1800,
+   "sims": 439,
+   "sucheMs": 1800,
+   "restMs": 206
+  },
+  {
+   "zug": 54,
+   "dauerMs": 2194,
+   "budgetMs": 1800,
+   "sims": 441,
+   "sucheMs": 1804,
+   "restMs": 390
+  },
+  {
+   "zug": 56,
+   "dauerMs": 2105,
+   "budgetMs": 1800,
+   "sims": 434,
+   "sucheMs": 1801,
+   "restMs": 304
+  },
+  {
+   "zug": 58,
+   "dauerMs": 2015,
+   "budgetMs": 1800,
+   "sims": 437,
+   "sucheMs": 1800,
+   "restMs": 215
+  },
+  {
+   "zug": 60,
+   "dauerMs": 1992,
+   "budgetMs": 1800,
+   "sims": 441,
+   "sucheMs": 1799,
+   "restMs": 193
+  },
+  {
+   "zug": 62,
+   "dauerMs": 1986,
+   "budgetMs": 1800,
+   "sims": 426,
+   "sucheMs": 1802,
+   "restMs": 184
+  },
+  {
+   "zug": 64,
+   "dauerMs": 1989,
+   "budgetMs": 1800,
+   "sims": 432,
+   "sucheMs": 1801,
+   "restMs": 188
+  },
+  {
+   "zug": 66,
+   "dauerMs": 1978,
+   "budgetMs": 1800,
+   "sims": 427,
+   "sucheMs": 1802,
+   "restMs": 176
+  },
+  {
+   "zug": 68,
+   "dauerMs": 1984,
+   "budgetMs": 1800,
+   "sims": 425,
+   "sucheMs": 1802,
+   "restMs": 182
+  },
+  {
+   "zug": 70,
+   "dauerMs": 1985,
+   "budgetMs": 1800,
+   "sims": 423,
+   "sucheMs": 1802,
+   "restMs": 183
+  },
+  {
+   "zug": 72,
+   "dauerMs": 1985,
+   "budgetMs": 1800,
+   "sims": 424,
+   "sucheMs": 1802,
+   "restMs": 183
+  },
+  {
+   "zug": 74,
+   "dauerMs": 1972,
+   "budgetMs": 1800,
+   "sims": 423,
+   "sucheMs": 1802,
+   "restMs": 170
+  },
+  {
+   "zug": 76,
+   "dauerMs": 2193,
+   "budgetMs": 1800,
+   "sims": 422,
+   "sucheMs": 1802,
+   "restMs": 391
+  },
+  {
+   "zug": 78,
+   "dauerMs": 2191,
+   "budgetMs": 1800,
+   "sims": 422,
+   "sucheMs": 1802,
+   "restMs": 389
+  },
+  {
+   "zug": 78,
+   "dauerMs": 2184,
+   "budgetMs": 1800,
+   "sims": 427,
+   "sucheMs": 1802,
+   "restMs": 382
+  },
+  {
+   "zug": 80,
+   "dauerMs": 2179,
+   "budgetMs": 1800,
+   "sims": 420,
+   "sucheMs": 1802,
+   "restMs": 377
+  },
+  {
+   "zug": 82,
+   "dauerMs": 3800,
+   "budgetMs": 1800,
+   "sims": 414,
+   "sucheMs": 1801,
+   "restMs": 1999
+  },
+  {
+   "zug": 84,
+   "dauerMs": 3806,
+   "budgetMs": 1800,
+   "sims": 418,
+   "sucheMs": 1802,
+   "restMs": 2004
+  },
+  {
+   "zug": 86,
+   "dauerMs": 3800,
+   "budgetMs": 1800,
+   "sims": 414,
+   "sucheMs": 1801,
+   "restMs": 1999
+  },
+  {
+   "zug": 88,
+   "dauerMs": 3791,
+   "budgetMs": 1800,
+   "sims": 408,
+   "sucheMs": 1799,
+   "restMs": 1992
+  },
+  {
+   "zug": 88,
+   "dauerMs": 3788,
+   "budgetMs": 1800,
+   "sims": 414,
+   "sucheMs": 1805,
+   "restMs": 1983
+  },
+  {
+   "zug": 90,
+   "dauerMs": 3800,
+   "budgetMs": 1800,
+   "sims": 413,
+   "sucheMs": 1805,
+   "restMs": 1995
+  },
+  {
+   "zug": 90,
+   "dauerMs": 3882,
+   "budgetMs": 1800,
+   "sims": 398,
+   "sucheMs": 1803,
+   "restMs": 2079
+  },
+  {
+   "zug": 92,
+   "dauerMs": 3801,
+   "budgetMs": 1800,
+   "sims": 408,
+   "sucheMs": 1799,
+   "restMs": 2002
+  },
+  {
+   "zug": 94,
+   "dauerMs": 3816,
+   "budgetMs": 1800,
+   "sims": 409,
+   "sucheMs": 1804,
+   "restMs": 2012
+  },
+  {
+   "zug": 96,
+   "dauerMs": 3772,
+   "budgetMs": 1800,
+   "sims": 409,
+   "sucheMs": 1804,
+   "restMs": 1968
+  },
+  {
+   "zug": 98,
+   "dauerMs": 3764,
+   "budgetMs": 1800,
+   "sims": 410,
+   "sucheMs": 1800,
+   "restMs": 1964
+  },
+  {
+   "zug": 100,
+   "dauerMs": 3775,
+   "budgetMs": 1800,
+   "sims": 411,
+   "sucheMs": 1800,
+   "restMs": 1975
+  },
+  {
+   "zug": 102,
+   "dauerMs": 3767,
+   "budgetMs": 1800,
+   "sims": 399,
+   "sucheMs": 1799,
+   "restMs": 1968
+  },
+  {
+   "zug": 100,
+   "dauerMs": 3831,
+   "budgetMs": 1800,
+   "sims": 397,
+   "sucheMs": 1798,
+   "restMs": 2033
+  },
+  {
+   "zug": 102,
+   "dauerMs": 3782,
+   "budgetMs": 1800,
+   "sims": 406,
+   "sucheMs": 1803,
+   "restMs": 1979
+  },
+  {
+   "zug": 104,
+   "dauerMs": 3783,
+   "budgetMs": 1800,
+   "sims": 398,
+   "sucheMs": 1803,
+   "restMs": 1980
+  },
+  {
+   "zug": 102,
+   "dauerMs": 3859,
+   "budgetMs": 1800,
+   "sims": 394,
+   "sucheMs": 1801,
+   "restMs": 2058
+  },
+  {
+   "zug": 104,
+   "dauerMs": 3843,
+   "budgetMs": 1800,
+   "sims": 394,
+   "sucheMs": 1801,
+   "restMs": 2042
+  },
+  {
+   "zug": 106,
+   "dauerMs": 3782,
+   "budgetMs": 1800,
+   "sims": 401,
+   "sucheMs": 1800,
+   "restMs": 1982
+  },
+  {
+   "zug": 108,
+   "dauerMs": 3782,
+   "budgetMs": 1800,
+   "sims": 395,
+   "sucheMs": 1801,
+   "restMs": 1981
+  },
+  {
+   "zug": 110,
+   "dauerMs": 3751,
+   "budgetMs": 1800,
+   "sims": 398,
+   "sucheMs": 1799,
+   "restMs": 1952
+  },
+  {
+   "zug": 112,
+   "dauerMs": 3747,
+   "budgetMs": 1800,
+   "sims": 396,
+   "sucheMs": 1802,
+   "restMs": 1945
+  },
+  {
+   "zug": 114,
+   "dauerMs": 3743,
+   "budgetMs": 1800,
+   "sims": 396,
+   "sucheMs": 1802,
+   "restMs": 1941
+  },
+  {
+   "zug": 116,
+   "dauerMs": 3752,
+   "budgetMs": 1800,
+   "sims": 390,
+   "sucheMs": 1802,
+   "restMs": 1950
+  },
+  {
+   "zug": 118,
+   "dauerMs": 3748,
+   "budgetMs": 1800,
+   "sims": 389,
+   "sucheMs": 1801,
+   "restMs": 1947
+  },
+  {
+   "zug": 120,
+   "dauerMs": 3742,
+   "budgetMs": 1800,
+   "sims": 394,
+   "sucheMs": 1805,
+   "restMs": 1937
+  },
+  {
+   "zug": 122,
+   "dauerMs": 3730,
+   "budgetMs": 1800,
+   "sims": 387,
+   "sucheMs": 1803,
+   "restMs": 1927
+  },
+  {
+   "zug": 124,
+   "dauerMs": 3788,
+   "budgetMs": 1800,
+   "sims": 386,
+   "sucheMs": 1803,
+   "restMs": 1985
+  },
+  {
+   "zug": 124,
+   "dauerMs": 3730,
+   "budgetMs": 1800,
+   "sims": 386,
+   "sucheMs": 1799,
+   "restMs": 1931
+  },
+  {
+   "zug": 126,
+   "dauerMs": 3788,
+   "budgetMs": 1800,
+   "sims": 383,
+   "sucheMs": 1804,
+   "restMs": 1984
+  },
+  {
+   "zug": 128,
+   "dauerMs": 3729,
+   "budgetMs": 1800,
+   "sims": 381,
+   "sucheMs": 1802,
+   "restMs": 1927
+  },
+  {
+   "zug": 130,
+   "dauerMs": 3724,
+   "budgetMs": 1800,
+   "sims": 385,
+   "sucheMs": 1802,
+   "restMs": 1922
+  },
+  {
+   "zug": 132,
+   "dauerMs": 3721,
+   "budgetMs": 1800,
+   "sims": 382,
+   "sucheMs": 1803,
+   "restMs": 1918
+  },
+  {
+   "zug": 134,
+   "dauerMs": 3732,
+   "budgetMs": 1800,
+   "sims": 373,
+   "sucheMs": 1802,
+   "restMs": 1930
+  },
+  {
+   "zug": 136,
+   "dauerMs": 3726,
+   "budgetMs": 1800,
+   "sims": 373,
+   "sucheMs": 1802,
+   "restMs": 1924
+  },
+  {
+   "zug": 138,
+   "dauerMs": 3719,
+   "budgetMs": 1800,
+   "sims": 375,
+   "sucheMs": 1800,
+   "restMs": 1919
+  },
+  {
+   "zug": 140,
+   "dauerMs": 3717,
+   "budgetMs": 1800,
+   "sims": 375,
+   "sucheMs": 1804,
+   "restMs": 1913
+  },
+  {
+   "zug": 142,
+   "dauerMs": 3712,
+   "budgetMs": 1800,
+   "sims": 372,
+   "sucheMs": 1800,
+   "restMs": 1912
+  },
+  {
+   "zug": 144,
+   "dauerMs": 3708,
+   "budgetMs": 1800,
+   "sims": 368,
+   "sucheMs": 1803,
+   "restMs": 1905
+  },
+  {
+   "zug": 146,
+   "dauerMs": 3709,
+   "budgetMs": 1800,
+   "sims": 367,
+   "sucheMs": 1802,
+   "restMs": 1907
+  },
+  {
+   "zug": 148,
+   "dauerMs": 3699,
+   "budgetMs": 1800,
+   "sims": 369,
+   "sucheMs": 1801,
+   "restMs": 1898
+  },
+  {
+   "zug": 150,
+   "dauerMs": 3718,
+   "budgetMs": 1800,
+   "sims": 342,
+   "sucheMs": 1799,
+   "restMs": 1919
+  },
+  {
+   "zug": 152,
+   "dauerMs": 3685,
+   "budgetMs": 1800,
+   "sims": 361,
+   "sucheMs": 1801,
+   "restMs": 1884
+  },
+  {
+   "zug": 154,
+   "dauerMs": 3698,
+   "budgetMs": 1800,
+   "sims": 360,
+   "sucheMs": 1800,
+   "restMs": 1898
+  },
+  {
+   "zug": 156,
+   "dauerMs": 3690,
+   "budgetMs": 1800,
+   "sims": 359,
+   "sucheMs": 1802,
+   "restMs": 1888
+  },
+  {
+   "zug": 158,
+   "dauerMs": 3680,
+   "budgetMs": 1800,
+   "sims": 361,
+   "sucheMs": 1801,
+   "restMs": 1879
+  },
+  {
+   "zug": 160,
+   "dauerMs": 3672,
+   "budgetMs": 1800,
+   "sims": 355,
+   "sucheMs": 1800,
+   "restMs": 1872
+  },
+  {
+   "zug": 162,
+   "dauerMs": 3669,
+   "budgetMs": 1800,
+   "sims": 351,
+   "sucheMs": 1804,
+   "restMs": 1865
+  },
+  {
+   "zug": 164,
+   "dauerMs": 3675,
+   "budgetMs": 1800,
+   "sims": 351,
+   "sucheMs": 1804,
+   "restMs": 1871
+  },
+  {
+   "zug": 166,
+   "dauerMs": 3660,
+   "budgetMs": 1800,
+   "sims": 349,
+   "sucheMs": 1801,
+   "restMs": 1859
+  },
+  {
+   "zug": 168,
+   "dauerMs": 3671,
+   "budgetMs": 1800,
+   "sims": 345,
+   "sucheMs": 1801,
+   "restMs": 1870
+  },
+  {
+   "zug": 170,
+   "dauerMs": 3652,
+   "budgetMs": 1800,
+   "sims": 345,
+   "sucheMs": 1804,
+   "restMs": 1848
+  },
+  {
+   "zug": 172,
+   "dauerMs": 3649,
+   "budgetMs": 1800,
+   "sims": 344,
+   "sucheMs": 1803,
+   "restMs": 1846
+  },
+  {
+   "zug": 174,
+   "dauerMs": 3657,
+   "budgetMs": 1800,
+   "sims": 341,
+   "sucheMs": 1800,
+   "restMs": 1857
+  },
+  {
+   "zug": 176,
+   "dauerMs": 3646,
+   "budgetMs": 1800,
+   "sims": 340,
+   "sucheMs": 1802,
+   "restMs": 1844
+  },
+  {
+   "zug": 178,
+   "dauerMs": 3644,
+   "budgetMs": 1800,
+   "sims": 340,
+   "sucheMs": 1805,
+   "restMs": 1839
+  },
+  {
+   "zug": 180,
+   "dauerMs": 3642,
+   "budgetMs": 1800,
+   "sims": 333,
+   "sucheMs": 1802,
+   "restMs": 1840
+  },
+  {
+   "zug": 182,
+   "dauerMs": 3652,
+   "budgetMs": 1800,
+   "sims": 336,
+   "sucheMs": 1801,
+   "restMs": 1851
+  },
+  {
+   "zug": 184,
+   "dauerMs": 3643,
+   "budgetMs": 1800,
+   "sims": 335,
+   "sucheMs": 1802,
+   "restMs": 1841
+  },
+  {
+   "zug": 186,
+   "dauerMs": 3637,
+   "budgetMs": 1800,
+   "sims": 335,
+   "sucheMs": 1802,
+   "restMs": 1835
+  },
+  {
+   "zug": 188,
+   "dauerMs": 3644,
+   "budgetMs": 1800,
+   "sims": 333,
+   "sucheMs": 1802,
+   "restMs": 1842
+  },
+  {
+   "zug": 190,
+   "dauerMs": 3656,
+   "budgetMs": 1800,
+   "sims": 335,
+   "sucheMs": 1802,
+   "restMs": 1854
+  },
+  {
+   "zug": 190,
+   "dauerMs": 3640,
+   "budgetMs": 1800,
+   "sims": 331,
+   "sucheMs": 1801,
+   "restMs": 1839
+  },
+  {
+   "zug": 192,
+   "dauerMs": 3642,
+   "budgetMs": 1800,
+   "sims": 330,
+   "sucheMs": 1805,
+   "restMs": 1837
+  },
+  {
+   "zug": 194,
+   "dauerMs": 3643,
+   "budgetMs": 1800,
+   "sims": 328,
+   "sucheMs": 1804,
+   "restMs": 1839
+  },
+  {
+   "zug": 192,
+   "dauerMs": 3639,
+   "budgetMs": 1800,
+   "sims": 333,
+   "sucheMs": 1802,
+   "restMs": 1837
+  },
+  {
+   "zug": 194,
+   "dauerMs": 3623,
+   "budgetMs": 1800,
+   "sims": 333,
+   "sucheMs": 1802,
+   "restMs": 1821
+  },
+  {
+   "zug": 194,
+   "dauerMs": 3628,
+   "budgetMs": 1800,
+   "sims": 332,
+   "sucheMs": 1799,
+   "restMs": 1829
+  },
+  {
+   "zug": 196,
+   "dauerMs": 3638,
+   "budgetMs": 1800,
+   "sims": 328,
+   "sucheMs": 1807,
+   "restMs": 1831
+  },
+  {
+   "zug": 198,
+   "dauerMs": 3629,
+   "budgetMs": 1800,
+   "sims": 326,
+   "sucheMs": 1803,
+   "restMs": 1826
+  },
+  {
+   "zug": 200,
+   "dauerMs": 3633,
+   "budgetMs": 1800,
+   "sims": 325,
+   "sucheMs": 1807,
+   "restMs": 1826
+  },
+  {
+   "zug": 202,
+   "dauerMs": 3629,
+   "budgetMs": 1800,
+   "sims": 321,
+   "sucheMs": 1804,
+   "restMs": 1825
+  },
+  {
+   "zug": 204,
+   "dauerMs": 3629,
+   "budgetMs": 1800,
+   "sims": 320,
+   "sucheMs": 1805,
+   "restMs": 1824
+  },
+  {
+   "zug": 204,
+   "dauerMs": 3622,
+   "budgetMs": 1800,
+   "sims": 318,
+   "sucheMs": 1806,
+   "restMs": 1816
+  },
+  {
+   "zug": 206,
+   "dauerMs": 3610,
+   "budgetMs": 1800,
+   "sims": 324,
+   "sucheMs": 1801,
+   "restMs": 1809
+  },
+  {
+   "zug": 206,
+   "dauerMs": 3677,
+   "budgetMs": 1800,
+   "sims": 313,
+   "sucheMs": 1800,
+   "restMs": 1877
+  },
+  {
+   "zug": 208,
+   "dauerMs": 3633,
+   "budgetMs": 1800,
+   "sims": 316,
+   "sucheMs": 1801,
+   "restMs": 1832
+  },
+  {
+   "zug": 210,
+   "dauerMs": 3634,
+   "budgetMs": 1800,
+   "sims": 315,
+   "sucheMs": 1799,
+   "restMs": 1835
+  },
+  {
+   "zug": 212,
+   "dauerMs": 3632,
+   "budgetMs": 1800,
+   "sims": 312,
+   "sucheMs": 1803,
+   "restMs": 1829
+  },
+  {
+   "zug": 214,
+   "dauerMs": 3615,
+   "budgetMs": 1800,
+   "sims": 316,
+   "sucheMs": 1801,
+   "restMs": 1814
+  },
+  {
+   "zug": 216,
+   "dauerMs": 3620,
+   "budgetMs": 1800,
+   "sims": 312,
+   "sucheMs": 1803,
+   "restMs": 1817
+  },
+  {
+   "zug": 218,
+   "dauerMs": 3620,
+   "budgetMs": 1800,
+   "sims": 314,
+   "sucheMs": 1806,
+   "restMs": 1815
+  },
+  {
+   "zug": 220,
+   "dauerMs": 3614,
+   "budgetMs": 1800,
+   "sims": 308,
+   "sucheMs": 1802,
+   "restMs": 1812
+  },
+  {
+   "zug": 222,
+   "dauerMs": 3616,
+   "budgetMs": 1800,
+   "sims": 309,
+   "sucheMs": 1805,
+   "restMs": 1811
+  },
+  {
+   "zug": 224,
+   "dauerMs": 3607,
+   "budgetMs": 1800,
+   "sims": 307,
+   "sucheMs": 1802,
+   "restMs": 1805
+  },
+  {
+   "zug": 226,
+   "dauerMs": 3582,
+   "budgetMs": 1800,
+   "sims": 303,
+   "sucheMs": 1806,
+   "restMs": 1776
+  },
+  {
+   "zug": 228,
+   "dauerMs": 3605,
+   "budgetMs": 1800,
+   "sims": 299,
+   "sucheMs": 1821,
+   "restMs": 1784
+  },
+  {
+   "zug": 230,
+   "dauerMs": 3624,
+   "budgetMs": 1800,
+   "sims": 301,
+   "sucheMs": 1842,
+   "restMs": 1782
+  },
+  {
+   "zug": 228,
+   "dauerMs": 3650,
+   "budgetMs": 1800,
+   "sims": 292,
+   "sucheMs": 1805,
+   "restMs": 1845
+  },
+  {
+   "zug": 230,
+   "dauerMs": 3642,
+   "budgetMs": 1800,
+   "sims": 299,
+   "sucheMs": 1839,
+   "restMs": 1803
+  },
+  {
+   "zug": 224,
+   "dauerMs": 3672,
+   "budgetMs": 1800,
+   "sims": 299,
+   "sucheMs": 1800,
+   "restMs": 1872
+  },
+  {
+   "zug": 226,
+   "dauerMs": 3616,
+   "budgetMs": 1800,
+   "sims": 299,
+   "sucheMs": 1803,
+   "restMs": 1813
+  },
+  {
+   "zug": 228,
+   "dauerMs": 3633,
+   "budgetMs": 1800,
+   "sims": 292,
+   "sucheMs": 1825,
+   "restMs": 1808
+  },
+  {
+   "zug": 230,
+   "dauerMs": 3668,
+   "budgetMs": 1800,
+   "sims": 276,
+   "sucheMs": 1855,
+   "restMs": 1813
+  },
+  {
+   "zug": 232,
+   "dauerMs": 3686,
+   "budgetMs": 1800,
+   "sims": 282,
+   "sucheMs": 1895,
+   "restMs": 1791
+  },
+  {
+   "zug": 234,
+   "dauerMs": 3703,
+   "budgetMs": 1800,
+   "sims": 282,
+   "sucheMs": 1929,
+   "restMs": 1774
+  },
+  {
+   "zug": 236,
+   "dauerMs": 3743,
+   "budgetMs": 1800,
+   "sims": 287,
+   "sucheMs": 1966,
+   "restMs": 1777
+  },
+  {
+   "zug": 238,
+   "dauerMs": 3764,
+   "budgetMs": 1800,
+   "sims": 287,
+   "sucheMs": 1980,
+   "restMs": 1784
+  },
+  {
+   "zug": 240,
+   "dauerMs": 3796,
+   "budgetMs": 1800,
+   "sims": 293,
+   "sucheMs": 2016,
+   "restMs": 1780
+  },
+  {
+   "zug": 242,
+   "dauerMs": 3839,
+   "budgetMs": 1800,
+   "sims": 296,
+   "sucheMs": 2075,
+   "restMs": 1764
+  },
+  {
+   "zug": 244,
+   "dauerMs": 3844,
+   "budgetMs": 1800,
+   "sims": 297,
+   "sucheMs": 2073,
+   "restMs": 1771
+  },
+  {
+   "zug": 246,
+   "dauerMs": 3826,
+   "budgetMs": 1800,
+   "sims": 299,
+   "sucheMs": 2069,
+   "restMs": 1757
+  },
+  {
+   "zug": 244,
+   "dauerMs": 3823,
+   "budgetMs": 1800,
+   "sims": 294,
+   "sucheMs": 2055,
+   "restMs": 1768
+  },
+  {
+   "zug": 246,
+   "dauerMs": 3876,
+   "budgetMs": 1800,
+   "sims": 299,
+   "sucheMs": 2108,
+   "restMs": 1768
+  },
+  {
+   "zug": 246,
+   "dauerMs": 3855,
+   "budgetMs": 1800,
+   "sims": 296,
+   "sucheMs": 2087,
+   "restMs": 1768
+  },
+  {
+   "zug": 248,
+   "dauerMs": 3877,
+   "budgetMs": 1800,
+   "sims": 299,
+   "sucheMs": 2111,
+   "restMs": 1766
+  },
+  {
+   "zug": 250,
+   "dauerMs": 3887,
+   "budgetMs": 1800,
+   "sims": 303,
+   "sucheMs": 2127,
+   "restMs": 1760
+  },
+  {
+   "zug": 252,
+   "dauerMs": 3948,
+   "budgetMs": 1800,
+   "sims": 305,
+   "sucheMs": 2181,
+   "restMs": 1767
+  },
+  {
+   "zug": 254,
+   "dauerMs": 3954,
+   "budgetMs": 1800,
+   "sims": 305,
+   "sucheMs": 2202,
+   "restMs": 1752
+  },
+  {
+   "zug": 256,
+   "dauerMs": 3992,
+   "budgetMs": 1800,
+   "sims": 309,
+   "sucheMs": 2237,
+   "restMs": 1755
+  },
+  {
+   "zug": 258,
+   "dauerMs": 4018,
+   "budgetMs": 1800,
+   "sims": 312,
+   "sucheMs": 2274,
+   "restMs": 1744
+  },
+  {
+   "zug": 258,
+   "dauerMs": 4018,
+   "budgetMs": 1800,
+   "sims": 306,
+   "sucheMs": 2249,
+   "restMs": 1769
+  },
+  {
+   "zug": 260,
+   "dauerMs": 4036,
+   "budgetMs": 1800,
+   "sims": 311,
+   "sucheMs": 2292,
+   "restMs": 1744
+  },
+  {
+   "zug": 262,
+   "dauerMs": 4079,
+   "budgetMs": 1800,
+   "sims": 316,
+   "sucheMs": 2326,
+   "restMs": 1753
+  },
+  {
+   "zug": 262,
+   "dauerMs": 4077,
+   "budgetMs": 1800,
+   "sims": 312,
+   "sucheMs": 2328,
+   "restMs": 1749
+  },
+  {
+   "zug": 262,
+   "dauerMs": 4080,
+   "budgetMs": 1800,
+   "sims": 317,
+   "sucheMs": 2327,
+   "restMs": 1753
+  },
+  {
+   "zug": 264,
+   "dauerMs": 4092,
+   "budgetMs": 1800,
+   "sims": 319,
+   "sucheMs": 2345,
+   "restMs": 1747
+  },
+  {
+   "zug": 264,
+   "dauerMs": 4140,
+   "budgetMs": 1800,
+   "sims": 307,
+   "sucheMs": 2345,
+   "restMs": 1795
+  },
+  {
+   "zug": 262,
+   "dauerMs": 4138,
+   "budgetMs": 1800,
+   "sims": 300,
+   "sucheMs": 2325,
+   "restMs": 1813
+  },
+  {
+   "zug": 264,
+   "dauerMs": 4165,
+   "budgetMs": 1800,
+   "sims": 311,
+   "sucheMs": 2360,
+   "restMs": 1805
+  },
+  {
+   "zug": 266,
+   "dauerMs": 4147,
+   "budgetMs": 1800,
+   "sims": 315,
+   "sucheMs": 2385,
+   "restMs": 1762
+  },
+  {
+   "zug": 268,
+   "dauerMs": 4162,
+   "budgetMs": 1800,
+   "sims": 313,
+   "sucheMs": 2379,
+   "restMs": 1783
+  },
+  {
+   "zug": 270,
+   "dauerMs": 4182,
+   "budgetMs": 1800,
+   "sims": 320,
+   "sucheMs": 2416,
+   "restMs": 1766
+  },
+  {
+   "zug": 272,
+   "dauerMs": 4198,
+   "budgetMs": 1800,
+   "sims": 319,
+   "sucheMs": 2453,
+   "restMs": 1745
+  },
+  {
+   "zug": 274,
+   "dauerMs": 4207,
+   "budgetMs": 1818,
+   "sims": 322,
+   "sucheMs": 2467,
+   "restMs": 1740
+  },
+  {
+   "zug": 276,
+   "dauerMs": 4241,
+   "budgetMs": 1854,
+   "sims": 322,
+   "sucheMs": 2505,
+   "restMs": 1736
+  },
+  {
+   "zug": 278,
+   "dauerMs": 4288,
+   "budgetMs": 1890,
+   "sims": 330,
+   "sucheMs": 2558,
+   "restMs": 1731
+  },
+  {
+   "zug": 280,
+   "dauerMs": 4336,
+   "budgetMs": 1926,
+   "sims": 334,
+   "sucheMs": 2599,
+   "restMs": 1737
+  },
+  {
+   "zug": 282,
+   "dauerMs": 4361,
+   "budgetMs": 1962,
+   "sims": 336,
+   "sucheMs": 2634,
+   "restMs": 1727
+  },
+  {
+   "zug": 284,
+   "dauerMs": 4392,
+   "budgetMs": 1998,
+   "sims": 335,
+   "sucheMs": 2667,
+   "restMs": 1725
+  },
+  {
+   "zug": 286,
+   "dauerMs": 4325,
+   "budgetMs": 1908,
+   "sims": 326,
+   "sucheMs": 2595,
+   "restMs": 1730
+  },
+  {
+   "zug": 288,
+   "dauerMs": 4411,
+   "budgetMs": 1944,
+   "sims": 318,
+   "sucheMs": 2649,
+   "restMs": 1762
+  },
+  {
+   "zug": 290,
+   "dauerMs": 4463,
+   "budgetMs": 1962,
+   "sims": 332,
+   "sucheMs": 2722,
+   "restMs": 1741
+  },
+  {
+   "zug": 292,
+   "dauerMs": 4478,
+   "budgetMs": 1998,
+   "sims": 330,
+   "sucheMs": 2739,
+   "restMs": 1739
+  },
+  {
+   "zug": 294,
+   "dauerMs": 4512,
+   "budgetMs": 2034,
+   "sims": 331,
+   "sucheMs": 2774,
+   "restMs": 1738
+  },
+  {
+   "zug": 294,
+   "dauerMs": 4489,
+   "budgetMs": 2034,
+   "sims": 337,
+   "sucheMs": 2774,
+   "restMs": 1715
+  },
+  {
+   "zug": 296,
+   "dauerMs": 4569,
+   "budgetMs": 2070,
+   "sims": 329,
+   "sucheMs": 2816,
+   "restMs": 1753
+  },
+  {
+   "zug": 298,
+   "dauerMs": 4586,
+   "budgetMs": 2106,
+   "sims": 336,
+   "sucheMs": 2846,
+   "restMs": 1740
+  },
+  {
+   "zug": 300,
+   "dauerMs": 4614,
+   "budgetMs": 2142,
+   "sims": 333,
+   "sucheMs": 2884,
+   "restMs": 1730
+  },
+  {
+   "zug": 302,
+   "dauerMs": 4635,
+   "budgetMs": 2178,
+   "sims": 336,
+   "sucheMs": 2903,
+   "restMs": 1732
+  },
+  {
+   "zug": 304,
+   "dauerMs": 4635,
+   "budgetMs": 2214,
+   "sims": 337,
+   "sucheMs": 2922,
+   "restMs": 1713
+  },
+  {
+   "zug": 306,
+   "dauerMs": 4662,
+   "budgetMs": 2250,
+   "sims": 340,
+   "sucheMs": 2955,
+   "restMs": 1707
+  },
+  {
+   "zug": 308,
+   "dauerMs": 4733,
+   "budgetMs": 2286,
+   "sims": 341,
+   "sucheMs": 3014,
+   "restMs": 1719
+  },
+  {
+   "zug": 310,
+   "dauerMs": 4751,
+   "budgetMs": 2322,
+   "sims": 339,
+   "sucheMs": 3051,
+   "restMs": 1700
+  },
+  {
+   "zug": 312,
+   "dauerMs": 4807,
+   "budgetMs": 2358,
+   "sims": 346,
+   "sucheMs": 3066,
+   "restMs": 1741
+  },
+  {
+   "zug": 310,
+   "dauerMs": 4742,
+   "budgetMs": 2322,
+   "sims": 338,
+   "sucheMs": 3032,
+   "restMs": 1710
+  },
+  {
+   "zug": 312,
+   "dauerMs": 4774,
+   "budgetMs": 2358,
+   "sims": 338,
+   "sucheMs": 3066,
+   "restMs": 1708
+  },
+  {
+   "zug": 314,
+   "dauerMs": 4788,
+   "budgetMs": 2394,
+   "sims": 342,
+   "sucheMs": 3099,
+   "restMs": 1689
+  },
+  {
+   "zug": 316,
+   "dauerMs": 4839,
+   "budgetMs": 2430,
+   "sims": 340,
+   "sucheMs": 3135,
+   "restMs": 1704
+  },
+  {
+   "zug": 318,
+   "dauerMs": 4868,
+   "budgetMs": 2466,
+   "sims": 341,
+   "sucheMs": 3168,
+   "restMs": 1700
+  },
+  {
+   "zug": 320,
+   "dauerMs": 4899,
+   "budgetMs": 2502,
+   "sims": 346,
+   "sucheMs": 3194,
+   "restMs": 1705
+  },
+  {
+   "zug": 322,
+   "dauerMs": 4914,
+   "budgetMs": 2538,
+   "sims": 347,
+   "sucheMs": 3224,
+   "restMs": 1690
+  },
+  {
+   "zug": 324,
+   "dauerMs": 4969,
+   "budgetMs": 2574,
+   "sims": 346,
+   "sucheMs": 3263,
+   "restMs": 1706
+  },
+  {
+   "zug": 326,
+   "dauerMs": 4990,
+   "budgetMs": 2610,
+   "sims": 349,
+   "sucheMs": 3295,
+   "restMs": 1695
+  },
+  {
+   "zug": 328,
+   "dauerMs": 5000,
+   "budgetMs": 2610,
+   "sims": 351,
+   "sucheMs": 3313,
+   "restMs": 1687
+  },
+  {
+   "zug": 330,
+   "dauerMs": 5024,
+   "budgetMs": 2646,
+   "sims": 348,
+   "sucheMs": 3330,
+   "restMs": 1694
+  },
+  {
+   "zug": 332,
+   "dauerMs": 5118,
+   "budgetMs": 2682,
+   "sims": 341,
+   "sucheMs": 3372,
+   "restMs": 1746
+  },
+  {
+   "zug": 334,
+   "dauerMs": 5115,
+   "budgetMs": 2718,
+   "sims": 351,
+   "sucheMs": 3405,
+   "restMs": 1710
+  },
+  {
+   "zug": 336,
+   "dauerMs": 5138,
+   "budgetMs": 2754,
+   "sims": 379,
+   "sucheMs": 3422,
+   "restMs": 1716
+  },
+  {
+   "zug": 338,
+   "dauerMs": 4816,
+   "budgetMs": 2412,
+   "sims": 352,
+   "sucheMs": 3080,
+   "restMs": 1736
+  },
+  {
+   "zug": 340,
+   "dauerMs": 4812,
+   "budgetMs": 2430,
+   "sims": 367,
+   "sucheMs": 3116,
+   "restMs": 1696
+  },
+  {
+   "zug": 342,
+   "dauerMs": 4726,
+   "budgetMs": 2322,
+   "sims": 360,
+   "sucheMs": 3013,
+   "restMs": 1713
+  },
+  {
+   "zug": 344,
+   "dauerMs": 4823,
+   "budgetMs": 2358,
+   "sims": 348,
+   "sucheMs": 3062,
+   "restMs": 1761
+  },
+  {
+   "zug": 346,
+   "dauerMs": 4836,
+   "budgetMs": 2394,
+   "sims": 359,
+   "sucheMs": 3102,
+   "restMs": 1734
+  },
+  {
+   "zug": 346,
+   "dauerMs": 4815,
+   "budgetMs": 2394,
+   "sims": 361,
+   "sucheMs": 3079,
+   "restMs": 1736
+  },
+  {
+   "zug": 348,
+   "dauerMs": 4769,
+   "budgetMs": 2322,
+   "sims": 350,
+   "sucheMs": 3007,
+   "restMs": 1763
+  },
+  {
+   "zug": 350,
+   "dauerMs": 4831,
+   "budgetMs": 2358,
+   "sims": 350,
+   "sucheMs": 3045,
+   "restMs": 1786
+  },
+  {
+   "zug": 352,
+   "dauerMs": 4797,
+   "budgetMs": 2394,
+   "sims": 364,
+   "sucheMs": 3061,
+   "restMs": 1736
+  },
+  {
+   "zug": 354,
+   "dauerMs": 4842,
+   "budgetMs": 2430,
+   "sims": 369,
+   "sucheMs": 3118,
+   "restMs": 1724
+  },
+  {
+   "zug": 356,
+   "dauerMs": 4837,
+   "budgetMs": 2394,
+   "sims": 367,
+   "sucheMs": 3134,
+   "restMs": 1703
+  },
+  {
+   "zug": 358,
+   "dauerMs": 4867,
+   "budgetMs": 2394,
+   "sims": 376,
+   "sucheMs": 3158,
+   "restMs": 1709
+  },
+  {
+   "zug": 360,
+   "dauerMs": 4791,
+   "budgetMs": 2340,
+   "sims": 369,
+   "sucheMs": 3103,
+   "restMs": 1688
+  },
+  {
+   "zug": 362,
+   "dauerMs": 4807,
+   "budgetMs": 2358,
+   "sims": 368,
+   "sucheMs": 3121,
+   "restMs": 1686
+  },
+  {
+   "zug": 364,
+   "dauerMs": 4841,
+   "budgetMs": 2376,
+   "sims": 374,
+   "sucheMs": 3153,
+   "restMs": 1688
+  },
+  {
+   "zug": 366,
+   "dauerMs": 4888,
+   "budgetMs": 2394,
+   "sims": 381,
+   "sucheMs": 3193,
+   "restMs": 1695
+  },
+  {
+   "zug": 368,
+   "dauerMs": 4931,
+   "budgetMs": 2412,
+   "sims": 381,
+   "sucheMs": 3242,
+   "restMs": 1689
+  },
+  {
+   "zug": 370,
+   "dauerMs": 4941,
+   "budgetMs": 2430,
+   "sims": 381,
+   "sucheMs": 3258,
+   "restMs": 1683
+  },
+  {
+   "zug": 372,
+   "dauerMs": 5003,
+   "budgetMs": 2466,
+   "sims": 380,
+   "sucheMs": 3298,
+   "restMs": 1705
+  },
+  {
+   "zug": 374,
+   "dauerMs": 5079,
+   "budgetMs": 2502,
+   "sims": 347,
+   "sucheMs": 3338,
+   "restMs": 1741
+  },
+  {
+   "zug": 376,
+   "dauerMs": 5062,
+   "budgetMs": 2538,
+   "sims": 362,
+   "sucheMs": 3349,
+   "restMs": 1714
+  },
+  {
+   "zug": 378,
+   "dauerMs": 5067,
+   "budgetMs": 2574,
+   "sims": 358,
+   "sucheMs": 3369,
+   "restMs": 1698
+  },
+  {
+   "zug": 380,
+   "dauerMs": 5105,
+   "budgetMs": 2610,
+   "sims": 361,
+   "sucheMs": 3404,
+   "restMs": 1701
+  },
+  {
+   "zug": 382,
+   "dauerMs": 5083,
+   "budgetMs": 2610,
+   "sims": 363,
+   "sucheMs": 3405,
+   "restMs": 1678
+  },
+  {
+   "zug": 384,
+   "dauerMs": 5132,
+   "budgetMs": 2646,
+   "sims": 364,
+   "sucheMs": 3447,
+   "restMs": 1685
+  },
+  {
+   "zug": 386,
+   "dauerMs": 5207,
+   "budgetMs": 2664,
+   "sims": 366,
+   "sucheMs": 3517,
+   "restMs": 1690
+  },
+  {
+   "zug": 388,
+   "dauerMs": 5072,
+   "budgetMs": 2538,
+   "sims": 355,
+   "sucheMs": 3390,
+   "restMs": 1682
+  },
+  {
+   "zug": 390,
+   "dauerMs": 5071,
+   "budgetMs": 2556,
+   "sims": 348,
+   "sucheMs": 3386,
+   "restMs": 1685
+  },
+  {
+   "zug": 392,
+   "dauerMs": 5046,
+   "budgetMs": 2538,
+   "sims": 342,
+   "sucheMs": 3369,
+   "restMs": 1677
+  },
+  {
+   "zug": 394,
+   "dauerMs": 5042,
+   "budgetMs": 2574,
+   "sims": 349,
+   "sucheMs": 3385,
+   "restMs": 1657
+  },
+  {
+   "zug": 396,
+   "dauerMs": 5090,
+   "budgetMs": 2592,
+   "sims": 342,
+   "sucheMs": 3406,
+   "restMs": 1684
+  },
+  {
+   "zug": 398,
+   "dauerMs": 5083,
+   "budgetMs": 2592,
+   "sims": 337,
+   "sucheMs": 3397,
+   "restMs": 1686
+  },
+  {
+   "zug": 400,
+   "dauerMs": 5089,
+   "budgetMs": 2628,
+   "sims": 335,
+   "sucheMs": 3410,
+   "restMs": 1679
+  },
+  {
+   "zug": 402,
+   "dauerMs": 5128,
+   "budgetMs": 2664,
+   "sims": 326,
+   "sucheMs": 3456,
+   "restMs": 1672
+  },
+  {
+   "zug": 404,
+   "dauerMs": 5126,
+   "budgetMs": 2700,
+   "sims": 310,
+   "sucheMs": 3457,
+   "restMs": 1670
+  },
+  {
+   "zug": 406,
+   "dauerMs": 5136,
+   "budgetMs": 2718,
+   "sims": 313,
+   "sucheMs": 3484,
+   "restMs": 1652
+  },
+  {
+   "zug": 408,
+   "dauerMs": 5103,
+   "budgetMs": 2682,
+   "sims": 312,
+   "sucheMs": 3407,
+   "restMs": 1696
+  },
+  {
+   "zug": 410,
+   "dauerMs": 5123,
+   "budgetMs": 2700,
+   "sims": 305,
+   "sucheMs": 3419,
+   "restMs": 1704
+  },
+  {
+   "zug": 412,
+   "dauerMs": 5135,
+   "budgetMs": 2736,
+   "sims": 303,
+   "sucheMs": 3445,
+   "restMs": 1690
+  },
+  {
+   "zug": 414,
+   "dauerMs": 5166,
+   "budgetMs": 2754,
+   "sims": 304,
+   "sucheMs": 3484,
+   "restMs": 1682
+  },
+  {
+   "zug": 416,
+   "dauerMs": 5166,
+   "budgetMs": 2772,
+   "sims": 290,
+   "sucheMs": 3500,
+   "restMs": 1666
+  },
+  {
+   "zug": 418,
+   "dauerMs": 5212,
+   "budgetMs": 2790,
+   "sims": 291,
+   "sucheMs": 3536,
+   "restMs": 1676
+  },
+  {
+   "zug": 420,
+   "dauerMs": 5227,
+   "budgetMs": 2808,
+   "sims": 287,
+   "sucheMs": 3550,
+   "restMs": 1677
+  },
+  {
+   "zug": 422,
+   "dauerMs": 5260,
+   "budgetMs": 2826,
+   "sims": 292,
+   "sucheMs": 3586,
+   "restMs": 1674
+  },
+  {
+   "zug": 424,
+   "dauerMs": 5268,
+   "budgetMs": 2844,
+   "sims": 296,
+   "sucheMs": 3602,
+   "restMs": 1666
+  },
+  {
+   "zug": 426,
+   "dauerMs": 5292,
+   "budgetMs": 2862,
+   "sims": 298,
+   "sucheMs": 3624,
+   "restMs": 1668
+  },
+  {
+   "zug": 428,
+   "dauerMs": 5311,
+   "budgetMs": 2880,
+   "sims": 297,
+   "sucheMs": 3644,
+   "restMs": 1667
+  },
+  {
+   "zug": 430,
+   "dauerMs": 5333,
+   "budgetMs": 2898,
+   "sims": 300,
+   "sucheMs": 3657,
+   "restMs": 1676
+  },
+  {
+   "zug": 432,
+   "dauerMs": 5337,
+   "budgetMs": 2916,
+   "sims": 299,
+   "sucheMs": 3672,
+   "restMs": 1665
+  },
+  {
+   "zug": 434,
+   "dauerMs": 5375,
+   "budgetMs": 2934,
+   "sims": 309,
+   "sucheMs": 3720,
+   "restMs": 1655
+  },
+  {
+   "zug": 436,
+   "dauerMs": 5392,
+   "budgetMs": 2952,
+   "sims": 303,
+   "sucheMs": 3733,
+   "restMs": 1659
+  },
+  {
+   "zug": 438,
+   "dauerMs": 5422,
+   "budgetMs": 2970,
+   "sims": 303,
+   "sucheMs": 3748,
+   "restMs": 1674
+  },
+  {
+   "zug": 440,
+   "dauerMs": 5462,
+   "budgetMs": 2988,
+   "sims": 316,
+   "sucheMs": 3805,
+   "restMs": 1657
+  },
+  {
+   "zug": 442,
+   "dauerMs": 5501,
+   "budgetMs": 3006,
+   "sims": 321,
+   "sucheMs": 3846,
+   "restMs": 1655
+  },
+  {
+   "zug": 444,
+   "dauerMs": 5543,
+   "budgetMs": 3024,
+   "sims": 325,
+   "sucheMs": 3881,
+   "restMs": 1663
+  },
+  {
+   "zug": 446,
+   "dauerMs": 5598,
+   "budgetMs": 3042,
+   "sims": 333,
+   "sucheMs": 3936,
+   "restMs": 1662
+  },
+  {
+   "zug": 448,
+   "dauerMs": 5610,
+   "budgetMs": 3060,
+   "sims": 334,
+   "sucheMs": 3948,
+   "restMs": 1662
+  },
+  {
+   "zug": 450,
+   "dauerMs": 5642,
+   "budgetMs": 3078,
+   "sims": 343,
+   "sucheMs": 3979,
+   "restMs": 1663
+  },
+  {
+   "zug": 452,
+   "dauerMs": 5679,
+   "budgetMs": 3096,
+   "sims": 346,
+   "sucheMs": 4021,
+   "restMs": 1658
+  },
+  {
+   "zug": 454,
+   "dauerMs": 5732,
+   "budgetMs": 3114,
+   "sims": 357,
+   "sucheMs": 4077,
+   "restMs": 1655
+  },
+  {
+   "zug": 456,
+   "dauerMs": 5743,
+   "budgetMs": 3132,
+   "sims": 368,
+   "sucheMs": 4088,
+   "restMs": 1655
+  },
+  {
+   "zug": 458,
+   "dauerMs": 5253,
+   "budgetMs": 2628,
+   "sims": 325,
+   "sucheMs": 3582,
+   "restMs": 1672
+  },
+  {
+   "zug": 460,
+   "dauerMs": 5279,
+   "budgetMs": 2646,
+   "sims": 323,
+   "sucheMs": 3605,
+   "restMs": 1674
+  },
+  {
+   "zug": 462,
+   "dauerMs": 5291,
+   "budgetMs": 2664,
+   "sims": 320,
+   "sucheMs": 3622,
+   "restMs": 1669
+  },
+  {
+   "zug": 464,
+   "dauerMs": 5325,
+   "budgetMs": 2682,
+   "sims": 321,
+   "sucheMs": 3656,
+   "restMs": 1669
+  },
+  {
+   "zug": 466,
+   "dauerMs": 5334,
+   "budgetMs": 2700,
+   "sims": 322,
+   "sucheMs": 3680,
+   "restMs": 1654
+  },
+  {
+   "zug": 468,
+   "dauerMs": 5363,
+   "budgetMs": 2718,
+   "sims": 320,
+   "sucheMs": 3693,
+   "restMs": 1670
+  },
+  {
+   "zug": 470,
+   "dauerMs": 5369,
+   "budgetMs": 2736,
+   "sims": 323,
+   "sucheMs": 3718,
+   "restMs": 1651
+  },
+  {
+   "zug": 472,
+   "dauerMs": 5383,
+   "budgetMs": 2754,
+   "sims": 324,
+   "sucheMs": 3736,
+   "restMs": 1647
+  },
+  {
+   "zug": 474,
+   "dauerMs": 5392,
+   "budgetMs": 2772,
+   "sims": 327,
+   "sucheMs": 3754,
+   "restMs": 1638
+  },
+  {
+   "zug": 476,
+   "dauerMs": 5417,
+   "budgetMs": 2790,
+   "sims": 329,
+   "sucheMs": 3784,
+   "restMs": 1634
+  },
+  {
+   "zug": 478,
+   "dauerMs": 5463,
+   "budgetMs": 2808,
+   "sims": 329,
+   "sucheMs": 3807,
+   "restMs": 1656
+  },
+  {
+   "zug": 480,
+   "dauerMs": 5687,
+   "budgetMs": 2826,
+   "sims": 328,
+   "sucheMs": 3838,
+   "restMs": 1849
+  },
+  {
+   "zug": 482,
+   "dauerMs": 5537,
+   "budgetMs": 2844,
+   "sims": 341,
+   "sucheMs": 3898,
+   "restMs": 1639
+  },
+  {
+   "zug": 484,
+   "dauerMs": 5580,
+   "budgetMs": 2862,
+   "sims": 347,
+   "sucheMs": 3935,
+   "restMs": 1645
+  },
+  {
+   "zug": 486,
+   "dauerMs": 5588,
+   "budgetMs": 2880,
+   "sims": 352,
+   "sucheMs": 3960,
+   "restMs": 1628
+  },
+  {
+   "zug": 488,
+   "dauerMs": 5635,
+   "budgetMs": 2898,
+   "sims": 363,
+   "sucheMs": 3997,
+   "restMs": 1638
+  },
+  {
+   "zug": 490,
+   "dauerMs": 5655,
+   "budgetMs": 2916,
+   "sims": 376,
+   "sucheMs": 4019,
+   "restMs": 1636
+  },
+  {
+   "zug": 492,
+   "dauerMs": 5688,
+   "budgetMs": 2934,
+   "sims": 394,
+   "sucheMs": 4058,
+   "restMs": 1630
+  }
+ ]
+}
