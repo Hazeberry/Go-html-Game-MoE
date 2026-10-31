@@ -123,3 +123,35 @@ Stunde Laufzeit.
 Nach Stufe 1 ein Nachtrag mit der Wahl und der Workflow für Stufe 2. Nach
 Stufe 2 der Nachtrag mit dem Urteil aus §4. Ändert sich der Default, dann nur
 `musterOhneVorgabe` in `index.html`, mit Kommentar und README.
+
+## 9. Nachtrag: Ergebnis der Stufe 1 (31.10.2026)
+
+Lauf 2 von [`fuego-gerade.yml`](../.github/workflows/fuego-gerade.yml) (Lauf 1
+scheiterte vor dem ersten Spiel: `ubuntu-latest` war seit dem 30.10.2026 Ubuntu
+26.04, auf dem Fuego mit dem neuen Boost nicht baut; seitdem laufen alle
+Workflows auf `ubuntu-24.04`). Daten:
+`docs/daten/fuego-gerade/lauf2/`. Alle 600 Partien gewertet.
+
+| Spiele je Zug | gewertet | Siege D | Quote | 95 % | Endstand Ø |
+|---:|---:|---:|---:|---|---:|
+| 10 | 120 | 120 | 100,0 % | 97,0 % bis 100,0 % | +156,9 |
+| 20 | 120 | 117 | 97,5 % | 92,9 % bis 99,5 % | +121,9 |
+| 30 | 120 | 97 | 80,8 % | 72,6 % bis 87,4 % | +67,6 |
+| 50 | 120 | 61 | 50,8 % | 41,6 % bis 60,1 % | +21,0 |
+| 70 | 120 | 34 | 28,3 % | 20,5 % bis 37,3 % | −12,3 |
+
+**Wahl: 50 Spiele je Zug**, nach Regel 2: keine Quote liegt zwischen 40 und
+50 % (50 Spiele knapp darüber mit 50,8 %), 50 ist die nächste an 45 % im Bereich
+30 bis 60 %. Das Intervall von 50 Spielen (41,6 % bis 60,1 %) schließt 45 %
+ein.
+
+**Die Erwartung in §6 lag daneben:** Ich erwartete 20 oder 30 Spiele. Fuego wird
+mit steigender Spielzahl viel schneller stärker als gedacht; 20 und 30 sind
+für D zu leicht.
+
+**Stufe 2 steht fest:** Fuego mit 50 Spielen je Zug, Seed 228, D, M0 und M50 zu
+je 960 Partien, Kontrolle D Partien 1 bis 20, Endpunkt und Urteil wie in §4
+([`fuego-siege.yml`](../.github/workflows/fuego-siege.yml), Bericht
+[`siege-bericht.js`](../auswertung/fuego/siege-bericht.js), 3 × 16 Teile zu 60
+Partien und eine Kontrolle). Die Auflösung in §5 gilt für eine Quote von D um
+50 %. Der Lauf startet erst nach einem eigenen Go.

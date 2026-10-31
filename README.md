@@ -103,7 +103,10 @@ nichts zu installieren.
   Fuego gewinnt die KI mit Mustern deutlich öfter (73 gegen 42 von 480).
   Vorab festgelegt ist eine Messung mit der Siegquote als Endpunkt, gegen ein
   Fuego, gegen das der Default ohne Vorgabe 40 bis 50 % gewinnt
-  (`docs/muster-fuego-siege.md`).
+  (`docs/muster-fuego-siege.md`). Der Prüfstand (Stufe 1) ergab: Fuego mit 50
+  Spielen je Zug, der Default gewinnt dort 50,8 % (10 Spiele: 100 %, 70
+  Spiele: 28,3 %). Stufe 2 (D, M0, M50 mit je 960 Paaren) ist vorbereitet und
+  startet erst nach Freigabe.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.
 - **Die Zeitsteuerung ist Wall-Clock.** Auf langsamer Hardware sinkt die Zahl

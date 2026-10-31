@@ -1,0 +1,189 @@
+name: Siege gegen Fuego ohne Vorgabe
+
+# Manueller Lauf aus docs/muster-fuego-siege.md §4: D, M0 (musterOhneVorgabe=0)
+# und M50 (0,5) ohne Vorgabe (Farben wechseln je Partie, Komi 7,5) gegen Fuego
+# mit 50 Spielen je Zug (Wahl des Prüfstands, §9), je 960 Partien, Seed 228.
+# Endpunkt: Siegquote, gepaart (McNemar, alpha 0,025).
+#
+# Ablauf:
+#   fuego-bauen   Fuego einmal bauen (SVN r2038, C++14)
+#   fuego         D, M0, M50 gegen Fuego × 16 Teile zu 60 Partien
+#   kontrolle     D gegen Fuego, Partien 1 bis 20, noch einmal
+#   ergebnis      Bericht, Rohdaten gepackt, Branch ergebnisse/fuego-siege-lauf<N>
+
+# Keine Eingaben: Seed und Bedingungen stehen in der Vorabfestlegung.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: fuego-siege
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  SEED: '228'
+  ARME: auswertung/komponenten/arme-o.sh
+  VORGABE: '0'
+  FUEGO_SPIELE: '50'
+
+# Alle Jobs laufen auf Ubuntu 24.04 (siehe fuego-gerade.yml).
+jobs:
+  fuego-bauen:
+    name: Fuego bauen
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Werkzeuge installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential autoconf automake libtool subversion libboost-all-dev
+
+      - name: Bauen
+        run: bash auswertung/fuego/bauen.sh svn gnu++14 fuego-bin
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin/
+          retention-days: 7
+
+  fuego:
+    name: Fuego, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
+    needs: fuego-bauen
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [D, M0, M50]
+        von: [1, 61, 121, 181, 241, 301, 361, 421, 481, 541, 601, 661, 721, 781, 841, 901]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go und Bibliotheken installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo libboost-all-dev
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin
+
+      - name: 60 Partien spielen
+        env:
+          ARM: ${{ matrix.arm }}
+          VON: ${{ matrix.von }}
+        run: |
+          set -euo pipefail
+          chmod +x fuego-bin/fuego
+          bash auswertung/komponenten/spielen.sh f "$ARM" "$VON" 60 "$SEED" "stand/$ARM-$VON.jsonl"
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-${{ matrix.arm }}-${{ matrix.von }}
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  kontrolle:
+    name: Kontrolle (D, Partien 1 bis 20, noch einmal)
+    needs: fuego-bauen
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go und Bibliotheken installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo libboost-all-dev
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin
+
+      - name: 20 Partien nachspielen
+        run: |
+          set -euo pipefail
+          chmod +x fuego-bin/fuego
+          bash auswertung/komponenten/spielen.sh f D 1 20 "$SEED" stand/kontrolle.jsonl
+
+      - name: Partien sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stand-kontrolle
+          path: stand/
+          if-no-files-found: warn
+          retention-days: 90
+
+  ergebnis:
+    name: Bericht und Ergebnisbranch
+    needs: [fuego, kontrolle]
+    # Auch wenn ein Teil scheitert: Der Bericht nennt die Paare, die da sind,
+    # und fehlende-teile.txt die, die fehlen.
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: stand-*
+          path: stand
+          merge-multiple: true
+
+      - name: Bericht
+        run: bash auswertung/fuego/siege-ergebnis.sh
+
+      - name: Ergebnisbranch
+        env:
+          LAUF: ${{ github.run_number }}
+          LAUF_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          zweig="ergebnisse/fuego-siege-lauf${LAUF}"
+          ziel="docs/daten/fuego-siege/lauf${LAUF}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$zweig"
+          mkdir -p "$ziel"
+          cp -r ergebnisse/. "$ziel/"
+          git add "$ziel"
+          git commit -q -m "Siege gegen Fuego: Ergebnisse von Lauf ${LAUF}" \
+                     -m "Workflow-Lauf ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${LAUF_ID}"
+          git push origin "$zweig"
+          echo "Ergebnisse auf Branch \`$zweig\` unter \`$ziel\`" >> "$GITHUB_STEP_SUMMARY"
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"

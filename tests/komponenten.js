@@ -615,4 +615,38 @@ test('Bericht: Partien am Zuglimit (gewonnen null, aber ein Endstand) werden gez
   pruefeGleich(`${ohne.zuglimit} ${ohne.fertig}`, '0 20', 'ohne Zuglimit: wie bisher');
 });
 
+test('Siege gegen Fuego ohne Vorgabe (Stufe 2): Bericht, Urteil, Workflow, Ergebnisskript', () => {
+  const B = require('../auswertung/fuego/siege-bericht.js');
+  const arm = (f, farbe = nr => (nr % 2 ? 'W' : 'S')) => new Map(Array.from({length: 40}, (_, i) => i + 1).map(nr => [nr, {nr, gewonnen: f(nr), endstand: f(nr) ? 5 : -5, wirFarbe: farbe(nr)}]));
+  const D = arm(nr => nr <= 16);
+  const besser = arm(nr => nr <= 16 || nr > 28);
+  let a = B.auswertung({D, M0: D, M50: besser});
+  pruefeGleich(a.zeilen.find(z => z.arm === 'M50').urteil, 'Arm gewinnt öfter', '12 gegen 0 Paare: M50 gewinnt öfter');
+  pruefeGleich(a.zeilen.find(z => z.arm === 'M0').urteil, 'kein Unterschied belegt', 'gleiche Partien: kein Unterschied');
+  pruefeGleich(a.folge, 'Default `musterOhneVorgabe` wird 0,5', 'M50 gewinnt öfter: Default 0,5');
+  pruefeGleich(B.auswertung({D, M0: D, M50: D}).folge, 'Default bleibt 1', 'sonst bleibt der Default');
+  pruefeGleich(B.auswertung({D, M0: besser, M50: D}).folge, 'Default bleibt 1; M0 gewinnt öfter, untersuchen', 'M0 gewinnt öfter: untersuchen');
+  pruefe(/\| M50 \| 40 \| 12 \| 0 \|/.test(B.text(a)), 'Tabelle nennt die Paare');
+  pruefeGleich(B.quote(D).S + ' ' + B.quote(D).W, '0.4 0.4', 'Quote je Farbe');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'muster-fuego-siege.md'), 'utf8');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'fuego-siege.yml'), 'utf8');
+  const e = fs.readFileSync(path.join(wurzel, 'auswertung', 'fuego', 'siege-ergebnis.sh'), 'utf8');
+  pruefe(/^  SEED: '228'$/m.test(t) && /^  FUEGO_SPIELE: '50'$/m.test(t) && /^  VORGABE: '0'$/m.test(t) && !/inputs:/.test(t), 'Seed 228, 50 Spiele, ohne Vorgabe, keine Eingaben');
+  pruefe(/arm: \[D, M0, M50\]/.test(t) && /von: \[1, 61, 121, 181, 241, 301, 361, 421, 481, 541, 601, 661, 721, 781, 841, 901\]/.test(t) && /for \(\(i = 0; i < 16; i\+\+\)\)/.test(e) && /1 \+ i \* 60/.test(e) && /for arm in D M0 M50; do/.test(e), 'Arme und 16 Teile zu 60 in Workflow und Ergebnisskript');
+  pruefe(/spielen\.sh f "\$ARM" "\$VON" 60 "\$SEED"/.test(t) && /spielen\.sh f D 1 20 "\$SEED"/.test(t), '60 Partien je Teil, Kontrolle 20');
+  pruefe(/\*\*Wahl: 50 Spiele je Zug\*\*/.test(doc) && /Fuego mit 50 Spielen je Zug, Seed 228/.test(doc), 'Wahl im Dokument');
+  pruefeGleich((t.match(/contents: write/g) || []).length, 1, 'Schreibrecht in genau einem Job');
+  pruefeGleich((t.match(/runs-on: ubuntu-24\.04/g) || []).length, 4, 'alle vier Jobs auf Ubuntu 24.04');
+  const ort = fs.mkdtempSync(path.join(ordner, 'fs-'));
+  fs.mkdirSync(path.join(ort, 'stand'));
+  const zeile = (nr, g, zuege = ['D4']) => JSON.stringify({nr, gewonnen: g, endstand: g ? 3 : -3, wirFarbe: nr % 2 ? 'W' : 'S', zuege});
+  for (const [name, f] of [['D', nr => nr <= 10], ['M0', nr => nr <= 10], ['M50', nr => nr <= 18]]) fs.writeFileSync(path.join(ort, 'stand', `${name}-1.jsonl`), Array.from({length: 20}, (_, i) => zeile(i + 1, f(i + 1))).join('\n') + '\n');
+  fs.writeFileSync(path.join(ort, 'stand', 'kontrolle.jsonl'), Array.from({length: 20}, (_, i) => zeile(i + 1, i < 10)).join('\n') + '\n');
+  const r = spawnSync('bash', [path.join(wurzel, 'auswertung', 'fuego', 'siege-ergebnis.sh')], {cwd: ort, encoding: 'utf8'});
+  pruefeGleich(r.status, 0, 'Ergebnisskript läuft: ' + r.stderr.slice(-300));
+  const md = fs.readFileSync(path.join(ort, 'ergebnisse', 'bericht.md'), 'utf8');
+  pruefe(/Kontrolle: 20 von 20 Partien Zug für Zug gleich/.test(md) && /\*\*Arm gewinnt öfter\*\*/.test(md) && /Default `musterOhneVorgabe` wird 0,5/.test(md), 'Bericht mit Kontrolle und Urteil');
+  pruefeGleich(fs.readFileSync(path.join(ort, 'ergebnisse', 'fehlende-teile.txt'), 'utf8').trim().split('\n').length, 3 * 15, 'je Arm 15 fehlende Teile genannt');
+});
+
 laufeTests('Komponenten Stufe A, B und Muster-Eröffnung, Baum-Übernahme, leeres Brett, Muster ohne Vorgabe, Siege gegen Fuego, Zuglimit').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
