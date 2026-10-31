@@ -2896,6 +2896,17 @@ globalThis.PARAMS = {
      Negativer Wert schaltet das Kriterium ab (Verhalten wie vor dem Fix). */
   resignAreaMargin: -1,   /* abgeschaltet, siehe Kasten oben */
   resignStreak:   5,
+  /* Versuchsregel „Pass nach Gegnerpass“ (docs/passregel-versuch.md). AUS (0):
+     das Verhalten ist dann bit-gleich zu vorher. Bei 1 passt die KI auf Stufe
+     Schwer, sobald der Gegner gerade gepasst hat und die Zählvorschau in der
+     eingestellten Wertung einen klaren, geklärten Vorsprung zeigt. Die
+     bestehende Passregel bleibt unverändert und gilt weiter, wenn diese hier
+     nicht auslöst. Kein Sicherheitsnachweis: die Zählvorschau kennt Seki und Ko
+     nicht, und „Sieg behalten“ ist nicht „weitere Züge sinnlos“. */
+  passNachGegnerpass: 0,
+  passMarge:       20,    /* Punkte Vorsprung, auch im ungünstigeren der beiden Stände */
+  passSpanne:      2,     /* höchstens so weit dürfen „mit Annahmen“ und „nur Bewiesenes“ auseinanderliegen */
+  passGemischt:    0.25,  /* höchstens so viel Anteil freier Punkte in gemischten Regionen */
   resignMinMoves: 60,
   /* Strukturelle Aufgabe: so viele Züge in Folge, in denen JEDER legale Zug
      todgeboren wäre. Anders als resignQ ist das bewiesen, nicht geschätzt —
@@ -5044,9 +5055,37 @@ function endspielNetzWurzel(board, aiColor, mc, scored, koPoint) {
   scored.__pNetz = p; scored.__lambda = PARAMS.endspielNetz;
 }
 
-/* Merkt sich den eigenen Zug je Farbe für das Endspiel-Netz; sonst unverändert */
-function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove) {
-  const r = _getAIMoveKern(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove);
+/* Versuchsregel „Pass nach Gegnerpass“ (PARAMS.passNachGegnerpass, docs/passregel-versuch.md).
+   Gibt null zurück, wenn sie nicht gilt (Schalter aus, Gegner hat nicht gerade gepasst).
+   Sonst {pass, grund, mit, nur, spanne, gemischt, wertung}: Stände aus Sicht der KI,
+   pass nur true, wenn ALLE Bedingungen erfüllt sind. grund nennt die erste verfehlte. */
+function passNachGegnerpassPruefung(board, aiColor, captures, extra) {
+  if (!(PARAMS.passNachGegnerpass >= 1) || !extra || !extra.gegnerPasste) return null;
+  const wertung = extra.wertung === 'territory' ? 'territory' : 'flaeche';
+  const v = zaehlVorschau(board, extra.komi === undefined ? 7.5 : extra.komi, {modus: wertung, gefangen: captures});
+  const sicht = aiColor === 1 ? 1 : -1;
+  const mit = sicht * v.mitSchaetzung.stand, nur = sicht * v.nurBewiesen.stand;
+  const spanne = Math.abs(mit - nur), gemischt = v.nurBewiesen.gemischtAnteil;
+  const schlechter = Math.min(mit, nur);
+  let grund = null;
+  if (gemischt > PARAMS.passGemischt) grund = 'nicht ausgespielt';
+  else if (spanne > PARAMS.passSpanne) grund = 'ungeklärte Gruppen (Spanne)';
+  else if (schlechter < PARAMS.passMarge) grund = 'Vorsprung zu klein';
+  return {pass: grund === null, grund, mit, nur, spanne, gemischt, wertung};
+}
+
+/* Merkt sich den eigenen Zug je Farbe für das Endspiel-Netz; sonst unverändert.
+   extra (optional): {gegnerPasste, wertung, komi} für die Versuchsregel. */
+function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove, extra) {
+  let r;
+  const vp = diff === 'hard' ? passNachGegnerpassPruefung(board, aiColor, captures, extra) : null;
+  if (vp && vp.pass) {
+    r = {type: 'pass', requestId: reqId,
+         info: `Pass — Gegner hat gepasst, Vorsprung ${vp.mit.toFixed(1)}/${vp.nur.toFixed(1)} (Versuchsregel)`};
+  } else {
+    r = _getAIMoveKern(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove);
+  }
+  if (vp) r.versuch = vp;
   endspielNetzMerke(aiColor, r && r.type === 'stone' ? r.y * 19 + r.x : -1, mc);
   return r;
 }
@@ -5792,7 +5831,8 @@ function buildWorkerSource() {
           new Uint8Array(d.board), d.aiColor, histSet,
           d.captures, d.mc, 'hard', d.reqId,
           d.koPoint ?? null,                     /* Fix 7: 8. Parameter */
-          d.lastMove ?? null                     /* Lokalitätsterm — fehlte in Go-v3: dort kam lastMove nie im Worker an */
+          d.lastMove ?? null,                    /* Lokalitätsterm — fehlte in Go-v3: dort kam lastMove nie im Worker an */
+          d.extra ?? null                        /* Versuchsregel Pass nach Gegnerpass */
         );
         if (globalThis.policyNet) globalThis.policyNet._netPriors = null;
         /* lastMsPerSim mitschicken: der Hauptthread-Watchdog hat eine
@@ -5821,6 +5861,12 @@ function cleanupWorker() {
   }
 }
 
+/* Angaben für die Versuchsregel „Pass nach Gegnerpass“: hat der Gegner gerade
+   gepasst, in welcher Wertung wird gespielt */
+function passExtra() {
+  return {gegnerPasste: state.consecutivePasses >= 1, wertung: state.scoringMode, komi: KOMI};
+}
+
 function fallbackToMainThread(reqId, netInp, netPriors, netHidden) {
   setTimeout(() => {
     if (reqId !== state.aiRequestId) return;
@@ -5829,7 +5875,7 @@ function fallbackToMainThread(reqId, netInp, netPriors, netHidden) {
       r = getAIMove(state.board, state.aiColor,
         Array.from(state.boardHistory), {...state.captures},
         state.moveCount, 'hard', reqId,
-        state.koPoint, state.lastMove);      /* Fix 7 + Lokalitätsterm */
+        state.koPoint, state.lastMove, passExtra());      /* Fix 7 + Lokalitätsterm + Versuchsregel */
     } catch (e) {
       /* Letzte Verteidigungslinie: wirft getAIMove hier, gibt es keinen
          Watchdog mehr, der uns rettet — ohne dieses catch blieb aiThinking
@@ -6005,6 +6051,7 @@ function triggerAIMove() {
         reqId,
         koPoint:  state.koPoint,               /* Fix 7 */
         lastMove: state.lastMove,              /* Lokalitätsterm */
+        extra:    passExtra(),                 /* Versuchsregel Pass nach Gegnerpass */
         params:   JSON.parse(JSON.stringify(PARAMS)),
         netPriors: _netPriors ? Array.from(_netPriors) : null,
         netBlend:  _netPriors ? policyNet.blendWeight : 0
@@ -6072,7 +6119,7 @@ function triggerAIMove() {
       const r = getAIMove(state.board, state.aiColor,
         Array.from(state.boardHistory), {...state.captures},
         state.moveCount, state.aiDifficulty, reqId,
-        state.koPoint, state.lastMove);      /* Fix 7 + Lokalitätsterm */
+        state.koPoint, state.lastMove, passExtra());      /* Fix 7 + Lokalitätsterm + Versuchsregel */
       applyAIResult(r, reqId, null, null, null);
     }, 50);
   }
@@ -7373,6 +7420,10 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
          tip:'Q-Schwelle (aus KI-Sicht negativ) für die Aufgabe-Serie'},
         {key:'resignStreak', label:'Aufgabe-Serie', step:1, min:2, max:20,
          tip:'So viele KI-Züge in Folge mit Q ≤ -Schwelle → KI gibt auf. resignEnabled=0 in PARAMS schaltet ab.'},
+        {key:'passNachGegnerpass', label:'Pass nach Gegnerpass', step:1, min:0, max:1,
+         tip:'VERSUCH, Standard 0 = aus. 1 = die KI passt, wenn der Gegner gerade gepasst hat und die Zählvorschau in der eingestellten Wertung einen klaren, geklärten Vorsprung zeigt. Kein Sicherheitsnachweis (Seki/Ko, unbewiesene Gruppen) und keine Aussage, ob weitere Züge sinnvoll wären. docs/passregel-versuch.md'},
+        {key:'passMarge', label:'Pass-Marge (Punkte)', step:5, min:5, max:200,
+         tip:'Nur für den Versuch Pass nach Gegnerpass: Vorsprung in Punkten, den auch der ungünstigere der beiden Stände der Zählvorschau erreichen muss.'},
         {key:'adaptiveBudgetTargetMinSims', label:'Ziel-Min-Sims', step:10, min:20, max:300, main:true,
          tip:'⭐ HAUPTHEBEL. Direkte Messkorrektur — wenn letzter Zug weniger Sims schaffte, wird automatisch mehr Zeit gegeben, unabhängig von der Ursache (Randkampf, große Gruppen etc.)'},
         {key:'rolloutSample',     label:'Rollout-Sample',   step:8,   min:0,   max:200,

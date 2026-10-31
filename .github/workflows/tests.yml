@@ -108,6 +108,7 @@ jobs:
           node tests/browser-nan.js
           node tests/browser-ui.js
           node tests/browser-zaehlvorschau.js
+          node tests/browser-passregel.js
 
   ergebnis:
     name: Zusammenfassung
