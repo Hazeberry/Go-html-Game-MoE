@@ -80,3 +80,49 @@ macht der Workflow in GitHub Actions.
 Job. Bericht im Job-Protokoll und als Artefakt. „Trägt nicht“ ist ein
 Ergebnis, kein Fehler: der Lauf wird nur bei einem Fehler im Nachspielen (Exit-
 Code 3) oder falschem Aufruf rot.
+
+## 5. Nachtrag: Ergebnis der Stufe 1 (31.10.2026)
+
+Lauf 2 von [`komi-k.yml`](../.github/workflows/komi-k.yml) (Lauf 1 brach wegen
+eines Fehlers im Workflow ab: GitHub startet Schritte mit `bash -e`, der
+Exit-Code 1 des Werkzeugs beendete den Schritt; Korrektur in PR #228). Bericht:
+[`docs/daten/komi-k/lauf2/bericht.md`](daten/komi-k/lauf2/bericht.md). Die Daten
+sind Arm D ohne Vorgabe aus den vier archivierten Läufen: 2 399 Partien, davon
+alle bei Zug 200, 2 391 bei Zug 240 und 2 257 bei Zug 280 (142 Partien kürzer).
+Das Nachspielen ist richtig: Die Gefangenenzahlen stimmen bei 2 399 von 2 399
+Partien.
+
+| Zug | Stellungen | R² | u (Einheiten je Punkt) | 95 % von u | k = 7,5 · u |
+|---:|---:|---:|---:|---|---:|
+| 200 | 2 399 | 0,327 | 5,88 | 5,67 bis 6,10 | 44,1 |
+| 240 | 2 391 | 0,309 | 7,62 | 7,34 bis 7,90 | 57,1 |
+| 280 | 2 257 | 0,338 | 10,42 | 10,09 bis 10,76 | 78,1 |
+
+**Nach der Regel aus §3:** R² liegt bei allen drei Zugzahlen über 0,25, und die
+Intervalle von u liegen über 0. Verfehlt ist allein die Stabilität von k: Die
+Werte bei 200 und 280 weichen um 22,8 % und 36,7 % vom Wert bei 240 ab,
+erlaubt waren 25 %. Es wird **kein k eingefroren.**
+
+**Ergebnis, nüchtern:** Diese Methode liefert auf diesen Daten keine tragfähige
+Kalibrierung. Die Einheiten je Punkt wachsen mit der Zugzahl (u 5,9, 7,6, 10,4);
+ein einzelnes k gibt es mit `evaluateBoard` nicht. Daraus folgt nicht, dass das
+Komi wirkungslos ist, und nicht, dass ein anderer Bewerter nötig wäre. Die Stufen
+2 und 3 bleiben zunächst zurückgestellt. Eine Randbemerkung zur Auswahl: Bei Zug
+280 fehlen 142 kürzere Partien, die Stichprobe dort ist also nicht dieselbe wie
+bei Zug 200.
+
+**Abschwächungen an den Aussagen in diesem Dokument:**
+
+1. **Verzerrung der Regressionen (§3):** Die Aussage, die beiden Regressionen
+   seien durch Messfehler „entgegengesetzt verzerrt“, ist nicht begründet. Für
+   den Fehler in der erklärenden Größe stimmt sie als Faustregel, für die
+   tatsächliche Fehlerstruktur zwischen `evaluateBoard` und dem späteren
+   Flächenstand wurde sie nicht geprüft. Das geometrische Mittel SD(E)/SD(d) ist
+   eine Konvention, kein nachgewiesener Schätzer.
+2. **Keine nachgewiesene Komi-Umrechnung:** SD(E)/SD(d) beschreibt das
+   Größenverhältnis der Streuung von E und d. Ein Bestehen der Kriterien wäre
+   nur ein Anlass zu weiterer Prüfung gewesen, keine Freigabe eines Komi-Arms.
+3. **Folgen (§1):** Dass die Komi-Blindheit Siegquote, Sieggefühl und Aufgabe
+   verschlechtert, ist bislang eine Hypothese. Belegt ist nur, dass die KI als
+   Weiß öfter gewinnt als als Schwarz, was zu einer Komi-Blindheit passt, sie
+   aber nicht beweist.
