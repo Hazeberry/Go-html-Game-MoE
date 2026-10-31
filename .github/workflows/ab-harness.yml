@@ -53,9 +53,14 @@ on:
         required: false
         default: ''
 
+# Alle Jobs laufen auf Ubuntu 24.04 statt ubuntu-latest: Seit dem 30.10.2026
+# ist ubuntu-latest Ubuntu 26.04 mit neuerem Boost (Fuego lässt sich dort nicht
+# bauen: boost::filesystem::path::normalize fehlt), anderem Chromium-Support und
+# anderen Paketständen von GNU Go. Die Messungen sollen auf dem Stand laufen,
+# auf dem sie vorab festgelegt und bisher gespielt wurden.
 jobs:
   selfplay:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # 20 Partien × bis zu 400 Zügen × 250 ms ≈ 35 min, plus Overhead der
     # Bewertung. Großzügig gesetzt, damit auch 100-Partien-Läufe durchlaufen.
     timeout-minutes: 300

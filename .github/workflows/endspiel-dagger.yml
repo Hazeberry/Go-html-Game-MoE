@@ -68,10 +68,15 @@ concurrency:
 permissions:
   contents: read
 
+# Alle Jobs laufen auf Ubuntu 24.04 statt ubuntu-latest: Seit dem 30.10.2026
+# ist ubuntu-latest Ubuntu 26.04 mit neuerem Boost (Fuego lässt sich dort nicht
+# bauen: boost::filesystem::path::normalize fehlt), anderem Chromium-Support und
+# anderen Paketständen von GNU Go. Die Messungen sollen auf dem Stand laufen,
+# auf dem sie vorab festgelegt und bisher gespielt wurden.
 jobs:
   pruefen:
     name: Eingaben prüfen
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
       runde: ${{ steps.p.outputs.runde }}
@@ -146,7 +151,7 @@ jobs:
   daten:
     name: Daten, Partien ab ${{ matrix.von }}
     needs: pruefen
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     strategy:
       fail-fast: false
@@ -196,7 +201,7 @@ jobs:
   lernen:
     name: Neue Tabelle lernen
     needs: [pruefen, daten]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v7
@@ -282,7 +287,7 @@ jobs:
   pilot-ref:
     name: Pilot ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
     needs: [pruefen, daten]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     strategy:
       fail-fast: false
@@ -337,7 +342,7 @@ jobs:
   pilot-neu:
     name: Pilot NEU, Partien ab ${{ matrix.von }}
     needs: [pruefen, lernen]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 150
     strategy:
       fail-fast: false
@@ -391,7 +396,7 @@ jobs:
   ergebnis:
     name: Bericht und Ergebnisbranch
     needs: [pruefen, lernen, pilot-ref, pilot-neu]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
     permissions:

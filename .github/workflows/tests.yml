@@ -32,10 +32,15 @@ concurrency:
 permissions:
   contents: read
 
+# Alle Jobs laufen auf Ubuntu 24.04 statt ubuntu-latest: Seit dem 30.10.2026
+# ist ubuntu-latest Ubuntu 26.04 mit neuerem Boost (Fuego lässt sich dort nicht
+# bauen: boost::filesystem::path::normalize fehlt), anderem Chromium-Support und
+# anderen Paketständen von GNU Go. Die Messungen sollen auf dem Stand laufen,
+# auf dem sie vorab festgelegt und bisher gespielt wurden.
 jobs:
   node:
     name: Node (alle Suiten außer Browser)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
@@ -105,7 +110,7 @@ jobs:
 
   ergebnis:
     name: Zusammenfassung
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [node, browser]
     if: always()
     steps:

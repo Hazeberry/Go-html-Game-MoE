@@ -27,10 +27,15 @@ env:
   ARME: auswertung/komponenten/arme-l.sh
   VORGABE: '0'
 
+# Alle Jobs laufen auf Ubuntu 24.04 statt ubuntu-latest: Seit dem 30.10.2026
+# ist ubuntu-latest Ubuntu 26.04 mit neuerem Boost (Fuego lässt sich dort nicht
+# bauen: boost::filesystem::path::normalize fehlt), anderem Chromium-Support und
+# anderen Paketständen von GNU Go. Die Messungen sollen auf dem Stand laufen,
+# auf dem sie vorab festgelegt und bisher gespielt wurden.
 jobs:
   gnugo:
     name: GNU Go ohne Vorgabe, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 180
     strategy:
       fail-fast: false
@@ -68,7 +73,7 @@ jobs:
 
   kontrolle:
     name: Kontrolle (D, Partien 1 bis 20, noch einmal)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
@@ -102,7 +107,7 @@ jobs:
     # Auch wenn ein Teil scheitert: Der Bericht nennt die Paare, die da sind,
     # und fehlende-teile.txt die, die fehlen.
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
     permissions:

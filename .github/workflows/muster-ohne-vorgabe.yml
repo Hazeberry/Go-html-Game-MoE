@@ -35,10 +35,15 @@ env:
   SEED_M2_M50: '20262601'
   SEED_M2_MW0: '20262701'
 
+# Alle Jobs laufen auf Ubuntu 24.04 statt ubuntu-latest: Seit dem 30.10.2026
+# ist ubuntu-latest Ubuntu 26.04 mit neuerem Boost (Fuego lässt sich dort nicht
+# bauen: boost::filesystem::path::normalize fehlt), anderem Chromium-Support und
+# anderen Paketständen von GNU Go. Die Messungen sollen auf dem Stand laufen,
+# auf dem sie vorab festgelegt und bisher gespielt wurden.
 jobs:
   fuego-bauen:
     name: Fuego bauen
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -60,7 +65,7 @@ jobs:
 
   gnugo:
     name: GNU Go ohne Vorgabe, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 180
     strategy:
       fail-fast: false
@@ -99,7 +104,7 @@ jobs:
   fuego:
     name: Fuego ohne Vorgabe, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
     needs: fuego-bauen
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 180
     strategy:
       fail-fast: false
@@ -145,7 +150,7 @@ jobs:
 
   selbstspiel:
     name: Selbstspiel ${{ matrix.arm }} gegen D, Teil ${{ matrix.teil }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 150
     strategy:
       fail-fast: false
@@ -184,7 +189,7 @@ jobs:
 
   kontrolle-g:
     name: Kontrolle GNU Go (D, Seed 222, Partien 1 bis 20 wie im Lauf „Leeres Brett“)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
@@ -215,7 +220,7 @@ jobs:
   kontrolle-f:
     name: Kontrolle Fuego (D, Seed 226, Partien 1 bis 20, noch einmal)
     needs: fuego-bauen
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
@@ -257,7 +262,7 @@ jobs:
     # Auch wenn ein Teil scheitert: Der Bericht nennt die Paare, die da sind,
     # und fehlende-teile.txt die, die fehlen.
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
     permissions:
