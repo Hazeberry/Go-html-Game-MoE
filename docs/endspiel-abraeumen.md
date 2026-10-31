@@ -187,3 +187,57 @@ Actions-Runner; sie sagt nichts über das Zeitbudget im Browser auf einem Handy
 bleibt damit unbelegt; dafür bräuchte es eine Messung im Browser. (2) Archivierte
 Gegner sind Programme. (3) Die Befragung wiederholt die Entscheidung, sie erklärt
 die Partie nur, wenn die Wiederholbarkeit hoch ist.
+
+## 8. Nachtrag: Ergebnis der Pass-Sonde (31.10.2026)
+
+Lauf 1 von [`pass-stellungen.yml`](../.github/workflows/pass-stellungen.yml),
+rein lesend, etwa eine Minute. Zahlen:
+[`daten/endspiel-abraeumen/lauf2/bericht.md`](daten/endspiel-abraeumen/lauf2/bericht.md).
+Beschreibend; die Lesehilfe aus §7 ist keine Entscheidung.
+
+| Quelle | W: KI spielte weiter (Stellungen) | Sonde passt | gleicher Zug | `best` Median | P: KI passte | Sonde passt | `best` Median |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| GNU Go | 98 | 0 | 68 | 472 | 17 | 17 | −57 |
+| Fuego 100 | 100 | 0 | 81 | 865 | 30 | 30 | −85 |
+| Fuego 50 | 100 | 0 | 80 | 2 392 | 47 | 47 | −86 |
+| alte PWA | 100 | 0 | 76 | 451 | 7 | 7 | −8 |
+
+**Gründe, warum die Sonde in Gruppe W nicht passt (398 Stellungen):** In 389 liegt
+`best` über allen Schwellen (a). In 9 Stellungen (Fuego 50: 1, alte PWA: 8)
+erlaubt `best` das Passen, aber der Gegner hätte einen Zug über
+`passGainThreshold` (c). **Keine Stellung wegen einer eigenen Kette im Atari (b).**
+
+**Befunde (beschreibend):**
+
+1. **Die Pass-Prüfung sieht in diesen Stellungen kein Passen vor.** Die Schwellen
+   liegen bei −50 bis 20; `best` liegt in den Stellungen, in denen die KI in der
+   Partie weiterspielte, im Median bei 451 bis 2 392. Die Schwellen stammen aus
+   der Zeit, als Zugwerte in den Zehnern lagen ([`parameter-reihe.md`](parameter-reihe.md)).
+2. **In Gruppe P passt die Sonde immer** (101 von 101), mit `best` im Median bei −8
+   bis −86 und wiederholt den Zug der Partie jedes Mal. `best` trennt die beiden
+   Gruppen also im Median klar. Wie scharf, zeigt nur die Verteilung (nächster
+   Schritt); hier steht nur der Median.
+3. **Wiederholbarkeit in Gruppe W: 68 bis 81 %** gleicher Zug wie in der Partie. Die
+   Sonde ist also kein genaues Abbild der Partie (Zufall, Suchbaum, Zustand der
+   Partie fehlen); das Passen selbst ist stabil (Pass-Prüfung ohne Suche), die
+   Zugwahl danach weniger.
+4. **Dauer bei 120 festen Simulationen:** Wo die KI weiterspielt, im Median rund
+   122 ms (90 %: 127 bis 137 ms, Maximum 238 ms); wo sie passt, 3 bis 6 ms. Der
+   Unterschied ist die Suche. **Das ist nicht die Zeit im Browser** (dort bestimmt
+   `getAdaptiveTimeBudget` die Bedenkzeit); „extrem lange“ bleibt unbelegt.
+
+**Vorbehalte:**
+
+- `oppBest` wird nur berechnet, wenn `best` unter einer Schwelle liegt; in Gruppe W
+  steht daher meist „–“.
+- Es sind Mediane. Ob einzelne Stellungen in W so niedrige `best`-Werte haben, dass
+  eine andere Schwelle sie trennen würde, zeigen die Mediane nicht.
+- Archivierte Gegner sind Programme, Gruppen W und P sind nicht zufällig, sondern
+  durch das Verhalten der KI selbst definiert; ein Schluss auf „die Schwelle ist
+  schuld“ folgt daraus nicht. Gezeigt ist: In diesen Stellungen verhindert allein
+  `best` über den Schwellen das Passen.
+
+**Nächster Schritt (Vorschlag, nicht beschlossen):** die Verteilung von `best` in W
+und P ausgeben (Minimum, 10-, 25-, 75-, 90-%-Quantil, Maximum), um zu sehen, ob sich
+die Gruppen überlappen. Erst danach lässt sich beurteilen, ob eine Änderung der
+Passregel überhaupt etwas trennen könnte. Nichts davon ändert das Spiel.
