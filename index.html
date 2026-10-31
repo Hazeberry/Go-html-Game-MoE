@@ -687,6 +687,67 @@ function toteSteineAmEnde(board, augeGross = AUGE_GROSS, offenGross = OFFEN_GROS
   return tot;
 }
 
+/* Zählvorschau (docs/zaehlvorschau.md): wie die App die Stellung einschätzt,
+   OHNE etwas zu ändern. Reine Funktion, verändert weder das Brett noch den
+   Spielzustand und wird vom Spiel (noch) nicht aufgerufen.
+
+   Die Unsicherheit bleibt sichtbar. Ein Stein ist
+     bewiesenTot      Benson-tot (beweisbar, ohne Annahmen)
+     geschaetztTot    nach toteSteineAmEnde tot, aber nicht bewiesen
+     bewiesenLebend   Benson-lebendig (pass-alive)
+     unbewiesen       lebend nach toteSteineAmEnde, aber nicht bewiesen
+                      (zwei Augen, großes Auge, offene Grenze). „Nicht von
+                      Benson als lebendig bestätigt“ heißt NICHT „tot“; Seki
+                      und Ko erkennt die Regel nicht, solche Gruppen landen
+                      hier oder bei geschaetztTot, nie bei „bewiesen“.
+   Der Stand wird zweimal gerechnet: nur mit den bewiesen toten Steinen
+   entfernt (untere Grenze der Annahmen) und mit allen geschätzt toten
+   entfernt (wie die Schlusszählung). stand = Fläche Schwarz − Fläche Weiß −
+   komi; größer 0 heißt Schwarz vorn. gemischtAnteil ist der Anteil der leeren
+   Punkte in Regionen, die an beide Farben grenzen (nach Entfernung der
+   geschätzt toten): hoch heißt „noch nicht ausgespielt“. */
+function zaehlVorschau(board, komi = 7.5) {
+  const N = BOARD_SIZE;
+  const ep = bensonClassify(board);
+  const bewiesenTot = new Uint8Array(N), bewiesenLebend = new Uint8Array(N);
+  for (let i = 0; i < N; i++) {
+    if (!board[i]) continue;
+    if (_bnDead[i] === ep) bewiesenTot[i] = 1;
+    else if (_bnAlive[i] === ep) bewiesenLebend[i] = 1;
+  }
+  const tot = toteSteineAmEnde(board);
+  const geschaetztTot = new Uint8Array(N), unbewiesen = new Uint8Array(N);
+  for (let i = 0; i < N; i++) {
+    if (!board[i]) continue;
+    if (tot[i] && !bewiesenTot[i]) geschaetztTot[i] = 1;
+    else if (!tot[i] && !bewiesenLebend[i]) unbewiesen[i] = 1;
+  }
+  const zaehle = entfernt => {
+    const b = new Uint8Array(N); for (let i = 0; i < N; i++) b[i] = entfernt[i] ? 0 : board[i];
+    const f = {1: 0, 2: 0}, v = new Uint8Array(N); let neutral = 0, gemischt = 0, leer = 0;
+    for (let i = 0; i < N; i++) if (b[i]) f[b[i]]++;
+    for (let i = 0; i < N; i++) {
+      if (b[i] || v[i]) continue;
+      const q = [i]; v[i] = 1; let r = 0;
+      for (let k = 0; k < q.length; k++) for (const n of NEIGHBORS[q[k]]) {
+        if (!b[n]) { if (!v[n]) { v[n] = 1; q.push(n); } } else r |= b[n];
+      }
+      leer += q.length;
+      if (r === 1 || r === 2) f[r] += q.length; else { neutral += q.length; if (r === 3) gemischt += q.length; }
+    }
+    return {schwarz: f[1], weiss: f[2], neutral, stand: f[1] - f[2] - komi, gemischtAnteil: leer ? gemischt / leer : 0};
+  };
+  const nurBewiesen = zaehle(bewiesenTot);
+  const alle = new Uint8Array(N); for (let i = 0; i < N; i++) alle[i] = bewiesenTot[i] || geschaetztTot[i] ? 1 : 0;
+  const mitSchaetzung = zaehle(alle);
+  let nBT = 0, nGT = 0, nBL = 0, nUB = 0;
+  for (let i = 0; i < N; i++) { nBT += bewiesenTot[i]; nGT += geschaetztTot[i]; nBL += bewiesenLebend[i]; nUB += unbewiesen[i]; }
+  return {bewiesenTot, geschaetztTot, bewiesenLebend, unbewiesen,
+          anzahl: {bewiesenTot: nBT, geschaetztTot: nGT, bewiesenLebend: nBL, unbewiesen: nUB},
+          nurBewiesen, mitSchaetzung, komi,
+          sicher: nGT === 0 && nUB === 0};   /* sicher: alles bewiesen, kein Raum für Annahmen */
+}
+
 function coordToLabel(x, y) { return `${COL_LETTERS[x]}${SIZE-y}`; }
 </script>
 <script id="worker-ai">
