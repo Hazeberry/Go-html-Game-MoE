@@ -28,8 +28,9 @@ stammt aus einer Durchsicht (Astra) und wird hier übernommen.
 1. **Spielt die KI nach dem Pass des Gegners unnötig weiter**, oder **passt sie
    schon, und der Gegner spielt weiter**? Das unterscheidet die möglichen
    Eingriffe.
-2. Wenn die KI weiterspielt: Sind das schlagende Züge (echtes Abräumen) oder
-   Züge ohne Schlag (Auffüllen, Grenze, Neutral)?
+2. Wenn die KI weiterspielt: Sind das schlagende Züge oder Züge ohne Schlag? Die
+   Art der Züge ohne Schlag (Auffüllen, Grenze, Neutral, Vorbereitung, Verteidigung)
+   unterscheidet die Zählung nicht.
 3. Wie oft und wie lange kommt das vor, und bei welchem Gegner?
 
 ## 3. Diagnose (Stufe 1, dieses Dokument)
@@ -105,8 +106,11 @@ Beschreibend, ohne Urteil.
    64). Warum, ist nicht geprüft (denkbar: Fuego passt in der Endphase
    anders als GNU Go, während die KI weiterspielt).
 2. **Die meisten dieser KI-Züge schlagen nicht** (Fuego: 4,1 und 5,4 ohne Schlag
-   gegen 0,5 und 0,9 mit Schlag im Mittel). Es ist in den Programmpartien also
-   überwiegend Auffüllen, Grenze und Neutral, nicht das Abräumen toter Steine.
+   gegen 0,5 und 0,9 mit Schlag im Mittel). „Ohne Schlag“ heißt aber nicht
+   automatisch Auffüllen oder Neutralzug: Auch vorbereitende Schlagzüge und
+   notwendige Verteidigung schlagen zunächst nichts. Welche Art von Zug es ist,
+   zeigt die Zählung nicht (Korrektur 31.10.2026: die erste Fassung ordnete sie
+   zu sicher als Auffüllen und Neutral ein).
 3. **Beides kommt vor:** „KI spielt weiter, der Gegner passt“ (Fuego) und „die KI
    passt zuerst, der Gegner spielt noch Steine“ (alte PWA 76 %, Fuego 25 bis 33 %,
    GNU Go fast nie).
@@ -126,8 +130,8 @@ Beschreibend, ohne Urteil.
 - Die Diagnose hat keine Schwelle. Sie sagt nicht, ob 6 Züge „zu lang“ sind.
 
 **Was daraus für die Vorbereitung folgt (Vorschlag, nicht beschlossen):** Das
-Weiterspielen ist nach den Programmpartien überwiegend Auffüllen ohne Schlag, und
-es tritt nicht nur bei „Gegner passt“ auf. Bevor ein Eingriff gewählt wird, bleibt
+Weiterspielen besteht nach den Programmpartien überwiegend aus Zügen ohne Schlag
+(deren Art offen ist, siehe oben), und es tritt nicht nur bei „Gegner passt“ auf. Bevor ein Eingriff gewählt wird, bleibt
 die Pass-Sonde (§4) der nächste Schritt: an späten Stellungen protokollieren, warum
 die KI nicht passt, und die Laufzeit je Zug messen. Der Beschwerdefall „extrem lange“
 ist bisher nur an einer Handpartie belegt; eine Bedenkzeit je Zug haben die
@@ -302,9 +306,13 @@ Beschreibend, ohne Urteil; die Grenzen aus §9 gelten.
    und Fuego 100, 1 % bei Fuego 50 und 8 % bei der alten PWA. Die Gruppen
    überlappen bei der Schwelle 20 kaum.
 3. **Oberhalb von 20 reicht die Verteilung von W weit:** Der Median liegt bei 451
-   bis 2 392, das Maximum bei 4 568 bis 30 946. Eine höhere Schwelle würde in
-   immer mehr W-Stellungen das Passen erlauben: bei 100 in 3 bis 15 %, bei 200 in
-   12 bis 25 %, bei 500 in 29 bis 55 %, bei 1000 in 42 bis 79 %.
+   bis 2 392, das Maximum bei 4 568 bis 30 946. Eine höhere Schwelle ließe in
+   immer mehr W-Stellungen die Passprüfung weiterlaufen (`wantsToPass`): bei 100 in
+   3 bis 15 %, bei 200 in 12 bis 25 %, bei 500 in 29 bis 55 %, bei 1000 in 42 bis
+   79 %. **Das sind keine erwarteten Passquoten:** Die Prüfung auf eine eigene
+   Kette im Atari und auf einen Gegnerzug über `passGainThreshold` kann das Passen
+   danach weiterhin verhindern (in der Sonde bei 9 von 398 W-Stellungen schon
+   bei `best` unter der Schwelle).
 4. **Die Kennzahl „Anteil P mit `best` ≥ kleinstes `best` in W“ ist bei Fuego 50
    (89 %) und der alten PWA (86 %) nicht aussagekräftig:** Sie wird von je einem
    einzelnen sehr niedrigen W-Wert (−182 und −171) bestimmt. Maßgeblich sind die
@@ -329,3 +337,19 @@ Vorabfestlegung messen (gepaarter Endstand und Siegquote, z. B. gegen GNU Go,
 ohne Vorgabe, Länge der Endphase als Nebenmaß). Alternativ bleibt die Zählphase
 (§4) der Kandidat, der die Suchstärke nicht berührt. Beide Wege brauchen
 Teststellungen für Seki, Ko und ungewöhnliche Augen. Entschieden ist nichts.
+
+## 11. Offener Vorschlag: Gegenprobe zum frühen Passen (nicht vorbereitet)
+
+Aus einer Durchsicht (Astra, 31.10.2026), noch nicht festgelegt: Die Sonde und die
+Verteilung zeigen, **warum** die KI nicht passt, aber nicht, **ob** früheres Passen
+etwas kostet. Eine Gegenprobe wäre: dieselben ausgewählten Stellungen (besonders
+gegen Fuego, wo das Weiterspielen häufiger vorkommt; GNU Go als zweite Referenz)
+einmal normal und einmal mit **erzwungenem Pass** der KI weiterspielen lassen und
+Endstand, Siegerwechsel und verbleibende Züge vergleichen. Das prüfte erstmals,
+ob das Weiterspielen etwas wert ist, bevor eine Schwelle gewählt wird.
+
+Offene Punkte dafür: Der Gegner (GNU Go, Fuego) müsste aus einer Stellung
+weiterspielen (die Züge der Partie per GTP einspielen, dann weiter), das
+Duell-Werkzeug kann bisher nur von der leeren Brettstellung starten. Der
+Vergleich wäre gepaart je Stellung. Die Zählphase löst den Fall „Mensch passt, KI
+spielt weiter“ für sich allein nicht. Bis zur Freigabe wird nichts davon gebaut.
