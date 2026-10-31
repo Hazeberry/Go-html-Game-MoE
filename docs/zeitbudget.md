@@ -42,29 +42,47 @@ mit und ohne Netz): Das Netz kostet auf dieser Maschine **0 ms bis Zug 80 und 44
 (Zug 82: 84 ms mit, 17 ms ohne Netz). Der Sprung liegt also an derselben Stelle wie in der
 Handy-Diagnose. Der Rest der Vorarbeit ändert sich in diesem Bereich nicht.
 
-## 3. Was nicht belegt ist
+## 3. Gegenprobe im echten Chromium (Entwicklungsumgebung)
 
-Die Vermutung „Netz = Ursache“ ist **nicht bewiesen**:
+[`browser-zeit.js`](../auswertung/endspiel/browser-zeit.js) lässt die KI in der App (Worker, Nachrichten,
+Diagnose wie auf dem Handy) dieselben Stellungen ziehen und zerlegt die Dauer.
+Ausgaben: [`browser-zeit-cpu1.txt`](daten/endspiel-abraeumen/territory/browser-zeit-cpu1.txt) und
+[`browser-zeit-cpu10.txt`](daten/endspiel-abraeumen/territory/browser-zeit-cpu10.txt) (CPU auf ein Zehntel
+gedrosselt, grobe Nachstellung eines langsamen Geräts).
 
-- Die Maschine hier rechnet etwa zehnmal schneller als das Handy (4178 gegen 414 Simulationen in
-  1,8 s). Mit demselben Faktor ergäben 45 bis 67 ms rund 0,5 bis 0,7 s, beobachtet sind 1,8 s.
-  Das Netz müsste auf dem Handy also relativ langsamer laufen als die Suche (große `Float64`-Puffer,
-  Cache, Drosselung); denkbar, nicht gemessen.
-- Es könnte noch etwas anderes ab Zug 80 oder 82 eintreten, das hier nicht auftritt (zum Beispiel die
-  Nachrichten zwischen Worker und Hauptthread oder die Nachbearbeitung im Hauptthread).
+- **Ohne Drosselung:** Rest 160 bis 270 ms, mit dem Netz ab Zug 82 etwa 60 bis 90 ms mehr (Netz 62, 77, 85 ms).
+  Kein Sprung auf 1,8 s.
+- **Mit Drosselung auf ein Zehntel:** Rest 540 bis 800 ms, mit und ohne Netz; das Netz selbst bleibt bei ca. 90 ms,
+  die Suche hält ihre 1,8 s. Auch hier **kein Sprung bei Zug 82 von der Größenordnung des Handys**.
 
-## 4. Entscheidender Test (braucht das Handy)
+Das Endspiel-Netz erklärt die 1,76 s auf dem Handy damit **nicht**; die Vermutung aus §2 ist geschwächt, nicht
+widerlegt: Ein Handy kann sich anders verhalten als eine gedrosselte Desktop-CPU (Kerne, Hitze, Hintergrund).
+Auffällig ist der **Nachrichtenweg** (Hauptthread → Worker → Hauptthread) mit rund 90 bis 110 ms schon ohne
+Drosselung und 210 bis 350 ms mit; auf dem Handy ist er noch nicht gemessen.
 
-Auf dem Handy im Dashboard `endspielNetz` auf 0 stellen, eine Partie bis Zug 100 spielen (der Mensch
-darf passen oder beliebig spielen) und den Fehlerbericht exportieren. Dann
-`node auswertung/endspiel/zeit-zerlegung.js bericht.json`:
+## 4. Zerlegung auf dem Handy: jetzt in der Diagnose
 
-- Fällt der Rest ab Zug 82 auf rund 0,2 s zurück, ist das Netz die Ursache.
-- Bleibt er bei rund 1,8 s, liegt die Ursache anderswo, und die Zerlegung muss feiner werden
-  (Zeitstempel vor und nach `endspielNetzWurzel`, vor `mctsPUCT` und nach `getAIMove` in die
-  Diagnose aufnehmen; das wäre dann eine kleine Änderung der Diagnose, keine am Spiel).
+Die Diagnose (`kiDiagnose` im Fehlerbericht) trägt seit dieser Änderung je KI-Zug Messpunkte, nur aus `Date.now()`,
+ohne Einfluss auf Zug oder Budget:
 
-## 5. Mögliche Änderungen (nur nach Entscheidung, nicht gebaut)
+- `zeiten.gesamtMs`: Zeit in `getAIMove`; davon `vorMs` (alles vor der Suche, enthält `netzMs`), `netzMs`
+  (Endspiel-Netz), `sucheMs`, `nachMs` (nach der Suche bis zur Rückgabe).
+- `nachrichtMs`: Hin- und Rückweg zwischen Hauptthread und Worker (Warten, Kopieren, Start).
+- `anwendenMs`: den Zug im Hauptthread einsetzen.
+
+Auswertung: `node auswertung/endspiel/zeit-zerlegung.js bericht.json` zeigt die Mediane vor und nach Zug 80.
+Dann steht in Zahlen, welcher Teil der 1,76 s auf dem Handy liegt: Vorarbeit im Worker, Netz, Nachrichtenweg
+oder Einsetzen im Hauptthread. Es genügt, auf dem Handy eine Partie bis etwa Zug 100 zu spielen und den
+Bericht zu exportieren; die Gegenprobe `endspielNetz` = 0 ist danach nur noch nötig, wenn das Netz in den
+Zahlen auffällt.
+
+## 5. Was nicht belegt ist
+
+Die Ursache auf dem Handy ist **nicht belegt**. Was die Daten tragen: Der Rest außerhalb der Suche springt bei
+Zug 82; in der Entwicklungsumgebung tritt der Sprung in dieser Größe nicht auf. Offen ist, ob es das Gerät,
+der Nachrichtenweg oder etwas Drittes ist.
+
+## 6. Mögliche Änderungen (nur nach Entscheidung, nicht gebaut)
 
 1. Die Vorarbeit auf das Suchbudget anrechnen (Frist ab Beginn des Zuges), damit die Dauer das
    Budget nicht übersteigt. Kostet etwas Suchzeit, ändert die Spielstärke leicht.

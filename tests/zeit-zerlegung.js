@@ -34,6 +34,21 @@ test('Zerlegung: Suche = Sims × ms/Sim, Rest = Dauer − Suche, Sprung bei Zug 
   pruefeGleich(r.sucheUeberBudget, 0, 'Suche selbst hält das Budget');
 });
 
+test('Messpunkte: Median je Teil vor und nach Zug 80; ältere Berichte ohne `zeiten` bleiben auswertbar', () => {
+  const k = [];
+  const mit = (zug, rest, netz) => ({...eintrag(zug, 400, 4.5, 1800 + rest), zeiten: {gesamtMs: 1800 + rest - 100, vorMs: rest - 100 - 10, netzMs: netz, sucheMs: 1800, nachMs: 10}, nachrichtMs: 100, anwendenMs: 3});
+  for (let z = 2; z <= 80; z += 2) k.push(mit(z, 200, 0));
+  for (let z = 82; z <= 100; z += 2) k.push(mit(z, 2000, 1500));
+  const r = Z.auswerten({kiDiagnose: k});
+  pruefeGleich(r.messpunkte.vor.netzMs, 0, 'vor Zug 80 kein Netz');
+  pruefeGleich(r.messpunkte.nach.netzMs, 1500, 'danach Netz 1500 ms');
+  pruefeGleich(r.messpunkte.nach.nachrichtMs, 100, 'Nachrichtenweg');
+  pruefe(/netzMs\s+0 \|\s+1500/.test(Z.text(r)), 'Textausgabe zeigt Netz vor | nach');
+  const alt = Z.auswerten({kiDiagnose: [eintrag(2, 400, 4.5, 2000)]});
+  pruefeGleich(alt.messpunkte, null, 'ältere Berichte: keine Messpunkte');
+  pruefe(/keine Messpunkte/.test(Z.text(alt)), 'Text sagt es');
+});
+
 test('Einträge ohne Simulationszahl oder ms/Sim werden nicht gezählt; leere Diagnose ist kein Fehler', () => {
   const r = Z.auswerten({kiDiagnose: [{zug: 2, typ: 'stone', info: 'ohne Zahl', dauerMs: 100, budgetMs: 1800, msProSim: 1}, {zug: 4, typ: 'stone', info: 'MCTS 10 Sims', dauerMs: 100, budgetMs: 1800, msProSim: null}]});
   pruefeGleich(r.zuege, 0, 'nichts auswertbar');
@@ -62,7 +77,8 @@ test('Endspiel-Netz: eingeschaltet ab Zug 80 (Deutung der Doku setzt das voraus)
 test('Dokument und Archivdaten vorhanden', () => {
   const doc = fs.readFileSync(path.join(wurzel, 'docs', 'zeitbudget.md'), 'utf8');
   pruefe(/Vermutung|Hypothese/.test(doc) && /nicht bewiesen|nicht belegt/.test(doc), 'Doc kennzeichnet die Ursache als nicht bewiesen');
-  for (const f of ['zeit-zerlegung.txt', 'netz-kosten.txt']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', f)), f);
+  pruefe(/Zerlegung auf dem Handy/.test(doc) && /nachrichtMs/.test(doc), 'Doc beschreibt die Messpunkte');
+  for (const f of ['zeit-zerlegung.txt', 'netz-kosten.txt', 'browser-zeit-cpu1.txt', 'browser-zeit-cpu10.txt']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', f)), f);
 });
 
 laufeTests('Zeit-Zerlegung').then(ok => process.exit(ok ? 0 : 1));

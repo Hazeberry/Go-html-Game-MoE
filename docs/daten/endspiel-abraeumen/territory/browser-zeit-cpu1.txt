@@ -1,0 +1,13 @@
+CPU ×1; Zeiten in ms: Dauer, Suche, Rest, davon vor der Suche, Netz, nach der Suche, Nachrichtenweg
+Netz 0.8  Zug  70  Dauer 2010  Suche 1795  Rest 215  vor 65  Netz 0  nach 0  Nachricht 116
+Netz 0.8  Zug  78  Dauer 2006  Suche 1820  Rest 186  vor 86  Netz 0  nach 0  Nachricht 99
+Netz 0.8  Zug  80  Dauer 1970  Suche 1786  Rest 184  vor 52  Netz 0  nach 0  Nachricht 93
+Netz 0.8  Zug  82  Dauer 2047  Suche 1809  Rest 238  vor 121  Netz 62  nach 0  Nachricht 103
+Netz 0.8  Zug  84  Dauer 2044  Suche 1778  Rest 266  vor 135  Netz 77  nach 0  Nachricht 88
+Netz 0.8  Zug 100  Dauer 2071  Suche 1821  Rest 250  vor 157  Netz 85  nach 0  Nachricht 89
+Netz 0  Zug  70  Dauer 1975  Suche 1772  Rest 203  vor 55  Netz 0  nach 0  Nachricht 91
+Netz 0  Zug  78  Dauer 1967  Suche 1808  Rest 159  vor 56  Netz 0  nach 0  Nachricht 91
+Netz 0  Zug  80  Dauer 1968  Suche 1788  Rest 180  vor 49  Netz 0  nach 0  Nachricht 99
+Netz 0  Zug  82  Dauer 1973  Suche 1807  Rest 166  vor 54  Netz 0  nach 0  Nachricht 91
+Netz 0  Zug  84  Dauer 1982  Suche 1782  Rest 200  vor 53  Netz 0  nach 0  Nachricht 101
+Netz 0  Zug 100  Dauer 2006  Suche 1790  Rest 216  vor 74  Netz 0  nach 0  Nachricht 109

@@ -4455,6 +4455,7 @@ function _tryReuseSubtree(savedBoard, aiColor, savedNode, currentBoard) {
 
 function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
   const _simStart = Date.now();
+  _zeit.simStart = _simStart;
   _mctsNonFinite = 0;
   /* Feste Simulationszahl statt Zeitbudget. Mit einem Zeitbudget haengt die
      Zahl der Simulationen an der Maschinenlast — derselbe Seed verbraucht
@@ -4629,6 +4630,7 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
 
   /* Feedback für den nächsten Zug: tatsächliche ms/Sim messen, unabhängig
      davon was die Kosten verursacht hat (Randkampf, große Gruppen, egal). */
+  _zeit.simEnd = Date.now();
   if (sims > 0) _lastMsPerSim = (Date.now() - _simStart) / sims;
 
   /* Teilbaum unter unserem gewählten Zug für den nächsten Aufruf sichern */
@@ -5037,6 +5039,7 @@ function endspielNetzWahrscheinlichkeiten(x) {
 const _enPuffer = new Uint8Array(28 * 361);
 function endspielNetzWurzel(board, aiColor, mc, scored, koPoint) {
   if (!(PARAMS.endspielNetz > 0) || mc < PARAMS.endspielNetzAb || !_enLade()) return;
+  const _tNetz = Date.now();
   const e = _enEigen[aiColor], vorletzt = e.mc === mc - 2 ? e.idx : -1;
   _enEbenen(board, aiColor, _lastMoveIdx, vorletzt, koPoint, mc, _enPuffer);
   const p = endspielNetzWahrscheinlichkeiten(_enPuffer);
@@ -5053,6 +5056,23 @@ function endspielNetzWurzel(board, aiColor, mc, scored, koPoint) {
     }
   }
   scored.__pNetz = p; scored.__lambda = PARAMS.endspielNetz;
+  _zeit.netzMs = Date.now() - _tNetz;
+}
+
+/* Zeitmesspunkte eines KI-Zuges (docs/zeitbudget.md). Reine Diagnose: nur Date.now(),
+   kein Einfluss auf Entscheidung oder Budget. Wird je Zug in getAIMove zurückgesetzt. */
+const _zeit = {t0: 0, tEnde: 0, simStart: 0, simEnd: 0, netzMs: 0};
+/* Messpunkte des letzten getAIMove-Aufrufs. Hängt der Aufrufer (Worker, Rückfall) an die Antwort;
+   getAIMove selbst bleibt unverändert und deterministisch (Tests vergleichen seine Ergebnisse). */
+function zeitenLesen() {
+  const gesucht = _zeit.simStart > 0 && _zeit.simEnd >= _zeit.simStart;
+  return {
+    gesamtMs: _zeit.tEnde - _zeit.t0,
+    vorMs:   gesucht ? _zeit.simStart - _zeit.t0 : null,      /* alles vor der Suche (enthält netzMs) */
+    netzMs:  _zeit.netzMs,                                     /* Endspiel-Netz an der Wurzel */
+    sucheMs: gesucht ? _zeit.simEnd - _zeit.simStart : null,
+    nachMs:  gesucht ? _zeit.tEnde - _zeit.simEnd : null       /* nach der Suche bis zur Rückgabe */
+  };
 }
 
 /* Versuchsregel „Pass nach Gegnerpass“ (PARAMS.passNachGegnerpass, docs/passregel-versuch.md).
@@ -5078,6 +5098,8 @@ function passNachGegnerpassPruefung(board, aiColor, captures, extra) {
    extra (optional): {gegnerPasste, wertung, komi} für die Versuchsregel. */
 function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove, extra) {
   let r;
+  const _t0 = Date.now();
+  _zeit.t0 = _t0; _zeit.simStart = 0; _zeit.simEnd = 0; _zeit.netzMs = 0;
   const vp = diff === 'hard' ? passNachGegnerpassPruefung(board, aiColor, captures, extra) : null;
   if (vp && vp.pass) {
     r = {type: 'pass', requestId: reqId,
@@ -5086,6 +5108,7 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
     r = _getAIMoveKern(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove);
   }
   if (vp) r.versuch = vp;
+  _zeit.tEnde = Date.now();
   endspielNetzMerke(aiColor, r && r.type === 'stone' ? r.y * 19 + r.x : -1, mc);
   return r;
 }
@@ -5713,6 +5736,7 @@ function showFinalScore() {
 }
 
 function applyAIResult(result, reqId, netInp, netPriors, netHidden) {
+  const _tAnkunft = Date.now();
   /* Veraltete Antwort: aiThinking gehört dem NEUEREN Request und darf hier
      nicht angefasst werden. Vorher wurde es hier gelöscht, obwohl der
      nachfolgende Request noch rechnete — mit drei Folgen:
@@ -5789,9 +5813,15 @@ function applyAIResult(result, reqId, netInp, netPriors, netHidden) {
     zug: state.moveCount, typ: result.type, info: result.info || null,
     dauerMs: state.aiReqT0 ? Date.now() - state.aiReqT0 : null,
     budgetMs: state.aiReqT0 ? state.aiReqBudget : null,
-    msProSim: typeof _lastMsPerSim === 'number' ? Math.round(_lastMsPerSim * 100) / 100 : null
+    msProSim: typeof _lastMsPerSim === 'number' ? Math.round(_lastMsPerSim * 100) / 100 : null,
+    /* Zerlegung (docs/zeitbudget.md): zeiten = Messpunkte im Worker bzw. Rückfall;
+       nachrichtMs = Hin- und Rückweg zwischen Hauptthread und Worker (Warten, Kopieren,
+       Start); anwendenMs = Zug im Hauptthread einsetzen */
+    zeiten: result.zeiten || null,
+    nachrichtMs: (result.zeiten && state.aiReqSend) ? _tAnkunft - state.aiReqSend - result.zeiten.gesamtMs : null,
+    anwendenMs: Date.now() - _tAnkunft
   });
-  state.aiReqT0 = 0;
+  state.aiReqT0 = 0; state.aiReqSend = 0;
   state.aiThinking = false;
   render(); updateUI(); updateAIStatus(); updateUndoButton();
   if (!state.gameOver && state.aiEnabled && state.currentPlayer === state.aiColor) triggerAIMove();
@@ -5838,7 +5868,7 @@ function buildWorkerSource() {
         /* lastMsPerSim mitschicken: der Hauptthread-Watchdog hat eine
            EIGENE Kopie von _lastMsPerSim (getrennte JS-Umgebung) und
            würde ohne diese Rückmeldung für immer mit null rechnen. */
-        self.postMessage({...result, reqId: d.reqId, lastMsPerSim: _lastMsPerSim});
+        self.postMessage({...result, zeiten: zeitenLesen(), reqId: d.reqId, lastMsPerSim: _lastMsPerSim});
       } catch (err) {
         self.postMessage({
           type: 'workerError',
@@ -5876,6 +5906,7 @@ function fallbackToMainThread(reqId, netInp, netPriors, netHidden) {
         Array.from(state.boardHistory), {...state.captures},
         state.moveCount, 'hard', reqId,
         state.koPoint, state.lastMove, passExtra());      /* Fix 7 + Lokalitätsterm + Versuchsregel */
+      r.zeiten = zeitenLesen();
     } catch (e) {
       /* Letzte Verteidigungslinie: wirft getAIMove hier, gibt es keinen
          Watchdog mehr, der uns rettet — ohne dieses catch blieb aiThinking
@@ -6057,6 +6088,7 @@ function triggerAIMove() {
         netBlend:  _netPriors ? policyNet.blendWeight : 0
       };
       state.aiWorkerCtx.letzteAnfrage = anfrage;   /* für den Wechsel data: → blob: in onerror */
+      state.aiReqSend = Date.now();
       state.aiWorker.postMessage(anfrage);
 
       /* Watchdog: falls der Worker durch eine echte Endlosschleife hängt
@@ -6120,6 +6152,7 @@ function triggerAIMove() {
         Array.from(state.boardHistory), {...state.captures},
         state.moveCount, state.aiDifficulty, reqId,
         state.koPoint, state.lastMove, passExtra());      /* Fix 7 + Lokalitätsterm + Versuchsregel */
+      r.zeiten = zeitenLesen();
       applyAIResult(r, reqId, null, null, null);
     }, 50);
   }
