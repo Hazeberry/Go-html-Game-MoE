@@ -1,0 +1,49 @@
+name: Komi k-Schätzung
+
+# Manueller Lauf aus docs/komi-bewusstsein.md §3: Wie viele Einheiten von
+# evaluateBoard entsprechen einem Punkt Flächenstand? Regression über die
+# archivierten Partien ohne Vorgabe (Arm D) nach Zug 200, 240 und 280. Keine
+# neuen Partien, nur Nachspielen und Rechnen. „Die Daten tragen keinen
+# Komi-Arm“ ist ein Ergebnis, kein Fehler; rot wird der Lauf nur bei einem
+# Fehler im Nachspielen (Exit-Code 3) oder falschem Aufruf (2).
+
+# Keine Eingaben.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  schaetzen:
+    name: k schätzen
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Regression
+        run: |
+          set -uo pipefail
+          mkdir -p ergebnisse
+          node auswertung/komi/k-schaetzung.js \
+            docs/daten/muster-ohne-vorgabe/lauf1/f-D.jsonl.gz \
+            docs/daten/muster-ohne-vorgabe/lauf1/g-D.jsonl.gz \
+            docs/daten/leeres-brett/lauf1/g-D.jsonl.gz \
+            docs/daten/fuego-siege/lauf1/D.jsonl.gz > ergebnisse/bericht.md
+          status=$?
+          cat ergebnisse/bericht.md
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
+          echo "Exit-Code des Werkzeugs: $status" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 1 ]; then echo "::error::Fehler im Werkzeug (Exit-Code $status)"; exit "$status"; fi
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: komi-k
+          path: ergebnisse/
+          retention-days: 90
