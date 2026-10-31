@@ -1,0 +1,48 @@
+name: Endspiel-Abräumen Diagnose
+
+# Manueller Lauf aus docs/endspiel-abraeumen.md §3: Wie viele Züge spielt die KI
+# nach dem letzten Gegnerstein noch, wie viele davon schlagen, und passt der
+# Gegner nur noch? Nur Lesen und Zählen auf archivierten Partien (GNU Go,
+# Fuego, alte PWA, zwei Partien von Hand als SGF), keine neuen Partien.
+
+# Keine Eingaben.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    name: Endphase vermessen
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Diagnose
+        run: |
+          set -euo pipefail
+          mkdir -p ergebnisse
+          d=docs/daten
+          node auswertung/endspiel/abraeumen-diagnose.js \
+            --gruppe "GNU Go, ohne Vorgabe (Leeres Brett, D)=$d/leeres-brett/lauf1/g-D.jsonl.gz" \
+            --gruppe "GNU Go, ohne Vorgabe (Muster ohne Vorgabe, D)=$d/muster-ohne-vorgabe/lauf1/g-D.jsonl.gz" \
+            --gruppe "Fuego 100 Spiele, ohne Vorgabe (D)=$d/muster-ohne-vorgabe/lauf1/f-D.jsonl.gz" \
+            --gruppe "Fuego 50 Spiele, ohne Vorgabe (D)=$d/fuego-siege/lauf1/D.jsonl.gz" \
+            --gruppe "alte PWA, ohne Vorgabe (M1)=$d/pwa-vergleich/lauf1/m1.jsonl.gz" \
+            --sgf $d/endspiel-abraeumen/mensch-412zuege.sgf:W \
+            --sgf $d/endspiel-abraeumen/mensch-427zuege.sgf:W > ergebnisse/bericht.md
+          cat ergebnisse/bericht.md
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: endspiel-abraeumen
+          path: ergebnisse/
+          retention-days: 90
