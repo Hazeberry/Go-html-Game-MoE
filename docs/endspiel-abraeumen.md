@@ -278,3 +278,54 @@ Keine Schwelle, kein Urteil. Die Verteilungen sagen, ob **eine** Schwelle auf
 Lücke, ist das ein Anlass für eine eigene Vorabfestlegung eines Eingriffs mit
 Messung der Partien (Siegquote, Endstand, Länge der Endphase), nicht dieser
 Auswertung.
+
+## 10. Nachtrag: Ergebnis der Verteilung von `best` (31.10.2026)
+
+Lauf 2 von [`pass-stellungen.yml`](../.github/workflows/pass-stellungen.yml), dieselben
+Stellungen wie in §8, rein lesend. Zahlen:
+[`daten/endspiel-abraeumen/lauf3/bericht.md`](daten/endspiel-abraeumen/lauf3/bericht.md).
+Beschreibend, ohne Urteil; die Grenzen aus §9 gelten.
+
+| Quelle | P: größtes `best` | P: `best` < 20 | W: kleinstes / Median / Maximum | W: `best` < 20 / < 100 / < 200 / < 500 / < 1000 |
+|---|---:|---:|---|---|
+| GNU Go | 9,7 | 100 % | 24 / 472 / 4 568 | 0 / 6 / 13 / 55 / 79 % |
+| Fuego 100 | 19,3 | 100 % | 24 / 865 / 8 487 | 0 / 3 / 12 / 34 / 53 % |
+| Fuego 50 | 17,6 | 100 % | −182 / 2 392 / 30 946 | 1 / 5 / 14 / 29 / 42 % |
+| alte PWA | 13,7 | 100 % | −171 / 451 / 17 253 | 8 / 15 / 25 / 51 / 57 % |
+
+**Befunde (beschreibend):**
+
+1. **In Gruppe P liegt `best` immer unter 20** (größter Wert 19,3 über alle vier
+   Quellen, 100 Stellungen). Das ist die Schwelle `passMinMc80`; die Gruppe P ist
+   damit, wie in §9 vorweg gesagt, durch das KI-Verhalten bedingt.
+2. **In Gruppe W liegt `best` fast immer darüber:** Unter 20 liegen 0 % bei GNU Go
+   und Fuego 100, 1 % bei Fuego 50 und 8 % bei der alten PWA. Die Gruppen
+   überlappen bei der Schwelle 20 kaum.
+3. **Oberhalb von 20 reicht die Verteilung von W weit:** Der Median liegt bei 451
+   bis 2 392, das Maximum bei 4 568 bis 30 946. Eine höhere Schwelle würde in
+   immer mehr W-Stellungen das Passen erlauben: bei 100 in 3 bis 15 %, bei 200 in
+   12 bis 25 %, bei 500 in 29 bis 55 %, bei 1000 in 42 bis 79 %.
+4. **Die Kennzahl „Anteil P mit `best` ≥ kleinstes `best` in W“ ist bei Fuego 50
+   (89 %) und der alten PWA (86 %) nicht aussagekräftig:** Sie wird von je einem
+   einzelnen sehr niedrigen W-Wert (−182 und −171) bestimmt. Maßgeblich sind die
+   Quantile und die Anteile unter den Schwellen.
+
+**Was das nicht zeigt** (Grenzen aus §9, hier konkret):
+
+- Dass die Gruppen bei 20 getrennt sind, ist durch die Definition von P
+  vorgegeben. Es sagt nichts darüber, ob das **Weiterspielen in W schlecht** war.
+  Viele W-Stellungen haben hohe `best`-Werte (hunderte bis tausende); ob diese Züge
+  etwas wert sind (z. B. weil sonst Punkte verloren gehen) oder nur Aufräumen
+  nach dem Pass des Gegners, ist offen. Die Auswertung kennt den Endstand nicht.
+- Eine höhere Schwelle ändert den Partieverlauf; was dann in den Stellungen
+  passiert, zeigt diese Auswertung nicht.
+- Programme sind keine Menschen.
+
+**Folge für die Vorbereitung (Vorschlag, nicht beschlossen):** Eine reine
+Schwellenänderung ist nach diesen Daten ein möglicher Kandidat, aber **nicht ohne
+Messung der Partien**. Die Frage wäre, ob das frühere Passen in W-Stellungen mit
+`best` etwa 20 bis 200 Punkte kostet. Das ließe sich in einer eigenen
+Vorabfestlegung messen (gepaarter Endstand und Siegquote, z. B. gegen GNU Go,
+ohne Vorgabe, Länge der Endphase als Nebenmaß). Alternativ bleibt die Zählphase
+(§4) der Kandidat, der die Suchstärke nicht berührt. Beide Wege brauchen
+Teststellungen für Seki, Ko und ungewöhnliche Augen. Entschieden ist nichts.
