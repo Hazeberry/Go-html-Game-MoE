@@ -90,6 +90,35 @@ nur M50 neuer Default werden.
 **Beschreibend, ohne Anspruch:** Endstand Arm − D (gepaart, 97,5 %, t),
 Siegquoten je Farbe der KI, die Quote von D selbst, Phasenprofil.
 
+## 4a. Gültigkeit des Laufs (ergänzt vor dem Messlauf, 31.10.2026)
+
+Zwei Zustände: **gültig** oder **ungültig**. Gültig nur, wenn **alle** drei
+gelten:
+
+1. Alle drei Arme (D, M0, M50) liegen vollständig vor: die Partienummern 1 bis
+   960 je Arm, also alle 16 Teile.
+2. Je Arm mit D sind mindestens **98 %** der erwarteten Paare gewertet
+   (mindestens 941 von 960). Partien ohne Sieger (Zuglimit, Abbruch) fallen
+   samt Partner heraus; ein bis zwei solcher Paare lassen den Lauf gültig.
+3. Die Kontrolle ist bestanden: 20 von 20 Partien Zug für Zug gleich.
+
+**Ungültig:** Der Bericht trägt oben „KEIN URTEIL“ mit dem Grund; die Zahlen
+darunter sind als **vorläufig** gekennzeichnet, die Spalte „Urteil“ nennt
+„kein Urteil“, und es gibt keine Folge für den Default. Der Lauf wird **rot**:
+`siege-ergebnis.sh` und `siege-bericht.js` enden mit Exit-Code 1, der Job
+„Bericht und Ergebnisbranch“ sichert erst Bericht und Rohdaten auf den
+Ergebnisbranch und schlägt danach im letzten Schritt fehl. Kein grüner Lauf
+mit leerem Urteil.
+
+## 4b. Geltungsbereich: ein sehr schwacher Fuego
+
+Fuego mit **50 Spielen je Zug** ist ein Fuego mit sehr schwacher Suche (die
+Standardeinstellung rechnet mit Zehntausenden Spielen je Zug). Er wurde
+gewählt, weil D gegen ihn etwa die Hälfte gewinnt (§9). Das Ergebnis gilt für
+**diesen** Gegner, nicht für Fuego bei normaler Stärke und nicht für Menschen.
+Gegen das Fuego mit 100 Spielen (D gewinnt 15 %) wurde nur der Punktestand
+gemessen ([`muster-ohne-vorgabe.md`](muster-ohne-vorgabe.md) §9).
+
 ## 5. Auflösung, vorab gerechnet
 
 Bei einer Siegquote um 45 % wechselt der Sieger erfahrungsgemäß in rund einem
