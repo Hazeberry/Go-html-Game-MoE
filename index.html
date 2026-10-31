@@ -64,6 +64,8 @@
     .btn:active { background:rgba(200,160,90,.18); }
     .btn:disabled { opacity:.4; cursor:not-allowed; }
     .btn-pass { margin-bottom:6px; }
+    .zv-zeile { font-family:var(--font-mono); font-size:.72rem; color:var(--wood-light); margin-bottom:6px; line-height:1.5; }
+    .zv-info { font-size:.6rem; color:var(--ui-dim); line-height:1.6; margin-top:4px; }
     .btn.active-mode { border-color:var(--green); color:var(--green); background:rgba(39,174,96,.08); }
     #log { font-family:var(--font-mono); font-size:.62rem; color:var(--ui-dim); max-height:140px; overflow-y:auto; line-height:1.7; }
     #log::-webkit-scrollbar { width:4px; } #log::-webkit-scrollbar-thumb { background:var(--ui-border); border-radius:2px; }
@@ -113,7 +115,16 @@
     <div class="panel">
       <button class="btn btn-pass" id="btn-pass">Passen</button>
       <button class="btn" id="btn-undo" disabled>Rückgängig</button>
-      <button class="btn" id="btn-reset" style="margin-top:6px">Neues Spiel</button>
+      <button class="btn" id="btn-zaehlvorschau" style="margin-top:6px" title="Zeigt, wie die App die Stellung zählt, ohne etwas zu ändern">Zählvorschau</button>
+      <button class="btn" id="btn-reset" style="margin-top:14px">Neues Spiel</button>
+    </div>
+    <div class="panel" id="zv-panel" style="display:none">
+      <div class="panel-title">Zählvorschau</div>
+      <div class="zv-zeile" id="zv-mit"></div>
+      <div class="zv-zeile" id="zv-nur"></div>
+      <div class="zv-info" id="zv-info"></div>
+      <div class="zv-info" id="zv-hinweis"></div>
+      <button class="btn" id="btn-zv-weiter" style="margin-top:8px">Weiterspielen</button>
     </div>
     <div class="panel">
       <div class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
@@ -5426,7 +5437,8 @@ const state = {
   aiDiag: [], lastAIRequest: null, aiReqT0: 0, aiReqBudget: 0,
   workerDeadReason: null,
   aiEnabled: false, aiColor: 2, aiDifficulty: 'easy',
-  aiThinking: false, aiRequestId: 0, aiWorker: null, aiWorkerCtx: null, deadStones: new Set(), undoStack: []
+  aiThinking: false, aiRequestId: 0, aiWorker: null, aiWorkerCtx: null, deadStones: new Set(), undoStack: [],
+  vorschau: null   /* Zählvorschau: {schluessel, v}; nur Anzeige, nie Teil des Spiels */
 };
 
 /* Touch-Bedienung: erster Tipp = Vorschau, zweiter Tipp = setzen */
@@ -5538,6 +5550,7 @@ function resetGame() {
   cleanupWorker();
   state.workerDead = false;   /* Neues Spiel = neuer Versuch */
   state.workerDeadReason = null;
+  state.vorschau = null; vorschauPanelAktualisieren();
   if (globalThis.policyNet) { policyNet._trained=false; policyNet._gameBuffer=[]; }
   state.aiRequestId++;
   const eb = createBoard(), eh = computeZobrist(eb);
@@ -6231,6 +6244,68 @@ function drawStateToCache() {
     sCtx.lineWidth = Math.max(1.5, C*0.07);
     sCtx.stroke();
   }
+  vorschauAbgleichen();
+  if (state.vorschau) zeichneVorschauMarken(sCtx, state.vorschau.v);
+}
+
+/* ── Zählvorschau (docs/zaehlvorschau.md) ──────────────────────────────────
+   Rein anzeigend: ändert weder Brett noch Gefangene noch Protokoll noch
+   deadStones. Gilt nur für genau die Stellung, für die sie berechnet wurde
+   (Zugzähler und Hash); jeder Zug, Pass, Rückgängig oder Neues Spiel blendet
+   sie aus. */
+function vorschauSchluessel() { return state.moveCount + ':' + state.currentHash; }
+function vorschauStandText(stand) {
+  return stand >= 0 ? `Schwarz +${stand.toFixed(1)}` : `Weiß +${(-stand).toFixed(1)}`;
+}
+function vorschauPanelAktualisieren() {
+  const panel = document.getElementById('zv-panel');
+  if (!state.vorschau) { panel.style.display = 'none'; return; }
+  const v = state.vorschau.v, komiText = String(v.komi).replace('.', ',');
+  document.getElementById('zv-mit').textContent = `Mit Annahmen: ${vorschauStandText(v.mitSchaetzung.stand)}`;
+  document.getElementById('zv-nur').textContent = `Nur Bewiesenes: ${vorschauStandText(v.nurBewiesen.stand)}`;
+  const a = v.anzahl;
+  let info = `Fläche, Komi ${komiText}. ${a.bewiesenTot} Steine bewiesen tot, ${a.geschaetztTot} als tot geschätzt (orange, mit ?), ${a.unbewiesen} lebend ohne Beweis.`;
+  document.getElementById('zv-info').textContent = info;
+  let hinweis = 'Seki und Ko erkennt die Zählung nicht.';
+  if (v.nurBewiesen.gemischtAnteil > 0.1) hinweis += ' Die Stellung ist noch nicht ausgespielt, die Zahlen sagen wenig.';
+  document.getElementById('zv-hinweis').textContent = hinweis;
+  panel.style.display = '';
+}
+function vorschauAbgleichen() {
+  if (state.vorschau && state.vorschau.schluessel !== vorschauSchluessel()) {
+    state.vorschau = null;
+    vorschauPanelAktualisieren();
+  }
+}
+function vorschauSchliessen() {
+  if (!state.vorschau) return;
+  state.vorschau = null;
+  vorschauPanelAktualisieren();
+  drawStateToCache(); render();
+}
+function vorschauOeffnen() {
+  if (state.gameOver) return;
+  state.vorschau = {schluessel: vorschauSchluessel(), v: zaehlVorschau(state.board, KOMI)};
+  vorschauPanelAktualisieren();
+  drawStateToCache(); render();
+}
+/* Bewiesen tot: rotes Kreuz (wie bei der Schlusszählung); geschätzt tot:
+   oranges Kreuz mit Fragezeichen. Unbewiesene Steine bleiben unmarkiert. */
+function zeichneVorschauMarken(ct, v) {
+  const {MARGIN:M, CELL:C} = layout, r = C*0.46;
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    const bew = v.bewiesenTot[i], ges = v.geschaetztTot[i];
+    if (!bew && !ges) continue;
+    const cx = M + xOf(i)*C, cy = M + yOf(i)*C;
+    ct.strokeStyle = bew ? '#c0392b' : '#e67e22'; ct.lineWidth = 3; ct.beginPath();
+    ct.moveTo(cx-r*.6, cy-r*.6); ct.lineTo(cx+r*.6, cy+r*.6);
+    ct.moveTo(cx+r*.6, cy-r*.6); ct.lineTo(cx-r*.6, cy+r*.6); ct.stroke();
+    if (ges) {
+      ct.fillStyle = '#e67e22'; ct.font = `bold ${Math.round(C*0.5)}px sans-serif`;
+      ct.textAlign = 'center'; ct.textBaseline = 'middle';
+      ct.fillText('?', cx + r*.55, cy - r*.55);
+    }
+  }
 }
 
 function resizeCanvas() {
@@ -6285,6 +6360,7 @@ function updateUI(msg='') {
     elLog.appendChild(d);
   }
   elLog.scrollTop=elLog.scrollHeight;
+  vorschauAbgleichen();   /* nach jedem Zug, Pass, Rückgängig, Neues Spiel */
 }
 
 function updateAIStatus() {
@@ -6383,6 +6459,11 @@ document.getElementById('btn-undo').addEventListener('click',()=>{
   if (state.aiEnabled) { undo(); undo(); } else { undo(); }
   if (state.aiEnabled && !state.gameOver && state.currentPlayer === state.aiColor) triggerAIMove();
 });
+
+document.getElementById('btn-zaehlvorschau').addEventListener('click',()=>{
+  if (state.vorschau) vorschauSchliessen(); else vorschauOeffnen();
+});
+document.getElementById('btn-zv-weiter').addEventListener('click',()=>vorschauSchliessen());
 
 document.getElementById('btn-reset').addEventListener('click',()=>{
   resetGame();render();updateUI();updateAIStatus();
