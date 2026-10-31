@@ -1,0 +1,46 @@
+name: Pass-Sonde Endphase
+
+# Manueller Lauf aus docs/endspiel-abraeumen.md §7: Feste späte Stellungen aus
+# archivierten Partien (die KI ist nach dem ersten Pass des Gegners in der
+# Endphase am Zug) werden der Engine noch einmal vorgelegt; protokolliert wird,
+# was die Pass-Prüfung sieht (best, Schwellen, Atari, Gegnerzug) und wie lange
+# getAIMove braucht. Keine neuen Partien, kein GNU Go, keine Änderung am Spiel.
+
+# Keine Eingaben.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sonde:
+    name: Stellungen befragen
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Sonde
+        run: |
+          set -euo pipefail
+          mkdir -p ergebnisse
+          d=docs/daten
+          node auswertung/endspiel/pass-stellungen.js --max 100 --seed 1 \
+            --gruppe "GNU Go ohne Vorgabe=$d/leeres-brett/lauf1/g-D.jsonl.gz,$d/muster-ohne-vorgabe/lauf1/g-D.jsonl.gz" \
+            --gruppe "Fuego 100 Spiele=$d/muster-ohne-vorgabe/lauf1/f-D.jsonl.gz" \
+            --gruppe "Fuego 50 Spiele=$d/fuego-siege/lauf1/D.jsonl.gz" \
+            --gruppe "alte PWA=$d/pwa-vergleich/lauf1/m1.jsonl.gz" > ergebnisse/bericht.md
+          cat ergebnisse/bericht.md
+          cat ergebnisse/bericht.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: pass-stellungen
+          path: ergebnisse/
+          retention-days: 90

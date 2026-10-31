@@ -132,3 +132,58 @@ die Pass-Sonde (§4) der nächste Schritt: an späten Stellungen protokollieren,
 die KI nicht passt, und die Laufzeit je Zug messen. Der Beschwerdefall „extrem lange“
 ist bisher nur an einer Handpartie belegt; eine Bedenkzeit je Zug haben die
 Datensätze nicht.
+
+## 7. Pass-Sonde: Vorabfestlegung (31.10.2026, vor dem Lauf)
+
+Nur Vorbereitung; der Lauf ([`pass-stellungen.yml`](../.github/workflows/pass-stellungen.yml))
+startet erst nach Freigabe. Kein Eingriff in das Spiel.
+
+**Was die Pass-Prüfung in `getAIMove` tut** (`index.html`, vor der Suche): Die KI
+passt nur, wenn der beste Kandidatenwert `best` unter einer der Schwellen
+`passMinMc40/80/120/150` (−50, 20, 8, 10) liegt (`wantsToPass`). Dann passt sie
+trotzdem nicht, wenn eine eigene Kette im Atari steht (`ownInAtari`) oder der
+beste Gegnerzug mehr als `passGainThreshold` (60) bringt (`oppBest`), außer der
+Gegnerzug ist nicht abwendbar (`passUnabwendbar`). Die Engine weiß nicht, dass der
+Gegner gerade gepasst hat; sie bewertet nur das Brett. Die Schwellen stammen aus
+einer Zeit, in der Zugwerte in den Zehnern lagen
+([`parameter-reihe.md`](parameter-reihe.md)).
+
+**Stellungen:** Aus den archivierten Partien (Fuego 50, Fuego 100, GNU Go in zwei
+Läufen, alte PWA, ohne Vorgabe, Arm D bzw. M1) die Stellung, in der die KI nach
+dem **ersten Gegnerpass der Endphase** am Zug ist (Endphase wie in §3). Zwei
+Gruppen je Quelle: **W** („KI spielte in der Partie weiter“, der nächste KI-Zug
+war ein Stein) und **P** („KI passte“). Höchstens **100 je Gruppe und Quelle**,
+gezogen mit festem Seed 1.
+
+**Befragung:** `getAIMove`, Stufe hard, Default der Datei, 120 feste Simulationen,
+Aufgabe aus (`resignEnabled=0`), ohne adaptives Zeitbudget, Zufall je Stellung
+geseedet (Seed 1 und Partienummer). Eine Kopie von `index.html` im Speicher trägt
+zwei Protokollzeilen an der Pass-Prüfung; die Datei im Repo bleibt unberührt.
+
+**Protokoll je Stellung:** `best`, `wantsToPass`, `ownInAtari`, `oppBest`,
+`opponentGainsAlot`, `unabwendbar`, die Entscheidung (pass, stone) mit gewähltem
+Zug, ob sie dem Zug der Partie entspricht, und die Dauer von `getAIMove` in ms.
+
+**Grund, warum die KI nicht passt:** (a) `best` über allen Schwellen, (b) eigene
+Kette im Atari, (c) der Gegner hat einen Zug über `passGainThreshold`, (d) sonst.
+
+**Auswertung, beschreibend:** je Quelle und Gruppe: Zahl der Stellungen, wie oft die
+Sonde passt, wie oft sie denselben Zug wie die Partie wählt (Wiederholbarkeit),
+Mediane von `best` und `oppBest`, die Gründe mit Anzahl, Dauer (Median, 90 %, Max).
+Keine Schwelle, kein Urteil.
+
+**Wie die Befunde zu lesen wären (vorab, nicht bindend):**
+
+| Befund in Gruppe W | spricht für |
+|---|---|
+| (a) überwiegt: `best` weit über den Schwellen | die Passregel (Schwellen aus der Zehner-Zeit) als Kandidat |
+| (c) überwiegt: Gegnerzug über der Schwelle, obwohl der Gegner gepasst hat | die Bewertung der Gegnerzüge (Auffüllen, Neutral), nicht die Schwellen |
+| (b) überwiegt: eigene Kette im Atari | die Ketten selbst; Zählphase hilft nicht |
+| Sonde passt oft, die Partie spielte weiter | Zufall oder Unterschied zwischen Sonde und Partie, Wiederholbarkeit prüfen |
+
+**Grenzen:** (1) Die Dauer ist die von 120 festen Simulationen auf einem
+Actions-Runner; sie sagt nichts über das Zeitbudget im Browser auf einem Handy
+(dort bestimmt `getAdaptiveTimeBudget` die Zeit). Die Beschwerde „extrem lange“
+bleibt damit unbelegt; dafür bräuchte es eine Messung im Browser. (2) Archivierte
+Gegner sind Programme. (3) Die Befragung wiederholt die Entscheidung, sie erklärt
+die Partie nur, wenn die Wiederholbarkeit hoch ist.
