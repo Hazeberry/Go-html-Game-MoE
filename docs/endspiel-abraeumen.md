@@ -353,3 +353,22 @@ weiterspielen (die Züge der Partie per GTP einspielen, dann weiter), das
 Duell-Werkzeug kann bisher nur von der leeren Brettstellung starten. Der
 Vergleich wäre gepaart je Stellung. Die Zählphase löst den Fall „Mensch passt, KI
 spielt weiter“ für sich allein nicht. Bis zur Freigabe wird nichts davon gebaut.
+
+## 12. Einordnung der Handpartien und Kandidat Zählvorschau (31.10.2026)
+
+Aus einer weiteren Durchsicht (Astra), übernommen als Einordnung, nicht als Beschluss:
+
+- Die zwei Handpartien (§1) sind eine gute Referenz für das **Bedienproblem**: Sie
+  zeigen, was passiert, wenn kein sinnvoller Zug mehr gesehen und wiederholt gepasst
+  wird. Sie sind **kein Maßstab dafür, wann die KI passen sollte.**
+- Ein Pass des Menschen bedeutet nicht, dass die Stellung ausgespielt ist. Die KI
+  könnte noch berechtigt schlagen oder Gebiet sichern. Das lange Weiterspielen
+  ist deshalb **zunächst kein belegter Fehler** (das deckt sich mit §8 und §10:
+  ob das Weiterspielen etwas wert ist, ist offen).
+- **Kandidat für den Fall „Mensch passt, KI spielt weiter“:** eine **freiwillige
+  Zählvorschau** mit „Weiterspielen“. Sie zeigt, wie die App die Stellung
+  einschätzt, ohne die KI zu einem vorzeitigen Pass zu zwingen. Die Unsicherheit
+  bei toten Gruppen muss sichtbar bleiben: „nicht von Benson als lebendig bestätigt“
+  heißt nicht „tot“, und Seki erkennt die Zählung nicht zuverlässig (§1). Gebaut
+  ist davon nichts; eine Umsetzung bräuchte eine eigene Vorabfestlegung und
+  Teststellungen für Seki, Ko, offene Grenzen und ungewöhnliche Augen.
