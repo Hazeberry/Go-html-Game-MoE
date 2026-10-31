@@ -103,4 +103,21 @@ test('Stand folgt der Fläche mit Komi: Vorzeichen und komi-Parameter', () => {
   pruefeGleich(a.komi, 7.5, 'Komi wird mitgegeben');
 });
 
+test('Sechs Handpartien (stellungen/hand-*.sgf): Endstand der Vorschau = Ergebnis der App, keine falsch toten Steine, offene Stellung erkannt', () => {
+  /* RE[] der Dateien ist das Ergebnis, das die App selbst nach ihrer Zählung angezeigt hat */
+  const erwartet = {'455': 61.5, '427': 67.5, '392': -106.5, '364': -98.5};
+  for (const [nr, stand] of Object.entries(erwartet)) {
+    const v = zaehlVorschau(sgf(`hand-${nr}.sgf`), 7.5);
+    pruefeGleich(v.mitSchaetzung.stand, stand, `${nr}: Stand wie RE der Partie`);
+    pruefeGleich(v.anzahl.geschaetztTot, 0, `${nr}: keine nur geschätzt toten Steine am Ende (nichts falsch als tot behauptet)`);
+    pruefeGleich(v.nurBewiesen.gemischtAnteil, 0, `${nr}: ausgespielt`);
+  }
+  /* 478 ohne RE (die Partie wurde nicht beendet); die Auswertung der App am Ende: B+93,5 wie bei auge-479 */
+  const v478 = zaehlVorschau(sgf('hand-478.sgf'), 7.5);
+  pruefeGleich(v478.mitSchaetzung.stand, 93.5, '478: Stand 93,5');
+  /* 117: nach Aufgabe der KI (B+R), nicht ausgespielt */
+  const v117 = zaehlVorschau(sgf('hand-117.sgf'), 7.5);
+  pruefe(v117.nurBewiesen.gemischtAnteil > 0.9 && !v117.sicher, `117: noch nicht ausgespielt (${v117.nurBewiesen.gemischtAnteil.toFixed(2)})`);
+});
+
 laufeTests('Zählvorschau (zaehlVorschau)').then(ok => process.exit(ok ? 0 : 1));

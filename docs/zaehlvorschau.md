@@ -126,3 +126,39 @@ in einer ausgespielten Stellung (Partie vom 12.10.) erscheint das Fragezeichen-K
 den acht Steinen; in einer offenen Stellung der Hinweis „noch nicht ausgespielt“.
 
 Gebaut wird erst auf dein Go.
+
+## 6. Sechs Handpartien als Prüfmaterial (31.10.2026)
+
+Hazeberry hat sechs Partien gegen die KI bereitgestellt (SGF aus der App,
+5. bis 29.10.2026, jetzt `tests/stellungen/hand-*.sgf`: 478, 455, 427, 392, 364 und
+117 Züge). Gefragt war, ob sie Seki- und Ko-Fälle enthalten. Befund, geprüft an den
+Endstellungen und den Zugfolgen:
+
+- **Kein Seki.** In keiner der sechs Endstellungen stehen zwei gegnerische Ketten
+  mit mindestens zwei gemeinsamen Freiheiten und je höchstens vier Freiheiten. Die
+  Seki-Teststellung bleibt deshalb konstruiert (`tests/zaehlvorschau.js`).
+- **Ko-Kämpfe kommen vor**, aber keiner ist am Ende offen: In den Zugfolgen stehen
+  je 4 bis 12 einzelne Schläge in Ko-Form (ein Stein genommen, der schlagende Stein
+  hat eine Freiheit; das zählt auch Rückschläge, die keine längeren Kämpfe waren).
+  Die Endstellungen enthalten keinen offenen Ko. Sie belegen, dass die
+  Spiellogik Ko-Züge verarbeitet, nicht, dass die Vorschau ein offenes Ko beurteilt.
+- **Keine ungewöhnlichen Augen auffällig**; das heißt nicht, dass keine vorkamen,
+  nur, dass der Test an diesen Endstellungen keine falsche Behauptung gefunden hat.
+
+**Was die Partien trotzdem prüfen** (`tests/zaehlvorschau.js`, Test „Sechs
+Handpartien“):
+
+- In vier Partien (455, 427, 392, 364) steht das Ergebnis, das die App selbst
+  angezeigt hat, in `RE[]` (B+61,5, B+67,5, W+106,5, W+98,5). Die Vorschau liefert an
+  der Endstellung **genau diese Stände**, ohne einen Stein als nur geschätzt tot zu
+  behaupten (`geschaetztTot` ist 0) und ohne gemischten Rest.
+- Partie 478 (nicht beendet, kein `RE`): Stand 93,5.
+- Partie 117 (Aufgabe der KI, B+R): **nicht ausgespielt** (gemischter Rest über 90 %),
+  die Vorschau sagt es, `sicher` ist falsch.
+
+**Grenze:** Alle fünf Endstellungen sind bereits aufgeräumt (die toten Steine wurden
+gespielt oder liegen schon als bewiesen tot), sie sind also leicht für die Vorschau.
+Schwierig wären Stellungen **vor** dem Aufräumen. Dafür fehlen echte Partien noch;
+Hinweis: Eine SGF-Datei aus der App enthält nur die Züge, die toten Steine am Ende
+sind darin nicht markiert. Wer eine Partie meldet, bei der die Zählung falsch lag,
+liefert am besten die SGF **und** die Stellung, die die App am Ende angezeigt hat.
