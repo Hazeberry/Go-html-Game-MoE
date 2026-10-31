@@ -33,10 +33,15 @@ concurrency:
 permissions:
   contents: read
 
+# Alle Jobs laufen auf Ubuntu 24.04 statt ubuntu-latest: Seit dem 30.10.2026
+# ist ubuntu-latest Ubuntu 26.04 mit neuerem Boost (Fuego lässt sich dort nicht
+# bauen: boost::filesystem::path::normalize fehlt), anderem Chromium-Support und
+# anderen Paketständen von GNU Go. Die Messungen sollen auf dem Stand laufen,
+# auf dem sie vorab festgelegt und bisher gespielt wurden.
 jobs:
   pruefen:
     name: Eingaben prüfen
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
       seed: ${{ steps.p.outputs.seed }}
@@ -55,7 +60,7 @@ jobs:
   fuego-bauen:
     name: Fuego bauen
     needs: pruefen
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -78,7 +83,7 @@ jobs:
   gnugo-gross:
     name: GNU Go, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
     needs: pruefen
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 150
     strategy:
       fail-fast: false
@@ -118,7 +123,7 @@ jobs:
   gnugo-klein:
     name: GNU Go, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
     needs: pruefen
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 150
     strategy:
       fail-fast: false
@@ -158,7 +163,7 @@ jobs:
   fuego-gross:
     name: Fuego, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
     needs: [pruefen, fuego-bauen]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 150
     strategy:
       fail-fast: false
@@ -206,7 +211,7 @@ jobs:
   fuego-klein:
     name: Fuego, ${{ matrix.arm }}, Partien ab ${{ matrix.von }}
     needs: [pruefen, fuego-bauen]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 150
     strategy:
       fail-fast: false
@@ -254,7 +259,7 @@ jobs:
   kontrolle-g:
     name: Kontrolle GNU Go (Seed 216, Partien 1 bis 15)
     needs: pruefen
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
@@ -288,7 +293,7 @@ jobs:
   kontrolle-f:
     name: Kontrolle Fuego (Seed 219, Partien 1 bis 10)
     needs: [pruefen, fuego-bauen]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
@@ -332,7 +337,7 @@ jobs:
     # Auch wenn ein Teil scheitert: Der Bericht nennt die Paare, die da sind,
     # und fehlende-teile.txt die, die fehlen.
     if: always() && needs.pruefen.result == 'success'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     # Nur dieser Job schreibt ins Repo, und nur auf einen neuen Branch.
     permissions:
