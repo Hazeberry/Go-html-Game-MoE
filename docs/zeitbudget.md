@@ -184,6 +184,12 @@ Stand nach der Auflösung: Das Handy-Problem war eine Browser-Einstellung. Was b
 
 0. **Langsamen Pfad erkennen und melden.** Schafft die Suche beim ersten KI-Zug auf Stufe Schwer weniger als etwa 800 Simulationen in 1,8 s (statt ca. 2000 und mehr), zeigt die App einen Hinweis („Dein Browser rechnet langsam, prüfe die Chrome-Einstellung für den V8-Optimierer“). Eine Anzeige, kein Eingriff in die Suche; die Schwelle wäre vorab festzulegen.
 
+**Entscheidung (Hazeberry, 31.10.2026): Das Endspiel-Netz wird nicht beschleunigt.** Die Mehrzeit liegt auf den
+Testgeräten im Bruchteil einer Sekunde (A20s: 520 von 2500 ms je Zug) und fällt kaum auf; Handys werden schneller; die
+übrigen Geräte der Nutzer sind schneller als die Testgeräte. Wer es verbessern will, findet die Messdaten und die
+Auswertung in diesem Dokument und in `daten/endspiel-abraeumen/territory/`. Die Optionen 1 bis 4 unten bleiben als
+Ideen stehen, sind aber nicht geplant.
+
 Die folgenden Optionen waren vor der Auflösung gedacht und sind jetzt zurückgestellt:
 
 1. Das Netz schneller rechnen, ohne sein Ergebnis zu ändern (gleiche Ausgabe, andere Schleifen oder

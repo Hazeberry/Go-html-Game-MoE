@@ -114,6 +114,7 @@ test('Dokument und Archivdaten vorhanden', () => {
   const doc = fs.readFileSync(path.join(wurzel, 'docs', 'zeitbudget.md'), 'utf8');
   pruefe(/Ergebnis vom Handy/.test(doc) && /1627/.test(doc) && /Galaxy A20s/.test(doc), 'Doc nennt beide Handy-Ergebnisse');
   pruefe(/V8-Optimierer/.test(doc) && /Auflösung/.test(doc), 'Doc nennt die Auflösung');
+  pruefe(/Das Endspiel-Netz wird nicht beschleunigt/.test(doc), 'Doc hält die Entscheidung fest');
   pruefe(/Zerlegung auf dem Handy/.test(doc) && /nachrichtMs/.test(doc), 'Doc beschreibt die Messpunkte');
   for (const f of ['zeit-zerlegung.txt', 'netz-kosten.txt', 'browser-zeit-cpu1.txt', 'browser-zeit-cpu10.txt', 'handy-bericht-280zuege.json', 'handy-zeit-zerlegung.txt', 'handy-bericht-a20s-292zuege.json', 'handy-a20s-zeit-zerlegung.txt', 'handy-bericht-a17-chrome2-356zuege.json', 'handy-bericht-a17-firefox-354zuege.json', 'handy-bericht-a17-pwa-340zuege.json', 'handy-bericht-a17-chrome-v8-358zuege.json', 'handy-zeit-zerlegung-a17-chrome-v8-358zuege.txt', 'chromium-referenz/README.md', 'chromium-referenz/bericht.md', 'chromium-referenz/metadaten.json', 'chromium-referenz/messungen.jsonl']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', f)), f);
 });
