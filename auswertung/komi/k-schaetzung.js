@@ -25,7 +25,14 @@
    Nachspielens müssen mit `gefangen` des Datensatzes übereinstimmen (sonst
    Exit-Code 3).
 
-   Aufruf:  node auswertung/komi/k-schaetzung.js [--html index.html] [--komi 7.5] partien.jsonl[.gz] ... */
+   Explorative Gegenproben (docs/komi-bewusstsein.md §6, ändern das Urteil
+   aus §5 nicht): `--quelle gnugo` nimmt für d den Endstand aus GNU Gos
+   final_score (Feld `endstand`) statt der eigenen Zählung `unsereZaehlung`
+   (Standard `eigene`, wie in der Vorabfestlegung gerechnet); `--gleiche-partien`
+   wertet an allen Zugzahlen nur die Partien aus, die die längste Zugzahl
+   erreichen.
+
+   Aufruf:  node auswertung/komi/k-schaetzung.js [--html index.html] [--komi 7.5] [--quelle eigene|gnugo] [--gleiche-partien] partien.jsonl[.gz] ... */
 'use strict';
 const fs = require('fs'), zlib = require('zlib'), path = require('path');
 
@@ -128,21 +135,36 @@ function nachspielen(E, zuege, zahlen) {
   return {stellungen: aus, gefangen: caps};
 }
 
-/* Gültige Partie: ohne Vorgabe, Schwarz beginnt, nicht abgebrochen, Sieger bekannt, Zählung vorhanden */
-function brauchbar(r, komi) {
-  return r && !r.abgebrochen && (r.gewonnen === true || r.gewonnen === false) && r.unsereZaehlung
-    && Number.isFinite(r.unsereZaehlung.b) && Number.isFinite(r.unsereZaehlung.w)
-    && r.komi === komi && r.beginnt === 'S' && (!r.vorgabe || r.vorgabe === 0) && Array.isArray(r.zuege);
+/* Komifreier Flächenstand für Schwarz, d = Fläche Schwarz − Fläche Weiß.
+   eigene: aus `unsereZaehlung` (Zählung von gnugo-duell.js, w enthält das Komi).
+   gnugo:  aus `endstand` = GNU Gos final_score aus Sicht der KI, mit Komi;
+           Rand für Schwarz = ±endstand, d = Rand + Komi. */
+function stand(r, komi, quelle = 'eigene') {
+  if (quelle === 'gnugo') {
+    if (!Number.isFinite(r.endstand) || (r.wirFarbe !== 'S' && r.wirFarbe !== 'W')) return NaN;
+    return (r.wirFarbe === 'S' ? r.endstand : -r.endstand) + komi;
+  }
+  return r.unsereZaehlung.b - (r.unsereZaehlung.w - komi);
 }
 
-function auswerten(E, partien, komi) {
+/* Gültige Partie: ohne Vorgabe, Schwarz beginnt, nicht abgebrochen, Sieger bekannt, Zählung vorhanden */
+function brauchbar(r, komi, quelle = 'eigene') {
+  return r && !r.abgebrochen && (r.gewonnen === true || r.gewonnen === false) && r.unsereZaehlung
+    && Number.isFinite(r.unsereZaehlung.b) && Number.isFinite(r.unsereZaehlung.w)
+    && r.komi === komi && r.beginnt === 'S' && (!r.vorgabe || r.vorgabe === 0) && Array.isArray(r.zuege)
+    && Number.isFinite(stand(r, komi, quelle));
+}
+
+function auswerten(E, partien, komi, opt = {}) {
+  const quelle = opt.quelle || 'eigene', gleiche = !!opt.gleiche;
   const punkte = Object.fromEntries(ZUGZAHLEN.map(z => [z, []]));
   let genutzt = 0, geprueft = 0, falsch = 0, uebersprungen = 0;
   const zuKurz = Object.fromEntries(ZUGZAHLEN.map(z => [z, 0]));
   for (const r of partien) {
-    if (!brauchbar(r, komi)) { uebersprungen++; continue; }
-    const d = r.unsereZaehlung.b - (r.unsereZaehlung.w - komi);   // komifreier Flächenstand für Schwarz
+    if (!brauchbar(r, komi, quelle)) { uebersprungen++; continue; }
+    const d = stand(r, komi, quelle);   // komifreier Flächenstand für Schwarz
     const n = r.zuege.length;
+    if (gleiche && n < Math.max(...ZUGZAHLEN)) { uebersprungen++; continue; }
     const na = nachspielen(E, r.zuege, ZUGZAHLEN.filter(z => z <= n));
     if (r.gefangen && Number.isFinite(r.gefangen.wir)) {   // Probe auf das Nachspielen selbst
       geprueft++;
@@ -159,12 +181,13 @@ function auswerten(E, partien, komi) {
     if (erg[z]) erg[z].ki = bootstrapU(punkte[z]);
   }
   const frei = einfrieren(erg, komi);
-  return {genutzt, uebersprungen, geprueft, falsch, zuKurz, erg, frei, trag: tragfaehig(erg, frei)};
+  return {genutzt, uebersprungen, geprueft, falsch, zuKurz, erg, frei, trag: tragfaehig(erg, frei), quelle, gleiche};
 }
 
 const z3 = v => Number.isFinite(v) ? v.toFixed(3).replace('.', ',') : '–';
 function text(res, komi) {
-  const o = [`Partien genutzt: ${res.genutzt} (nicht brauchbar übersprungen: ${res.uebersprungen}). Komifreier Flächenstand d = Fläche Schwarz − Fläche Weiß; E = evaluateBoard(Schwarz).`,
+  const o = [`Quelle von d: ${res.quelle === 'gnugo' ? 'GNU Gos final_score (`endstand`)' : 'eigene Zählung (`unsereZaehlung`)'}; Partien: ${res.gleiche ? 'nur die, die alle drei Zugzahlen erreichen' : 'alle brauchbaren'}.`, '',
+    `Partien genutzt: ${res.genutzt} (nicht brauchbar übersprungen: ${res.uebersprungen}). Komifreier Flächenstand d = Fläche Schwarz − Fläche Weiß; E = evaluateBoard(Schwarz).`,
     `Probe des Nachspielens: ${res.geprueft - res.falsch} von ${res.geprueft} Partien mit gleichen Gefangenenzahlen wie im Datensatz${res.falsch ? ' — **FEHLER im Nachspielen**' : ''}.`, '',
     '| Zug | Stellungen | zu kurz | Punkte je Einheit (d auf E) | Einheiten je Punkt (E auf d) | R² | u (geometr. Mittel) | 95 % von u | k = Komi · u |', '|---:|---:|---:|---:|---:|---:|---:|---|---:|'];
   for (const z of ZUGZAHLEN) {
@@ -180,20 +203,22 @@ function text(res, komi) {
   return o.join('\n') + '\n';
 }
 
-module.exports = {regression, einfrieren, bootstrapU, tragfaehig, nachspielen, auswerten, brauchbar, text, motor, ZUGZAHLEN};
+module.exports = {stand, regression, einfrieren, bootstrapU, tragfaehig, nachspielen, auswerten, brauchbar, text, motor, ZUGZAHLEN};
 
 if (require.main === module) {
   const a = process.argv.slice(2);
-  let html = path.join(__dirname, '..', '..', 'index.html'), komi = 7.5; const dateien = [];
+  let html = path.join(__dirname, '..', '..', 'index.html'), komi = 7.5, quelle = 'eigene', gleiche = false; const dateien = [];
   for (let i = 0; i < a.length; i++) {
     if (a[i] === '--html') html = a[++i];
     else if (a[i] === '--komi') komi = +a[++i];
+    else if (a[i] === '--quelle') { quelle = a[++i]; if (quelle !== 'eigene' && quelle !== 'gnugo') { console.error('--quelle: eigene oder gnugo'); process.exit(2); } }
+    else if (a[i] === '--gleiche-partien') gleiche = true;
     else if (a[i].startsWith('--')) { console.error('Unbekannte Option ' + a[i]); process.exit(2); }
     else dateien.push(a[i]);
   }
   if (!dateien.length) { console.error('Aufruf: node auswertung/komi/k-schaetzung.js [--html index.html] [--komi 7.5] partien.jsonl[.gz] ...'); process.exit(2); }
   const partien = dateien.flatMap(d => { const r = fs.readFileSync(d); return (d.endsWith('.gz') ? zlib.gunzipSync(r) : r).toString('utf8').split('\n').filter(Boolean).map(x => JSON.parse(x)); });
-  const res = auswerten(motor(html), partien, komi);
+  const res = auswerten(motor(html), partien, komi, {quelle, gleiche});
   process.stdout.write(text(res, komi));
   process.exit(res.falsch ? 3 : res.trag.traegt ? 0 : 1);
 }
