@@ -105,7 +105,7 @@ nichts zu installieren.
   Fuego, gegen das der Default ohne Vorgabe 40 bis 50 % gewinnt
   (`docs/muster-fuego-siege.md`). Der Prüfstand (Stufe 1) ergab: Fuego mit 50
   Spielen je Zug, der Default gewinnt dort 50,8 % (10 Spiele: 100 %, 70
-  Spiele: 28,3 %). Stufe 2 (D, M0, M50 mit je 960 Paaren) ist vorbereitet und
+  Spiele: 28,3 %). Stufe 2 (D, M0, M50 mit je 960 Paaren; ungültige Läufe liefern „kein Urteil“ und werden rot; Gegner ist ein sehr schwacher Fuego) ist vorbereitet und
   startet erst nach Freigabe.
 - **Lange Partien.** Ohne Aufgabelogik laufen Selbstspiel-Partien regelmäßig
   auf 400+ Züge, der erste Pass fällt im Mittel um Zug 390.

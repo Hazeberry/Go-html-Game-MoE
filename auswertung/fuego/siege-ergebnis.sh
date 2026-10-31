@@ -8,6 +8,8 @@
 # wird mit den Partien von D verglichen). Fehlende Teile brechen nicht ab,
 # der Bericht nennt sie.
 #
+# Exit-Code 1, wenn der Lauf ungültig ist (kein Urteil).
+#
 # Aufruf: bash auswertung/fuego/siege-ergebnis.sh   (im Verzeichnis mit stand/)
 set -euo pipefail
 wurzel=$(cd "$(dirname "$0")/../.." && pwd)
@@ -25,19 +27,15 @@ for arm in D M0 M50; do
     gzip -9 -c "zw/$arm.jsonl" > "ergebnisse/$arm.jsonl.gz"
   fi
 done
-kontrolle="Kontrolle: fehlt"
-if [ -s stand/kontrolle.jsonl ] && [ -s zw/D.jsonl ]; then
-  gzip -9 -c stand/kontrolle.jsonl > ergebnisse/kontrolle.jsonl.gz
-  kontrolle=$(node -e '
-    const fs = require("fs");
-    const l = f => fs.readFileSync(f, "utf8").split("\n").filter(Boolean).map(JSON.parse);
-    const k = l("stand/kontrolle.jsonl"), d = new Map(l("zw/D.jsonl").map(r => [r.nr, r]));
-    const gleich = k.filter(r => d.has(r.nr) && JSON.stringify(d.get(r.nr).zuege) === JSON.stringify(r.zuege)).length;
-    console.log(`Kontrolle: ${gleich} von ${k.length} Partien Zug für Zug gleich (erwartet 20 von 20)`);')
-else echo "kontrolle" >> ergebnisse/fehlende-teile.txt; fi
+if [ -s stand/kontrolle.jsonl ]; then gzip -9 -c stand/kontrolle.jsonl > ergebnisse/kontrolle.jsonl.gz; else echo "kontrolle" >> ergebnisse/fehlende-teile.txt; fi
 [ -s ergebnisse/fehlende-teile.txt ] && echo "::warning::Teile ohne Partien: $(tr '\n' ' ' < ergebnisse/fehlende-teile.txt)"
+# Gültig oder ungültig (docs/muster-fuego-siege.md §4a): ungültig → „kein Urteil“
+# mit Grund im Bericht und Exit-Code 1, nachdem der Bericht geschrieben ist.
+status=0
 { echo "# Siege gegen Fuego ohne Vorgabe"; echo
   echo "Seed 228, Fuego mit 50 Spielen je Zug, ohne Vorgabe, je Arm 960 Partien."; echo
-  if [ "${#args[@]}" -gt 0 ]; then node "$wurzel/auswertung/fuego/siege-bericht.js" "${args[@]}"; else echo "keine Partien"; fi
-  echo; echo "$kontrolle"; } > ergebnisse/bericht.md
+  if [ "${#args[@]}" -gt 0 ]; then node "$wurzel/auswertung/fuego/siege-bericht.js" "${args[@]}" --kontrolle stand/kontrolle.jsonl --erwartet 960 || status=$?
+  else echo "## KEIN URTEIL"; echo; echo "Keine Partien."; status=1; fi; } > ergebnisse/bericht.md
 cat ergebnisse/bericht.md
+[ "$status" -eq 0 ] || echo "::error::Lauf ungültig, kein Urteil (Exit-Code $status), Gründe im Bericht"
+exit "$status"
