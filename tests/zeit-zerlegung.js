@@ -67,6 +67,17 @@ test('Diagnose vom 31.10. (Handy): Rest springt bei Zug 82 von ~190 auf ~1760 ms
   pruefeGleich(r.maxDauer, 5743, 'längster Zug 5743 ms');
 });
 
+test('Handy-Bericht vom 31.10. (140 Steinzüge mit Messpunkten): das Netz kostet ab Zug 81 rund 1,6 s je Zug', () => {
+  const d = JSON.parse(fs.readFileSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', 'handy-bericht-280zuege.json'), 'utf8'));
+  const r = Z.auswerten(d);
+  pruefeGleich(r.zuege, 140, '140 Steinzüge');
+  pruefeGleich(r.messpunkte.nach.netzMs, 1627, 'Netz im Median 1627 ms');
+  pruefeGleich(r.messpunkte.vor.netzMs, 0, 'vor Zug 80 kein Netz');
+  pruefe(r.messpunkte.nach.nachrichtMs <= 5, `Nachrichtenweg ${r.messpunkte.nach.nachrichtMs} ms`);
+  const netz = r.zeilen.filter(x => x.zug > 80).map(x => x.netzMs);
+  pruefe(Math.min(...netz) >= 1500 && Math.max(...netz) <= 1800, `Netz in jedem Zug 1,5 bis 1,8 s (${Math.min(...netz)} bis ${Math.max(...netz)})`);
+});
+
 test('Endspiel-Netz: eingeschaltet ab Zug 80 (Deutung der Doku setzt das voraus)', () => {
   const html = fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8');
   pruefe(/endspielNetz:\s+0\.8,/.test(html), 'endspielNetz 0,8');
@@ -76,9 +87,9 @@ test('Endspiel-Netz: eingeschaltet ab Zug 80 (Deutung der Doku setzt das voraus)
 
 test('Dokument und Archivdaten vorhanden', () => {
   const doc = fs.readFileSync(path.join(wurzel, 'docs', 'zeitbudget.md'), 'utf8');
-  pruefe(/Vermutung|Hypothese/.test(doc) && /nicht bewiesen|nicht belegt/.test(doc), 'Doc kennzeichnet die Ursache als nicht bewiesen');
+  pruefe(/Ergebnis vom Handy/.test(doc) && /1627/.test(doc), 'Doc nennt das Handy-Ergebnis');
   pruefe(/Zerlegung auf dem Handy/.test(doc) && /nachrichtMs/.test(doc), 'Doc beschreibt die Messpunkte');
-  for (const f of ['zeit-zerlegung.txt', 'netz-kosten.txt', 'browser-zeit-cpu1.txt', 'browser-zeit-cpu10.txt', 'chromium-referenz/README.md', 'chromium-referenz/bericht.md', 'chromium-referenz/metadaten.json', 'chromium-referenz/messungen.jsonl']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', f)), f);
+  for (const f of ['zeit-zerlegung.txt', 'netz-kosten.txt', 'browser-zeit-cpu1.txt', 'browser-zeit-cpu10.txt', 'handy-bericht-280zuege.json', 'handy-zeit-zerlegung.txt', 'chromium-referenz/README.md', 'chromium-referenz/bericht.md', 'chromium-referenz/metadaten.json', 'chromium-referenz/messungen.jsonl']) pruefe(fs.existsSync(path.join(wurzel, 'docs', 'daten', 'endspiel-abraeumen', 'territory', f)), f);
 });
 
 laufeTests('Zeit-Zerlegung').then(ok => process.exit(ok ? 0 : 1));
