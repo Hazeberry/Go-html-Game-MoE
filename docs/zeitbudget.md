@@ -168,8 +168,10 @@ Auswertungen unter [`daten/endspiel-abraeumen/territory/`](daten/endspiel-abraeu
   (die Parameter sind in allen Berichten gleich und gleich dem Standard; das Löschen der Chrome-Daten änderte nichts)
   sowie Energiesparmodus (war aus). Das Risiko gemeinsamer Speicherschlüssel (`go_pnet`, `PD_STORE`) beider Projekte bleibt
   davon unberührt.
-- **Offen:** Der Zustand des Schalters vor dem Einschalten ist nur aus den Zahlen erschlossen; ob er „aus“ war, weiß ich
-  nicht aus erster Hand. Das Galaxy A20s zeigt in Chrome früh dieselben Simulationszahlen wie das A17 vorher (ca. 450);
+- **Bestätigt (Hazeberry):** Der V8-Schalter in Chrome war aus; er wurde eingeschaltet, Chrome neu gestartet und ein neues
+  Spiel begonnen (der Lauf „Chrome, V8-Optimierer an“). Warum er aus war (Voreinstellung des Geräts oder eine Einstellung),
+  ist offen.
+- **Offen:** Das Galaxy A20s zeigt in Chrome früh dieselben Simulationszahlen wie das A17 vorher (ca. 450);
   dort ist derselbe Zustand möglich, aber nicht geprüft.
 
 Folge: Option 1 und 2 (§6) sind nicht mehr nötig, um das Handy-Problem zu beheben. Offen bleibt, ob die App einen zu
