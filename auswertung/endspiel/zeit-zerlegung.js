@@ -68,7 +68,7 @@ function text(r) {
     `ab Zug ${r.grenze + 1}: ${r.nach.n} Züge, Dauer ${r.nach.dauerMedian} ms (Median), davon Suche ${r.nach.sucheMedian}, Rest ${r.nach.restMedian} (${r.nach.restMin} bis ${r.nach.restMax})`,
     ...(r.messpunkte ? ['Messpunkte (Median, ms) vor | nach Zug ' + r.grenze + ':',
       ...['vorMs', 'netzMs', 'sucheMs', 'nachMs', 'nachrichtMs', 'anwendenMs', 'restMs'].map(k => `  ${k.padEnd(12)} ${String(r.messpunkte.vor[k]).padStart(6)} | ${String(r.messpunkte.nach[k]).padStart(6)}`)] : ['(keine Messpunkte im Bericht: ältere Diagnose ohne `zeiten`)']),
-    `erster dauerhafter Sprung des Rests über 1000 ms bei Zug ${r.sprungBeiZug}`,
+    r.sprungBeiZug === null ? 'kein dauerhafter Sprung des Rests über 1000 ms' : `erster dauerhafter Sprung des Rests über 1000 ms bei Zug ${r.sprungBeiZug}`,
     `Suche länger als 1,1 × Budget: ${r.sucheUeberBudget} Züge; Dauer länger als 1,5 × Budget: ${r.dauerUeberBudget15} Züge; längster Zug ${r.maxDauer} ms`,
   ].join('\n');
 }
