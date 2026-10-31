@@ -1,8 +1,7 @@
 # Zählvorschau: wie die App die Stellung einschätzt, ohne die KI zu zwingen
 
-Vorbereitet am 31.10.2026. **Nur Vorbereitung:** die Rechenfunktion und ihre Tests
-stehen, **im Spiel ist nichts angeschlossen** (kein Knopf, kein Verhalten
-geändert). Anlass und Einordnung: [`endspiel-abraeumen.md`](endspiel-abraeumen.md)
+Vorbereitet am 31.10.2026, **angeschlossen am 31.10.2026** (§7): Die Rechenfunktion
+und die Oberfläche stehen; im Spiel gibt es den Knopf „Zählvorschau“. Anlass und Einordnung: [`endspiel-abraeumen.md`](endspiel-abraeumen.md)
 §12. Dort steht auch, warum es kein vorzeitiges Passen der KI sein soll: Ein Pass
 des Menschen heißt nicht, dass die Stellung ausgespielt ist.
 
@@ -162,3 +161,24 @@ Schwierig wären Stellungen **vor** dem Aufräumen. Dafür fehlen echte Partien 
 Hinweis: Eine SGF-Datei aus der App enthält nur die Züge, die toten Steine am Ende
 sind darin nicht markiert. Wer eine Partie meldet, bei der die Zählung falsch lag,
 liefert am besten die SGF **und** die Stellung, die die App am Ende angezeigt hat.
+
+## 7. Umgesetzt (31.10.2026)
+
+Gebaut nach §5, ohne Abweichung:
+
+- Knopf „Zählvorschau“ im Knopffeld, Reihenfolge Passen, Rückgängig, Zählvorschau,
+  Neues Spiel („Neues Spiel“ mit größerem Abstand).
+- Ergebnisfeld darunter (`zv-panel`) mit „Mit Annahmen“, „Nur Bewiesenes“, Zähl-Info
+  („Fläche, Komi 7,5 …“) und Hinweis; Knopf „Weiterspielen“ blendet es aus, ein
+  zweiter Klick auf „Zählvorschau“ ebenso.
+- Gültig nur für die berechnete Stellung (Zugzähler und Hash); jeder Zug, Pass,
+  Rückgängig und „Neues Spiel“ blendet aus (`vorschauAbgleichen`, aus `updateUI` und
+  `drawStateToCache` aufgerufen). Nach dem Spielende gibt es keine Vorschau.
+- Markierung auf dem Brett: rotes Kreuz = bewiesen tot, oranges Kreuz mit „?“ =
+  geschätzt tot. Das Spiel selbst bleibt unberührt (kein Eintrag in `deadStones`,
+  keine Änderung am Brett, an den Gefangenen oder am Protokoll).
+- Browser-Tests: [`tests/browser-zaehlvorschau.js`](../tests/browser-zaehlvorschau.js),
+  im CI-Job „Browser“.
+
+Nicht enthalten: eine Vorschau mit der Wertung Territory (die Vorschau rechnet Fläche),
+und eine Darstellung unbewiesener Gruppen auf dem Brett (nur als Zahl im Text).
