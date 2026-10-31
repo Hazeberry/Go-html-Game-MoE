@@ -194,8 +194,8 @@ in allen Varianten.
    eigene Zählung und `evaluateBoard` benutzen beide die Benson-Logik für tote
    Ketten. Ein Teil des höheren R² mit der eigenen Zählung könnte daher an
    einer gemeinsamen Methode liegen und nicht an einer besseren Vorhersage von
-   GNU Gos Urteil. Gegenüber dem Urteil der Gegenseite, das zählt, ist die
-   Vorhersage von `evaluateBoard` bei Zug 200 schwach.
+   GNU Gos Urteil. Gegenüber GNU Gos Zählung ist die Vorhersage von
+   `evaluateBoard` bei Zug 200 schwach (R² 0,05).
 
 **Einordnung:** Keine Variante erfüllt die Stabilitätsregel (höchstens 25 %), und
 mit GNU Gos Zählung verfehlt auch R² die Schwelle. Das stützt das Ergebnis aus §5
