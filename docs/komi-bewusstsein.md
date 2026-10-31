@@ -164,3 +164,43 @@ Ergebnisse als Nachtrag §7 nach dem Lauf):
 - `--gleiche-partien`: an allen drei Zugzahlen nur die Partien, die Zug 280
   erreichen (damit ändert sich die Stichprobe zwischen den Zugzahlen nicht).
 - beides zusammen.
+
+## 7. Nachtrag: Ergebnis der explorativen Gegenproben (31.10.2026)
+
+Lauf 3 von [`komi-k.yml`](../.github/workflows/komi-k.yml), die drei Varianten
+aus §6; Zahlen in
+[`docs/daten/komi-k/lauf3/bericht.md`](daten/komi-k/lauf3/bericht.md).
+**Explorativ; das Urteil aus §5 bleibt unverändert.** Das Nachspielen stimmt
+in allen Varianten.
+
+| Variante | R² bei 200 / 240 / 280 | k bei 200 / 240 / 280 | Abweichung (200, 280) |
+|---|---|---|---|
+| §5 (Standard): eigene Zählung, alle Partien | 0,33 / 0,31 / 0,34 | 44,1 / 57,1 / 78,1 | 22,8 % / 36,7 % |
+| gleiche Partien (2 257), eigene Zählung | 0,32 / 0,31 / 0,34 | 45,7 / 59,4 / 78,1 | 23,1 % / 31,4 % |
+| GNU Go `final_score`, alle Partien | 0,05 / 0,12 / 0,28 | 33,8 / 43,6 / 57,9 | 22,5 % / 32,9 % |
+| GNU Go `final_score`, gleiche Partien | 0,06 / 0,14 / 0,28 | 33,9 / 44,1 / 57,9 | 23,1 % / 31,4 % |
+
+**Was sich zeigt (beschreibend):**
+
+1. **Die wechselnde Stichprobe erklärt die Instabilität nur zu einem kleinen
+   Teil.** Mit denselben 2 257 Partien an allen Zugzahlen sinkt die Abweichung
+   bei Zug 280 von 36,7 % auf 31,4 %, bei Zug 200 steigt sie leicht (22,8 % auf
+   23,1 %). Das Wachsen von k mit der Zugzahl bleibt in allen vier Varianten.
+2. **Die Wahl der Zählung ändert die Höhe von k und vor allem R².** Mit GNU Gos
+   `final_score` liegt k um etwa ein Viertel niedriger (34 / 44 / 58 statt 44 /
+   57 / 78), und R² fällt bei Zug 200 und 240 unter 0,25 (0,05 und 0,12). Mit
+   der eigenen Zählung ist R² höher.
+3. **Mögliche Ursache für den R²-Unterschied (Hypothese, nicht geprüft):** Die
+   eigene Zählung und `evaluateBoard` benutzen beide die Benson-Logik für tote
+   Ketten. Ein Teil des höheren R² mit der eigenen Zählung könnte daher an
+   einer gemeinsamen Methode liegen und nicht an einer besseren Vorhersage von
+   GNU Gos Urteil. Gegenüber GNU Gos Zählung ist die Vorhersage von
+   `evaluateBoard` bei Zug 200 schwach (R² 0,05).
+
+**Einordnung:** Keine Variante erfüllt die Stabilitätsregel (höchstens 25 %), und
+mit GNU Gos Zählung verfehlt auch R² die Schwelle. Das stützt das Ergebnis aus §5
+(diese Methode liefert auf diesen Daten keine tragfähige Kalibrierung), ändert
+es aber nicht. Es folgt weiterhin nicht, dass `evaluateBoard` grundsätzlich
+keinen festen Komi-Faktor haben kann; belegt ist, dass dieser Schätzer auch bei
+gleicher Stichprobe und bei GNU Gos Zählung keinen stabilen liefert. Die Stufen 2
+und 3 bleiben zurückgestellt.
