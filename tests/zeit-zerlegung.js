@@ -13,7 +13,8 @@
    Aufruf:  node tests/zeit-zerlegung.js */
 'use strict';
 const fs = require('fs'), path = require('path');
-const {test, pruefe, pruefeGleich, laufeTests} = require('./rahmen');
+const {ladeKI, test, pruefe, pruefeGleich, laufeTests} = require('./rahmen');
+const KI = ladeKI({mitNetz: false});
 const Z = require('../auswertung/endspiel/zeit-zerlegung.js');
 const wurzel = path.join(__dirname, '..');
 
@@ -101,6 +102,20 @@ test('A17: Chrome mit V8-Optimierer schnell wie Firefox, Chrome davor langsam (g
   const p = JSON.stringify(Object.entries(langsam.reproduktion.params).sort());
   pruefeGleich(JSON.stringify(Object.entries(firefox.reproduktion.params).sort()), p, 'Firefox: gleiche Parameter');
   pruefeGleich(JSON.stringify(Object.entries(v8.reproduktion.params).sort()), p, 'Chrome mit V8: gleiche Parameter');
+});
+
+test('Dashboard: Endspiel-Netz als Schalter mit Fragezeichen-Text; Texte ohne Anführungszeichen (stehen in HTML-Attributen)', () => {
+  const html = fs.readFileSync(path.join(wurzel, 'index.html'), 'utf8');
+  for (const k of ['endspielNetz', 'endspielNetzAb']) {
+    const m = new RegExp(`\\{key:'${k}',[^]*?tip:'([^']*)'\\}`).exec(html);
+    pruefe(m, `${k} steht im Dashboard`);
+    pruefe(!/["<>]/.test(m[1]), `${k}: Tooltip ohne Anführungszeichen und Klammern`);
+    pruefe(m[1].length > 30, `${k}: Tooltip erklärt den Parameter`);
+  }
+  pruefe(/0 = aus/.test(html.match(/\{key:'endspielNetz',[^]*?tip:'([^']*)'/)[1]), 'Tooltip nennt 0 = aus');
+  pruefe(/V8-Optimierer/.test(html.match(/\{key:'endspielNetz',[^]*?tip:'([^']*)'/)[1]), 'Tooltip nennt den V8-Optimierer');
+  pruefeGleich(KI.PARAMS.endspielNetz, 0.8, 'Standardwert unverändert');
+  pruefeGleich(KI.PARAMS.endspielNetzAb, 80, 'Standardwert Ab unverändert');
 });
 
 test('Endspiel-Netz: eingeschaltet ab Zug 80 (Deutung der Doku setzt das voraus)', () => {
