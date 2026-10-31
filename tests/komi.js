@@ -106,4 +106,30 @@ test('Workflow komi-k.yml und Dokument: Zugzahlen, Daten, Regel', () => {
   pruefe(!t.includes('${{'), 'keine Ausdrücke im Workflow');
 });
 
+test('Quelle von d: eigene Zählung gegen GNU Gos final_score, gleiche Partien', () => {
+  /* Partie 1 aus den Daten: KI Weiß, GNU Go B+9,5 (endstand −9,5), eigene Zählung b 180, w 182,5 (mit Komi) */
+  const r = {wirFarbe: 'W', endstand: -9.5, unsereZaehlung: {b: 180, w: 182.5}};
+  pruefeGleich(K.stand(r, 7.5, 'eigene'), 5, 'eigene Zählung: 180 − (182,5 − 7,5)');
+  pruefeGleich(K.stand(r, 7.5, 'gnugo'), 17, 'GNU Go: Rand B+9,5 plus Komi 7,5');
+  pruefeGleich(K.stand({...r, wirFarbe: 'S', endstand: 4}, 7.5, 'gnugo'), 11.5, 'KI Schwarz mit 4 vorn: 4 + 7,5');
+  pruefe(Number.isNaN(K.stand({wirFarbe: 'W'}, 7.5, 'gnugo')), 'ohne endstand: NaN');
+  const p = {abgebrochen: null, gewonnen: true, unsereZaehlung: {b: 190, w: 178.5}, komi: 7.5, beginnt: 'S', vorgabe: 0, zuege: ['D4'], wirFarbe: 'S'};
+  pruefe(K.brauchbar(p, 7.5, 'eigene') && !K.brauchbar(p, 7.5, 'gnugo'), 'gnugo verlangt endstand');
+  const E = K.motor(path.join(wurzel, 'index.html'));
+  const SP = 'ABCDEFGHJKLMNOPQRST';
+  const partie = (nr, laenge, endstand) => ({nr, abgebrochen: null, gewonnen: true, wirFarbe: 'S', gefangen: {wir: 0, gegner: 0}, endstand, unsereZaehlung: {b: 180 + nr, w: 170 + (nr % 5)}, komi: 7.5, beginnt: 'S', vorgabe: 0,
+    zuege: Array.from({length: laenge}, (_, i) => i < 10 + (nr % 24) ? SP[Math.floor(i / 2)] + (i % 2 ? 2 : 1) : 'pass')});
+  const partien = [...Array.from({length: 20}, (_, i) => partie(i + 1, 300, i - 10)), partie(98, 250, 1), partie(99, 150, 2)];
+  const alle = K.auswerten(E, partien, 7.5);
+  const gleich = K.auswerten(E, partien, 7.5, {gleiche: true});
+  pruefeGleich(`${alle.erg[200].n} ${alle.erg[240].n} ${alle.erg[280].n}`, '21 21 20', 'alle: 21 Partien erreichen 200 und 240, 20 erreichen 280');
+  pruefeGleich(`${gleich.erg[200].n} ${gleich.erg[240].n} ${gleich.erg[280].n}`, '20 20 20', 'gleiche Partien: überall dieselben 20');
+  const gn = K.auswerten(E, partien, 7.5, {quelle: 'gnugo'});
+  pruefe(/GNU Gos final_score/.test(K.text(gn, 7.5)) && /nur die, die alle drei Zugzahlen erreichen/.test(K.text(gleich, 7.5)), 'Bericht nennt Quelle und Auswahl');
+  const doc = fs.readFileSync(path.join(wurzel, 'docs', 'komi-bewusstsein.md'), 'utf8');
+  const t = fs.readFileSync(path.join(wurzel, '.github', 'workflows', 'komi-k.yml'), 'utf8');
+  pruefe(/## 6\. /.test(doc) && /unsereZaehlung/.test(doc) && /explorativ/i.test(doc), 'Nachtrag §6 im Dokument');
+  pruefe(/--quelle gnugo/.test(t) && /--gleiche-partien/.test(t), 'Workflow rechnet die Gegenproben');
+});
+
 laufeTests('Komi k-Schätzung').then(ok => process.exit(ok ? 0 : 1));

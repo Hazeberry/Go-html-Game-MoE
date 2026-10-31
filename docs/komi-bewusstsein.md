@@ -126,3 +126,41 @@ bei Zug 200.
    verschlechtert, ist bislang eine Hypothese. Belegt ist nur, dass die KI als
    Weiß öfter gewinnt als als Schwarz, was zu einer Komi-Blindheit passt, sie
    aber nicht beweist.
+
+## 6. Nachtrag: zwei methodische Einschränkungen und Gegenproben (31.10.2026)
+
+Aus der Durchsicht von §5 (PR #229). Das Urteil aus §5 bleibt unverändert;
+die Gegenproben unten sind **explorativ** und ändern es nicht rückwirkend.
+
+**1. Abweichung der Datenquelle von der Beschreibung.** §3 sagt, der komifreie
+Flächenstand stamme „aus der Zählung von GNU Go“. Tatsächlich rechnet
+[`k-schaetzung.js`](../auswertung/komi/k-schaetzung.js) mit `unsereZaehlung`,
+der eigenen Flächenzählung von `gnugo-duell.js` (die Funktion
+`unsereZaehlung`), nicht mit GNU Gos `final_score`; dieser steht im Feld
+`endstand` (aus Sicht der KI, mit Komi). Die beiden Größen können deutlich
+auseinanderliegen: In Partie 1 von Seed 226 (`f-D`) ergibt die eigene Zählung
+komifrei +5 für Schwarz, GNU Go zählt B+9,5 mit Komi, also komifrei +17. Ob die
+ursprüngliche Festlegung die GNU-Go-Zählung verbindlich verlangte, ist aus dem
+Wortlaut von §3 nicht eindeutig zu sagen („von GNU Go gezählt“ beschreibt die
+Absicht, die Rechnung folgte der leichter verfügbaren eigenen Zählung). Das
+steht hier so, ohne die Festlegung nachträglich umzudeuten: **Geurteilt wurde
+nach der eigenen Zählung (§5).** Die Rechnung mit `endstand` als Gegenprobe
+folgt unten.
+
+**2. Zwischenstellung gegen späteren Endstand.** Verglichen wird E nach Zug 200,
+240 und 280 mit dem Flächenstand der Schlussstellung. Die Regression misst
+deshalb auch, wie gut `evaluateBoard` den späteren Endstand vorhersagt, und
+nicht nur, wie viele Einheiten einem Punkt in dieser Stellung entsprechen. Das
+Wachsen von u (5,9 / 7,6 / 10,4) kann mehrere Ursachen haben: die Bewertungsfunktion
+selbst, die mit dem Partieverlauf genauere Vorhersage und die wechselnde
+Auswahl der Partien (142 Partien erreichen Zug 280 nicht). Belegt ist nur, dass
+dieser Schätzer keinen ausreichend stabilen Faktor geliefert hat. Daraus folgt
+nicht, dass `evaluateBoard` grundsätzlich keinen festen Komi-Faktor haben kann.
+
+**Explorative Gegenproben** (`komi-k.yml`, zweiter Schritt, ohne neue Partien;
+Ergebnisse als Nachtrag §7 nach dem Lauf):
+
+- `--quelle gnugo`: d aus `endstand` (GNU Gos final_score) statt `unsereZaehlung`.
+- `--gleiche-partien`: an allen drei Zugzahlen nur die Partien, die Zug 280
+  erreichen (damit ändert sich die Stichprobe zwischen den Zugzahlen nicht).
+- beides zusammen.

@@ -44,6 +44,21 @@ jobs:
           echo "Exit-Code des Werkzeugs: $status" >> "$GITHUB_STEP_SUMMARY"
           if [ "$status" -ne 0 ] && [ "$status" -ne 1 ]; then echo "::error::Fehler im Werkzeug (Exit-Code $status)"; exit "$status"; fi
 
+      # Explorative Gegenproben (docs/komi-bewusstsein.md §6): ändern das Urteil
+      # aus §5 nicht. Exit-Code 1 („trägt nicht“) ist auch hier ein Ergebnis.
+      - name: Explorative Gegenproben
+        run: |
+          set -uo pipefail
+          daten="docs/daten/muster-ohne-vorgabe/lauf1/f-D.jsonl.gz docs/daten/muster-ohne-vorgabe/lauf1/g-D.jsonl.gz docs/daten/leeres-brett/lauf1/g-D.jsonl.gz docs/daten/fuego-siege/lauf1/D.jsonl.gz"
+          for variante in "gnugo:--quelle gnugo" "gleiche:--gleiche-partien" "gnugo-gleiche:--quelle gnugo --gleiche-partien"; do
+            name=${variante%%:*}; optionen=${variante#*:}
+            status=0
+            # shellcheck disable=SC2086
+            node auswertung/komi/k-schaetzung.js $optionen $daten > "ergebnisse/explorativ-$name.md" || status=$?
+            if [ "$status" -ne 0 ] && [ "$status" -ne 1 ]; then echo "::error::Fehler im Werkzeug (Variante $name, Exit-Code $status)"; exit "$status"; fi
+            { echo "## Explorativ: $name"; echo; cat "ergebnisse/explorativ-$name.md"; echo; } | tee -a "$GITHUB_STEP_SUMMARY"
+          done
+
       - uses: actions/upload-artifact@v7
         with:
           name: komi-k
