@@ -180,5 +180,23 @@ Gebaut nach §5, ohne Abweichung:
 - Browser-Tests: [`tests/browser-zaehlvorschau.js`](../tests/browser-zaehlvorschau.js),
   im CI-Job „Browser“.
 
-Nicht enthalten: eine Vorschau mit der Wertung Territory (die Vorschau rechnet Fläche),
-und eine Darstellung unbewiesener Gruppen auf dem Brett (nur als Zahl im Text).
+Nicht enthalten: eine Darstellung unbewiesener Gruppen auf dem Brett (nur als Zahl im Text).
+Die Wertung Territory kam später dazu (§8).
+
+## 8. Territory (31.10.2026)
+
+Auslöser: Die Partie vom 31.10. wurde im Territory-Modus gespielt (`RU[Japanese]`); die Vorschau
+rechnete bis dahin nur Fläche (§7, „Nicht enthalten“). Jetzt gilt:
+
+- `zaehlVorschau(board, komi, {modus, gefangen})`. Standard bleibt Fläche; mit `modus: 'territory'`
+  zählt jede Farbe ihre Gefangenen (`gefangen` aus dem Spielzustand) plus die tot angenommenen
+  Gegnersteine plus die einseitig umschlossenen freien Punkte, lebende Steine zählen nicht. Das ist
+  dieselbe Rechnung wie `resolveLifeAndDeath` + `finalTerritoryScore` am Spielende.
+- Die Oberfläche übergibt `state.scoringMode` und `state.captures`; die Zähl-Info nennt die Wertung
+  („Fläche, Komi 7,5 …“ oder „Territory (Gebiet + Gefangene), Komi 7,5 …“). Das Umschalten der
+  Wertung blendet eine offene Vorschau aus, damit sie nie zu einer anderen Wertung gehört.
+- Geprüft: Identität Territory = Gefangene + tote Gegnersteine + Gebiet bzw. Fläche = lebende Steine
+  + Gebiet an der Partie vom 12.10.; die Partie vom 31.10. gibt am Ende W+200,5 (wie die App) und vor
+  dem ersten Pass W+186,5 (wie die Nachrechnung); im Browser Text, Stand und Umschalten.
+- Weiterhin offen: Seki und Ko erkennt die Zählung nicht; die Schätzung toter Steine ist in
+  unfertigen Stellungen unruhig (siehe `endspiel-abraeumen.md` §13).

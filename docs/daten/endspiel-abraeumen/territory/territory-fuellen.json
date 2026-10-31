@@ -1,0 +1,123 @@
+{
+ "komi": 7.5,
+ "passFarbe": 1,
+ "kiFarbe": 2,
+ "ersterPassNach": 354,
+ "zuege": 494,
+ "kiSteineNachErstemPass": 69,
+ "passesDesGegnersDanach": 49,
+ "kiPassesDanach": 1,
+ "standVorPass": {
+  "zug": 354,
+  "schwarz": 53,
+  "weiss": 239.5,
+  "stand": -186.5,
+  "gebietSchwarz": 29,
+  "gebietWeiss": 117,
+  "gefangenSchwarz": 24,
+  "gefangenWeiss": 115,
+  "tote": 29
+ },
+ "standEnde": {
+  "zug": 494,
+  "schwarz": 31,
+  "weiss": 231.5,
+  "stand": -200.5,
+  "gebietSchwarz": 7,
+  "gebietWeiss": 79,
+  "gefangenSchwarz": 24,
+  "gefangenWeiss": 145,
+  "tote": 0
+ },
+ "verlustKiPunkte": 14,
+ "reihe": [
+  {
+   "zug": 354,
+   "schwarz": 53,
+   "weiss": 239.5,
+   "stand": -186.5,
+   "gebietSchwarz": 29,
+   "gebietWeiss": 117,
+   "gefangenSchwarz": 24,
+   "gefangenWeiss": 115,
+   "tote": 29
+  },
+  {
+   "zug": 374,
+   "schwarz": 52,
+   "weiss": 230.5,
+   "stand": -178.5,
+   "gebietSchwarz": 28,
+   "gebietWeiss": 107,
+   "gefangenSchwarz": 24,
+   "gefangenWeiss": 116,
+   "tote": 25
+  },
+  {
+   "zug": 394,
+   "schwarz": 42,
+   "weiss": 220.5,
+   "stand": -178.5,
+   "gebietSchwarz": 18,
+   "gebietWeiss": 97,
+   "gefangenSchwarz": 24,
+   "gefangenWeiss": 116,
+   "tote": 8
+  },
+  {
+   "zug": 414,
+   "schwarz": 31,
+   "weiss": 270.5,
+   "stand": -239.5,
+   "gebietSchwarz": 7,
+   "gebietWeiss": 118,
+   "gefangenSchwarz": 24,
+   "gefangenWeiss": 145,
+   "tote": 29
+  },
+  {
+   "zug": 434,
+   "schwarz": 31,
+   "weiss": 260.5,
+   "stand": -229.5,
+   "gebietSchwarz": 7,
+   "gebietWeiss": 108,
+   "gefangenSchwarz": 24,
+   "gefangenWeiss": 145,
+   "tote": 29
+  },
+  {
+   "zug": 454,
+   "schwarz": 32,
+   "weiss": 251.5,
+   "stand": -219.5,
+   "gebietSchwarz": 7,
+   "gebietWeiss": 99,
+   "gefangenSchwarz": 25,
+   "gefangenWeiss": 145,
+   "tote": 30
+  },
+  {
+   "zug": 474,
+   "schwarz": 31,
+   "weiss": 240.5,
+   "stand": -209.5,
+   "gebietSchwarz": 7,
+   "gebietWeiss": 88,
+   "gefangenSchwarz": 24,
+   "gefangenWeiss": 145,
+   "tote": 0
+  },
+  {
+   "zug": 494,
+   "schwarz": 31,
+   "weiss": 231.5,
+   "stand": -200.5,
+   "gebietSchwarz": 7,
+   "gebietWeiss": 79,
+   "gefangenSchwarz": 24,
+   "gefangenWeiss": 145,
+   "tote": 0
+  }
+ ]
+}

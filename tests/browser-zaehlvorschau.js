@@ -13,6 +13,9 @@
         Steine, oranges Kreuz im Bild, der Text nennt sie.
      6. Offene Stellung: Hinweis „noch nicht ausgespielt“.
      7. Nach dem Spielende tut der Knopf nichts.
+     8. Territory-Modus: der Text nennt „Territory“, der Stand der Partie vom
+        31.10. vor dem ersten Pass ist W+186,5 (mit den Gefangenen der Partie);
+        das Umschalten der Wertung blendet die Vorschau aus.
 
    Aufruf:  node tests/browser-zaehlvorschau.js [pfad/zur/index.html] */
 'use strict';
@@ -179,6 +182,41 @@ test('Nach dem Spielende tut der Knopf nichts', async () => {
   pruefe(r.vorbei, 'Spiel beendet');
   pruefeGleich(r.vorschau, null, 'keine Vorschau');
   pruefe(!r.sichtbar, 'Ergebnisfeld bleibt zu');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('Territory-Modus: Text, Stand der Partie vom 31.10. und Ausblenden beim Umschalten der Wertung', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const txt = fs.readFileSync(path.join(__dirname, '..', 'docs', 'daten', 'endspiel-abraeumen', 'territory', 'mensch-494zuege-territory.sgf'), 'utf8');
+  const zuege = []; { const re = /;([BW])\[([a-s]{0,2})\]/g; let m; while ((m = re.exec(txt))) zuege.push([m[1] === 'B' ? 1 : 2, m[2]]); }
+  const ersterPass = zuege.findIndex(z => !z[1]);
+  const r = await s.evaluate(({zuege, bis}) => {
+    document.querySelector('.scoring-btn[data-scoring="territory"]').click();
+    state.captures = {1: 0, 2: 0};
+    for (let k = 0; k < bis; k++) {
+      const [f, p] = zuege[k]; if (!p) continue;
+      const i = (p.charCodeAt(1) - 97) * 19 + (p.charCodeAt(0) - 97);
+      state.board[i] = f; state.captures[f] += removeDeadGroups(state.board, 3 - f, i);
+    }
+    state.currentPlayer = 1; state.moveCount = bis;
+    drawStateToCache(); render(); updateUI();
+    document.getElementById('btn-zaehlvorschau').click();
+    const aus = {mit: document.getElementById('zv-mit').textContent, info: document.getElementById('zv-info').textContent,
+                 modus: state.vorschau && state.vorschau.v.modus, sichtbar: document.getElementById('zv-panel').style.display !== 'none'};
+    document.querySelector('.scoring-btn[data-scoring="area"]').click();
+    aus.nachUmschalten = document.getElementById('zv-panel').style.display !== 'none' || !!state.vorschau;
+    document.getElementById('btn-zaehlvorschau').click();
+    aus.flaecheInfo = document.getElementById('zv-info').textContent; aus.flaecheModus = state.vorschau.v.modus;
+    return aus;
+  }, {zuege, bis: ersterPass});
+  await ctx.close();
+  pruefeGleich(r.modus, 'territory', 'Modus Territory');
+  pruefeGleich(r.mit, 'Mit Annahmen: Weiß +186.5', 'Stand wie die Nachrechnung vor dem ersten Pass');
+  pruefe(/^Territory \(Gebiet \+ Gefangene\), Komi 7,5\./.test(r.info), `Info nennt Territory: ${r.info}`);
+  pruefeGleich(r.nachUmschalten, false, 'Umschalten der Wertung blendet die Vorschau aus');
+  pruefeGleich(r.flaecheModus, 'flaeche', 'zurück auf Area: wieder Fläche');
+  pruefe(/^Fläche, Komi 7,5\./.test(r.flaecheInfo), `Info nennt Fläche: ${r.flaecheInfo}`);
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 

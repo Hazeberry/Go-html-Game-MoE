@@ -714,11 +714,17 @@ function toteSteineAmEnde(board, augeGross = AUGE_GROSS, offenGross = OFFEN_GROS
    Der Stand wird zweimal gerechnet: nur mit den bewiesen toten Steinen
    entfernt (untere Grenze der Annahmen) und mit allen geschätzt toten
    entfernt (wie die Schlusszählung). stand = Fläche Schwarz − Fläche Weiß −
-   komi; größer 0 heißt Schwarz vorn. gemischtAnteil ist der Anteil der leeren
+   komi; größer 0 heißt Schwarz vorn. Mit opt.modus 'territory' zählt statt der
+   Fläche das Gebiet plus Gefangene (docs/zaehlvorschau.md, Nachtrag Territory). gemischtAnteil ist der Anteil der leeren
    Punkte in Regionen, die an beide Farben grenzen (nach Entfernung der
    geschätzt toten): hoch heißt „noch nicht ausgespielt“. */
-function zaehlVorschau(board, komi = 7.5) {
+function zaehlVorschau(board, komi = 7.5, opt = {}) {
   const N = BOARD_SIZE;
+  /* Wertung: 'flaeche' (Standard, Area) oder 'territory' (Gefangene + umschlossene
+     freie Punkte, wie finalTerritoryScore). opt.gefangen = bisher geschlagene
+     Steine {1, 2}; die als tot angenommenen Steine kommen wie bei der
+     Schlusszählung (resolveLifeAndDeath) als Gefangene des Gegners dazu. */
+  const territory = opt.modus === 'territory', gefBisher = opt.gefangen || {1: 0, 2: 0};
   const ep = bensonClassify(board);
   const bewiesenTot = new Uint8Array(N), bewiesenLebend = new Uint8Array(N);
   for (let i = 0; i < N; i++) {
@@ -736,7 +742,10 @@ function zaehlVorschau(board, komi = 7.5) {
   const zaehle = entfernt => {
     const b = new Uint8Array(N); for (let i = 0; i < N; i++) b[i] = entfernt[i] ? 0 : board[i];
     const f = {1: 0, 2: 0}, v = new Uint8Array(N); let neutral = 0, gemischt = 0, leer = 0;
-    for (let i = 0; i < N; i++) if (b[i]) f[b[i]]++;
+    if (territory) {
+      f[1] = gefBisher[1] || 0; f[2] = gefBisher[2] || 0;
+      for (let i = 0; i < N; i++) if (entfernt[i] && board[i]) f[board[i] === 1 ? 2 : 1]++;
+    } else for (let i = 0; i < N; i++) if (b[i]) f[b[i]]++;
     for (let i = 0; i < N; i++) {
       if (b[i] || v[i]) continue;
       const q = [i]; v[i] = 1; let r = 0;
@@ -755,7 +764,7 @@ function zaehlVorschau(board, komi = 7.5) {
   for (let i = 0; i < N; i++) { nBT += bewiesenTot[i]; nGT += geschaetztTot[i]; nBL += bewiesenLebend[i]; nUB += unbewiesen[i]; }
   return {bewiesenTot, geschaetztTot, bewiesenLebend, unbewiesen,
           anzahl: {bewiesenTot: nBT, geschaetztTot: nGT, bewiesenLebend: nBL, unbewiesen: nUB},
-          nurBewiesen, mitSchaetzung, komi,
+          nurBewiesen, mitSchaetzung, komi, modus: territory ? 'territory' : 'flaeche',
           sicher: nGT === 0 && nUB === 0};   /* sicher: alles bewiesen, kein Raum für Annahmen */
 }
 
@@ -6253,7 +6262,7 @@ function drawStateToCache() {
    deadStones. Gilt nur für genau die Stellung, für die sie berechnet wurde
    (Zugzähler und Hash); jeder Zug, Pass, Rückgängig oder Neues Spiel blendet
    sie aus. */
-function vorschauSchluessel() { return state.moveCount + ':' + state.currentHash; }
+function vorschauSchluessel() { return state.moveCount + ':' + state.currentHash + ':' + state.scoringMode; }
 function vorschauStandText(stand) {
   return stand >= 0 ? `Schwarz +${stand.toFixed(1)}` : `Weiß +${(-stand).toFixed(1)}`;
 }
@@ -6264,7 +6273,8 @@ function vorschauPanelAktualisieren() {
   document.getElementById('zv-mit').textContent = `Mit Annahmen: ${vorschauStandText(v.mitSchaetzung.stand)}`;
   document.getElementById('zv-nur').textContent = `Nur Bewiesenes: ${vorschauStandText(v.nurBewiesen.stand)}`;
   const a = v.anzahl;
-  let info = `Fläche, Komi ${komiText}. ${a.bewiesenTot} Steine bewiesen tot, ${a.geschaetztTot} als tot geschätzt (orange, mit ?), ${a.unbewiesen} lebend ohne Beweis.`;
+  const wertung = v.modus === 'territory' ? 'Territory (Gebiet + Gefangene)' : 'Fläche';
+  let info = `${wertung}, Komi ${komiText}. ${a.bewiesenTot} Steine bewiesen tot, ${a.geschaetztTot} als tot geschätzt (orange, mit ?), ${a.unbewiesen} lebend ohne Beweis.`;
   document.getElementById('zv-info').textContent = info;
   let hinweis = 'Seki und Ko erkennt die Zählung nicht.';
   if (v.nurBewiesen.gemischtAnteil > 0.1) hinweis += ' Die Stellung ist noch nicht ausgespielt, die Zahlen sagen wenig.';
@@ -6285,7 +6295,8 @@ function vorschauSchliessen() {
 }
 function vorschauOeffnen() {
   if (state.gameOver) return;
-  state.vorschau = {schluessel: vorschauSchluessel(), v: zaehlVorschau(state.board, KOMI)};
+  state.vorschau = {schluessel: vorschauSchluessel(),
+    v: zaehlVorschau(state.board, KOMI, {modus: state.scoringMode, gefangen: state.captures})};
   vorschauPanelAktualisieren();
   drawStateToCache(); render();
 }
@@ -6447,6 +6458,7 @@ document.querySelectorAll('.color-btn').forEach(btn=>btn.addEventListener('click
 document.querySelectorAll('.scoring-btn').forEach(btn=>btn.addEventListener('click',function(){
   document.querySelectorAll('.scoring-btn').forEach(b=>b.classList.remove('active'));
   this.classList.add('active');state.scoringMode=this.dataset.scoring;
+  vorschauSchliessen();   /* Zählvorschau gilt nur für die Wertung, mit der sie gerechnet wurde */
 }));
 
 document.getElementById('btn-pass').addEventListener('click',()=>{
