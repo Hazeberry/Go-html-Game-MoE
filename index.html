@@ -7285,6 +7285,10 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
          tip:'↓ = früher Gebiets-Denken (Area-Scoring). Gemessen: 150 statt 80 gewinnt nur 31 % (docs/endspielgrenze.md).'},
         {key:'endgameEmpty',    label:'Endspiel ≤ Frei',   step:1,   min:10,  max:150,
          tip:'↓ = schaltet noch früher in Endspiel-Modus'},
+        {key:'endspielNetz',   label:'Endspiel-Netz (0 = aus)', step:0.1, min:0, max:1, float:true,
+         tip:'Netzrechnung ab dem Endspiel-Zug (siehe Endspiel-Netz ab Zug): 0 = aus, 0.8 = Standard. Das Netz sagt GNU Gos Zug voraus und mischt ihn in die Zugwahl (Selbstspiel 83,1 %). Es kostet je Zug 60 ms am Desktop, auf langsamen Handys bis zu 0,5 s. Dort abschalten, wenn die Zugzeit stört. Ist die KI auf dem Handy ungewohnt langsam (unter 800 Simulationen in 1,8 s), prüfe in Chrome den V8-Optimierer unter Website-Einstellungen. Messdaten: docs/zeitbudget.md'},
+        {key:'endspielNetzAb', label:'Endspiel-Netz ab Zug', step:1, min:20, max:300,
+         tip:'Ab diesem Zug rechnet das Endspiel-Netz (Standard 80). Höher = das Netz greift später und spart Rechenzeit in der Mitte der Partie.'},
       ]
     },
     {
