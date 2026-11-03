@@ -28,10 +28,8 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
 
 ## Stand 03.11.2026, später
 - Festgelegt (Hazeberry): 480 Paare je Gegner und Arm (2880 Partien), Budget 158 Runnerstunden als Planungsbudget.
-- PR #267 (`claude/kandidaten-orakel-probe-nachtrag`, Kopf `68ed060fa05280aadab9594f3261a7f21a3ecae9`): Nachtrag §11,
-  Probe-Rohdaten, Spalte „Auslöser“ korrekt, 42× kein-protokoll erklärt (Pass der KI vor der Suche, Orakel
-  ebenfalls Pass → Fall a). CI grün. **Wartet aufs Lesen durch Hazeberry, dann Merge.**
-- PR #268 (`claude/kandidaten-orakel-hauptversuch`, Kopf `43093420d25490039b0d01ca2ed7542126d7eb98`, enthält #267):
+- PR #267 gemergt (Merge `5b42448`), Abo beendet.
+- PR #268 (`claude/kandidaten-orakel-hauptversuch`, Kopf siehe Branch, main eingemergt):
   Workflow `kandidaten-orakel-haupt.yml`, `paket.js` (Fortsetzen), `zusammenfuehren.js`, `haupt-bericht.js`, Tests,
   Doc §12. Zweiter Commit nach Festlegung Hazeberry: Prior-Summe zur Laufzeit (index.html, nur Messpfad) mit
   Fehlerprotokoll, nur vollständige Paare, Ausfälle je Arm/Gegner/Farbe, Budget rund 160 h; dritter Commit: verwendete Paarzahl und Ausfallgründe im Bericht, keine Zusatzschwelle für vollständige Paare. **Wartet auf
@@ -46,4 +44,4 @@ Docs mit Vorgaben vor Merge von Hazeberry lesen lassen; gültig/ungültig, ungü
 `claude/diagnose-p1p2`, `claude/diagnose-p1p2-pakete`, `claude/diagnose-probe-nachtrag`,
 `claude/diagnose-rohdaten-41480291668`, `claude/diagnose-korrektur`, `claude/diagnose-p2-rang`,
 `claude/claude-md-skalierung`, `claude/diagnose-p2-rang-ergebnis-41538801704`, `claude/kandidaten-orakel`,
-`claude/kandidaten-orakel-umsetzung`. `ergebnisse/kandidaten-orakel-probe-lauf1` löschbar nach Merge von #267.
+`claude/kandidaten-orakel-umsetzung`. `ergebnisse/kandidaten-orakel-probe-lauf1` und `claude/kandidaten-orakel-probe-nachtrag` löschbar.
