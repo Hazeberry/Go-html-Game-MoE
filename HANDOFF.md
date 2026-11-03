@@ -37,7 +37,13 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
   [+30,1; +42,0] (480 Paare). 2 Ausfälle (GNU-Go-Absturz). Partiezeit 65 h, Wanduhr 3 h 39 min.
 - PR #269 gemergt (Merge `c45298a`), Abo beendet. Nachtrag §13 und Rohdaten in main.
 - Keine weiteren Läufe ohne Wort von Hazeberry. Löschbar: `ergebnisse/kandidaten-orakel-haupt-lauf1`,
-  `claude/kandidaten-orakel-haupt-ergebnis`.
+  `claude/kandidaten-orakel-haupt-ergebnis`, `claude/kandidaten-orakel-vierarm`.
+
+## Vierarm-Versuch (03.11.2026)
+- Vorabfestlegung `docs/kandidaten-orakel-vierarm.md` gemergt (#270, `4eb8dee`).
+- Umsetzung (Go): PR `claude/kandidaten-orakel-vierarm-umsetzung` (Arme N, P, pEnd, vierarm-bericht.js,
+  Workflows Probe Seed 233 und Hauptlauf Seeds 234/235, Tests). **Wartet auf Lesen/Merge.**
+- **Probe und Hauptlauf: kein Go.**
 
 ## Regeln (Kurzfassung, siehe CLAUDE.md)
 Deutsch, nüchtern; Läufe nur in Actions und nur nach „Go“; Merge `merge` mit voller Kopf-SHA;
