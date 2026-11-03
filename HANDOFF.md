@@ -44,6 +44,8 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
 - Umsetzung (Go): PR `claude/kandidaten-orakel-vierarm-umsetzung` (Arme N, P, pEnd, vierarm-bericht.js,
   Workflows Probe Seed 233 und Hauptlauf Seeds 234/235, Tests). **Wartet auf Lesen/Merge.**
 - **Probe und Hauptlauf: kein Go.**
+- PR #272 (`claude/engine-vergleich-actions`): Engine-Vergleich in Actions, Regel in CLAUDE.md. Wartet aufs
+  Lesen. **Engine-Vergleich: kein Go** (meine Lesart als Go war falsch). #271 erst nach Vergleich mergen.
 
 ## Regeln (Kurzfassung, siehe CLAUDE.md)
 Deutsch, nüchtern; Läufe nur in Actions und nur nach „Go“; Merge `merge` mit voller Kopf-SHA;
