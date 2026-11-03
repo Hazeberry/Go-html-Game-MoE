@@ -31,10 +31,11 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
 - PR #267 (`claude/kandidaten-orakel-probe-nachtrag`, Kopf `68ed060fa05280aadab9594f3261a7f21a3ecae9`): Nachtrag §11,
   Probe-Rohdaten, Spalte „Auslöser“ korrekt, 42× kein-protokoll erklärt (Pass der KI vor der Suche, Orakel
   ebenfalls Pass → Fall a). CI grün. **Wartet aufs Lesen durch Hazeberry, dann Merge.**
-- PR #268 (`claude/kandidaten-orakel-hauptversuch`, Kopf `6e27e6024722cc4a4073391dbb39d4704417ece9`, enthält #267):
+- PR #268 (`claude/kandidaten-orakel-hauptversuch`, Kopf `68c1cacda50f0c763d59a82e16e3456a04d6e125`, enthält #267):
   Workflow `kandidaten-orakel-haupt.yml`, `paket.js` (Fortsetzen), `zusammenfuehren.js`, `haupt-bericht.js`, Tests,
-  Doc §12. **Wartet auf Prüfung; Hauptlauf erst nach eigenem Go.** Offene Punkte zur Prüfung in §12 (Prior-Summe
-  nur per Test gesichert, Antwortquote je Arm, Farbgleichheit auf gespielte Partien, eine Partie je Prozess).
+  Doc §12. Zweiter Commit nach Festlegung Hazeberry: Prior-Summe zur Laufzeit (index.html, nur Messpfad) mit
+  Fehlerprotokoll, nur vollständige Paare, Ausfälle je Arm/Gegner/Farbe, Budget rund 160 h. **Wartet auf
+  Prüfung; Hauptlauf erst nach eigenem Go.**
 - Budget vorsichtig 157,5 h Partien, mit Kontrollen rund 159 bis 160 h (gut 1 % über Plan); nach Medianen rund 65 h.
 
 ## Regeln (Kurzfassung, siehe CLAUDE.md)
