@@ -29,11 +29,7 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
 ## Stand 03.11.2026, später
 - Festgelegt (Hazeberry): 480 Paare je Gegner und Arm (2880 Partien), Budget 158 Runnerstunden als Planungsbudget.
 - PR #267 gemergt (Merge `5b42448`), Abo beendet.
-- PR #268 (`claude/kandidaten-orakel-hauptversuch`, Kopf siehe Branch, main eingemergt):
-  Workflow `kandidaten-orakel-haupt.yml`, `paket.js` (Fortsetzen), `zusammenfuehren.js`, `haupt-bericht.js`, Tests,
-  Doc §12. Zweiter Commit nach Festlegung Hazeberry: Prior-Summe zur Laufzeit (index.html, nur Messpfad) mit
-  Fehlerprotokoll, nur vollständige Paare, Ausfälle je Arm/Gegner/Farbe, Budget rund 160 h; dritter Commit: verwendete Paarzahl und Ausfallgründe im Bericht, keine Zusatzschwelle für vollständige Paare. **Wartet auf
-  Prüfung; Hauptlauf erst nach eigenem Go.**
+- PR #268 gemergt (Merge `370df8e`), Abo beendet. Workflow `kandidaten-orakel-haupt.yml` liegt in main. **Hauptlauf: kein Go.**
 - Budget vorsichtig 157,5 h Partien, mit Kontrollen rund 159 bis 160 h (gut 1 % über Plan); nach Medianen rund 65 h.
 
 ## Regeln (Kurzfassung, siehe CLAUDE.md)
@@ -44,4 +40,4 @@ Docs mit Vorgaben vor Merge von Hazeberry lesen lassen; gültig/ungültig, ungü
 `claude/diagnose-p1p2`, `claude/diagnose-p1p2-pakete`, `claude/diagnose-probe-nachtrag`,
 `claude/diagnose-rohdaten-41480291668`, `claude/diagnose-korrektur`, `claude/diagnose-p2-rang`,
 `claude/claude-md-skalierung`, `claude/diagnose-p2-rang-ergebnis-41538801704`, `claude/kandidaten-orakel`,
-`claude/kandidaten-orakel-umsetzung`. `ergebnisse/kandidaten-orakel-probe-lauf1` und `claude/kandidaten-orakel-probe-nachtrag` löschbar.
+`claude/kandidaten-orakel-umsetzung`. `ergebnisse/kandidaten-orakel-probe-lauf1`, `claude/kandidaten-orakel-probe-nachtrag`, `claude/kandidaten-orakel-hauptversuch` löschbar.
