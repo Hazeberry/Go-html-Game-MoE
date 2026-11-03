@@ -26,10 +26,16 @@
 | 960 | 109 h | 206 h | ~316 h | 4,3 / 6,1 |
 Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go) und 232 (Fuego).
 
-## Offen – wartet auf Hazeberry
-1. Paarezahl und Budget festlegen (Bedingung 5 aus §7).
-2. Wort für den Nachtrag ins Doc samt Übernahme der Probe-Daten (PR).
-3. Go für den Workflow des Hauptversuchs (erst schreiben, als PR vorlegen); **kein Lauf ohne eigenes Go**.
+## Stand 03.11.2026, später
+- Festgelegt (Hazeberry): 480 Paare je Gegner und Arm (2880 Partien), Budget 158 Runnerstunden als Planungsbudget.
+- PR #267 (`claude/kandidaten-orakel-probe-nachtrag`, Kopf `68ed060fa05280aadab9594f3261a7f21a3ecae9`): Nachtrag §11,
+  Probe-Rohdaten, Spalte „Auslöser“ korrekt, 42× kein-protokoll erklärt (Pass der KI vor der Suche, Orakel
+  ebenfalls Pass → Fall a). CI grün. **Wartet aufs Lesen durch Hazeberry, dann Merge.**
+- PR #268 (`claude/kandidaten-orakel-hauptversuch`, Kopf `6e27e6024722cc4a4073391dbb39d4704417ece9`, enthält #267):
+  Workflow `kandidaten-orakel-haupt.yml`, `paket.js` (Fortsetzen), `zusammenfuehren.js`, `haupt-bericht.js`, Tests,
+  Doc §12. **Wartet auf Prüfung; Hauptlauf erst nach eigenem Go.** Offene Punkte zur Prüfung in §12 (Prior-Summe
+  nur per Test gesichert, Antwortquote je Arm, Farbgleichheit auf gespielte Partien, eine Partie je Prozess).
+- Budget vorsichtig 157,5 h Partien, mit Kontrollen rund 159 bis 160 h (gut 1 % über Plan); nach Medianen rund 65 h.
 
 ## Regeln (Kurzfassung, siehe CLAUDE.md)
 Deutsch, nüchtern; Läufe nur in Actions und nur nach „Go“; Merge `merge` mit voller Kopf-SHA;
@@ -39,4 +45,4 @@ Docs mit Vorgaben vor Merge von Hazeberry lesen lassen; gültig/ungültig, ungü
 `claude/diagnose-p1p2`, `claude/diagnose-p1p2-pakete`, `claude/diagnose-probe-nachtrag`,
 `claude/diagnose-rohdaten-41480291668`, `claude/diagnose-korrektur`, `claude/diagnose-p2-rang`,
 `claude/claude-md-skalierung`, `claude/diagnose-p2-rang-ergebnis-41538801704`, `claude/kandidaten-orakel`,
-`claude/kandidaten-orakel-umsetzung`. `ergebnisse/kandidaten-orakel-probe-lauf1` bleibt bis zur Übernahme.
+`claude/kandidaten-orakel-umsetzung`. `ergebnisse/kandidaten-orakel-probe-lauf1` löschbar nach Merge von #267.
