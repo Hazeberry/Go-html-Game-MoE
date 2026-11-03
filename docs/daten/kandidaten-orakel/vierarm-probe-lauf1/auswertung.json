@@ -1,0 +1,83 @@
+{
+ "gueltig": true,
+ "vollstaendig": true,
+ "gruende": [],
+ "priorFehler": [],
+ "pruefungen": [
+  {
+   "nr": "1",
+   "name": "Vollständigkeit (jede Nummer genau einmal, Farbe nach Nummer)",
+   "geprueft": "48 Partien",
+   "nichtPruefbar": "–",
+   "ok": true,
+   "fehler": []
+  },
+  {
+   "nr": "P",
+   "name": "Pflichtprotokoll und Endstand je nicht abgebrochener Partie",
+   "geprueft": "48 Partien",
+   "nichtPruefbar": "–",
+   "ok": true,
+   "fehler": []
+  },
+  {
+   "nr": "3",
+   "name": "Kontrolle Arm A gegen Archiv (Seed 222, Nr. 1 bis 4)",
+   "geprueft": "4 Partien",
+   "nichtPruefbar": "–",
+   "ok": true,
+   "fehler": []
+  },
+  {
+   "nr": "4",
+   "name": "Antwortquote des Orakels ≥ 98 % je Arm und Gegner",
+   "geprueft": "6167 Abfragen",
+   "nichtPruefbar": "–",
+   "ok": true,
+   "fehler": []
+  },
+  {
+   "nr": "5",
+   "name": "Fall d je Gegner in beiden Farben",
+   "geprueft": "48 Partien",
+   "nichtPruefbar": "–",
+   "ok": true,
+   "fehler": []
+  },
+  {
+   "nr": "7",
+   "name": "Zählersummen (Eintrag je Abfrage, Abfrage je KI-Zug ab Zug 81, Fälle bekannt)",
+   "geprueft": "48 Partien",
+   "nichtPruefbar": "–",
+   "ok": true,
+   "fehler": []
+  },
+  {
+   "nr": "8",
+   "name": "Prior-Summe 1 je Eingriff (Abweichung ≤ 1e-9)",
+   "geprueft": "6113 Einträge",
+   "nichtPruefbar": "–",
+   "ok": true,
+   "fehler": []
+  },
+  {
+   "nr": "10",
+   "name": "erste Auslösestelle in allen vier Armen gleich",
+   "geprueft": "12 Vierergruppen",
+   "nichtPruefbar": "–",
+   "ok": true,
+   "fehler": []
+  },
+  {
+   "nr": "11",
+   "name": "Eingriffsart je Arm an jedem Protokolleintrag",
+   "geprueft": "6167 Einträge",
+   "nichtPruefbar": "–",
+   "ok": true,
+   "fehler": []
+  }
+ ],
+ "ausfaelle": [],
+ "artBeispiele": [],
+ "auswertung": null
+}
