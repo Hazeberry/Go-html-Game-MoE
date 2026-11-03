@@ -55,7 +55,9 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
   Hazeberry lässt ihn durchlaufen. Merke: **nur ein ausdrückliches „Go“ zählt**, keine Empfehlung.
 - Vergleich: GLEICH (Nachtrag in docs/kandidaten-orakel-vierarm.md §12). #271 gemergt (`bd93a21`, Kopf `c44ef9b`).
 - Vierarm-Probe Lauf 41623472366 (Go Hazeberry): gültig; Nachtrag §13 und Rohdaten gemergt (#273, `8740574`).
-- **Hauptlauf des Vierarm-Versuchs (Seeds 234/235): kein Go.**
+- Vierarm-Hauptlauf Lauf 41627980348 (Go Hazeberry, Commit 8740574): gültig. N − A kein nachgewiesener Unterschied,
+  S − N und P − A positiv. Nachtrag §14 als PR #274 (`claude/kandidaten-orakel-vierarm-ergebnis`). **Wartet aufs Lesen.**
+- Keine weiteren Läufe ohne ausdrückliches Go.
 
 ## Regeln (Kurzfassung, siehe CLAUDE.md)
 Deutsch, nüchtern; Läufe nur in Actions und nur nach „Go“; Merge `merge` mit voller Kopf-SHA;
