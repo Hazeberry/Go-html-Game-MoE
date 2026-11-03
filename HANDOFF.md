@@ -47,6 +47,12 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
 - PR #272 (`claude/engine-vergleich-actions`): Engine-Vergleich in Actions, Regel in CLAUDE.md. Wartet aufs
   Lesen. **Engine-Vergleich: kein Go** (meine Lesart als Go war falsch). #271 erst nach Vergleich mergen.
 
+## Engine-Vergleich (03.11.2026)
+- #272 gemergt (`f87f148`). Engine-Vergleich Lauf 41617738140 (alt `370df8e317f5919f92837563fd5aaf553bf39789`,
+  neu `e0de66f8f2f74257155557df9da928f75eb8b681`) **ohne Go gestartet** (Empfehlung als Go gelesen, Fehler).
+  Hazeberry lässt ihn durchlaufen. Merke: **nur ein ausdrückliches „Go“ zählt**, keine Empfehlung.
+- #271 (Kopf `e0de66f`) grün; Merge erst nach dem Vergleich und auf Hazeberrys Wort.
+
 ## Regeln (Kurzfassung, siehe CLAUDE.md)
 Deutsch, nüchtern; Läufe nur in Actions und nur nach „Go“; Merge `merge` mit voller Kopf-SHA;
 Docs mit Vorgaben vor Merge von Hazeberry lesen lassen; gültig/ungültig, ungültig = „KEIN URTEIL“, Lauf rot.
