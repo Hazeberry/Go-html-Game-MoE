@@ -32,6 +32,13 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
 - PR #268 gemergt (Merge `370df8e`), Abo beendet. Workflow `kandidaten-orakel-haupt.yml` liegt in main. **Hauptlauf: kein Go.**
 - Budget vorsichtig 157,5 h Partien, mit Kontrollen rund 159 bis 160 h (gut 1 % über Plan); nach Medianen rund 65 h.
 
+## Hauptversuch (03.11.2026)
+- Lauf 41563696817 (Go Hazeberry), gültig. S − A: GNU Go +24,7 [+19,9; +29,5] (478 Paare), Fuego +36,0
+  [+30,1; +42,0] (480 Paare). 2 Ausfälle (GNU-Go-Absturz). Partiezeit 65 h, Wanduhr 3 h 39 min.
+- PR #269 (`claude/kandidaten-orakel-haupt-ergebnis`): Nachtrag §13 und Rohdaten. **Wartet aufs Lesen, dann Merge.**
+- Keine weiteren Läufe ohne Wort von Hazeberry. Nach Merge löschbar: `ergebnisse/kandidaten-orakel-haupt-lauf1`,
+  `claude/kandidaten-orakel-haupt-ergebnis`.
+
 ## Regeln (Kurzfassung, siehe CLAUDE.md)
 Deutsch, nüchtern; Läufe nur in Actions und nur nach „Go“; Merge `merge` mit voller Kopf-SHA;
 Docs mit Vorgaben vor Merge von Hazeberry lesen lassen; gültig/ungültig, ungültig = „KEIN URTEIL“, Lauf rot.
