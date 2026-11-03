@@ -39,7 +39,8 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
 - Keine weiteren Läufe ohne Wort von Hazeberry. Löschbar: `ergebnisse/kandidaten-orakel-haupt-lauf1`,
   `claude/kandidaten-orakel-haupt-ergebnis`, `claude/kandidaten-orakel-vierarm`,
   `claude/kandidaten-orakel-vierarm-umsetzung`, `claude/engine-vergleich-actions`,
-  `claude/kandidaten-orakel-vierarm-probe-nachtrag`, `ergebnisse/kandidaten-orakel-vierarm-probe-lauf1`.
+  `claude/kandidaten-orakel-vierarm-probe-nachtrag`, `ergebnisse/kandidaten-orakel-vierarm-probe-lauf1`,
+  `claude/kandidaten-orakel-vierarm-ergebnis`, `ergebnisse/kandidaten-orakel-vierarm-lauf1`.
 
 ## Vierarm-Versuch (03.11.2026)
 - Vorabfestlegung `docs/kandidaten-orakel-vierarm.md` gemergt (#270, `4eb8dee`).
@@ -56,7 +57,7 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
 - Vergleich: GLEICH (Nachtrag in docs/kandidaten-orakel-vierarm.md §12). #271 gemergt (`bd93a21`, Kopf `c44ef9b`).
 - Vierarm-Probe Lauf 41623472366 (Go Hazeberry): gültig; Nachtrag §13 und Rohdaten gemergt (#273, `8740574`).
 - Vierarm-Hauptlauf Lauf 41627980348 (Go Hazeberry, Commit 8740574): gültig. N − A kein nachgewiesener Unterschied,
-  S − N und P − A positiv. Nachtrag §14 als PR #274 (`claude/kandidaten-orakel-vierarm-ergebnis`). **Wartet aufs Lesen.**
+  S − N und P − A positiv. Nachtrag §14 und Rohdaten gemergt (#274, `645a325`).
 - Keine weiteren Läufe ohne ausdrückliches Go.
 
 ## Regeln (Kurzfassung, siehe CLAUDE.md)
