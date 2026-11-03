@@ -37,12 +37,13 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
   [+30,1; +42,0] (480 Paare). 2 Ausfälle (GNU-Go-Absturz). Partiezeit 65 h, Wanduhr 3 h 39 min.
 - PR #269 gemergt (Merge `c45298a`), Abo beendet. Nachtrag §13 und Rohdaten in main.
 - Keine weiteren Läufe ohne Wort von Hazeberry. Löschbar: `ergebnisse/kandidaten-orakel-haupt-lauf1`,
-  `claude/kandidaten-orakel-haupt-ergebnis`, `claude/kandidaten-orakel-vierarm`.
+  `claude/kandidaten-orakel-haupt-ergebnis`, `claude/kandidaten-orakel-vierarm`,
+  `claude/kandidaten-orakel-vierarm-umsetzung`, `claude/engine-vergleich-actions`.
 
 ## Vierarm-Versuch (03.11.2026)
 - Vorabfestlegung `docs/kandidaten-orakel-vierarm.md` gemergt (#270, `4eb8dee`).
-- Umsetzung (Go): PR `claude/kandidaten-orakel-vierarm-umsetzung` (Arme N, P, pEnd, vierarm-bericht.js,
-  Workflows Probe Seed 233 und Hauptlauf Seeds 234/235, Tests). **Wartet auf Lesen/Merge.**
+- Umsetzung gemergt (#271, `bd93a21`): Arme N, P, pEnd, vierarm-bericht.js, Workflows Probe Seed 233 und
+  Hauptlauf Seeds 234/235, Tests.
 - **Probe und Hauptlauf: kein Go.**
 - PR #272 (`claude/engine-vergleich-actions`): Engine-Vergleich in Actions, Regel in CLAUDE.md. Wartet aufs
   Lesen. **Engine-Vergleich: kein Go** (meine Lesart als Go war falsch). #271 erst nach Vergleich mergen.
@@ -51,7 +52,8 @@ Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go)
 - #272 gemergt (`f87f148`). Engine-Vergleich Lauf 41617738140 (alt `370df8e317f5919f92837563fd5aaf553bf39789`,
   neu `e0de66f8f2f74257155557df9da928f75eb8b681`) **ohne Go gestartet** (Empfehlung als Go gelesen, Fehler).
   Hazeberry lässt ihn durchlaufen. Merke: **nur ein ausdrückliches „Go“ zählt**, keine Empfehlung.
-- #271 (Kopf `e0de66f`) grün; Merge erst nach dem Vergleich und auf Hazeberrys Wort.
+- Vergleich: GLEICH (Nachtrag in docs/kandidaten-orakel-vierarm.md §12). #271 gemergt (`bd93a21`, Kopf `c44ef9b`).
+- **Probe und Hauptlauf des Vierarm-Versuchs: kein Go.**
 
 ## Regeln (Kurzfassung, siehe CLAUDE.md)
 Deutsch, nüchtern; Läufe nur in Actions und nur nach „Go“; Merge `merge` mit voller Kopf-SHA;
