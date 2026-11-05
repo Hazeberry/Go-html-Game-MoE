@@ -1,71 +1,65 @@
-# Übergabe – Kandidaten-Orakel (Stand 03.11.2026)
+# Übergabe – Kandidaten-Orakel (Stand 05.11.2026)
 
-## Erledigt
-- Vorabfestlegung `docs/kandidaten-orakel.md` (#265) und Umsetzung Stufe 1 (#266, Merge `1c71b02`).
-  Schalter `extra.kandidatenOrakel = {arm, g}` in `index.html`, Standard aus, Arm A bitgleich zum Default.
-  Harness: `gnugo-duell.js --kandidaten-orakel A|S|ZS [--kandidaten-ab 80]`; `spielen.sh` mit `DUELL_ZUSATZ`.
-- Fall d1 (Zusatzkind schon mit höchstem Prior): Aufnahme als 17. Kind bleibt, nur die Anhebung entfällt
-  (geprüft, Test „Randfall d1“ in `tests/kandidaten-orakel.js`).
-- Laufzeitprobe: Lauf 41550610778 (Workflow `kandidaten-orakel-probe.yml`, Seed 230), **gültig**.
-  Bericht und Rohdaten auf Branch `ergebnisse/kandidaten-orakel-probe-lauf1`
-  (`docs/daten/kandidaten-orakel/probe-lauf1/`), noch **nicht** in `main`.
+## Aktueller Stand
+- **Nichts läuft.** Keine offenen PRs (#267 bis #274 sind alle gemergt). Keine Läufe ohne ausdrückliches Go.
+- `main` steht auf `645a325` (Merge von #274).
+- Alle Ergebnisse und Rohdaten liegen in `main` unter `docs/daten/kandidaten-orakel/`.
 
-## Ergebnis der Probe (nur Technik, keine Effekthöhe)
-- Kontrolle Seed 222 Nr. 1–4 bitgleich; Orakelantwort 4678/4678; Fall d in beiden Farben (681 S / 733 W);
-  erster Auslöser S/ZS in 12/12 Paaren gleich.
-- Partiedauer max.: GNU Go 90,7 s, Fuego 171,7 s. Planung mit +50 %: 136 s bzw. 258 s je Partie.
-- SD Paardifferenz S−A: GNU Go 44,9 (n=8), Fuego 13,2 (n=4) – nur Größenordnung, Planungswerte 59/85 bleiben.
-- Auffälligkeiten: Spalte „Eingriffe je Partie“ zählt Auslöser (auch in Arm A) → im Nachtrag umbenennen;
-  42× `kein-protokoll` (Wurzel nicht neu gebildet, Orakel ohne Wirkung).
+## Merges (Commit auf main)
+| PR | Inhalt | Merge |
+|---|---|---|
+| #265 / #266 | Vorabfestlegung und Umsetzung Stufe 1 (Schalter `extra.kandidatenOrakel`, Standard aus) | `1d3dd75` / `1c71b02` |
+| #267 | Nachtrag Laufzeitprobe Stufe 1, Rohdaten | `5b42448` |
+| #268 | Workflow Hauptversuch Stufe 1, Prior-Prüfung, vollständige Paare | `370df8e` |
+| #269 | Nachtrag Hauptversuch Stufe 1 (§13), Rohdaten | `c45298a` |
+| #270 | Vorabfestlegung Vierarm-Versuch (§12 Engine-Vergleich nachgetragen) | `4eb8dee` |
+| #272 | Engine-Vergleich in Actions, Regel in CLAUDE.md | `f87f148` |
+| #271 | Umsetzung Vierarm (Arme N, P, pEnd, Bericht, Workflows, Tests) | `bd93a21` |
+| #273 | Nachtrag technische Probe Vierarm (§13), Rohdaten | `8740574` |
+| #274 | Nachtrag Hauptlauf Vierarm (§14), Rohdaten | `645a325` |
 
-## Aufwand Hauptversuch (Arme A, S, ZS je Gegner, Runnerzeit)
-| n je Arm | GNU Go | Fuego | Summe | halbe Breite 97,5 % (GNU Go / Fuego) |
-|---|---:|---:|---:|---:|
-| 240 | 27 h | 52 h | ~79 h | 8,5 / 12,3 |
-| 480 | 54 h | 103 h | ~158 h | 6,0 / 8,7 |
-| 960 | 109 h | 206 h | ~316 h | 4,3 / 6,1 |
-Vorschlag: n=480; Pakete 30 (GNU Go) bzw. 20 Partien (Fuego), Seeds 231 (GNU Go) und 232 (Fuego).
+## Ergebnisse
+**Stufe 1** (Lauf 41563696817, Seeds 231/232, gültig, §13 in `docs/kandidaten-orakel.md`):
+- S − A: GNU Go +24,7 [+19,9; +29,5] (478 Paare), Fuego +36,0 [+30,1; +42,0] (480 Paare).
+- Der kombinierte Eingriff (Orakelzug als zusätzliches Wurzelkind mit Spitzenprior) verbessert den Endstand.
+  ZS (Rang-Nachbar) verschlechtert ihn; das ist keine isoliert gemessene Eingriffskost.
+- Siegquote gegen Fuego mit 100 Spielen je Zug. Die frühere 48-%-Messung (50 Spiele je Zug) ist nicht direkt vergleichbar.
 
-## Stand 03.11.2026, später
-- Festgelegt (Hazeberry): 480 Paare je Gegner und Arm (2880 Partien), Budget 158 Runnerstunden als Planungsbudget.
-- PR #267 gemergt (Merge `5b42448`), Abo beendet.
-- PR #268 gemergt (Merge `370df8e`), Abo beendet. Workflow `kandidaten-orakel-haupt.yml` liegt in main. **Hauptlauf: kein Go.**
-- Budget vorsichtig 157,5 h Partien, mit Kontrollen rund 159 bis 160 h (gut 1 % über Plan); nach Medianen rund 65 h.
+**Vierarm-Versuch** (§14 in `docs/kandidaten-orakel-vierarm.md`, Hauptlauf 41627980348, Seeds 234/235, gültig):
+- N − A: kein nachgewiesener Unterschied (GNU Go +0,7 [−5,2; +6,6], Fuego −0,9 [−6,9; +5,1]).
+- S − N: positiv (+26,3 GNU Go; +30,4 Fuego). P − A: positiv (+13,8 GNU Go; +11,7 Fuego).
+- Nicht getrennt voneinander abgezogen; die Mittelwerte sind additiv (N − A) + (S − N) = S − A.
+- Ausfall: Partie 127 gegen GNU Go in allen Armen (SIGSEGV). Die Ursache liegt nach Vermutung an einer
+  Stellung vor dem ersten Eingriff; das ist nicht geprüft.
+- Laufzeit: 83,5 h Partiezeit, rund 4 h 40 min Wanduhr. Einzelne Fuego-Partien bis 1118 s; die Ursache ist nicht untersucht.
 
-## Hauptversuch (03.11.2026)
-- Lauf 41563696817 (Go Hazeberry), gültig. S − A: GNU Go +24,7 [+19,9; +29,5] (478 Paare), Fuego +36,0
-  [+30,1; +42,0] (480 Paare). 2 Ausfälle (GNU-Go-Absturz). Partiezeit 65 h, Wanduhr 3 h 39 min.
-- PR #269 gemergt (Merge `c45298a`), Abo beendet. Nachtrag §13 und Rohdaten in main.
-- Keine weiteren Läufe ohne Wort von Hazeberry. Löschbar: `ergebnisse/kandidaten-orakel-haupt-lauf1`,
+**Engine-Vergleich** (Lauf 41617738140, alt `370df8e`, neu `e0de66f`): GLEICH über 26 Replays und 1328 KI-Abfragen.
+Die Vorprüfung ist bestanden. Abdeckung: S und ZS nur 22 bzw. 16 Stellen ab Zug 81, für ZS nur 5 mit Fall d.
+Fall d1, e, c0 und d0 kamen nicht vor.
+
+## Offene Punkte (keine Aufgabe ohne Go)
+- Hypothese: Die Verwandtschaft mit GNU Go (Orakel, Netz, Muster, Schiedsrichter) kann am Ergebnis beteiligt sein. Nicht gemessen.
+- Ursache der langen Fuego-Partien und des GNU-Go-Absturzes in Partie 127: nicht untersucht.
+- Das Orakel ist ein Messmittel und steht im Spiel nicht zur Verfügung. Ob sich der Befund ohne Orakel nutzen lässt,
+  ist eine neue Fragestellung und braucht eine eigene Vorabfestlegung.
+- Was offen bleibt: Ob Aufnahme oder Gewichtung allein wirkt, ist mit den vorliegenden Daten nicht getrennt belegt.
+
+## Regeln aus den letzten Sitzungen
+- **Nur ein ausdrückliches „Go“ startet einen Lauf** oder merged einen PR. Eine Empfehlung ist kein Go. Diesen Fehler gab es einmal (Engine-Vergleich), er ist im Nachtrag vermerkt.
+- Messungen laufen ausschließlich in GitHub Actions. Engine-Vergleiche je Stand in einem eigenen Prozess, nie zwei Stände im selben Node-Prozess (CLAUDE.md).
+- „Gleich“ erst nach Vorprüfung (Priors je Wurzelkind vorhanden und endlich, Abdeckung der Arme und Fälle), sonst KEIN URTEIL.
+- Zulässige Partieausfälle stehen getrennt von bestandenen Prüfungen. Ein fehlendes Pflichtprotokoll ist kein Ausfall, sondern KEIN URTEIL.
+- Merge mit voller Kopf-SHA (`expectedHeadSha`), Merge-Methode `merge`. Docs mit Vorgaben vor dem Merge von Hazeberry lesen lassen.
+
+## Löschbare Branches (nicht gelöscht; auf Wort von Hazeberry)
+Alle auf origin vorhanden und durch PRs eingegangen:
+- Diagnose: `claude/diagnose-p1p2`, `claude/diagnose-p1p2-pakete`, `claude/diagnose-probe-nachtrag`,
+  `claude/diagnose-rohdaten-41480291668`, `claude/diagnose-korrektur`, `claude/diagnose-p2-rang`,
+  `claude/claude-md-skalierung`, `claude/diagnose-p2-rang-ergebnis-41538801704`
+- Kandidaten-Orakel: `claude/kandidaten-orakel`, `claude/kandidaten-orakel-umsetzung`,
+  `claude/kandidaten-orakel-probe-nachtrag`, `claude/kandidaten-orakel-hauptversuch`,
   `claude/kandidaten-orakel-haupt-ergebnis`, `claude/kandidaten-orakel-vierarm`,
-  `claude/kandidaten-orakel-vierarm-umsetzung`, `claude/engine-vergleich-actions`,
-  `claude/kandidaten-orakel-vierarm-probe-nachtrag`, `ergebnisse/kandidaten-orakel-vierarm-probe-lauf1`,
-  `claude/kandidaten-orakel-vierarm-ergebnis`, `ergebnisse/kandidaten-orakel-vierarm-lauf1`.
-
-## Vierarm-Versuch (03.11.2026)
-- Vorabfestlegung `docs/kandidaten-orakel-vierarm.md` gemergt (#270, `4eb8dee`).
-- Umsetzung gemergt (#271, `bd93a21`): Arme N, P, pEnd, vierarm-bericht.js, Workflows Probe Seed 233 und
-  Hauptlauf Seeds 234/235, Tests.
-- **Probe und Hauptlauf: kein Go.**
-- PR #272 (`claude/engine-vergleich-actions`): Engine-Vergleich in Actions, Regel in CLAUDE.md. Wartet aufs
-  Lesen. **Engine-Vergleich: kein Go** (meine Lesart als Go war falsch). #271 erst nach Vergleich mergen.
-
-## Engine-Vergleich (03.11.2026)
-- #272 gemergt (`f87f148`). Engine-Vergleich Lauf 41617738140 (alt `370df8e317f5919f92837563fd5aaf553bf39789`,
-  neu `e0de66f8f2f74257155557df9da928f75eb8b681`) **ohne Go gestartet** (Empfehlung als Go gelesen, Fehler).
-  Hazeberry lässt ihn durchlaufen. Merke: **nur ein ausdrückliches „Go“ zählt**, keine Empfehlung.
-- Vergleich: GLEICH (Nachtrag in docs/kandidaten-orakel-vierarm.md §12). #271 gemergt (`bd93a21`, Kopf `c44ef9b`).
-- Vierarm-Probe Lauf 41623472366 (Go Hazeberry): gültig; Nachtrag §13 und Rohdaten gemergt (#273, `8740574`).
-- Vierarm-Hauptlauf Lauf 41627980348 (Go Hazeberry, Commit 8740574): gültig. N − A kein nachgewiesener Unterschied,
-  S − N und P − A positiv. Nachtrag §14 und Rohdaten gemergt (#274, `645a325`).
-- Keine weiteren Läufe ohne ausdrückliches Go.
-
-## Regeln (Kurzfassung, siehe CLAUDE.md)
-Deutsch, nüchtern; Läufe nur in Actions und nur nach „Go“; Merge `merge` mit voller Kopf-SHA;
-Docs mit Vorgaben vor Merge von Hazeberry lesen lassen; gültig/ungültig, ungültig = „KEIN URTEIL“, Lauf rot.
-
-## Löschbare Branches
-`claude/diagnose-p1p2`, `claude/diagnose-p1p2-pakete`, `claude/diagnose-probe-nachtrag`,
-`claude/diagnose-rohdaten-41480291668`, `claude/diagnose-korrektur`, `claude/diagnose-p2-rang`,
-`claude/claude-md-skalierung`, `claude/diagnose-p2-rang-ergebnis-41538801704`, `claude/kandidaten-orakel`,
-`claude/kandidaten-orakel-umsetzung`. `ergebnisse/kandidaten-orakel-probe-lauf1`, `claude/kandidaten-orakel-probe-nachtrag`, `claude/kandidaten-orakel-hauptversuch` löschbar.
+  `claude/kandidaten-orakel-vierarm-umsetzung`, `claude/kandidaten-orakel-vierarm-probe-nachtrag`,
+  `claude/kandidaten-orakel-vierarm-ergebnis`, `claude/engine-vergleich-actions`
+- Ergebnis-Branches: `ergebnisse/kandidaten-orakel-probe-lauf1`, `ergebnisse/kandidaten-orakel-haupt-lauf1`,
+  `ergebnisse/kandidaten-orakel-vierarm-probe-lauf1`, `ergebnisse/kandidaten-orakel-vierarm-lauf1`
