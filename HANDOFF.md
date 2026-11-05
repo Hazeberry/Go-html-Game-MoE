@@ -38,11 +38,18 @@ Die Vorprüfung ist bestanden. Abdeckung: S und ZS nur 22 bzw. 16 Stellen ab Zug
 Fall d1, e, c0 und d0 kamen nicht vor.
 
 ## Offene Punkte (keine Aufgabe ohne Go)
-- Hypothese: Die Verwandtschaft mit GNU Go (Orakel, Netz, Muster, Schiedsrichter) kann am Ergebnis beteiligt sein. Nicht gemessen.
-- Ursache der langen Fuego-Partien und des GNU-Go-Absturzes in Partie 127: nicht untersucht.
-- Das Orakel ist ein Messmittel und steht im Spiel nicht zur Verfügung. Ob sich der Befund ohne Orakel nutzen lässt,
-  ist eine neue Fragestellung und braucht eine eigene Vorabfestlegung.
-- Was offen bleibt: Ob Aufnahme oder Gewichtung allein wirkt, ist mit den vorliegenden Daten nicht getrennt belegt.
+- **GNU-Go-Verwandtschaft:** Hypothese, Ursache nicht nachgewiesen. Dass der Gewinn auch gegen Fuego auftrat,
+  spricht gegen eine rein gegnerspezifische Ausnutzung. Er trennt aber nicht den Einfluss von (a) dem
+  GNU-Go-Orakel, (b) den GNU-Go-geprägten Netz- und Musterdaten und (c) der GNU-Go-Wertung (Endstand-Zählung).
+- **Lange Fuego-Partien und GNU-Go-Absturz:** nicht untersucht. Fuego-Partien dauerten bis 1117,8 s (Arm P) bzw.
+  1112,3 s (Arm S), Probe-Maximum 170,2 s. GNU Go stürzte in Partie 127 in allen vier Armen mit SIGSEGV bei
+  `genmove B` ab. Die gemeinsame Stellung vor dem Eingriff ist eine **Vermutung**, keine ermittelte Ursache.
+- **Nutzung ohne Orakel:** offen. Der Versuch zeigt, dass die Prior-Anhebung hilft, auch bei Zügen, die schon
+  Kandidaten sind (P − A +13,8 und +11,7; S − N positiv). Arm P braucht aber GNU Go, um zu wissen, welchen Zug
+  er anheben soll. N − A zeigt keinen nachgewiesenen Gewinn; das ist **kein** Beleg für Wirkungslosigkeit.
+  Die nächste Frage: Lässt sich die nützliche Anhebung mit einer rein engineinternen Regel finden? Eine solche
+  Regel dürfte das Orakel nicht als Eingabe nutzen, sonst bliebe die Abhängigkeit bestehen. Das ist eine neue
+  Fragestellung mit eigener Vorabfestlegung und eigenem Go; noch nicht festgelegt.
 
 ## Regeln aus den letzten Sitzungen
 - **Nur ein ausdrückliches „Go“ startet einen Lauf** oder merged einen PR. Eine Empfehlung ist kein Go. Diesen Fehler gab es einmal (Engine-Vergleich), er ist im Nachtrag vermerkt.
