@@ -1,12 +1,12 @@
 # Übergabe – Kandidaten-Orakel (Stand 05.11.2026)
 
-## Status: eingefroren (05.11.2026)
-- Dieses Repository ist **eingefroren**. Weiterarbeit findet im neuen Codex-Repository statt, das laut
-  Hazeberry die Werkzeuge und die Dokumentation übernommen hat. Dieses Repo bleibt als Referenz und Archiv.
-- Hier wird **nichts mehr geändert**, außer dieser Übergabe. Der offene Doc-Punkt in §14 der Vierarm-Doku
-  (`docs/kandidaten-orakel-vierarm.md`) wird hier **nicht** nachgezogen; er gehört ins neue Repo.
-- Die Befunde (Fuego-Laufzeit, Absturz Partie 127) stehen laut Hazeberry dort. Ich habe das nicht geprüft.
-- Änderungen im neuen Repo fließen nicht hierher zurück. Quelle der Wahrheit ist ab jetzt das neue Repo.
+## Arbeitsumgebung (korrigiert 05.11.2026)
+- Die Arbeit geht **in diesem Repo** weiter. Dieses Repo ist die Hauptumgebung.
+- Es gibt eine **zweite Umgebung** (neues Codex-Repo mit anderem Coding-Agenten). Sie untersucht dieselben
+  Fragen parallel. Was dort steht oder ergibt, habe ich nicht geprüft; das ist eine Angabe von Hazeberry.
+- Eine frühere Notiz hier („eingefroren, Quelle der Wahrheit ist das neue Repo“) war falsch und ist entfernt.
+- Der offene Doc-Punkt in §14 der Vierarm-Doku (`docs/kandidaten-orakel-vierarm.md`) ist hier **offen**
+  und wartet auf ein Go.
 
 ## Aktueller Stand
 - **Nichts läuft.** Keine offenen PRs (#267 bis #274 sind alle gemergt). Keine Läufe ohne ausdrückliches Go.
