@@ -354,7 +354,7 @@ Territory mit Steinen und beidseitig akzeptierte `captures`-Zuordnung werden jew
 ## 12. Offen vor einem Go
 
 - **Zählabweichung klären:** Warum die Fläche aus der Tot-Liste bei einer Stellung von `final_score` abweicht (Probe 1,
-  §13), ist offen. Die Diagnose-Ausgabe ist vorbereitet; geklärt ist damit nichts. Ob die strenge Gleichheit der
+  §13), ist offen. Vorbereitet ist eine gezielte Diagnose dieser einen Stellung ([`passregel-zaehldiagnose.md`](passregel-zaehldiagnose.md), nicht gestartet, braucht ein eigenes Go). Die Diagnose-Ausgabe ist vorbereitet; geklärt ist damit nichts. Ob die strenge Gleichheit der
   Fläche die richtige Kontrolle ist, wird nach der Ursache entschieden, nicht vorher.
 - **Stufe B wiederholen** (Probe 2) braucht ein eigenes Go, nach Durchsicht dieser Festlegung und nach der Klärung der
   Ursache. Probe 1 ist für Stufe C keine ausreichende Grundlage.
