@@ -33,8 +33,9 @@ function auswerten({einheiten, zeilen, probe}) {
   if (globaleFehler.length) ergebnis.gueltig = false;
   const konv = {};
   for (const r of zeilen) { const k = r.kontrolle && r.kontrolle.gefangen && r.kontrolle.gefangen.konvention; if (k) konv[k] = (konv[k] || 0) + 1; }
+  const ungleichGefangen = zeilen.filter(r => r.kontrolle && r.kontrolle.gefangen && r.kontrolle.gefangen.unterscheidbar).length;
   const dauer = zeilen.map(r => r.dauerMs).filter(Number.isFinite);
-  return {ergebnis, globaleFehler, konv, verletztTotListe: verletzt, dauer: dauer.length ? {n: dauer.length, mittelS: L.mittel(dauer) / 1000, maxS: Math.max(...dauer) / 1000, summeS: dauer.reduce((s, x) => s + x, 0) / 1000} : null,
+  return {ergebnis, globaleFehler, konv, ungleichGefangen, verletztTotListe: verletzt, dauer: dauer.length ? {n: dauer.length, mittelS: L.mittel(dauer) / 1000, maxS: Math.max(...dauer) / 1000, summeS: dauer.reduce((s, x) => s + x, 0) / 1000} : null,
           zeilenZahl: zeilen.length, einheitenZahl: einheiten.length, probe};
 }
 
@@ -54,8 +55,13 @@ function bericht(a) {
     md.push(`- ${w}: N ${z.N}, Ausfälle ${z.ausfaelle} (${f3(z.ausfallAnteil)}), davon ohne Ergebnis ${z.fehlend}, Pflichtfehler ${z.pflichtFehler.length}`);
     for (const p of z.pflichtFehler.slice(0, 10)) md.push(`    - ${p.schluessel}: ${p.fehler.join('; ')}`);
   }
-  if (a.nachspiel) md.push(`- Nachspiel-Kontrolle am Archiv (§9 Nr. 4): ${a.nachspiel.ok ? 'bestanden' : 'NICHT bestanden'}; ` + a.nachspiel.gruppen.map(g => `${g.name} ${g.gleich}/${g.geprueft}`).join(', '));
-  md.push(`- Konvention von GNU Gos \`captures\` (Anzahl Stellungen): ${JSON.stringify(a.konv)}`);
+  if (a.nachspiel) {
+    md.push(`- Nachspiel-Kontrolle am Archiv (§9 Nr. 4): ${a.nachspiel.ok ? 'bestanden' : 'NICHT bestanden'}; ` + a.nachspiel.gruppen.map(g => `${g.name} ${g.gleich}/${g.geprueft}`).join(', '));
+    md.push(`    - bestätigt: ${a.nachspiel.bestaetigt || 'Archivzugfolge einspielbar und Endstand gleich'}`);
+    md.push(`    - nicht bestätigt: ${a.nachspiel.nichtBestaetigt || 'ob die heutige Engine dieselben Züge wählen würde'}`);
+  }
+  md.push(`- Konvention von GNU Gos \`captures\` (in der Kalibrierung bestimmt, je Stellung angewendet; Anzahl Stellungen): ${JSON.stringify(a.konv)}`);
+  md.push(`- Stellungen mit ungleichen Gefangenenzahlen (dort würde ein vertauschter Zähler auffallen): ${a.ungleichGefangen} von ${a.zeilenZahl}`);
   if (a.verletztTotListe.length) md.push(`- Fläche aus Tot-Liste ≠ final_score: ${a.verletztTotListe.join(', ')}`);
   if (a.dauer) md.push(`- Dauer je Einheit: Mittel ${a.dauer.mittelS.toFixed(0)} s, Maximum ${a.dauer.maxS.toFixed(0)} s, Summe ${(a.dauer.summeS / 3600).toFixed(2)} h`);
   md.push('', '## Ausfälle (einzeln, §9 Nr. 6)', '');

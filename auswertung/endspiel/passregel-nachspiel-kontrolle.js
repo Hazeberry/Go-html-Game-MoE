@@ -1,6 +1,15 @@
 // Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
-/* Passregel-Vergleich, Pflichtprüfung §9 Nr. 4 „Nachspiel-Kontrolle am Archiv“:
+/* Passregel-Vergleich, Pflichtprüfung §9 Nr. 4 „Nachspiel-Kontrolle am Archiv“.
+
+   WAS SIE BESTÄTIGT: (a) Die archivierten Züge sind in GNU Go regelkonform einspielbar (jedes `play` wird
+   angenommen), und (b) GNU Gos final_score der Schlussstellung gleich dem archivierten Endstand: der Schiedsrichter
+   und die Aufzeichnung stimmen überein.
+   WAS SIE NICHT BESTÄTIGT: dass die heutige Engine dieselben Züge wählen würde (die Archive stammen von älteren
+   Ständen; das wäre eine eigene, hier nicht verlangte Prüfung), und Brett und Gefangene der Engine (das prüft die
+   Fortsetzung je Einheit gegen `list_stones` und `captures`). Das eine gilt nicht als Nachweis für das andere.
+
+   Verfahren:
    Je Gruppe werden die ersten N Partien (Standard 10) vollständig in GNU Go (Stufe 1, chinesische
    Regeln, Komi aus der Aufzeichnung) eingespielt. GNU Gos final_score der Schlussstellung muss den
    aufgezeichneten Endstand ergeben. Verfahren und Zählung wie `orakel-nachspiel.js`.
@@ -23,7 +32,9 @@ async function kontrolle(gruppen, je, gnugo) {
     const abweichend = z.filter(x => x.ende !== x.aufgezeichnet).map(x => ({nr: x.nr, ende: x.ende, aufgezeichnet: x.aufgezeichnet}));
     aus.push({name: g.name, verlangt: je, geprueft: z.length, gleich: z.length - abweichend.length, abweichend});
   }
-  return {ok: aus.every(g => g.geprueft >= je && g.abweichend.length === 0), je, gruppen: aus};
+  return {ok: aus.every(g => g.geprueft >= je && g.abweichend.length === 0), je, gruppen: aus,
+          bestaetigt: 'Archivzugfolge in GNU Go regelkonform einspielbar; GNU Gos final_score der Schlussstellung gleich dem archivierten Endstand',
+          nichtBestaetigt: 'Dass die heutige Engine dieselben Züge wählen würde; Brett und Gefangene der Engine (prüft die Fortsetzung je Einheit)'};
 }
 
 async function main() {

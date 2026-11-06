@@ -104,6 +104,7 @@ function sgfStellung(E, datei, bis = Infinity) {
 }
 test('Zählung aus der Tot-Liste = finalAreaScore und finalTerritoryScore der App (aus index.html geschnitten)', () => {
   const E = engine(), app = appFunktionen(E);
+  let mitTot = 0, mitTotUngleich = 0;
   for (const [datei, bis] of [['hand-427.sgf', Infinity], ['hand-364.sgf', Infinity], ['zaehlung-358.sgf', Infinity], ['hand-427.sgf', 150]]) {
     const s = sgfStellung(E, datei, bis), toteFeld = E.toteSteineAmEnde(Uint8Array.from(s.b));
     const tot = new Set(); for (let i = 0; i < s.b.length; i++) if (toteFeld[i] && s.b[i]) tot.add(i);
@@ -115,7 +116,40 @@ test('Zählung aus der Tot-Liste = finalAreaScore und finalTerritoryScore der Ap
     pruefeGleich(a.schwarz, area[1], `${datei} (${bis}): Fläche Schwarz`); pruefeGleich(a.weiss, area[2], `${datei}: Fläche Weiß`);
     pruefeGleich(t.schwarz, terr[1], `${datei}: Territory Schwarz`); pruefeGleich(t.weiss, terr[2], `${datei}: Territory Weiß`);
     pruefeGleich(t.stand, terr[1] - (terr[2] + 7.5), `${datei}: Stand mit Komi`);
+    if (tot.size > 0) mitTot++;
+    if (tot.size > 0 && s.caps[1] !== s.caps[2]) mitTotUngleich++;
   }
+  pruefe(mitTot >= 1, `mindestens eine Stellung mit toten Steinen (${mitTot})`);
+  pruefe(mitTotUngleich >= 1, `mindestens eine Stellung mit toten Steinen UND ungleichen Gefangenenzahlen (${mitTotUngleich})`);
+});
+
+test('Zählung aus der Tot-Liste = App-Code auch auf 300 Zufallsbrettern (tote Steine beider Farben, ungleiche Gefangene, Neutrale)', () => {
+  const E = engine(), app = appFunktionen(E), zufall = L.mulberry32(20261106), n = E.BOARD_SIZE;
+  let mitTote = 0, ungleich = 0, neutral = 0, beideTot = 0;
+  for (let k = 0; k < 300; k++) {
+    const dichte = 0.15 + zufall() * 0.6, b = new Uint8Array(n);
+    for (let i = 0; i < n; i++) if (zufall() < dichte) b[i] = zufall() < 0.5 ? 1 : 2;
+    const caps = {1: Math.floor(zufall() * 40), 2: Math.floor(zufall() * 40)}, tot = new Set(), arten = new Set();
+    for (let i = 0; i < n; i++) if (b[i] && zufall() < 0.2) { tot.add(i); arten.add(b[i]); }
+    const b2 = Uint8Array.from(b), c2 = {1: caps[1], 2: caps[2]};
+    for (const i of tot) { c2[b2[i] === 1 ? 2 : 1]++; b2[i] = 0; }
+    const area = app.area({board: b2}), terr = app.territory({board: b2, captures: c2});
+    const a = L.zaehleMitTotListe(b, caps, tot, 7.5, E.NEIGHBORS, 'flaeche'), t = L.zaehleMitTotListe(b, caps, tot, 7.5, E.NEIGHBORS, 'territory');
+    if (a.schwarz !== area[1] || a.weiss !== area[2] || t.schwarz !== terr[1] || t.weiss !== terr[2])
+      pruefe(false, `Zufallsbrett ${k}: Fläche ${a.schwarz}/${a.weiss} gegen App ${area[1]}/${area[2]}, Territory ${t.schwarz}/${t.weiss} gegen App ${terr[1]}/${terr[2]}`);
+    if (tot.size) mitTote++; if (caps[1] !== caps[2]) ungleich++; if (arten.size === 2) beideTot++;
+    const leer = []; const v = new Uint8Array(n);
+    for (let i = 0; i < n; i++) { if (b2[i] || v[i]) continue; const q = [i]; v[i] = 1; let r = 0; for (let j = 0; j < q.length; j++) for (const nb of E.NEIGHBORS[q[j]]) { if (!b2[nb]) { if (!v[nb]) { v[nb] = 1; q.push(nb); } } else r |= b2[nb]; } if (r === 3 || r === 0) neutral++; }
+  }
+  pruefe(mitTote > 250 && ungleich > 250 && beideTot > 100 && neutral > 100, `Abdeckung: tote ${mitTote}, ungleiche Gefangene ${ungleich}, tote beider Farben ${beideTot}, neutrale Regionen ${neutral}`);
+  /* explizit: tote Steine einer Farbe werden dem GEGNER als Gefangene gutgeschrieben, nicht der eigenen Farbe.
+     Ein toter weißer Stein neben einem schwarzen: Schwarz 5 + 1 Gefangene + 360 leere Punkte, nur von Schwarz umgeben. */
+  const b = new Uint8Array(n); b[0] = 2; b[1] = 1;
+  const t = L.zaehleMitTotListe(b, {1: 5, 2: 0}, new Set([0]), 0, E.NEIGHBORS, 'territory');
+  pruefeGleich(t.schwarz, 366, 'toter weißer Stein: Schwarz bekommt den Gefangenen'); pruefeGleich(t.weiss, 0, 'Weiß bekommt nichts');
+  const b3 = new Uint8Array(n); b3[0] = 1; b3[1] = 2;
+  const t3 = L.zaehleMitTotListe(b3, {1: 0, 2: 7}, new Set([0]), 0, E.NEIGHBORS, 'territory');
+  pruefeGleich(t3.weiss, 368, 'toter schwarzer Stein: Weiß 7 + 1 + 360'); pruefeGleich(t3.schwarz, 0, 'Schwarz bekommt nichts');
 });
 
 test('GNU-Go-Antworten lesen: final_score und Tot-Liste', () => {
@@ -233,7 +267,7 @@ test('Stufe A: erste Auslösung der Handpartie 427 (KI Schwarz, Weiß passt), Vo
 });
 
 /* ── 7 Fortsetzung mit Attrappe ────────────────────────────────────── */
-function attrappe(E) {
+function attrappe(E, konv = 'gefangen-von', gleichGemeldet = false) {
   const board = new Uint8Array(E.BOARD_SIZE), caps = {1: 0, 2: 0}, log = [];
   const farbe = s => (/^b/i.test(s) ? 1 : 2);
   const frage = async befehl => {
@@ -243,7 +277,10 @@ function attrappe(E) {
       case 'play': { const f = farbe(t[1]); if (t[2].toLowerCase() !== 'pass') { const s = F.setze(E, board, L.vonGtp(t[2]), f); caps[f] += s.cap; } return ''; }
       case 'genmove': return 'pass';                                       /* der Gegner passt immer */
       case 'list_stones': return [...board.keys()].filter(i => board[i] === (t[1] === 'black' ? 1 : 2)).map(L.zuGtp).join(' ');
-      case 'captures': return String(caps[t[1] === 'black' ? 1 : 2]);
+      case 'captures': {   /* konv: wie GNU Go die Zahl meint; gleichGemeldet: defekt, beide gleich */
+        const f = t[1] === 'black' ? 1 : 2;
+        return String(gleichGemeldet ? 0 : konv === 'gefangen-von' ? caps[f] : caps[3 - f]);
+      }
       case 'final_score': { const s = L.zaehleMitTotListe(board, caps, new Set(), 7.5, E.NEIGHBORS, 'flaeche').stand; return s > 0 ? `B+${s}` : s < 0 ? `W+${-s}` : '0'; }
       case 'final_status_list': return '';
       default: return '';
@@ -263,7 +300,7 @@ async function einheitAusHand(E, ctxExtra = {}) {
 }
 test('Fortsetzung mit Attrappe: Einspielen, Kontrollen, Arm 1 und Arm 0, Passregel AUS', async () => {
   const E = engine(), e = await einheitAusHand(E), ref = attrappe(E);
-  const ctx = {E, DEFAULT: _DEFAULT, opt: {sims: 4, maxZuege: 600, seed: 1}, startReferee: async () => ref, startGegner: async () => null};
+  const ctx = {E, DEFAULT: _DEFAULT, capturesKonvention: 'gefangen-von', opt: {sims: 4, maxZuege: 600, seed: 1}, startReferee: async () => ref, startGegner: async () => null};
   const res = await F.bearbeiteEinheit(ctx, e);
   pruefeGleich(res.fehler.length, 0, 'keine Pflichtfehler: ' + res.fehler.join(' | '));
   pruefe(res.kontrolle.voraussetzung.ok, 'Voraussetzung geprüft und bestanden'); pruefeGleich(res.kontrolle.bretterGleich, true, 'Bretter gleich');
@@ -286,13 +323,13 @@ test('Fortsetzung mit Attrappe: Einspielen, Kontrollen, Arm 1 und Arm 0, Passreg
 test('Fortsetzung verweigert sich bei Schalter 1 und meldet verletzte Voraussetzung', async () => {
   const E = engine(), e = await einheitAusHand(E);
   const an = JSON.parse(JSON.stringify(_DEFAULT)); an.passNachGegnerpass = 1;
-  const r1 = await F.bearbeiteEinheit({E, DEFAULT: an, opt: {sims: 4, maxZuege: 600, seed: 1}, startReferee: async () => attrappe(E), startGegner: async () => null}, e);
+  const r1 = await F.bearbeiteEinheit({E, DEFAULT: an, capturesKonvention: 'gefangen-von', opt: {sims: 4, maxZuege: 600, seed: 1}, startReferee: async () => attrappe(E), startGegner: async () => null}, e);
   pruefe(r1.fehler.some(x => /PASSREGEL/.test(x)), 'Schalter 1 im Fortsetzungsprozess wird verweigert: ' + r1.fehler.join(' | '));
   pruefeGleich(E.PARAMS.passNachGegnerpass, 1, 'der Test hat PARAMS über DEFAULT gesetzt (Rücksetzen folgt)');
   Object.assign(E.PARAMS, _DEFAULT);
   /* Voraussetzung verletzt: Zugfolge endet nicht mit einem Gegnerpass */
   const kaputt = {...e, zuege: e.zuege.slice(0, e.zuege.length - 1), index: e.index - 1};
-  const r2 = await F.bearbeiteEinheit({E, DEFAULT: _DEFAULT, opt: {sims: 4, maxZuege: 600, seed: 1}, startReferee: async () => attrappe(E), startGegner: async () => null}, kaputt);
+  const r2 = await F.bearbeiteEinheit({E, DEFAULT: _DEFAULT, capturesKonvention: 'gefangen-von', opt: {sims: 4, maxZuege: 600, seed: 1}, startReferee: async () => attrappe(E), startGegner: async () => null}, kaputt);
   pruefe(r2.fehler.some(x => /Voraussetzung/.test(x)), 'Voraussetzung verletzt wird gemeldet: ' + r2.fehler.join(' | '));
   pruefeGleich(r2.arm0.status, 'ausfall', 'ohne Voraussetzung keine Fortsetzung');
 });
@@ -332,6 +369,38 @@ test('Kommandozeile: Stufe A schreibt Einheiten und Bericht; Auswertung verlangt
   pruefeGleich(p.status, 0, 'Probe gültig'); pruefe(!/K\/N|## E1/.test(fs.readFileSync(path.join(tmp, 'o', 'bericht.md'), 'utf8')), 'Probe-Bericht ohne Wirkungszahlen');
   pruefe(!/Konfidenz|K\/N/.test(fs.readFileSync(path.join(tmp, 'o', 'zahlen.json'), 'utf8')), 'Probe-Zahlen ohne Wirkung');
   fs.rmSync(tmp, {recursive: true, force: true});
+});
+
+/* ── 7b captures: Konvention eindeutig bestimmen und fest anwenden ───────── */
+test('captures-Kalibrierung: beide Konventionen werden unterschieden, Unklares ist ein Fehler', async () => {
+  const E = engine();
+  pruefeGleich((await F.kalibriereCaptures(async () => attrappe(E, 'gefangen-von'), 1)).konvention, 'gefangen-von', 'gefangen von');
+  const v = await F.kalibriereCaptures(async () => attrappe(E, 'verloren-an'), 1);
+  pruefeGleich(v.konvention, 'verloren-an', 'verloren an'); pruefeGleich(v.black + '/' + v.white, '1/2', 'Rohwerte vertauscht');
+  let fehler = null;
+  try { await F.kalibriereCaptures(async () => attrappe(E, 'gefangen-von', true), 1); } catch (e) { fehler = e.message; }
+  pruefe(fehler && /nicht eindeutig/.test(fehler), 'gleiche Zahlen: Kalibrierung scheitert statt zu raten');
+  /* die Kalibrierstellung hat wirklich ungleiche Zahlen (Schwarz 2, Weiß 1) in der Regelrechnung der Engine */
+  const b = new Uint8Array(E.BOARD_SIZE), caps = {1: 0, 2: 0};
+  for (const z of F.KALIBRIER_ZUEGE) { const [, f, p] = z.split(' '); const s = F.setze(E, b, L.vonGtp(p), f === 'B' ? 1 : 2); caps[f === 'B' ? 1 : 2] += s.cap; }
+  pruefeGleich(caps[1] + '/' + caps[2], '2/1', 'Kalibrierstellung: Schwarz schlägt 2, Weiß 1');
+});
+
+test('captures: ein vertauschter Zähler fällt bei ungleichen Zahlen auf; die kalibrierte Zuordnung gilt fest', async () => {
+  const E = engine(), e = await einheitAusHand(E);
+  const opt = {sims: 4, maxZuege: 600, seed: 1};
+  const lauf = (programm, konvention) => F.bearbeiteEinheit({E, DEFAULT: _DEFAULT, capturesKonvention: konvention, opt, startReferee: async () => programm, startGegner: async () => null}, e);
+  const gut = await lauf(attrappe(E, 'gefangen-von'), 'gefangen-von');
+  pruefeGleich(gut.kontrolle.gefangen.unterscheidbar, true, 'die Stellung hat ungleiche Gefangenenzahlen (sonst prüft der Test nichts): ' + JSON.stringify(gut.kontrolle.gefangen));
+  pruefeGleich(gut.fehler.length, 0, 'passende Zuordnung: kein Fehler');
+  const verloren = await lauf(attrappe(E, 'verloren-an'), 'verloren-an');
+  pruefeGleich(verloren.fehler.length, 0, 'andere Konvention, richtig kalibriert: kein Fehler');
+  pruefeGleich(verloren.kontrolle.gefangen.konvention, 'verloren-an', 'angewendete Konvention protokolliert');
+  const falsch = await lauf(attrappe(E, 'verloren-an'), 'gefangen-von');
+  pruefe(falsch.fehler.some(x => /^Gefangene:/.test(x)), 'vertauschter Zähler gegen falsche Kalibrierung wird NICHT akzeptiert: ' + falsch.fehler.join(' | '));
+  pruefeGleich(falsch.arm0.status, 'ausfall', 'ohne bestandene Kontrolle keine Fortsetzung');
+  const ohne = await F.bearbeiteEinheit({E, DEFAULT: _DEFAULT, opt, startReferee: async () => attrappe(E), startGegner: async () => null}, e);
+  pruefe(ohne.fehler.some(x => /Kalibrierung/.test(x)), 'ohne Kalibrierung keine Prüfung: ' + ohne.fehler.join(' | '));
 });
 
 laufeTests('Passregel-Vergleich (Werkzeuge)').then(ok => process.exit(ok ? 0 : 1));

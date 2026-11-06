@@ -86,6 +86,23 @@ async function zaehlung(E, ref, board, caps) {
   return {flaeche, territory, flaecheTotListe: Math.abs(flaecheTot - flaeche) < 1e-9, flaecheAusTotListe: flaecheTot, tote: tot.size, finalScore: fs_};
 }
 
+/* Kalibrierung der Konvention von GNU Gos `captures` an einer Stellung mit UNGLEICHEN Zahlen:
+   Schwarz schlägt zwei Steine (A1, T1), Weiß einen (A19). Liefert `captures black` 2 und `captures white` 1,
+   zählt GNU Go „von dieser Farbe gefangen“ (wie caps der Engine); liefert es 1 und 2, zählt es „an diese Farbe
+   verloren“. Alles andere ist ein Fehler. Der Test läuft in einem eigenen, frischen Schiedsrichter und wird
+   in jedem Prozess einmal gemacht; danach gilt genau diese Zuordnung. */
+const KALIBRIER_ZUEGE = ['play B A2', 'play W A1', 'play B B1', 'play B T2', 'play W T1', 'play B S1', 'play W A18', 'play B A19', 'play W B19'];
+async function kalibriereCaptures(startReferee, seed) {
+  const ref = await startReferee(seed);
+  try {
+    for (const z of KALIBRIER_ZUEGE) await ref.frage(z);
+    const gb = +(await ref.frage('captures black')), gw = +(await ref.frage('captures white'));
+    if (gb === 2 && gw === 1) return {konvention: 'gefangen-von', black: gb, white: gw};
+    if (gb === 1 && gw === 2) return {konvention: 'verloren-an', black: gb, white: gw};
+    throw new Error(`captures-Kalibrierung nicht eindeutig: black ${gb}, white ${gw} (erwartet 2/1 oder 1/2)`);
+  } finally { ref.ende(); }
+}
+
 async function bearbeiteEinheit(ctx, e) {
   const {E, opt} = ctx, N = E.BOARD_SIZE, ki = e.kiFarbe, seed = L.fortsetzungsSeed(opt.seed, e.gruppe, e.datei, e.nr, e.index);
   const res = {schluessel: e.schluessel, gruppe: e.gruppe, datei: e.datei, nr: e.nr, index: e.index, kiFarbe: ki, gegner: e.gegner, seed,
@@ -123,13 +140,16 @@ async function bearbeiteEinheit(ctx, e) {
     }
     res.kontrolle.bretterGleich = !res.fehler.some(x => /^Einspielen: Brett/.test(x));
     try {
+      /* Gefangene: nur die EINE in der Kalibrierung bestimmte Zuordnung gilt (siehe kalibriereCaptures).
+         Ein vertauschter Zähler wird so nicht verdeckt: bei ungleichen Gefangenenzahlen schlägt die Prüfung an. */
+      const konv = ctx.capturesKonvention;
+      if (konv !== 'gefangen-von' && konv !== 'verloren-an') throw new Error('keine Kalibrierung der captures-Konvention');
       const gb = +(await ref.frage('captures black')), gw = +(await ref.frage('captures white'));
-      /* Die Konvention von GNU Gos `captures` (gefangen von / verloren an) ist hier nicht festgelegt:
-         beide Zuordnungen werden akzeptiert und die tatsächliche protokolliert (Probe klärt sie). */
-      const gleich = gb === caps[1] && gw === caps[2], vertauscht = gb === caps[2] && gw === caps[1];
-      res.kontrolle.gefangen = {gnugoBlack: gb, gnugoWhite: gw, engineVonSchwarz: caps[1], engineVonWeiss: caps[2], konvention: gleich ? 'gefangen-von' : vertauscht ? 'verloren-an' : 'abweichend'};
-      res.kontrolle.gefangenGleich = gleich || vertauscht;
-      if (!res.kontrolle.gefangenGleich) res.fehler.push('Gefangene: Engine und GNU Go weichen ab');
+      const erwartetB = konv === 'gefangen-von' ? caps[1] : caps[2], erwartetW = konv === 'gefangen-von' ? caps[2] : caps[1];
+      res.kontrolle.gefangen = {gnugoBlack: gb, gnugoWhite: gw, engineVonSchwarz: caps[1], engineVonWeiss: caps[2], konvention: konv,
+                                unterscheidbar: caps[1] !== caps[2]};
+      res.kontrolle.gefangenGleich = gb === erwartetB && gw === erwartetW;
+      if (!res.kontrolle.gefangenGleich) res.fehler.push(`Gefangene: Engine ${caps[1]}/${caps[2]} (von Schwarz/von Weiß), GNU Go black ${gb} white ${gw}, Konvention ${konv}`);
     } catch (err) { res.kontrolle.gefangenGleich = false; res.fehler.push('Gefangene nicht prüfbar: ' + err.message.slice(0, 120)); }
     if (res.fehler.length) return res;
     /* Arm 1 „sofort“: Zählung der Stellung. Scheitert sie, ist „sofort“ unbekannt (zählt konservativ, §7). */
@@ -254,6 +274,9 @@ async function main() {
   const E = motor(opt.html), DEFAULT = JSON.parse(JSON.stringify(E.PARAMS));
   if (DEFAULT.passNachGegnerpass !== 0) { console.error('Standardwert passNachGegnerpass ist nicht 0: Abbruch'); process.exit(2); }
   const ctx = {E, DEFAULT, opt, ...echteProgramme(opt)};
+  const kal = await kalibriereCaptures(ctx.startReferee, opt.seed);
+  ctx.capturesKonvention = kal.konvention;
+  console.log(`captures-Kalibrierung: black ${kal.black}, white ${kal.white} → Konvention ${kal.konvention}`);
   let n = 0, fehler = 0, ausfaelle = 0;
   for (const e of meine) {
     const r = await bearbeiteEinheit(ctx, e);
@@ -266,4 +289,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch(e => { console.error(e.stack || e.message); process.exit(1); });
-module.exports = {motor, bearbeiteEinheit, setze, echteProgramme};
+module.exports = {motor, bearbeiteEinheit, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};

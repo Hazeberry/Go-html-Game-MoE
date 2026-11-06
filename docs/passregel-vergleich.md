@@ -226,17 +226,28 @@ Pflichtprüfungen:
    Weglassen.
 3. **Einspielen:** Jeder Zug bis zur Stellung wird von GNU Go bzw. Fuego akzeptiert, und die
    Steinlisten von Engine und Gegner sind an jeder Stellung gleich. Pflicht für 100 % der Einheiten.
-4. **Nachspiel-Kontrolle am Archiv** (eigener Job `nachspiel`, `passregel-nachspiel-kontrolle.js`; fehlt sie oder besteht sie nicht, ist der Lauf ungültig): Je Gruppe mindestens 10 Partien werden vollständig eingespielt;
-   GNU Gos `final_score` der Schlussstellung ergibt den aufgezeichneten Endstand (Verfahren wie in
-   `orakel-nachspiel.js`).
+4. **Nachspiel-Kontrolle am Archiv** (eigener Job `nachspiel`, `passregel-nachspiel-kontrolle.js`; fehlt sie oder besteht
+   sie nicht, ist der Lauf ungültig): Je Gruppe werden mindestens 10 Partien vollständig in GNU Go eingespielt.
+   - **Sie bestätigt:** (a) Die archivierten Züge sind in GNU Go regelkonform einspielbar. (b) GNU Gos `final_score`
+     der Schlussstellung ist gleich dem archivierten Endstand: Schiedsrichter und Aufzeichnung stimmen überein.
+   - **Sie bestätigt nicht:** dass die heutige Engine dieselben Züge wählen würde (die Archive stammen von älteren
+     Ständen; das ist eine eigene Prüfung, die hier nicht verlangt wird) und Brett und Gefangene **der Engine**
+     (das prüft die Fortsetzung je Einheit gegen `list_stones` und `captures`, Nr. 3). Das eine gilt nicht als
+     Nachweis für das andere; der Bericht nennt beides getrennt.
 5. **Zählung:** Auf den Kontrollstellungen ist die aus der Tot-Liste gerechnete Fläche gleich
    `final_score`. Für Territory gilt zusätzlich:
-   - Die Gefangenen aus dem Einspielen in der Engine sind gleich GNU Gos `captures` je Farbe. Welche Konvention
-     GNU Go dafür nutzt (gefangen von oder verloren an), ist nicht festgelegt: Das Werkzeug akzeptiert beide
-     Zuordnungen und protokolliert die tatsächliche. Die Probe klärt sie; danach wird die Prüfung auf diese eine
-     Zuordnung verschärft.
+   - Die Gefangenen aus dem Einspielen in der Engine sind gleich GNU Gos `captures` je Farbe, mit **einer**
+     festen Zuordnung. Welche Konvention GNU Go meint (von dieser Farbe gefangen oder an sie verloren), wird in
+     jedem Fortsetzungs-Prozess **vor der ersten Einheit** an einer Kalibrierstellung mit ungleichen Zahlen
+     bestimmt: Schwarz schlägt zwei Steine (A1, T1), Weiß einen (A19). `captures black` 2 und `captures white` 1
+     heißt „gefangen von“, 1 und 2 heißt „verloren an“, alles andere bricht ab. Danach gilt nur diese Zuordnung.
+     Es werden nie beide akzeptiert, ein vertauschter Zähler fällt also bei ungleichen Zahlen auf. Der Bericht
+     nennt die angewandte Konvention und die Zahl der Stellungen mit ungleichen Gefangenenzahlen. Die
+     Kalibrierung ist lokal nur gegen eine Attrappe getestet, nicht gegen das echte GNU Go.
    - Die Territory-Rechnung folgt der Regel der App (`finalTerritoryScore`, Test `tests/passregel-vergleich.js` gegen den
-     aus `index.html` geschnittenen Code, auch Fläche gegen `finalAreaScore`), mit Komi 7,5, und schreibt die
+     aus `index.html` geschnittenen Code, auch Fläche gegen `finalAreaScore`; geprüft an Stellungen mit toten Steinen
+     und ungleichen Gefangenenzahlen sowie an 300 Zufallsbrettern mit toten Steinen beider Farben und Neutralen), mit
+     Komi 7,5, und schreibt die
      toten Steine der Tot-Liste als Gefangene gut. Das prüft ein Test an einer bekannten Stellung.
    - Die Partie vom 31.10. ergibt W+200,5 (`tests/zaehlvorschau.js`).
 
@@ -307,8 +318,10 @@ Gebaut, ohne einen Lauf zu starten; getestet nur lokal mit Handdaten und einer A
 - `.github/workflows/passregel-vergleich.yml`: manuell, Eingabe Stufe A, B oder C; **noch nicht gestartet**.
 
 Nicht durch Tests abgedeckt, weil es GNU Go, Fuego und die Gegner-KI braucht: der echte Ablauf mit den drei Gegnern,
-die Konvention von `captures`, der Abgleich der Tot-Liste mit `final_score` an echten Stellungen und die Dauer je
-Einheit. Das ist Aufgabe der Probe (Stufe B).
+die echte Antwort von `captures` auf die Kalibrierstellung (lokal nur Attrappe, beide Konventionen), der Abgleich der
+Tot-Liste mit `final_score` an echten Stellungen und die Dauer je Einheit. Das ist Aufgabe der Probe (Stufe B).
+Die Tests bestehen eine Mutationsprobe: Gutschrift der toten Steine an die falsche Farbe, falsches Komi-Vorzeichen,
+Territory mit Steinen und beidseitig akzeptierte `captures`-Zuordnung werden jeweils erkannt.
 
 ## 12. Offen vor einem Go
 
