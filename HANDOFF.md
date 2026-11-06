@@ -38,18 +38,24 @@ Die Vorprüfung ist bestanden. Abdeckung: S und ZS nur 22 bzw. 16 Stellen ab Zug
 Fall d1, e, c0 und d0 kamen nicht vor.
 
 ## Offene Punkte (keine Aufgabe ohne Go)
-- **GNU-Go-Verwandtschaft:** Hypothese, Ursache nicht nachgewiesen. Dass der Gewinn auch gegen Fuego auftrat,
-  spricht gegen eine rein gegnerspezifische Ausnutzung. Er trennt aber nicht den Einfluss von (a) dem
-  GNU-Go-Orakel, (b) den GNU-Go-geprägten Netz- und Musterdaten und (c) der GNU-Go-Wertung (Endstand-Zählung).
-- **Lange Fuego-Partien und GNU-Go-Absturz:** nicht untersucht. Fuego-Partien dauerten bis 1117,8 s (Arm P) bzw.
-  1112,3 s (Arm S), Probe-Maximum 170,2 s. GNU Go stürzte in Partie 127 in allen vier Armen mit SIGSEGV bei
-  `genmove B` ab. Die gemeinsame Stellung vor dem Eingriff ist eine **Vermutung**, keine ermittelte Ursache.
+- **GNU-Go-Verwandtschaft:** Hypothese, nicht nachgewiesen. Dass der Gewinn auch gegen Fuego auftrat, spricht
+  gegen eine rein gegnerspezifische Ausnutzung. Er trennt aber nicht den Einfluss von (a) dem GNU-Go-Orakel,
+  (b) den GNU-Go-geprägten Netz- und Musterdaten und (c) der GNU-Go-Wertung (Endstand-Zählung).
+- **Lange Fuego-Partien:** Ursache weitgehend geklärt. In den zwei untersuchten Fällen entfallen rund 97–98 %
+  der Partiezeit auf GNU-Go-Orakelabfragen (nach Mitteilung von Hazeberry; Auswertung nicht im Repo). Die Suche
+  der KI ist also nicht der Engpass. Maximum: 1117,8 s (Arm P), 1112,3 s (Arm S); Probe-Maximum 170,2 s.
+- **GNU-Go-Absturz in Partie 127:** SIGSEGV bei `genmove B` in allen vier Armen. Alle vier Arme erreichen
+  dieselbe Stellung nach Zug 82. Der Absturz ist auch eigenständig über GTP/GDB reproduzierbar (nach Mitteilung).
+  Der konkrete Fehler im GNU-Go-Quellcode ist **offen**. Zu klären: Die Angabe „nach dem ersten Eingriff“ passt
+  nicht auf Arm A, der keinen Eingriff hat; dort ist dieselbe Stellung ohne Eingriff erreicht. Gemeint ist
+  vermutlich die gemeinsame Stellung ab Zug 82. Die frühere Vermutung „gemeinsame Stellung vor dem Eingriff“
+  wird dadurch ersetzt.
 - **Nutzung ohne Orakel:** offen. Der Versuch zeigt, dass die Prior-Anhebung hilft, auch bei Zügen, die schon
-  Kandidaten sind (P − A +13,8 und +11,7; S − N positiv). Arm P braucht aber GNU Go, um zu wissen, welchen Zug
+  Kandidaten sind (P − A +13,8 und +11,7; S − N positiv). Arm P braucht GNU Go aber, um zu wissen, welchen Zug
   er anheben soll. N − A zeigt keinen nachgewiesenen Gewinn; das ist **kein** Beleg für Wirkungslosigkeit.
   Die nächste Frage: Lässt sich die nützliche Anhebung mit einer rein engineinternen Regel finden? Eine solche
-  Regel dürfte das Orakel nicht als Eingabe nutzen, sonst bliebe die Abhängigkeit bestehen. Das ist eine neue
-  Fragestellung mit eigener Vorabfestlegung und eigenem Go; noch nicht festgelegt.
+  Regel dürfte das Orakel nicht als Eingabe nutzen. Das ist eine neue Fragestellung mit eigener
+  Vorabfestlegung und eigenem Go; noch nicht festgelegt.
 
 ## Regeln aus den letzten Sitzungen
 - **Nur ein ausdrückliches „Go“ startet einen Lauf** oder merged einen PR. Eine Empfehlung ist kein Go. Diesen Fehler gab es einmal (Engine-Vergleich), er ist im Nachtrag vermerkt.
