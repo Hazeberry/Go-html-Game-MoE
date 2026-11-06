@@ -1,10 +1,11 @@
 # Passregel-Vergleich: kostet „Pass nach Gegnerpass“ Siege oder Punkte?
 
 Vorabfestlegung, 06.11.2026, überarbeitet nach Durchsicht am selben Tag (Voraussetzung Gegnerpass,
-Passregel im Arm „weiter“ aus, Ausfälle konservativ, Nenner, Unabhängigkeit, Territory-Kontrollen).
-Status: **festgelegt, nicht gestartet, kein Go, keine Freigabe für Umsetzung oder Lauf.** Das Spiel bleibt
-unverändert (`passNachGegnerpass` bleibt 0). Es gibt noch keine Messung und keine Zahl zu
-Auslösungen oder Wirkung. Dies ist die Ausführung von §4 in
+Passregel im Arm „weiter“ aus, Ausfälle konservativ, Nenner, Unabhängigkeit, Territory-Kontrollen) und nach Probe 1
+nachgebessert (§9 Nr. 5 und Nr. 7, §13).
+Status: **Umgesetzt; Stufe A abgeschlossen, Probe 1 ungültig (§13). Probe 2 und Hauptlauf nicht freigegeben.** Das
+Spiel bleibt unverändert (`passNachGegnerpass` bleibt 0). Zahlen zu den Auslösungen stehen in §13; zur Wirkung der
+Regel gibt es keine Zahl. Dies ist die Ausführung von §4 in
 [`passregel-versuch.md`](passregel-versuch.md); dort stehen Regel und Einzelrechnung.
 
 ## 1. Frage und Abgrenzung
@@ -110,7 +111,10 @@ wird genannt: Was läuft, wo, welches Go gilt.
 2. **Stufe B, technische Probe:** wenige Stellungen je Gruppe, nur zum Prüfen der Werkzeuge und der
    Gültigkeit (§9). **Keine Wirkungsauswertung:** Die Probe berichtet keine Siegwechsel und keine Mittel
    als Ergebnis. Sie misst Dauer und Ausfälle, damit der Hauptumfang vor dem Hauptlauf festgelegt werden
-   kann.
+   kann. **Wirkungszahlen werden im gesamten Probe-Ablauf unterdrückt**, auch in den Logs der Fortsetzung
+   (`--probe`: keine Stände beider Arme, keine „weiter/sofort“-Werte, auch nicht in der Ausfallliste des Berichts).
+   Zugzahlen der KI (Steinzüge, Pässe, Züge nach der Stellung) sind technische Diagnose und erlaubt. Die Rohdaten der
+   Probe (Artefakte) enthalten die Stände trotzdem; sie werden in der Probe nicht ausgewertet.
 3. **Stufe C, Hauptlauf:** alle Einheiten aus Stufe A, mit einem Deckel je Gruppe nur, wenn er nach Stufe A
    festgelegt wurde. Eigenes Go.
 
@@ -253,6 +257,14 @@ Pflichtprüfungen:
 
    Verfehlt eine dieser Kontrollen, ist der Territory-Teil ungültig; der Flächenteil bleibt davon
    unberührt.
+
+   **Diagnose zur Zählung:** Für jede gezählte Stellung (Anfang, Ende, jede Wiederholung) speichert die Fortsetzung
+   in `diagnose` das Brett als Text, die Gefangenen, die toten Koordinaten, den `final_score`-Text, die Fläche aus
+   `final_score` und aus der Tot-Liste und die Territory-Zählung aus der Tot-Liste. Bei einer Abweichung schreibt das
+   Log den Ort (Anfang, Ende oder Wiederholung k), beide Zählwerte, die toten Koordinaten und das Brett (19 Zeilen).
+   Die Gleichheitsprüfung bleibt unverändert; die Diagnose behebt die Ursache nicht. Eine Abweichung in einer
+   Wiederholung macht die Kontrolle der Einheit falsch.
+
 6. **Fortsetzungen und Ausfälle:** Jeder Ausfall (Absturz von GNU Go oder Fuego, Timeout,
    600-Züge-Grenze, Abbruch, nicht zählbare Endstellung) wird einzeln mit Stellung, Gruppe, Arm-1-Ergebnis
    und Grund aufgelistet. Es gibt zwei getrennte Folgen:
@@ -265,16 +277,24 @@ Pflichtprüfungen:
      sein kann. E1 bleibt davon unberührt und bekommt über A die Konsequenz.
    - Ein technisch bedingtes Nichtausführen (Runner-Abbruch, Paket nicht gelaufen) ist kein Ausfall im
      obigen Sinn: Das ganze Paket wird wiederholt, nie einzelne Stellungen.
-7. **Wiederholbarkeit (nur Probe):** Mindestens 3 Fortsetzungen je Gegnerart (GNU Go, Fuego, Gegner-KI) werden mit
-   gleichem Seed wiederholt (Workflow: `--wiederhole 3`, je Gegnerart die ersten drei Einheiten des Pakets). Eine
-   Wiederholung zählt nur als **vollständig**, wenn beide Durchläufe fehlerfrei und regulär (zwei Pässe in Folge, kein
-   Ausfall) endeten und endliche Endstände in beiden Wertungen haben; die Auswertung prüft das aus den Rohfeldern. Zwei
-   abgebrochene Fortsetzungen mit gleicher Teilfolge sind nie „gleich“. Verglichen werden die Zugfolge der Fortsetzung
-   und der Endstand. Bei Gegner **GNU Go** und **Gegner-KI** müssen alle vollständigen Wiederholungen in Zugfolge und
-   Endstand gleich sein, sonst ist die Probe ungültig. Die Gegner-KI gehört dazu, weil sie wie unsere Engine mit festem Seed läuft; das
-   ist eine Klarstellung zur ersten Fassung, die nur „Engine und GNU Go“ nannte. Bei **Fuego** wird das Ergebnis nur
-   berichtet; die Paare brauchen keine Wiederholbarkeit. Gibt es für eine Gegnerart weniger als 3 vollständige
-   Wiederholungen (auch bei Fuego), ist die Probe ungültig und liefert „KEIN URTEIL“. Im Hauptlauf wird sie nicht verlangt.
+7. **Wiederholbarkeit (nur Probe), neu festgelegt am 06.11.2026 nach Probe 1:** Je Gegnerart (GNU Go, Fuego,
+   Gegner-KI) werden Fortsetzungen mit **identischem Seed** wiederholt und mit dem ersten Durchlauf verglichen
+   (Workflow: `--wiederhole 3`, Plan in `wiederholungsPlan`):
+   - **Ab 3 Einheiten der Gegnerart:** die ersten drei Einheiten (nach Schlüssel) laufen je ein zweites Mal.
+   - **Weniger als 3 Einheiten der Gegnerart** (in Probe 1 hatte GNU Go nur 2): **jede vorhandene Einheit läuft
+     insgesamt dreimal**, also mit zwei Wiederholungsläufen. Das prüft die Wiederholbarkeit an den vorhandenen
+     Stellungen. Weitere Durchläufe schaffen keine dritte Stellung; die Prüfung ist damit schwächer als bei 3
+     verschiedenen Stellungen, und der Bericht nennt Zahl der Einheiten und der Läufe.
+
+   Ein Wiederholungslauf zählt nur als **vollständig**, wenn beide Durchläufe fehlerfrei und regulär (zwei Pässe in
+   Folge, kein Ausfall) endeten und endliche Endstände in beiden Wertungen haben; die Auswertung prüft das aus den
+   Rohfeldern. Zwei abgebrochene Fortsetzungen mit gleicher Teilfolge sind nie „gleich“. „Gleich“ heißt vollständig,
+   gleiche Zugfolge und gleicher Endstand. Bei **GNU Go** und **Gegner-KI** müssen alle vollständigen Läufe gleich
+   sein, sonst ist die Probe ungültig; die Gegner-KI gehört dazu, weil sie wie unsere Engine mit festem Seed läuft. Bei
+   **Fuego** wird die Gleichheit nur berichtet. Verlangt wird je Gegnerart: bei mindestens 3 Einheiten drei Einheiten
+   mit je einem vollständigen Wiederholungslauf, bei weniger Einheiten jede mit zwei vollständigen Läufen; sonst ist
+   die Probe ungültig und liefert „KEIN URTEIL“. Im Hauptlauf wird die Wiederholung nicht verlangt. **Probe 1 wird
+   dadurch nicht nachträglich gültig** (siehe Nachtrag §13).
 8. **Voraussetzung „Gegner hat unmittelbar davor gepasst“** (§2): Für 100 % der Einheiten sind die drei
    Prüfungen im Protokoll vermerkt und bestanden. Eine einzige Verletzung macht den Lauf ungültig.
 9. **Passregel im Arm „weiter“ aus:** Das Protokoll jeder Fortsetzung enthält `passNachGegnerpass` = 0
@@ -309,10 +329,11 @@ Wenige ausgelöste Stellungen machen den Lauf nicht ungültig. Sie begrenzen die
 - **Territory** ist nur eine Zählvariante (§5).
 - Eine **Hypothese** wie „verschenkte Punkte beim Beenden“ bleibt eine, bis E2 sie belegt.
 
-## 11. Umsetzung (vorbereitet am 06.11.2026, nichts gelaufen)
+## 11. Umsetzung (06.11.2026)
 
-Gebaut, ohne einen Lauf zu starten; getestet nur lokal mit Handdaten und einer Attrappe statt GNU Go
-(`tests/passregel-vergleich.js`, in `tests/run.js` und `tests/README.md` eingetragen). Der Spielcode ist unverändert.
+Gebaut und lokal getestet mit Handdaten und einer Attrappe statt GNU Go (`tests/passregel-vergleich.js`, in
+`tests/run.js` und `tests/README.md` eingetragen). Gelaufen sind danach Stufe A und Probe 1 (§13). Der Spielcode ist
+unverändert.
 
 - `auswertung/endspiel/passregel-lib.js`: Koordinaten, Statistik, Seed, Voraussetzung, Zählung aus der Tot-Liste,
   Auswertung (`bewerte`) mit Gültigkeit und Wortlaut des Befunds.
@@ -322,7 +343,7 @@ Gebaut, ohne einen Lauf zu starten; getestet nur lokal mit Handdaten und einer A
   Fuego oder Gegner-KI; Fortsetzungen im Prozess mit Schalter 0.
 - `auswertung/endspiel/passregel-nachspiel-kontrolle.js`: §9 Nr. 4.
 - `auswertung/endspiel/passregel-vergleich.js`: Auswertung und Bericht; `--probe` ohne Wirkungszahlen.
-- `.github/workflows/passregel-vergleich.yml`: manuell, Eingabe Stufe A, B oder C; **noch nicht gestartet**.
+- `.github/workflows/passregel-vergleich.yml`: manuell, Eingabe Stufe A, B oder C. Gelaufen: Stufe A, Probe 1 (§13).
 
 Nicht durch Tests abgedeckt, weil es GNU Go, Fuego und die Gegner-KI braucht: der echte Ablauf mit den drei Gegnern,
 die echte Antwort von `captures` auf die Kalibrierstellung (lokal nur Attrappe, beide Konventionen), der Abgleich der
@@ -332,8 +353,47 @@ Territory mit Steinen und beidseitig akzeptierte `captures`-Zuordnung werden jew
 
 ## 12. Offen vor einem Go
 
-- **Stufe A** (Auslösung) hat noch kein Go. Erst danach ist N je Wertung bekannt und damit, ob das Kriterium in §8
-  erreichbar ist. Ein Deckel auf Einheiten wird erst danach festgelegt (§3).
-- **Stufe B** (Probe): Umfang (Standard 3 Einheiten je Gruppe) und Go stehen aus; die Probe liefert keine Wirkungszahlen.
-- **Hauptumfang, Zeitbudget, Einheiten je Paket** (Standard 10, Dauer noch nicht gemessen): nach der Probe.
+- **Zählabweichung klären:** Warum die Fläche aus der Tot-Liste bei einer Stellung von `final_score` abweicht (Probe 1,
+  §13), ist offen. Die Diagnose-Ausgabe ist vorbereitet; geklärt ist damit nichts. Ob die strenge Gleichheit der
+  Fläche die richtige Kontrolle ist, wird nach der Ursache entschieden, nicht vorher.
+- **Stufe B wiederholen** (Probe 2) braucht ein eigenes Go, nach Durchsicht dieser Festlegung und nach der Klärung der
+  Ursache. Probe 1 ist für Stufe C keine ausreichende Grundlage.
+- **Hauptumfang, Zeitbudget, Einheiten je Paket:** Probe 1 maß je Einheit im Mittel 4 s, höchstens 8 s (§13); das ist
+  ein Hinweis, kein festgelegter Umfang. Der Hauptumfang wird nach Probe 2 festgelegt.
+- **Stufe C** hat kein Go. Die GNU-Go-Gruppe hat nur 2 Einheiten (§13); die Auswertung berichtet die Gruppen getrennt (§10).
 - Fuego wird im Workflow gebaut (`auswertung/fuego/bauen.sh`, wie in `fuego-siege.yml`).
+
+## 13. Nachtrag: Stufe A und Probe 1 (06.11.2026)
+
+Quelle: Job-Logs der Actions-Läufe auf `main` am Merge-Commit `df557efabebfe0012248f59588a4b803dad9e185`. Die
+Rohdaten-Artefakte (`stufe-a` Lauf 42302248358; `ergebnisse-teil-1` und `bericht` Lauf 42302924212) liegen im
+Actions-Lauf, **nicht** unter `docs/daten/`, weil der Download aus der Arbeitsumgebung gesperrt war.
+
+**Stufe A** (Lauf 42302248358, Go von Hazeberry, gültig, Pflichtprüfungen bestanden): 2760 Zeilen gelesen und
+ausgewertet, 56345 Stellungen geprüft, 563 Einheiten (Fläche 561, Territory 520), keine Duplikate unter den Einheiten.
+Das Kriterium N ≥ 183 ist gepoolt in beiden Wertungen erreicht. Verteilung der Auslösungen (Fläche/Territory):
+GNU Go ohne Vorgabe 2/2 (960 Partien), Fuego 100 Spiele 44/43 (480), Fuego 50 Spiele 317/301 (960), alte PWA 198/174
+(360). Fläche nach KI-Farbe: Schwarz 206, Weiß 355. An der Auslösung (Fläche, alle Einheiten): `mit` = `nur` im Mittel
+68,6 (Median 61,5; 20,5 bis 230,5), Spanne im Mittel 0,098 (höchstens 2,0), gemischter Anteil im Mittel 0,010
+(höchstens 0,243). Gründe ohne Auslösung (Fläche): „ungeklärte Gruppen (Spanne)“ 32270, „nicht ausgespielt“ 20090,
+„Vorsprung zu klein“ 2850. Das ist keine Aussage über die Wirkung der Regel.
+
+**Probe 1** (Lauf 42302924212, Go von Hazeberry für Stufe B, **ungültig: „KEIN URTEIL“**, Lauf endete in „Auswertung“
+mit Fehler, alle anderen Jobs erfolgreich, Dauer gut fünf Minuten):
+- 11 Einheiten (GNU Go 2, Fuego 6, Gegner-KI 3), 0 Pflichtfehler, 0 Ausfälle, je Einheit im Mittel 4 s, höchstens 8 s.
+- Nachspiel-Kontrolle bestanden, 10 von 10 in jeder der vier Gruppen. Sie bestätigt nur die Einspielbarkeit der
+  Archivzüge in GNU Go und die Übereinstimmung von `final_score` mit dem archivierten Endstand (§9 Nr. 4).
+- `captures`: Kalibrierung ergab „gefangen von“, in allen 11 Stellungen angewandt, 10 davon mit ungleichen
+  Gefangenenzahlen, keine Abweichung.
+- Wiederholbarkeit: Fuego 3 von 3, GNU Go 2 von 2, Gegner-KI 3 von 3 vollständig und gleich in Zugfolge und Stand.
+- **Ungültig aus zwei Gründen:** (1) Wiederholung bei GNU Go nur 2 vollständige von mindestens 3, weil es nur 2
+  Einheiten gab; (2) Territory-Kontrolle: bei einer Stellung (alte PWA, `m1`, Partie 206, Zug 341) war die Fläche aus
+  der Tot-Liste ungleich `final_score`. Ursache offen. Laut Durchsicht von Hazeberry an den Rohdaten: `final_score`
+  B+139,5 gegenüber +136,5 aus der Tot-Liste (von mir nicht nachgeprüft, weil der Download gesperrt war).
+- Laut Durchsicht von Hazeberry enthalten alle elf Fortsetzungen KI-Steinzüge, 3 bis 77 (von mir nicht nachgeprüft).
+  Die Fortsetzung spielt also tatsächlich weiter.
+- **Fehler im Werkzeug:** Das Log der Fortsetzung druckte je Einheit die Stände beider Arme („weiter F … / sofort F …“),
+  obwohl die Probe keine Wirkungszahlen zeigen soll. Die Zeilen wurden gelesen; daraus wird keine Wirkungsaussage
+  abgeleitet. Behoben durch `--probe` (§4). Meine erste Schätzung „die Probe dauert Stunden“ war falsch.
+
+Probe 1 wird nicht nachträglich für gültig erklärt und ist keine Grundlage für Stufe C.

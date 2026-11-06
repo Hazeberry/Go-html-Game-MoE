@@ -408,49 +408,138 @@ test('captures: ein vertauschter Zähler fällt bei ungleichen Zahlen auf; die k
   pruefe(ohne.fehler.some(x => /Kalibrierung/.test(x)), 'ohne Kalibrierung keine Prüfung: ' + ohne.fehler.join(' | '));
 });
 
-/* ── 9 Wiederholung (§9 Nr. 7) und Schlussbefund bei Ungültigkeit ──────── */
+/* ── 9 Wiederholung (§9 Nr. 7), Diagnose, Probe-Log und Schlussbefund bei Ungültigkeit ──── */
 const mitGegner = (n, gegner, o = {}) => ({...einheit(n, o), gegner});
-const wh = (o = {}) => ({gegner: 'gnugo', status1: 'regulaer', status2: 'regulaer', fehler2: [], stand1: {flaeche: 5, territory: 6}, stand2: {flaeche: 5, territory: 6}, gleichFolge: true, gleichStand: true, ...o});
-const zeileW = (e, gleich = true, o = {}) => ({schluessel: e.schluessel, gegner: e.gegner, ...regulaer(20, 15), wiederholung: wh({gegner: e.gegner, gleichFolge: gleich, ...(gleich ? {} : {stand2: {flaeche: 7, territory: 6}, gleichStand: false}), ...o})});
-test('Wiederholung: Probe verlangt je Gegnerart 3; gnugo und ki müssen gleich sein, fuego wird berichtet', () => {
-  const arten = ['gnugo', 'fuego', 'ki'], eh = [];
-  for (const [k, a] of arten.entries()) for (let i = 0; i < 3; i++) eh.push(mitGegner(k * 10 + i, a));
+const wh = (o = {}) => ({lauf: 2, gegner: 'gnugo', status1: 'regulaer', status2: 'regulaer', fehler2: [], stand1: {flaeche: 5, territory: 6}, stand2: {flaeche: 5, territory: 6}, gleichFolge: true, gleichStand: true, ...o});
+/* eine Zeile mit `laeufe` Wiederholungsläufen; o überschreibt Felder in jedem Lauf; gleich = false: abweichender Stand */
+const zeileW = (e, gleich = true, o = {}, laeufe = 1) => ({schluessel: e.schluessel, gegner: e.gegner, ...regulaer(20, 15),
+  wiederholungen: Array.from({length: laeufe}, (_, k) => wh({lauf: k + 2, gegner: e.gegner, gleichFolge: gleich, ...(gleich ? {} : {stand2: {flaeche: 7, territory: 6}, gleichStand: false}), ...o}))});
+const dreiArten = () => { const eh = []; for (const [k, a] of ['gnugo', 'fuego', 'ki'].entries()) for (let i = 0; i < 3; i++) eh.push(mitGegner(k * 10 + i, a)); return eh; };
+
+test('Wiederholung ab 3 Einheiten je Gegnerart: 3 Einheiten mit je einem vollständigen Lauf; gnugo und ki gleich, fuego berichtet', () => {
+  const eh = dreiArten();
   const alle = (f = () => true) => eh.map(e => zeileW(e, f(e)));
   const gut = V.auswerten({einheiten: eh, zeilen: alle(), probe: true});
   pruefe(gut.ergebnis.gueltig && gut.globaleFehler.length === 0, 'alle gleich, je 3: gültig: ' + gut.globaleFehler.join(' | '));
-  pruefeGleich(gut.wiederholung.gnugo.n, 3, 'gnugo 3 vollständig wiederholt'); pruefeGleich(gut.wiederholung.gnugo.gleich, 3, 'alle drei gleich');
+  pruefeGleich(gut.wiederholung.gnugo.n, 3, 'gnugo 3 vollständige Läufe'); pruefeGleich(gut.wiederholung.gnugo.gleich, 3, 'alle drei gleich');
+  pruefeGleich(gut.wiederholung.gnugo.verlangtJe, 1, 'ab 3 Einheiten genügt ein Wiederholungslauf je Einheit');
   const fuegoUngleich = V.auswerten({einheiten: eh, zeilen: alle(e => e.gegner !== 'fuego'), probe: true});
   pruefe(fuegoUngleich.ergebnis.gueltig, 'Fuego ungleich: nur berichtet, weiterhin gültig');
-  pruefe(/fuego 0\/3 vollständige gleich/.test(V.bericht(fuegoUngleich)) && /Gleichheit nur berichtet/.test(V.bericht(fuegoUngleich)), 'Bericht nennt Fuego als nur berichtet');
+  pruefe(/fuego: 3\/3 Einheiten erfüllt/.test(V.bericht(fuegoUngleich)) && /davon gleich in Zugfolge und Stand 0/.test(V.bericht(fuegoUngleich)) && /Gleichheit nur berichtet/.test(V.bericht(fuegoUngleich)), 'Bericht nennt Fuego als nur berichtet');
   const einzeln = V.auswerten({einheiten: eh, zeilen: eh.map((e, i) => zeileW(e, !(e.gegner === 'gnugo' && i === 0))), probe: true});
   pruefeGleich(einzeln.ergebnis.gueltig, false, 'eine ungleiche gnugo-Wiederholung macht ungültig'); pruefe(/KEIN URTEIL/.test(einzeln.ergebnis.befund), 'Befund KEIN URTEIL');
-  const kiUngleich = V.auswerten({einheiten: eh, zeilen: eh.map((e, i) => zeileW(e, !(e.gegner === 'ki' && i === 6))), probe: true});
-  pruefeGleich(kiUngleich.ergebnis.gueltig, false, 'auch bei der Gegner-KI');
-  const zuWenig = V.auswerten({einheiten: eh, zeilen: eh.map((e, i) => (i === 3 ? {...zeileW(e), wiederholung: undefined} : zeileW(e))), probe: true});
-  pruefeGleich(zuWenig.ergebnis.gueltig, false, 'fuego nur 2 statt 3 Wiederholungen'); pruefe(zuWenig.globaleFehler.some(x => /Wiederholungsprüfung fehlt: Gegner fuego 2/.test(x)), zuWenig.globaleFehler.join(' | '));
-  const ohne = V.auswerten({einheiten: eh, zeilen: eh.map(e => ({schluessel: e.schluessel, gegner: e.gegner, ...regulaer(20, 15)})), probe: true});
-  pruefeGleich(ohne.ergebnis.gueltig, false, 'Probe ohne jede Wiederholung ist ungültig');
-  const hauptlauf = V.auswerten({einheiten: eh, zeilen: eh.map(e => ({schluessel: e.schluessel, gegner: e.gegner, ...regulaer(20, 15)})), probe: false});
-  pruefeGleich(hauptlauf.globaleFehler.length, 0, 'Hauptlauf verlangt keine Wiederholung');
+  pruefeGleich(V.auswerten({einheiten: eh, zeilen: eh.map((e, i) => zeileW(e, !(e.gegner === 'ki' && i === 6))), probe: true}).ergebnis.gueltig, false, 'auch bei der Gegner-KI');
+  const zuWenig = V.auswerten({einheiten: eh, zeilen: eh.map((e, i) => (i === 3 ? {...zeileW(e), wiederholungen: []} : zeileW(e))), probe: true});
+  pruefeGleich(zuWenig.ergebnis.gueltig, false, 'fuego nur 2 Einheiten mit Wiederholung'); pruefe(zuWenig.globaleFehler.some(x => /Gegner fuego 2 von 3 Einheiten/.test(x)), zuWenig.globaleFehler.join(' | '));
+  pruefeGleich(V.auswerten({einheiten: eh, zeilen: eh.map(e => ({schluessel: e.schluessel, gegner: e.gegner, ...regulaer(20, 15)})), probe: true}).ergebnis.gueltig, false, 'Probe ohne jede Wiederholung ist ungültig');
+  pruefeGleich(V.auswerten({einheiten: eh, zeilen: eh.map(e => ({schluessel: e.schluessel, gegner: e.gegner, ...regulaer(20, 15)})), probe: false}).globaleFehler.length, 0, 'Hauptlauf verlangt keine Wiederholung');
 });
 
-test('Wiederholung: bearbeiteMitWiederholung vergleicht Zugfolge und Stand; zählt je Gegnerart', async () => {
+test('Wiederholung bei weniger als 3 Einheiten (GNU Go hatte nur 2): jede Einheit insgesamt 3 Durchläufe, nie als 3 verschiedene Stellungen ausgegeben', () => {
+  const eh = [mitGegner(0, 'gnugo'), mitGegner(1, 'gnugo')];
+  const pruefen = zeilen => V.auswerten({einheiten: eh, zeilen, probe: true});
+  const gut = pruefen(eh.map(e => zeileW(e, true, {}, 2)));
+  pruefe(gut.ergebnis.gueltig, 'beide Einheiten je 2 vollständige gleiche Wiederholungsläufe (3 Durchläufe): gültig: ' + gut.globaleFehler.join(' | '));
+  pruefeGleich(gut.wiederholung.gnugo.verlangtJe, 2, 'verlangt 2 Wiederholungsläufe je Einheit'); pruefeGleich(gut.wiederholung.gnugo.verlangtEinheiten, 2, 'verlangt beide Einheiten'); pruefeGleich(gut.wiederholung.gnugo.n, 4, 'vier vollständige Läufe');
+  const einLauf = pruefen(eh.map(e => zeileW(e, true, {}, 1)));
+  pruefeGleich(einLauf.ergebnis.gueltig, false, 'nur ein Wiederholungslauf je Einheit (2 Durchläufe) genügt bei 2 Einheiten nicht');
+  pruefe(einLauf.globaleFehler.some(x => /0 von 2 Einheiten mit je 2 vollständigen/.test(x)), einLauf.globaleFehler.join(' | '));
+  pruefeGleich(pruefen([zeileW(eh[0], true, {}, 2), zeileW(eh[1], true, {}, 2)].map((z, i) => (i === 1 ? {...z, wiederholungen: [z.wiederholungen[0], {...z.wiederholungen[1], gleichFolge: false}]} : z))).ergebnis.gueltig, false, 'ein ungleicher Lauf von drei macht ungültig');
+  pruefeGleich(pruefen([zeileW(eh[0], true, {}, 2), zeileW(eh[1], true, {}, 2)].map((z, i) => (i === 1 ? {...z, wiederholungen: [z.wiederholungen[0], {...z.wiederholungen[1], status2: 'ausfall'}]} : z))).ergebnis.gueltig, false, 'ein Ausfall unter den Wiederholungsläufen: nicht vollständig');
+  pruefeGleich(pruefen([zeileW(eh[0], true, {}, 2), {schluessel: eh[1].schluessel, gegner: 'gnugo', ...regulaer(20, 15)}]).ergebnis.gueltig, false, 'eine der beiden Einheiten ohne Wiederholung: ungültig');
+  /* 1 Einheit: dieselbe Regel */
+  pruefe(V.auswerten({einheiten: [eh[0]], zeilen: [zeileW(eh[0], true, {}, 2)], probe: true}).ergebnis.gueltig, 'eine einzige Einheit mit 3 Durchläufen genügt der Regel');
+});
+
+test('Wiederholungsplan: je Gegnerart, nach Schlüssel sortiert, wenige Einheiten insgesamt je 3 Durchläufe', () => {
+  const eh = [...['b', 'a'].map(k => ({schluessel: 'gnugo-' + k, gegner: 'gnugo'})), ...['f1', 'f2', 'f3', 'f4', 'f5', 'f6'].map(k => ({schluessel: k, gegner: 'fuego'})), ...['k3', 'k1', 'k2'].map(k => ({schluessel: k, gegner: 'ki'}))];
+  const plan = F.wiederholungsplan ? null : F.wiederholungsPlan(eh, 3);
+  pruefeGleich(plan.get('gnugo-a'), 2, 'gnugo (2 Einheiten): 2 zusätzliche Durchläufe = 3 insgesamt'); pruefeGleich(plan.get('gnugo-b'), 2, 'auch die zweite');
+  for (const k of ['f1', 'f2', 'f3']) pruefeGleich(plan.get(k), 1, `fuego ${k}: erste drei, ein zusätzlicher Durchlauf`);
+  for (const k of ['f4', 'f5', 'f6']) pruefeGleich(plan.get(k), undefined, `fuego ${k}: nicht im Plan`);
+  for (const k of ['k1', 'k2', 'k3']) pruefeGleich(plan.get(k), 1, `ki ${k}: genau 3 Einheiten, je ein zusätzlicher Durchlauf`);
+  pruefeGleich(plan.size, 2 + 3 + 3, 'Größe des Plans');
+});
+
+test('Wiederholung: nur vollständige Durchläufe zählen (fehlerfrei, regulär, endliche Stände); Ausfälle sind nie „gleich“', () => {
+  const eh = dreiArten();
+  const mit = aendere => V.auswerten({einheiten: eh, zeilen: eh.map((e, i) => aendere(e, i) || zeileW(e)), probe: true});
+  pruefe(mit(() => null).ergebnis.gueltig, 'Ausgangslage gültig');
+  const f2 = mit((e, i) => (i === 0 ? zeileW(e, true, {fehler2: ['Fortsetzung: x']}) : null));
+  pruefeGleich(f2.ergebnis.gueltig, false, 'fehler2 verhindert das Bestehen'); pruefe(f2.globaleFehler.some(x => /Gegner gnugo 2 von 3 Einheiten/.test(x)), f2.globaleFehler.join(' | '));
+  const ausfall2 = mit((e, i) => (i === 0 ? zeileW(e, true, {status1: 'ausfall', status2: 'ausfall', stand1: {}, stand2: {}, gleichStand: false}) : null));
+  pruefeGleich(ausfall2.ergebnis.gueltig, false, 'zwei Ausfälle mit gleicher Teilfolge zählen nicht als gleich'); pruefeGleich(ausfall2.wiederholung.gnugo.unvollstaendig, 1, 'als unvollständig gezählt');
+  pruefeGleich(mit((e, i) => (i === 3 ? zeileW(e, true, {status2: 'ausfall'}) : null)).ergebnis.gueltig, false, 'ein Durchlauf Ausfall: nicht vollständig (auch bei Fuego)');
+  pruefeGleich(mit((e, i) => (i === 6 ? zeileW(e, true, {stand1: {flaeche: NaN, territory: 1}, stand2: {flaeche: NaN, territory: 1}}) : null)).ergebnis.gueltig, false, 'nicht endliche Stände');
+  pruefeGleich(mit((e, i) => (i === 7 ? zeileW(e, true, {stand1: undefined, stand2: undefined}) : null)).ergebnis.gueltig, false, 'fehlende Stände');
+  pruefeGleich(mit((e, i) => (i === 1 ? zeileW(e, true, {stand2: {flaeche: 9, territory: 6}}) : null)).ergebnis.gueltig, false, 'gleiche Zugfolge, anderer Stand bei GNU Go');
+  const fuegoAnders = mit(e => (e.gegner === 'fuego' ? zeileW(e, true, {stand2: {flaeche: 9, territory: 6}}) : null));
+  pruefe(fuegoAnders.ergebnis.gueltig && fuegoAnders.wiederholung.fuego.gleich === 0 && fuegoAnders.wiederholung.fuego.n === 3, 'Fuego: ungleiche Stände nur berichtet, 3 vollständige vorhanden');
+  pruefeGleich(mit((e, i) => (i === 0 ? {...zeileW(e), fehler: ['Einspielen: x']} : null)).ergebnis.gueltig, false, 'Fehler in der ersten Zeile: ungültig');
+});
+
+test('Wiederholung: bearbeiteMitWiederholung führt die zusätzlichen Durchläufe aus, vergleicht und protokolliert Diagnose', async () => {
   const E = engine(), e = {...(await einheitAusHand(E))};
   const opt = {sims: 4, maxZuege: 600, seed: 1};
   const ctx = (flaky = false) => { let n = 0; return {E, DEFAULT: _DEFAULT, capturesKonvention: 'gefangen-von', opt,
     startReferee: async () => { n++; const a = attrappe(E); if (flaky && n === 2) { const alt = a.frage; a.frage = async b => (/^genmove/.test(b) && !a.schon ? (a.schon = true, 'A10') : alt(b)); } return a; }, startGegner: async () => null}; };
-  const gezaehlt = {};
-  const r = await F.bearbeiteMitWiederholung(ctx(), e, gezaehlt, 3);
-  pruefe(r.wiederholung && r.wiederholung.gleichFolge && r.wiederholung.gleichStand, 'gleicher Seed: gleiche Zugfolge und gleicher Stand: ' + JSON.stringify(r.wiederholung));
-  pruefe(Number.isFinite(r.wiederholung.stand1.flaeche) && r.wiederholung.stand1.flaeche === r.wiederholung.stand2.flaeche && r.wiederholung.status1 === 'regulaer' && r.wiederholung.fehler2.length === 0, 'beide Stände und Status protokolliert: ' + JSON.stringify(r.wiederholung));
-  pruefe(r.arm0.folge.length >= 1 && r.arm0.folge.length === r.wiederholung.laenge1, 'die Folge wird protokolliert');
-  pruefeGleich(gezaehlt.gnugo, 1, 'je Gegnerart gezählt');
-  const k = await F.bearbeiteMitWiederholung(ctx(true), e, {}, 3);
-  pruefeGleich(k.wiederholung.gleichFolge, false, 'abweichender zweiter Lauf wird als ungleich erkannt');
-  const voll = await F.bearbeiteMitWiederholung(ctx(), e, {gnugo: 3}, 3);
-  pruefeGleich(voll.wiederholung, undefined, 'nach drei Wiederholungen der Gegnerart keine weitere');
-  const aus = await F.bearbeiteMitWiederholung(ctx(), e, {}, 0);
-  pruefeGleich(aus.wiederholung, undefined, 'ohne --wiederhole keine Wiederholung');
+  const r = await F.bearbeiteMitWiederholung(ctx(), e, 2);
+  pruefeGleich(r.wiederholungen.length, 2, 'zwei zusätzliche Durchläufe');
+  pruefe(r.wiederholungen.every(w => w.gleichFolge && w.gleichStand && w.status2 === 'regulaer' && w.fehler2.length === 0), 'gleicher Seed: alle gleich in Zugfolge und Stand: ' + JSON.stringify(r.wiederholungen.map(w => [w.lauf, w.gleichFolge, w.gleichStand])));
+  pruefeGleich(r.wiederholungen.map(w => w.lauf).join(','), '2,3', 'Laufnummern 2 und 3 (Durchlauf 1 ist die Zeile selbst)');
+  pruefe(r.arm0.folge.length >= 1 && r.arm0.folge.length === r.wiederholungen[0].laenge1, 'die Folge wird protokolliert');
+  pruefe(r.wiederholungen.every(w => w.diagnose && w.diagnose.anfang && w.diagnose.ende), 'Diagnose (Brett, tote Koordinaten, Zählwerte) für Anfang und Ende auch in den Wiederholungen');
+  pruefe(r.diagnose.anfang.brett.length === 361 && r.diagnose.ende.brett.length === 361, 'Diagnose der ersten Zeile: Brett für Anfang und Ende');
+  const k = await F.bearbeiteMitWiederholung(ctx(true), e, 1);
+  pruefeGleich(k.wiederholungen[0].gleichFolge, false, 'abweichender zweiter Lauf wird als ungleich erkannt');
+  pruefeGleich((await F.bearbeiteMitWiederholung(ctx(), e, 0)).wiederholungen, undefined, 'ohne Wiederholung kein Eintrag');
+});
+
+test('Zählabweichung: Gleichheitsprüfung bleibt, Brett, tote Koordinaten und beide Zählwerte werden festgehalten (Anfang, Ende, Wiederholung)', async () => {
+  const E = engine(), e = await einheitAusHand(E);
+  /* Attrappe, deren Tot-Liste ALLE schwarzen Steine nennt: Fläche aus der Tot-Liste ≠ final_score */
+  const mitTot = () => { const a = attrappe(E), alt = a.frage;
+    a.frage = async b => (/^final_status_list/.test(b) ? alt('list_stones black') : alt(b)); return a; };
+  const ctx = {E, DEFAULT: _DEFAULT, capturesKonvention: 'gefangen-von', opt: {sims: 4, maxZuege: 600, seed: 1}, startReferee: async () => mitTot(), startGegner: async () => null};
+  const r = await F.bearbeiteMitWiederholung(ctx, e, 1);
+  pruefeGleich(r.kontrolle.flaecheTotListe, false, 'Gleichheitsprüfung schlägt an');
+  const wos = r.kontrolle.abweichungen.map(x => x.wo).sort().join(',');
+  pruefeGleich(wos, 'anfang,ende,wiederholung 2 anfang,wiederholung 2 ende', 'Abweichung an Anfang, Ende und in der Wiederholung festgehalten: ' + wos);
+  const x = r.kontrolle.abweichungen[0], d = x.diagnose;
+  pruefe(d.brett.length === 361 && /^[.XO]+$/.test(d.brett), 'Brett als Text'); pruefe(d.tote.length >= 1 && /^[A-HJ-T]\d+$/.test(d.tote[0]), 'tote Koordinaten: ' + d.tote.join(' '));
+  pruefe(Number.isFinite(d.flaecheFinalScore) && Number.isFinite(d.flaecheAusTotListe) && Number.isFinite(d.territoryAusTotListe) && d.flaecheFinalScore !== d.flaecheAusTotListe, 'beide Zählwerte und Territory festgehalten und verschieden');
+  pruefe(d.gefangen[1] >= 0 && d.gefangen[2] >= 0 && typeof d.finalScore === 'string', 'Gefangene und final_score-Text');
+  const log = F.logAbweichungen(r);
+  pruefe(/ZÄHLABWEICHUNG .* anfang: final_score ".*", Fläche aus Tot-Liste -?[\d.]+, tote Steine \d+/.test(log[0]) && log.filter(z => /^  [.XO]{19}$/.test(z)).length >= 19, 'Log: Abweichung samt Brett (19 Zeilen): ' + log[0]);
+  const res = V.auswerten({einheiten: [e], zeilen: [{...r, gegner: 'gnugo'}], probe: true});
+  pruefeGleich(res.ergebnis.wertungen.territory.gueltig, false, 'die Territory-Kontrolle macht die Wertung ungültig (Gleichheitsprüfung bleibt)');
+  pruefe(Object.keys(res.abweichungen).length === 1 && /Zählabweichung .* \(anfang\)/.test(V.bericht(res)), 'Bericht nennt die Abweichung');
+  /* nur die Wiederholung weicht ab (der erste Durchlauf zählt richtig): die Kontrolle muss trotzdem anschlagen */
+  let nr = 0;
+  const nurWdh = await F.bearbeiteMitWiederholung({...ctx, startReferee: async () => (++nr === 2 ? mitTot() : attrappe(E))}, e, 1);
+  pruefeGleich(nurWdh.diagnose.anfang.tote.length, 0, 'erster Durchlauf ohne Abweichung');
+  pruefeGleich(nurWdh.kontrolle.flaecheTotListe, false, 'Abweichung nur in der Wiederholung macht die Kontrolle der Einheit falsch');
+  pruefeGleich(nurWdh.kontrolle.abweichungen.map(x => x.wo).sort().join(','), 'wiederholung 2 anfang,wiederholung 2 ende', 'nur die Wiederholung ist als Abweichung festgehalten');
+  pruefeGleich(V.auswerten({einheiten: [e], zeilen: [{...nurWdh, gegner: 'gnugo'}], probe: true}).ergebnis.wertungen.territory.gueltig, false, 'Territory ungültig');
+  /* ohne Abweichung: keine Meldung, keine Einträge */
+  const ok = await F.bearbeiteMitWiederholung({...ctx, startReferee: async () => attrappe(E)}, e, 0);
+  pruefe(ok.kontrolle.abweichungen === undefined && F.logAbweichungen(ok).length === 0, 'ohne Abweichung nichts im Log');
+});
+
+test('Probe-Log: keine Wirkungszahlen, nur Zugzahlen und Status; außerhalb der Probe die Stände', async () => {
+  const E = engine(), e = await einheitAusHand(E);
+  const r = await F.bearbeiteMitWiederholung({E, DEFAULT: _DEFAULT, capturesKonvention: 'gefangen-von', opt: {sims: 4, maxZuege: 600, seed: 1}, startReferee: async () => attrappe(E), startGegner: async () => null}, e, 1);
+  const probe = F.logZeile(r, 1, 11, true), voll = F.logZeile(r, 1, 11, false);
+  pruefe(/KI-Steinzüge \d+, KI-Pässe \d+, Züge nach der Stellung \d+/.test(probe) && /regulär/.test(probe), 'Probe nennt Zugzahlen und Status: ' + probe);
+  pruefe(!/weiter F|sofort F/.test(probe) && !/-?\d+\.5/.test(probe.replace(/\(\d+ s\)/, '')), 'Probe-Zeile ohne Stände beider Arme: ' + probe);
+  pruefe(/weiter F -?[\d.]+ \/ sofort F -?[\d.]+/.test(voll), 'außerhalb der Probe stehen die Stände in der Zeile: ' + voll);
+  /* Probe-Bericht: Ausfälle ohne „sofort“-Wert, KI-Züge als technische Diagnose */
+  const eh = [e], zeile = {...r, gegner: 'gnugo'};
+  const ausfall = {...zeile, arm0: {status: 'ausfall', grund: 'GNU Go beendet', kiSteine: 0, kiPaesse: 0}, wiederholungen: undefined};
+  const b1 = V.bericht(V.auswerten({einheiten: eh, zeilen: [ausfall], probe: true})), b2 = V.bericht(V.auswerten({einheiten: eh, zeilen: [ausfall], probe: false}));
+  pruefe(!/sofort aus KI-Sicht/.test(b1) && /sofort aus KI-Sicht/.test(b2), 'Ausfallliste: in der Probe ohne Sofort-Wert, sonst mit');
+  const b3 = V.bericht(V.auswerten({einheiten: eh, zeilen: [zeile], probe: true}));
+  pruefe(/KI-Züge in den Fortsetzungen \(technisch\): 1 reguläre, Steinzüge \d+ bis \d+/.test(b3), 'Probe-Bericht nennt die KI-Zugzahlen als technische Diagnose: ' + (b3.match(/- KI-Züge.*/) || [''])[0]);
 });
 
 test('Ungültiger Lauf: der Schlussbefund heißt KEIN URTEIL, nie der erfüllte 2-%-Wortlaut', () => {
@@ -474,35 +563,6 @@ test('Ungültiger Lauf: der Schlussbefund heißt KEIN URTEIL, nie der erfüllte 
   pruefe(/\*\*Lauf UNGÜLTIG/.test(md) && /\*\*KEIN URTEIL: Nachspiel-Kontrolle fehlt/.test(md) && !/liegt unter den Modellannahmen/.test(md), 'Bericht: oben UNGÜLTIG und unten ebenfalls KEIN URTEIL');
   pruefe(/^KEIN URTEIL/.test(zahlen.ergebnis.befund), 'zahlen.json: Befund KEIN URTEIL');
   fs.rmSync(tmp, {recursive: true, force: true});
-});
-
-test('Wiederholung: nur vollständige Durchläufe zählen (fehlerfrei, regulär, endliche Stände); Ausfälle sind nie „gleich“', () => {
-  const arten = ['gnugo', 'fuego', 'ki'], eh = [];
-  for (const [k, a] of arten.entries()) for (let i = 0; i < 3; i++) eh.push(mitGegner(k * 10 + i, a));
-  const mit = (aendere) => V.auswerten({einheiten: eh, zeilen: eh.map((e, i) => aendere(e, i) || zeileW(e)), probe: true});
-  pruefe(mit(() => null).ergebnis.gueltig, 'Ausgangslage gültig');
-  /* Fehler im zweiten Durchlauf */
-  const f2 = mit((e, i) => (i === 0 ? zeileW(e, true, {fehler2: ['Fortsetzung: x']}) : null));
-  pruefeGleich(f2.ergebnis.gueltig, false, 'fehler2 verhindert das Bestehen'); pruefe(f2.globaleFehler.some(x => /gnugo 2 vollständige/.test(x)), f2.globaleFehler.join(' | '));
-  /* zwei abgebrochene Fortsetzungen mit gleicher Teilfolge und gleichem Status */
-  const ausfall2 = mit((e, i) => (i === 0 ? zeileW(e, true, {status1: 'ausfall', status2: 'ausfall', stand1: {}, stand2: {}, gleichStand: false}) : null));
-  pruefeGleich(ausfall2.ergebnis.gueltig, false, 'zwei Ausfälle mit gleicher Teilfolge zählen nicht als gleich');
-  pruefeGleich(ausfall2.wiederholung.gnugo.unvollstaendig, 1, 'als unvollständig gezählt');
-  /* nur ein Durchlauf regulär */
-  pruefeGleich(mit((e, i) => (i === 3 ? zeileW(e, true, {status2: 'ausfall'}) : null)).ergebnis.gueltig, false, 'ein Durchlauf Ausfall: nicht vollständig (auch bei Fuego, dort zählt die Mindestzahl)');
-  /* nicht endliche oder fehlende Stände: undefined === undefined darf nicht als gleich gelten */
-  const ohneStand = mit((e, i) => (i === 6 ? zeileW(e, true, {stand1: {flaeche: NaN, territory: 1}, stand2: {flaeche: NaN, territory: 1}}) : null));
-  pruefeGleich(ohneStand.ergebnis.gueltig, false, 'nicht endliche Stände: nicht vollständig');
-  const fehltStand = mit((e, i) => (i === 7 ? zeileW(e, true, {stand1: undefined, stand2: undefined}) : null));
-  pruefeGleich(fehltStand.ergebnis.gueltig, false, 'fehlende Stände: nicht vollständig');
-  /* gleiche Zugfolge, aber anderer Stand */
-  pruefeGleich(mit((e, i) => (i === 1 ? zeileW(e, true, {stand2: {flaeche: 9, territory: 6}}) : null)).ergebnis.gueltig, false, 'gleiche Zugfolge, anderer Stand bei GNU Go: nicht gleich');
-  /* Fuego: Gleichheit nur berichtet, aber vollständig müssen 3 sein */
-  const fuegoAnders = mit((e, i) => (e.gegner === 'fuego' ? zeileW(e, true, {stand2: {flaeche: 9, territory: 6}}) : null));
-  pruefe(fuegoAnders.ergebnis.gueltig && fuegoAnders.wiederholung.fuego.gleich === 0 && fuegoAnders.wiederholung.fuego.n === 3, 'Fuego: ungleiche Stände nur berichtet, 3 vollständige vorhanden');
-  /* die Zeile der Einheit selbst hat einen Fehler */
-  const zeilenFehler = mit((e, i) => (i === 0 ? {...zeileW(e), fehler: ['Einspielen: x']} : null));
-  pruefeGleich(zeilenFehler.ergebnis.gueltig, false, 'Fehler in der ersten Zeile: ungültig');
 });
 
 laufeTests('Passregel-Vergleich (Werkzeuge)').then(ok => process.exit(ok ? 0 : 1));

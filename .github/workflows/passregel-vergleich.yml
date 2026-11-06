@@ -176,12 +176,13 @@ jobs:
           set -uo pipefail
           chmod +x fuego-bin/fuego
           mkdir -p ergebnisse
-          # Wiederholungsprüfung (§9 Nr. 7) nur in der Probe: je Gegnerart die ersten 3 Einheiten ein zweites Mal
+          # Probe: Wiederholungsprüfung (§9 Nr. 7) und KEINE Wirkungszahlen im Log (--probe)
           wiederhole=0
-          if [ "$STUFE" = "B" ]; then wiederhole=3; fi
+          probe=()
+          if [ "$STUFE" = "B" ]; then wiederhole=3; probe=(--probe); fi
           status=0
           node auswertung/endspiel/passregel-fortsetzung.js --einheiten stufe-a/einheiten.jsonl \
-            --aus "ergebnisse/teil-${TEIL}.jsonl" --teil "${TEIL}/${M}" --wiederhole "$wiederhole" \
+            --aus "ergebnisse/teil-${TEIL}.jsonl" --teil "${TEIL}/${M}" --wiederhole "$wiederhole" "${probe[@]}" \
             --sims "$SIMS" --maxzuege "$MAXZUEGE" --seed "$SEED" \
             --gnugo /usr/games/gnugo --fuego fuego-bin/fuego || status=$?
           echo "Paket ${TEIL} von ${M}, Ausgang ${status}" >> "$GITHUB_STEP_SUMMARY"
