@@ -14,7 +14,7 @@
 
    Aufruf:
      node auswertung/endspiel/passregel-fortsetzung.js --einheiten einheiten.jsonl --aus ergebnis.jsonl
-        [--teil i/m] [--sims 120] [--maxzuege 600] [--seed 1] [--html index.html]
+        [--teil i/m] [--wiederhole 3] [--sims 120] [--maxzuege 600] [--seed 1] [--html index.html]
         [--gnugo /usr/games/gnugo] [--fuego fuego-bin/fuego] [--gegner-html-verz vergleich] */
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
@@ -163,6 +163,7 @@ async function bearbeiteEinheit(ctx, e) {
     E.neuePartie(); E.setzeKrisenDauer(null); E.setzeLebensurteil(null);
     Math.random = L.mulberry32(seed);
     let f = ki, kiSteine = 0, kiPaesse = 0, versuch = false, ausfall = null;
+    const folge = [];   /* alle Züge der Fortsetzung in Reihenfolge (GTP), für die Wiederholungsprüfung §9 Nr. 7 */
     try {
       while (mc < opt.maxZuege && paesse < 2) {
         let i;
@@ -185,6 +186,7 @@ async function bearbeiteEinheit(ctx, e) {
           if (board[i]) { throw Object.assign(new Error(`Zug ${mc + 1} auf besetztes Feld ${L.zuGtp(i)}`), {logik: true}); }
           const s = setze(E, board, i, f); caps[f] += s.cap; ko = s.ko; last = i; paesse = 0; hist.add(E.computeZobrist(board));
         }
+        folge.push(i < 0 ? 'pass' : L.zuGtp(i));
         mc++; f = 3 - f;
       }
       if (!ausfall && paesse < 2) ausfall = `Zuglimit ${opt.maxZuege} erreicht`;
@@ -193,14 +195,14 @@ async function bearbeiteEinheit(ctx, e) {
         if (b) { res.fehler.push('Fortsetzung: ' + b); }
         else {
           const z = await zaehlung(E, ref, board, caps);
-          res.arm0 = {status: 'regulaer', flaeche: z.flaeche, territory: z.territory, kiSteine, kiPaesse, zuegeNachher: mc - e.zuege.length,
+          res.arm0 = {status: 'regulaer', flaeche: z.flaeche, territory: z.territory, kiSteine, kiPaesse, zuegeNachher: mc - e.zuege.length, folge,
                       passNachGegnerpass: E.PARAMS.passNachGegnerpass, versuch};
           if (!z.flaecheTotListe) res.kontrolle.flaecheTotListe = false;
         }
-      } else res.arm0 = {status: 'ausfall', grund: ausfall, kiSteine, kiPaesse, passNachGegnerpass: E.PARAMS.passNachGegnerpass, versuch};
+      } else res.arm0 = {status: 'ausfall', grund: ausfall, kiSteine, kiPaesse, folge, passNachGegnerpass: E.PARAMS.passNachGegnerpass, versuch};
     } catch (err) {
       if (err.logik || /^PASSREGEL/.test(err.message)) res.fehler.push('Fortsetzung: ' + err.message);
-      else if (fehlerProgramm(err)) res.arm0 = {status: 'ausfall', grund: err.message.slice(0, 200), kiSteine, kiPaesse, passNachGegnerpass: E.PARAMS.passNachGegnerpass, versuch};
+      else if (fehlerProgramm(err)) res.arm0 = {status: 'ausfall', grund: err.message.slice(0, 200), kiSteine, kiPaesse, folge, passNachGegnerpass: E.PARAMS.passNachGegnerpass, versuch};
       else res.fehler.push('Fortsetzung: unerwarteter Fehler ' + (err.stack || err.message).slice(0, 300));
     }
   } catch (err) {
@@ -212,6 +214,20 @@ async function bearbeiteEinheit(ctx, e) {
     res.dauerMs = Date.now() - t0;
   }
   return res;
+}
+
+/* Wiederholungsprüfung §9 Nr. 7 (nur Probe): dieselbe Einheit noch einmal mit demselben Seed.
+   Verglichen werden die Zugfolge der Fortsetzung und der Endstand. Das Ergebnis hängt an der ersten Zeile. */
+async function bearbeiteMitWiederholung(ctx, e, gezaehlt, je) {
+  const r1 = await bearbeiteEinheit(ctx, e);
+  if (!(je > 0) || (gezaehlt[e.gegner] || 0) >= je || r1.fehler.length) return r1;
+  gezaehlt[e.gegner] = (gezaehlt[e.gegner] || 0) + 1;
+  const r2 = await bearbeiteEinheit(ctx, e);
+  const a = r1.arm0, b = r2.arm0;
+  r1.wiederholung = {gegner: e.gegner, seed: r1.seed, status1: a.status, status2: b.status, fehler2: r2.fehler,
+    gleichFolge: JSON.stringify(a.folge || null) === JSON.stringify(b.folge || null) && a.status === b.status,
+    gleichStand: a.flaeche === b.flaeche && a.territory === b.territory, laenge1: (a.folge || []).length, laenge2: (b.folge || []).length};
+  return r1;
 }
 
 /* ── echte Programme ──────────────────────────────────────────────────── */
@@ -246,7 +262,7 @@ function echteProgramme(opt) {
 
 async function main() {
   const a = process.argv.slice(2);
-  const opt = {einheiten: null, aus: null, teil: [1, 1], sims: 120, maxZuege: 600, seed: 1, html: path.join(__dirname, '..', '..', 'index.html'),
+  const opt = {einheiten: null, aus: null, teil: [1, 1], wiederhole: 0, sims: 120, maxZuege: 600, seed: 1, html: path.join(__dirname, '..', '..', 'index.html'),
                gnugo: '/usr/games/gnugo', fuego: path.join(__dirname, '..', '..', 'fuego-bin', 'fuego'), gegnerHtmlVerz: path.join(__dirname, '..', '..', 'vergleich')};
   for (let i = 0; i < a.length; i++) {
     const v = a[i + 1];
@@ -257,6 +273,7 @@ async function main() {
       case '--sims': opt.sims = +v; i++; break;
       case '--maxzuege': opt.maxZuege = +v; i++; break;
       case '--seed': opt.seed = +v; i++; break;
+      case '--wiederhole': opt.wiederhole = +v; i++; break;
       case '--html': opt.html = v; i++; break;
       case '--gnugo': opt.gnugo = v; i++; break;
       case '--fuego': opt.fuego = v; i++; break;
@@ -278,8 +295,9 @@ async function main() {
   ctx.capturesKonvention = kal.konvention;
   console.log(`captures-Kalibrierung: black ${kal.black}, white ${kal.white} → Konvention ${kal.konvention}`);
   let n = 0, fehler = 0, ausfaelle = 0;
+  const gezaehlt = {};
   for (const e of meine) {
-    const r = await bearbeiteEinheit(ctx, e);
+    const r = await bearbeiteMitWiederholung(ctx, e, gezaehlt, opt.wiederhole);
     fs.appendFileSync(opt.aus, JSON.stringify(r) + '\n');
     n++; if (r.fehler.length) fehler++; if (r.arm0.status !== 'regulaer') ausfaelle++;
     console.log(`${n}/${meine.length} ${e.schluessel}: ${r.fehler.length ? 'FEHLER ' + r.fehler[0] : r.arm0.status === 'regulaer' ? `weiter F ${r.arm0.flaeche} / sofort F ${r.arm1.flaeche}` : 'Ausfall: ' + r.arm0.grund} (${(r.dauerMs / 1000).toFixed(0)} s)`);
@@ -289,4 +307,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch(e => { console.error(e.stack || e.message); process.exit(1); });
-module.exports = {motor, bearbeiteEinheit, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};
+module.exports = {motor, bearbeiteEinheit, bearbeiteMitWiederholung, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};

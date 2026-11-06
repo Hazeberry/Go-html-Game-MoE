@@ -18,6 +18,30 @@ const f1 = v => (v === null || v === undefined || !Number.isFinite(v) ? '–' : 
 const f3 = v => (v * 100).toFixed(2).replace('.', ',') + ' %';
 const iv = c => c ? `${f3(c.anteil)} [${f3(c.unten)} bis ${f3(c.oben)}]` : '–';
 
+/* §9 Nr. 7 (nur Probe): je Gegnerart mindestens 3 wiederholte Fortsetzungen. Engine und GNU Go (Gegner gnugo) und die
+   Gegner-KI (ki) müssen gleiche Zugfolgen liefern; bei Fuego wird nur berichtet. */
+const WIEDERHOLUNGEN_MIN = 3, WIEDERHOLUNG_PFLICHT = ['gnugo', 'ki'];
+function pruefeWiederholung(einheiten, zeilen, probe) {
+  const arten = [...new Set(einheiten.map(e => e.gegner))].sort(), je = {}, fehler = [];
+  for (const art of arten) {
+    const w = zeilen.filter(r => r.gegner === art && r.wiederholung).map(r => r.wiederholung);
+    je[art] = {n: w.length, gleichFolge: w.filter(x => x.gleichFolge).length, gleichStand: w.filter(x => x.gleichStand).length, pflicht: WIEDERHOLUNG_PFLICHT.includes(art)};
+    if (!probe) continue;
+    if (w.length < WIEDERHOLUNGEN_MIN) fehler.push(`Wiederholungsprüfung fehlt: Gegner ${art} ${w.length} von mindestens ${WIEDERHOLUNGEN_MIN}`);
+    else if (WIEDERHOLUNG_PFLICHT.includes(art) && je[art].gleichFolge < w.length) fehler.push(`Wiederholung nicht gleich: Gegner ${art} ${je[art].gleichFolge} von ${w.length} mit gleicher Zugfolge`);
+  }
+  return {je, fehler};
+}
+
+/* Ungültig heißt „kein Urteil“: der Schlussbefund wird überschrieben, nie nur das Flag gesetzt */
+function setzeUngueltig(a, grund) {
+  if (grund && !a.globaleFehler.includes(grund)) a.globaleFehler.push(grund);
+  a.ergebnis.gueltig = false;
+  const gruende = [...a.globaleFehler, ...['flaeche', 'territory'].flatMap(w => a.ergebnis.wertungen[w].gruendeUngueltig.map(g => `${w}: ${g}`))];
+  a.ergebnis.befund = 'KEIN URTEIL' + (gruende.length ? ': ' + gruende.join('; ') : '');
+  return a;
+}
+
 function auswerten({einheiten, zeilen, probe}) {
   const ergebnisse = new Map(), doppelt = [];
   for (const r of zeilen) { if (ergebnisse.has(r.schluessel)) doppelt.push(r.schluessel); ergebnisse.set(r.schluessel, r); }
@@ -30,13 +54,17 @@ function auswerten({einheiten, zeilen, probe}) {
   const globaleFehler = [];
   if (doppelt.length) globaleFehler.push(`${doppelt.length} Ergebnis(se) doppelt`);
   if (unbekannt.length) globaleFehler.push(`${unbekannt.length} Ergebnis(se) ohne Einheit`);
-  if (globaleFehler.length) ergebnis.gueltig = false;
+  const wh = pruefeWiederholung(einheiten, zeilen, probe);
+  globaleFehler.push(...wh.fehler);
   const konv = {};
   for (const r of zeilen) { const k = r.kontrolle && r.kontrolle.gefangen && r.kontrolle.gefangen.konvention; if (k) konv[k] = (konv[k] || 0) + 1; }
   const ungleichGefangen = zeilen.filter(r => r.kontrolle && r.kontrolle.gefangen && r.kontrolle.gefangen.unterscheidbar).length;
   const dauer = zeilen.map(r => r.dauerMs).filter(Number.isFinite);
-  return {ergebnis, globaleFehler, konv, ungleichGefangen, verletztTotListe: verletzt, dauer: dauer.length ? {n: dauer.length, mittelS: L.mittel(dauer) / 1000, maxS: Math.max(...dauer) / 1000, summeS: dauer.reduce((s, x) => s + x, 0) / 1000} : null,
+  const out0 = {ergebnis, globaleFehler, konv, ungleichGefangen, wiederholung: wh.je, verletztTotListe: verletzt, dauer: dauer.length ? {n: dauer.length, mittelS: L.mittel(dauer) / 1000, maxS: Math.max(...dauer) / 1000, summeS: dauer.reduce((s, x) => s + x, 0) / 1000} : null,
           zeilenZahl: zeilen.length, einheitenZahl: einheiten.length, probe};
+  const a = out0;
+  if (!ergebnis.gueltig || globaleFehler.length) setzeUngueltig(a, null);
+  return a;
 }
 
 function bericht(a) {
@@ -60,6 +88,7 @@ function bericht(a) {
     md.push(`    - bestätigt: ${a.nachspiel.bestaetigt || 'Archivzugfolge einspielbar und Endstand gleich'}`);
     md.push(`    - nicht bestätigt: ${a.nachspiel.nichtBestaetigt || 'ob die heutige Engine dieselben Züge wählen würde'}`);
   }
+  md.push('- Wiederholbarkeit (§9 Nr. 7, nur Probe verlangt; Gegner gnugo und ki müssen gleich sein, fuego wird berichtet): ' + (Object.entries(a.wiederholung).map(([k, v]) => `${k} ${v.gleichFolge}/${v.n} gleiche Zugfolge, ${v.gleichStand}/${v.n} gleicher Stand${v.pflicht ? '' : ' (nur berichtet)'}`).join('; ') || 'keine'));
   md.push(`- Konvention von GNU Gos \`captures\` (in der Kalibrierung bestimmt, je Stellung angewendet; Anzahl Stellungen): ${JSON.stringify(a.konv)}`);
   md.push(`- Stellungen mit ungleichen Gefangenenzahlen (dort würde ein vertauschter Zähler auffallen): ${a.ungleichGefangen} von ${a.zeilenZahl}`);
   if (a.verletztTotListe.length) md.push(`- Fläche aus Tot-Liste ≠ final_score: ${a.verletztTotListe.join(', ')}`);
@@ -98,7 +127,7 @@ function bericht(a) {
     if (z.zaehlvorschau) md.push(`- Zählvorschau minus GNU Go (KI-Sicht, n = ${z.zaehlvorschau.n}): „mit Annahmen“ Mittel ${f1(z.zaehlvorschau.mitMittel)}, größte Abweichung ${f1(z.zaehlvorschau.mitGroesste)}; „nur Bewiesenes“ Mittel ${f1(z.zaehlvorschau.nurMittel)}, größte Abweichung ${f1(z.zaehlvorschau.nurGroesste)}`);
     md.push('');
   }
-  md.push('## Befund', '', r.gueltig ? `**${r.befund}**` : `**${r.befund}**`, '',
+  md.push('## Befund', '', r.gueltig ? `**${r.befund}**` : `**${r.befund}**`, r.gueltig ? '' : 'Der Lauf ist ungültig; die Zahlen oben sind kein Urteil.', '',
     'Das Urteil betrifft ausschließlich den Anteil verlorener Siege pro Auslösung (K/N, beide Wertungen). Punktverluste bei weiterhin gewonnenen Partien und andere Verschlechterungen erfasst es nicht (E2, E3 getrennt). Die Intervalle gelten unter der Modellannahme unabhängiger Einheiten (§10) und nur für dieses Material.');
   return md.join('\n') + '\n';
 }
@@ -120,13 +149,13 @@ function main() {
   /* §9 Nr. 4: Nachspiel-Kontrolle am Archiv; fehlt sie oder ist sie nicht bestanden, ist der Lauf ungültig */
   let nach = null;
   try { nach = opt.nachspiel ? JSON.parse(fs.readFileSync(opt.nachspiel, 'utf8')) : null; } catch (e) { nach = null; }
-  if (!nach) { a_.globaleFehler.push('Nachspiel-Kontrolle fehlt'); a_.ergebnis.gueltig = false; }
-  else if (!nach.ok) { a_.globaleFehler.push('Nachspiel-Kontrolle nicht bestanden: ' + nach.gruppen.map(g => `${g.name} ${g.gleich}/${g.verlangt}`).join(', ')); a_.ergebnis.gueltig = false; }
+  if (!nach) setzeUngueltig(a_, 'Nachspiel-Kontrolle fehlt');
+  else if (!nach.ok) setzeUngueltig(a_, 'Nachspiel-Kontrolle nicht bestanden: ' + nach.gruppen.map(g => `${g.name} ${g.gleich}/${g.verlangt}`).join(', '));
   a_.nachspiel = nach;
   fs.mkdirSync(opt.aus, {recursive: true});
   const md = bericht(a_);
   fs.writeFileSync(path.join(opt.aus, 'bericht.md'), md);
-  const roh = opt.probe ? {gueltig: a_.ergebnis.gueltig, globaleFehler: a_.globaleFehler, konv: a_.konv, dauer: a_.dauer, einheiten: a_.einheitenZahl, zeilen: a_.zeilenZahl}
+  const roh = opt.probe ? {gueltig: a_.ergebnis.gueltig, befund: a_.ergebnis.befund, globaleFehler: a_.globaleFehler, wiederholung: a_.wiederholung, konv: a_.konv, dauer: a_.dauer, einheiten: a_.einheitenZahl, zeilen: a_.zeilenZahl}
     : {...a_, ergebnis: {...a_.ergebnis, wertungen: Object.fromEntries(Object.entries(a_.ergebnis.wertungen).map(([k, z]) => { const {d, kiSteine, kiPaesse, abwMit, abwNur, ...rest} = z; return [k, rest]; }))}};
   fs.writeFileSync(path.join(opt.aus, 'zahlen.json'), JSON.stringify(roh, null, 1));
   console.log(md);
@@ -134,4 +163,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = {auswerten, bericht};
+module.exports = {auswerten, bericht, pruefeWiederholung, setzeUngueltig};

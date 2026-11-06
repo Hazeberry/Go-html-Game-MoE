@@ -104,7 +104,8 @@ function main() {
   const skip = (grund, n = 1) => { quellen.uebersprungen[grund] = (quellen.uebersprungen[grund] || 0) + n; };
   for (const g of opt.gruppen) {
     const zeilenJeDatei = {};
-    const gb = {name: g.name, dateien: g.dateien, partien: 0, ausgeloest: {flaeche: 0, territory: 0}, ohneAusloesung: {flaeche: 0, territory: 0}};
+    const gb = {name: g.name, dateien: g.dateien, partien: 0, ausgeloest: {flaeche: 0, territory: 0}, ohneAusloesung: {flaeche: 0, territory: 0},
+                farben: {S: {partien: 0, ausgeloest: {flaeche: 0, territory: 0}}, W: {partien: 0, ausgeloest: {flaeche: 0, territory: 0}}}};
     const kand = [];
     for (const datei of g.dateien) {
       const zeilen = L.leseJsonl(datei);
@@ -114,7 +115,8 @@ function main() {
         if (r.vorgabe > 0 || r.komi !== 7.5 || (r.vorgabeSteine && r.vorgabeSteine.length)) { skip('Vorgabe oder Komi ≠ 7,5'); continue; }
         quellen.ausgewertet++; gb.partien++;
         const p = pruefePartie(E, r, stat);
-        for (const w of WERTUNGEN) if (p.erste[w]) gb.ausgeloest[w]++; else gb.ohneAusloesung[w]++;
+        const fb = gb.farben[p.ki === 1 ? 'S' : 'W']; fb.partien++;
+        for (const w of WERTUNGEN) if (p.erste[w]) { gb.ausgeloest[w]++; fb.ausgeloest[w]++; } else gb.ohneAusloesung[w]++;
         /* je Stellung eine Einheit; fällt eine Stellung in beiden Wertungen zusammen, ist es eine Einheit */
         const byIdx = new Map();
         for (const w of WERTUNGEN) if (p.erste[w]) {
@@ -158,8 +160,18 @@ function main() {
   }
   fs.writeFileSync(path.join(opt.aus, 'einheiten.jsonl'), einheiten.map(e => JSON.stringify(e)).join('\n') + (einheiten.length ? '\n' : ''));
   const n = w => einheiten.filter(e => e.ausgeloest[w]).length;
+  /* Werte an der Auslösung (aus Sicht der KI, wie die Prüfung sie liefert): mit, nur, Spanne, gemischter Anteil */
+  const werte = {};
+  for (const w of WERTUNGEN) {
+    werte[w] = {};
+    for (const [name, filter] of [['gesamt', () => true], ['S', e => e.kiFarbe === 1], ['W', e => e.kiFarbe === 2]]) {
+      const es = einheiten.filter(e => e.ausgeloest[w] && filter(e));
+      const st = key => { const x = es.map(e => e.pruef[w][key]).filter(Number.isFinite); return x.length ? {n: x.length, mittel: L.mittel(x), median: L.median(x), min: Math.min(...x), max: Math.max(...x)} : null; };
+      werte[w][name] = {einheiten: es.length, mit: st('mit'), nur: st('nur'), spanne: st('spanne'), gemischt: st('gemischt')};
+    }
+  }
   const summary = {version: 1, quellen, gruppen: gruppenBericht, stellungenGeprueft: stat.stellungenGeprueft, geprueft: stat.geprueft, gruende: stat.gruende,
-    einheiten: {gesamt: einheiten.length, flaeche: n('flaeche'), territory: n('territory')}, duplikate, voraussetzungVerletzt: stat.voraussetzungVerletzt,
+    einheiten: {gesamt: einheiten.length, flaeche: n('flaeche'), territory: n('territory')}, werte, duplikate, voraussetzungVerletzt: stat.voraussetzungVerletzt,
     kriterium: {mindestensNBeiNull: L.MIN_N_NULL, flaecheErreicht: n('flaeche') >= L.MIN_N_NULL, territoryErreicht: n('territory') >= L.MIN_N_NULL},
     pflichtfehler: fehler, gueltig: fehler.length === 0, maxEinheitenJeGruppe: Number.isFinite(opt.max) ? opt.max : null};
   fs.writeFileSync(path.join(opt.aus, 'stufe-a.json'), JSON.stringify(summary, null, 1));
@@ -168,6 +180,12 @@ function main() {
   md.push(`Zeilen gelesen: ${quellen.gelesen}, ausgewertet: ${quellen.ausgewertet}; übersprungen: ${JSON.stringify(quellen.uebersprungen)}`, '');
   md.push('| Gruppe | Partien | Einheiten (vor Deckel) | Einheiten | ausgelöst Fläche | ausgelöst Territory | ohne Auslösung Fläche | ohne Auslösung Territory |', '|---|---:|---:|---:|---:|---:|---:|---:|');
   for (const g of gruppenBericht) md.push(`| ${g.name} | ${g.partien} | ${g.einheitenVorDeckel} | ${g.einheiten} | ${g.ausgeloest.flaeche} | ${g.ausgeloest.territory} | ${g.ohneAusloesung.flaeche} | ${g.ohneAusloesung.territory} |`);
+  md.push('', '### Aufschlüsselung nach KI-Farbe', '', '| Gruppe | KI-Farbe | Partien | ausgelöst Fläche | ausgelöst Territory |', '|---|---|---:|---:|---:|');
+  for (const g of gruppenBericht) for (const f of ['S', 'W']) md.push(`| ${g.name} | ${f === 'S' ? 'Schwarz' : 'Weiß'} | ${g.farben[f].partien} | ${g.farben[f].ausgeloest.flaeche} | ${g.farben[f].ausgeloest.territory} |`);
+  const z1 = x => (x ? `${x.mittel.toFixed(1).replace('.', ',')} (Median ${x.median.toFixed(1).replace('.', ',')}; ${x.min.toFixed(1).replace('.', ',')} bis ${x.max.toFixed(1).replace('.', ',')})` : '–');
+  const z2 = x => (x ? `${x.mittel.toFixed(3).replace('.', ',')} (max ${x.max.toFixed(3).replace('.', ',')})` : '–');
+  md.push('', '### Werte an der Auslösung (aus Sicht der KI: mit Annahmen, nur Bewiesenes, Spanne, gemischter Anteil)', '', '| Wertung | Auswahl | Einheiten | mit | nur | Spanne | gemischt |', '|---|---|---:|---|---|---|---|');
+  for (const w of WERTUNGEN) for (const k of ['gesamt', 'S', 'W']) { const x = werte[w][k]; md.push(`| ${w} | ${k === 'gesamt' ? 'alle' : k === 'S' ? 'KI Schwarz' : 'KI Weiß'} | ${x.einheiten} | ${z1(x.mit)} | ${z1(x.nur)} | ${z2(x.spanne)} | ${z2(x.gemischt)} |`); }
   md.push('', `Geprüfte Stellungen (Gegnerpass, KI am Zug): ${stat.stellungenGeprueft}`, '', '| Grund | Fläche | Territory |', '|---|---:|---:|');
   for (const g of GRUENDE) md.push(`| ${g} | ${stat.gruende.flaeche[g]} | ${stat.gruende.territory[g]} |`);
   md.push('', `Einheiten nach Abzug der Duplikate: Fläche ${n('flaeche')}, Territory ${n('territory')} (Einheiten gesamt ${einheiten.length}). Duplikate (gleiche Zugfolge bis zur Stellung, nur einmal gezählt): ${duplikate.length}.`);

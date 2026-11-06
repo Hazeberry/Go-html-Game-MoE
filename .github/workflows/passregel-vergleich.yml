@@ -11,7 +11,8 @@ name: Passregel-Vergleich
 # Ablauf:
 #   stufe-a        Einheiten bestimmen (Schalter 1 in diesem Prozess), Pakete planen
 #   fuego-bauen    Fuego einmal bauen (nur Stufen B und C)
-#   fortsetzung    je Paket: Einspielen, Kontrollen, Arm „sofort“ und Arm „weiter“ (Passregel AUS)
+#   fortsetzung    je Paket: Einspielen, Kontrollen, Arm „sofort“ und Arm „weiter“ (Passregel AUS);
+#                  in der Probe zusätzlich Wiederholungsprüfung (§9 Nr. 7, je Gegnerart 3)
 #   nachspiel      Nachspiel-Kontrolle am Archiv (§9 Nr. 4), 10 Partien je Gruppe
 #   ergebnis       Auswertung, Bericht, Rohdaten; rot bei ungültigem Lauf oder fehlenden Paketen
 #
@@ -170,13 +171,17 @@ jobs:
         env:
           TEIL: ${{ matrix.teil }}
           M: ${{ strategy.job-total }}
+          STUFE: ${{ inputs.stufe }}
         run: |
           set -uo pipefail
           chmod +x fuego-bin/fuego
           mkdir -p ergebnisse
+          # Wiederholungsprüfung (§9 Nr. 7) nur in der Probe: je Gegnerart die ersten 3 Einheiten ein zweites Mal
+          wiederhole=0
+          if [ "$STUFE" = "B" ]; then wiederhole=3; fi
           status=0
           node auswertung/endspiel/passregel-fortsetzung.js --einheiten stufe-a/einheiten.jsonl \
-            --aus "ergebnisse/teil-${TEIL}.jsonl" --teil "${TEIL}/${M}" \
+            --aus "ergebnisse/teil-${TEIL}.jsonl" --teil "${TEIL}/${M}" --wiederhole "$wiederhole" \
             --sims "$SIMS" --maxzuege "$MAXZUEGE" --seed "$SEED" \
             --gnugo /usr/games/gnugo --fuego fuego-bin/fuego || status=$?
           echo "Paket ${TEIL} von ${M}, Ausgang ${status}" >> "$GITHUB_STEP_SUMMARY"

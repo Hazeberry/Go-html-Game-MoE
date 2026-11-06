@@ -349,6 +349,11 @@ test('Kommandozeile: Stufe A schreibt Einheiten und Bericht; Auswertung verlangt
   pruefeGleich(sum.quellen.gelesen, 3, 'drei Zeilen gelesen'); pruefeGleich(sum.quellen.ausgewertet, 1, 'eine ausgewertet'); pruefeGleich(sum.gueltig, true, 'gültig');
   pruefe(zeilen[0].ausgeloest.flaeche && Array.isArray(zeilen[0].zuege) && zeilen[0].zuege[zeilen[0].index] === 'pass', 'Einheit endet mit dem Pass');
   pruefeGleich(sum.kriterium.flaecheErreicht, false, 'eine Einheit reicht nicht für N ≥ 183');
+  const md = fs.readFileSync(path.join(aus, 'stufe-a.md'), 'utf8');
+  pruefe(/Aufschlüsselung nach KI-Farbe/.test(md) && /\| hand \| Schwarz \| 1 \|/.test(md), 'Stufe-A-Bericht schlüsselt nach KI-Farbe auf');
+  pruefe(/Werte an der Auslösung/.test(md) && /\| mit \| nur \| Spanne \| gemischt \|/.test(md), 'Stufe-A-Bericht nennt mit, nur, Spanne und gemischten Anteil');
+  pruefe(sum.werte.flaeche.gesamt.mit && sum.werte.flaeche.S.einheiten === 1 && sum.werte.flaeche.W.einheiten === 0, 'Werte je Farbe in stufe-a.json');
+  pruefeGleich(sum.gruppen[0].farben.S.partien, 1, 'Partien je Farbe in stufe-a.json');
   /* gleiche Zugfolge zweimal: Duplikat wird nur einmal gezählt */
   fs.writeFileSync(quelle, JSON.stringify(r) + '\n' + JSON.stringify({...r, nr: 9}) + '\n');
   const b = node(path.join(wurzel, 'auswertung/endspiel/passregel-stellungen.js'), '--aus', path.join(tmp, 'b'), '--gruppe', `hand=${quelle}`);
@@ -366,7 +371,7 @@ test('Kommandozeile: Stufe A schreibt Einheiten und Bericht; Auswertung verlangt
   pruefeGleich(auswerten('--nachspiel', ok).status, 0, 'mit bestandener Kontrolle gültig');
   pruefeGleich(auswerten('--nachspiel', schlecht).status, 1, 'mit nicht bestandener Kontrolle ungültig');
   const p = auswerten('--nachspiel', ok, '--probe');
-  pruefeGleich(p.status, 0, 'Probe gültig'); pruefe(!/K\/N|## E1/.test(fs.readFileSync(path.join(tmp, 'o', 'bericht.md'), 'utf8')), 'Probe-Bericht ohne Wirkungszahlen');
+  pruefeGleich(p.status, 1, 'Probe ohne Wiederholungsprüfung ist ungültig (§9 Nr. 7), auch mit bestandener Nachspiel-Kontrolle'); pruefe(!/K\/N|## E1/.test(fs.readFileSync(path.join(tmp, 'o', 'bericht.md'), 'utf8')), 'Probe-Bericht ohne Wirkungszahlen');
   pruefe(!/Konfidenz|K\/N/.test(fs.readFileSync(path.join(tmp, 'o', 'zahlen.json'), 'utf8')), 'Probe-Zahlen ohne Wirkung');
   fs.rmSync(tmp, {recursive: true, force: true});
 });
@@ -401,6 +406,72 @@ test('captures: ein vertauschter Zähler fällt bei ungleichen Zahlen auf; die k
   pruefeGleich(falsch.arm0.status, 'ausfall', 'ohne bestandene Kontrolle keine Fortsetzung');
   const ohne = await F.bearbeiteEinheit({E, DEFAULT: _DEFAULT, opt, startReferee: async () => attrappe(E), startGegner: async () => null}, e);
   pruefe(ohne.fehler.some(x => /Kalibrierung/.test(x)), 'ohne Kalibrierung keine Prüfung: ' + ohne.fehler.join(' | '));
+});
+
+/* ── 9 Wiederholung (§9 Nr. 7) und Schlussbefund bei Ungültigkeit ──────── */
+const mitGegner = (n, gegner, o = {}) => ({...einheit(n, o), gegner});
+const zeileW = (e, gleich = true) => ({schluessel: e.schluessel, gegner: e.gegner, ...regulaer(20, 15), wiederholung: {gegner: e.gegner, gleichFolge: gleich, gleichStand: gleich}});
+test('Wiederholung: Probe verlangt je Gegnerart 3; gnugo und ki müssen gleich sein, fuego wird berichtet', () => {
+  const arten = ['gnugo', 'fuego', 'ki'], eh = [];
+  for (const [k, a] of arten.entries()) for (let i = 0; i < 3; i++) eh.push(mitGegner(k * 10 + i, a));
+  const alle = (f = () => true) => eh.map(e => zeileW(e, f(e)));
+  const gut = V.auswerten({einheiten: eh, zeilen: alle(), probe: true});
+  pruefe(gut.ergebnis.gueltig && gut.globaleFehler.length === 0, 'alle gleich, je 3: gültig: ' + gut.globaleFehler.join(' | '));
+  pruefeGleich(gut.wiederholung.gnugo.n, 3, 'gnugo 3 wiederholt');
+  const fuegoUngleich = V.auswerten({einheiten: eh, zeilen: alle(e => e.gegner !== 'fuego'), probe: true});
+  pruefe(fuegoUngleich.ergebnis.gueltig, 'Fuego ungleich: nur berichtet, weiterhin gültig');
+  pruefe(/fuego 0\/3 gleiche Zugfolge/.test(V.bericht(fuegoUngleich)) && /nur berichtet/.test(V.bericht(fuegoUngleich)), 'Bericht nennt Fuego als nur berichtet');
+  const einzeln = V.auswerten({einheiten: eh, zeilen: eh.map((e, i) => zeileW(e, !(e.gegner === 'gnugo' && i === 0))), probe: true});
+  pruefeGleich(einzeln.ergebnis.gueltig, false, 'eine ungleiche gnugo-Wiederholung macht ungültig'); pruefe(/KEIN URTEIL/.test(einzeln.ergebnis.befund), 'Befund KEIN URTEIL');
+  const kiUngleich = V.auswerten({einheiten: eh, zeilen: eh.map((e, i) => zeileW(e, !(e.gegner === 'ki' && i === 6))), probe: true});
+  pruefeGleich(kiUngleich.ergebnis.gueltig, false, 'auch bei der Gegner-KI');
+  const zuWenig = V.auswerten({einheiten: eh, zeilen: eh.map((e, i) => (i === 3 ? {...zeileW(e), wiederholung: undefined} : zeileW(e))), probe: true});
+  pruefeGleich(zuWenig.ergebnis.gueltig, false, 'fuego nur 2 statt 3 Wiederholungen'); pruefe(zuWenig.globaleFehler.some(x => /Wiederholungsprüfung fehlt: Gegner fuego 2/.test(x)), zuWenig.globaleFehler.join(' | '));
+  const ohne = V.auswerten({einheiten: eh, zeilen: eh.map(e => ({schluessel: e.schluessel, gegner: e.gegner, ...regulaer(20, 15)})), probe: true});
+  pruefeGleich(ohne.ergebnis.gueltig, false, 'Probe ohne jede Wiederholung ist ungültig');
+  const hauptlauf = V.auswerten({einheiten: eh, zeilen: eh.map(e => ({schluessel: e.schluessel, gegner: e.gegner, ...regulaer(20, 15)})), probe: false});
+  pruefeGleich(hauptlauf.globaleFehler.length, 0, 'Hauptlauf verlangt keine Wiederholung');
+});
+
+test('Wiederholung: bearbeiteMitWiederholung vergleicht Zugfolge und Stand; zählt je Gegnerart', async () => {
+  const E = engine(), e = {...(await einheitAusHand(E))};
+  const opt = {sims: 4, maxZuege: 600, seed: 1};
+  const ctx = (flaky = false) => { let n = 0; return {E, DEFAULT: _DEFAULT, capturesKonvention: 'gefangen-von', opt,
+    startReferee: async () => { n++; const a = attrappe(E); if (flaky && n === 2) { const alt = a.frage; a.frage = async b => (/^genmove/.test(b) && !a.schon ? (a.schon = true, 'A10') : alt(b)); } return a; }, startGegner: async () => null}; };
+  const gezaehlt = {};
+  const r = await F.bearbeiteMitWiederholung(ctx(), e, gezaehlt, 3);
+  pruefe(r.wiederholung && r.wiederholung.gleichFolge && r.wiederholung.gleichStand, 'gleicher Seed: gleiche Zugfolge und gleicher Stand: ' + JSON.stringify(r.wiederholung));
+  pruefe(r.arm0.folge.length >= 1 && r.arm0.folge.length === r.wiederholung.laenge1, 'die Folge wird protokolliert');
+  pruefeGleich(gezaehlt.gnugo, 1, 'je Gegnerart gezählt');
+  const k = await F.bearbeiteMitWiederholung(ctx(true), e, {}, 3);
+  pruefeGleich(k.wiederholung.gleichFolge, false, 'abweichender zweiter Lauf wird als ungleich erkannt');
+  const voll = await F.bearbeiteMitWiederholung(ctx(), e, {gnugo: 3}, 3);
+  pruefeGleich(voll.wiederholung, undefined, 'nach drei Wiederholungen der Gegnerart keine weitere');
+  const aus = await F.bearbeiteMitWiederholung(ctx(), e, {}, 0);
+  pruefeGleich(aus.wiederholung, undefined, 'ohne --wiederhole keine Wiederholung');
+});
+
+test('Ungültiger Lauf: der Schlussbefund heißt KEIN URTEIL, nie der erfüllte 2-%-Wortlaut', () => {
+  const eh = [], erg = [];
+  for (let i = 0; i < 183; i++) { const e = einheit(i); eh.push(e); erg.push({schluessel: e.schluessel, ...regulaer(20, 15)}); }
+  const gut = V.auswerten({einheiten: eh, zeilen: erg, probe: false});
+  pruefe(/höchstens 2 %/.test(gut.ergebnis.befund) && gut.ergebnis.gueltig, 'Ausgangslage: gültig, Grenze erfüllt');
+  const doppelt = V.auswerten({einheiten: eh, zeilen: [...erg, erg[0]], probe: false});
+  pruefeGleich(doppelt.ergebnis.gueltig, false, 'doppeltes Ergebnis: ungültig');
+  pruefe(/^KEIN URTEIL/.test(doppelt.ergebnis.befund) && !/höchstens 2 %/.test(doppelt.ergebnis.befund), 'Befund überschrieben: ' + doppelt.ergebnis.befund);
+  const b = V.bericht(doppelt);
+  pruefe(/\*\*KEIN URTEIL/.test(b) && !/liegt unter den Modellannahmen/.test(b), 'Bericht ohne positiven Schlusssatz');
+  const a = V.setzeUngueltig(V.auswerten({einheiten: eh, zeilen: erg, probe: false}), 'Nachspiel-Kontrolle fehlt');
+  pruefe(/^KEIN URTEIL: Nachspiel-Kontrolle fehlt/.test(a.ergebnis.befund), 'setzeUngueltig überschreibt den Befund');
+  /* Kommandozeile: 183 gute Einheiten, aber keine Nachspiel-Kontrolle */
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'passregel-')), ef = path.join(tmp, 'e.jsonl'), zf = path.join(tmp, 'z.jsonl');
+  fs.writeFileSync(ef, eh.map(e => JSON.stringify(e)).join('\n') + '\n'); fs.writeFileSync(zf, erg.map(r => JSON.stringify(r)).join('\n') + '\n');
+  const r = spawnSync(process.execPath, [path.join(wurzel, 'auswertung/endspiel/passregel-vergleich.js'), '--einheiten', ef, '--ergebnisse', zf, '--aus', path.join(tmp, 'o')], {encoding: 'utf8'});
+  pruefeGleich(r.status, 1, 'ohne Nachspiel-Kontrolle: Exit 1');
+  const md = fs.readFileSync(path.join(tmp, 'o', 'bericht.md'), 'utf8'), zahlen = JSON.parse(fs.readFileSync(path.join(tmp, 'o', 'zahlen.json'), 'utf8'));
+  pruefe(/\*\*Lauf UNGÜLTIG/.test(md) && /\*\*KEIN URTEIL: Nachspiel-Kontrolle fehlt/.test(md) && !/liegt unter den Modellannahmen/.test(md), 'Bericht: oben UNGÜLTIG und unten ebenfalls KEIN URTEIL');
+  pruefe(/^KEIN URTEIL/.test(zahlen.ergebnis.befund), 'zahlen.json: Befund KEIN URTEIL');
+  fs.rmSync(tmp, {recursive: true, force: true});
 });
 
 laufeTests('Passregel-Vergleich (Werkzeuge)').then(ok => process.exit(ok ? 0 : 1));

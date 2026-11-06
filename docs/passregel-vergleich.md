@@ -100,7 +100,7 @@ wird genannt: Was läuft, wo, welches Go gilt.
 1. **Stufe A, Auslösung** (reine Rechnung auf Archivdaten, kein GNU Go, keine Partie): je Quellpartie
    die erste Auslösung, getrennt nach Wertung, Gruppe und KI-Farbe; Nichtauslösung mit Grund
    (`nicht ausgespielt`, `ungeklärte Gruppen (Spanne)`, `Vorsprung zu klein`); die Werte `mit`, `nur`,
-   Spanne und Anteil an der Auslösung. Ausgabe: Tabelle und die Liste der Einheiten. **Entscheidungshilfe
+   Spanne und Anteil an der Auslösung. Ausgabe: Tabelle, die Liste der Einheiten, die Aufschlüsselung je Gruppe und KI-Farbe und die Werte `mit`, `nur`, Spanne und gemischter Anteil an der Auslösung (alle, KI Schwarz, KI Weiß). **Entscheidungshilfe
    vor Stufe C:** Reicht die Zahl der Auslösungen N für das Kriterium in §8 (mindestens 183 je
    Wertung, bei möglichen Ausfällen eher mehr)? Stufe A prüft außerdem für jede Einheit die
    Voraussetzung aus §2 und die Duplikate aus §10 und nennt die Zahl der Einheiten nach Abzug der
@@ -265,9 +265,13 @@ Pflichtprüfungen:
      sein kann. E1 bleibt davon unberührt und bekommt über A die Konsequenz.
    - Ein technisch bedingtes Nichtausführen (Runner-Abbruch, Paket nicht gelaufen) ist kein Ausfall im
      obigen Sinn: Das ganze Paket wird wiederholt, nie einzelne Stellungen.
-7. **Wiederholbarkeit (nur Probe):** Mindestens 3 Fortsetzungen je Gegnerart werden mit gleichem Seed
-   wiederholt und müssen bei Engine und GNU Go gleiche Zugfolgen liefern. Bei Fuego wird das Ergebnis
-   nur berichtet; die Paare brauchen keine Wiederholbarkeit.
+7. **Wiederholbarkeit (nur Probe):** Mindestens 3 Fortsetzungen je Gegnerart (GNU Go, Fuego, Gegner-KI) werden mit
+   gleichem Seed wiederholt (Workflow: `--wiederhole 3`, je Gegnerart die ersten drei Einheiten des Pakets). Die Zugfolge
+   der Fortsetzung und der Endstand werden verglichen. Bei Gegner **GNU Go** und **Gegner-KI** müssen die Zugfolgen gleich
+   sein, sonst ist die Probe ungültig. Die Gegner-KI gehört dazu, weil sie wie unsere Engine mit festem Seed läuft; das
+   ist eine Klarstellung zur ersten Fassung, die nur „Engine und GNU Go“ nannte. Bei **Fuego** wird das Ergebnis nur
+   berichtet; die Paare brauchen keine Wiederholbarkeit. Fehlt die Wiederholungsprüfung für eine Gegnerart (weniger als
+   3), ist die Probe ungültig. Im Hauptlauf wird sie nicht verlangt.
 8. **Voraussetzung „Gegner hat unmittelbar davor gepasst“** (§2): Für 100 % der Einheiten sind die drei
    Prüfungen im Protokoll vermerkt und bestanden. Eine einzige Verletzung macht den Lauf ungültig.
 9. **Passregel im Arm „weiter“ aus:** Das Protokoll jeder Fortsetzung enthält `passNachGegnerpass` = 0
