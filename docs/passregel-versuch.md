@@ -54,6 +54,8 @@ Prüfung an jeder KI-Entscheidung nach einem Schwarzpass (KI = Weiß, Archivdate
 
 ## 4. Geplanter Vergleich (nicht gestartet, braucht Go)
 
+> Ausgeführt als Vorabfestlegung in [`passregel-vergleich.md`](passregel-vergleich.md) (06.11.2026, nicht gestartet).
+
 „Sofort beenden“ (Schalter 1) gegen „normal weiterspielen“ (Schalter 0), gepaart je Stellung, ausgehend
 von Stellungen **direkt nach einem Gegnerpass** (Quelle: Pass-Stellungen, `pass-stellungen.yml`, und die
 archivierten Handpartien als Prüfmaterial). Weiterspielen gegen GNU Go Stufe 1 bis zwei Pässe, Zählung

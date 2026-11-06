@@ -1,0 +1,298 @@
+name: Passregel-Vergleich
+
+# Manueller Lauf aus docs/passregel-vergleich.md. NICHT STARTEN ohne ausdrückliches Go von Hazeberry
+# für genau diese Stufe (CLAUDE.md). Vorbereitet, nicht gelaufen.
+#
+# Stufen (Eingabe `stufe`):
+#   A  Auslösung: reine Rechnung auf Archivdaten (kein GNU Go, keine Partie). Liefert die Einheiten.
+#   B  technische Probe: wenige Einheiten je Gruppe, Pflichtprüfungen und Dauer; KEINE Wirkungsauswertung.
+#   C  Hauptlauf: alle Einheiten aus Stufe A (Deckel je Gruppe nur, wenn `max_einheiten` gesetzt ist).
+#
+# Ablauf:
+#   stufe-a        Einheiten bestimmen (Schalter 1 in diesem Prozess), Pakete planen
+#   fuego-bauen    Fuego einmal bauen (nur Stufen B und C)
+#   fortsetzung    je Paket: Einspielen, Kontrollen, Arm „sofort“ und Arm „weiter“ (Passregel AUS);
+#                  in der Probe zusätzlich Wiederholungsprüfung (§9 Nr. 7, je Gegnerart 3)
+#   nachspiel      Nachspiel-Kontrolle am Archiv (§9 Nr. 4), 10 Partien je Gruppe
+#   ergebnis       Auswertung, Bericht, Rohdaten; rot bei ungültigem Lauf oder fehlenden Paketen
+#
+# Der Spielcode (index.html) bleibt unverändert; Fortsetzungen laufen in eigenen Prozessen mit
+# den Standardwerten (passNachGegnerpass 0).
+on:
+  workflow_dispatch:
+    inputs:
+      stufe:
+        description: 'A = Auslösung, B = technische Probe, C = Hauptlauf'
+        required: true
+        type: choice
+        options: ['A', 'B', 'C']
+        default: 'A'
+      max_einheiten:
+        description: 'Höchstens so viele Einheiten je Gruppe (leer = alle; bei B Standard 3)'
+        required: false
+        type: string
+        default: ''
+      einheiten_je_paket:
+        description: 'Einheiten je Fortsetzungs-Paket (Stufe C); Dauer je Einheit ist noch nicht gemessen'
+        required: false
+        type: string
+        default: '10'
+
+concurrency:
+  group: passregel-vergleich
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  SEED: '1'
+  SIMS: '120'
+  MAXZUEGE: '600'
+  D: docs/daten
+
+jobs:
+  stufe-a:
+    name: Stufe A, Einheiten bestimmen
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    outputs:
+      teile: ${{ steps.plan.outputs.teile }}
+      anzahl: ${{ steps.plan.outputs.anzahl }}
+      gueltig: ${{ steps.plan.outputs.gueltig }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Einheiten bestimmen
+        id: plan
+        env:
+          STUFE: ${{ inputs.stufe }}
+          MAX_EINHEITEN: ${{ inputs.max_einheiten }}
+          JE_PAKET: ${{ inputs.einheiten_je_paket }}
+        run: |
+          set -uo pipefail
+          mkdir -p stufe-a
+          max="$MAX_EINHEITEN"
+          if [ "$STUFE" = "B" ] && [ -z "$max" ]; then max=3; fi
+          args=()
+          if [ -n "$max" ]; then
+            [[ "$max" =~ ^[0-9]+$ ]] && [ "$max" -ge 1 ] || { echo "max_einheiten muss eine ganze Zahl ≥ 1 sein" >&2; exit 2; }
+            args+=(--max-einheiten "$max")
+          fi
+          [[ "$JE_PAKET" =~ ^[0-9]+$ ]] && [ "$JE_PAKET" -ge 1 ] || { echo "einheiten_je_paket muss eine ganze Zahl ≥ 1 sein" >&2; exit 2; }
+          status=0
+          node auswertung/endspiel/passregel-stellungen.js --aus stufe-a --seed "$SEED" "${args[@]}" \
+            --gruppe "GNU Go ohne Vorgabe=$D/leeres-brett/lauf1/g-D.jsonl.gz,$D/muster-ohne-vorgabe/lauf1/g-D.jsonl.gz" \
+            --gruppe "Fuego 100 Spiele=$D/muster-ohne-vorgabe/lauf1/f-D.jsonl.gz" \
+            --gruppe "Fuego 50 Spiele=$D/fuego-siege/lauf1/D.jsonl.gz" \
+            --gruppe "alte PWA=$D/pwa-vergleich/lauf1/m1.jsonl.gz" || status=$?
+          cat stufe-a/stufe-a.md >> "$GITHUB_STEP_SUMMARY" || true
+          n=$(wc -l < stufe-a/einheiten.jsonl)
+          if [ "$STUFE" = "B" ]; then pakete=1; else pakete=$(( (n + JE_PAKET - 1) / JE_PAKET )); fi
+          [ "$pakete" -ge 1 ] || pakete=1
+          if [ "$pakete" -gt 60 ]; then echo "Mehr als 60 Pakete (${pakete}): einheiten_je_paket erhöhen" >&2; status=2; fi
+          teile=$(node -e "console.log(JSON.stringify(Array.from({length: $pakete}, (_, i) => i + 1)))")
+          echo "teile=$teile" >> "$GITHUB_OUTPUT"
+          echo "anzahl=$n" >> "$GITHUB_OUTPUT"
+          echo "gueltig=$([ "$status" -eq 0 ] && echo ja || echo nein)" >> "$GITHUB_OUTPUT"
+          exit "$status"
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: stufe-a
+          path: stufe-a/
+          retention-days: 90
+
+  fuego-bauen:
+    name: Fuego bauen
+    needs: stufe-a
+    if: ${{ inputs.stufe != 'A' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Werkzeuge installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential autoconf automake libtool subversion libboost-all-dev
+
+      - name: Bauen
+        run: bash auswertung/fuego/bauen.sh svn gnu++14 fuego-bin
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin/
+          retention-days: 7
+
+  fortsetzung:
+    name: Fortsetzung, Paket ${{ matrix.teil }}
+    needs: [stufe-a, fuego-bauen]
+    if: ${{ inputs.stufe != 'A' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        teil: ${{ fromJSON(needs.stufe-a.outputs.teile) }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go und Bibliotheken installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo libboost-all-dev
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: fuego-bin
+          path: fuego-bin
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: stufe-a
+          path: stufe-a
+
+      - name: Fortsetzungen
+        env:
+          TEIL: ${{ matrix.teil }}
+          M: ${{ strategy.job-total }}
+          STUFE: ${{ inputs.stufe }}
+        run: |
+          set -uo pipefail
+          chmod +x fuego-bin/fuego
+          mkdir -p ergebnisse
+          # Wiederholungsprüfung (§9 Nr. 7) nur in der Probe: je Gegnerart die ersten 3 Einheiten ein zweites Mal
+          wiederhole=0
+          if [ "$STUFE" = "B" ]; then wiederhole=3; fi
+          status=0
+          node auswertung/endspiel/passregel-fortsetzung.js --einheiten stufe-a/einheiten.jsonl \
+            --aus "ergebnisse/teil-${TEIL}.jsonl" --teil "${TEIL}/${M}" --wiederhole "$wiederhole" \
+            --sims "$SIMS" --maxzuege "$MAXZUEGE" --seed "$SEED" \
+            --gnugo /usr/games/gnugo --fuego fuego-bin/fuego || status=$?
+          echo "Paket ${TEIL} von ${M}, Ausgang ${status}" >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ergebnisse-teil-${{ matrix.teil }}
+          path: ergebnisse/
+          retention-days: 90
+
+  nachspiel:
+    name: Nachspiel-Kontrolle am Archiv
+    needs: stufe-a
+    if: ${{ inputs.stufe != 'A' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: Nachspielen (je Gruppe 10 Partien)
+        run: |
+          set -uo pipefail
+          mkdir -p nachspiel
+          status=0
+          node auswertung/endspiel/passregel-nachspiel-kontrolle.js --aus nachspiel/nachspiel.json --je 10 \
+            --gruppe "GNU Go ohne Vorgabe=$D/leeres-brett/lauf1/g-D.jsonl.gz,$D/muster-ohne-vorgabe/lauf1/g-D.jsonl.gz" \
+            --gruppe "Fuego 100 Spiele=$D/muster-ohne-vorgabe/lauf1/f-D.jsonl.gz" \
+            --gruppe "Fuego 50 Spiele=$D/fuego-siege/lauf1/D.jsonl.gz" \
+            --gruppe "alte PWA=$D/pwa-vergleich/lauf1/m1.jsonl.gz" || status=$?
+          exit "$status"
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: nachspiel
+          path: nachspiel/
+          retention-days: 90
+
+  ergebnis:
+    name: Auswertung
+    needs: [stufe-a, fortsetzung, nachspiel]
+    if: ${{ always() && inputs.stufe != 'A' && needs.stufe-a.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: stufe-a
+          path: stufe-a
+
+      - uses: actions/download-artifact@v7
+        continue-on-error: true
+        with:
+          name: nachspiel
+          path: nachspiel
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: ergebnisse-teil-*
+          path: teile
+          merge-multiple: true
+
+      - name: Auswerten
+        env:
+          STUFE: ${{ inputs.stufe }}
+          TEILE: ${{ needs.stufe-a.outputs.teile }}
+        run: |
+          set -uo pipefail
+          mkdir -p bericht
+          erwartet=$(node -e "console.log(JSON.parse(process.env.TEILE).length)")
+          vorhanden=$(ls teile/teil-*.jsonl 2>/dev/null | wc -l || true)
+          status=0
+          if [ "$vorhanden" -ne "$erwartet" ]; then
+            echo "FEHLENDE PAKETE: ${vorhanden} von ${erwartet}. Ganze Pakete wiederholen, nie einzelne Stellungen." | tee -a "$GITHUB_STEP_SUMMARY" >&2
+            status=1
+          fi
+          probe=()
+          [ "$STUFE" = "B" ] && probe=(--probe)
+          dateien=$(ls teile/teil-*.jsonl 2>/dev/null | paste -sd, - || true)
+          node auswertung/endspiel/passregel-vergleich.js --einheiten stufe-a/einheiten.jsonl \
+            --ergebnisse "$dateien" --aus bericht --nachspiel nachspiel/nachspiel.json "${probe[@]}" || status=$?
+          cat bericht/bericht.md >> "$GITHUB_STEP_SUMMARY" || true
+          exit "$status"
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: bericht
+          path: |
+            bericht/
+            stufe-a/
+            teile/
+            nachspiel/
+          retention-days: 90
