@@ -266,12 +266,15 @@ Pflichtprüfungen:
    - Ein technisch bedingtes Nichtausführen (Runner-Abbruch, Paket nicht gelaufen) ist kein Ausfall im
      obigen Sinn: Das ganze Paket wird wiederholt, nie einzelne Stellungen.
 7. **Wiederholbarkeit (nur Probe):** Mindestens 3 Fortsetzungen je Gegnerart (GNU Go, Fuego, Gegner-KI) werden mit
-   gleichem Seed wiederholt (Workflow: `--wiederhole 3`, je Gegnerart die ersten drei Einheiten des Pakets). Die Zugfolge
-   der Fortsetzung und der Endstand werden verglichen. Bei Gegner **GNU Go** und **Gegner-KI** müssen die Zugfolgen gleich
-   sein, sonst ist die Probe ungültig. Die Gegner-KI gehört dazu, weil sie wie unsere Engine mit festem Seed läuft; das
+   gleichem Seed wiederholt (Workflow: `--wiederhole 3`, je Gegnerart die ersten drei Einheiten des Pakets). Eine
+   Wiederholung zählt nur als **vollständig**, wenn beide Durchläufe fehlerfrei und regulär (zwei Pässe in Folge, kein
+   Ausfall) endeten und endliche Endstände in beiden Wertungen haben; die Auswertung prüft das aus den Rohfeldern. Zwei
+   abgebrochene Fortsetzungen mit gleicher Teilfolge sind nie „gleich“. Verglichen werden die Zugfolge der Fortsetzung
+   und der Endstand. Bei Gegner **GNU Go** und **Gegner-KI** müssen alle vollständigen Wiederholungen in Zugfolge und
+   Endstand gleich sein, sonst ist die Probe ungültig. Die Gegner-KI gehört dazu, weil sie wie unsere Engine mit festem Seed läuft; das
    ist eine Klarstellung zur ersten Fassung, die nur „Engine und GNU Go“ nannte. Bei **Fuego** wird das Ergebnis nur
-   berichtet; die Paare brauchen keine Wiederholbarkeit. Fehlt die Wiederholungsprüfung für eine Gegnerart (weniger als
-   3), ist die Probe ungültig. Im Hauptlauf wird sie nicht verlangt.
+   berichtet; die Paare brauchen keine Wiederholbarkeit. Gibt es für eine Gegnerart weniger als 3 vollständige
+   Wiederholungen (auch bei Fuego), ist die Probe ungültig und liefert „KEIN URTEIL“. Im Hauptlauf wird sie nicht verlangt.
 8. **Voraussetzung „Gegner hat unmittelbar davor gepasst“** (§2): Für 100 % der Einheiten sind die drei
    Prüfungen im Protokoll vermerkt und bestanden. Eine einzige Verletzung macht den Lauf ungültig.
 9. **Passregel im Arm „weiter“ aus:** Das Protokoll jeder Fortsetzung enthält `passNachGegnerpass` = 0

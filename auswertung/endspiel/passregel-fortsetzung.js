@@ -224,9 +224,13 @@ async function bearbeiteMitWiederholung(ctx, e, gezaehlt, je) {
   gezaehlt[e.gegner] = (gezaehlt[e.gegner] || 0) + 1;
   const r2 = await bearbeiteEinheit(ctx, e);
   const a = r1.arm0, b = r2.arm0;
+  const endlich = x => Number.isFinite(x.flaeche) && Number.isFinite(x.territory);
   r1.wiederholung = {gegner: e.gegner, seed: r1.seed, status1: a.status, status2: b.status, fehler2: r2.fehler,
+    stand1: {flaeche: a.flaeche, territory: a.territory}, stand2: {flaeche: b.flaeche, territory: b.territory},
     gleichFolge: JSON.stringify(a.folge || null) === JSON.stringify(b.folge || null) && a.status === b.status,
-    gleichStand: a.flaeche === b.flaeche && a.territory === b.territory, laenge1: (a.folge || []).length, laenge2: (b.folge || []).length};
+    /* ohne endliche Stände gibt es keinen „gleichen Stand“ (undefined === undefined zählt nicht) */
+    gleichStand: endlich(a) && endlich(b) && a.flaeche === b.flaeche && a.territory === b.territory,
+    laenge1: (a.folge || []).length, laenge2: (b.folge || []).length};
   return r1;
 }
 

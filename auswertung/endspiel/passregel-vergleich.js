@@ -21,14 +21,23 @@ const iv = c => c ? `${f3(c.anteil)} [${f3(c.unten)} bis ${f3(c.oben)}]` : '–'
 /* §9 Nr. 7 (nur Probe): je Gegnerart mindestens 3 wiederholte Fortsetzungen. Engine und GNU Go (Gegner gnugo) und die
    Gegner-KI (ki) müssen gleiche Zugfolgen liefern; bei Fuego wird nur berichtet. */
 const WIEDERHOLUNGEN_MIN = 3, WIEDERHOLUNG_PFLICHT = ['gnugo', 'ki'];
+/* Eine Wiederholung zählt nur als VOLLSTÄNDIG, wenn beide Durchläufe fehlerfrei und regulär endeten und endliche Stände
+   haben. Das wird hier aus den Rohfeldern geprüft, nicht aus einem vorberechneten Flag übernommen. Nur vollständige
+   Wiederholungen zählen für die Mindestzahl; „gleich“ heißt vollständig, gleiche Zugfolge UND gleiche Stände. */
+const endlichPaar = s => !!s && Number.isFinite(s.flaeche) && Number.isFinite(s.territory);
+const wiederholungVollstaendig = (r, w) => !!w && (!r.fehler || r.fehler.length === 0) && w.status1 === 'regulaer' && w.status2 === 'regulaer'
+  && Array.isArray(w.fehler2) && w.fehler2.length === 0 && endlichPaar(w.stand1) && endlichPaar(w.stand2);
+const wiederholungGleich = (r, w) => wiederholungVollstaendig(r, w) && w.gleichFolge === true
+  && w.stand1.flaeche === w.stand2.flaeche && w.stand1.territory === w.stand2.territory;
 function pruefeWiederholung(einheiten, zeilen, probe) {
   const arten = [...new Set(einheiten.map(e => e.gegner))].sort(), je = {}, fehler = [];
   for (const art of arten) {
-    const w = zeilen.filter(r => r.gegner === art && r.wiederholung).map(r => r.wiederholung);
-    je[art] = {n: w.length, gleichFolge: w.filter(x => x.gleichFolge).length, gleichStand: w.filter(x => x.gleichStand).length, pflicht: WIEDERHOLUNG_PFLICHT.includes(art)};
+    const mit = zeilen.filter(r => r.gegner === art && r.wiederholung);
+    const voll = mit.filter(r => wiederholungVollstaendig(r, r.wiederholung)), gleich = mit.filter(r => wiederholungGleich(r, r.wiederholung));
+    je[art] = {versucht: mit.length, n: voll.length, gleich: gleich.length, unvollstaendig: mit.length - voll.length, pflicht: WIEDERHOLUNG_PFLICHT.includes(art)};
     if (!probe) continue;
-    if (w.length < WIEDERHOLUNGEN_MIN) fehler.push(`Wiederholungsprüfung fehlt: Gegner ${art} ${w.length} von mindestens ${WIEDERHOLUNGEN_MIN}`);
-    else if (WIEDERHOLUNG_PFLICHT.includes(art) && je[art].gleichFolge < w.length) fehler.push(`Wiederholung nicht gleich: Gegner ${art} ${je[art].gleichFolge} von ${w.length} mit gleicher Zugfolge`);
+    if (voll.length < WIEDERHOLUNGEN_MIN) fehler.push(`Wiederholungsprüfung fehlt: Gegner ${art} ${voll.length} vollständige von mindestens ${WIEDERHOLUNGEN_MIN} (versucht ${mit.length}, davon ${mit.length - voll.length} mit Fehler, Ausfall oder ohne endlichen Stand)`);
+    else if (WIEDERHOLUNG_PFLICHT.includes(art) && gleich.length < voll.length) fehler.push(`Wiederholung nicht gleich: Gegner ${art} ${gleich.length} von ${voll.length} vollständigen mit gleicher Zugfolge und gleichem Stand`);
   }
   return {je, fehler};
 }
@@ -88,7 +97,7 @@ function bericht(a) {
     md.push(`    - bestätigt: ${a.nachspiel.bestaetigt || 'Archivzugfolge einspielbar und Endstand gleich'}`);
     md.push(`    - nicht bestätigt: ${a.nachspiel.nichtBestaetigt || 'ob die heutige Engine dieselben Züge wählen würde'}`);
   }
-  md.push('- Wiederholbarkeit (§9 Nr. 7, nur Probe verlangt; Gegner gnugo und ki müssen gleich sein, fuego wird berichtet): ' + (Object.entries(a.wiederholung).map(([k, v]) => `${k} ${v.gleichFolge}/${v.n} gleiche Zugfolge, ${v.gleichStand}/${v.n} gleicher Stand${v.pflicht ? '' : ' (nur berichtet)'}`).join('; ') || 'keine'));
+  md.push('- Wiederholbarkeit (§9 Nr. 7, nur Probe verlangt; Gegner gnugo und ki müssen gleich sein, fuego wird berichtet): ' + (Object.entries(a.wiederholung).map(([k, v]) => `${k} ${v.gleich}/${v.n} vollständige gleich in Zugfolge und Stand (versucht ${v.versucht}, unvollständig ${v.unvollstaendig})${v.pflicht ? '' : ' (Gleichheit nur berichtet)'}`).join('; ') || 'keine'));
   md.push(`- Konvention von GNU Gos \`captures\` (in der Kalibrierung bestimmt, je Stellung angewendet; Anzahl Stellungen): ${JSON.stringify(a.konv)}`);
   md.push(`- Stellungen mit ungleichen Gefangenenzahlen (dort würde ein vertauschter Zähler auffallen): ${a.ungleichGefangen} von ${a.zeilenZahl}`);
   if (a.verletztTotListe.length) md.push(`- Fläche aus Tot-Liste ≠ final_score: ${a.verletztTotListe.join(', ')}`);
