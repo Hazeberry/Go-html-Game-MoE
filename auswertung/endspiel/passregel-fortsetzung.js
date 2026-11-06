@@ -14,7 +14,7 @@
 
    Aufruf:
      node auswertung/endspiel/passregel-fortsetzung.js --einheiten einheiten.jsonl --aus ergebnis.jsonl
-        [--teil i/m] [--wiederhole 3] [--sims 120] [--maxzuege 600] [--seed 1] [--html index.html]
+        [--teil i/m] [--wiederhole 3] [--probe] [--sims 120] [--maxzuege 600] [--seed 1] [--html index.html]
         [--gnugo /usr/games/gnugo] [--fuego fuego-bin/fuego] [--gegner-html-verz vergleich] */
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
@@ -60,6 +60,10 @@ function gtpStarten(programm, argumente, name) {
 /* ── Ablauf je Einheit; ctx macht die Programme austauschbar (Test mit Attrappe) ──
    ctx: {E, DEFAULT, opt:{sims,maxZuege,seed}, startReferee(seed), startGegner(einheit, seed) → null bei GNU Go} */
 const KOMI = 7.5;
+/* Abweichung Fläche aus Tot-Liste ≠ final_score: die Gleichheitsprüfung bleibt; hier wird nur festgehalten, wo und womit */
+function meldeAbweichung(res, wo, z) {
+  (res.kontrolle.abweichungen = res.kontrolle.abweichungen || []).push({wo, finalScore: z.finalScore, flaecheAusTotListe: z.flaecheAusTotListe, tote: z.tote, diagnose: z.diagnose});
+}
 const fehlerProgramm = e => /^(GNU Go|Fuego|KI-Gegner)( beendet|: )/.test(e.message);
 
 function setze(E, board, i, f) {
@@ -77,13 +81,17 @@ async function bretterGleich(E, board, prog, name) {
   return null;
 }
 /* Zählung der aktuellen Stellung durch den Schiedsrichter: Fläche (final_score) und Territory (Tot-Liste) */
+const brettText = b => Array.from(b, c => '.XO'[c]).join('');
 async function zaehlung(E, ref, board, caps) {
   const fs_ = await ref.frage('final_score');
   const flaeche = L.standAusFinalScore(fs_);
   const tot = L.totListeAusGtp(await ref.frage('final_status_list dead'));
   const territory = L.zaehleMitTotListe(board, caps, tot, KOMI, E.NEIGHBORS, 'territory').stand;
   const flaecheTot = L.zaehleMitTotListe(board, caps, tot, KOMI, E.NEIGHBORS, 'flaeche').stand;
-  return {flaeche, territory, flaecheTotListe: Math.abs(flaecheTot - flaeche) < 1e-9, flaecheAusTotListe: flaecheTot, tote: tot.size, finalScore: fs_};
+  /* Diagnose zur Zählabweichung (docs/passregel-vergleich.md §9 Nr. 5): Brett, tote Koordinaten und beide Zählwerte */
+  const diagnose = {brett: brettText(board), gefangen: {1: caps[1], 2: caps[2]}, tote: [...tot].sort((a, b) => a - b).map(L.zuGtp),
+                    finalScore: fs_, flaecheFinalScore: flaeche, flaecheAusTotListe: flaecheTot, territoryAusTotListe: territory};
+  return {flaeche, territory, flaecheTotListe: Math.abs(flaecheTot - flaeche) < 1e-9, flaecheAusTotListe: flaecheTot, tote: tot.size, finalScore: fs_, diagnose};
 }
 
 /* Kalibrierung der Konvention von GNU Gos `captures` an einer Stellung mit UNGLEICHEN Zahlen:
@@ -106,7 +114,7 @@ async function kalibriereCaptures(startReferee, seed) {
 async function bearbeiteEinheit(ctx, e) {
   const {E, opt} = ctx, N = E.BOARD_SIZE, ki = e.kiFarbe, seed = L.fortsetzungsSeed(opt.seed, e.gruppe, e.datei, e.nr, e.index);
   const res = {schluessel: e.schluessel, gruppe: e.gruppe, datei: e.datei, nr: e.nr, index: e.index, kiFarbe: ki, gegner: e.gegner, seed,
-               fehler: [], arm1: {flaeche: null, territory: null}, arm0: {status: 'ausfall', grund: 'nicht gelaufen'}, kontrolle: {}};
+               fehler: [], arm1: {flaeche: null, territory: null}, arm0: {status: 'ausfall', grund: 'nicht gelaufen'}, kontrolle: {}, diagnose: {}};
   const t0 = Date.now();
   let ref = null, geg = null;
   const farbeDe = f => (f === 1 ? 'B' : 'W');
@@ -157,6 +165,7 @@ async function bearbeiteEinheit(ctx, e) {
       const z = await zaehlung(E, ref, board, caps);
       res.arm1 = {flaeche: z.flaeche, territory: z.territory};
       res.kontrolle.flaecheTotListe = z.flaecheTotListe; res.kontrolle.arm1Zaehlung = {tote: z.tote, finalScore: z.finalScore, flaecheAusTotListe: z.flaecheAusTotListe};
+      res.diagnose.anfang = z.diagnose; if (!z.flaecheTotListe) meldeAbweichung(res, 'anfang', z);
     } catch (err) { res.arm1Fehler = err.message.slice(0, 160); }
     /* Arm 0 „weiter“: Passregel AUS, 120 feste Simulationen, Aufgabe aus, kein adaptives Zeitbudget */
     Object.assign(E.PARAMS, ctx.DEFAULT, {adaptiveBudgetEnabled: 0, mctsFixedSims: opt.sims, resignEnabled: 0});
@@ -197,7 +206,7 @@ async function bearbeiteEinheit(ctx, e) {
           const z = await zaehlung(E, ref, board, caps);
           res.arm0 = {status: 'regulaer', flaeche: z.flaeche, territory: z.territory, kiSteine, kiPaesse, zuegeNachher: mc - e.zuege.length, folge,
                       passNachGegnerpass: E.PARAMS.passNachGegnerpass, versuch};
-          if (!z.flaecheTotListe) res.kontrolle.flaecheTotListe = false;
+          res.diagnose.ende = z.diagnose; if (!z.flaecheTotListe) { res.kontrolle.flaecheTotListe = false; meldeAbweichung(res, 'ende', z); }
         }
       } else res.arm0 = {status: 'ausfall', grund: ausfall, kiSteine, kiPaesse, folge, passNachGegnerpass: E.PARAMS.passNachGegnerpass, versuch};
     } catch (err) {
@@ -216,22 +225,67 @@ async function bearbeiteEinheit(ctx, e) {
   return res;
 }
 
-/* Wiederholungsprüfung §9 Nr. 7 (nur Probe): dieselbe Einheit noch einmal mit demselben Seed.
-   Verglichen werden die Zugfolge der Fortsetzung und der Endstand. Das Ergebnis hängt an der ersten Zeile. */
-async function bearbeiteMitWiederholung(ctx, e, gezaehlt, je) {
+/* Wiederholungsprüfung §9 Nr. 7 (nur Probe). Plan je Gegnerart (je = 3):
+   – mindestens je Einheiten vorhanden: die ersten je Einheiten (nach Schlüssel) laufen ein zweites Mal;
+   – weniger als je Einheiten: JEDE vorhandene Einheit läuft insgesamt je-mal (je − 1 Wiederholungen), mit
+     identischem Seed. Das prüft die Wiederholbarkeit an den vorhandenen Stellungen; weitere Durchläufe
+     schaffen keine zusätzliche Stellung.
+   Rückgabe: Map Schlüssel → Zahl der zusätzlichen Durchläufe. */
+function wiederholungsPlan(einheiten, je) {
+  const nach = {}, plan = new Map();
+  for (const e of einheiten) (nach[e.gegner] = nach[e.gegner] || []).push(e.schluessel);
+  for (const liste of Object.values(nach)) {
+    liste.sort();
+    if (liste.length >= je) liste.slice(0, je).forEach(s => plan.set(s, 1));
+    else liste.forEach(s => plan.set(s, je - 1));
+  }
+  return plan;
+}
+
+/* Dieselbe Einheit `extra`-mal noch einmal mit demselben Seed. Verglichen werden Zugfolge und Endstand mit dem
+   ersten Durchlauf; jedes Ergebnis hängt als Eintrag in `wiederholungen` an der ersten Zeile. */
+async function bearbeiteMitWiederholung(ctx, e, extra) {
   const r1 = await bearbeiteEinheit(ctx, e);
-  if (!(je > 0) || (gezaehlt[e.gegner] || 0) >= je || r1.fehler.length) return r1;
-  gezaehlt[e.gegner] = (gezaehlt[e.gegner] || 0) + 1;
-  const r2 = await bearbeiteEinheit(ctx, e);
-  const a = r1.arm0, b = r2.arm0;
-  const endlich = x => Number.isFinite(x.flaeche) && Number.isFinite(x.territory);
-  r1.wiederholung = {gegner: e.gegner, seed: r1.seed, status1: a.status, status2: b.status, fehler2: r2.fehler,
-    stand1: {flaeche: a.flaeche, territory: a.territory}, stand2: {flaeche: b.flaeche, territory: b.territory},
-    gleichFolge: JSON.stringify(a.folge || null) === JSON.stringify(b.folge || null) && a.status === b.status,
-    /* ohne endliche Stände gibt es keinen „gleichen Stand“ (undefined === undefined zählt nicht) */
-    gleichStand: endlich(a) && endlich(b) && a.flaeche === b.flaeche && a.territory === b.territory,
-    laenge1: (a.folge || []).length, laenge2: (b.folge || []).length};
+  if (!(extra > 0) || r1.fehler.length) return r1;
+  const a = r1.arm0, endlich = x => Number.isFinite(x.flaeche) && Number.isFinite(x.territory);
+  r1.wiederholungen = [];
+  for (let k = 0; k < extra; k++) {
+    const rk = await bearbeiteEinheit(ctx, e), b = rk.arm0;
+    r1.wiederholungen.push({lauf: k + 2, gegner: e.gegner, seed: r1.seed, status1: a.status, status2: b.status, fehler2: rk.fehler,
+      stand1: {flaeche: a.flaeche, territory: a.territory}, stand2: {flaeche: b.flaeche, territory: b.territory},
+      gleichFolge: JSON.stringify(a.folge || null) === JSON.stringify(b.folge || null) && a.status === b.status,
+      /* ohne endliche Stände gibt es keinen „gleichen Stand“ (undefined === undefined zählt nicht) */
+      gleichStand: endlich(a) && endlich(b) && a.flaeche === b.flaeche && a.territory === b.territory,
+      laenge1: (a.folge || []).length, laenge2: (b.folge || []).length, diagnose: rk.diagnose, abweichungen: rk.kontrolle.abweichungen || []});
+    /* die Zählkontrolle gilt für jede gezählte Stellung, auch in den Wiederholungen */
+    if (rk.kontrolle.flaecheTotListe === false) {
+      r1.kontrolle.flaecheTotListe = false;
+      for (const x of rk.kontrolle.abweichungen || []) (r1.kontrolle.abweichungen = r1.kontrolle.abweichungen || []).push({...x, wo: `wiederholung ${k + 2} ${x.wo}`});
+    }
+  }
   return r1;
+}
+
+/* Logzeile je Einheit. In der Probe KEINE Wirkungszahlen (keine Stände beider Arme): nur Zugzahlen und Status. */
+function logZeile(r, n, gesamt, probe) {
+  const dauer = `(${((r.dauerMs || 0) / 1000).toFixed(0)} s)`, kopf = `${n}/${gesamt} ${r.schluessel}:`;
+  if (r.fehler.length) return `${kopf} FEHLER ${r.fehler[0]} ${dauer}`;
+  const a = r.arm0, wh = r.wiederholungen ? `, ${r.wiederholungen.length} Wiederholungslauf/-läufe` : '';
+  if (probe) return `${kopf} ${a.status === 'regulaer' ? 'regulär' : 'Ausfall: ' + a.grund}, KI-Steinzüge ${a.kiSteine}, KI-Pässe ${a.kiPaesse}, Züge nach der Stellung ${a.zuegeNachher === undefined ? '–' : a.zuegeNachher}${wh} ${dauer}`;
+  return `${kopf} ${a.status === 'regulaer' ? `weiter F ${a.flaeche} / sofort F ${r.arm1.flaeche}` : 'Ausfall: ' + a.grund}${wh} ${dauer}`;
+}
+/* Zählabweichungen mit Brett, toten Koordinaten und beiden Zählwerten ins Log (nur wo sie auftreten) */
+function logAbweichungen(r) {
+  const aus = [];
+  for (const x of (r.kontrolle && r.kontrolle.abweichungen) || []) {
+    aus.push(`ZÄHLABWEICHUNG ${r.schluessel} ${x.wo}: final_score "${x.finalScore}", Fläche aus Tot-Liste ${x.flaecheAusTotListe}, tote Steine ${x.tote}`);
+    const d = x.diagnose;
+    if (d && d.brett) {
+      aus.push(`  gefangen von Schwarz/Weiß: ${d.gefangen[1]}/${d.gefangen[2]}; tote Koordinaten: ${d.tote.join(' ') || '–'}; Territory aus Tot-Liste ${d.territoryAusTotListe}`);
+      for (let y = 0; y < 19; y++) aus.push('  ' + d.brett.slice(y * 19, y * 19 + 19));
+    }
+  }
+  return aus;
 }
 
 /* ── echte Programme ──────────────────────────────────────────────────── */
@@ -266,7 +320,7 @@ function echteProgramme(opt) {
 
 async function main() {
   const a = process.argv.slice(2);
-  const opt = {einheiten: null, aus: null, teil: [1, 1], wiederhole: 0, sims: 120, maxZuege: 600, seed: 1, html: path.join(__dirname, '..', '..', 'index.html'),
+  const opt = {einheiten: null, aus: null, teil: [1, 1], wiederhole: 0, probe: false, sims: 120, maxZuege: 600, seed: 1, html: path.join(__dirname, '..', '..', 'index.html'),
                gnugo: '/usr/games/gnugo', fuego: path.join(__dirname, '..', '..', 'fuego-bin', 'fuego'), gegnerHtmlVerz: path.join(__dirname, '..', '..', 'vergleich')};
   for (let i = 0; i < a.length; i++) {
     const v = a[i + 1];
@@ -278,6 +332,7 @@ async function main() {
       case '--maxzuege': opt.maxZuege = +v; i++; break;
       case '--seed': opt.seed = +v; i++; break;
       case '--wiederhole': opt.wiederhole = +v; i++; break;
+      case '--probe': opt.probe = true; break;
       case '--html': opt.html = v; i++; break;
       case '--gnugo': opt.gnugo = v; i++; break;
       case '--fuego': opt.fuego = v; i++; break;
@@ -299,16 +354,17 @@ async function main() {
   ctx.capturesKonvention = kal.konvention;
   console.log(`captures-Kalibrierung: black ${kal.black}, white ${kal.white} → Konvention ${kal.konvention}`);
   let n = 0, fehler = 0, ausfaelle = 0;
-  const gezaehlt = {};
+  const plan = opt.wiederhole > 0 ? wiederholungsPlan(meine, opt.wiederhole) : new Map();
   for (const e of meine) {
-    const r = await bearbeiteMitWiederholung(ctx, e, gezaehlt, opt.wiederhole);
+    const r = await bearbeiteMitWiederholung(ctx, e, plan.get(e.schluessel) || 0);
     fs.appendFileSync(opt.aus, JSON.stringify(r) + '\n');
     n++; if (r.fehler.length) fehler++; if (r.arm0.status !== 'regulaer') ausfaelle++;
-    console.log(`${n}/${meine.length} ${e.schluessel}: ${r.fehler.length ? 'FEHLER ' + r.fehler[0] : r.arm0.status === 'regulaer' ? `weiter F ${r.arm0.flaeche} / sofort F ${r.arm1.flaeche}` : 'Ausfall: ' + r.arm0.grund} (${(r.dauerMs / 1000).toFixed(0)} s)`);
+    console.log(logZeile(r, n, meine.length, opt.probe));
+    for (const z of logAbweichungen(r)) console.log(z);
   }
   console.log(`Fertig: ${n} Einheiten, ${fehler} mit Pflichtfehler, ${ausfaelle} ohne reguläre Fortsetzung`);
   process.exit(fehler ? 1 : 0);
 }
 
 if (require.main === module) main().catch(e => { console.error(e.stack || e.message); process.exit(1); });
-module.exports = {motor, bearbeiteEinheit, bearbeiteMitWiederholung, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};
+module.exports = {motor, bearbeiteEinheit, bearbeiteMitWiederholung, wiederholungsPlan, logZeile, logAbweichungen, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};

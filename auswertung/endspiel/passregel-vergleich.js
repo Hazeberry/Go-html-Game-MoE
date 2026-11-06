@@ -32,12 +32,19 @@ const wiederholungGleich = (r, w) => wiederholungVollstaendig(r, w) && w.gleichF
 function pruefeWiederholung(einheiten, zeilen, probe) {
   const arten = [...new Set(einheiten.map(e => e.gegner))].sort(), je = {}, fehler = [];
   for (const art of arten) {
-    const mit = zeilen.filter(r => r.gegner === art && r.wiederholung);
-    const voll = mit.filter(r => wiederholungVollstaendig(r, r.wiederholung)), gleich = mit.filter(r => wiederholungGleich(r, r.wiederholung));
-    je[art] = {versucht: mit.length, n: voll.length, gleich: gleich.length, unvollstaendig: mit.length - voll.length, pflicht: WIEDERHOLUNG_PFLICHT.includes(art)};
+    const u = einheiten.filter(e => e.gegner === art).length;
+    const zs = zeilen.filter(r => r.gegner === art && Array.isArray(r.wiederholungen) && r.wiederholungen.length);
+    const laeufe = zs.flatMap(r => r.wiederholungen.map(w => ({r, w})));
+    const voll = laeufe.filter(x => wiederholungVollstaendig(x.r, x.w)), gleich = laeufe.filter(x => wiederholungGleich(x.r, x.w));
+    /* Anforderung je Gegnerart: ab 3 Einheiten genügen 3 Einheiten mit je 1 vollständigen Wiederholungslauf; bei weniger
+       als 3 Einheiten muss JEDE vorhandene Einheit insgesamt 3 Durchläufe haben (2 vollständige Wiederholungsläufe). */
+    const verlangtEinheiten = Math.min(u, WIEDERHOLUNGEN_MIN), verlangtJe = u >= WIEDERHOLUNGEN_MIN ? 1 : WIEDERHOLUNGEN_MIN - 1;
+    const erfuellt = zs.filter(r => r.wiederholungen.filter(w => wiederholungVollstaendig(r, w)).length >= verlangtJe).length;
+    je[art] = {einheiten: u, verlangtEinheiten, verlangtJe, einheitenErfuellt: erfuellt, versucht: laeufe.length, n: voll.length, gleich: gleich.length,
+               unvollstaendig: laeufe.length - voll.length, pflicht: WIEDERHOLUNG_PFLICHT.includes(art)};
     if (!probe) continue;
-    if (voll.length < WIEDERHOLUNGEN_MIN) fehler.push(`Wiederholungsprüfung fehlt: Gegner ${art} ${voll.length} vollständige von mindestens ${WIEDERHOLUNGEN_MIN} (versucht ${mit.length}, davon ${mit.length - voll.length} mit Fehler, Ausfall oder ohne endlichen Stand)`);
-    else if (WIEDERHOLUNG_PFLICHT.includes(art) && gleich.length < voll.length) fehler.push(`Wiederholung nicht gleich: Gegner ${art} ${gleich.length} von ${voll.length} vollständigen mit gleicher Zugfolge und gleichem Stand`);
+    if (erfuellt < verlangtEinheiten) fehler.push(`Wiederholungsprüfung fehlt: Gegner ${art} ${erfuellt} von ${verlangtEinheiten} Einheiten mit je ${verlangtJe} vollständigen Wiederholungsläufen (Einheiten ${u}, Läufe versucht ${laeufe.length}, davon ${laeufe.length - voll.length} mit Fehler, Ausfall oder ohne endlichen Stand)`);
+    else if (WIEDERHOLUNG_PFLICHT.includes(art) && gleich.length < voll.length) fehler.push(`Wiederholung nicht gleich: Gegner ${art} ${gleich.length} von ${voll.length} vollständigen Läufen mit gleicher Zugfolge und gleichem Stand`);
   }
   return {je, fehler};
 }
@@ -68,8 +75,12 @@ function auswerten({einheiten, zeilen, probe}) {
   const konv = {};
   for (const r of zeilen) { const k = r.kontrolle && r.kontrolle.gefangen && r.kontrolle.gefangen.konvention; if (k) konv[k] = (konv[k] || 0) + 1; }
   const ungleichGefangen = zeilen.filter(r => r.kontrolle && r.kontrolle.gefangen && r.kontrolle.gefangen.unterscheidbar).length;
+  const steine = zeilen.filter(r => r.arm0 && r.arm0.status === 'regulaer' && Number.isFinite(r.arm0.kiSteine)).map(r => r.arm0.kiSteine).sort((x, y) => x - y);
+  const zuege = steine.length ? {n: steine.length, min: steine[0], max: steine[steine.length - 1], median: L.median(steine), ohneStein: steine.filter(x => x === 0).length} : null;
+  const abweichungen = {};
+  for (const r of zeilen) if (r.kontrolle && Array.isArray(r.kontrolle.abweichungen) && r.kontrolle.abweichungen.length) abweichungen[r.schluessel] = r.kontrolle.abweichungen.map(({wo, finalScore, flaecheAusTotListe, tote}) => ({wo, finalScore, flaecheAusTotListe, tote}));
   const dauer = zeilen.map(r => r.dauerMs).filter(Number.isFinite);
-  const out0 = {ergebnis, globaleFehler, konv, ungleichGefangen, wiederholung: wh.je, verletztTotListe: verletzt, dauer: dauer.length ? {n: dauer.length, mittelS: L.mittel(dauer) / 1000, maxS: Math.max(...dauer) / 1000, summeS: dauer.reduce((s, x) => s + x, 0) / 1000} : null,
+  const out0 = {ergebnis, globaleFehler, konv, ungleichGefangen, wiederholung: wh.je, zuege, abweichungen, verletztTotListe: verletzt, dauer: dauer.length ? {n: dauer.length, mittelS: L.mittel(dauer) / 1000, maxS: Math.max(...dauer) / 1000, summeS: dauer.reduce((s, x) => s + x, 0) / 1000} : null,
           zeilenZahl: zeilen.length, einheitenZahl: einheiten.length, probe};
   const a = out0;
   if (!ergebnis.gueltig || globaleFehler.length) setzeUngueltig(a, null);
@@ -97,16 +108,18 @@ function bericht(a) {
     md.push(`    - bestätigt: ${a.nachspiel.bestaetigt || 'Archivzugfolge einspielbar und Endstand gleich'}`);
     md.push(`    - nicht bestätigt: ${a.nachspiel.nichtBestaetigt || 'ob die heutige Engine dieselben Züge wählen würde'}`);
   }
-  md.push('- Wiederholbarkeit (§9 Nr. 7, nur Probe verlangt; Gegner gnugo und ki müssen gleich sein, fuego wird berichtet): ' + (Object.entries(a.wiederholung).map(([k, v]) => `${k} ${v.gleich}/${v.n} vollständige gleich in Zugfolge und Stand (versucht ${v.versucht}, unvollständig ${v.unvollstaendig})${v.pflicht ? '' : ' (Gleichheit nur berichtet)'}`).join('; ') || 'keine'));
+  md.push('- Wiederholbarkeit (§9 Nr. 7, nur Probe verlangt; Gegner gnugo und ki müssen gleich sein, fuego wird berichtet): ' + (Object.entries(a.wiederholung).map(([k, v]) => `${k}: ${v.einheitenErfuellt}/${v.verlangtEinheiten} Einheiten erfüllt (je ${v.verlangtJe} Wiederholungsläufe, Einheiten ${v.einheiten}), vollständige Läufe ${v.n}, davon gleich in Zugfolge und Stand ${v.gleich} (versucht ${v.versucht}, unvollständig ${v.unvollstaendig})${v.pflicht ? '' : ' (Gleichheit nur berichtet)'}`).join('; ') || 'keine'));
+  if (a.zuege) md.push(`- KI-Züge in den Fortsetzungen (technisch): ${a.zuege.n} reguläre, Steinzüge ${a.zuege.min} bis ${a.zuege.max} (Median ${a.zuege.median}), ohne KI-Steinzug: ${a.zuege.ohneStein}`);
+  for (const [k, ab] of Object.entries(a.abweichungen)) for (const x of ab) md.push(`- Zählabweichung ${k} (${x.wo}): final_score "${x.finalScore}", Fläche aus Tot-Liste ${x.flaecheAusTotListe}, tote Steine ${x.tote}; Brett, tote Koordinaten und beide Zählwerte stehen in den Rohdaten (diagnose)`);
   md.push(`- Konvention von GNU Gos \`captures\` (in der Kalibrierung bestimmt, je Stellung angewendet; Anzahl Stellungen): ${JSON.stringify(a.konv)}`);
   md.push(`- Stellungen mit ungleichen Gefangenenzahlen (dort würde ein vertauschter Zähler auffallen): ${a.ungleichGefangen} von ${a.zeilenZahl}`);
-  if (a.verletztTotListe.length) md.push(`- Fläche aus Tot-Liste ≠ final_score: ${a.verletztTotListe.join(', ')}`);
+  if (a.verletztTotListe.length) md.push(`- Fläche aus Tot-Liste ≠ final_score bei: ${a.verletztTotListe.join(', ')}`);
   if (a.dauer) md.push(`- Dauer je Einheit: Mittel ${a.dauer.mittelS.toFixed(0)} s, Maximum ${a.dauer.maxS.toFixed(0)} s, Summe ${(a.dauer.summeS / 3600).toFixed(2)} h`);
   md.push('', '## Ausfälle (einzeln, §9 Nr. 6)', '');
   for (const w of ['flaeche', 'territory']) {
     const z = r.wertungen[w];
     md.push(`${w}: ${z.ausfallListe.length}`);
-    for (const x of z.ausfallListe) md.push(`- ${x.schluessel}: ${x.grund}${x.sofort !== undefined && x.sofort !== null ? ` (sofort aus KI-Sicht ${f1(x.sofort)})` : x.sofort === null ? ' (sofort unbekannt)' : ''}`);
+    for (const x of z.ausfallListe) md.push(`- ${x.schluessel}: ${x.grund}${a.probe ? '' : (x.sofort !== undefined && x.sofort !== null ? ` (sofort aus KI-Sicht ${f1(x.sofort)})` : x.sofort === null ? ' (sofort unbekannt)' : '')}`);
   }
   if (a.probe) { md.push('', '**Probe: keine Wirkungsauswertung.** Siegwechsel, Punkt-Mittel und Intervalle werden nicht berichtet.'); return md.join('\n') + '\n'; }
   md.push('', '## E1 verlorene Siege (Endpunkt, §7)', '');
@@ -164,7 +177,7 @@ function main() {
   fs.mkdirSync(opt.aus, {recursive: true});
   const md = bericht(a_);
   fs.writeFileSync(path.join(opt.aus, 'bericht.md'), md);
-  const roh = opt.probe ? {gueltig: a_.ergebnis.gueltig, befund: a_.ergebnis.befund, globaleFehler: a_.globaleFehler, wiederholung: a_.wiederholung, konv: a_.konv, dauer: a_.dauer, einheiten: a_.einheitenZahl, zeilen: a_.zeilenZahl}
+  const roh = opt.probe ? {gueltig: a_.ergebnis.gueltig, befund: a_.ergebnis.befund, globaleFehler: a_.globaleFehler, wiederholung: a_.wiederholung, zuege: a_.zuege, abweichungen: a_.abweichungen, konv: a_.konv, dauer: a_.dauer, einheiten: a_.einheitenZahl, zeilen: a_.zeilenZahl}
     : {...a_, ergebnis: {...a_.ergebnis, wertungen: Object.fromEntries(Object.entries(a_.ergebnis.wertungen).map(([k, z]) => { const {d, kiSteine, kiPaesse, abwMit, abwNur, ...rest} = z; return [k, rest]; }))}};
   fs.writeFileSync(path.join(opt.aus, 'zahlen.json'), JSON.stringify(roh, null, 1));
   console.log(md);
