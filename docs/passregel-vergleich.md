@@ -38,7 +38,8 @@ für jede Einheit gelten und wird beim Einspielen **geprüft**, nicht angenommen
 
 1. Der letzte eingespielte Zug ist ein Pass der Gegnerfarbe.
 2. Der Zug davor ist **kein** Pass. (Sonst wären es schon zwei Pässe in Folge gewesen.)
-3. Die Engine führt an dieser Stellung `consecutivePasses` = 1 und übergibt `gegnerPasste`.
+3. Der Pass-Zähler des Einspielens steht an dieser Stellung auf 1. Daraus bildet das Werkzeug `gegnerPasste`;
+   die Engine selbst führt keinen Pass-Zähler.
 
 Eine ausgewählte Stellung, die das nicht erfüllt, ist ein Fehler im Werkzeug und macht den Lauf
 ungültig (§9). Sie wird nicht stillschweigend aussortiert und bekommt auch keinen Arm „sofort“ ohne
@@ -72,10 +73,18 @@ Komi 7,5):
 | GNU Go ohne Vorgabe | GNU Go Stufe 1 | `leeres-brett/lauf1/g-D`, `muster-ohne-vorgabe/lauf1/g-D` |
 | Fuego 100 Spiele | Fuego (schwache Suche) | `muster-ohne-vorgabe/lauf1/f-D` |
 | Fuego 50 Spiele | Fuego (schwache Suche) | `fuego-siege/lauf1/D` |
-| alte PWA | GNU Go Stufe 1 | `pwa-vergleich/lauf1/m1` |
+| alte PWA | die PWA-Engine (`vergleich/pwa-index.html` über `gtp-ki.js`, Hash gegen das Archiv geprüft) | `pwa-vergleich/lauf1/m1` |
 
-Je Gruppe höchstens 100 Partien, gezogen mit festem Seed 1 wie in `pass-stellungen.js`. Abgebrochene
-Partien und solche ohne `zuege` oder `wirFarbe` fallen weg und werden gezählt. Handpartien
+**Berichtigung (06.11.2026, beim Bau):** Der Gegner der Gruppe „alte PWA“ ist die PWA-Engine, nicht GNU Go, wie
+in der ersten Fassung stand. GNU Go ist dort nur Schiedsrichter. Die Fortsetzung dieser Gruppe läuft mit derselben
+Engine und denselben Archivangaben wie die Quelle (`gegner.html`, `sha256`, `ki` aus dem Datensatz).
+
+**Kein Deckel auf Quellpartien.** In der ersten Fassung stand „je Gruppe höchstens 100 Partien“. Das passt nicht
+zum Kriterium von N ≥ 183 je Wertung (§8), denn es ließe das Material schon vor der Auslösung schrumpfen. Stufe A
+wertet alle brauchbaren Quellpartien aus. Ein Deckel gilt, wenn überhaupt, für die **Einheiten** je Gruppe
+(`--max-einheiten`, feste Ziehung nach Hash aus Seed und Schlüssel) und wird erst nach Stufe A mit Hazeberry
+festgelegt. Abgebrochene Partien, solche ohne `zuege` oder `wirFarbe` und solche mit Vorgabe oder Komi ≠ 7,5
+fallen weg und werden gezählt. Handpartien
 (`tests/stellungen/hand-*.sgf`) sind nur Prüfmaterial für die Werkzeuge und gehen nicht in die
 Auswertung ein.
 
@@ -102,7 +111,8 @@ wird genannt: Was läuft, wo, welches Go gilt.
    Gültigkeit (§9). **Keine Wirkungsauswertung:** Die Probe berichtet keine Siegwechsel und keine Mittel
    als Ergebnis. Sie misst Dauer und Ausfälle, damit der Hauptumfang vor dem Hauptlauf festgelegt werden
    kann.
-3. **Stufe C, Hauptlauf:** alle Einheiten aus Stufe A (je Gruppe höchstens 100). Eigenes Go.
+3. **Stufe C, Hauptlauf:** alle Einheiten aus Stufe A, mit einem Deckel je Gruppe nur, wenn er nach Stufe A
+   festgelegt wurde. Eigenes Go.
 
 ## 5. Zählung
 
@@ -112,7 +122,9 @@ verglichen (§7, Nebenkennzahl).
 
 - **Fläche:** `final_score` auf der Stellung.
 - **Territory:** `final_status_list dead` auf der Stellung, danach die **Territory-Rechnung der App**
-  (derselbe Code wie `finalTerritoryScore`, keine Nachbildung): Gefangene aus dem Einspielen, tote
+  (dieselbe Rechenregel wie `finalTerritoryScore`; der Code selbst steckt im Hauptskript und ist von außen nicht
+  aufrufbar, darum ist es eine Nachbildung, die ein Test an den aus `index.html` geschnittenen App-Code bindet,
+  siehe §9 Nr. 5): Gefangene aus dem Einspielen, tote
   Steine der Tot-Liste als Gefangene gutgeschrieben, umschlossene freie Punkte, Komi 7,5. GNU Go spielt
   dabei nicht in japanischen Regeln. Die Engine kennt den Wertungsmodus nicht, die Fortsetzung ist
   also in beiden Wertungen dieselbe Partie; nur Auslösung und Zählung unterscheiden sich. **Das ist
@@ -214,13 +226,17 @@ Pflichtprüfungen:
    Weglassen.
 3. **Einspielen:** Jeder Zug bis zur Stellung wird von GNU Go bzw. Fuego akzeptiert, und die
    Steinlisten von Engine und Gegner sind an jeder Stellung gleich. Pflicht für 100 % der Einheiten.
-4. **Nachspiel-Kontrolle am Archiv:** Je Gruppe mindestens 10 Partien werden vollständig eingespielt;
+4. **Nachspiel-Kontrolle am Archiv** (eigener Job `nachspiel`, `passregel-nachspiel-kontrolle.js`; fehlt sie oder besteht sie nicht, ist der Lauf ungültig): Je Gruppe mindestens 10 Partien werden vollständig eingespielt;
    GNU Gos `final_score` der Schlussstellung ergibt den aufgezeichneten Endstand (Verfahren wie in
    `orakel-nachspiel.js`).
 5. **Zählung:** Auf den Kontrollstellungen ist die aus der Tot-Liste gerechnete Fläche gleich
    `final_score`. Für Territory gilt zusätzlich:
-   - Die Gefangenen aus dem Einspielen in der Engine sind gleich GNU Gos `captures` je Farbe.
-   - Die Territory-Rechnung ist der Code der App (`finalTerritoryScore`), mit Komi 7,5, und schreibt die
+   - Die Gefangenen aus dem Einspielen in der Engine sind gleich GNU Gos `captures` je Farbe. Welche Konvention
+     GNU Go dafür nutzt (gefangen von oder verloren an), ist nicht festgelegt: Das Werkzeug akzeptiert beide
+     Zuordnungen und protokolliert die tatsächliche. Die Probe klärt sie; danach wird die Prüfung auf diese eine
+     Zuordnung verschärft.
+   - Die Territory-Rechnung folgt der Regel der App (`finalTerritoryScore`, Test `tests/passregel-vergleich.js` gegen den
+     aus `index.html` geschnittenen Code, auch Fläche gegen `finalAreaScore`), mit Komi 7,5, und schreibt die
      toten Steine der Tot-Liste als Gefangene gut. Das prüft ein Test an einer bekannten Stellung.
    - Die Partie vom 31.10. ergibt W+200,5 (`tests/zaehlvorschau.js`).
 
@@ -275,21 +291,29 @@ Wenige ausgelöste Stellungen machen den Lauf nicht ungültig. Sie begrenzen die
 - **Territory** ist nur eine Zählvariante (§5).
 - Eine **Hypothese** wie „verschenkte Punkte beim Beenden“ bleibt eine, bis E2 sie belegt.
 
-## 11. Umsetzung (noch nicht gebaut, erst nach Freigabe dieser Festlegung)
+## 11. Umsetzung (vorbereitet am 06.11.2026, nichts gelaufen)
 
-- `auswertung/endspiel/passregel-stellungen.js`: Stufe A (Auslösung, Einheiten, Gründe).
-- Fortsetzen aus einer Stellung in `gnugo-duell.js` (Option mit Zugfolge) samt Zählung (Fläche und
-  Tot-Liste) und Ausfallprotokoll.
-- `auswertung/endspiel/passregel-vergleich.js`: Auswertung (L, G, D, Intervalle, Tests, Nebenkennzahlen).
-- Workflow `passregel-vergleich.yml` (manuell, Eingabe Stufe A/B/C, Pakete je Gruppe und Wertung),
-  Runner `ubuntu-24.04`.
-- Tests: Ausgangsstellung und Einspielen an einer Handpartie, Schalter 0 ohne `versuch`, Seed-Ableitung,
-  Clopper-Pearson und Vorzeichentest an bekannten Werten, Gültigkeitsregeln. Eintrag in `tests/run.js`,
-  `tests/README.md` und `.github/workflows/tests.yml`, falls ein Browser nötig ist (nicht vorgesehen).
-- Neue interne Funktionen, die ein Test braucht, kommen in `tests/rahmen.js`.
+Gebaut, ohne einen Lauf zu starten; getestet nur lokal mit Handdaten und einer Attrappe statt GNU Go
+(`tests/passregel-vergleich.js`, in `tests/run.js` und `tests/README.md` eingetragen). Der Spielcode ist unverändert.
+
+- `auswertung/endspiel/passregel-lib.js`: Koordinaten, Statistik, Seed, Voraussetzung, Zählung aus der Tot-Liste,
+  Auswertung (`bewerte`) mit Gültigkeit und Wortlaut des Befunds.
+- `auswertung/endspiel/passregel-stellungen.js`: Stufe A (Auslösung, Einheiten, Gründe, Duplikate), Schalter 1 nur in
+  diesem Prozess.
+- `auswertung/endspiel/passregel-fortsetzung.js`: Einspielen, Kontrollen, Arm „sofort“ und Arm „weiter“, Gegner GNU Go,
+  Fuego oder Gegner-KI; Fortsetzungen im Prozess mit Schalter 0.
+- `auswertung/endspiel/passregel-nachspiel-kontrolle.js`: §9 Nr. 4.
+- `auswertung/endspiel/passregel-vergleich.js`: Auswertung und Bericht; `--probe` ohne Wirkungszahlen.
+- `.github/workflows/passregel-vergleich.yml`: manuell, Eingabe Stufe A, B oder C; **noch nicht gestartet**.
+
+Nicht durch Tests abgedeckt, weil es GNU Go, Fuego und die Gegner-KI braucht: der echte Ablauf mit den drei Gegnern,
+die Konvention von `captures`, der Abgleich der Tot-Liste mit `final_score` an echten Stellungen und die Dauer je
+Einheit. Das ist Aufgabe der Probe (Stufe B).
 
 ## 12. Offen vor einem Go
 
-- Zahl der Auslösungen je Wertung (Stufe A). Ohne sie ist offen, ob das Kriterium in §8 erreichbar ist.
-- Hauptumfang, Zeitbudget und Pakete: nach der Probe (Dauer je Fortsetzung noch nicht gemessen).
-- Ob Fuego im Workflow gebaut wird (vorhandene Fuego-Workflows zeigen, wie).
+- **Stufe A** (Auslösung) hat noch kein Go. Erst danach ist N je Wertung bekannt und damit, ob das Kriterium in §8
+  erreichbar ist. Ein Deckel auf Einheiten wird erst danach festgelegt (§3).
+- **Stufe B** (Probe): Umfang (Standard 3 Einheiten je Gruppe) und Go stehen aus; die Probe liefert keine Wirkungszahlen.
+- **Hauptumfang, Zeitbudget, Einheiten je Paket** (Standard 10, Dauer noch nicht gemessen): nach der Probe.
+- Fuego wird im Workflow gebaut (`auswertung/fuego/bauen.sh`, wie in `fuego-siege.yml`).
