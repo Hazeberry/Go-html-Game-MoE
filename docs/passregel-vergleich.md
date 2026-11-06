@@ -1,10 +1,11 @@
 # Passregel-Vergleich: kostet „Pass nach Gegnerpass“ Siege oder Punkte?
 
 Vorabfestlegung, 06.11.2026, überarbeitet nach Durchsicht am selben Tag (Voraussetzung Gegnerpass,
-Passregel im Arm „weiter“ aus, Ausfälle konservativ, Nenner, Unabhängigkeit, Territory-Kontrollen).
-Status: **festgelegt, nicht gestartet, kein Go, keine Freigabe für Umsetzung oder Lauf.** Das Spiel bleibt
-unverändert (`passNachGegnerpass` bleibt 0). Es gibt noch keine Messung und keine Zahl zu
-Auslösungen oder Wirkung. Dies ist die Ausführung von §4 in
+Passregel im Arm „weiter“ aus, Ausfälle konservativ, Nenner, Unabhängigkeit, Territory-Kontrollen) und nach Probe 1
+nachgebessert (§9 Nr. 5 und Nr. 7, §13).
+Status: **Umgesetzt; Stufe A abgeschlossen, Probe 1 ungültig (§13). Probe 2 und Hauptlauf nicht freigegeben.** Das
+Spiel bleibt unverändert (`passNachGegnerpass` bleibt 0). Zahlen zu den Auslösungen stehen in §13; zur Wirkung der
+Regel gibt es keine Zahl. Dies ist die Ausführung von §4 in
 [`passregel-versuch.md`](passregel-versuch.md); dort stehen Regel und Einzelrechnung.
 
 ## 1. Frage und Abgrenzung
