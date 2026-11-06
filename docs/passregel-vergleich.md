@@ -172,14 +172,19 @@ der Endpunkt. Stand aus Sicht der KI, positiv = KI gewinnt.
 
 ## 8. Entscheidungsregel (vorab)
 
-Wie in `passregel-versuch.md` §4: **Die Regel wird nicht Standard, solange verlorene Siege nicht
-ausgeschlossen werden können.** Konkret:
+`passregel-versuch.md` §4 sagt: Die Regel wird nicht Standard, solange verlorene Siege nicht
+ausgeschlossen werden können. Das wird hier so operationalisiert, und zwar **ohne absolutes
+Ausschließen**:
 
-- „Verlorene Siege ausgeschlossen“ gilt nur, wenn **in beiden Wertungen** die obere Grenze des
-  Clopper-Pearson-Intervalls für **K/N** (§7, K = L + A, N = alle Auslösungen) höchstens **2,0 %**
-  beträgt. Die 2,0 % sind eine Setzung. Ungeklärte Ausfälle zählen also konservativ als mögliche
-  Schadensfälle. Sie werden nicht ausgeschlossen. Ein Ausfall mit ungeklärtem Ergebnis kann das Urteil
-  verhindern, auch wenn kein Schaden beobachtet wurde.
+- **Das Urteil betrifft ausschließlich den Anteil verlorener Siege pro Auslösung** (E1). Punktverluste
+  bei weiterhin gewonnenen Partien (E2), eingesparte Züge (E3) und andere Verschlechterungen erfasst es
+  nicht. Sie werden getrennt berichtet.
+- **Wortlaut des Befunds**, wenn in **beiden Wertungen** die obere Grenze des Clopper-Pearson-Intervalls
+  für **K/N** (§7, K = L + A, N = alle Auslösungen) höchstens **2,0 %** beträgt: *„Die obere
+  Konfidenzgrenze für den Anteil verlorener Siege liegt unter den Modellannahmen (§10) bei höchstens
+  2 %.“* Das ist keine Aussage, dass verlorene Siege nicht vorkommen. Die 2,0 % sind eine Setzung.
+- Ungeklärte Ausfälle zählen konservativ als mögliche Verluste (K), sie werden nicht weggelassen. Ein
+  Ausfall mit ungeklärtem Ergebnis kann den Befund verhindern, auch wenn kein Verlust beobachtet wurde.
 - Höchstens zulässiges K bei oberer Grenze ≤ 2,0 % (Formelrechnung, keine Messung):
 
   | N (Auslösungen je Wertung) | 182 | 183 | 200 | 250 | 300 | 400 | 600 |
@@ -189,8 +194,8 @@ ausgeschlossen werden können.** Konkret:
   Bei N = 183 und K = 0 liegt die obere Grenze bei 1,996 %; bei N = 182 bei 2,006 %. Bei N = 100
   und K = 0 bliebe sie bei 3,6 %. Jeder Ausfall mit möglichem Schaden verbraucht also einen Teil
   dieser Reserve; bei N = 183 darf es gar keinen geben.
-- Ist das nicht erfüllt, bleibt der Schalter AUS und der Befund lautet „nicht ausgeschlossen“ mit L, A,
-  N und Intervall. Das ist **kein** Nachweis, dass die Regel schadet.
+- Ist die Grenze nicht erfüllt, bleibt der Schalter AUS und der Befund lautet „Grenze von 2 % nicht
+  gezeigt“ mit L, A, N und Intervall. Das ist **kein** Nachweis, dass die Regel Siege kostet.
 - Auch bei erfüllter Grenze folgt daraus **keine** automatische Aktivierung. Ein Standardwechsel
   braucht eine eigene Festlegung und ein Go, E2 und E3 fließen dort ein. Diese Messung gilt für die
   Archivstellungen und Gegner aus §3, nicht für Menschen.
@@ -198,7 +203,7 @@ ausgeschlossen werden können.** Konkret:
 ## 9. Gültigkeit
 
 Nur zwei Zustände je Wertung, gültig oder ungültig. Ungültig heißt „kein Urteil“ mit Grund, und der
-Lauf wird rot. Ein gültiges Ergebnis kann trotzdem „nicht ausgeschlossen“ lauten.
+Lauf wird rot. Ein gültiges Ergebnis kann trotzdem „Grenze von 2 % nicht gezeigt“ lauten.
 
 Pflichtprüfungen:
 
