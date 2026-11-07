@@ -316,7 +316,7 @@ test('Nutzdaten streng: Erfolgsantwort, gültige Koordinaten, endlicher final_sc
   const E = engine(), basis = () => [['list_stones black', '= '], ['list_stones white', '= '], ['captures black', '= 0'], ['captures white', '= 0'], ['final_score', '= B+5.5'],
     ['final_status_list alive', '= '], ['final_status_list dead', '= '], ['final_status_list seki', '= '], ['final_status_list white_territory', '= '], ['final_status_list black_territory', '= '], ['final_status_list dame', '= '], ['showboard', '= ']].map(([befehl, antwort]) => ({befehl, antwort}));
   pruefeGleich(Z.analysiere(E, [], [], basis()).finalScore.stand, 5.5, 'gültiges Protokoll wird gelesen');
-  for (const [befehl, antwort, text] of [['final_score', '= B+1.2.3', /nicht endlich/], ['final_score', '? nope', /Fehlerantwort/], ['captures black', '= ', /keine ganze Zahl/], ['captures white', '= -2', /keine ganze Zahl/],
+  for (const [befehl, antwort, text] of [['final_score', '= B+1.2.3', /unlesbar|nicht endlich/], ['final_score', '? nope', /Fehlerantwort/], ['captures black', '= ', /keine ganze Zahl/], ['captures white', '= -2', /keine ganze Zahl/],
                                          ['final_status_list dead', '= A1 PASS', /ungültige Koordinate/], ['final_status_list dame', '? x', /Fehlerantwort/], ['list_stones white', '= Z99', /ungültige Koordinate/]]) {
     const log = basis(); log.find(x => x.befehl === befehl).antwort = antwort;
     let msg = ''; try { Z.analysiere(E, [], [], log); } catch (e) { msg = e.message; }

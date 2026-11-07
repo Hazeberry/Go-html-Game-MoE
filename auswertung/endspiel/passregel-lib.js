@@ -217,17 +217,22 @@ const ausSicht = (stand, kiFarbe) => (kiFarbe === 1 ? 1 : -1) * stand;
 const gewonnen = standKI => standKI > 0;   /* Remis zählt als nicht gewonnen (mit Komi 7,5 ohnehin unmöglich) */
 
 /* GNU Gos final_score ("B+12.5", "W+3.5", "0") als Stand Schwarz − Weiß */
+/* Unzulässige Daten in einer ANTWORT von GNU Go tragen `daten: true`: Das Fortsetzungswerkzeug behandelt sie als
+   Pflichtfehler, nicht als technischen Ausfall (docs/passregel-vergleich.md §9 Nr. 5). */
+const datenFehler = msg => Object.assign(new Error(msg), {daten: true});
 function standAusFinalScore(antwort) {
-  const m = /^([BW])\+([\d.]+)/.exec(String(antwort).trim());
-  if (!m) { if (String(antwort).trim() === '0') return 0; throw new Error('final_score unlesbar: ' + antwort); }
-  return (m[1] === 'B' ? 1 : -1) * +m[2];
+  const m = /^([BW])\+(\d+(\.\d+)?)$/.exec(String(antwort).trim());
+  if (!m) { if (String(antwort).trim() === '0') return 0; throw datenFehler('final_score unlesbar: ' + antwort); }
+  const wert = +m[2];
+  if (!Number.isFinite(wert)) throw datenFehler('final_score nicht endlich: ' + antwort);
+  return (m[1] === 'B' ? 1 : -1) * wert;
 }
 /* final_status_list dead: Zeilen mit Punkten getrennt durch Leerzeichen, jede Zeile eine Kette */
 function totListeAusGtp(antwort) {
   /* jedes Wort muss eine gültige Brettkoordinate sein; „pass“, „resign“ und Koordinaten außerhalb des Bretts wären sonst stillschweigend −1 oder −2 */
   const menge = new Set();
   for (const w of String(antwort).split(/\s+/).filter(Boolean)) {
-    if (!/^[A-HJ-T]([1-9]|1[0-9])$/i.test(w)) throw new Error('ungültige Koordinate in einer Punktliste: ' + JSON.stringify(w));
+    if (!/^[A-HJ-T]([1-9]|1[0-9])$/i.test(w)) throw datenFehler('ungültige Koordinate in einer Punktliste: ' + JSON.stringify(w));
     menge.add(vonGtp(w));
   }
   return menge;

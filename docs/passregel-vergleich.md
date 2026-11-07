@@ -250,6 +250,12 @@ Pflichtprüfungen:
      ungleichen Zahlen auf. Der Bericht nennt die angewandte Konvention und die Zahl der Stellungen mit ungleichen
      Gefangenenzahlen.
    - **Tot-Liste:** `final_status_list dead` ist lesbar, jedes Wort eine gültige Brettkoordinate (kein `pass`).
+     **Unzulässige Daten** in einer Antwort von GNU Go (z. B. `pass` oder `Z99` in der Tot-Liste, ein unlesbarer oder nicht
+     endlicher `final_score`) sind ein **Pflichtfehler**, beim Arm „sofort“ wie beim Arm „weiter“; die Einheit läuft dann nicht
+     weiter. Ein **technischer Ausfall** (GNU Go beendet sich, die Frage bleibt ohne Antwort, Fehlerantwort „?“) ist dagegen
+     **kein** Pflichtfehler, sondern wird konservativ nach der Ausfallregel behandelt (Nr. 6): beim Arm „sofort“ ist der Stand
+     unbekannt, beim Arm „weiter“ ist es ein Ausfall. Ein **unerwarteter Fehler im Werkzeug selbst** ist ein Pflichtfehler
+     und wird nicht als Ausfall getarnt.
    - **Komi 7,5** und **Übereinstimmung mit dem App-Code:** Die Territory-Rechnung folgt der Regel der App
      (`finalTerritoryScore`, tote Steine als Gefangene des Gegners, Komi 7,5). Das prüfen Tests gegen die aus `index.html`
      geschnittenen Funktionen `finalAreaScore` und `finalTerritoryScore` (Stellungen mit toten Steinen und ungleichen
@@ -282,7 +288,8 @@ Pflichtprüfungen:
    abweichender Zuordnung und die Bestandteile aus; das Log schreibt Ort (Anfang, Ende oder Wiederholung k), beide
    Zählwerte, Bestandteile, Koordinaten und das Brett.
 
-6. **Fortsetzungen und Ausfälle:** Jeder Ausfall (Absturz von GNU Go oder Fuego, Timeout,
+6. **Fortsetzungen und Ausfälle:** (Als Ausfall zählt nur ein technischer Ausfall; unzulässige Daten und unerwartete Fehler im
+   Werkzeug sind Pflichtfehler, Nr. 5.) Jeder Ausfall (Absturz von GNU Go oder Fuego, Timeout,
    600-Züge-Grenze, Abbruch, nicht zählbare Endstellung) wird einzeln mit Stellung, Gruppe, Arm-1-Ergebnis
    und Grund aufgelistet. Es gibt zwei getrennte Folgen:
    - **Für E1 (das Urteil über verlorene Siege)** ist ein Ausfall kein Ausschlussgrund. Er zählt in N,

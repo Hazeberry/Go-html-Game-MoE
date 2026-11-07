@@ -352,6 +352,55 @@ test('Pflichtprüfungen bleiben: Brett und Gefangene machen ungültig; der Zähl
   pruefe(/G19 \(GNU Go gebiet-S, unser Besitzer neutral\)/.test(md), 'Koordinate steht im Bericht');
 });
 
+/* ── 7d Fehlerwege der Zählung im ganzen Ablauf ───────────────────────── */
+test('Fehlerwege der Zählung: unzulässige Daten = Pflichtfehler, technischer Ausfall = konservativ, unerwarteter Fehler = Pflichtfehler', async () => {
+  const E = engine(), e = await einheitAusHand(E), opt = {sims: 4, maxZuege: 600, seed: 1};
+  /* Schiedsrichter, dessen nummer-ter Aufruf von `muster` durch `antwort` ersetzt wird (Text oder eine Funktion, die wirft) */
+  const mit = (muster, nummer, antwort) => { let n = 0; return async () => { const a = attrappe(E), alt = a.frage;
+    a.frage = async b => (muster.test(b) && ++n === nummer ? (typeof antwort === 'function' ? antwort() : antwort) : alt(b)); return a; }; };
+  const lauf = async (startReferee) => {
+    const r = await F.bearbeiteEinheit({E, DEFAULT: _DEFAULT, capturesKonvention: 'gefangen-von', opt, startReferee, startGegner: async () => null}, e);
+    return {r, z: V.auswerten({einheiten: [e], zeilen: [{...r, gegner: 'gnugo'}], probe: true})};
+  };
+  const werfen = text => () => { throw new Error(text); };
+  const absturz = werfen('GNU Go beendet (code null, signal SIGSEGV) ');
+  const fehlerantwort = werfen('GNU Go: final_score → ? cannot do that');
+  const pflicht = (x, was) => { pruefeGleich(x.z.ergebnis.wertungen.flaeche.gueltig, false, `${was}: Fläche ungültig`); pruefeGleich(x.z.ergebnis.wertungen.territory.gueltig, false, `${was}: Territory ungültig`); pruefeGleich(x.z.ergebnis.gueltig, false, `${was}: Lauf ungültig`); pruefe(/KEIN URTEIL/.test(x.z.ergebnis.befund), `${was}: Befund KEIN URTEIL`); };
+  /* 1 bis 3: unzulässige Daten in der Tot-Liste und im final_score beim Arm „sofort“ */
+  for (const [name, wert] of [['PASS in der Tot-Liste', 'A1 PASS'], ['Z99 in der Tot-Liste', 'Z99'], ['Koordinate A20', 'A20']]) {
+    const x = await lauf(mit(/^final_status_list dead/, 1, wert));
+    pruefe(x.r.fehler.some(f => /^Zählung Anfang: unzulässige Daten von GNU Go/.test(f)), `${name}: Pflichtfehler am Anfang: ${x.r.fehler.join(' | ')}`);
+    pruefeGleich(x.r.arm1Fehler, undefined, `${name}: kein stiller arm1Fehler`); pruefeGleich(x.r.arm0.grund, 'nicht gelaufen', `${name}: keine Fortsetzung nach unzulässigen Daten`); pflicht(x, name);
+  }
+  const fs = await lauf(mit(/^final_score/, 1, 'B+1.2.3'));
+  pruefe(fs.r.fehler.some(f => /^Zählung Anfang: unzulässige Daten/.test(f)), 'unlesbarer final_score: Pflichtfehler: ' + fs.r.fehler.join(' | ')); pflicht(fs, 'final_score unlesbar');
+  /* 4: unzulässige Daten beim Arm „weiter“ (zweite Zählung) */
+  const ende = await lauf(mit(/^final_status_list dead/, 2, 'PASS'));
+  pruefe(ende.r.fehler.some(f => /^Zählung Ende: unzulässige Daten/.test(f)), 'unzulässige Daten am Ende: Pflichtfehler: ' + ende.r.fehler.join(' | ')); pflicht(ende, 'Daten am Ende');
+  /* 5 und 6: technischer Ausfall beim Arm „sofort“ (Absturz, Fehlerantwort): kein Pflichtfehler, „sofort“ unbekannt, konservativ */
+  for (const [name, f] of [['GNU-Go-Absturz', absturz], ['Fehlerantwort „?“', fehlerantwort]]) {
+    const x = await lauf(mit(/^final_score/, 1, f));
+    pruefeGleich(x.r.fehler.length, 0, `${name} beim Arm sofort: kein Pflichtfehler`); pruefe(typeof x.r.arm1Fehler === 'string' && x.r.arm1.flaeche === null, `${name}: „sofort“ unbekannt, Grund festgehalten: ${x.r.arm1Fehler}`);
+    pruefeGleich(x.r.arm0.status, 'regulaer', `${name}: die Fortsetzung läuft weiter`);
+    const w = x.z.ergebnis.wertungen.flaeche;
+    pruefeGleich(w.gueltig, true, `${name}: Lauf bleibt gültig`); pruefeGleich(w.sofortUnbekannt, 1, `${name}: sofort unbekannt gezählt`);
+    pruefeGleich(w.A, 1, `${name}: konservativ als möglicher verlorener Sieg (weiter gewinnt, sofort unbekannt)`); pruefeGleich(w.K, 1, `${name}: K = 1`);
+  }
+  /* 7: technischer Ausfall beim Arm „weiter“: Ausfallregel */
+  const aus = await lauf(mit(/^final_score/, 2, absturz));
+  pruefeGleich(aus.r.fehler.length, 0, 'Absturz beim Arm weiter: kein Pflichtfehler'); pruefeGleich(aus.r.arm0.status, 'ausfall', 'Ausfall des Arms weiter'); pruefe(/GNU Go beendet/.test(aus.r.arm0.grund), 'Grund festgehalten');
+  pruefeGleich(aus.z.ergebnis.wertungen.flaeche.ausfaelle, 1, 'als Ausfall gezählt'); pruefeGleich(aus.z.ergebnis.wertungen.flaeche.gueltig, true, 'Lauf bleibt gültig');
+  /* 8: unerwarteter Fehler im Werkzeug (kein Programm-, kein Datenfehler): Pflichtfehler, nicht still */
+  for (const [name, nr, wo] of [['unerwarteter Fehler beim Arm sofort', 1, /^Zählung Anfang: unerwarteter Fehler/], ['unerwarteter Fehler beim Arm weiter', 2, /^Fortsetzung: unerwarteter Fehler/]]) {
+    const x = await lauf(mit(/^final_score/, nr, () => { throw new TypeError('boom'); }));
+    pruefe(x.r.fehler.some(f => wo.test(f)), `${name}: Pflichtfehler: ${x.r.fehler.join(' | ').slice(0, 200)}`); pruefeGleich(x.r.arm1Fehler, undefined, `${name}: nicht als technischer Ausfall getarnt`); pflicht(x, name);
+  }
+  /* die Klassifikation selbst */
+  pruefeGleich(F.fehlerArt(Object.assign(new Error('x'), {daten: true})), 'daten', 'Datenfehler'); pruefeGleich(F.fehlerArt(new Error('GNU Go beendet (code 1)')), 'technisch', 'Prozess beendet');
+  pruefeGleich(F.fehlerArt(new Error('GNU Go: final_score → ? x')), 'technisch', 'Fehlerantwort'); pruefeGleich(F.fehlerArt(new Error('Fuego beendet (code 1)')), 'technisch', 'Fuego beendet');
+  pruefeGleich(F.fehlerArt(new TypeError('boom')), 'werkzeug', 'unerwartet'); pruefeGleich(F.fehlerArt(null), 'werkzeug', 'null');
+});
+
 /* ── 8 Kommandozeilen (mit Handdaten, nicht mit Archivdaten) ───────────── */
 test('Kommandozeile: Stufe A schreibt Einheiten und Bericht; Auswertung verlangt die Nachspiel-Kontrolle', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'passregel-'));
