@@ -13,20 +13,26 @@ mindestens 20 Punkte Vorsprung zeigt (`passMarge`). Sie rechnet nur mit der **Z�
 und Ko erkennt sie nicht, `docs/zaehlvorschau.md`). GNU Go kommt in der Prüfung nicht vor.
 
 In Stufe C war der Arm „sofort“ (Zählung durch GNU Go) in 18 von 561 Auslösungen (Fläche) und 11 von 520 (Territory) für die
-KI verloren (Log, §15). Die größte Abweichung der Zählvorschau vom GNU-Go-Stand betrug 122,0 Punkte.
+KI verloren (Log, §15). Die größte Abweichung der Zählvorschau vom Referenzstand (Log: „Zählvorschau minus GNU Go“) betrug 122,0 Punkte.
 
-**Frage:** Woher kommt in diesen Fällen die Differenz zwischen dem Vorsprung der Zählvorschau und dem Stand von GNU Go?
+**Frage:** Woher kommt in diesen Fällen die Differenz zwischen dem Vorsprung der Zählvorschau und dem Referenzstand (§2)?
 
 ## 2. Definitionen (vorab)
 
 - **Stand** = Stand aus Sicht der KI, positiv = KI gewinnt, Komi 7,5, je Wertung (Fläche, Territory) wie in der Messung.
-- **Vorzeichenwechsel V** = Auslösung, bei der der Stand von GNU Go im Arm „sofort“ **negativ** ist. Bei einer Auslösung gilt
-  min(mit, nur) ≥ 20 (`passMarge`); ein Wechsel heißt also: min(mit, nur) ≥ 20 und Stand(GNU Go) < 0. V ist genau die
+- **Referenzstand** = der Stand des Arms „sofort“, wie die Messung ihn bildet (§5 in `passregel-vergleich.md`). Er ist je Wertung
+  verschieden definiert:
+  - **Fläche:** GNU Gos `final_score` (Ergebnisfeld `arm1.flaeche`).
+  - **Territory:** die **App-Rechnung mit GNU Gos Tot-Liste** (`final_status_list dead`), Ergebnisfeld `arm1.territory`. Das ist
+    kein Stand, den GNU Go selbst meldet.
+  „Stand(GNU Go)“ wird deshalb nicht verwendet; durchgehend gilt „Referenzstand“.
+- **Vorzeichenwechsel V** = Auslösung, bei der der Referenzstand (Arm „sofort“) **negativ** ist. Bei einer Auslösung gilt
+  min(mit, nur) ≥ 20 (`passMarge`); ein Wechsel heißt also: min(mit, nur) ≥ 20 und Referenzstand < 0. V ist genau die
   „Auslösung bei verlorener Stellung“ aus §15 (18 und 11 Fälle).
-- **Differenz D** = min(mit, nur) − Stand(GNU Go). In V gilt D > 20. Umgekehrt ist eine absolute Abweichung über 20 **kein**
-  Wechsel: Sie kann bei positivem GNU-Go-Stand auftreten. D > 20 ist notwendig, aber nicht hinreichend. Gezählt wird V direkt, nicht
+- **Differenz D** = min(mit, nur) − Referenzstand. In V gilt D > 20. Umgekehrt ist eine absolute Abweichung über 20 **kein**
+  Wechsel: Sie kann bei positivem Referenzstand auftreten. D > 20 ist notwendig, aber nicht hinreichend. Gezählt wird V direkt, nicht
   die Abweichung.
-- **Näherungsfälle** (beschreibend): 0 < Stand(GNU Go) < 20 bei Auslösung.
+- **Näherungsfälle** (beschreibend): 0 < Referenzstand < 20 bei Auslösung.
 
 ## 3. Datenbedarf (Schritt 0, vor jeder Rechnung)
 
@@ -37,16 +43,20 @@ Ursache einzelner Gruppen ableiten. Was gespeichert ist, ist zunächst aus dem *
 | Vorhanden (laut Code) | Nicht gespeichert (laut Code) |
 |---|---|
 | Stufe A, `einheiten.jsonl`: `mit`, `nur`, `spanne`, `gemischt`, Gefangene (`caps`) je Einheit | Zuordnung der Zählvorschau (bewiesen tot, geschätzt tot, lebend) je Gruppe |
-| Ergebniszeile: `arm1.flaeche`, `arm1.territory` (Stand GNU Go, „sofort“) | GNU Gos Listen `alive`, `seki`, `white_territory`, `black_territory`, `dame` (nur bei Zählabweichung, 15 Einheiten) |
+| Ergebniszeile: `arm1.flaeche`, `arm1.territory` (Referenzstand, „sofort“; Fläche: `final_score`, Territory: App-Rechnung mit Tot-Liste) | GNU Gos Listen `alive`, `seki`, `white_territory`, `black_territory`, `dame` (nur bei Zählabweichung, 15 Einheiten) |
 | `diagnose.anfang`: Brett als Text, Gefangene, GNU Gos Tot-Liste, `final_score`, Fläche und Territory aus der Tot-Liste | |
 
 **Schritt 0 stellt am Artefakt fest**, ob diese Felder in den Rohdaten tatsächlich vorhanden sind, und berichtet das, bevor
 weitergerechnet wird. Fehlt ein Feld, ist die betreffende Auswertung nicht möglich und wird als „nicht auswertbar“ berichtet.
 
 **Rekonstruktion der Zuordnung:** Brett und Gefangene stehen in `diagnose.anfang`. Die Zählvorschau lässt sich damit
-deterministisch neu rechnen (ohne GNU Go, ohne Partie). Das gilt nur, wenn die **Identitätskontrolle** besteht: Für jede Einheit
+deterministisch neu rechnen (ohne GNU Go, ohne Partie). Die Neurechnung ist **fest verankert**: Sie läuft mit dem Code des
+Hauptlaufs, also `index.html` (`zaehlVorschau`, `passNachGegnerpassPruefung`) am Commit
+`7d57e2bf1826904be9c4e6f8a59164db632d032f`, und mit denselben Parametern wie dort (Standard-`PARAMS` mit `passNachGegnerpass` 1,
+Komi 7,5, Wertung wie in der Einheit). Ein anderer Stand von `index.html` oder andere Parameter sind nicht zulässig. Zusätzlich bleibt die **Identitätskontrolle** erforderlich: Für jede Einheit
 muss die neu gerechnete Vorschau dasselbe `mit` und `nur` ergeben wie gespeichert. Besteht sie bei einer Einheit nicht, wird
-diese Einheit nicht zerlegt, mit Grund.
+diese Einheit nicht zerlegt, mit Grund. Die Verankerung ersetzt die Identitätskontrolle nicht, und die Kontrolle ersetzt nicht die
+Verankerung.
 
 ## 4. Rohdatenquelle
 
@@ -62,7 +72,7 @@ diese Einheit nicht zerlegt, mit Grund.
 
 **Schritt 1, ohne Zerlegung:** je Wertung
 1. Anzahl V und V/N (N = Auslösungen), getrennt nach Gruppe und KI-Farbe.
-2. Verteilung von Stand(GNU Go) und D in V, dazu die Näherungsfälle.
+2. Verteilung von Referenzstand und D in V, dazu die Näherungsfälle.
 3. Überschneidung von V mit den 15 Einheiten, bei denen Fläche aus der Tot-Liste und `final_score` abweichen, und von V in
    Fläche gegen V in Territory.
 4. Verteilung von D über **alle** Auslösungen (Median, Quantile, Anteil mit D > 20), nur als Beschreibung, nicht als Wechsel.
