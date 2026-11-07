@@ -136,9 +136,10 @@ Workflow sind vorbereitet; **gestartet wird erst nach dem Merge dieser Umsetzung
 - **Gruppenzahlen und Summen** (84 Gruppen, 864 und 271 Punkte): von Hand aus den Logzeilen der 18 Fläche-Einheiten addiert, nicht vom Werkzeug berechnet.
 - **Beiträge:** vom Werkzeug rechnerisch zerlegt (Rechenidentität, §5), nicht gedeutet.
 
-**Ablauf (offen berichtet):** Der Workflow lief, bevor Hazeberry Workflow, Werkzeug und §8 gelesen hatte; Claude hatte den Merge von PR #284 als Freigabe
-gewertet. Gemergt hat PR #284 laut Angabe von Hazeberry ChatGPT über dessen Konto, nicht Claude und nicht Hazeberry selbst (Claude hat das nicht unabhängig geprüft; GitHub führt Hazeberry als Merger). Das Go für die Untersuchung lag vor; der Lauf ist lesend
-(`contents: read`, `actions: read`) und änderte nichts im Repo. Die Reihenfolge war nicht die zugesagte.
+**Ablauf (offen berichtet):** Claude hatte Hazeberry vor dem Merge von PR #284 um Durchsicht von Workflow, Werkzeug und §8 gebeten, wertete den Merge dann als Freigabe
+und startete den Workflow. Gemergt hat #284 laut Bestätigung von ChatGPT (6.1 Sol) ChatGPT selbst, über das Konto von Hazeberry; GitHub führt Hazeberry als Merger. ChatGPT gibt an, Workflow und
+Werkzeug vor dem Merge gelesen zu haben. **Wann Hazeberry sie gelesen hat, ist nicht belegt und wird hier nicht behauptet.** Claude hat weder das Lesen noch den Merge durch ChatGPT unabhängig
+geprüft. Das Go für die Untersuchung lag vor; der Lauf ist lesend (`contents: read`, `actions: read`) und änderte nichts im Repo.
 
 **Lauf und Schritt 0:** Gültig laut Werkzeug (Exit 0), 16 Sekunden. Artefakt-SHA-256 `0d9ca865d424251c57a3c9d424cd290e0206a86fe4d6fdd37bd13b8be4720e08`
 stimmt mit dem erwarteten überein. `index.html` aus dem Commit `7d57e2bf1826904be9c4e6f8a59164db632d032f`, SHA-256
