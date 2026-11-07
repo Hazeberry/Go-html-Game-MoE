@@ -438,10 +438,10 @@ geändert (§9 Nr. 5, ab Probe 2). Probe 1 bleibt ungültig.
 ## 13a. Nachtrag: Probe 2 (07.11.2026)
 
 **Quelle: ausschließlich das Auswertungs-Log** (Job „Auswertung“, Job-ID 128258509364) des Actions-Laufs 42324497564 auf
-`main` am Merge-Commit `532874ae079a2441c92f5745f667208edfe2b24d`. Der Download des Artefakts `bericht` (ID 13554508128) war
-aus der Arbeitsumgebung gesperrt (Proxy: Forbidden). **Die Rohdaten sind daher nicht gelesen und nicht unter `docs/daten/`
-abgelegt**; Hazeberry hat die Gültigkeit ebenfalls nicht unabhängig an den Rohdaten geprüft. Alle Zahlen unten sind dem Log
-entnommen.
+`main` am Merge-Commit `532874ae079a2441c92f5745f667208edfe2b24d`. Die hier berichteten Zahlen stammen ausschließlich aus dem
+Auswertungs-Log. Der berichtende Assistent konnte das Artefakt `bericht` (ID 13554508128) wegen der Proxy-Sperre (Forbidden)
+nicht herunterladen und hat die Rohdaten nicht gelesen. Sie wurden nicht unter `docs/daten/` abgelegt. Hazeberry hat die
+Gültigkeit **nicht** unabhängig an den Rohdaten geprüft; auch die Log-Zahlen sind nicht unabhängig geprüft.
 
 **Probe 2** (Lauf 42324497564, Go von Hazeberry für Stufe B, laut Auswertung **„Lauf gültig“**, alle fünf Jobs grün, Dauer gut
 sieben Minuten): Das ist ein technischer Befund. Er sagt nichts über die Wirkung der Regel, und es wurden keine Wirkungszahlen berichtet.
