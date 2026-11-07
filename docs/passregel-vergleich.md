@@ -389,7 +389,7 @@ Territory mit Steinen und beidseitig akzeptierte `captures`-Zuordnung werden jew
 - **Probe 2** ist gelaufen (§13, gültig laut Auswertungs-Log). Die offene Frage, warum GNU Go G19, H19 und J19 anders
   zuordnet, blieb offen; die Kontrolle berichtet diese Abweichung nur. Probe 1 ist für Stufe C keine Grundlage.
 - **Hauptumfang, Zeitbudget, Einheiten je Paket:** Festlegung in §14, ausgeführt in Stufe C (§15).
-- **Vorsprungsprüfung:** Vorabfestlegung der Untersuchung in [`passregel-vorsprung.md`](passregel-vorsprung.md) (nur Festlegung, kein Go).
+- **Vorsprungsprüfung:** Untersuchung gelaufen, Festlegung und Ergebnis in [`passregel-vorsprung.md`](passregel-vorsprung.md) (§9). Ursache und Richtigkeit der Tot-Bewertung sind offen.
 - **Stufe C** ist gelaufen (§15). Weitere Untersuchungen haben kein Go. Die GNU-Go-Gruppe hat nur 2 Einheiten (§13); die Auswertung berichtet die Gruppen getrennt (§10).
 - Fuego wird im Workflow gebaut (`auswertung/fuego/bauen.sh`, wie in `fuego-siege.yml`).
 
