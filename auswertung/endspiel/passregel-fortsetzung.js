@@ -69,6 +69,15 @@ const fehlerProgramm = e => /^(GNU Go|Fuego|KI-Gegner)( beendet|: )/.test(e.mess
    daten      GNU Go hat geantwortet, die Antwort ist unzulässig (z. B. `pass` oder Z99 in der Tot-Liste, unlesbarer final_score) → Pflichtfehler
    technisch  GNU Go hat nicht geantwortet (Prozess beendet, Fehlerantwort „?“) → konservativ nach der Ausfallregel (§9 Nr. 6)
    werkzeug   alles andere: ein unerwarteter Fehler im Werkzeug selbst → Pflichtfehler */
+/* Ursache eines technischen Ausfalls, ungekürzt: Fehlerantwort „?“ heißt „Befehl abgelehnt“ (GNU Go lebt, hat den Befehl aber
+   verweigert), „beendet“ heißt kein Prozess mehr. Befehl und Fehlertext bleiben erhalten, damit eine systematische Fehlbedienung
+   (derselbe Befehl in vielen Einheiten abgelehnt) erkennbar ist. */
+const technischeUrsache = e => {
+  const msg = String(e && e.message || ''), m = /^(GNU Go|Fuego|KI-Gegner): ([\s\S]+?) → ([\s\S]*)$/.exec(msg);
+  if (m) return {typ: 'abgelehnt', programm: m[1], befehl: m[2], text: m[3].slice(0, 500)};
+  const b = /^(GNU Go|Fuego|KI-Gegner) beendet/.exec(msg);
+  return {typ: 'beendet', programm: b ? b[1] : null, befehl: null, text: msg.slice(0, 500)};
+};
 const fehlerArt = e => (e && e.daten ? 'daten' : e && fehlerProgramm(e) ? 'technisch' : 'werkzeug');
 
 function setze(E, board, i, f) {
@@ -183,7 +192,7 @@ async function bearbeiteEinheit(ctx, e) {
       res.diagnose.anfang = z.diagnose; if (!z.flaecheTotListe) meldeAbweichung(res, 'anfang', z);
     } catch (err) {
       const art = fehlerArt(err);
-      if (art === 'technisch') res.arm1Fehler = err.message.slice(0, 160);     /* „sofort“ unbekannt: zählt konservativ (§7) */
+      if (art === 'technisch') { res.arm1Fehler = err.message.slice(0, 160); res.arm1Technisch = technischeUrsache(err); }     /* „sofort“ unbekannt: zählt konservativ (§7) */
       else res.fehler.push(art === 'daten' ? 'Zählung Anfang: unzulässige Daten von GNU Go: ' + err.message.slice(0, 160)
                                            : 'Zählung Anfang: unerwarteter Fehler ' + (err.stack || err.message).slice(0, 300));
     }
@@ -233,7 +242,7 @@ async function bearbeiteEinheit(ctx, e) {
     } catch (err) {
       if (err.logik || /^PASSREGEL/.test(err.message)) res.fehler.push('Fortsetzung: ' + err.message);
       else if (err.daten) res.fehler.push('Zählung Ende: unzulässige Daten von GNU Go: ' + err.message.slice(0, 160));
-      else if (fehlerProgramm(err)) res.arm0 = {status: 'ausfall', grund: err.message.slice(0, 200), kiSteine, kiPaesse, folge, passNachGegnerpass: E.PARAMS.passNachGegnerpass, versuch};
+      else if (fehlerProgramm(err)) res.arm0 = {status: 'ausfall', grund: err.message.slice(0, 200), technisch: technischeUrsache(err), kiSteine, kiPaesse, folge, passNachGegnerpass: E.PARAMS.passNachGegnerpass, versuch};
       else res.fehler.push('Fortsetzung: unerwarteter Fehler ' + (err.stack || err.message).slice(0, 300));
     }
   } catch (err) {
@@ -397,4 +406,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch(e => { console.error(e.stack || e.message); process.exit(1); });
-module.exports = {motor, fehlerArt, gnugoArgumente, bearbeiteEinheit, bearbeiteMitWiederholung, wiederholungsPlan, logZeile, logAbweichungen, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};
+module.exports = {motor, fehlerArt, technischeUrsache, gnugoArgumente, bearbeiteEinheit, bearbeiteMitWiederholung, wiederholungsPlan, logZeile, logAbweichungen, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};

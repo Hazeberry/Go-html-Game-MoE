@@ -86,8 +86,17 @@ function auswerten({einheiten, zeilen, probe}) {
             bestandteile: v ? {steine: v.unsereZaehlung.steine, gebiet: v.unsereZaehlung.gebiet, neutral: v.unsereZaehlung.neutral, tote: v.unsereZaehlung.tote} : null,
             vergleichFehler: diagnose && diagnose.vergleichFehler || null};
   });
+  /* Technische Ausfälle nach Art (docs/passregel-vergleich.md §9 Nr. 5): Fehlerantwort „?“ = Befehl abgelehnt, „beendet“ = Prozess weg.
+     Befehl und Fehlertext bleiben erhalten; derselbe Befehl in mehreren Einheiten abgelehnt weist auf eine systematische Fehlbedienung. */
+  const tech = new Map();
+  for (const r of zeilen) for (const [arm, t] of [['sofort', r.arm1Technisch], ['weiter', r.arm0 && r.arm0.technisch]]) if (t) {
+    const k = [t.typ, t.programm, t.befehl, t.text].join('|'), x = tech.get(k) || {typ: t.typ, programm: t.programm, befehl: t.befehl, text: t.text, sofort: 0, weiter: 0, einheiten: new Set()};
+    x[arm]++; x.einheiten.add(r.schluessel); tech.set(k, x);
+  }
+  const technisch = [...tech.values()].map(x => ({typ: x.typ, programm: x.programm, befehl: x.befehl, text: x.text, sofort: x.sofort, weiter: x.weiter, einheiten: x.einheiten.size}))
+    .sort((a, b) => b.einheiten - a.einheiten || String(a.befehl).localeCompare(String(b.befehl)));
   const dauer = zeilen.map(r => r.dauerMs).filter(Number.isFinite);
-  const out0 = {ergebnis, globaleFehler, konv, ungleichGefangen, wiederholung: wh.je, zuege, abweichungen, verletztTotListe: verletzt, dauer: dauer.length ? {n: dauer.length, mittelS: L.mittel(dauer) / 1000, maxS: Math.max(...dauer) / 1000, summeS: dauer.reduce((s, x) => s + x, 0) / 1000} : null,
+  const out0 = {ergebnis, globaleFehler, konv, ungleichGefangen, wiederholung: wh.je, zuege, abweichungen, technisch, verletztTotListe: verletzt, dauer: dauer.length ? {n: dauer.length, mittelS: L.mittel(dauer) / 1000, maxS: Math.max(...dauer) / 1000, summeS: dauer.reduce((s, x) => s + x, 0) / 1000} : null,
           zeilenZahl: zeilen.length, einheitenZahl: einheiten.length, probe};
   const a = out0;
   if (!ergebnis.gueltig || globaleFehler.length) setzeUngueltig(a, null);
@@ -128,6 +137,13 @@ function bericht(a) {
   md.push(`- Stellungen mit ungleichen Gefangenenzahlen (dort würde ein vertauschter Zähler auffallen): ${a.ungleichGefangen} von ${a.zeilenZahl}`);
   if (a.verletztTotListe.length) md.push(`- Zählvergleich: Fläche aus Tot-Liste ≠ final_score bei ${a.verletztTotListe.length} Stellung(en): ${a.verletztTotListe.join(', ')} (Vergleich zweier Zählverfahren, nicht Teil der Gültigkeit)`);
   if (a.dauer) md.push(`- Dauer je Einheit: Mittel ${a.dauer.mittelS.toFixed(0)} s, Maximum ${a.dauer.maxS.toFixed(0)} s, Summe ${(a.dauer.summeS / 3600).toFixed(2)} h`);
+  md.push('', '## Technische Ausfälle nach Art (Befehl und Fehlertext unverändert)', '');
+  if (!a.technisch.length) md.push('keine');
+  for (const x of a.technisch) {
+    md.push(x.typ === 'abgelehnt'
+      ? `- Befehl abgelehnt (${x.programm} antwortete mit Fehler): \`${x.befehl}\` → „${x.text}“ in ${x.einheiten} Einheit(en) (Arm sofort ${x.sofort}, Arm weiter ${x.weiter})${x.einheiten >= 2 ? ' – **derselbe Befehl in mehreren Einheiten abgelehnt: systematische Fehlbedienung möglich**' : ''}`
+      : `- Prozess beendet${x.programm ? ' (' + x.programm + ')' : ''}: „${x.text}“ in ${x.einheiten} Einheit(en) (Arm sofort ${x.sofort}, Arm weiter ${x.weiter})`);
+  }
   md.push('', '## Ausfälle (einzeln, §9 Nr. 6)', '');
   for (const w of ['flaeche', 'territory']) {
     const z = r.wertungen[w];
@@ -190,7 +206,7 @@ function main() {
   fs.mkdirSync(opt.aus, {recursive: true});
   const md = bericht(a_);
   fs.writeFileSync(path.join(opt.aus, 'bericht.md'), md);
-  const roh = opt.probe ? {gueltig: a_.ergebnis.gueltig, befund: a_.ergebnis.befund, globaleFehler: a_.globaleFehler, wiederholung: a_.wiederholung, zuege: a_.zuege, abweichungen: a_.abweichungen, konv: a_.konv, dauer: a_.dauer, einheiten: a_.einheitenZahl, zeilen: a_.zeilenZahl}
+  const roh = opt.probe ? {gueltig: a_.ergebnis.gueltig, befund: a_.ergebnis.befund, globaleFehler: a_.globaleFehler, wiederholung: a_.wiederholung, technisch: a_.technisch, zuege: a_.zuege, abweichungen: a_.abweichungen, konv: a_.konv, dauer: a_.dauer, einheiten: a_.einheitenZahl, zeilen: a_.zeilenZahl}
     : {...a_, ergebnis: {...a_.ergebnis, wertungen: Object.fromEntries(Object.entries(a_.ergebnis.wertungen).map(([k, z]) => { const {d, kiSteine, kiPaesse, abwMit, abwNur, ...rest} = z; return [k, rest]; }))}};
   fs.writeFileSync(path.join(opt.aus, 'zahlen.json'), JSON.stringify(roh, null, 1));
   console.log(md);
