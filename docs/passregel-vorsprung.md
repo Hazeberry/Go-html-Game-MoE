@@ -114,9 +114,15 @@ Workflow sind vorbereitet; **gestartet wird erst nach dem Merge dieser Umsetzung
   Lauf 42331033107, holt `index.html` per `git show` aus dem Commit `7d57e2bf1826904be9c4e6f8a59164db632d032f` (nicht aus dem
   aktuellen Stand) und listet vor der Rechnung die Dateien des Artefakts. Erwartet werden `stufe-a/einheiten.jsonl` und
   `teile/teil-*.jsonl`; **ob diese Pfade im Artefakt so liegen, ist ungeprüft** und ist Teil von Schritt 0. Fehlt etwas, endet der Lauf
-  rot mit „nicht auswertbar“.
+  rot mit „nicht auswertbar“ (Exit 1).
 - **Tests:** `tests/passregel-vorsprung.js` (ohne Rohdaten: Zerlegung als Rechenidentität auf Zufallsbrettern, Schritt 0,
   Identitätskontrolle, V und Vorzeichen, Zugfolge gegen Brett, Kommandozeile; sieben Mutationsproben, jede erkannt).
+- **Gültigkeit (nur zwei Zustände):** Der Lauf ist **ungültig und endet rot** (Exit 1, „KEIN URTEIL“ mit Grund im Bericht, der
+  Bericht entsteht trotzdem), wenn eine ausgelöste Einheit **nicht auswertbar** ist (fehlende Ergebniszeile oder fehlendes
+  Pflichtfeld: `arm1`, `diagnose.anfang`, Brett, Gefangene, Tot-Liste, `mit`, `nur`, Zugfolge), wenn die **Identitätskontrolle**
+  bei einer Einheit nicht besteht, wenn die **Zugfolge** ein anderes Brett oder andere Gefangene ergibt als `diagnose.anfang`, oder
+  wenn eine Wertung keine ausgelöste Einheit hat. Sonst ist er gültig (Exit 0). „Gültig“ heißt nur, dass die Daten vollständig und
+  die Kontrollen bestanden sind, nicht, dass eine Ursache gefunden wäre.
 - **Zusätzliche Kontrolle:** Die Zugfolge der Einheit muss dasselbe Brett und dieselben Gefangenen ergeben wie `diagnose.anfang`.
   Sonst wird die Einheit nicht zerlegt.
 - Ein Lauf ergibt höchstens Beschreibung und Zerlegung; er ändert weder Schwellen noch Spiel und aktiviert die Passregel nicht.

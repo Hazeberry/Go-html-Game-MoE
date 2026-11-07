@@ -195,14 +195,31 @@ function auswerten(E, einheiten, ergebnisse, optionen = {}) {
     out.schritt2[w] = zer;
   }
   out.schritt1.ueberlappungFlaecheTerritory = [...vSchluessel.flaeche].filter(k => vSchluessel.territory.has(k));
+  out.gueltigkeit = gueltigkeit(out);
   return out;
+}
+
+/* Gültigkeit: nur zwei Zustände. Ungültig heißt „KEIN URTEIL“ mit Grund und der Lauf wird rot (Exit 1); der Bericht entsteht trotzdem.
+   Ungültig ist der Lauf bei fehlenden Ergebniszeilen oder Pflichtfeldern (Einheit nicht auswertbar), bei durchgefallener
+   Identitätskontrolle und bei Zugfolge ≠ diagnose.anfang. Bei keiner ausgelösten Einheit gibt es nichts auszuwerten. */
+function gueltigkeit(out) {
+  const gruende = [];
+  for (const w of WERTUNGEN) {
+    const s0 = out.schritt0[w];
+    if (s0.N === 0) gruende.push(`${w}: keine ausgelöste Einheit`);
+    if (s0.nichtAuswertbar.length) gruende.push(`${w}: ${s0.nichtAuswertbar.length} von ${s0.N} Einheit(en) nicht auswertbar (fehlende Ergebniszeile oder Pflichtfeld; Felder: ${JSON.stringify(Object.fromEntries(Object.entries(s0.fehlendeFelder).filter(([, n]) => n)))})`);
+    if (s0.identitaet.durchgefallen.length) gruende.push(`${w}: Identitätskontrolle bei ${s0.identitaet.durchgefallen.length} Einheit(en) nicht bestanden`);
+    if (s0.replayAbweichung.length) gruende.push(`${w}: Zugfolge ≠ diagnose.anfang bei ${s0.replayAbweichung.length} Einheit(en)`);
+  }
+  return {gueltig: gruende.length === 0, gruende};
 }
 
 function bericht(out) {
   const md = ['# Passregel: Untersuchung der Vorsprungsprüfung (nur Rechnung)', '',
     `Code des Hauptlaufs: Commit \`${out.kopf.hauptlaufCommit}\`; SHA-256 der benutzten index.html: \`${out.kopf.htmlSha256}\`.`,
     `Parameter: ${JSON.stringify(out.kopf.parameter)}. Quelle der Daten: ${out.kopf.quelle || 'nicht angegeben'}.`,
-    'Referenzstand: Fläche = GNU Gos final_score, Territory = App-Rechnung mit GNU Gos Tot-Liste. Alles beschreibend, kein Urteil, keine Änderung am Spiel.', ''];
+    'Referenzstand: Fläche = GNU Gos final_score, Territory = App-Rechnung mit GNU Gos Tot-Liste. Alles beschreibend, kein Urteil, keine Änderung am Spiel.', '',
+    out.gueltigkeit.gueltig ? '**Lauf gültig.** (Schritt 0 vollständig, Identitätskontrolle und Zugfolge bestanden.)' : `**KEIN URTEIL: ${out.gueltigkeit.gruende.join(' | ')}**`, ''];
   for (const w of WERTUNGEN) {
     const s0 = out.schritt0[w], s1 = out.schritt1[w], s2 = out.schritt2[w];
     md.push(`## ${w}`, '', '### Schritt 0: Datenprüfung', '',
@@ -254,6 +271,7 @@ function main() {
   const md = bericht(out);
   fs.writeFileSync(path.join(opt.aus, 'vorsprung.md'), md);
   console.log(md);
+  if (!out.gueltigkeit.gueltig) { console.error('KEIN URTEIL: ' + out.gueltigkeit.gruende.join(' | ')); process.exit(1); }
 }
 if (require.main === module) main();
-module.exports = {motor, brettAusText, pruefeFelder, einspielen, identitaet, zerlege, auswerten, bericht, HAUPTLAUF_COMMIT, FELDER};
+module.exports = {motor, brettAusText, pruefeFelder, einspielen, identitaet, zerlege, auswerten, gueltigkeit, bericht, HAUPTLAUF_COMMIT, FELDER};

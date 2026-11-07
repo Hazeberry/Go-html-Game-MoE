@@ -172,6 +172,26 @@ test('Werkzeug: Kommandozeile schreibt Bericht und JSON; fehlende Dateien ergebe
     const j = JSON.parse(fs.readFileSync(path.join(aus, 'vorsprung.json'), 'utf8'));
     pruefeGleich(j.kopf.hauptlaufCommit, V.HAUPTLAUF_COMMIT, 'Commit im JSON'); pruefeGleich(j.kopf.quelle, 'Test', 'Quelle im JSON');
     pruefeGleich(j.kopf.parameter.passNachGegnerpass, 1, 'Parameter: Versuchsregel eingeschaltet, wie in Stufe A');
+    /* gültig: Exit 0 und „Lauf gültig“ */
+    pruefe(/Lauf gültig/.test(fs.readFileSync(path.join(aus, 'vorsprung.md'), 'utf8')) && j.gueltigkeit.gueltig === true, 'vollständige Daten: Lauf gültig');
+    /* fehlende Ergebniszeile, fehlendes Pflichtfeld, durchgefallene Identität, Zugfolge ≠ Brett: Exit 1, Bericht entsteht trotzdem, KEIN URTEIL */
+    const w = e.ausgeloest.flaeche ? 'flaeche' : 'territory', gut = zeileZu(E, e, -30);
+    const faelle = {
+      'fehlende Ergebniszeile': {zeilen: [], einheit: e},
+      'fehlendes Pflichtfeld (Brett)': {zeilen: [mit(gut, z => { delete z.diagnose.anfang.brett; })], einheit: e},
+      'fehlende Tot-Liste': {zeilen: [mit(gut, z => { delete z.diagnose.anfang.tote; })], einheit: e},
+      'fehlender Referenzstand': {zeilen: [mit(gut, z => { z.arm1[w] = null; })], einheit: e},
+      'Identitätskontrolle durchgefallen': {zeilen: [gut], einheit: mit(e, k => { k.pruef[w].mit += 1; })},
+      'nur die Zugfolge weicht ab (Identität besteht)': {zeilen: [gut], einheit: mit(e, k => { const frei = [...Array(361).keys()].map(L.zuGtp).find(c => !k.zuege.includes(c)); k.zuege[0] = frei; })},
+      'Zugfolge ≠ diagnose.anfang': {zeilen: [mit(gut, z => { const b = z.diagnose.anfang.brett, i = b.search(/[XO]/); z.diagnose.anfang.brett = b.slice(0, i) + '.' + b.slice(i + 1); })], einheit: e}};
+    for (const [name, f] of Object.entries(faelle)) {
+      const d2 = path.join(dir, 'f-' + name.replace(/\W+/g, '_')), eh2 = path.join(d2, 'einheiten.jsonl'), er2 = path.join(d2, 'teil-1.jsonl'), aus2 = path.join(d2, 'aus');
+      fs.mkdirSync(d2, {recursive: true}); fs.writeFileSync(eh2, JSON.stringify(f.einheit) + '\n'); fs.writeFileSync(er2, f.zeilen.map(z => JSON.stringify(z)).join('\n') + '\n');
+      const r2 = spawnSync(process.execPath, [werkzeug, '--einheiten', eh2, '--ergebnisse', er2, '--html', html, '--aus', aus2], {encoding: 'utf8'});
+      pruefeGleich(r2.status, 1, `${name}: Exit 1 (rot)`);
+      pruefe(fs.existsSync(path.join(aus2, 'vorsprung.md')) && /KEIN URTEIL/.test(fs.readFileSync(path.join(aus2, 'vorsprung.md'), 'utf8')), `${name}: Bericht entsteht, KEIN URTEIL`);
+      pruefe(JSON.parse(fs.readFileSync(path.join(aus2, 'vorsprung.json'), 'utf8')).gueltigkeit.gueltig === false, `${name}: gueltigkeit.gueltig false`);
+    }
     const fehl = spawnSync(process.execPath, [werkzeug, '--einheiten', path.join(dir, 'gibtsnicht.jsonl'), '--ergebnisse', erg, '--html', html, '--aus', path.join(dir, 'aus2')], {encoding: 'utf8'});
     pruefeGleich(fehl.status, 1, 'fehlende Datei: Exit 1'); pruefe(/nicht auswertbar/.test(fehl.stdout), 'Schritt 0: nicht auswertbar');
     const ohneErg = spawnSync(process.execPath, [werkzeug, '--einheiten', eh, '--ergebnisse', ',', '--html', html, '--aus', path.join(dir, 'aus3')], {encoding: 'utf8'});

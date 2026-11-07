@@ -9,6 +9,9 @@ name: Passregel Vorsprungsprüfung
 # Der Code der Zählvorschau ist an den Hauptlauf gebunden: index.html wird per `git show` aus dem Commit des Hauptlaufs
 # geholt (nicht aus dem aktuellen Stand). Der SHA-256 der benutzten Datei steht im Bericht.
 #
+# Ungültig (Exit 1, Job rot, „KEIN URTEIL“ im Bericht): fehlende Dateien, Ergebniszeilen oder Pflichtfelder, durchgefallene
+# Identitätskontrolle, Zugfolge ≠ Brett. Der Bericht und das Artefakt entstehen trotzdem.
+#
 # Keine Eingaben: Lauf, Artefakt und Commit stehen in der Vorabfestlegung.
 on:
   workflow_dispatch:
