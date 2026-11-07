@@ -3,7 +3,7 @@
 Vorabfestlegung, 06.11.2026, überarbeitet nach Durchsicht am selben Tag (Voraussetzung Gegnerpass,
 Passregel im Arm „weiter“ aus, Ausfälle konservativ, Nenner, Unabhängigkeit, Territory-Kontrollen) und nach Probe 1
 nachgebessert (§9 Nr. 5 und Nr. 7, §13).
-Status: **Umgesetzt; Stufe A abgeschlossen, Probe 1 ungültig, Probe 2 gültig (§13). Der Hauptlauf ist nicht freigegeben.** Das
+Status: **Umgesetzt; Stufe A abgeschlossen, Probe 1 ungültig, Probe 2 laut Auswertung gültig (§13a). Der Hauptlauf ist nicht freigegeben.** Das
 Spiel bleibt unverändert (`passNachGegnerpass` bleibt 0). Zahlen zu den Auslösungen stehen in §13; zur Wirkung der
 Regel gibt es keine Zahl. Dies ist die Ausführung von §4 in
 [`passregel-versuch.md`](passregel-versuch.md); dort stehen Regel und Einzelrechnung.
@@ -440,8 +440,8 @@ geändert (§9 Nr. 5, ab Probe 2). Probe 1 bleibt ungültig.
 **Quelle: ausschließlich das Auswertungs-Log** (Job „Auswertung“, Job-ID 128258509364) des Actions-Laufs 42324497564 auf
 `main` am Merge-Commit `532874ae079a2441c92f5745f667208edfe2b24d`. Die hier berichteten Zahlen stammen ausschließlich aus dem
 Auswertungs-Log. Der berichtende Assistent konnte das Artefakt `bericht` (ID 13554508128) wegen der Proxy-Sperre (Forbidden)
-nicht herunterladen und hat die Rohdaten nicht gelesen. Sie wurden nicht unter `docs/daten/` abgelegt. Hazeberry hat die
-Gültigkeit **nicht** unabhängig an den Rohdaten geprüft; auch die Log-Zahlen sind nicht unabhängig geprüft.
+nicht herunterladen und hat die Rohdaten nicht gelesen. Sie wurden nicht unter `docs/daten/` abgelegt. Die Gültigkeit
+wurde durch den berichtenden Assistenten nicht unabhängig an den Rohdaten geprüft; auch die Log-Zahlen sind nicht unabhängig geprüft.
 
 **Probe 2** (Lauf 42324497564, Go von Hazeberry für Stufe B, laut Auswertung **„Lauf gültig“**, alle fünf Jobs grün, Dauer gut
 sieben Minuten): Das ist ein technischer Befund. Er sagt nichts über die Wirkung der Regel, und es wurden keine Wirkungszahlen berichtet.
