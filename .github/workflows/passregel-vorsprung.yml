@@ -1,0 +1,75 @@
+name: Passregel Vorsprungsprüfung
+
+# Manueller Lauf aus docs/passregel-vorsprung.md: Warum meldet die Vorsprungsprüfung Vorsprung, obwohl der Referenzstand die
+# Stellung als verloren zeigt? NICHT STARTEN ohne ausdrückliches Go von Hazeberry für genau diesen Lauf (CLAUDE.md).
+# Reine Rechnung auf den Rohdaten der Stufe C (Lauf 42331033107, Artefakt `bericht`, ID 13557498693): KEIN GNU Go, KEINE
+# Partie, KEINE Änderung am Spiel. Schritt 0 prüft die Daten, Schritt 1 beschreibt, Schritt 2 zerlegt nach bestandener
+# Identitätskontrolle.
+#
+# Der Code der Zählvorschau ist an den Hauptlauf gebunden: index.html wird per `git show` aus dem Commit des Hauptlaufs
+# geholt (nicht aus dem aktuellen Stand). Der SHA-256 der benutzten Datei steht im Bericht.
+#
+# Keine Eingaben: Lauf, Artefakt und Commit stehen in der Vorabfestlegung.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: passregel-vorsprung
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  LAUF: '42331033107'
+  ARTEFAKT_ID: '13557498693'
+  HAUPTLAUF_COMMIT: 7d57e2bf1826904be9c4e6f8a59164db632d032f
+
+jobs:
+  vorsprung:
+    name: Vorsprungsprüfung, Schritt 0 bis 2
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ env.ARTEFAKT_ID }}
+          run-id: ${{ env.LAUF }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: daten
+
+      - name: Vorsprungsprüfung
+        run: |
+          set -uo pipefail
+          mkdir -p vorsprung
+          # Schritt 0: was liegt im Artefakt?
+          find daten -maxdepth 2 | sort > vorsprung/dateien.txt
+          # index.html des Hauptlaufs, nicht des aktuellen Stands
+          git show "${HAUPTLAUF_COMMIT}:index.html" > html-hauptlauf.html
+          sha256sum html-hauptlauf.html > vorsprung/html-hauptlauf.sha256
+          ergebnisse=$(ls daten/teile/teil-*.jsonl 2>/dev/null | paste -sd, - || true)
+          status=0
+          node auswertung/endspiel/passregel-vorsprung.js --einheiten daten/stufe-a/einheiten.jsonl \
+            --ergebnisse "$ergebnisse" --html html-hauptlauf.html --aus vorsprung \
+            --artefakt "Lauf ${LAUF}, Artefakt bericht ${ARTEFAKT_ID}" || status=$?
+          { echo '### Dateien im Artefakt'; echo '```'; cat vorsprung/dateien.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          cat vorsprung/vorsprung.md >> "$GITHUB_STEP_SUMMARY" || true
+          exit "$status"
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: vorsprung
+          path: vorsprung/
+          retention-days: 90

@@ -101,3 +101,22 @@ anderem Besitzer oder als neutral/seki/dame geführt, (c) Gefangene. Die Summe m
   Rohdaten ohne Go.
 - Grenzen: 18 und 11 Fälle sind wenig; Verteilungen sind beschreibend. Die Zahlen aus Stufe C stammen aus dem Auswertungs-Log
   des berichtenden Assistenten und aus der getrennten Prüfung durch 6.1 Sol (ChatGPT), siehe §15 in `passregel-vergleich.md`.
+
+## 8. Umsetzung (07.11.2026)
+
+Hazeberry hat das Go für diese Untersuchung erteilt. Die Rechnung läuft **in GitHub Actions**, weil das Artefakt dort erreichbar
+ist (aus der Arbeitsumgebung ist der Download gesperrt) und weil sie ohnehin nur lesend auf Rohdaten arbeitet. Werkzeug, Tests und
+Workflow sind vorbereitet; **gestartet wird erst nach dem Merge dieser Umsetzung**.
+
+- **Werkzeug:** `auswertung/endspiel/passregel-vorsprung.js` (Schritt 0, 1 und 2 wie in §3 und §5). Es nutzt GNU Go nicht, spielt
+  keine Partie und ändert nichts am Spiel. Der Bericht trägt den Hauptlauf-Commit und den SHA-256 der benutzten `index.html`.
+- **Workflow:** `.github/workflows/passregel-vorsprung.yml`, ohne Eingaben. Er lädt das Artefakt `bericht` (ID 13557498693) aus
+  Lauf 42331033107, holt `index.html` per `git show` aus dem Commit `7d57e2bf1826904be9c4e6f8a59164db632d032f` (nicht aus dem
+  aktuellen Stand) und listet vor der Rechnung die Dateien des Artefakts. Erwartet werden `stufe-a/einheiten.jsonl` und
+  `teile/teil-*.jsonl`; **ob diese Pfade im Artefakt so liegen, ist ungeprüft** und ist Teil von Schritt 0. Fehlt etwas, endet der Lauf
+  rot mit „nicht auswertbar“.
+- **Tests:** `tests/passregel-vorsprung.js` (ohne Rohdaten: Zerlegung als Rechenidentität auf Zufallsbrettern, Schritt 0,
+  Identitätskontrolle, V und Vorzeichen, Zugfolge gegen Brett, Kommandozeile; sieben Mutationsproben, jede erkannt).
+- **Zusätzliche Kontrolle:** Die Zugfolge der Einheit muss dasselbe Brett und dieselben Gefangenen ergeben wie `diagnose.anfang`.
+  Sonst wird die Einheit nicht zerlegt.
+- Ein Lauf ergibt höchstens Beschreibung und Zerlegung; er ändert weder Schwellen noch Spiel und aktiviert die Passregel nicht.
