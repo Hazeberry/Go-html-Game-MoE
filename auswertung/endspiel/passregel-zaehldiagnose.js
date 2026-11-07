@@ -87,17 +87,6 @@ const punkte = roh => {
 /* Zahl: nicht negative ganze Zahl, nichts anderes (eine leere Antwort ist keine 0) */
 const zahlAntwort = roh => { const s = ohneKopf(roh).trim(); if (!/^\d+$/.test(s)) throw new Error('keine ganze Zahl: ' + JSON.stringify(s)); return +s; };
 
-function klasseGnugo(p, orig, m) {
-  if (m.alive.has(p)) return orig[p] === 1 ? 'lebend-S' : 'lebend-W';
-  if (m.dead.has(p)) return orig[p] === 1 ? 'tot-S' : 'tot-W';
-  if (m.seki.has(p)) return orig[p] === 1 ? 'seki-S' : 'seki-W';
-  if (m.bt.has(p)) return 'gebiet-S';
-  if (m.wt.has(p)) return 'gebiet-W';
-  if (m.dame.has(p)) return 'dame';
-  return orig[p] ? 'unklassifiziert-Stein' : 'unklassifiziert-leer';
-}
-const NAME_BESITZER = {0: 'neutral', 1: 'S', 2: 'W'};
-
 function analysiere(E, zuege, farben, log) {
   const n = E.BOARD_SIZE, board = new Uint8Array(n), caps = {1: 0, 2: 0};
   for (let j = 0; j < zuege.length; j++) {
@@ -110,7 +99,6 @@ function analysiere(E, zuege, farben, log) {
   const m = {alive: punkte(antwortVon(log, 'final_status_list alive')), dead: punkte(antwortVon(log, 'final_status_list dead')),
              seki: punkte(antwortVon(log, 'final_status_list seki')), wt: punkte(antwortVon(log, 'final_status_list white_territory')),
              bt: punkte(antwortVon(log, 'final_status_list black_territory')), dame: punkte(antwortVon(log, 'final_status_list dame'))};
-  const zb = L.zaehlbestandteile(board, caps, m.dead, KOMI, E.NEIGHBORS);
   /* Brett und Gefangene gegen GNU Go */
   const bretter = [];
   for (const [farbe, f] of [['black', 1], ['white', 2]]) {
@@ -118,32 +106,12 @@ function analysiere(E, zuege, farben, log) {
     for (let k = 0; k < n; k++) if ((board[k] === f) !== bei.has(k)) bretter.push(`${farbe} ${L.zuGtp(k)}`);
   }
   const gb = zahlAntwort(antwortVon(log, 'captures black')), gw = zahlAntwort(antwortVon(log, 'captures white'));
-  /* Punkt für Punkt: GNU Gos Klasse gegen unseren Besitzer */
-  const kreuz = {}, abw = [];
-  for (let p = 0; p < n; p++) {
-    const g = klasseGnugo(p, board, m), o = NAME_BESITZER[zb.besitzer[p]], tot = m.dead.has(p);
-    const k = `${g} → ${o}`; kreuz[k] = (kreuz[k] || 0) + 1;
-    const erwartet = g === 'gebiet-S' ? 'S' : g === 'gebiet-W' ? 'W' : g === 'dame' ? 'neutral' : null;
-    if (erwartet && o !== erwartet) abw.push({punkt: L.zuGtp(p), gnugo: g, unser: o, aufTotemStein: tot});
-    if ((g === 'seki-S' || g === 'seki-W' || g.startsWith('unklassifiziert'))) abw.push({punkt: L.zuGtp(p), gnugo: g, unser: o, aufTotemStein: tot, hinweis: 'Seki oder von GNU Go nicht klassifiziert'});
-  }
-  /* Varianten, GNU Gos Zählung aus den Listen nachzubilden (nur Hinweise, keine Annahme über GNU Gos Regeln) */
-  const zahl = s => s.size, stein = (f, menge) => [...menge].filter(p => board[p] === f).length;
-  const lebS = stein(1, m.alive), lebW = stein(2, m.alive), sekiS = stein(1, m.seki), sekiW = stein(2, m.seki);
-  const v1 = {schwarz: lebS + zahl(m.bt), weiss: lebW + zahl(m.wt)}, v2 = {schwarz: v1.schwarz + sekiS, weiss: v1.weiss + sekiW};
-  for (const v of [v1, v2]) v.stand = v.schwarz - v.weiss - KOMI;
+  const vgl = L.vergleicheZaehlung(board, caps, m, KOMI, E.NEIGHBORS, stand);
   return {brett: Array.from(board, c => '.XO'[c]).join(''), gefangen: {schwarz: caps[1], weiss: caps[2]}, gnugoGefangen: {black: gb, white: gw},
           bretterAbweichungen: bretter, finalScore: {roh: rohFinal, stand},
           listen: Object.fromEntries(Object.entries(m).map(([k, v]) => [k, [...v].sort((a, b) => a - b).map(L.zuGtp)])),
           listenGroesse: Object.fromEntries(Object.entries(m).map(([k, v]) => [k, v.size])),
-          unsereZaehlung: {steine: {schwarz: zb.steine[1], weiss: zb.steine[2]}, gebiet: {schwarz: zb.gebiet[1], weiss: zb.gebiet[2]}, neutral: zb.neutral,
-                           tote: {schwarz: zb.tote[1], weiss: zb.tote[2]}, gefangenMitTot: {schwarz: zb.gefangenMitTot[1], weiss: zb.gefangenMitTot[2]},
-                           flaeche: zb.flaeche, territory: zb.territory,
-                           neutraleRegionen: zb.regionen.filter(r => r.besitzer === 0).map(r => ({groesse: r.groesse, rand: r.rand, punkte: r.punkte.map(L.zuGtp)}))},
-          gnugoAusListen: {variante1_lebendePlusGebiet: v1, variante2_mitSeki: v2,
-                           v1GleichFinalScore: v1.stand === stand, v2GleichFinalScore: v2.stand === stand},
-          abweichungFlaecheAusTotListe: {finalScore: stand, ausTotListe: zb.flaeche.stand, unterschied: zb.flaeche.stand - stand, reproduziert: Math.abs(zb.flaeche.stand - stand) > 1e-9},
-          kreuztabelle: kreuz, punktAbweichungen: abw};
+          ...vgl};
 }
 
 /* ── Einheit prüfen: dieselbe Auslösung wie in Stufe A (Kontrolle gegen eine falsche Stellung) ── */
@@ -241,7 +209,7 @@ async function main() {
       `- Zählbestandteile (unsere Zählung): Schwarz Steine ${u.steine.schwarz} + Gebiet ${u.gebiet.schwarz} = ${u.flaeche.schwarz}; Weiß Steine ${u.steine.weiss} + Gebiet ${u.gebiet.weiss} = ${u.flaeche.weiss}; neutrale Punkte ${u.neutral}; tote Steine Schwarz ${u.tote.schwarz}, Weiß ${u.tote.weiss}`,
       `- Gefangene bisher Schwarz/Weiß ${analyse.gefangen.schwarz}/${analyse.gefangen.weiss} (GNU Go black/white ${analyse.gnugoGefangen.black}/${analyse.gnugoGefangen.white}); Territory aus Tot-Liste ${u.territory.stand}`,
       `- GNU Gos Listen (Anzahl Punkte): ${Object.entries(analyse.listenGroesse).map(([k, x]) => `${k} ${x}`).join(', ')}`,
-      `- Nachbildung aus GNU Gos Listen: Variante 1 (lebende Steine + Gebiet) Stand ${analyse.gnugoAusListen.variante1_lebendePlusGebiet.stand} (${analyse.gnugoAusListen.v1GleichFinalScore ? 'gleich' : 'ungleich'} final_score); Variante 2 (mit Seki-Steinen) Stand ${analyse.gnugoAusListen.variante2_mitSeki.stand} (${analyse.gnugoAusListen.v2GleichFinalScore ? 'gleich' : 'ungleich'})`,
+      `- Nachbildung aus GNU Gos Listen: Variante 1 (lebende Steine + Gebiet) Stand ${analyse.gnugoAusListen.variante1_lebendePlusGebiet.stand} (${analyse.gnugoAusListen.v1GleichFinalScore ? 'gleich' : 'ungleich'} final_score); Variante 2 (mit Seki-Steinen) Stand ${analyse.gnugoAusListen.variante2_mitSeki.stand} (${analyse.gnugoAusListen.v2GleichFinalScore ? 'gleich' : 'ungleich'}); Variante 3 (zusätzlich Punkte toter Steine dem Gegner) Stand ${analyse.gnugoAusListen.variante3_mitPunktenToterSteine.stand} (${analyse.gnugoAusListen.v3GleichFinalScore ? 'gleich' : 'ungleich'}) – Hinweise, keine Annahme über GNU Gos Regeln`,
       `- Neutrale Regionen (unsere Zählung): ${u.neutraleRegionen.length ? u.neutraleRegionen.map(r => `${r.groesse} Punkte, Rand ${r.rand}: ${r.punkte.join(' ')}`).join(' | ') : 'keine'}`,
       `- Tote Koordinaten (GNU Go): ${analyse.listen.dead.join(' ') || '–'}`, `- Seki: ${analyse.listen.seki.join(' ') || '–'}; Dame: ${analyse.listen.dame.join(' ') || '–'}`,
       `- Punkte, an denen GNU Gos Gebiets- oder Dame-Klasse von unserem Besitzer abweicht (und Seki/unklassifiziert): ${analyse.punktAbweichungen.length}`);

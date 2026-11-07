@@ -1,7 +1,7 @@
 # Zähldiagnose: Warum weicht die Fläche aus der Tot-Liste von `final_score` ab?
 
-Vorabfestlegung, 06.11.2026. Status: **vorbereitet, nicht gestartet, kein Go.** Der Lauf braucht ein eigenes ausdrückliches
-Go von Hazeberry. Das Spiel bleibt unverändert. Anlass: Probe 1 des Passregel-Vergleichs
+Vorabfestlegung, 06.11.2026. Status: **Lauf 42317041690 am 07.11.2026 durchgeführt (Go von Hazeberry), gültig; Ergebnis in §8.**
+Das Spiel bleibt unverändert. Anlass: Probe 1 des Passregel-Vergleichs
 ([`passregel-vergleich.md`](passregel-vergleich.md) §13) wurde ungültig, unter anderem weil bei **einer** Stellung
 die Fläche aus GNU Gos Tot-Liste ungleich `final_score` war. Nach der Durchsicht von Hazeberry liegen die Werte drei Punkte
 auseinander (`final_score` B+139,5 gegenüber +136,5 aus der Tot-Liste; von mir nicht nachgeprüft).
@@ -78,8 +78,8 @@ Nur zwei Zustände, gültig oder ungültig. Ungültig heißt „kein Urteil“ m
 
 - Berichtet werden Zahlen und Koordinaten. Eine Ursache wird nur als **Hypothese** genannt, bis sie an der Stellung
   gezeigt ist. Ein einzelner Fall begründet keine allgemeine Aussage über GNU Go.
-- Die Gleichheitsprüfung der Fläche in `passregel-vergleich.md` §9 Nr. 5 bleibt unverändert, bis Hazeberry anhand dieses
-  Befunds etwas anderes entscheidet. Dieser Lauf ändert keine Kontrollregel.
+- Der Lauf selbst ändert keine Kontrollregel. Die Änderung der Kontrollregel in `passregel-vergleich.md` §9 Nr. 5 ist eine
+  eigene, begründete Festlegung nach diesem Befund (§8).
 - Wird die Abweichung nicht reproduziert, ist offen, ob die Version, der Seed oder etwas in Probe 1 (etwa die Stellung
   nach der Fortsetzung statt davor) sie verursacht hat; das wird dann als offen berichtet, nicht erklärt.
 - Ob die Abweichung am Anfang oder am Ende einer Fortsetzung auftrat, hat Probe 1 nicht festgehalten (das Feld `wo`
@@ -97,3 +97,48 @@ folgt ein Bericht mit dem Befund, ohne Auswirkung auf Probe 2 und Hauptlauf; der
   `tests/passregel-zaehldiagnose.js` (Attrappe als ausführbares Programm, Mutationsprobe bestanden).
 - Gemeinsame Funktionen: `L.zaehlbestandteile`, `L.fortsetzungsSeed`, `F.gnugoArgumente`, `F.kalibriereCaptures`.
 - Nicht lokal geprüft: der echte Ablauf mit GNU Go.
+
+## 8. Nachtrag: Ergebnis des Laufs 42317041690 (07.11.2026)
+
+Quelle: Job-Log (Job 128232101736) am Merge-Commit `358ca0951480d9b46e0b7e3f4e4b93b86487bdd9`; der Bericht steht unverändert in
+[`docs/daten/passregel-zaehldiagnose/lauf1/zaehldiagnose.md`](daten/passregel-zaehldiagnose/lauf1/zaehldiagnose.md). **Nicht gesichert:**
+das Artefakt `zaehldiagnose` (ID 13551695622) mit der vollständigen Zugfolge, allen Listen und dem GTP-Protokoll mit den
+unveränderten Antworten; es war aus der Arbeitsumgebung nicht ladbar.
+
+**Gemessen** (Fläche, Ausgangsstellung Index 341, KI Schwarz):
+- Die Diagnose ist gültig; zwei Läufe mit demselben Seed (432182360) liefern in allen 360 Befehlen identische Rohantworten.
+  GNU Go 3.8, Paket `gnugo 3.8-11build2`, Runner-Image 20261101.360.1. Die Version von Probe 1 ist nicht protokolliert, „dieselbe
+  Version“ lässt sich nicht beweisen.
+- `final_score` roh `= B+139.5`; Fläche aus der Tot-Liste 136,5; Unterschied −3. Die Abweichung ist an der Ausgangsstellung
+  **reproduziert**.
+- Unsere Zählung: Schwarz 150 Steine + 100 Gebiet = 250, Weiß 70 + 36 = 106, 5 neutrale Punkte (E19 F19 G19 H19 J19, Rand Schwarz und
+  Weiß), tote Steine Schwarz 1 und Weiß 19, Gefangene 74/20 (gleich GNU Gos `captures`).
+- GNU Gos Listen: alive 220, dead 20, seki 0, white_territory 35, black_territory 84, dame 2 (E19, F19).
+- **Punkte mit abweichender Zuordnung: G19, H19, J19** (GNU Go: Schwarz-Gebiet; unsere Zählung: neutral). Bei allen übrigen Punkten, für die GNU Go
+  ein Gebiet oder Dame nennt (81 + 35 + 2), stimmt die Zuordnung überein; lebende Steine (150 + 70) sind gleich, die Punkte der 20
+  toten Steine nennt GNU Go nicht als Gebiet (Kreuztabelle im Bericht).
+- Nachgerechnet aus den Zahlen des Berichts (Variante 3 im Werkzeug, ein Hinweis ohne Annahme über GNU Gos Regeln): Schwarz 150 lebende
+  Steine + 84 Gebiet + 19 Punkte toter weißer Steine = 253, Weiß 70 + 35 + 1 Punkt toter schwarzer Steine = 106, 253 − 106 − 7,5 =
+  139,5. Die Differenz von 3 entspricht damit genau den drei Punkten.
+
+**Am Code geprüft, keine Hypothese:** Die App zählt nach derselben Regel wie unsere Zählung. In `index.html` zählt `finalAreaScore`
+(Zeile 5812) und `finalTerritoryScore` (Zeile 5835) eine zusammenhängende leere Region nur, wenn sie genau eine Randfarbe hat
+(`borders.size === 1`). Der feste Testfall (`tests/stellungen/zaehldiagnose-pwa206-341.json`, Test in
+`tests/passregel-zaehldiagnose.js`) schneidet beide Funktionen aus `index.html` und zeigt: Die App-Fläche dieser Stellung ist
+250/106, Stand 136,5, gleich unserer Zählung und ungleich `final_score`.
+
+**Eingeschränkt, was daraus folgt:**
+- Der Befund erklärt die drei Punkte Differenz. Er beweist **keinen Fehler der App-Zählung**: beide Verfahren ordnen G19, H19 und J19
+  unterschiedlich zu. **Warum GNU Go diese Zuordnung trifft, bleibt offen.**
+- Gezeigt ist die Abweichung für **diese eine Stellung**. In Probe 1 meldete die Kontrolle unter 11 Einheiten diese eine
+  Abweichung. Ob sie bei anderen Stellungen mit teilweise strittigen Regionen auftritt, ist nicht gezeigt; eine allgemeine Aussage
+  („bei jeder solchen Region“) trägt dieser Befund nicht.
+- Dass die Differenz schon an der Ausgangsstellung liegt, ist gezeigt; ob zusätzlich die Endstellung der Fortsetzung in Probe 1
+  abwich, ist nicht untersucht.
+- Die vollständigen Listen `black_territory` und `white_territory` sind nicht roh gesichert. Der feste Testfall leitet sie aus der
+  Kreuztabelle des Laufs ab (81 + 3 bzw. 35 Punkte) und kennzeichnet das.
+
+**Folge für die Kontrollregel:** `passregel-vergleich.md` §9 Nr. 5 ist begründet geändert (ab Probe 2): Die Gleichheit der
+Flood-Fill-Fläche mit `final_score` wird als Vergleich zweier Zählverfahren berichtet und ist keine Pflicht mehr; Brett, Gefangene,
+Tot-Liste, Komi und die Übereinstimmung mit dem App-Code bleiben Pflicht. Territory bleibt „App-Rechnung mit GNU-Go-Tot-Liste“, die
+Fläche verwendet direkt `final_score`. Probe 1 bleibt ungültig.

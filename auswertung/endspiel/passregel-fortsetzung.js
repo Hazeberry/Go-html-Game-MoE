@@ -65,6 +65,11 @@ function meldeAbweichung(res, wo, z) {
   (res.kontrolle.abweichungen = res.kontrolle.abweichungen || []).push({wo, finalScore: z.finalScore, flaecheAusTotListe: z.flaecheAusTotListe, tote: z.tote, diagnose: z.diagnose});
 }
 const fehlerProgramm = e => /^(GNU Go|Fuego|KI-Gegner)( beendet|: )/.test(e.message);
+/* Art eines Fehlers beim Zählen (docs/passregel-vergleich.md §9 Nr. 5 und Nr. 6):
+   daten      GNU Go hat geantwortet, die Antwort ist unzulässig (z. B. `pass` oder Z99 in der Tot-Liste, unlesbarer final_score) → Pflichtfehler
+   technisch  GNU Go hat nicht geantwortet (Prozess beendet, Fehlerantwort „?“) → konservativ nach der Ausfallregel (§9 Nr. 6)
+   werkzeug   alles andere: ein unerwarteter Fehler im Werkzeug selbst → Pflichtfehler */
+const fehlerArt = e => (e && e.daten ? 'daten' : e && fehlerProgramm(e) ? 'technisch' : 'werkzeug');
 
 function setze(E, board, i, f) {
   board[i] = f;
@@ -91,6 +96,16 @@ async function zaehlung(E, ref, board, caps) {
   /* Diagnose zur Zählabweichung (docs/passregel-vergleich.md §9 Nr. 5): Brett, tote Koordinaten und beide Zählwerte */
   const diagnose = {brett: brettText(board), gefangen: {1: caps[1], 2: caps[2]}, tote: [...tot].sort((a, b) => a - b).map(L.zuGtp),
                     finalScore: fs_, flaecheFinalScore: flaeche, flaecheAusTotListe: flaecheTot, territoryAusTotListe: territory};
+  /* Nur bei einer Abweichung: GNU Gos Listen holen und beide Zählverfahren Punkt für Punkt vergleichen (Koordinaten und
+     Bestandteile, ohne Toleranz). Scheitert das, steht der Grund da; es ist kein Gültigkeitskriterium. */
+  if (Math.abs(flaecheTot - flaeche) >= 1e-9) {
+    try {
+      const m = {dead: tot};
+      for (const [k, art] of [['alive', 'alive'], ['seki', 'seki'], ['wt', 'white_territory'], ['bt', 'black_territory'], ['dame', 'dame']])
+        m[k] = L.totListeAusGtp(await ref.frage('final_status_list ' + art));
+      diagnose.vergleich = L.vergleicheZaehlung(board, caps, m, KOMI, E.NEIGHBORS, flaeche);
+    } catch (err) { diagnose.vergleichFehler = err.message.slice(0, 160); }
+  }
   return {flaeche, territory, flaecheTotListe: Math.abs(flaecheTot - flaeche) < 1e-9, flaecheAusTotListe: flaecheTot, tote: tot.size, finalScore: fs_, diagnose};
 }
 
@@ -166,7 +181,13 @@ async function bearbeiteEinheit(ctx, e) {
       res.arm1 = {flaeche: z.flaeche, territory: z.territory};
       res.kontrolle.flaecheTotListe = z.flaecheTotListe; res.kontrolle.arm1Zaehlung = {tote: z.tote, finalScore: z.finalScore, flaecheAusTotListe: z.flaecheAusTotListe};
       res.diagnose.anfang = z.diagnose; if (!z.flaecheTotListe) meldeAbweichung(res, 'anfang', z);
-    } catch (err) { res.arm1Fehler = err.message.slice(0, 160); }
+    } catch (err) {
+      const art = fehlerArt(err);
+      if (art === 'technisch') res.arm1Fehler = err.message.slice(0, 160);     /* „sofort“ unbekannt: zählt konservativ (§7) */
+      else res.fehler.push(art === 'daten' ? 'Zählung Anfang: unzulässige Daten von GNU Go: ' + err.message.slice(0, 160)
+                                           : 'Zählung Anfang: unerwarteter Fehler ' + (err.stack || err.message).slice(0, 300));
+    }
+    if (res.fehler.length) return res;
     /* Arm 0 „weiter“: Passregel AUS, 120 feste Simulationen, Aufgabe aus, kein adaptives Zeitbudget */
     Object.assign(E.PARAMS, ctx.DEFAULT, {adaptiveBudgetEnabled: 0, mctsFixedSims: opt.sims, resignEnabled: 0});
     E.neuePartie(); E.setzeKrisenDauer(null); E.setzeLebensurteil(null);
@@ -211,6 +232,7 @@ async function bearbeiteEinheit(ctx, e) {
       } else res.arm0 = {status: 'ausfall', grund: ausfall, kiSteine, kiPaesse, folge, passNachGegnerpass: E.PARAMS.passNachGegnerpass, versuch};
     } catch (err) {
       if (err.logik || /^PASSREGEL/.test(err.message)) res.fehler.push('Fortsetzung: ' + err.message);
+      else if (err.daten) res.fehler.push('Zählung Ende: unzulässige Daten von GNU Go: ' + err.message.slice(0, 160));
       else if (fehlerProgramm(err)) res.arm0 = {status: 'ausfall', grund: err.message.slice(0, 200), kiSteine, kiPaesse, folge, passNachGegnerpass: E.PARAMS.passNachGegnerpass, versuch};
       else res.fehler.push('Fortsetzung: unerwarteter Fehler ' + (err.stack || err.message).slice(0, 300));
     }
@@ -282,6 +304,11 @@ function logAbweichungen(r) {
     const d = x.diagnose;
     if (d && d.brett) {
       aus.push(`  gefangen von Schwarz/Weiß: ${d.gefangen[1]}/${d.gefangen[2]}; tote Koordinaten: ${d.tote.join(' ') || '–'}; Territory aus Tot-Liste ${d.territoryAusTotListe}`);
+      if (d.vergleich) {
+        const u = d.vergleich.unsereZaehlung;
+        aus.push(`  Bestandteile (unsere Zählung): Schwarz Steine ${u.steine.schwarz} + Gebiet ${u.gebiet.schwarz}, Weiß Steine ${u.steine.weiss} + Gebiet ${u.gebiet.weiss}, neutral ${u.neutral}, tote Steine S/W ${u.tote.schwarz}/${u.tote.weiss}`);
+        aus.push(`  Punktabweichungen GNU Go gegen unseren Besitzer: ${d.vergleich.punktAbweichungen.map(p => `${p.punkt} (GNU Go ${p.gnugo}, unser Besitzer ${p.unser})`).join('; ') || 'keine'}`);
+      } else if (d.vergleichFehler) aus.push(`  Vergleich mit GNU Gos Listen nicht möglich: ${d.vergleichFehler}`);
       for (let y = 0; y < 19; y++) aus.push('  ' + d.brett.slice(y * 19, y * 19 + 19));
     }
   }
@@ -370,4 +397,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch(e => { console.error(e.stack || e.message); process.exit(1); });
-module.exports = {motor, gnugoArgumente, bearbeiteEinheit, bearbeiteMitWiederholung, wiederholungsPlan, logZeile, logAbweichungen, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};
+module.exports = {motor, fehlerArt, gnugoArgumente, bearbeiteEinheit, bearbeiteMitWiederholung, wiederholungsPlan, logZeile, logAbweichungen, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};
