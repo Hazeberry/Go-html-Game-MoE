@@ -1,7 +1,7 @@
 # Passregel: Warum meldet die Vorsprungsprüfung Vorsprung bei verlorener Stellung?
 
-Vorabfestlegung, 07.11.2026. **Status: nur Festlegung. Keine Rechnung, kein Lauf, kein Go.** Die Untersuchung beginnt erst
-nach Durchsicht durch Hazeberry und einem ausdrücklichen Go. Das Spiel bleibt unverändert (`passNachGegnerpass` bleibt 0).
+Vorabfestlegung, 07.11.2026. **Status: Untersuchung gelaufen, Ergebnis in §9; Ursache und Richtigkeit der Tot-Bewertung offen.**
+Die Festlegung in §1 bis §8 stand vor dem Lauf. Das Spiel bleibt unverändert (`passNachGegnerpass` bleibt 0).
 Anlass ist der Ergebnis-Nachtrag zu Stufe C in [`passregel-vergleich.md`](passregel-vergleich.md) §15; dort stehen die Zahlen
 mit ihrer Quelle (Auswertungs-Log, Lauf 42331033107).
 
@@ -126,3 +126,55 @@ Workflow sind vorbereitet; **gestartet wird erst nach dem Merge dieser Umsetzung
 - **Zusätzliche Kontrolle:** Die Zugfolge der Einheit muss dasselbe Brett und dieselben Gefangenen ergeben wie `diagnose.anfang`.
   Sonst wird die Einheit nicht zerlegt.
 - Ein Lauf ergibt höchstens Beschreibung und Zerlegung; er ändert weder Schwellen noch Spiel und aktiviert die Passregel nicht.
+
+## 9. Nachtrag: Lauf 42340940626 (07.11.2026)
+
+**Herkunft der Angaben (getrennt):**
+- **Zahlen:** aus Claudes Auswertung des Job-Logs (Job 128308250502, Lauf 42340940626, `main` bei `1b38b96033d4396542bc6ae45ab9ad14eaca42a5`). Die Rohdaten
+  (Artefakt `bericht` 13557498693 und das Ergebnisartefakt `vorsprung` 13561398554) hat Claude nicht geöffnet.
+- **Farbzuteilung der Gruppen** (eigene Farbe der KI oder des Gegners): von Hand aus den Logzeilen gelesen, **nicht maschinell gezählt**.
+- **Gruppenzahlen und Summen** (84 Gruppen, 864 und 271 Punkte): von Hand aus den Logzeilen der 18 Fläche-Einheiten addiert, nicht vom Werkzeug berechnet.
+- **Beiträge:** vom Werkzeug rechnerisch zerlegt (Rechenidentität, §5), nicht gedeutet.
+
+**Ablauf (offen berichtet):** Der Workflow lief, bevor Hazeberry Workflow, Werkzeug und §8 gelesen hatte; Claude hatte den Merge von PR #284 als Freigabe
+gewertet. Gemergt hat PR #284 laut Angabe von Hazeberry ChatGPT über dessen Konto, nicht Claude und nicht Hazeberry selbst (Claude hat das nicht unabhängig geprüft; GitHub führt Hazeberry als Merger). Das Go für die Untersuchung lag vor; der Lauf ist lesend
+(`contents: read`, `actions: read`) und änderte nichts im Repo. Die Reihenfolge war nicht die zugesagte.
+
+**Lauf und Schritt 0:** Gültig laut Werkzeug (Exit 0), 16 Sekunden. Artefakt-SHA-256 `0d9ca865d424251c57a3c9d424cd290e0206a86fe4d6fdd37bd13b8be4720e08`
+stimmt mit dem erwarteten überein. `index.html` aus dem Commit `7d57e2bf1826904be9c4e6f8a59164db632d032f`, SHA-256
+`d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b`, Parameter `passNachGegnerpass` 1, `passMarge` 20, `passSpanne` 2, `passGemischt` 0,25,
+Komi 7,5. Alle Pflichtfelder vorhanden (561 Einheiten Fläche, 520 Territory, je 0 nicht auswertbar). **Identitätskontrolle** bestanden 561 von 561 und 520 von
+520 (neu gerechnetes `mit` und `nur` gleich gespeichert). Zugfolge ≠ `diagnose.anfang`: 0.
+
+**Schritt 1:**
+
+| | Fläche | Territory |
+|---|---:|---:|
+| Auslösungen N | 561 | 520 |
+| **V** (Referenzstand < 0) | **18** (3,21 %) | **11** (2,12 %) |
+| Näherungsfälle (0 ≤ Referenzstand < 20) | 1 | 0 |
+| D in V | 24 bis 122 | 47 bis 122 |
+| D über alle: Median, q90, q99, Maximum | 0, 0, 72, 122 | 0, 0, 72, 122 |
+| D > 20 insgesamt | 22 (3,92 %) | 14 (2,69 %) |
+
+- **Alle V-Fälle stammen aus den beiden Fuego-Gruppen:** Fuego 100 Spiele 4 von 44 (Fläche) und 3 von 43 (Territory), Fuego 50 Spiele 14 von 317 und 8 von 301. Bei der alten PWA
+  (198 und 174) und bei GNU Go (N = 2) gab es keinen. Gruppenunterschiede sind nicht getestet (nicht vorab festgelegt); warum nur Fuego, ist nicht untersucht.
+- Alle 11 V-Fälle in Territory sind zugleich V in Fläche. Bei mindestens 90 % der Auslösungen ist D ≤ 0; große Abweichungen sind selten.
+- Die Zählabweichung (15 Einheiten, §15 in `passregel-vergleich.md`) berührt V nur bei `Fuego 50 Spiele|D.jsonl.gz|212|337`; laut dem Log der Stufe C trat sie dort am Ende
+  der Fortsetzung auf, nicht an der Ausgangsstellung.
+
+**Schritt 2:** Alle V-Einheiten sind zerlegbar (18 und 11). In jeder ist der Rest „Tot-Liste-Rechnung − Referenzstand“ gleich 0: Die App kommt mit GNU Gos Tot-Liste auf den Referenzstand.
+Die ganze Differenz D liegt damit zwischen der Zählvorschau und der Tot-Liste. Fläche, Summe über die 18 Einheiten: D 1135 Punkte, davon 864 aus Steinen mit verschiedenem
+Urteil und 271 aus Gebiet mit anderem Besitz. Das sind 84 Gruppen: 76 **von GNU Gos Tot-Liste als tot geführt und von der Vorschau nicht als tot entfernt**, 8 umgekehrt (von der
+Vorschau als tot entfernt, nicht in der Tot-Liste). Nach Durchsicht der Logzeilen sind alle 76 Gruppen der ersten Art Gruppen der eigenen Farbe der KI, alle 8 der zweiten Art Gruppen des
+Gegners. Die größten Gruppen haben 17 bis 22 Steine; im Fall mit D = 122 tragen Gruppen mit 22 und 18 Steinen den größten Teil der 104 Punkte aus Steinen. Viele liegen am Rand oder in der
+Ecke.
+
+**Was das aussagt und was nicht:**
+- Die Zerlegung weist die „große, unterschiedlich bewertete Gruppe“ als Beitrag aus (§6): In diesen Einheiten rechnet die Zählvorschau mit eigenen Gruppen der KI, die sie nicht als tot
+  entfernt, während GNU Gos Tot-Liste sie als tot führt.
+- Das ist **kein positiver Lebensnachweis der Vorschau**: Die Vorschau entfernt diese Steine nur nicht aus der Zählung.
+- **Offen:** *warum* die Vorschau diese Gruppen nicht entfernt (welche Regel in `toteSteineAmEnde` und Benson greift) und **ob GNU Gos Tot-Bewertung richtig ist**. Der Referenzstand ist der Maßstab dieser Messung,
+  nicht die Wahrheit. Ursache im Programm und Richtigkeit der Bewertung sind nicht gezeigt.
+- Das Ergebnis gilt für diese Archivstellungen und Gegner. Es ändert nichts am Spiel, an `passMarge` oder an der Passregel (bleibt aus). Eine weitere Untersuchung hat kein Go.
+

@@ -72,9 +72,9 @@ test('Zerlegung: Summe der Beiträge genau gleich D, auf 300 Zufallsbrettern mit
   pruefe(ok === 1200, `alle 1200 Zerlegungen bestehen (${ok})`);
   pruefe(mitGruppen > 400 && ungleich > 400, `die Fälle sind nicht leer: ${mitGruppen} mit Gruppen, ${ungleich} mit Unterschied zwischen Vorschau und Tot-Liste`);
 });
-test('Zerlegung: eine große, in der Vorschau lebende und laut Tot-Liste tote Gruppe erscheint als Beitrag mit Koordinaten', () => {
+test('Zerlegung: eine große, von GNU Go als tot geführte und von der Vorschau nicht als tot entfernte Gruppe erscheint als Beitrag mit Koordinaten', () => {
   const E = engine(), n = 19, board = new Uint8Array(E.BOARD_SIZE), caps = {1: 0, 2: 0};
-  /* Schwarz: große Gruppe links (Spalten A bis F, 6x19 minus zwei Augen), Weiß: schmale Gruppe rechts; Vorschau hält Schwarz für lebend */
+  /* Schwarz: große Gruppe links (Spalten A bis F, 6x19 minus zwei Augen), Weiß: schmale Gruppe rechts; die Vorschau entfernt Schwarz nicht als tot (das ist kein Lebensnachweis) */
   for (let y = 0; y < n; y++) for (let x = 0; x < 6; x++) board[y * n + x] = 1;
   for (const [x, y] of [[2, 4], [2, 14]]) board[y * n + x] = 0;
   for (let y = 0; y < n; y++) board[y * n + 7] = 2;
