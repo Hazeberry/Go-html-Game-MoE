@@ -441,7 +441,7 @@ geändert (§9 Nr. 5, ab Probe 2). Probe 1 bleibt ungültig.
 `main` am Merge-Commit `532874ae079a2441c92f5745f667208edfe2b24d`. Die hier berichteten Zahlen stammen ausschließlich aus dem
 Auswertungs-Log. Der berichtende Assistent konnte das Artefakt `bericht` (ID 13554508128) wegen der Proxy-Sperre (Forbidden)
 nicht herunterladen und hat die Rohdaten nicht gelesen. Sie wurden nicht unter `docs/daten/` abgelegt. Die Gültigkeit
-wurde durch den berichtenden Assistenten nicht unabhängig an den Rohdaten geprüft; auch die Log-Zahlen sind nicht unabhängig geprüft.
+wurde durch den berichtenden Assistenten nicht unabhängig an den Rohdaten geprüft; auch die Log-Zahlen wurden durch den berichtenden Assistenten nicht unabhängig geprüft.
 
 **Probe 2** (Lauf 42324497564, Go von Hazeberry für Stufe B, laut Auswertung **„Lauf gültig“**, alle fünf Jobs grün, Dauer gut
 sieben Minuten): Das ist ein technischer Befund. Er sagt nichts über die Wirkung der Regel, und es wurden keine Wirkungszahlen berichtet.
