@@ -146,6 +146,32 @@ function zaehleMitTotListe(board, caps, tot, komi, NEIGHBORS, modus) {
   }
   return {schwarz: f[1], weiss: f[2], stand: f[1] - f[2] - komi};
 }
+/* Zählbestandteile (docs/passregel-zaehldiagnose.md): wie zaehleMitTotListe, aber nach Bestandteilen getrennt und mit
+   Besitzer je Punkt. Besitzer: 1 Schwarz, 2 Weiß, 0 neutral (leere Region ohne einfarbigen Rand). Die toten Steine
+   werden entfernt und dem Gegner als Gefangene gutgeschrieben; ihre Punkte werden danach wie leere Punkte behandelt.
+   Regionen: jede zusammenhängende Menge leerer Punkte (nach Entfernung der toten Steine) mit Rand-Farben. */
+function zaehlbestandteile(board, caps, tot, komi, NEIGHBORS) {
+  const n = board.length, b = Uint8Array.from(board), c = {1: caps[1] || 0, 2: caps[2] || 0}, tote = {1: 0, 2: 0};
+  for (const i of tot) if (b[i]) { tote[b[i]]++; c[b[i] === 1 ? 2 : 1]++; b[i] = 0; }
+  const steine = {1: 0, 2: 0}; for (let i = 0; i < n; i++) if (b[i]) steine[b[i]]++;
+  const besitzer = new Int8Array(n), gebiet = {1: 0, 2: 0}, regionen = [], v = new Uint8Array(n);
+  let neutral = 0;
+  for (let i = 0; i < n; i++) {
+    if (b[i]) { besitzer[i] = b[i]; continue; }
+    if (v[i]) continue;
+    const q = [i]; v[i] = 1; let rand = 0;
+    for (let k = 0; k < q.length; k++) for (const nb of NEIGHBORS[q[k]]) {
+      if (!b[nb]) { if (!v[nb]) { v[nb] = 1; q.push(nb); } } else rand |= b[nb];
+    }
+    const eigner = rand === 1 || rand === 2 ? rand : 0;
+    for (const p of q) besitzer[p] = eigner;
+    if (eigner) gebiet[eigner] += q.length; else neutral += q.length;
+    regionen.push({groesse: q.length, rand: rand === 1 ? 'S' : rand === 2 ? 'W' : rand === 3 ? 'SW' : '-', besitzer: eigner, punkte: q.slice()});
+  }
+  const flaeche = {schwarz: steine[1] + gebiet[1], weiss: steine[2] + gebiet[2]}, territory = {schwarz: c[1] + gebiet[1], weiss: c[2] + gebiet[2]};
+  flaeche.stand = flaeche.schwarz - flaeche.weiss - komi; territory.stand = territory.schwarz - territory.weiss - komi;
+  return {steine, gebiet, neutral, gefangenBisher: {1: caps[1] || 0, 2: caps[2] || 0}, tote, gefangenMitTot: c, flaeche, territory, besitzer, regionen};
+}
 const ausSicht = (stand, kiFarbe) => (kiFarbe === 1 ? 1 : -1) * stand;
 const gewonnen = standKI => standKI > 0;   /* Remis zählt als nicht gewonnen (mit Komi 7,5 ohnehin unmöglich) */
 
@@ -248,6 +274,6 @@ function bewerte(einheiten, ergebnisse, kontrollenTerritory = {ok: true, grund: 
   return {wertungen: w, gueltig: beideGueltig, befund, grenze: GRENZE, maxAusfallAnteil: MAX_AUSFALL_ANTEIL};
 }
 
-module.exports = {SPALTEN, zuGtp, vonGtp, mulberry32, fnv32, fortsetzungsSeed, binomCdf, cpIntervall, vorzeichenTestExakt,
+module.exports = {zaehlbestandteile, SPALTEN, zuGtp, vonGtp, mulberry32, fnv32, fortsetzungsSeed, binomCdf, cpIntervall, vorzeichenTestExakt,
   betaI, tCdf, tQuantil, tIntervall, mittel, sd, median, voraussetzung, zaehleMitTotListe, ausSicht, gewonnen,
   standAusFinalScore, totListeAusGtp, leseJsonl, bewerteWertung, bewerte, GRENZE, MAX_AUSFALL_ANTEIL, MIN_N_NULL};

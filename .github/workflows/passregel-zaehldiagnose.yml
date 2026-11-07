@@ -1,0 +1,61 @@
+name: Passregel Zähldiagnose
+
+# Manueller Lauf aus docs/passregel-zaehldiagnose.md: Warum weicht die Fläche aus GNU Gos Tot-Liste von final_score ab
+# (Probe 1: alte PWA, m1, Partie 206, Index 341)? NICHT STARTEN ohne ausdrückliches Go von Hazeberry für genau diesen
+# Lauf (CLAUDE.md). Nur Einspielen und Zählen: keine Fortsetzung, keine Engine-Züge, keine Auswertung der Passregel.
+#
+# Erfasst wird: vollständige archivierte Zugfolge bis zum Index, dieselben GNU-Go-Einstellungen und derselbe Seed wie in
+# der Fortsetzung, GNU-Go-Version (--version, GTP, Paket, Runner-Image), die genaue GTP-Befehlsfolge mit unveränderten
+# Antworten, final_status_list (alive, dead, seki, white_territory, black_territory, dame), final_score und getrennte
+# Zählbestandteile für Schwarz, Weiß und neutrale Punkte. Zwei Läufe mit demselben Seed müssen identisch sein.
+#
+# Keine Eingaben: Einheit und Seed stehen in der Vorabfestlegung.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: passregel-zaehldiagnose
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    name: Zähldiagnose einer Stellung
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - name: Diagnose
+        run: |
+          set -uo pipefail
+          mkdir -p zaehldiagnose
+          paket=$(dpkg-query -W -f='${Package} ${Version}' gnugo)
+          apt-cache policy gnugo > zaehldiagnose/apt-policy.txt || true
+          /usr/games/gnugo --version > zaehldiagnose/gnugo-version.txt 2>&1 || true
+          status=0
+          node auswertung/endspiel/passregel-zaehldiagnose.js \
+            --datei docs/daten/pwa-vergleich/lauf1/m1.jsonl.gz --gruppe "alte PWA" --nr 206 --index 341 --seed-basis 1 \
+            --aus zaehldiagnose --gnugo /usr/games/gnugo --paket-version "$paket" || status=$?
+          cat zaehldiagnose/zaehldiagnose.md >> "$GITHUB_STEP_SUMMARY" || true
+          exit "$status"
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: zaehldiagnose
+          path: zaehldiagnose/
+          retention-days: 90

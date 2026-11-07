@@ -288,11 +288,14 @@ function logAbweichungen(r) {
   return aus;
 }
 
+/* GNU-Go-Argumente des Schiedsrichters: EINE Stelle, damit Fortsetzung und Zähldiagnose dieselben Einstellungen nutzen */
+const gnugoArgumente = seed => ['--mode', 'gtp', '--level', '1', '--chinese-rules', '--komi', String(KOMI), '--seed', String(seed), '--never-resign'];
+
 /* ── echte Programme ──────────────────────────────────────────────────── */
 function echteProgramme(opt) {
   return {
     async startReferee(seed) {
-      const g = gtpStarten(opt.gnugo, ['--mode', 'gtp', '--level', '1', '--chinese-rules', '--komi', String(KOMI), '--seed', String(seed), '--never-resign'], 'GNU Go');
+      const g = gtpStarten(opt.gnugo, gnugoArgumente(seed), 'GNU Go');
       await g.frage('boardsize 19'); await g.frage('clear_board'); await g.frage('komi ' + KOMI);
       return g;
     },
@@ -367,4 +370,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch(e => { console.error(e.stack || e.message); process.exit(1); });
-module.exports = {motor, bearbeiteEinheit, bearbeiteMitWiederholung, wiederholungsPlan, logZeile, logAbweichungen, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};
+module.exports = {motor, gnugoArgumente, bearbeiteEinheit, bearbeiteMitWiederholung, wiederholungsPlan, logZeile, logAbweichungen, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};
