@@ -36,14 +36,21 @@ const KOPF = ['protocol_version', 'name', 'version', 'boardsize 19', 'clear_boar
 /* ── GTP mit Rohantworten: nichts wird getrimmt oder ersetzt ──────────── */
 function gtpRoh(programm, argumente) {
   const p = spawn(programm, argumente, {stdio: ['pipe', 'pipe', 'pipe']});
-  let puffer = '', warte = [], stderr = '';
+  let puffer = '', warte = [], stderr = '', ende = null;
+  p.stdin.on('error', () => {});   /* Schreiben an einen beendeten Prozess (EPIPE) ist kein eigener Fehler */
   p.stderr.on('data', d => { stderr += d.toString(); });
-  p.on('exit', (code, sig) => { for (const w of warte.splice(0)) w(`? Prozess beendet (code ${code}, signal ${sig}) ${stderr.slice(-300)}`); });
+  p.on('close', (code, sig) => { ende = {code, sig}; for (const w of warte.splice(0)) w({beendet: true}); });
   p.stdout.on('data', d => {
     puffer += d.toString(); let k;
-    while ((k = puffer.indexOf('\n\n')) >= 0) { const roh = puffer.slice(0, k); puffer = puffer.slice(k + 2); const w = warte.shift(); if (w) w(roh); }
+    while ((k = puffer.indexOf('\n\n')) >= 0) { const roh = puffer.slice(0, k); puffer = puffer.slice(k + 2); const w = warte.shift(); if (w) w({roh}); }
   });
-  const frage = befehl => new Promise(ok => { warte.push(roh => ok({befehl, roh, ok: /^=/.test(roh)})); p.stdin.write(befehl + '\n'); });
+  /* „beendet“ (Prozess weg) und eine Fehlerantwort „?“ (Befehl abgelehnt) sind getrennte Zustände, kein Text, der erraten wird */
+  const beendet = befehl => ({befehl, roh: `? Prozess beendet (code ${ende.code}, signal ${ende.sig}) ${stderr.slice(-300)}`.trim(), ok: false, beendet: true});
+  const frage = befehl => new Promise(ok => {
+    if (ende) return ok(beendet(befehl));
+    warte.push(a => ok(a.beendet ? beendet(befehl) : {befehl, roh: a.roh, ok: /^=/.test(a.roh), beendet: false}));
+    p.stdin.write(befehl + '\n');
+  });
   return {frage, stderr: () => stderr, ende: () => { try { p.stdin.write('quit\n'); } catch (e) {} p.kill(); }};
 }
 
@@ -54,7 +61,7 @@ async function protokollLauf(gnugo, seed, zuege, farben) {
      endet der Lauf als Fehler, nichts wird als Nutzdaten weiterverarbeitet. */
   const q = async b => {
     const a = await prog.frage(b); log.push({befehl: b, antwort: a.roh});
-    if (!a.ok) fehler.push(`Befehl „${b}“ abgelehnt: ${a.roh}`);
+    if (!a.ok) fehler.push(a.beendet ? `Befehl „${b}“: Prozess beendet: ${a.roh}` : `Befehl „${b}“ abgelehnt: ${a.roh}`);
     return a;
   };
   try {
