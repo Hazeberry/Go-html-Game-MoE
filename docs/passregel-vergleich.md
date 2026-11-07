@@ -3,7 +3,7 @@
 Vorabfestlegung, 06.11.2026, überarbeitet nach Durchsicht am selben Tag (Voraussetzung Gegnerpass,
 Passregel im Arm „weiter“ aus, Ausfälle konservativ, Nenner, Unabhängigkeit, Territory-Kontrollen) und nach Probe 1
 nachgebessert (§9 Nr. 5 und Nr. 7, §13).
-Status: **Umgesetzt; Stufe A abgeschlossen, Probe 1 ungültig (§13). Probe 2 und Hauptlauf nicht freigegeben.** Das
+Status: **Umgesetzt; Stufe A abgeschlossen, Probe 1 ungültig, Probe 2 gültig (§13). Der Hauptlauf ist nicht freigegeben.** Das
 Spiel bleibt unverändert (`passNachGegnerpass` bleibt 0). Zahlen zu den Auslösungen stehen in §13; zur Wirkung der
 Regel gibt es keine Zahl. Dies ist die Ausführung von §4 in
 [`passregel-versuch.md`](passregel-versuch.md); dort stehen Regel und Einzelrechnung.
@@ -386,12 +386,10 @@ Territory mit Steinen und beidseitig akzeptierte `captures`-Zuordnung werden jew
 - **Zählabweichung:** Die Zähldiagnose (Lauf 42317041690, §13) hat die Differenz eingegrenzt (drei Punkte: G19, H19, J19).
   Warum GNU Go sie anders zuordnet als die App-Regel, ist offen. Die Kontrollregel ist dafür geändert (§9 Nr. 5, ab Probe 2).
   Diese Änderung ist eine Vorgabe für die KI-Assistenten; Hazeberry liest sie vor dem Merge.
-- **Stufe B wiederholen** (Probe 2) braucht ein eigenes Go, nach Durchsicht dieser Festlegung einschließlich der geänderten
-  Kontrollregel (§9 Nr. 5). Ob die Probe vor einer Klärung der offenen Frage läuft, warum GNU Go G19, H19 und J19 anders
-  zuordnet, entscheidet Hazeberry; die Kontrolle berichtet diese Abweichung nur noch. Probe 1 ist für Stufe C keine
-  ausreichende Grundlage.
-- **Hauptumfang, Zeitbudget, Einheiten je Paket:** Probe 1 maß je Einheit im Mittel 4 s, höchstens 8 s (§13); das ist
-  ein Hinweis, kein festgelegter Umfang. Der Hauptumfang wird nach Probe 2 festgelegt.
+- **Probe 2** ist gelaufen (§13, gültig laut Auswertungs-Log). Die offene Frage, warum GNU Go G19, H19 und J19 anders
+  zuordnet, blieb offen; die Kontrolle berichtet diese Abweichung nur. Probe 1 ist für Stufe C keine Grundlage.
+- **Hauptumfang, Zeitbudget, Einheiten je Paket:** Probe 1 maß je Einheit im Mittel 4 s, höchstens 8 s, Probe 2 im Mittel
+  5 s, höchstens 10 s (§13); das ist ein Hinweis, kein festgelegter Umfang. Der Hauptumfang ist noch festzulegen.
 - **Stufe C** hat kein Go. Die GNU-Go-Gruppe hat nur 2 Einheiten (§13); die Auswertung berichtet die Gruppen getrennt (§10).
 - Fuego wird im Workflow gebaut (`auswertung/fuego/bauen.sh`, wie in `fuego-siege.yml`).
 
@@ -436,3 +434,33 @@ Index 341) ist `final_score` B+139,5 und die Fläche aus der Tot-Liste 136,5, Un
 Punkten G19, H19 und J19, die GNU Go als Schwarz-Gebiet und die App-Regel als neutral zuordnet. Warum GNU Go so zuordnet, ist
 offen. Beide Verfahren sind verglichen; ein Fehler eines Verfahrens ist damit nicht gezeigt. Daraufhin ist die Kontrollregel
 geändert (§9 Nr. 5, ab Probe 2). Probe 1 bleibt ungültig.
+
+## 13a. Nachtrag: Probe 2 (07.11.2026)
+
+**Quelle: ausschließlich das Auswertungs-Log** (Job „Auswertung“, Job-ID 128258509364) des Actions-Laufs 42324497564 auf
+`main` am Merge-Commit `532874ae079a2441c92f5745f667208edfe2b24d`. Der Download des Artefakts `bericht` (ID 13554508128) war
+aus der Arbeitsumgebung gesperrt (Proxy: Forbidden). **Die Rohdaten sind daher nicht gelesen und nicht unter `docs/daten/`
+abgelegt**; Hazeberry hat die Gültigkeit ebenfalls nicht unabhängig an den Rohdaten geprüft. Alle Zahlen unten sind dem Log
+entnommen.
+
+**Probe 2** (Lauf 42324497564, Go von Hazeberry für Stufe B, laut Auswertung **„Lauf gültig“**, alle fünf Jobs grün, Dauer gut
+sieben Minuten): Das ist ein technischer Befund. Er sagt nichts über die Wirkung der Regel, und es wurden keine Wirkungszahlen berichtet.
+- 11 Einheiten (Fuego 6, GNU Go 2, alte PWA 3), 11 Ergebniszeilen. Fläche und Territory je N = 11, Ausfälle 0, Pflichtfehler 0,
+  technische Ausfälle keine.
+- Nachspiel-Kontrolle bestanden, 10 von 10 in jeder der vier Gruppen. Sie bestätigt nur die Einspielbarkeit der Archivzüge
+  in GNU Go und die Übereinstimmung von `final_score` der Schlussstellung mit dem archivierten Endstand; sie bestätigt nicht,
+  dass die heutige Engine dieselben Züge wählen würde.
+- Wiederholbarkeit (§9 Nr. 7): GNU Go 2 von 2 Einheiten mit je 2 Wiederholungsläufen (4 vollständig, 4 gleich in Zugfolge und
+  Stand), Gegner-KI 3 von 3 (3 vollständig, 3 gleich), Fuego 3 von 3 (3 vollständig, 3 gleich; nur berichtet). Bei GNU Go
+  stützt sich das auf nur 2 Einheiten.
+- `captures`: Konvention „gefangen von“ in allen 11 Stellungen, 10 davon mit ungleichen Gefangenenzahlen.
+- KI-Züge in den Fortsetzungen: 11 reguläre, Steinzüge 3 bis 77 (Median 30), keine Einheit ohne KI-Steinzug.
+- Dauer je Einheit: Mittel 5 s, Maximum 10 s, Summe 0,02 h.
+- **Zählvergleich (Bericht, kein Gültigkeitskriterium):** Nur bei alte PWA, `m1`, Partie 206, Index 341 ist die Fläche aus der
+  Tot-Liste ungleich `final_score` (136,5 gegen B+139,5, Unterschied −3, im Anfangslauf und in der Wiederholung gleich). Die
+  Punktabweichungen sind G19, H19 und J19 (GNU Go: Schwarz-Gebiet, unsere Zählung: neutral). Das ist dieselbe Stellung und
+  dieselbe Differenz wie in Probe 1 und in der Zähldiagnose. **Die Ursache bei GNU Go bleibt offen; ein Fehler der
+  App-Zählung ist nicht belegt.** In den übrigen 10 Stellungen stimmen die Verfahren überein.
+
+**Folgerung:** Probe 2 ist laut Auswertung gültig. Das ist **keine Freigabe für Stufe C**; der Hauptlauf braucht ein eigenes
+Go, und der Hauptumfang ist noch festzulegen (§12).
