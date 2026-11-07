@@ -60,11 +60,16 @@ Nur zwei Zustände, gültig oder ungültig. Ungültig heißt „kein Urteil“ m
 2. **Einheit stimmt:** Die Stufe-A-Prüfung (Schalter 1, in diesem Prozess) löst in dieser Partie bei Fläche oder Territory
    am Index aus; die Voraussetzung „Gegner hat unmittelbar davor gepasst“ ist erfüllt.
 3. **Farben:** die Farben der Aufzeichnung sind gleich den Farben der Einheit.
-4. **Einspielen:** GNU Go nimmt jeden Zug an (Antwort „=“), in beiden Läufen.
+4. **Jeder verlangte GTP-Befehl wird erfolgreich beantwortet:** Kopfbefehle, jeder Zug und jede Abfrage am Ende müssen in
+   beiden Läufen mit „=“ beantwortet werden. Bei der ersten Fehlerantwort („?“) endet der Lauf als Fehler und es wird nichts
+   weiter gesendet. Eine Fehlerantwort wird nie als Nutzdaten gelesen; zwei identische Fehlerantworten bestehen die
+   Wiederholbarkeit nicht.
 5. **Wiederholbarkeit:** die Rohantworten beider Läufe sind identisch.
 6. **Brett und Gefangene:** die Steinlisten der Engine und von GNU Go sind gleich; die Gefangenen stimmen mit der
    kalibrierten `captures`-Konvention überein (nie beide Zuordnungen).
-7. `final_score` und alle Listen sind lesbar.
+7. **Antworten sind gültig:** `final_score` ist lesbar und endlich; jedes Wort in einer Punktliste ist eine gültige
+   Brettkoordinate (kein `pass`, nichts außerhalb des Bretts); `captures` sind nicht negative ganze Zahlen (eine leere
+   Antwort ist keine 0).
 
 **Die Reproduktion der Abweichung ist ein Ergebnis, kein Gültigkeitskriterium:** „Abweichung reproduziert“ oder
 „nicht reproduziert“ sind beide gültige Befunde.

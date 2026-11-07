@@ -50,23 +50,42 @@ function gtpRoh(programm, argumente) {
 /* Ein vollständiger GTP-Ablauf in einem frischen Prozess; Rückgabe: Protokoll aus {befehl, antwort} (Rohtext) */
 async function protokollLauf(gnugo, seed, zuege, farben) {
   const prog = gtpRoh(gnugo, F.gnugoArgumente(seed)), log = [], fehler = [];
-  const q = async b => { const a = await prog.frage(b); log.push({befehl: b, antwort: a.roh}); return a; };
+  /* JEDER verlangte Befehl muss mit „=“ beantwortet werden (Kopf, Züge, Abfragen); bei der ersten Fehlerantwort
+     endet der Lauf als Fehler, nichts wird als Nutzdaten weiterverarbeitet. */
+  const q = async b => {
+    const a = await prog.frage(b); log.push({befehl: b, antwort: a.roh});
+    if (!a.ok) fehler.push(`Befehl „${b}“ abgelehnt: ${a.roh}`);
+    return a;
+  };
   try {
-    for (const b of KOPF) await q(b);
-    for (let j = 0; j < zuege.length; j++) {
-      const a = await q(`play ${farben[j]} ${zuege[j]}`);
-      if (!a.ok) { fehler.push(`Zug ${j} (${farben[j]} ${zuege[j]}) abgelehnt: ${a.roh}`); break; }
-    }
-    if (!fehler.length) for (const b of ABFRAGEN) await q(b);
+    for (const b of KOPF) { await q(b); if (fehler.length) break; }
+    if (!fehler.length) for (let j = 0; j < zuege.length; j++) { await q(`play ${farben[j]} ${zuege[j]}`); if (fehler.length) break; }
+    if (!fehler.length) for (const b of ABFRAGEN) { await q(b); if (fehler.length) break; }
   } finally { prog.ende(); }
   return {log, fehler, stderr: prog.stderr()};
 }
 
 /* ── Auswertung des Protokolls (rein, ohne GNU Go) ────────────────────── */
+/* nur zur Anzeige im Bericht, nie für Nutzdaten: auch eine fehlende oder fehlerhafte Antwort bleibt darstellbar */
+const zeige = roh => (roh === null || roh === undefined ? '–' : String(roh).replace(/^=\s*/, ''));
 const antwortVon = (log, befehl) => { const x = log.find(e => e.befehl === befehl); return x ? x.antwort : null; };
-/* nur das Statuszeichen und die Leerzeichen dahinter; Befehle werden ohne Kennung gesendet, Ziffern gehören zur Antwort */
-const ohneKopf = roh => String(roh).replace(/^[=?]\s*/, '');
-const punkte = roh => L.totListeAusGtp(ohneKopf(roh));
+/* Nutzdaten nur aus einer ERFOLGSantwort („=“): eine Fehlerantwort („?“) wirft, sie wird nie als Nutzdaten gelesen.
+   Entfernt werden nur „=“ und die Leerzeichen dahinter; Befehle werden ohne Kennung gesendet, Ziffern gehören zur Antwort. */
+const ohneKopf = roh => {
+  if (!/^=/.test(String(roh))) throw new Error('Fehlerantwort statt Nutzdaten: ' + JSON.stringify(String(roh).slice(0, 80)));
+  return String(roh).replace(/^=\s*/, '');
+};
+/* Punktliste: jedes Wort muss eine gültige Brettkoordinate sein (kein „pass“, keine Koordinate außerhalb des Bretts) */
+const punkte = roh => {
+  const menge = new Set();
+  for (const w of ohneKopf(roh).split(/\s+/).filter(Boolean)) {
+    if (!/^[A-HJ-T]([1-9]|1[0-9])$/i.test(w)) throw new Error('ungültige Koordinate in einer Punktliste: ' + JSON.stringify(w));
+    menge.add(L.vonGtp(w));
+  }
+  return menge;
+};
+/* Zahl: nicht negative ganze Zahl, nichts anderes (eine leere Antwort ist keine 0) */
+const zahlAntwort = roh => { const s = ohneKopf(roh).trim(); if (!/^\d+$/.test(s)) throw new Error('keine ganze Zahl: ' + JSON.stringify(s)); return +s; };
 
 function klasseGnugo(p, orig, m) {
   if (m.alive.has(p)) return orig[p] === 1 ? 'lebend-S' : 'lebend-W';
@@ -87,6 +106,7 @@ function analysiere(E, zuege, farben, log) {
     board[i] = f; caps[f] += E.removeDeadGroups(board, 3 - f, i);
   }
   const rohFinal = antwortVon(log, 'final_score'), stand = L.standAusFinalScore(ohneKopf(rohFinal));
+  if (!Number.isFinite(stand)) throw new Error('final_score ist nicht endlich: ' + JSON.stringify(rohFinal));
   const m = {alive: punkte(antwortVon(log, 'final_status_list alive')), dead: punkte(antwortVon(log, 'final_status_list dead')),
              seki: punkte(antwortVon(log, 'final_status_list seki')), wt: punkte(antwortVon(log, 'final_status_list white_territory')),
              bt: punkte(antwortVon(log, 'final_status_list black_territory')), dame: punkte(antwortVon(log, 'final_status_list dame'))};
@@ -97,7 +117,7 @@ function analysiere(E, zuege, farben, log) {
     const bei = punkte(antwortVon(log, `list_stones ${farbe}`));
     for (let k = 0; k < n; k++) if ((board[k] === f) !== bei.has(k)) bretter.push(`${farbe} ${L.zuGtp(k)}`);
   }
-  const gb = +ohneKopf(antwortVon(log, 'captures black')), gw = +ohneKopf(antwortVon(log, 'captures white'));
+  const gb = zahlAntwort(antwortVon(log, 'captures black')), gw = zahlAntwort(antwortVon(log, 'captures white'));
   /* Punkt für Punkt: GNU Gos Klasse gegen unseren Besitzer */
   const kreuz = {}, abw = [];
   for (let p = 0; p < n; p++) {
@@ -211,7 +231,7 @@ async function main() {
   md.push('# Zähldiagnose', '', `Einheit ${ergebnis.einheit.schluessel}; KI ${ergebnis.einheit.kiFarbe}; ${ergebnis.einheit.hinweisZugNummer}.`,
     `Folge: ${zuege.length} Züge, SHA-256 ${ergebnis.einheit.folgeSha256}; Archiv gesamt ${rec.zuege.length} Züge.`,
     `Seed ${seed} (aus ${ergebnis.seed.ableitung}); GNU-Go-Argumente: ${ergebnis.gnugo.argumente.join(' ')}`,
-    `GNU Go: ${umgebung.gnugoVersionAusgabe.split('\n')[0]}; Paket ${umgebung.paketVersion || '–'}; Image ${umgebung.imageVersion || '–'}; GTP name/version: ${ohneKopf(antwortVon(laeufe[0].log, 'name') || '')} / ${ohneKopf(antwortVon(laeufe[0].log, 'version') || '')}`,
+    `GNU Go: ${umgebung.gnugoVersionAusgabe.split('\n')[0]}; Paket ${umgebung.paketVersion || '–'}; Image ${umgebung.imageVersion || '–'}; GTP name/version: ${zeige(antwortVon(laeufe[0].log, 'name'))} / ${zeige(antwortVon(laeufe[0].log, 'version'))}`,
     `captures-Kalibrierung: ${kal ? kal.konvention : 'fehlgeschlagen'}. Auslösung (Stufe-A-Prüfung): Fläche ${kontrolle.ausloesung.flaeche}, Territory ${kontrolle.ausloesung.territory}.`, '',
     gueltig ? '**Diagnose gültig.**' : `**Diagnose UNGÜLTIG: kein Urteil.** ${gruende.join(' | ')}`, `Zwei Läufe mit demselben Seed, Rohantworten identisch: ${identisch ? 'ja' : 'NEIN'} (${laeufe[0].log.length} Befehle).`);
   if (analyse) {
@@ -235,4 +255,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch(e => { console.error(e.stack || e.message); process.exit(1); });
-module.exports = {gtpRoh, protokollLauf, analysiere, einheitKontrolle, KOPF, ABFRAGEN};
+module.exports = {gtpRoh, protokollLauf, analysiere, einheitKontrolle, ohneKopf, punkte, zahlAntwort, KOPF, ABFRAGEN};

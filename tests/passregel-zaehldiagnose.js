@@ -48,6 +48,7 @@ const liste = set => { const p = [...set].sort((a, b) => a - b).map(L.zuGtp); co
 let gaukelDame = null;
 require('readline').createInterface({input: process.stdin}).on('line', l => {
   const t = l.trim().split(/\\s+/);
+  if (process.env.STUB_FEHLER_BEI && l.trim() === process.env.STUB_FEHLER_BEI) return out('? cannot do that');
   switch (t[0]) {
     case 'protocol_version': return out('= 2');
     case 'name': return out('= GNU Go Attrappe');
@@ -62,6 +63,7 @@ require('readline').createInterface({input: process.stdin}).on('line', l => {
     case 'list_stones': return out('= ' + liste(stone(t[1] === 'black' ? 1 : 2)));
     case 'captures': return out('= ' + caps[t[1] === 'black' ? 1 : 2]);
     case 'final_score': {
+      if (process.env.STUB_SCHLECHT === 'score') return out('= B+1.2.3');
       const s = zb(process.env.STUB_FINAL_OHNE_TOT ? new Set() : tot()).flaeche.stand + (process.env.STUB_ZUFALL ? Math.floor(Math.random() * 90) / 10 : 0);
       return out('= ' + fmt(s));
     }
@@ -216,6 +218,57 @@ test('Ungültig (kein Urteil): nicht wiederholbar, abgelehnter Zug, falsche Stel
     pruefeGleich(falsch.status, 1, 'falsche Stellung: Exit 1'); pruefe(falsch.j.gruendeUngueltig.some(x => /Voraussetzung|Einheit:/.test(x)), 'falsche Stellung wird erkannt: ' + falsch.j.gruendeUngueltig.join(' | '));
     pruefe(/Diagnose UNGÜLTIG: kein Urteil/.test(falsch.stdout), 'Bericht sagt „kein Urteil“');
   } finally { fs.rmSync(w.dir, {recursive: true, force: true}); }
+});
+
+/* ── 6 Jeder verlangte Befehl muss erfolgreich beantwortet werden ───────── */
+test('Fehlerantworten: jeder Befehl (Kopf, Zug, Abfragen) macht den Lauf zum Fehler und wird nie als Nutzdaten gelesen', async () => {
+  const w = werkstatt(), partie = handPartie(), zuege = partie.zuege.slice(0, 6), farben = zuege.map((_, j) => (j % 2 === 0 ? 'B' : 'W'));
+  const befehle = [...Z.KOPF, `play ${farben[0]} ${zuege[0]}`, `play ${farben[3]} ${zuege[3]}`, ...Z.ABFRAGEN];
+  try {
+    for (const b of befehle) {
+      process.env.STUB_FEHLER_BEI = b;
+      const l = await Z.protokollLauf(w.gnugo, 5, zuege, farben);
+      pruefeGleich(l.fehler.length, 1, `„${b}“ abgelehnt: genau ein Fehler`);
+      pruefe(l.fehler[0].includes(`Befehl „${b}“ abgelehnt: ? cannot do that`), 'Fehlertext nennt Befehl und Rohantwort: ' + l.fehler[0]);
+      pruefeGleich(l.log[l.log.length - 1].befehl, b, `nach der Fehlerantwort auf „${b}“ wird nichts weiter gesendet`);
+    }
+  } finally { delete process.env.STUB_FEHLER_BEI; fs.rmSync(w.dir, {recursive: true, force: true}); }
+});
+
+test('Zwei identische Fehlerantworten bestehen die Wiederholbarkeit nicht: ungültig mit dem Grund des Befehls', () => {
+  const E = engine(), w = werkstatt(), index = erstenIndex(E, handPartie());
+  try {
+    for (const b of ['final_score', 'version', 'final_status_list dead', 'showboard']) {
+      const r = lauf(w, path.join(w.dir, 'x-' + b.replace(/\W+/g, '_')), index, {STUB_FEHLER_BEI: b});
+      pruefeGleich(r.status, 1, `„${b}“ abgelehnt: Exit 1`); pruefeGleich(r.j.gueltig, false, 'ungültig');
+      pruefe(r.j.gruendeUngueltig.some(x => x.startsWith('Lauf 1: ') && x.includes(`Befehl „${b}“ abgelehnt`)) && r.j.gruendeUngueltig.some(x => x.startsWith('Lauf 2: ')),
+        'beide Läufe nennen den abgelehnten Befehl: ' + r.j.gruendeUngueltig.join(' | '));
+      pruefeGleich(r.j.protokollLauf2IdentischMitLauf1, true, 'die Fehlerantworten sind identisch, das reicht trotzdem nicht'); pruefeGleich(r.j.ergebnis, 'kein Urteil', 'kein Ergebnis aus Fehlerantworten'); pruefeGleich(r.j.analyse, null, 'keine Auswertung');
+      pruefe(/Diagnose UNGÜLTIG: kein Urteil/.test(r.stdout), 'Bericht auch bei fehlenden Antworten darstellbar');
+    }
+    const schlecht = lauf(w, path.join(w.dir, 'y'), index, {STUB_SCHLECHT: 'score'});
+    pruefeGleich(schlecht.status, 1, 'nicht endlicher final_score: Exit 1'); pruefe(schlecht.j.gruendeUngueltig.some(x => /Auswertung des Protokolls/.test(x)), schlecht.j.gruendeUngueltig.join(' | '));
+  } finally { fs.rmSync(w.dir, {recursive: true, force: true}); }
+});
+
+test('Nutzdaten streng: Erfolgsantwort, gültige Koordinaten, endlicher final_score, ganze Zahlen', () => {
+  const wirft = f => { try { f(); return false; } catch (e) { return true; } };
+  pruefe(wirft(() => Z.ohneKopf('? bad')), 'eine Fehlerantwort wird nie zu Nutzdaten'); pruefe(wirft(() => Z.ohneKopf('')), 'leere Antwort ist keine Erfolgsantwort');
+  pruefeGleich(Z.ohneKopf('='), '', 'leere Nutzdaten'); pruefeGleich(Z.ohneKopf('= B+1.5'), 'B+1.5', 'Nutzdaten');
+  pruefeGleich(Z.punkte('= A1 B2\nT19').size, 3, 'drei gültige Koordinaten'); pruefeGleich(Z.punkte('=').size, 0, 'leere Liste');
+  for (const schlecht of ['= A1 PASS', '= Z99', '= A20', '= I5', '= A0', '= resign']) pruefe(wirft(() => Z.punkte(schlecht)), `ungültige Koordinate ${schlecht} wird abgelehnt`);
+  pruefe(wirft(() => Z.punkte('? A1 B2')), 'Fehlerantwort als Punktliste wird abgelehnt');
+  pruefeGleich(Z.zahlAntwort('= 12'), 12, '12'); pruefeGleich(Z.zahlAntwort('= 0'), 0, '0');
+  for (const schlecht of ['= ', '=', '= -1', '= 1.5', '= abc', '? 3']) pruefe(wirft(() => Z.zahlAntwort(schlecht)), `keine ganze Zahl: ${JSON.stringify(schlecht)}`);
+  const E = engine(), basis = () => [['list_stones black', '= '], ['list_stones white', '= '], ['captures black', '= 0'], ['captures white', '= 0'], ['final_score', '= B+5.5'],
+    ['final_status_list alive', '= '], ['final_status_list dead', '= '], ['final_status_list seki', '= '], ['final_status_list white_territory', '= '], ['final_status_list black_territory', '= '], ['final_status_list dame', '= '], ['showboard', '= ']].map(([befehl, antwort]) => ({befehl, antwort}));
+  pruefeGleich(Z.analysiere(E, [], [], basis()).finalScore.stand, 5.5, 'gültiges Protokoll wird gelesen');
+  for (const [befehl, antwort, text] of [['final_score', '= B+1.2.3', /nicht endlich/], ['final_score', '? nope', /Fehlerantwort/], ['captures black', '= ', /keine ganze Zahl/], ['captures white', '= -2', /keine ganze Zahl/],
+                                         ['final_status_list dead', '= A1 PASS', /ungültige Koordinate/], ['final_status_list dame', '? x', /Fehlerantwort/], ['list_stones white', '= Z99', /ungültige Koordinate/]]) {
+    const log = basis(); log.find(x => x.befehl === befehl).antwort = antwort;
+    let msg = ''; try { Z.analysiere(E, [], [], log); } catch (e) { msg = e.message; }
+    pruefe(text.test(msg), `${befehl} → ${JSON.stringify(antwort)}: ${msg || 'keine Fehlermeldung'}`);
+  }
 });
 
 laufeTests('Zähldiagnose (Werkzeug, Attrappe)').then(ok => process.exit(ok ? 0 : 1));
