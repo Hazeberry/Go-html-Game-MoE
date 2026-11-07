@@ -30,7 +30,8 @@ const engine = () => _E || (_E = S.motor(html));
 
 /* Attrappe als ausführbares Programm: spielt echte Regeln (Engine-Funktionen), antwortet mit Rohtext wie GNU Go.
    Verhalten über Umgebungsvariablen: STUB_TOT=alleSchwarz, STUB_FINAL_OHNE_TOT=1, STUB_ZUFALL=1, STUB_ABLEHNEN=<Punkt>,
-   STUB_DAME_FALSCH=1 (ein Schwarz-Gebietspunkt wird als Dame gemeldet). */
+   STUB_DAME_FALSCH=1 (ein Schwarz-Gebietspunkt wird als Dame gemeldet),
+   STUB_ABSTURZ_BEI=<Befehlswort> mit STUB_ABSTURZ_NR=<n>: Prozess stirbt beim n-ten solchen Befehl an SIGSEGV. */
 const STUB = abs => `#!/usr/bin/env node
 'use strict';
 const F = require(${JSON.stringify(path.join(abs, 'auswertung/endspiel/passregel-fortsetzung.js'))});
@@ -46,9 +47,11 @@ const zb = dead => L.zaehlbestandteile(board, caps, dead, 7.5, E.NEIGHBORS);
 const fmt = s => (s > 0 ? 'B+' + s : s < 0 ? 'W+' + (-s) : '0');
 const liste = set => { const p = [...set].sort((a, b) => a - b).map(L.zuGtp); const z = []; for (let i = 0; i < p.length; i += 5) z.push(p.slice(i, i + 5).join(' ')); return z.join('\\n'); };
 let gaukelDame = null;
+const zaehler = {};
 require('readline').createInterface({input: process.stdin}).on('line', l => {
   const t = l.trim().split(/\\s+/);
   if (process.env.STUB_FEHLER_BEI && l.trim() === process.env.STUB_FEHLER_BEI) return out('? cannot do that');
+  if (process.env.STUB_ABSTURZ_BEI && t[0] === process.env.STUB_ABSTURZ_BEI) { zaehler[t[0]] = (zaehler[t[0]] || 0) + 1; if (zaehler[t[0]] === Number(process.env.STUB_ABSTURZ_NR || 1)) { process.stderr.write('Attrappe stuerzt ab\\n'); process.kill(process.pid, 'SIGSEGV'); return; } }
   switch (t[0]) {
     case 'protocol_version': return out('= 2');
     case 'name': return out('= GNU Go Attrappe');
@@ -322,6 +325,59 @@ test('Nutzdaten streng: Erfolgsantwort, gültige Koordinaten, endlicher final_sc
     let msg = ''; try { Z.analysiere(E, [], [], log); } catch (e) { msg = e.message; }
     pruefe(text.test(msg), `${befehl} → ${JSON.stringify(antwort)}: ${msg || 'keine Fehlermeldung'}`);
   }
+});
+
+/* ── GTP-Client: Prozessende und Fehlerantwort sind verschiedene Fehlerarten (Fehlerfeld, kein Text) ── */
+const anfrage = async (w, env, befehle) => {
+  const alt = {}; for (const k of Object.keys(env)) { alt[k] = process.env[k]; process.env[k] = env[k]; }
+  const g = F.gtpStarten(w.gnugo, [], 'GNU Go'), fehler = [];
+  try { for (const b of befehle) { try { await g.frage(b); fehler.push(null); } catch (e) { fehler.push(e); } } }
+  finally { g.ende(); for (const k of Object.keys(alt)) { if (alt[k] === undefined) delete process.env[k]; else process.env[k] = alt[k]; } }
+  return fehler;
+};
+test('GTP-Client mit tatsächlich beendetem Prozess: Art „beendet“, Befehl erhalten, kein Textabgleich', async () => {
+  const w = werkstatt();
+  try {
+    /* Absturz beim ersten final_score; der Text der Fehlerfeld-Ursache trägt das berüchtigte „? “ nicht als Art */
+    const [a, b, c] = await anfrage(w, {STUB_ABSTURZ_BEI: 'final_score', STUB_ABSTURZ_NR: '1'}, ['boardsize 19', 'final_score', 'final_score']);
+    pruefe(a === null, 'Befehl vor dem Absturz klappt');
+    pruefe(b && b.gtp, 'Absturz trägt das Fehlerfeld gtp'); pruefeGleich(b.gtp.typ, 'beendet', 'Art beendet'); pruefeGleich(b.gtp.befehl, 'final_score', 'Befehl erhalten');
+    pruefe(/SIGSEGV/.test(b.gtp.text), 'Signal im Text: ' + b.gtp.text); pruefeGleich(F.fehlerArt(b), 'technisch', 'Fehlerart technisch');
+    pruefeGleich(F.technischeUrsache(b).typ, 'beendet', 'Ursache beendet');
+    /* Weiterschreiben an den toten Prozess: wieder „beendet“, kein Werkzeugabsturz (EPIPE) */
+    pruefe(c && c.gtp && c.gtp.typ === 'beendet', 'zweiter Befehl an toten Prozess: beendet'); pruefeGleich(F.fehlerArt(c), 'technisch', 'nicht Werkzeug');
+    /* Absturz erst beim zweiten final_score */
+    const [d, e2] = await anfrage(w, {STUB_ABSTURZ_BEI: 'final_score', STUB_ABSTURZ_NR: '2'}, ['final_score', 'final_score']);
+    pruefe(d === null && e2 && e2.gtp && e2.gtp.typ === 'beendet', 'Absturz beim zweiten final_score');
+  } finally { fs.rmSync(w.dir, {recursive: true, force: true}); }
+});
+test('GTP-Client mit Fehlerantwort „?“: Art „abgelehnt“, auch wenn der Text „beendet“ enthält; Prozess lebt weiter', async () => {
+  const w = werkstatt();
+  try {
+    const [a, b] = await anfrage(w, {STUB_FEHLER_BEI: 'final_score'}, ['final_score', 'boardsize 19']);
+    pruefe(a && a.gtp, 'Fehlerantwort trägt gtp'); pruefeGleich(a.gtp.typ, 'abgelehnt', 'Art abgelehnt'); pruefeGleich(a.gtp.befehl, 'final_score', 'Befehl'); pruefe(/cannot do that/.test(a.gtp.text), 'Fehlertext erhalten');
+    pruefeGleich(F.fehlerArt(a), 'technisch', 'technisch'); pruefe(b === null, 'Prozess lebt weiter');
+    /* Nur der Text ähnelt einem Absturz: bleibt „abgelehnt“ */
+    const x = F.gtpFehler('abgelehnt', 'GNU Go', 'final_score', '? GNU Go beendet (code null, signal SIGSEGV)', 'x');
+    pruefeGleich(F.technischeUrsache(x).typ, 'abgelehnt', 'Text wird nicht ausgewertet');
+    const y = F.gtpFehler('beendet', 'GNU Go', 'final_score', 'ganz harmlos', 'y');
+    pruefeGleich(F.technischeUrsache(y).typ, 'beendet', 'Art kommt aus dem Feld');
+    pruefeGleich(F.fehlerArt(new Error('GNU Go: final_score → ? ...')), 'werkzeug', 'Fremdfehler ohne Feld ist Werkzeugfehler');
+  } finally { fs.rmSync(w.dir, {recursive: true, force: true}); }
+});
+test('Diagnose-Client gtpRoh: Prozessende und Fehlerantwort unterscheiden sich', async () => {
+  const w = werkstatt();
+  const alt = process.env.STUB_ABSTURZ_BEI; process.env.STUB_ABSTURZ_BEI = 'final_score';
+  try {
+    const g = Z.gtpRoh(w.gnugo, []);
+    const a = await g.frage('final_score'), b = await g.frage('name');
+    g.ende();
+    pruefe(a.beendet === true && a.ok === false && /SIGSEGV/.test(a.roh), 'Prozess beendet: ' + a.roh);
+    pruefe(b.beendet === true, 'weiterer Befehl an toten Prozess: ebenfalls beendet, kein Absturz des Werkzeugs');
+    delete process.env.STUB_ABSTURZ_BEI; process.env.STUB_FEHLER_BEI = 'name'; const w2 = Z.gtpRoh(w.gnugo, []);
+    const c = await w2.frage('name'); w2.ende();
+    pruefe(c.beendet === false && c.ok === false && /^\?/.test(c.roh), 'Fehlerantwort: abgelehnt, nicht beendet');
+  } finally { delete process.env.STUB_FEHLER_BEI; if (alt === undefined) delete process.env.STUB_ABSTURZ_BEI; else process.env.STUB_ABSTURZ_BEI = alt; fs.rmSync(w.dir, {recursive: true, force: true}); }
 });
 
 laufeTests('Zähldiagnose (Werkzeug, Attrappe)').then(ok => process.exit(ok ? 0 : 1));

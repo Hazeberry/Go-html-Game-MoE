@@ -41,17 +41,32 @@ function motor(htmlPfad) {
 }
 
 /* ── GTP über Prozesse (wie gnugo-duell.js; ohne Neustart: ein Absturz ist ein Ausfall) ── */
+/* Fehler des GTP-Clients tragen ein FELD `gtp` {typ, programm, befehl, text}: Die Art steht dort, sie wird nie aus dem Text
+   erraten. „beendet“: der Prozess ist weg (auch ein Absturz, während ein Befehl wartete, oder ein Befehl an einen schon
+   beendeten Prozess). „abgelehnt“: GNU Go lebt und hat den Befehl mit einer Fehlerantwort „?“ verweigert. */
+const gtpFehler = (typ, programm, befehl, text, nachricht) => Object.assign(new Error(nachricht), {gtp: {typ, programm, befehl, text: String(text).slice(0, 500)}});
+
 function gtpStarten(programm, argumente, name) {
   const p = spawn(programm, argumente, {stdio: ['pipe', 'pipe', 'pipe']});
-  let puffer = '', warte = [], stderr = '';
+  let puffer = '', warte = [], stderr = '', ende = null;
+  /* Schreiben an einen beendeten Prozess meldet die Pipe als 'error' (EPIPE); das ist kein eigener Fehler und darf das Werkzeug nicht abstürzen lassen */
+  p.stdin.on('error', () => {});
   p.stderr.on('data', d => { stderr += d.toString(); });
-  p.on('exit', (code, sig) => { for (const w of warte.splice(0)) w(`? ${name} beendet (code ${code}, signal ${sig}) ${stderr.slice(-300)}`); });
+  /* 'close' kommt erst, wenn alle Ausgaben gelesen sind: eine Antwort, die vor dem Ende noch ankam, geht nicht verloren */
+  p.on('close', (code, sig) => { ende = {code, sig}; for (const w of warte.splice(0)) w({beendet: true}); });
   p.stdout.on('data', d => {
     puffer += d.toString(); let k;
-    while ((k = puffer.indexOf('\n\n')) >= 0) { const antwort = puffer.slice(0, k); puffer = puffer.slice(k + 2); const w = warte.shift(); if (w) w(antwort); }
+    while ((k = puffer.indexOf('\n\n')) >= 0) { const antwort = puffer.slice(0, k); puffer = puffer.slice(k + 2); const w = warte.shift(); if (w) w({roh: antwort}); }
   });
+  const beendetFehler = befehl => {
+    const text = `code ${ende.code}, signal ${ende.sig} ${stderr.slice(-300)}`.trim();
+    return gtpFehler('beendet', name, befehl, text, `${name} beendet (${text}) bei „${befehl}“`);
+  };
   const frage = befehl => new Promise((ok, fehler) => {
-    warte.push(antwort => antwort.startsWith('=') ? ok(antwort.slice(1).trim()) : fehler(new Error(`${name}: ${befehl} → ${antwort}`)));
+    if (ende) return fehler(beendetFehler(befehl));
+    warte.push(a => (a.beendet ? fehler(beendetFehler(befehl))
+      : a.roh.startsWith('=') ? ok(a.roh.slice(1).trim())
+      : fehler(gtpFehler('abgelehnt', name, befehl, a.roh, `${name}: ${befehl} → ${a.roh}`))));
     p.stdin.write(befehl + '\n');
   });
   return {frage, ende: () => { try { p.stdin.write('quit\n'); } catch (e) {} p.kill(); }};
@@ -64,20 +79,16 @@ const KOMI = 7.5;
 function meldeAbweichung(res, wo, z) {
   (res.kontrolle.abweichungen = res.kontrolle.abweichungen || []).push({wo, finalScore: z.finalScore, flaecheAusTotListe: z.flaecheAusTotListe, tote: z.tote, diagnose: z.diagnose});
 }
-const fehlerProgramm = e => /^(GNU Go|Fuego|KI-Gegner)( beendet|: )/.test(e.message);
+const fehlerProgramm = e => !!(e && e.gtp);   /* Fehler des GTP-Clients, erkannt am Feld, nicht am Text */
 /* Art eines Fehlers beim Zählen (docs/passregel-vergleich.md §9 Nr. 5 und Nr. 6):
    daten      GNU Go hat geantwortet, die Antwort ist unzulässig (z. B. `pass` oder Z99 in der Tot-Liste, unlesbarer final_score) → Pflichtfehler
    technisch  GNU Go hat nicht geantwortet (Prozess beendet, Fehlerantwort „?“) → konservativ nach der Ausfallregel (§9 Nr. 6)
    werkzeug   alles andere: ein unerwarteter Fehler im Werkzeug selbst → Pflichtfehler */
-/* Ursache eines technischen Ausfalls, ungekürzt: Fehlerantwort „?“ heißt „Befehl abgelehnt“ (GNU Go lebt, hat den Befehl aber
-   verweigert), „beendet“ heißt kein Prozess mehr. Befehl und Fehlertext bleiben erhalten, damit eine systematische Fehlbedienung
+/* Ursache eines technischen Ausfalls, ungekürzt, aus dem Fehlerfeld des GTP-Clients: Fehlerantwort „?“ heißt „Befehl abgelehnt“ (GNU Go lebt,
+   hat den Befehl aber verweigert), „beendet“ heißt kein Prozess mehr. Befehl und Fehlertext bleiben erhalten, damit eine systematische Fehlbedienung
    (derselbe Befehl in vielen Einheiten abgelehnt) erkennbar ist. */
-const technischeUrsache = e => {
-  const msg = String(e && e.message || ''), m = /^(GNU Go|Fuego|KI-Gegner): ([\s\S]+?) → ([\s\S]*)$/.exec(msg);
-  if (m) return {typ: 'abgelehnt', programm: m[1], befehl: m[2], text: m[3].slice(0, 500)};
-  const b = /^(GNU Go|Fuego|KI-Gegner) beendet/.exec(msg);
-  return {typ: 'beendet', programm: b ? b[1] : null, befehl: null, text: msg.slice(0, 500)};
-};
+const technischeUrsache = e => (e && e.gtp ? {...e.gtp}
+  : {typ: 'unbekannt', programm: null, befehl: null, text: String(e && e.message || '').slice(0, 500)});   /* Rückfall: ohne Fehlerfeld wird nichts aus dem Text erraten */
 const fehlerArt = e => (e && e.daten ? 'daten' : e && fehlerProgramm(e) ? 'technisch' : 'werkzeug');
 
 function setze(E, board, i, f) {
@@ -406,4 +417,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch(e => { console.error(e.stack || e.message); process.exit(1); });
-module.exports = {motor, fehlerArt, technischeUrsache, gnugoArgumente, bearbeiteEinheit, bearbeiteMitWiederholung, wiederholungsPlan, logZeile, logAbweichungen, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};
+module.exports = {motor, fehlerArt, technischeUrsache, gtpFehler, gtpStarten, gnugoArgumente, bearbeiteEinheit, bearbeiteMitWiederholung, wiederholungsPlan, logZeile, logAbweichungen, setze, echteProgramme, kalibriereCaptures, KALIBRIER_ZUEGE};

@@ -362,9 +362,10 @@ test('Fehlerwege der Zählung: unzulässige Daten = Pflichtfehler, technischer A
     const r = await F.bearbeiteEinheit({E, DEFAULT: _DEFAULT, capturesKonvention: 'gefangen-von', opt, startReferee, startGegner: async () => null}, e);
     return {r, z: V.auswerten({einheiten: [e], zeilen: [{...r, gegner: 'gnugo'}], probe: true})};
   };
-  const werfen = text => () => { throw new Error(text); };
-  const absturz = werfen('GNU Go beendet (code null, signal SIGSEGV) ');
-  const fehlerantwort = werfen('GNU Go: final_score → ? cannot do that');
+  /* Fehler wie der echte GTP-Client sie baut: die Art steht im Feld `gtp`, nicht im Wortlaut */
+  const gtp = (typ, befehl, text, nachricht) => () => { throw F.gtpFehler(typ, 'GNU Go', befehl, text, nachricht); };
+  const absturz = gtp('beendet', 'final_score', 'code null, signal SIGSEGV', 'GNU Go beendet (code null, signal SIGSEGV) bei „final_score“');
+  const fehlerantwort = gtp('abgelehnt', 'final_score', '? cannot do that', 'GNU Go: final_score → ? cannot do that');
   const pflicht = (x, was) => { pruefeGleich(x.z.ergebnis.wertungen.flaeche.gueltig, false, `${was}: Fläche ungültig`); pruefeGleich(x.z.ergebnis.wertungen.territory.gueltig, false, `${was}: Territory ungültig`); pruefeGleich(x.z.ergebnis.gueltig, false, `${was}: Lauf ungültig`); pruefe(/KEIN URTEIL/.test(x.z.ergebnis.befund), `${was}: Befund KEIN URTEIL`); };
   /* 1 bis 3: unzulässige Daten in der Tot-Liste und im final_score beim Arm „sofort“ */
   for (const [name, wert] of [['PASS in der Tot-Liste', 'A1 PASS'], ['Z99 in der Tot-Liste', 'Z99'], ['Koordinate A20', 'A20']]) {
@@ -396,33 +397,41 @@ test('Fehlerwege der Zählung: unzulässige Daten = Pflichtfehler, technischer A
     pruefe(x.r.fehler.some(f => wo.test(f)), `${name}: Pflichtfehler: ${x.r.fehler.join(' | ').slice(0, 200)}`); pruefeGleich(x.r.arm1Fehler, undefined, `${name}: nicht als technischer Ausfall getarnt`); pflicht(x, name);
   }
   /* die Klassifikation selbst */
-  pruefeGleich(F.fehlerArt(Object.assign(new Error('x'), {daten: true})), 'daten', 'Datenfehler'); pruefeGleich(F.fehlerArt(new Error('GNU Go beendet (code 1)')), 'technisch', 'Prozess beendet');
-  pruefeGleich(F.fehlerArt(new Error('GNU Go: final_score → ? x')), 'technisch', 'Fehlerantwort'); pruefeGleich(F.fehlerArt(new Error('Fuego beendet (code 1)')), 'technisch', 'Fuego beendet');
+  pruefeGleich(F.fehlerArt(Object.assign(new Error('x'), {daten: true})), 'daten', 'Datenfehler');
+  pruefeGleich(F.fehlerArt(F.gtpFehler('beendet', 'GNU Go', 'final_score', 'x', 'm')), 'technisch', 'Prozess beendet (Fehlerfeld)');
+  pruefeGleich(F.fehlerArt(F.gtpFehler('abgelehnt', 'Fuego', 'genmove W', '? x', 'm')), 'technisch', 'Befehl abgelehnt (Fehlerfeld)');
+  pruefeGleich(F.fehlerArt(new Error('GNU Go beendet (code 1)')), 'werkzeug', 'ein Wortlaut allein genügt nicht: die Art steht im Fehlerfeld');
+  pruefeGleich(F.fehlerArt(new Error('GNU Go: final_score → ? x')), 'werkzeug', 'auch der Wortlaut einer Fehlerantwort ohne Fehlerfeld ist kein technischer Ausfall');
   pruefeGleich(F.fehlerArt(new TypeError('boom')), 'werkzeug', 'unerwartet'); pruefeGleich(F.fehlerArt(null), 'werkzeug', 'null');
 });
 
 /* ── 7e Technische Ausfälle: Befehl und Fehlertext bleiben, „abgelehnt“ ist nicht „beendet“ ─────── */
 test('Technische Ausfälle: Fehlerantwort „?“ = Befehl abgelehnt (Befehl und Text ungekürzt), Absturz = beendet; systematische Ablehnung erkennbar', async () => {
   const E = engine(), e = await einheitAusHand(E), opt = {sims: 4, maxZuege: 600, seed: 1};
-  const mit = (muster, nummer, text) => { let n = 0; return async () => { const a = attrappe(E), alt = a.frage;
-    a.frage = async b => { if (muster.test(b) && ++n === nummer) throw new Error(text); return alt(b); }; return a; }; };
+  const mit = (muster, nummer, fehler) => { let n = 0; return async () => { const a = attrappe(E), alt = a.frage;
+    a.frage = async b => { if (muster.test(b) && ++n === nummer) throw fehler; return alt(b); }; return a; }; };
+  const abgelehnt = (befehl, text) => F.gtpFehler('abgelehnt', 'GNU Go', befehl, text, `GNU Go: ${befehl} → ${text}`);
   const lauf = startReferee => F.bearbeiteEinheit({E, DEFAULT: _DEFAULT, capturesKonvention: 'gefangen-von', opt, startReferee, startGegner: async () => null}, e);
   /* Fehlerantwort beim Arm sofort */
-  const lang = '? ' + 'sehr langer Fehlertext '.repeat(14), r1 = await lauf(mit(/^final_status_list dead/, 1, `GNU Go: final_status_list dead → ${lang}`));
+  const lang = '? ' + 'sehr langer Fehlertext '.repeat(14), r1 = await lauf(mit(/^final_status_list dead/, 1, abgelehnt('final_status_list dead', lang)));
   pruefeGleich(r1.fehler.length, 0, 'kein Pflichtfehler');
   pruefeGleich(JSON.stringify(r1.arm1Technisch), JSON.stringify({typ: 'abgelehnt', programm: 'GNU Go', befehl: 'final_status_list dead', text: lang.slice(0, 500)}), 'Art, Programm, Befehl und Fehlertext erhalten');
   pruefe(lang.length > 160 && r1.arm1Technisch.text === lang && r1.arm1Fehler.length === 160, `der Fehlertext bleibt ungekürzt (${r1.arm1Technisch.text.length} Zeichen), die alte Kurzfassung bleibt gekürzt`);
   /* Absturz beim Arm sofort */
-  const r2 = await lauf(mit(/^final_score/, 1, 'GNU Go beendet (code null, signal SIGSEGV) boom'));
-  pruefeGleich(r2.arm1Technisch.typ, 'beendet', 'Absturz ist „beendet“'); pruefeGleich(r2.arm1Technisch.programm, 'GNU Go', 'Programm'); pruefeGleich(r2.arm1Technisch.befehl, null, 'kein Befehl beim Absturz'); pruefe(/SIGSEGV/.test(r2.arm1Technisch.text), 'Text erhalten');
+  const r2 = await lauf(mit(/^final_score/, 1, F.gtpFehler('beendet', 'GNU Go', 'final_score', 'code null, signal SIGSEGV boom', 'GNU Go beendet (code null, signal SIGSEGV boom) bei „final_score“')));
+  pruefeGleich(r2.arm1Technisch.typ, 'beendet', 'Absturz ist „beendet“'); pruefeGleich(r2.arm1Technisch.programm, 'GNU Go', 'Programm'); pruefeGleich(r2.arm1Technisch.befehl, 'final_score', 'Befehl beim Absturz bleibt erhalten'); pruefe(/SIGSEGV/.test(r2.arm1Technisch.text), 'Text erhalten');
   /* Fehlerantwort beim Arm weiter */
-  const r3 = await lauf(mit(/^final_score/, 2, 'GNU Go: final_score → ? cannot do that'));
+  const r3 = await lauf(mit(/^final_score/, 2, abgelehnt('final_score', '? cannot do that')));
   pruefeGleich(r3.arm0.status, 'ausfall', 'Ausfall des Arms weiter');
   pruefeGleich(JSON.stringify(r3.arm0.technisch), JSON.stringify({typ: 'abgelehnt', programm: 'GNU Go', befehl: 'final_score', text: '? cannot do that'}), 'auch beim Arm weiter bleiben Befehl und Text erhalten');
   /* Ursachen im Format des echten GTP-Clients */
   const u = F.technischeUrsache;
-  pruefeGleich(JSON.stringify(u(new Error('GNU Go: play B D4 → ? illegal move'))), JSON.stringify({typ: 'abgelehnt', programm: 'GNU Go', befehl: 'play B D4', text: '? illegal move'}), 'Befehl mit Leerzeichen');
-  pruefeGleich(u(new Error('Fuego: genmove W → ? nope')).programm, 'Fuego', 'Fuego'); pruefeGleich(u(new Error('KI-Gegner beendet (code 1, signal null) x')).typ, 'beendet', 'KI-Gegner beendet'); pruefeGleich(u(new Error('KI-Gegner beendet (code 1, signal null) x')).programm, 'KI-Gegner', 'Programm KI-Gegner');
+  pruefeGleich(JSON.stringify(u(abgelehnt('play B D4', '? illegal move'))), JSON.stringify({typ: 'abgelehnt', programm: 'GNU Go', befehl: 'play B D4', text: '? illegal move'}), 'Befehl mit Leerzeichen');
+  pruefeGleich(u(F.gtpFehler('abgelehnt', 'Fuego', 'genmove W', '? nope', 'Fuego: genmove W → ? nope')).programm, 'Fuego', 'Fuego');
+  pruefeGleich(u(F.gtpFehler('beendet', 'KI-Gegner', 'genmove B', 'code 1, signal null x', 'KI-Gegner beendet (code 1, signal null x) bei „genmove B“')).typ, 'beendet', 'KI-Gegner beendet');
+  /* der Fall aus der Durchsicht: ein Absturz, dessen Meldung wie eine Fehlerantwort aussieht, bleibt „beendet“, weil das Fehlerfeld entscheidet */
+  pruefeGleich(u(F.gtpFehler('beendet', 'GNU Go', 'final_score', 'code null, signal SIGSEGV', 'GNU Go: final_score → ? GNU Go beendet (code null, signal SIGSEGV)')).typ, 'beendet', 'Absturz im Wortlaut einer Fehlerantwort bleibt beendet');
+  pruefeGleich(u(new Error('GNU Go: final_score → ? GNU Go beendet (code null, signal SIGSEGV)')).typ, 'unbekannt', 'ohne Fehlerfeld wird nichts aus dem Text erraten');
   /* Bericht: gruppiert nach Art, Befehl und Text; derselbe abgelehnte Befehl in mehreren Einheiten wird als mögliche Fehlbedienung gekennzeichnet */
   const eh = [einheit(0), einheit(1), einheit(2)];
   const zeilenGleich = eh.slice(0, 2).map(x => ({...r1, schluessel: x.schluessel, gegner: 'gnugo'}));
@@ -435,11 +444,11 @@ test('Technische Ausfälle: Fehlerantwort „?“ = Befehl abgelehnt (Befehl und
   pruefeGleich(gemischt.technisch.length, 2, 'abgelehnt und beendet sind getrennte Zeilen'); const mg = V.bericht(gemischt);
   pruefe(/Befehl abgelehnt/.test(mg) && /Prozess beendet \(GNU Go\)/.test(mg) && !/systematische Fehlbedienung/.test(mg), 'abgelehnt und beendet im Bericht getrennt, kein Fehlbedienungs-Hinweis bei Einzelfällen');
   /* zwei VERSCHIEDENE abgelehnte Befehle bleiben getrennte Zeilen und lösen den Hinweis nicht aus */
-  const r4 = await lauf(mit(/^final_score/, 1, 'GNU Go: final_score → ? cannot do that'));
+  const r4 = await lauf(mit(/^final_score/, 1, abgelehnt('final_score', '? cannot do that')));
   const verschieden = V.auswerten({einheiten: eh.slice(0, 2), zeilen: [{...r1, schluessel: eh[0].schluessel, gegner: 'gnugo'}, {...r4, schluessel: eh[1].schluessel, gegner: 'gnugo'}], probe: false});
   pruefeGleich(verschieden.technisch.length, 2, 'zwei verschiedene Befehle: zwei Zeilen'); pruefe(!/systematische Fehlbedienung/.test(V.bericht(verschieden)), 'verschiedene Befehle in je einer Einheit: kein Hinweis');
   /* verschiedene Befehle mit GLEICHEM Fehlertext (der häufige Fall) bleiben getrennte Zeilen */
-  const r5 = await lauf(mit(/^final_status_list dead/, 1, 'GNU Go: final_status_list dead → ? cannot do that'));
+  const r5 = await lauf(mit(/^final_status_list dead/, 1, abgelehnt('final_status_list dead', '? cannot do that')));
   const gleicherText = V.auswerten({einheiten: eh.slice(0, 2), zeilen: [{...r4, schluessel: eh[0].schluessel, gegner: 'gnugo'}, {...r5, schluessel: eh[1].schluessel, gegner: 'gnugo'}], probe: false});
   pruefeGleich(gleicherText.technisch.length, 2, 'zwei Befehle, gleicher Text: zwei Zeilen'); pruefe(!/systematische Fehlbedienung/.test(V.bericht(gleicherText)), 'zwei verschiedene Befehle zählen nicht als derselbe');
   /* derselbe Befehl, anderer Fehlertext: ebenfalls getrennt */
