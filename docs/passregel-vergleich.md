@@ -512,7 +512,7 @@ Gegner. Ein Standardwechsel folgt daraus nicht.
 Actions-Laufs 42331033107 auf `main` am Merge-Commit `7d57e2bf1826904be9c4e6f8a59164db632d032f`. Der berichtende Assistent
 hat die Rohdaten nicht gelesen. Die Rohdaten liegen nicht unter `docs/daten/`.
 
-**Zusätzlich, getrennt davon:** Sol (ChatGPT) hat das Artefakt geladen, die Vollständigkeit der 563 Ergebniszeilen geprüft und
+**Zusätzlich, getrennt davon:** 6.1 Sol (ChatGPT; 6.1 Sol ist die Modellbezeichnung) hat das Artefakt geladen, die Vollständigkeit der 563 Ergebniszeilen geprüft und
 zentrale Kennzahlen aus den Rohfeldern nachgerechnet. Laut dieser Prüfung stimmen sie mit dem Auswertungs-Log überein. Der
 berichtende Assistent hat diese Prüfung nicht selbst nachvollzogen.
 
