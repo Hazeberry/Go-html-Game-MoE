@@ -3,7 +3,7 @@
 Vorabfestlegung, 06.11.2026, überarbeitet nach Durchsicht am selben Tag (Voraussetzung Gegnerpass,
 Passregel im Arm „weiter“ aus, Ausfälle konservativ, Nenner, Unabhängigkeit, Territory-Kontrollen) und nach Probe 1
 nachgebessert (§9 Nr. 5 und Nr. 7, §13).
-Status: **Umgesetzt; Stufe A abgeschlossen, Probe 1 ungültig, Probe 2 laut Auswertung gültig (§13a). Umfang und Zeitbudget für Stufe C stehen als Vorschlag in §14; der Hauptlauf ist nicht freigegeben.** Das
+Status: **Umgesetzt; Stufe A abgeschlossen, Probe 1 ungültig, Probe 2 laut Auswertung gültig (§13a). Stufe C ist gelaufen und laut Auswertung gültig (§15); Umfang und Zeitbudget standen vor dem Start in §14, der Merge von §14 kam erst danach. Aus dem Ergebnis folgt keine Aktivierung der Passregel.** Das
 Spiel bleibt unverändert (`passNachGegnerpass` bleibt 0). Zahlen zu den Auslösungen stehen in §13; zur Wirkung der
 Regel gibt es keine Zahl. Dies ist die Ausführung von §4 in
 [`passregel-versuch.md`](passregel-versuch.md); dort stehen Regel und Einzelrechnung.
@@ -388,9 +388,8 @@ Territory mit Steinen und beidseitig akzeptierte `captures`-Zuordnung werden jew
   Diese Änderung ist eine Vorgabe für die KI-Assistenten; Hazeberry liest sie vor dem Merge.
 - **Probe 2** ist gelaufen (§13, gültig laut Auswertungs-Log). Die offene Frage, warum GNU Go G19, H19 und J19 anders
   zuordnet, blieb offen; die Kontrolle berichtet diese Abweichung nur. Probe 1 ist für Stufe C keine Grundlage.
-- **Hauptumfang, Zeitbudget, Einheiten je Paket:** Vorschlag in §14 (vor einem Go von Hazeberry zu lesen). Erst nach
-  seiner Durchsicht und einem ausdrücklichen Go für Stufe C gilt er.
-- **Stufe C** hat kein Go. Die GNU-Go-Gruppe hat nur 2 Einheiten (§13); die Auswertung berichtet die Gruppen getrennt (§10).
+- **Hauptumfang, Zeitbudget, Einheiten je Paket:** Festlegung in §14, ausgeführt in Stufe C (§15).
+- **Stufe C** ist gelaufen (§15). Weitere Untersuchungen haben kein Go. Die GNU-Go-Gruppe hat nur 2 Einheiten (§13); die Auswertung berichtet die Gruppen getrennt (§10).
 - Fuego wird im Workflow gebaut (`auswertung/fuego/bauen.sh`, wie in `fuego-siege.yml`).
 
 ## 13. Nachtrag: Stufe A und Probe 1 (06.11.2026)
@@ -467,7 +466,7 @@ Go, und der Hauptumfang ist noch festzulegen (§12).
 
 ## 14. Stufe C: Umfang und Zeitbudget (Vorabfestlegung, 07.11.2026)
 
-**Status: Vorschlag.** Er legt fest, was Stufe C ausführen soll, damit der Umfang vor den Zahlen steht. Er ist **kein Go**:
+**Status: Vorschlag, vor dem Start von Stufe C auf dem PR-Branch (Stand `2583eb14889f26112eb80af14b838252b01ab2be`), erst danach gemergt (§15).** Er legt fest, was Stufe C ausführen soll, damit der Umfang vor den Zahlen steht. Er ist **kein Go**:
 Stufe C startet nur nach Durchsicht dieses Abschnitts durch Hazeberry und einem ausdrücklichen Go für genau diese Stufe.
 Es wird nichts gestartet und kein Code und kein Workflow geändert; die Werte werden beim Start als Eingaben übergeben.
 
@@ -506,3 +505,67 @@ bleibt offen; ein Fehler der App-Zählung ist nicht belegt.
 **4. Grenzen dieses Vorschlags.** Die Zeitwerte stammen aus 11 Einheiten und dem Log, die Rechnung zu K aus einer Formel. Der
 Befund aus Stufe C betrifft nur verlorene Siege pro Auslösung (E1, §8) und ist keine Aussage über E2, E3, Menschen oder andere
 Gegner. Ein Standardwechsel folgt daraus nicht.
+
+## 15. Nachtrag: Stufe C, Hauptlauf (07.11.2026)
+
+**Quelle des berichtenden Assistenten: ausschließlich das Auswertungs-Log** (Job „Auswertung“, Job-ID 128279543781) des
+Actions-Laufs 42331033107 auf `main` am Merge-Commit `7d57e2bf1826904be9c4e6f8a59164db632d032f`. Der berichtende Assistent
+hat die Rohdaten nicht gelesen. Die Rohdaten liegen nicht unter `docs/daten/`.
+
+**Zusätzlich, getrennt davon:** Ein Prüfer, nicht der berichtende Assistent, hat laut seiner Angabe das Artefakt geladen, die 563
+Ergebniszeilen gelesen und zentrale Kennzahlen nachgerechnet. Mehr ist über Umfang und Ergebnis dieser Prüfung nicht bekannt;
+der berichtende Assistent hat sie nicht nachgeprüft.
+
+**Reihenfolge (muss dokumentiert bleiben):** Der Vorschlag §14 stand vor dem Start auf dem PR-Branch (PR #281, Stand `2583eb1`,
+CI grün), war aber noch nicht gemergt. Hazeberry gab das Go für Stufe C danach; der Lauf startete um 02:48 UTC, der Merge von
+§14 folgte später (Merge-Commit `90a33beda97ff61e87ca1437eae14655648c2fec`). Das weist für sich keinen technischen Fehler nach. Der
+Workflow-Code war unverändert.
+
+**Lauf** (Go von Hazeberry für Stufe C, laut Auswertung **„Lauf gültig“**): Eingaben wie in §14 (alle Einheiten,
+`einheiten_je_paket` 25). Alle 27 Jobs grün (23 Pakete), 02:48:34 bis 02:57:52 UTC, gut neun Minuten Wanduhr; Dauer je Einheit
+Mittel 4 s, Maximum 14 s, Summe 0,60 h. 563 Einheiten, 563 Ergebniszeilen, keine Pflichtfehler, keine Ausfälle, keine technischen
+Ausfälle, Nachspiel-Kontrolle 10 von 10 je Gruppe. Wiederholungsläufe waren in Stufe C nicht verlangt (§14). Acht Fortsetzungen
+endeten ohne KI-Steinzug (563 reguläre Fortsetzungen insgesamt, Steinzüge 0 bis 77, Median 20).
+
+**E1, verlorene Siege (Endpunkt, §7):** L = Einheiten, in denen „weiter“ gewinnt und „sofort“ verliert; beobachtet wurde kein
+solcher Fall.
+
+| | Fläche | Territory |
+|---|---:|---:|
+| N (Auslösungen) | 561 | 520 |
+| L / A / K | 0 / 0 / 0 | 0 / 0 / 0 |
+| K/N, 95 % Clopper-Pearson | 0,00 % [0,00 %; 0,66 %] | 0,00 % [0,00 %; 0,71 %] |
+| G („weiter“ verliert, „sofort“ gewinnt) | 0 | 4 |
+
+Der vorab festgelegte Wortlaut (§8) trifft in beiden Wertungen zu: **Die obere Konfidenzgrenze für den Anteil verlorener Siege
+liegt unter den Modellannahmen bei höchstens 2 %.** Das ist keine Aussage, dass verlorene Siege nicht vorkommen. Je Gruppe war L
+und A überall 0; die Gruppen tragen N = 2 (GNU Go), 44/43 (Fuego 100 Spiele), 317/301 (Fuego 50 Spiele) und 198/174 (alte PWA)
+(Fläche/Territory). Der Befund wird vom Material aus Fuego 50 Spielen und der alten PWA bestimmt; GNU Go trägt praktisch
+nichts bei. Unabhängigkeit der Einheiten ist eine Modellannahme (§10) und nicht belegt.
+
+**E2 und E3 (beschreibend, kein Urteil nach §8):**
+- Fläche: D = „weiter“ − „sofort“ im Mittel +0,1 [−0,3; +0,5], Median 0,0; „weiter“ besser in 11, schlechter in 7, Vorzeichentest
+  p = 0,48. Das Intervall enthält 0; ein Vorteil einer Seite ist nicht nachgewiesen.
+- Territory: Mittel −15,1 [−16,1; −14,1], Median −15,0; „weiter“ besser in 18, schlechter in 490, Vorzeichentest p < 0,0001. Das
+  gilt für die festgelegte Zählvariante (App-Rechnung mit GNU-Go-Tot-Liste, §5) und lässt sich nicht ohne Weiteres auf Territory-Partien
+  von Menschen übertragen. Ob die zusätzlichen Steinzüge im eigenen Gebiet diesen Unterschied erklären, ist eine Hypothese und nicht
+  gemessen.
+- E3: KI-Steinzüge in „weiter“ im Mittel 20,7 (Fläche) und 20,8 (Territory), KI-Pässe im Mittel 3,0.
+
+**Auslösung bei laut Schiedsrichter bereits verlorener Stellung** („sofort“ verliert): 18 von 561 (Fläche), 11 von 520 (Territory).
+Gerade in diesen Stellungen hätte Weiterspielen einen Sieg retten können; ein solcher Fall (L) wurde nicht beobachtet. Die größte
+Abweichung der Zählvorschau vom GNU-Go-Stand betrug 122,0 Punkte (beide Wertungen), im Mittel 1,2 bis 1,7. Das zeigt eine Grenze
+der Vorsprungsprüfung.
+
+**Zählvergleich (Bericht, kein Gültigkeitskriterium):** Die Fläche aus der Tot-Liste weicht von `final_score` bei **15 Einheiten**
+ab (14 bei der alten PWA, 1 bei Fuego 50 Spielen), nicht nur bei Partie 206, Index 341. Die protokollierten Differenzen reichen
+von −29 bis +10 Punkten. Die Punktabweichungen sind teils Punkte, die GNU Go als „seki“ oder „dame“ führt und unsere Zählung einem
+Besitzer zuordnet, teils Punkte, die GNU Go als Gebiet führt und unsere Zählung als neutral. **Die Ursache ist nicht geklärt; ein
+Fehler der App-Zählung ist nicht belegt.** Die `captures`-Konvention „gefangen-von“ galt in allen 563 Stellungen, 561 davon haben
+ungleiche Gefangenenzahlen.
+
+**Folgerung und Grenzen:** Das Urteil betrifft ausschließlich den Anteil verlorener Siege pro Auslösung (E1, §8), für diese
+Archivstellungen und Gegner (§3), nicht für Menschen. **Daraus folgt keine automatische Aktivierung der Passregel**; `passNachGegnerpass`
+bleibt 0. Ein Standardwechsel braucht eine eigene Festlegung mit E2 und E3 und ein Go, und E2 fällt in Territory deutlich anders aus
+als in Fläche. Eine weitere Untersuchung (etwa der Zählabweichung bei 15 Einheiten, der Vorsprungsprüfung oder der Rohdatensicherung)
+ist mit diesem Nachtrag nicht freigegeben und hat kein Go.
