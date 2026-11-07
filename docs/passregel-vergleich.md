@@ -4,8 +4,8 @@ Vorabfestlegung, 06.11.2026, überarbeitet nach Durchsicht am selben Tag (Voraus
 Passregel im Arm „weiter“ aus, Ausfälle konservativ, Nenner, Unabhängigkeit, Territory-Kontrollen) und nach Probe 1
 nachgebessert (§9 Nr. 5 und Nr. 7, §13).
 Status: **Umgesetzt; Stufe A abgeschlossen, Probe 1 ungültig, Probe 2 laut Auswertung gültig (§13a). Stufe C ist gelaufen und laut Auswertung gültig (§15); Umfang und Zeitbudget standen vor dem Start in §14, der Merge von §14 kam erst danach. Aus dem Ergebnis folgt keine Aktivierung der Passregel.** Das
-Spiel bleibt unverändert (`passNachGegnerpass` bleibt 0). Zahlen zu den Auslösungen stehen in §13; zur Wirkung der
-Regel gibt es keine Zahl. Dies ist die Ausführung von §4 in
+Spiel bleibt unverändert (`passNachGegnerpass` bleibt 0). Zahlen zu den Auslösungen stehen in §13. Die Ergebnisse des
+Hauptlaufs stehen in §15. Dies ist die Ausführung von §4 in
 [`passregel-versuch.md`](passregel-versuch.md); dort stehen Regel und Einzelrechnung.
 
 ## 1. Frage und Abgrenzung
@@ -512,9 +512,9 @@ Gegner. Ein Standardwechsel folgt daraus nicht.
 Actions-Laufs 42331033107 auf `main` am Merge-Commit `7d57e2bf1826904be9c4e6f8a59164db632d032f`. Der berichtende Assistent
 hat die Rohdaten nicht gelesen. Die Rohdaten liegen nicht unter `docs/daten/`.
 
-**Zusätzlich, getrennt davon:** Ein Prüfer, nicht der berichtende Assistent, hat laut seiner Angabe das Artefakt geladen, die 563
-Ergebniszeilen gelesen und zentrale Kennzahlen nachgerechnet. Mehr ist über Umfang und Ergebnis dieser Prüfung nicht bekannt;
-der berichtende Assistent hat sie nicht nachgeprüft.
+**Zusätzlich, getrennt davon:** Sol (ChatGPT) hat das Artefakt geladen, die Vollständigkeit der 563 Ergebniszeilen geprüft und
+zentrale Kennzahlen aus den Rohfeldern nachgerechnet. Laut dieser Prüfung stimmen sie mit dem Auswertungs-Log überein. Der
+berichtende Assistent hat diese Prüfung nicht selbst nachvollzogen.
 
 **Reihenfolge (muss dokumentiert bleiben):** Der Vorschlag §14 stand vor dem Start auf dem PR-Branch (PR #281, Stand `2583eb1`,
 CI grün), war aber noch nicht gemergt. Hazeberry gab das Go für Stufe C danach; der Lauf startete um 02:48 UTC, der Merge von
