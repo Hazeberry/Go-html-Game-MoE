@@ -491,15 +491,16 @@ geprüft), Probe 1 im Mittel 4 s, höchstens 8 s. Ob die 11 Einheiten für alle 
 - Die Probe-Werte sind eine Schätzung aus 11 Einheiten. Als Sicherheitsfaktor gilt 10: Selbst dann bliebe ein Paket unter einer
   Stunde und weit unter der Job-Grenze von 340 Minuten.
 - Gesamtbudget (Wanduhr, grob): Bau von Fuego etwa drei Minuten, Pakete parallel, Auswertung unter einer Minute. Erwartet
-  deutlich unter einer Stunde, **Obergrenze zwei Stunden**. Läuft nach zwei Stunden noch ein Paket, berichtet die KI das und
-  fragt Hazeberry, ob der Lauf abgebrochen wird; sie bricht nicht von sich aus ab.
+  deutlich unter einer Stunde. **Rückfrage nach zwei Stunden, keine feste Laufzeitgrenze:** Läuft nach zwei Stunden noch ein
+  Paket, berichtet die KI das und fragt Hazeberry, ob der Lauf abgebrochen wird; der Lauf darf bis dahin und danach
+  weiterlaufen, und die KI bricht nicht von sich aus ab. Die Zeitangaben sind eine unsichere Schätzung aus 11 Einheiten.
 - Fehlt ein Paket oder bricht es ab, ist der Lauf ungültig („KEIN URTEIL“, §9). Es werden ganze Pakete wiederholt, nie
   einzelne Stellungen; über die Wiederholung entscheidet Hazeberry.
 
 **3. Unverändert:** Wiederholungsläufe (§9 Nr. 7) gelten nur in der Probe und entfallen in Stufe C. Pflichtprüfungen,
 Kontrollregel (§9 Nr. 5), Ausfallregel (§9 Nr. 6), Endpunkt E1 und Schwelle 2,0 % bleiben wie festgelegt. Die Einheit
 alte PWA, `m1`, Partie 206, Index 341 bleibt im Material; ihre 3-Punkte-Abweichung zwischen `final_score` und der Zählung
-aus der Tot-Liste wird wie in Probe 2 nur berichtet (Kontrolle, kein Gültigkeitskriterium). Der Fehler der Zählung bei GNU Go
+aus der Tot-Liste wird wie in Probe 2 nur berichtet (Kontrolle, kein Gültigkeitskriterium). Die Ursache der Zählabweichung
 bleibt offen; ein Fehler der App-Zählung ist nicht belegt.
 
 **4. Grenzen dieses Vorschlags.** Die Zeitwerte stammen aus 11 Einheiten und dem Log, die Rechnung zu K aus einer Formel. Der
