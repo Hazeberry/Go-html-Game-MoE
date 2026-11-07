@@ -3,7 +3,7 @@
 Vorabfestlegung, 06.11.2026, überarbeitet nach Durchsicht am selben Tag (Voraussetzung Gegnerpass,
 Passregel im Arm „weiter“ aus, Ausfälle konservativ, Nenner, Unabhängigkeit, Territory-Kontrollen) und nach Probe 1
 nachgebessert (§9 Nr. 5 und Nr. 7, §13).
-Status: **Umgesetzt; Stufe A abgeschlossen, Probe 1 ungültig, Probe 2 laut Auswertung gültig (§13a). Der Hauptlauf ist nicht freigegeben.** Das
+Status: **Umgesetzt; Stufe A abgeschlossen, Probe 1 ungültig, Probe 2 laut Auswertung gültig (§13a). Umfang und Zeitbudget für Stufe C stehen als Vorschlag in §14; der Hauptlauf ist nicht freigegeben.** Das
 Spiel bleibt unverändert (`passNachGegnerpass` bleibt 0). Zahlen zu den Auslösungen stehen in §13; zur Wirkung der
 Regel gibt es keine Zahl. Dies ist die Ausführung von §4 in
 [`passregel-versuch.md`](passregel-versuch.md); dort stehen Regel und Einzelrechnung.
@@ -388,8 +388,8 @@ Territory mit Steinen und beidseitig akzeptierte `captures`-Zuordnung werden jew
   Diese Änderung ist eine Vorgabe für die KI-Assistenten; Hazeberry liest sie vor dem Merge.
 - **Probe 2** ist gelaufen (§13, gültig laut Auswertungs-Log). Die offene Frage, warum GNU Go G19, H19 und J19 anders
   zuordnet, blieb offen; die Kontrolle berichtet diese Abweichung nur. Probe 1 ist für Stufe C keine Grundlage.
-- **Hauptumfang, Zeitbudget, Einheiten je Paket:** Probe 1 maß je Einheit im Mittel 4 s, höchstens 8 s, Probe 2 im Mittel
-  5 s, höchstens 10 s (§13); das ist ein Hinweis, kein festgelegter Umfang. Der Hauptumfang ist noch festzulegen.
+- **Hauptumfang, Zeitbudget, Einheiten je Paket:** Vorschlag in §14 (vor einem Go von Hazeberry zu lesen). Erst nach
+  seiner Durchsicht und einem ausdrücklichen Go für Stufe C gilt er.
 - **Stufe C** hat kein Go. Die GNU-Go-Gruppe hat nur 2 Einheiten (§13); die Auswertung berichtet die Gruppen getrennt (§10).
 - Fuego wird im Workflow gebaut (`auswertung/fuego/bauen.sh`, wie in `fuego-siege.yml`).
 
@@ -464,3 +464,44 @@ sieben Minuten): Das ist ein technischer Befund. Er sagt nichts über die Wirkun
 
 **Folgerung:** Probe 2 ist laut Auswertung gültig. Das ist **keine Freigabe für Stufe C**; der Hauptlauf braucht ein eigenes
 Go, und der Hauptumfang ist noch festzulegen (§12).
+
+## 14. Stufe C: Umfang und Zeitbudget (Vorabfestlegung, 07.11.2026)
+
+**Status: Vorschlag.** Er legt fest, was Stufe C ausführen soll, damit der Umfang vor den Zahlen steht. Er ist **kein Go**:
+Stufe C startet nur nach Durchsicht dieses Abschnitts durch Hazeberry und einem ausdrücklichen Go für genau diese Stufe.
+Es wird nichts gestartet und kein Code und kein Workflow geändert; die Werte werden beim Start als Eingaben übergeben.
+
+**Grundlage (Zahlen aus §13 und §13a, dort mit Quelle und Vorbehalten):** Stufe A fand 563 Einheiten (Fläche 561, Territory
+520). Probe 2 maß je Einheit im Mittel 5 s, höchstens 10 s (11 Einheiten, nur aus dem Auswertungs-Log, nicht an den Rohdaten
+geprüft), Probe 1 im Mittel 4 s, höchstens 8 s. Ob die 11 Einheiten für alle 563 repräsentativ sind, ist nicht gezeigt.
+
+**1. Umfang: alle 563 Einheiten, kein Deckel** (`max_einheiten` leer). Gründe:
+- Das Kriterium aus §8 (K = 0 braucht N ≥ 183) ist in beiden Wertungen mit Reserve erreicht. Ein Deckel würde N und damit die
+  Reserve für mögliche Ausfälle verkleinern, ohne dass die Zeit ein Problem darstellt (Nr. 2).
+- Höchstzulässiges K bei oberer Grenze ≤ 2,0 % (Formelrechnung mit `cpIntervall`, keine Messung): bei N = 520 (Territory)
+  **K ≤ 4** (obere Grenze bei K = 0: 0,707 %, bei K = 4: 1,958 %), bei N = 561 (Fläche) **K ≤ 4** (0,655 % und 1,815 %).
+  Zum Vergleich: bei N = 183 wäre K = 0 die einzige Möglichkeit.
+- Die Gruppen werden getrennt berichtet (§10). Die Verteilung (Fläche/Territory) ist GNU Go ohne Vorgabe 2/2, Fuego 100
+  Spiele 44/43, Fuego 50 Spiele 317/301, alte PWA 198/174. Die GNU-Go-Gruppe trägt mit 2 Einheiten praktisch nichts zu
+  einer Aussage bei; der gepoolte Befund wird von Fuego 50 Spielen und der alten PWA bestimmt. Das gehört in den Bericht.
+
+**2. Zeitbudget und Pakete.** `einheiten_je_paket` = **25**, das ergibt 23 Pakete (Grenze des Workflows: 60). Begründung:
+- Erwartung bei Probe-Werten: 563 Einheiten × 5 s ≈ 47 Minuten Rechenzeit, bei 10 s je Einheit ≈ 94 Minuten, auf 23 Pakete
+  verteilt etwa 2 bis 4 Minuten je Paket (Rechenzeit der Fortsetzungen, ohne Bau von Fuego und Installation).
+- Die Probe-Werte sind eine Schätzung aus 11 Einheiten. Als Sicherheitsfaktor gilt 10: Selbst dann bliebe ein Paket unter einer
+  Stunde und weit unter der Job-Grenze von 340 Minuten.
+- Gesamtbudget (Wanduhr, grob): Bau von Fuego etwa drei Minuten, Pakete parallel, Auswertung unter einer Minute. Erwartet
+  deutlich unter einer Stunde, **Obergrenze zwei Stunden**. Läuft nach zwei Stunden noch ein Paket, berichtet die KI das und
+  fragt Hazeberry, ob der Lauf abgebrochen wird; sie bricht nicht von sich aus ab.
+- Fehlt ein Paket oder bricht es ab, ist der Lauf ungültig („KEIN URTEIL“, §9). Es werden ganze Pakete wiederholt, nie
+  einzelne Stellungen; über die Wiederholung entscheidet Hazeberry.
+
+**3. Unverändert:** Wiederholungsläufe (§9 Nr. 7) gelten nur in der Probe und entfallen in Stufe C. Pflichtprüfungen,
+Kontrollregel (§9 Nr. 5), Ausfallregel (§9 Nr. 6), Endpunkt E1 und Schwelle 2,0 % bleiben wie festgelegt. Die Einheit
+alte PWA, `m1`, Partie 206, Index 341 bleibt im Material; ihre 3-Punkte-Abweichung zwischen `final_score` und der Zählung
+aus der Tot-Liste wird wie in Probe 2 nur berichtet (Kontrolle, kein Gültigkeitskriterium). Der Fehler der Zählung bei GNU Go
+bleibt offen; ein Fehler der App-Zählung ist nicht belegt.
+
+**4. Grenzen dieses Vorschlags.** Die Zeitwerte stammen aus 11 Einheiten und dem Log, die Rechnung zu K aus einer Formel. Der
+Befund aus Stufe C betrifft nur verlorene Siege pro Auslösung (E1, §8) und ist keine Aussage über E2, E3, Menschen oder andere
+Gegner. Ein Standardwechsel folgt daraus nicht.
