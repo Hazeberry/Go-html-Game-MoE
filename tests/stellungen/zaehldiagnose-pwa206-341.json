@@ -1,0 +1,143 @@
+{
+ "beschreibung": "Bekannte Zähldifferenz aus Probe 1: Fläche aus GNU Gos Tot-Liste (136,5) gegen final_score (139,5) an der Ausgangsstellung. Gemessen von der Zähldiagnose; fester Testfall, damit die Differenz nachvollziehbar bleibt. Kein Nachweis eines Fehlers in einem der beiden Zählverfahren.",
+ "quelle": {
+  "lauf": 42317041690,
+  "job": 128232101736,
+  "artefaktId": 13551695622,
+  "artefaktGeladen": false,
+  "mergeCommit": "358ca0951480d9b46e0b7e3f4e4b93b86487bdd9",
+  "bericht": "docs/daten/passregel-zaehldiagnose/lauf1/zaehldiagnose.md",
+  "hinweis": "Werte aus dem Job-Log des Laufs. Die Rohdaten (GTP-Protokoll, vollständige Listen) liegen im Artefakt, das aus der Arbeitsumgebung nicht ladbar war. black_territory und white_territory sind deshalb NICHT roh gespeichert; der Test leitet sie aus der Kreuztabelle des Laufs ab (81 + 3 bzw. 35 Punkte)."
+ },
+ "einheit": {
+  "datei": "docs/daten/pwa-vergleich/lauf1/m1.jsonl.gz",
+  "gruppe": "alte PWA",
+  "nr": 206,
+  "index": 341,
+  "kiFarbe": "S",
+  "zuegeInFolge": 342,
+  "archivZuegeGesamt": 417,
+  "folgeSha256": "ca08970090e9fc458f40f5c3f8f8ab82fb6cf425a22ea7ae3585101f30fe60a0"
+ },
+ "gnugo": {
+  "version": "3.8",
+  "paket": "gnugo 3.8-11build2",
+  "image": "20261101.360.1",
+  "seed": 432182360,
+  "argumente": "--mode gtp --level 1 --chinese-rules --komi 7.5 --seed 432182360 --never-resign"
+ },
+ "finalScore": {
+  "roh": "= B+139.5",
+  "stand": 139.5
+ },
+ "tot": [
+  "S18",
+  "N14",
+  "N13",
+  "Q12",
+  "Q11",
+  "T11",
+  "Q10",
+  "S10",
+  "T10",
+  "Q9",
+  "R9",
+  "S9",
+  "R8",
+  "S8",
+  "T8",
+  "M7",
+  "N7",
+  "S7",
+  "T6",
+  "M5"
+ ],
+ "dame": [
+  "E19",
+  "F19"
+ ],
+ "listenGroesse": {
+  "alive": 220,
+  "dead": 20,
+  "seki": 0,
+  "wt": 35,
+  "bt": 84,
+  "dame": 2
+ },
+ "gefangen": {
+  "schwarz": 74,
+  "weiss": 20
+ },
+ "unsereZaehlung": {
+  "steine": {
+   "schwarz": 150,
+   "weiss": 70
+  },
+  "gebiet": {
+   "schwarz": 100,
+   "weiss": 36
+  },
+  "neutral": 5,
+  "tote": {
+   "schwarz": 1,
+   "weiss": 19
+  },
+  "flaeche": {
+   "schwarz": 250,
+   "weiss": 106,
+   "stand": 136.5
+  },
+  "territoryStand": 128.5,
+  "neutraleRegion": {
+   "punkte": [
+    "E19",
+    "F19",
+    "G19",
+    "H19",
+    "J19"
+   ],
+   "rand": "SW"
+  }
+ },
+ "punktAbweichungen": [
+  "G19",
+  "H19",
+  "J19"
+ ],
+ "kreuztabelle": {
+  "dame → neutral": 2,
+  "gebiet-S → S": 81,
+  "gebiet-S → neutral": 3,
+  "gebiet-W → W": 35,
+  "lebend-S → S": 150,
+  "lebend-W → W": 70,
+  "tot-S → W": 1,
+  "tot-W → S": 19
+ },
+ "nachbildungen": {
+  "variante1": 121.5,
+  "variante2": 121.5,
+  "variante3": 139.5
+ },
+ "brett": [
+  "...O.....X...XXO...",
+  ".OO.OXXXX.XXXXOOOX.",
+  "O..O.OOOOX.XOOOOOO.",
+  "O.OO..OXOX.XXOXO.O.",
+  ".OO.O.OXX.XXXXXXOOO",
+  "....OOX.X..XO.X.XXX",
+  "...OOXXXX..XOX.X.X.",
+  ".OOXOOX..XXXX.XOX.X",
+  "OOXXXXOXX.X..XXOXXO",
+  "OX.XXOOXX.X.X.XOXOO",
+  "XXXXOOX..XXXX.XOOO.",
+  "..XOOXXXX.X..XXXOOO",
+  "XXO.OOXX..XOO.XXXO.",
+  ".XOOO.OX..XXXX...XO",
+  "X.XO..OXX.XO.XX..X.",
+  "X.XO.O.OXX...XXXXXX",
+  ".XXXOOOOX.XX..XX.XX",
+  "..X.XXOX.X..XX....X",
+  "...X.XXXX...X.XXX.X"
+ ]
+}

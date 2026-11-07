@@ -158,6 +158,7 @@ test('GNU-Go-Antworten lesen: final_score und Tot-Liste', () => {
   pruefe(fehler, 'Unlesbares wirft');
   const t = L.totListeAusGtp('A1 B2\nC3'); pruefeGleich(t.size, 3, 'drei Punkte'); pruefe(t.has(L.vonGtp('B2')), 'B2');
   pruefeGleich(L.totListeAusGtp('').size, 0, 'leer');
+  for (const schlecht of ['A1 PASS', 'Z99', 'A20', 'I5', 'resign', 'A0']) { let wirft = false; try { L.totListeAusGtp(schlecht); } catch (e) { wirft = true; } pruefe(wirft, `Tot-Liste mit ${JSON.stringify(schlecht)} wird abgelehnt (nie stillschweigend −1)`); }
   pruefeGleich(L.vonGtp(L.zuGtp(0)), 0, 'Umlauf links oben'); pruefeGleich(L.vonGtp(L.zuGtp(360)), 360, 'Umlauf rechts unten');
 });
 
@@ -334,6 +335,23 @@ test('Fortsetzung verweigert sich bei Schalter 1 und meldet verletzte Voraussetz
   pruefeGleich(r2.arm0.status, 'ausfall', 'ohne Voraussetzung keine Fortsetzung');
 });
 
+/* ── 7c Was Pflicht bleibt und dass es keine Toleranz gibt ─────────────── */
+test('Pflichtprüfungen bleiben: Brett und Gefangene machen ungültig; der Zählvergleich ohne Toleranz weist jeden Unterschied aus', async () => {
+  const E = engine(), e = await einheitAusHand(E), opt = {sims: 4, maxZuege: 600, seed: 1};
+  const schlecht = () => { const a = attrappe(E), alt = a.frage; a.frage = async b => (/^list_stones white/.test(b) ? '' : alt(b)); return a; };
+  const r = await F.bearbeiteEinheit({E, DEFAULT: _DEFAULT, capturesKonvention: 'gefangen-von', opt, startReferee: async () => schlecht(), startGegner: async () => null}, e);
+  pruefe(r.fehler.some(x => /^Einspielen: Brett weicht/.test(x)), 'abweichendes Brett ist ein Pflichtfehler: ' + r.fehler.join(' | '));
+  const z = V.auswerten({einheiten: [e], zeilen: [{...r, gegner: 'gnugo'}], probe: true});
+  pruefeGleich(z.ergebnis.wertungen.flaeche.gueltig, false, 'Brett abweichend: Fläche ungültig'); pruefeGleich(z.ergebnis.wertungen.territory.gueltig, false, 'Brett abweichend: Territory ungültig');
+  /* keine pauschale Toleranz: Unterschiede von 0,5 und 3 stehen beide mit ihrem genauen Wert im Bericht */
+  const zeile = (wo, fs, flaeche) => ({kontrolle: {flaecheTotListe: false, abweichungen: [{wo, finalScore: fs, flaecheAusTotListe: flaeche, tote: 2, diagnose: {vergleich: {punktAbweichungen: [{punkt: 'G19', gnugo: 'gebiet-S', unser: 'neutral'}], unsereZaehlung: {steine: {schwarz: 1, weiss: 2}, gebiet: {schwarz: 3, weiss: 4}, neutral: 5, tote: {schwarz: 0, weiss: 1}}}}}]}});
+  const ehs = [einheit(0), einheit(1)], zeilen = ehs.map((x, k) => ({schluessel: x.schluessel, gegner: 'gnugo', ...regulaer(20, 15), ...zeile('anfang', k === 0 ? '= B+10.5' : '= B+139.5', k === 0 ? 10 : 136.5)}));
+  const res = V.auswerten({einheiten: ehs, zeilen, probe: false}), md = V.bericht(res);
+  pruefe(/Unterschied -0\.5/.test(md) && /Unterschied -3/.test(md), 'beide Unterschiede (−0,5 und −3) stehen genau da: ' + (md.match(/Unterschied -?[\d.]+/g) || []).join(', '));
+  pruefe(res.ergebnis.wertungen.flaeche.gueltig && res.ergebnis.wertungen.territory.gueltig, 'keine Toleranzgrenze, aber auch keine Ungültigkeit durch den Vergleich');
+  pruefe(/G19 \(GNU Go gebiet-S, unser Besitzer neutral\)/.test(md), 'Koordinate steht im Bericht');
+});
+
 /* ── 8 Kommandozeilen (mit Handdaten, nicht mit Archivdaten) ───────────── */
 test('Kommandozeile: Stufe A schreibt Einheiten und Bericht; Auswertung verlangt die Nachspiel-Kontrolle', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'passregel-'));
@@ -495,14 +513,14 @@ test('Wiederholung: bearbeiteMitWiederholung führt die zusätzlichen Durchläuf
   pruefeGleich((await F.bearbeiteMitWiederholung(ctx(), e, 0)).wiederholungen, undefined, 'ohne Wiederholung kein Eintrag');
 });
 
-test('Zählabweichung: Gleichheitsprüfung bleibt, Brett, tote Koordinaten und beide Zählwerte werden festgehalten (Anfang, Ende, Wiederholung)', async () => {
+test('Zählvergleich (geänderte Kontrollregel): Abweichung mit Koordinaten und Bestandteilen berichtet, kein Gültigkeitskriterium; Anfang, Ende, Wiederholung', async () => {
   const E = engine(), e = await einheitAusHand(E);
   /* Attrappe, deren Tot-Liste ALLE schwarzen Steine nennt: Fläche aus der Tot-Liste ≠ final_score */
   const mitTot = () => { const a = attrappe(E), alt = a.frage;
     a.frage = async b => (/^final_status_list/.test(b) ? alt('list_stones black') : alt(b)); return a; };
   const ctx = {E, DEFAULT: _DEFAULT, capturesKonvention: 'gefangen-von', opt: {sims: 4, maxZuege: 600, seed: 1}, startReferee: async () => mitTot(), startGegner: async () => null};
   const r = await F.bearbeiteMitWiederholung(ctx, e, 1);
-  pruefeGleich(r.kontrolle.flaecheTotListe, false, 'Gleichheitsprüfung schlägt an');
+  pruefeGleich(r.kontrolle.flaecheTotListe, false, 'der Vergleich erkennt die Abweichung (Hinweis in den Rohdaten)');
   const wos = r.kontrolle.abweichungen.map(x => x.wo).sort().join(',');
   pruefeGleich(wos, 'anfang,ende,wiederholung 2 anfang,wiederholung 2 ende', 'Abweichung an Anfang, Ende und in der Wiederholung festgehalten: ' + wos);
   const x = r.kontrolle.abweichungen[0], d = x.diagnose;
@@ -512,15 +530,20 @@ test('Zählabweichung: Gleichheitsprüfung bleibt, Brett, tote Koordinaten und b
   const log = F.logAbweichungen(r);
   pruefe(/ZÄHLABWEICHUNG .* anfang: final_score ".*", Fläche aus Tot-Liste -?[\d.]+, tote Steine \d+/.test(log[0]) && log.filter(z => /^  [.XO]{19}$/.test(z)).length >= 19, 'Log: Abweichung samt Brett (19 Zeilen): ' + log[0]);
   const res = V.auswerten({einheiten: [e], zeilen: [{...r, gegner: 'gnugo'}], probe: true});
-  pruefeGleich(res.ergebnis.wertungen.territory.gueltig, false, 'die Territory-Kontrolle macht die Wertung ungültig (Gleichheitsprüfung bleibt)');
-  pruefe(Object.keys(res.abweichungen).length === 1 && /Zählabweichung .* \(anfang\)/.test(V.bericht(res)), 'Bericht nennt die Abweichung');
+  pruefeGleich(res.ergebnis.wertungen.territory.gueltig, true, 'die Abweichung der beiden Zählverfahren macht Territory NICHT ungültig'); pruefeGleich(res.ergebnis.wertungen.flaeche.gueltig, true, 'Fläche bleibt gültig');
+  const v = r.kontrolle.abweichungen[0].diagnose.vergleich;
+  pruefe(v && Array.isArray(v.punktAbweichungen) && v.unsereZaehlung && v.kreuztabelle, 'Koordinaten und Bestandteile an der Abweichung: ' + JSON.stringify(Object.keys(r.kontrolle.abweichungen[0].diagnose)));
+  pruefe(/Bestandteile \(unsere Zählung\): Schwarz Steine \d+ \+ Gebiet \d+/.test(log.join('\n')) && /Punktabweichungen GNU Go gegen unseren Besitzer:/.test(log.join('\n')), 'Log nennt Bestandteile und Punktabweichungen');
+  const bericht = V.bericht(res);
+  pruefe(Object.keys(res.abweichungen).length === 1 && /Zählvergleich zweier Verfahren \(kein Gültigkeitskriterium\) .* \(anfang\)/.test(bericht), 'Bericht nennt den Vergleich');
+  pruefe(/Unterschied -?[\d.]+/.test(bericht) && /Bestandteile \(unsere Zählung\)/.test(bericht) && /Punktabweichungen:/.test(bericht), 'Bericht weist Unterschied, Bestandteile und Punktabweichungen aus');
   /* nur die Wiederholung weicht ab (der erste Durchlauf zählt richtig): die Kontrolle muss trotzdem anschlagen */
   let nr = 0;
   const nurWdh = await F.bearbeiteMitWiederholung({...ctx, startReferee: async () => (++nr === 2 ? mitTot() : attrappe(E))}, e, 1);
   pruefeGleich(nurWdh.diagnose.anfang.tote.length, 0, 'erster Durchlauf ohne Abweichung');
   pruefeGleich(nurWdh.kontrolle.flaecheTotListe, false, 'Abweichung nur in der Wiederholung macht die Kontrolle der Einheit falsch');
   pruefeGleich(nurWdh.kontrolle.abweichungen.map(x => x.wo).sort().join(','), 'wiederholung 2 anfang,wiederholung 2 ende', 'nur die Wiederholung ist als Abweichung festgehalten');
-  pruefeGleich(V.auswerten({einheiten: [e], zeilen: [{...nurWdh, gegner: 'gnugo'}], probe: true}).ergebnis.wertungen.territory.gueltig, false, 'Territory ungültig');
+  pruefeGleich(V.auswerten({einheiten: [e], zeilen: [{...nurWdh, gegner: 'gnugo'}], probe: true}).ergebnis.wertungen.territory.gueltig, true, 'auch dann bleibt Territory gültig');
   /* ohne Abweichung: keine Meldung, keine Einträge */
   const ok = await F.bearbeiteMitWiederholung({...ctx, startReferee: async () => attrappe(E)}, e, 0);
   pruefe(ok.kontrolle.abweichungen === undefined && F.logAbweichungen(ok).length === 0, 'ohne Abweichung nichts im Log');

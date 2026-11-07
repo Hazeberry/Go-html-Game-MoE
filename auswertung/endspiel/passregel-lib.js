@@ -172,6 +172,47 @@ function zaehlbestandteile(board, caps, tot, komi, NEIGHBORS) {
   flaeche.stand = flaeche.schwarz - flaeche.weiss - komi; territory.stand = territory.schwarz - territory.weiss - komi;
   return {steine, gebiet, neutral, gefangenBisher: {1: caps[1] || 0, 2: caps[2] || 0}, tote, gefangenMitTot: c, flaeche, territory, besitzer, regionen};
 }
+/* Vergleich zweier Zählverfahren an EINER Stellung (docs/passregel-zaehldiagnose.md, passregel-vergleich.md §9 Nr. 5):
+   unsere Flood-Fill-Zählung (Region zählt nur mit genau einer Randfarbe, wie finalAreaScore der App) gegen GNU Gos
+   Klassen aus `final_status_list`. m: Mengen {alive, dead, seki, wt, bt, dame}; finalStand: Stand aus `final_score`.
+   Das Ergebnis weist Koordinaten und Bestandteile aus, ohne Toleranz: jeder Unterschied steht da, wie er ist. Es ist ein
+   VERGLEICH, kein Nachweis, dass eines der Verfahren richtig ist. Die Nachbildungen von final_score aus GNU Gos Listen
+   sind Hinweise (keine Annahme über GNU Gos Regeln). */
+function vergleicheZaehlung(board, caps, m, komi, NEIGHBORS, finalStand) {
+  const n = board.length, zb = zaehlbestandteile(board, caps, m.dead, komi, NEIGHBORS), NAME = {0: 'neutral', 1: 'S', 2: 'W'};
+  const klasse = p => {
+    if (m.alive.has(p)) return board[p] === 1 ? 'lebend-S' : 'lebend-W';
+    if (m.dead.has(p)) return board[p] === 1 ? 'tot-S' : 'tot-W';
+    if (m.seki.has(p)) return board[p] === 1 ? 'seki-S' : 'seki-W';
+    if (m.bt.has(p)) return 'gebiet-S';
+    if (m.wt.has(p)) return 'gebiet-W';
+    if (m.dame.has(p)) return 'dame';
+    return board[p] ? 'unklassifiziert-Stein' : 'unklassifiziert-leer';
+  };
+  const kreuz = {}, abw = [];
+  for (let p = 0; p < n; p++) {
+    const g = klasse(p), o = NAME[zb.besitzer[p]], tot = m.dead.has(p), k = `${g} → ${o}`;
+    kreuz[k] = (kreuz[k] || 0) + 1;
+    const erwartet = g === 'gebiet-S' ? 'S' : g === 'gebiet-W' ? 'W' : g === 'dame' ? 'neutral' : null;
+    if (erwartet && o !== erwartet) abw.push({punkt: zuGtp(p), gnugo: g, unser: o, aufTotemStein: tot});
+    if (g === 'seki-S' || g === 'seki-W' || g.startsWith('unklassifiziert')) abw.push({punkt: zuGtp(p), gnugo: g, unser: o, aufTotemStein: tot, hinweis: 'Seki oder von GNU Go nicht klassifiziert'});
+  }
+  const stein = (f, menge) => [...menge].filter(p => board[p] === f).length;
+  const lebS = stein(1, m.alive), lebW = stein(2, m.alive), sekiS = stein(1, m.seki), sekiW = stein(2, m.seki), totS = stein(1, m.dead), totW = stein(2, m.dead);
+  const v1 = {schwarz: lebS + m.bt.size, weiss: lebW + m.wt.size}, v2 = {schwarz: v1.schwarz + sekiS, weiss: v1.weiss + sekiW};
+  /* Variante 3: wie 2, dazu die Punkte toter Steine dem Gegner (tote weiße Steine Schwarz, tote schwarze Weiß) */
+  const v3 = {schwarz: v2.schwarz + totW, weiss: v2.weiss + totS};
+  for (const v of [v1, v2, v3]) v.stand = v.schwarz - v.weiss - komi;
+  return {
+    unsereZaehlung: {steine: {schwarz: zb.steine[1], weiss: zb.steine[2]}, gebiet: {schwarz: zb.gebiet[1], weiss: zb.gebiet[2]}, neutral: zb.neutral,
+                     tote: {schwarz: zb.tote[1], weiss: zb.tote[2]}, gefangenMitTot: {schwarz: zb.gefangenMitTot[1], weiss: zb.gefangenMitTot[2]},
+                     flaeche: zb.flaeche, territory: zb.territory,
+                     neutraleRegionen: zb.regionen.filter(r => r.besitzer === 0).map(r => ({groesse: r.groesse, rand: r.rand, punkte: r.punkte.map(zuGtp)}))},
+    gnugoAusListen: {variante1_lebendePlusGebiet: v1, variante2_mitSeki: v2, variante3_mitPunktenToterSteine: v3,
+                     v1GleichFinalScore: v1.stand === finalStand, v2GleichFinalScore: v2.stand === finalStand, v3GleichFinalScore: v3.stand === finalStand},
+    abweichungFlaecheAusTotListe: {finalScore: finalStand, ausTotListe: zb.flaeche.stand, unterschied: zb.flaeche.stand - finalStand, reproduziert: Math.abs(zb.flaeche.stand - finalStand) > 1e-9},
+    kreuztabelle: kreuz, punktAbweichungen: abw};
+}
 const ausSicht = (stand, kiFarbe) => (kiFarbe === 1 ? 1 : -1) * stand;
 const gewonnen = standKI => standKI > 0;   /* Remis zählt als nicht gewonnen (mit Komi 7,5 ohnehin unmöglich) */
 
@@ -183,7 +224,13 @@ function standAusFinalScore(antwort) {
 }
 /* final_status_list dead: Zeilen mit Punkten getrennt durch Leerzeichen, jede Zeile eine Kette */
 function totListeAusGtp(antwort) {
-  return new Set(String(antwort).split(/\s+/).filter(Boolean).map(vonGtp));
+  /* jedes Wort muss eine gültige Brettkoordinate sein; „pass“, „resign“ und Koordinaten außerhalb des Bretts wären sonst stillschweigend −1 oder −2 */
+  const menge = new Set();
+  for (const w of String(antwort).split(/\s+/).filter(Boolean)) {
+    if (!/^[A-HJ-T]([1-9]|1[0-9])$/i.test(w)) throw new Error('ungültige Koordinate in einer Punktliste: ' + JSON.stringify(w));
+    menge.add(vonGtp(w));
+  }
+  return menge;
 }
 
 /* ── Archivdaten lesen ───────────────────────────────────────────────── */
@@ -274,6 +321,6 @@ function bewerte(einheiten, ergebnisse, kontrollenTerritory = {ok: true, grund: 
   return {wertungen: w, gueltig: beideGueltig, befund, grenze: GRENZE, maxAusfallAnteil: MAX_AUSFALL_ANTEIL};
 }
 
-module.exports = {zaehlbestandteile, SPALTEN, zuGtp, vonGtp, mulberry32, fnv32, fortsetzungsSeed, binomCdf, cpIntervall, vorzeichenTestExakt,
+module.exports = {vergleicheZaehlung, zaehlbestandteile, SPALTEN, zuGtp, vonGtp, mulberry32, fnv32, fortsetzungsSeed, binomCdf, cpIntervall, vorzeichenTestExakt,
   betaI, tCdf, tQuantil, tIntervall, mittel, sd, median, voraussetzung, zaehleMitTotListe, ausSicht, gewonnen,
   standAusFinalScore, totListeAusGtp, leseJsonl, bewerteWertung, bewerte, GRENZE, MAX_AUSFALL_ANTEIL, MIN_N_NULL};

@@ -238,32 +238,49 @@ Pflichtprüfungen:
      Ständen; das ist eine eigene Prüfung, die hier nicht verlangt wird) und Brett und Gefangene **der Engine**
      (das prüft die Fortsetzung je Einheit gegen `list_stones` und `captures`, Nr. 3). Das eine gilt nicht als
      Nachweis für das andere; der Bericht nennt beides getrennt.
-5. **Zählung:** Auf den Kontrollstellungen ist die aus der Tot-Liste gerechnete Fläche gleich
-   `final_score`. Für Territory gilt zusätzlich:
-   - Die Gefangenen aus dem Einspielen in der Engine sind gleich GNU Gos `captures` je Farbe, mit **einer**
-     festen Zuordnung. Welche Konvention GNU Go meint (von dieser Farbe gefangen oder an sie verloren), wird in
-     jedem Fortsetzungs-Prozess **vor der ersten Einheit** an einer Kalibrierstellung mit ungleichen Zahlen
-     bestimmt: Schwarz schlägt zwei Steine (A1, T1), Weiß einen (A19). `captures black` 2 und `captures white` 1
-     heißt „gefangen von“, 1 und 2 heißt „verloren an“, alles andere bricht ab. Danach gilt nur diese Zuordnung.
-     Es werden nie beide akzeptiert, ein vertauschter Zähler fällt also bei ungleichen Zahlen auf. Der Bericht
-     nennt die angewandte Konvention und die Zahl der Stellungen mit ungleichen Gefangenenzahlen. Die
-     Kalibrierung ist lokal nur gegen eine Attrappe getestet, nicht gegen das echte GNU Go.
-   - Die Territory-Rechnung folgt der Regel der App (`finalTerritoryScore`, Test `tests/passregel-vergleich.js` gegen den
-     aus `index.html` geschnittenen Code, auch Fläche gegen `finalAreaScore`; geprüft an Stellungen mit toten Steinen
-     und ungleichen Gefangenenzahlen sowie an 300 Zufallsbrettern mit toten Steinen beider Farben und Neutralen), mit
-     Komi 7,5, und schreibt die
-     toten Steine der Tot-Liste als Gefangene gut. Das prüft ein Test an einer bekannten Stellung.
-   - Die Partie vom 31.10. ergibt W+200,5 (`tests/zaehlvorschau.js`).
+5. **Zählung (Kontrollregel am 07.11.2026 begründet geändert, nach der Zähldiagnose; Probe 1 bleibt ungültig):**
 
-   Verfehlt eine dieser Kontrollen, ist der Territory-Teil ungültig; der Flächenteil bleibt davon
-   unberührt.
+   **Pflichtprüfungen** (verletzt: ungültig):
+   - **Brett:** die Steinlisten von Engine und GNU Go sind an jeder Stellung gleich.
+   - **Gefangene:** die Gefangenen aus dem Einspielen sind gleich GNU Gos `captures` je Farbe, mit **einer** festen
+     Zuordnung. Welche Konvention GNU Go meint (von dieser Farbe gefangen oder an sie verloren), wird in jedem
+     Fortsetzungs-Prozess **vor der ersten Einheit** an einer Kalibrierstellung mit ungleichen Zahlen bestimmt: Schwarz
+     schlägt zwei Steine (A1, T1), Weiß einen (A19). `captures black` 2 und `captures white` 1 heißt „gefangen von“, 1 und 2
+     heißt „verloren an“, alles andere bricht ab. Danach gilt nur diese Zuordnung; ein vertauschter Zähler fällt bei
+     ungleichen Zahlen auf. Der Bericht nennt die angewandte Konvention und die Zahl der Stellungen mit ungleichen
+     Gefangenenzahlen.
+   - **Tot-Liste:** `final_status_list dead` ist lesbar, jedes Wort eine gültige Brettkoordinate (kein `pass`).
+   - **Komi 7,5** und **Übereinstimmung mit dem App-Code:** Die Territory-Rechnung folgt der Regel der App
+     (`finalTerritoryScore`, tote Steine als Gefangene des Gegners, Komi 7,5). Das prüfen Tests gegen die aus `index.html`
+     geschnittenen Funktionen `finalAreaScore` und `finalTerritoryScore` (Stellungen mit toten Steinen und ungleichen
+     Gefangenenzahlen, 300 Zufallsbretter, und die feste Stellung aus der Zähldiagnose). Die Partie vom 31.10. ergibt
+     W+200,5 (`tests/zaehlvorschau.js`).
 
-   **Diagnose zur Zählung:** Für jede gezählte Stellung (Anfang, Ende, jede Wiederholung) speichert die Fortsetzung
-   in `diagnose` das Brett als Text, die Gefangenen, die toten Koordinaten, den `final_score`-Text, die Fläche aus
-   `final_score` und aus der Tot-Liste und die Territory-Zählung aus der Tot-Liste. Bei einer Abweichung schreibt das
-   Log den Ort (Anfang, Ende oder Wiederholung k), beide Zählwerte, die toten Koordinaten und das Brett (19 Zeilen).
-   Die Gleichheitsprüfung bleibt unverändert; die Diagnose behebt die Ursache nicht. Eine Abweichung in einer
-   Wiederholung macht die Kontrolle der Einheit falsch.
+   **Vergleich zweier Zählverfahren (kein Gültigkeitskriterium):** die Fläche aus der Tot-Liste (App-Regel, Flood-Fill:
+   eine leere Region zählt nur mit genau einer Randfarbe, `index.html` `finalAreaScore` und `finalTerritoryScore`,
+   `borders.size === 1`) gegen GNU Gos `final_score`. Abweichungen werden **mit Koordinaten und Bestandteilen** berichtet
+   (Steine, Gebiet, neutrale Punkte, tote Steine, die Punkte mit abweichender Zuordnung und GNU Gos Klassen dazu), **ohne
+   pauschale Toleranz**: jeder Unterschied steht mit seinem genauen Wert da. Ein gleicher Wert ist **kein allgemeiner
+   Nachweis korrekter Implementierung**, ein ungleicher **kein Nachweis eines Fehlers** in einem der beiden Verfahren.
+
+   **Fläche** verwendet weiterhin direkt GNU Gos `final_score`. **Territory** bleibt ausdrücklich „App-Rechnung mit
+   GNU-Go-Tot-Liste“; das war das festgelegte Messziel. Ein Wechsel auf GNU Gos Gebietslisten würde dieses Ziel ändern und
+   ist **nicht** Teil dieser Änderung.
+
+   **Begründung der Änderung:** Die Zähldiagnose (Lauf 42317041690, §13 und `passregel-zaehldiagnose.md` §8) zeigt an der
+   Ausgangsstellung von Probe 1 (alte PWA, `m1`, Partie 206, Index 341), dass beide Verfahren drei Punkte (G19, H19, J19)
+   unterschiedlich zuordnen (GNU Go: Schwarz-Gebiet; App-Regel: neutral). Warum GNU Go sie so zuordnet, ist offen. Die
+   frühere Regel „Gleichheit mit `final_score` ist Pflicht, sonst ist der Territory-Teil ungültig“ hätte damit die
+   App-Rechnung selbst als fehlerhaft behandelt, obwohl nichts einen Fehler zeigt, oder das Messziel auf GNU Gos Zählung
+   verschoben. Die Änderung gilt **ab Probe 2** und nicht rückwirkend: Probe 1 bleibt nach der damals geltenden Regel
+   ungültig.
+
+   **Diagnose zur Zählung:** Für jede gezählte Stellung (Anfang, Ende, jede Wiederholung) speichert die Fortsetzung in
+   `diagnose` das Brett als Text, die Gefangenen, die toten Koordinaten, den `final_score`-Text, die Fläche aus
+   `final_score` und aus der Tot-Liste und die Territory-Zählung aus der Tot-Liste. Bei einer Abweichung holt sie
+   zusätzlich GNU Gos Listen (`alive`, `seki`, `white_territory`, `black_territory`, `dame`) und weist die Punkte mit
+   abweichender Zuordnung und die Bestandteile aus; das Log schreibt Ort (Anfang, Ende oder Wiederholung k), beide
+   Zählwerte, Bestandteile, Koordinaten und das Brett.
 
 6. **Fortsetzungen und Ausfälle:** Jeder Ausfall (Absturz von GNU Go oder Fuego, Timeout,
    600-Züge-Grenze, Abbruch, nicht zählbare Endstellung) wird einzeln mit Stellung, Gruppe, Arm-1-Ergebnis
@@ -353,11 +370,13 @@ Territory mit Steinen und beidseitig akzeptierte `captures`-Zuordnung werden jew
 
 ## 12. Offen vor einem Go
 
-- **Zählabweichung klären:** Warum die Fläche aus der Tot-Liste bei einer Stellung von `final_score` abweicht (Probe 1,
-  §13), ist offen. Vorbereitet ist eine gezielte Diagnose dieser einen Stellung ([`passregel-zaehldiagnose.md`](passregel-zaehldiagnose.md), nicht gestartet, braucht ein eigenes Go). Die Diagnose-Ausgabe ist vorbereitet; geklärt ist damit nichts. Ob die strenge Gleichheit der
-  Fläche die richtige Kontrolle ist, wird nach der Ursache entschieden, nicht vorher.
-- **Stufe B wiederholen** (Probe 2) braucht ein eigenes Go, nach Durchsicht dieser Festlegung und nach der Klärung der
-  Ursache. Probe 1 ist für Stufe C keine ausreichende Grundlage.
+- **Zählabweichung:** Die Zähldiagnose (Lauf 42317041690, §13) hat die Differenz eingegrenzt (drei Punkte: G19, H19, J19).
+  Warum GNU Go sie anders zuordnet als die App-Regel, ist offen. Die Kontrollregel ist dafür geändert (§9 Nr. 5, ab Probe 2).
+  Diese Änderung ist eine Vorgabe für die KI-Assistenten; Hazeberry liest sie vor dem Merge.
+- **Stufe B wiederholen** (Probe 2) braucht ein eigenes Go, nach Durchsicht dieser Festlegung einschließlich der geänderten
+  Kontrollregel (§9 Nr. 5). Ob die Probe vor einer Klärung der offenen Frage läuft, warum GNU Go G19, H19 und J19 anders
+  zuordnet, entscheidet Hazeberry; die Kontrolle berichtet diese Abweichung nur noch. Probe 1 ist für Stufe C keine
+  ausreichende Grundlage.
 - **Hauptumfang, Zeitbudget, Einheiten je Paket:** Probe 1 maß je Einheit im Mittel 4 s, höchstens 8 s (§13); das ist
   ein Hinweis, kein festgelegter Umfang. Der Hauptumfang wird nach Probe 2 festgelegt.
 - **Stufe C** hat kein Go. Die GNU-Go-Gruppe hat nur 2 Einheiten (§13); die Auswertung berichtet die Gruppen getrennt (§10).
@@ -397,3 +416,10 @@ mit Fehler, alle anderen Jobs erfolgreich, Dauer gut fünf Minuten):
   abgeleitet. Behoben durch `--probe` (§4). Meine erste Schätzung „die Probe dauert Stunden“ war falsch.
 
 Probe 1 wird nicht nachträglich für gültig erklärt und ist keine Grundlage für Stufe C.
+
+**Zähldiagnose** (Lauf 42317041690, 07.11.2026, Go von Hazeberry, gültig; ausführlich `passregel-zaehldiagnose.md` §8 und
+`docs/daten/passregel-zaehldiagnose/lauf1/zaehldiagnose.md`): An der Ausgangsstellung von Probe 1 (alte PWA, `m1`, Partie 206,
+Index 341) ist `final_score` B+139,5 und die Fläche aus der Tot-Liste 136,5, Unterschied −3. Die Differenz entspricht genau den
+Punkten G19, H19 und J19, die GNU Go als Schwarz-Gebiet und die App-Regel als neutral zuordnet. Warum GNU Go so zuordnet, ist
+offen. Beide Verfahren sind verglichen; ein Fehler eines Verfahrens ist damit nicht gezeigt. Daraufhin ist die Kontrollregel
+geändert (§9 Nr. 5, ab Probe 2). Probe 1 bleibt ungültig.

@@ -63,10 +63,11 @@ function auswerten({einheiten, zeilen, probe}) {
   for (const r of zeilen) { if (ergebnisse.has(r.schluessel)) doppelt.push(r.schluessel); ergebnisse.set(r.schluessel, r); }
   const bekannt = new Set(einheiten.map(e => e.schluessel));
   const unbekannt = zeilen.filter(r => !bekannt.has(r.schluessel)).map(r => r.schluessel);
-  /* Territory-Kontrollen (§9 Nr. 5): Fläche aus der Tot-Liste gleich final_score auf allen Stellungen */
+  /* Zählvergleich (§9 Nr. 5, geändert nach der Zähldiagnose): Fläche aus der Tot-Liste gegen final_score ist der Vergleich
+     ZWEIER Zählverfahren. Abweichungen werden mit Koordinaten und Bestandteilen berichtet, ohne Toleranz, und sind KEIN
+     Gültigkeitskriterium. Pflicht bleiben Brett, Gefangene, Tot-Liste, Komi und die Übereinstimmung mit dem App-Code (Tests). */
   const verletzt = zeilen.filter(r => r.kontrolle && r.kontrolle.flaecheTotListe === false).map(r => r.schluessel);
-  const kontrollen = {ok: verletzt.length === 0, grund: verletzt.length ? `Fläche aus Tot-Liste ≠ final_score bei ${verletzt.length} Stellung(en)` : null};
-  const ergebnis = L.bewerte(einheiten, ergebnisse, kontrollen);
+  const ergebnis = L.bewerte(einheiten, ergebnisse);
   const globaleFehler = [];
   if (doppelt.length) globaleFehler.push(`${doppelt.length} Ergebnis(se) doppelt`);
   if (unbekannt.length) globaleFehler.push(`${unbekannt.length} Ergebnis(se) ohne Einheit`);
@@ -78,7 +79,13 @@ function auswerten({einheiten, zeilen, probe}) {
   const steine = zeilen.filter(r => r.arm0 && r.arm0.status === 'regulaer' && Number.isFinite(r.arm0.kiSteine)).map(r => r.arm0.kiSteine).sort((x, y) => x - y);
   const zuege = steine.length ? {n: steine.length, min: steine[0], max: steine[steine.length - 1], median: L.median(steine), ohneStein: steine.filter(x => x === 0).length} : null;
   const abweichungen = {};
-  for (const r of zeilen) if (r.kontrolle && Array.isArray(r.kontrolle.abweichungen) && r.kontrolle.abweichungen.length) abweichungen[r.schluessel] = r.kontrolle.abweichungen.map(({wo, finalScore, flaecheAusTotListe, tote}) => ({wo, finalScore, flaecheAusTotListe, tote}));
+  for (const r of zeilen) if (r.kontrolle && Array.isArray(r.kontrolle.abweichungen) && r.kontrolle.abweichungen.length) abweichungen[r.schluessel] = r.kontrolle.abweichungen.map(({wo, finalScore, flaecheAusTotListe, tote, diagnose}) => {
+    const v = diagnose && diagnose.vergleich, stand = (() => { try { return L.standAusFinalScore(String(finalScore).replace(/^=\s*/, '')); } catch (e) { return null; } })();
+    return {wo, finalScore, flaecheAusTotListe, tote, unterschied: stand === null ? null : flaecheAusTotListe - stand,
+            punkte: v ? v.punktAbweichungen.map(p => `${p.punkt} (GNU Go ${p.gnugo}, unser Besitzer ${p.unser})`) : null,
+            bestandteile: v ? {steine: v.unsereZaehlung.steine, gebiet: v.unsereZaehlung.gebiet, neutral: v.unsereZaehlung.neutral, tote: v.unsereZaehlung.tote} : null,
+            vergleichFehler: diagnose && diagnose.vergleichFehler || null};
+  });
   const dauer = zeilen.map(r => r.dauerMs).filter(Number.isFinite);
   const out0 = {ergebnis, globaleFehler, konv, ungleichGefangen, wiederholung: wh.je, zuege, abweichungen, verletztTotListe: verletzt, dauer: dauer.length ? {n: dauer.length, mittelS: L.mittel(dauer) / 1000, maxS: Math.max(...dauer) / 1000, summeS: dauer.reduce((s, x) => s + x, 0) / 1000} : null,
           zeilenZahl: zeilen.length, einheitenZahl: einheiten.length, probe};
@@ -110,10 +117,16 @@ function bericht(a) {
   }
   md.push('- Wiederholbarkeit (§9 Nr. 7, nur Probe verlangt; Gegner gnugo und ki müssen gleich sein, fuego wird berichtet): ' + (Object.entries(a.wiederholung).map(([k, v]) => `${k}: ${v.einheitenErfuellt}/${v.verlangtEinheiten} Einheiten erfüllt (je ${v.verlangtJe} Wiederholungsläufe, Einheiten ${v.einheiten}), vollständige Läufe ${v.n}, davon gleich in Zugfolge und Stand ${v.gleich} (versucht ${v.versucht}, unvollständig ${v.unvollstaendig})${v.pflicht ? '' : ' (Gleichheit nur berichtet)'}`).join('; ') || 'keine'));
   if (a.zuege) md.push(`- KI-Züge in den Fortsetzungen (technisch): ${a.zuege.n} reguläre, Steinzüge ${a.zuege.min} bis ${a.zuege.max} (Median ${a.zuege.median}), ohne KI-Steinzug: ${a.zuege.ohneStein}`);
-  for (const [k, ab] of Object.entries(a.abweichungen)) for (const x of ab) md.push(`- Zählabweichung ${k} (${x.wo}): final_score "${x.finalScore}", Fläche aus Tot-Liste ${x.flaecheAusTotListe}, tote Steine ${x.tote}; Brett, tote Koordinaten und beide Zählwerte stehen in den Rohdaten (diagnose)`);
+  for (const [k, ab] of Object.entries(a.abweichungen)) for (const x of ab) {
+    md.push(`- Zählvergleich zweier Verfahren (kein Gültigkeitskriterium) ${k} (${x.wo}): final_score "${x.finalScore}", Fläche aus Tot-Liste ${x.flaecheAusTotListe}${x.unterschied === null ? '' : `, Unterschied ${x.unterschied}`}, tote Steine ${x.tote}`);
+    if (x.bestandteile) md.push(`    - Bestandteile (unsere Zählung): Schwarz Steine ${x.bestandteile.steine.schwarz} + Gebiet ${x.bestandteile.gebiet.schwarz}, Weiß Steine ${x.bestandteile.steine.weiss} + Gebiet ${x.bestandteile.gebiet.weiss}, neutral ${x.bestandteile.neutral}, tote Steine S/W ${x.bestandteile.tote.schwarz}/${x.bestandteile.tote.weiss}`);
+    if (x.punkte) md.push(`    - Punktabweichungen: ${x.punkte.join('; ') || 'keine'}`);
+    if (x.vergleichFehler) md.push(`    - Vergleich mit GNU Gos Listen nicht möglich: ${x.vergleichFehler}`);
+    md.push('    - Brett, tote Koordinaten und beide Zählwerte stehen in den Rohdaten (diagnose)');
+  }
   md.push(`- Konvention von GNU Gos \`captures\` (in der Kalibrierung bestimmt, je Stellung angewendet; Anzahl Stellungen): ${JSON.stringify(a.konv)}`);
   md.push(`- Stellungen mit ungleichen Gefangenenzahlen (dort würde ein vertauschter Zähler auffallen): ${a.ungleichGefangen} von ${a.zeilenZahl}`);
-  if (a.verletztTotListe.length) md.push(`- Fläche aus Tot-Liste ≠ final_score bei: ${a.verletztTotListe.join(', ')}`);
+  if (a.verletztTotListe.length) md.push(`- Zählvergleich: Fläche aus Tot-Liste ≠ final_score bei ${a.verletztTotListe.length} Stellung(en): ${a.verletztTotListe.join(', ')} (Vergleich zweier Zählverfahren, nicht Teil der Gültigkeit)`);
   if (a.dauer) md.push(`- Dauer je Einheit: Mittel ${a.dauer.mittelS.toFixed(0)} s, Maximum ${a.dauer.maxS.toFixed(0)} s, Summe ${(a.dauer.summeS / 3600).toFixed(2)} h`);
   md.push('', '## Ausfälle (einzeln, §9 Nr. 6)', '');
   for (const w of ['flaeche', 'territory']) {

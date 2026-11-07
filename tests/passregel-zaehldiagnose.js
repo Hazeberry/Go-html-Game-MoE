@@ -103,6 +103,16 @@ function lauf(w, aus, index, env = {}, extra = []) {
   return {status: r.status, stdout: r.stdout, stderr: r.stderr, j};
 }
 
+/* finalAreaScore und finalTerritoryScore aus index.html schneiden (wie tests/passregel-vergleich.js) */
+function appFunktionenTest(E) {
+  const quelle = fs.readFileSync(html, 'utf8');
+  const bau = (name, state) => {
+    const m = new RegExp(`function ${name}\\(\\) \\{[\\s\\S]*?\\n\\}\\n`).exec(quelle);
+    if (!m) throw new Error(name + ' nicht gefunden');
+    return new Function('state', 'BOARD_SIZE', 'NEIGHBORS', m[0] + `;return ${name}();`)(state, E.BOARD_SIZE, E.NEIGHBORS);
+  };
+  return {area: s => bau('finalAreaScore', s), territory: s => bau('finalTerritoryScore', s)};
+}
 const gruendeText = r => (r.j ? r.j.gruendeUngueltig.join(' | ') : '') + ' ' + (r.stderr || '').slice(0, 300);
 
 /* ── 1 Zählbestandteile ─────────────────────────────────────────────── */
@@ -218,6 +228,49 @@ test('Ungültig (kein Urteil): nicht wiederholbar, abgelehnter Zug, falsche Stel
     pruefeGleich(falsch.status, 1, 'falsche Stellung: Exit 1'); pruefe(falsch.j.gruendeUngueltig.some(x => /Voraussetzung|Einheit:/.test(x)), 'falsche Stellung wird erkannt: ' + falsch.j.gruendeUngueltig.join(' | '));
     pruefe(/Diagnose UNGÜLTIG: kein Urteil/.test(falsch.stdout), 'Bericht sagt „kein Urteil“');
   } finally { fs.rmSync(w.dir, {recursive: true, force: true}); }
+});
+
+/* ── 5b Fester Testfall: die bekannte Zähldifferenz aus Probe 1 ─────────── */
+test('Fester Testfall alte PWA, m1, Partie 206, Index 341: die bekannte Differenz von 3 Punkten bleibt nachvollziehbar', () => {
+  const fx = JSON.parse(fs.readFileSync(path.join(wurzel, 'tests', 'stellungen', 'zaehldiagnose-pwa206-341.json'), 'utf8')), E = engine(), n = E.BOARD_SIZE;
+  const rec = L.leseJsonl(path.join(wurzel, fx.einheit.datei)).find(r => r.nr === fx.einheit.nr);
+  const zuege = rec.zuege.slice(0, fx.einheit.index + 1), farben = zuege.map((_, j) => (j % 2 === 0 ? (rec.beginnt === 'S' ? 'B' : 'W') : (rec.beginnt === 'S' ? 'W' : 'B')));
+  pruefeGleich(zuege.length, fx.einheit.zuegeInFolge, 'Länge der Folge'); pruefeGleich(rec.zuege.length, fx.einheit.archivZuegeGesamt, 'Länge der ganzen Archivpartie');
+  pruefeGleich(crypto.createHash('sha256').update(zuege.join(',')).digest('hex'), fx.einheit.folgeSha256, 'SHA-256 der Folge wie in der Diagnose');
+  pruefeGleich(L.fortsetzungsSeed(1, fx.einheit.gruppe, path.basename(fx.einheit.datei), fx.einheit.nr, fx.einheit.index), fx.gnugo.seed, 'Seed wie in der Diagnose');
+  pruefeGleich(F.gnugoArgumente(fx.gnugo.seed).join(' '), fx.gnugo.argumente, 'GNU-Go-Argumente wie in der Diagnose');
+  /* Brett und Gefangene aus dem Archiv gleich dem Brett, das GNU Go im Lauf hatte (Abschrift des Berichts) */
+  const board = new Uint8Array(n), caps = {1: 0, 2: 0};
+  zuege.forEach((m, j) => { if (m === 'pass') return; const i = L.vonGtp(m), f = farben[j] === 'B' ? 1 : 2; board[i] = f; caps[f] += E.removeDeadGroups(board, 3 - f, i); });
+  pruefeGleich(Array.from({length: 19}, (_, y) => Array.from(board.slice(y * 19, y * 19 + 19), c => '.XO'[c]).join('')).join('\n'), fx.brett.join('\n'), 'Brett wie im Bericht des Laufs');
+  pruefeGleich(caps[1] + '/' + caps[2], fx.gefangen.schwarz + '/' + fx.gefangen.weiss, 'Gefangene wie GNU Go (74/20)');
+  /* unsere Zählung mit der Tot-Liste des Laufs */
+  const tot = new Set(fx.tot.map(L.vonGtp)), zb = L.zaehlbestandteile(board, caps, tot, 7.5, E.NEIGHBORS), u = fx.unsereZaehlung;
+  pruefeGleich(zb.steine[1] + '/' + zb.steine[2], u.steine.schwarz + '/' + u.steine.weiss, 'Steine'); pruefeGleich(zb.gebiet[1] + '/' + zb.gebiet[2], u.gebiet.schwarz + '/' + u.gebiet.weiss, 'Gebiet');
+  pruefeGleich(zb.neutral, u.neutral, 'neutrale Punkte'); pruefeGleich(zb.tote[1] + '/' + zb.tote[2], u.tote.schwarz + '/' + u.tote.weiss, 'tote Steine');
+  pruefeGleich(zb.flaeche.stand, u.flaeche.stand, 'Fläche aus der Tot-Liste 136,5'); pruefeGleich(zb.territory.stand, u.territoryStand, 'Territory aus der Tot-Liste 128,5');
+  const neutral = zb.regionen.filter(r => r.besitzer === 0);
+  pruefeGleich(neutral.length, 1, 'eine neutrale Region'); pruefeGleich(neutral[0].punkte.map(L.zuGtp).sort().join(' '), [...u.neutraleRegion.punkte].sort().join(' '), 'E19 F19 G19 H19 J19'); pruefeGleich(neutral[0].rand, u.neutraleRegion.rand, 'Rand Schwarz und Weiß');
+  /* die App zählt dieselbe Stellung nach derselben Flood-Fill-Regel: gleich unserer Zählung, ungleich GNU Gos final_score */
+  const app = appFunktionenTest(E), b2 = Uint8Array.from(board), c2 = {1: caps[1], 2: caps[2]};
+  for (const i of tot) { c2[b2[i] === 1 ? 2 : 1]++; b2[i] = 0; }
+  const fl = app.area({board: b2}), tr = app.territory({board: b2, captures: c2});
+  pruefeGleich(fl[1] + '/' + fl[2], u.flaeche.schwarz + '/' + u.flaeche.weiss, 'finalAreaScore der App: 250/106, gleich unserer Zählung');
+  pruefeGleich(fl[1] - (fl[2] + 7.5), u.flaeche.stand, 'Stand der App-Fläche 136,5'); pruefe(fl[1] - (fl[2] + 7.5) !== fx.finalScore.stand, 'App-Fläche ≠ final_score (139,5): Vergleich zweier Zählverfahren');
+  pruefeGleich(tr[1] - (tr[2] + 7.5), u.territoryStand, 'finalTerritoryScore der App 128,5');
+  /* GNU Gos Listen: bt und wt aus der Kreuztabelle abgeleitet (nicht roh gespeichert, siehe Fixture) */
+  const bt = new Set(), wt = new Set(), dame = new Set(fx.dame.map(L.vonGtp)), alive = new Set(), nur = fx.punktAbweichungen.map(L.vonGtp);
+  for (let p = 0; p < n; p++) { if (board[p]) { if (!tot.has(p)) alive.add(p); continue; } if (dame.has(p) || nur.includes(p)) continue; if (zb.besitzer[p] === 1) bt.add(p); if (zb.besitzer[p] === 2) wt.add(p); }
+  for (const p of nur) bt.add(p);
+  pruefeGleich(bt.size + '/' + wt.size + '/' + alive.size, fx.listenGroesse.bt + '/' + fx.listenGroesse.wt + '/' + fx.listenGroesse.alive, 'Größen der abgeleiteten Listen wie im Lauf (84/35/220)');
+  const v = L.vergleicheZaehlung(board, caps, {alive, dead: tot, seki: new Set(), wt, bt, dame}, 7.5, E.NEIGHBORS, fx.finalScore.stand);
+  pruefeGleich(JSON.stringify(Object.fromEntries(Object.entries(v.kreuztabelle).sort())), JSON.stringify(Object.fromEntries(Object.entries(fx.kreuztabelle).sort())), 'Kreuztabelle wie im Lauf');
+  pruefeGleich(v.punktAbweichungen.map(x => x.punkt).sort().join(' '), [...fx.punktAbweichungen].sort().join(' '), 'abweichende Punkte G19 H19 J19');
+  pruefe(v.punktAbweichungen.every(x => x.gnugo === 'gebiet-S' && x.unser === 'neutral'), 'GNU Go: Schwarz-Gebiet, unser Besitzer: neutral');
+  pruefeGleich(v.abweichungFlaecheAusTotListe.unterschied, -3, 'Unterschied −3'); pruefeGleich(v.abweichungFlaecheAusTotListe.reproduziert, true, 'Abweichung');
+  pruefeGleich(v.gnugoAusListen.variante1_lebendePlusGebiet.stand, fx.nachbildungen.variante1, 'Variante 1 wie im Lauf'); pruefeGleich(v.gnugoAusListen.variante2_mitSeki.stand, fx.nachbildungen.variante2, 'Variante 2 wie im Lauf');
+  pruefeGleich(v.gnugoAusListen.variante3_mitPunktenToterSteine.stand, fx.nachbildungen.variante3, 'Variante 3 trifft final_score (139,5)'); pruefeGleich(v.gnugoAusListen.v3GleichFinalScore, true, 'Nachrechnung: 253 − 106 − 7,5');
+  pruefeGleich(v.gnugoAusListen.variante3_mitPunktenToterSteine.schwarz + '/' + v.gnugoAusListen.variante3_mitPunktenToterSteine.weiss, '253/106', 'Schwarz 150 + 84 + 19 = 253, Weiß 70 + 35 + 1 = 106');
 });
 
 /* ── 6 Jeder verlangte Befehl muss erfolgreich beantwortet werden ───────── */

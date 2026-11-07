@@ -91,6 +91,16 @@ async function zaehlung(E, ref, board, caps) {
   /* Diagnose zur Zählabweichung (docs/passregel-vergleich.md §9 Nr. 5): Brett, tote Koordinaten und beide Zählwerte */
   const diagnose = {brett: brettText(board), gefangen: {1: caps[1], 2: caps[2]}, tote: [...tot].sort((a, b) => a - b).map(L.zuGtp),
                     finalScore: fs_, flaecheFinalScore: flaeche, flaecheAusTotListe: flaecheTot, territoryAusTotListe: territory};
+  /* Nur bei einer Abweichung: GNU Gos Listen holen und beide Zählverfahren Punkt für Punkt vergleichen (Koordinaten und
+     Bestandteile, ohne Toleranz). Scheitert das, steht der Grund da; es ist kein Gültigkeitskriterium. */
+  if (Math.abs(flaecheTot - flaeche) >= 1e-9) {
+    try {
+      const m = {dead: tot};
+      for (const [k, art] of [['alive', 'alive'], ['seki', 'seki'], ['wt', 'white_territory'], ['bt', 'black_territory'], ['dame', 'dame']])
+        m[k] = L.totListeAusGtp(await ref.frage('final_status_list ' + art));
+      diagnose.vergleich = L.vergleicheZaehlung(board, caps, m, KOMI, E.NEIGHBORS, flaeche);
+    } catch (err) { diagnose.vergleichFehler = err.message.slice(0, 160); }
+  }
   return {flaeche, territory, flaecheTotListe: Math.abs(flaecheTot - flaeche) < 1e-9, flaecheAusTotListe: flaecheTot, tote: tot.size, finalScore: fs_, diagnose};
 }
 
@@ -282,6 +292,11 @@ function logAbweichungen(r) {
     const d = x.diagnose;
     if (d && d.brett) {
       aus.push(`  gefangen von Schwarz/Weiß: ${d.gefangen[1]}/${d.gefangen[2]}; tote Koordinaten: ${d.tote.join(' ') || '–'}; Territory aus Tot-Liste ${d.territoryAusTotListe}`);
+      if (d.vergleich) {
+        const u = d.vergleich.unsereZaehlung;
+        aus.push(`  Bestandteile (unsere Zählung): Schwarz Steine ${u.steine.schwarz} + Gebiet ${u.gebiet.schwarz}, Weiß Steine ${u.steine.weiss} + Gebiet ${u.gebiet.weiss}, neutral ${u.neutral}, tote Steine S/W ${u.tote.schwarz}/${u.tote.weiss}`);
+        aus.push(`  Punktabweichungen GNU Go gegen unseren Besitzer: ${d.vergleich.punktAbweichungen.map(p => `${p.punkt} (GNU Go ${p.gnugo}, unser Besitzer ${p.unser})`).join('; ') || 'keine'}`);
+      } else if (d.vergleichFehler) aus.push(`  Vergleich mit GNU Gos Listen nicht möglich: ${d.vergleichFehler}`);
       for (let y = 0; y < 19; y++) aus.push('  ' + d.brett.slice(y * 19, y * 19 + 19));
     }
   }
