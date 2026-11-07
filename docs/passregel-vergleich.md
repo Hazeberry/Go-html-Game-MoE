@@ -252,9 +252,13 @@ Pflichtprüfungen:
    - **Tot-Liste:** `final_status_list dead` ist lesbar, jedes Wort eine gültige Brettkoordinate (kein `pass`).
      **Unzulässige Daten** in einer Antwort von GNU Go (z. B. `pass` oder `Z99` in der Tot-Liste, ein unlesbarer oder nicht
      endlicher `final_score`) sind ein **Pflichtfehler**, beim Arm „sofort“ wie beim Arm „weiter“; die Einheit läuft dann nicht
-     weiter. Ein **technischer Ausfall** (GNU Go beendet sich, die Frage bleibt ohne Antwort, Fehlerantwort „?“) ist dagegen
-     **kein** Pflichtfehler, sondern wird konservativ nach der Ausfallregel behandelt (Nr. 6): beim Arm „sofort“ ist der Stand
-     unbekannt, beim Arm „weiter“ ist es ein Ausfall. Ein **unerwarteter Fehler im Werkzeug selbst** ist ein Pflichtfehler
+     weiter. Ein **technischer Ausfall** ist dagegen **kein** Pflichtfehler, sondern wird konservativ nach der Ausfallregel
+     behandelt (Nr. 6): beim Arm „sofort“ ist der Stand unbekannt, beim Arm „weiter“ ist es ein Ausfall. Zwei Arten sind zu
+     unterscheiden: **„beendet“** (der Prozess ist weg, keine Antwort) und **„Befehl abgelehnt“** (GNU Go lebt, hat den Befehl
+     aber mit einer Fehlerantwort „?“ verweigert). **Befehl und Fehlertext bleiben unverändert erhalten** (Rohdaten:
+     `arm1Technisch` und `arm0.technisch`), und der Bericht gruppiert die Ausfälle nach Art, Programm, Befehl und Fehlertext.
+     Wird **derselbe Befehl in mehreren Einheiten abgelehnt**, kennzeichnet der Bericht das als mögliche systematische
+     Fehlbedienung; das ist ein Hinweis und kein Gültigkeitskriterium. Ein **unerwarteter Fehler im Werkzeug selbst** ist ein Pflichtfehler
      und wird nicht als Ausfall getarnt.
    - **Komi 7,5** und **Übereinstimmung mit dem App-Code:** Die Territory-Rechnung folgt der Regel der App
      (`finalTerritoryScore`, tote Steine als Gefangene des Gegners, Komi 7,5). Das prüfen Tests gegen die aus `index.html`
