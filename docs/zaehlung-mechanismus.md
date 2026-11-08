@@ -60,9 +60,13 @@ Ausgabe: `daten/zaehlung-mechanismus/browser/`, `browser-konsole.txt`, `browser-
   Exit 1 heißt nur „mindestens ein Fall reproduziert“; die Einzelstatus stehen in `browser/bericht.json`.
 - Vergleich mit dem Bericht der Wiederholung (`docs/daten/bughunt-wiederholung/lauf1/browser/bericht.json`, dort die `index.html` aus codex): Status je Fall gleich. Bei sechs Fällen sind alle Felder gleich. Bei UI-3
   unterscheiden sich nur die drei Pixel-Hashes (`screenshotHash`, `cleanHash`, `cachedHash`); die Beziehungen (Bild nach Pass gleich Cache, ungleich Neuaufbau) sind gleich.
-- **Die Pixel-Hashes sind auch zwischen zwei Läufen mit derselben Datei verschieden** (erster eigener Lauf `12b43ad1…`, zweiter `a00abf0e…`, Wiederholung `243c1d10…`; auch die PNG-Dateien sind nicht bytegleich). Die Abweichung
+- **Die Pixel-Hashes sind auch zwischen Läufen mit derselben Datei verschieden** (`screenshotHash` des ersten eigenen Laufs `12b43ad1…`, des zweiten `a00abf0e…`, des dritten, abgelegten `dee051bd…`; Wiederholung `243c1d10…`; auch die PNG-Dateien sind nicht bytegleich). Die Abweichung
   gegenüber der Wiederholung ist daher kein Hinweis auf einen Unterschied der Dateien. Warum die Hashes schwanken, habe ich nicht untersucht.
-- Gesichtet (zweiter Lauf, abgelegt): `UI-3.nach-pass.png` (acht orange Kreuze oben rechts) und `UI-3.nach-neuzeichnen.png` (keines). Die übrigen Bilder nicht.
+- Gesichtet (abgelegter dritter Lauf): `UI-3.nach-pass.png` (acht orange Kreuze oben rechts) und `UI-3.nach-neuzeichnen.png` (keines). Die übrigen Bilder nicht.
+- **Gültigkeit des Browserteils (nur zwei Zustände):** `browser-teil.sh` löscht vor dem Lauf alle früheren Browserausgaben und lässt für `browser.cjs` nur Exit 0 und 1 zu (jeder andere Exit ist ein technischer Fehler, der
+  den Gesamtlauf rot macht). Ein Exit 1 allein genügt nicht, weil `node` auch bei einem technischen Fehler (etwa fehlendes Skript) mit 1 endet. Maßgeblich ist der Bericht: `browser-vergleich.js` verlangt, dass er lesbar ist,
+  keinen Startfehler und eine Browserversion nennt, zur geprüften `index.html` (SHA-256) gehört, nicht älter ist als der Start des Laufs und alle sieben Pflichtfälle genau einmal mit Status „reproduziert“ oder „nicht_reproduziert“ enthält;
+  sonst „KEIN URTEIL“ mit Grund und Exit 1. Geprüft von `tests/zaehlung-mechanismus.js` (Attrappen-`browser.cjs`, vier Mutationen der Skripte wurden erkannt).
 - `reproduce.cjs` (neun Prüfungen unter Node) wurde **nicht** gegen diese Dateien ausgeführt; es prüft fest eingebaute Hashes der codex-Dateien und müsste dazu geändert werden.
 
 Die Befunde UI-1, UI-2, UI-3, TRAIN-1, TRAIN-2 und NET-1 sind damit auch an der `index.html` dieses Repos in dieser Umgebung (nur Chromium 153) reproduziert. Das bestätigt die Übertragbarkeit der Abläufe, ist aber
@@ -165,6 +169,9 @@ gezählt, Herkunft dort beschrieben); die Zahlen hier sind eine andere, maschine
   alle 98 Ketten sind 79 KI-Farbe und 19 Gegnerfarbe; für V (71 Ketten) stimmt die frühere Angabe „alle KI-Farbe“. Das wurde beim Konsolidieren der Skripte bemerkt.
 - **GTP-1:** Meine Zwischenfassung „berührt die PWA-Läufe nicht“ war zu weit; nach Durchsicht durch Hazeberry gilt §3.
 - **Falsche Augen:** „Verbesserung“ war zu stark; gilt als nachträglicher Diagnosebefund (6.6).
+- **Browserteil von `lauf.sh`:** In der ersten Fassung wurde der Exitcode von `browser.cjs` nur in eine Datei geschrieben, `browser-vergleich.js` prüfte weder Startfehler noch fehlende Pflichtfälle, und ein wiederverwendetes
+  Ausgabeverzeichnis hätte alte Berichte lesen können; der Lauf hätte erfolgreich enden können, ohne dass der Browserteil lief. Hinweis von Luna vor dem Merge, bestätigt am Code; behoben (§4, Gültigkeit des Browserteils). Die abgelegten
+  Ergebnisse waren davon nicht betroffen (der Browserbericht enthielt alle sieben Fälle), wurden aber mit den korrigierten Skripten neu erzeugt; alle anderen Ausgaben waren dabei bytegleich.
 
 ## 8. Grenzen
 
@@ -190,7 +197,7 @@ Getrennt zu besprechen (Vorabfestlegung und Go jeweils für genau einen Punkt):
 ## 10. Dateien und Reproduktion
 
 Skripte (alle mit Lizenzkopf): [`../auswertung/zaehlung-mechanismus/`](../auswertung/zaehlung-mechanismus/): `lauf.sh` (feste Reihenfolge), `gemeinsam.js`, `zaehl-liste.js`, `mechanismus.js`, `kennzahlen.js`, `benson-unabhaengig.js`,
-`gegenprobe.js`, `falschesauge.js`, `browser-vergleich.js`. Ausgaben und Prüfsummen: [`daten/zaehlung-mechanismus/`](daten/zaehlung-mechanismus/README.md).
+`gegenprobe.js`, `falschesauge.js`, `browser-teil.sh`, `browser-vergleich.js`; Test: `tests/zaehlung-mechanismus.js`. Ausgaben und Prüfsummen: [`daten/zaehlung-mechanismus/`](daten/zaehlung-mechanismus/README.md).
 
 ```sh
 bash auswertung/zaehlung-mechanismus/lauf.sh docs/daten/passregel-vergleich/stufe-c-42331033107/bericht.zip <Arbeitsverzeichnis außerhalb des Repos> <Ausgabeverzeichnis> [<codex-Checkout>]

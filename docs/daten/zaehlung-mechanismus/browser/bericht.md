@@ -1,6 +1,6 @@
 # Gezielte Bughunt-Browserdiagnose
 
-Zeit: 2026-11-08T02:37:00.632Z
+Zeit: 2026-11-08T02:56:37.901Z
 index.html SHA-256: d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b
 Node: v22.23.4; Browser: 153.0.8010.12
 
@@ -512,9 +512,9 @@ Node: v22.23.4; Browser: 153.0.8010.12
     },
     "previewNull": true,
     "panelHidden": true,
-    "screenshotHash": "a00abf0ef7cbb7d92f4096dfa8035387d14c001cec1cd9147642037184b0ee6e",
-    "cleanHash": "a0ba3bba01cf1504e95d397f8bf67d36bee5aee370da0dafcb7d1e4185bf9668",
-    "cachedHash": "a00abf0ef7cbb7d92f4096dfa8035387d14c001cec1cd9147642037184b0ee6e"
+    "screenshotHash": "dee051bd75755c6d87115f2409ecdb5ca9c19cea098156608293fdfc675536ea",
+    "cleanHash": "9255c27ec72106f29a999235dc14591a4cb90b12781daaf18f3a282214615277",
+    "cachedHash": "dee051bd75755c6d87115f2409ecdb5ca9c19cea098156608293fdfc675536ea"
   }
 }
 ```

@@ -23,7 +23,7 @@ Ausgaben von `auswertung/zaehlung-mechanismus/lauf.sh` am 08.11.2026. Deutung un
 | `gegenprobe-freiheitsverband.txt`, `.json` | Gegenprobe ohne Verbandsbildung über gemeinsame Freiheiten (§6.4) |
 | `gegenprobe-diagonalauge.txt`, `.json` | Gegenprobe mit Diagonalprüfung bei Ein-Punkt-Augen, mit Einzelliste der „nur App tot“-/„nur GNU tot“-Ketten in V (§6.6) |
 | `falschesauge.txt` | Ein-Punkt-Augen nach der Diagonalregel (§6.5) |
-| `browser/`, `browser-konsole.txt`, `browser-selbsttest.txt`, `browser-exit.txt`, `browser-vergleich.txt` | `browser.cjs` gegen die eigene `index.html` und Vergleich mit der Wiederholung (§4) |
+| `browser/`, `browser-konsole.txt`, `browser-selbsttest.txt`, `browser-exit.txt`, `browser-vergleich.txt` | `browser.cjs` gegen die eigene `index.html` (erzeugt von `browser-teil.sh`, das alte Ausgaben vorher löscht), Gültigkeitsprüfung und Vergleich mit der Wiederholung (§4) |
 | `SHA256SUMS` | Prüfsummen aller Dateien in diesem Verzeichnis |
 
 ```sh

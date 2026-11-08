@@ -13,6 +13,8 @@ ERWARTET=0d9ca865d424251c57a3c9d424cd290e0206a86fe4d6fdd37bd13b8be4720e08
 ist=$(sha256sum "$ZIP" | cut -d' ' -f1)
 if [ "$ist" != "$ERWARTET" ]; then echo "ZIP-SHA-256 weicht ab ($ist): kein Urteil"; exit 1; fi
 rm -rf "$ARBEIT/stufe-c"; mkdir -p "$ARBEIT/stufe-c" "$AUS"
+# Frische Ausgabe: bekannte Ergebnisdateien früherer Läufe entfernen (nie alte Zwischenstände lesen)
+rm -f "$AUS"/mech.json "$AUS"/benson.json "$AUS"/gegenprobe-*.json "$AUS"/zaehl-liste.txt "$AUS"/mechanismus.txt "$AUS"/kennzahlen.txt "$AUS"/benson.txt "$AUS"/gegenprobe-*.txt "$AUS"/falschesauge.txt
 unzip -q "$ZIP" -d "$ARBEIT/stufe-c" || exit 1
 D="$ARBEIT/stufe-c"; H="$WURZEL/index.html"; status=0
 schritt() { local name=$1; shift; echo "== $name"; "$@" > "$AUS/$name.txt" 2>&1 || { s=$?; echo "   Exit $s"; status=1; }; tail -n 3 "$AUS/$name.txt"; }
@@ -24,10 +26,6 @@ schritt gegenprobe-freiheitsverband node "$HIER/gegenprobe.js" --variante freihe
 schritt gegenprobe-diagonalauge     node "$HIER/gegenprobe.js" --variante diagonalauge --html "$H" --daten "$D" --tmp "$ARBEIT/kopien" --aus "$AUS/gegenprobe-diagonalauge.json"
 schritt falschesauge  node "$HIER/falschesauge.js" --daten "$D" --mech "$AUS/mech.json"
 if [ -n "$CODEX" ]; then
-  B="$CODEX/auswertung/bughunt-20261107/browser.cjs"; mkdir -p "$AUS/browser"
-  schritt browser-selbsttest node "$B" --selftest
-  echo "== browser (Exit 1 heißt: mindestens ein Fall reproduziert; Exit 2: nicht ausgeführt)"
-  node "$B" --html "$H" --aus "$AUS/browser" > "$AUS/browser-konsole.txt" 2>&1; echo "   Exit $?" | tee "$AUS/browser-exit.txt"
-  schritt browser-vergleich node "$HIER/browser-vergleich.js" --eigen "$AUS/browser/bericht.json" --lauf1 "$WURZEL/docs/daten/bughunt-wiederholung/lauf1/browser/bericht.json"
+  bash "$HIER/browser-teil.sh" "$H" "$CODEX" "$AUS" || status=1
 fi
 exit $status
