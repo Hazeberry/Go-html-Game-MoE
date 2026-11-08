@@ -61,7 +61,8 @@ function partie(nr, laenge, sonder = {}) {
 const GRUPPE_A = [partie(1, 340), partie(2, 330), partie(3, 360), partie(4, 300), partie(5, 355), partie(6, 380), partie(7, 320),
   partie(8, 248), partie(9, 249), partie(10, 320, {ende: false}), partie(11, 320, {felder: {aufgabe: {wer: 'S'}}}),
   partie(12, 320, {felder: {abgebrochen: true}}), partie(13, 320, {felder: {komi: 6.5}})];
-const GRUPPE_B = [partie(1, 340), partie(2, 310), partie(3, 330), partie(4, 350), partie(5, 365)];
+/* eigener Seed: sonst wären Partien beider Gruppen gleich oder hätten gleiche Anfänge (und damit gleiche Bretter) */
+const GRUPPE_B = [partie(1, 340, {seed: 500}), partie(2, 310, {seed: 500}), partie(3, 330, {seed: 500}), partie(4, 350, {seed: 500}), partie(5, 365, {seed: 500})];
 const ZUFALL_E = [5, 7, 9].map(s => B.ZUFALL.find(z => z.seed === s));
 
 function schreibeArchiv(verz, a = GRUPPE_A, b = GRUPPE_B) {
@@ -269,13 +270,14 @@ test('rechnen verweigert die falsche Fassung', () => {
 /* Synthetische Ergebnisse für die Fallabdeckung und den Mindestumfang */
 const leer = {flaeche: {schwarz: 0, weiss: 0, stand: -7.5}, territory: {schwarz: 0, weiss: 0, stand: -7.5}};
 const vor = {flaeche: {hash: 'h', standNur: -7.5, standMit: -7.5, anzahl: {}, sicher: true}, territory: {hash: 'h', standNur: -7.5, standMit: -7.5, anzahl: {}, sicher: true}};
-const stell = [{id: 'E|x', art: 'E', gruppe: 'g', quelle: 'q', nr: 1, index: 5, partie: null, kiFarbe: 1, komi: 7.5},
-  {id: 'g|q|1|S', art: 'S', gruppe: 'g', quelle: 'q', nr: 1, index: 5, partie: 'g|q|1', kiFarbe: 1, komi: 7.5},
-  {id: 'g|q|1|V250', art: 'V', gruppe: 'g', quelle: 'q', nr: 1, index: 250, partie: 'g|q|1', kiFarbe: 1, komi: 7.5}];
+const einStein = p => '.'.repeat(p) + 'X' + '.'.repeat(360 - p);
+const stell = [{id: 'E|x', art: 'E', gruppe: 'g', quelle: 'q', nr: 1, index: 5, partie: null, kiFarbe: 1, komi: 7.5, brett: einStein(0)},
+  {id: 'g|q|1|S', art: 'S', gruppe: 'g', quelle: 'q', nr: 1, index: 5, partie: 'g|q|1', kiFarbe: 1, komi: 7.5, brett: einStein(1)},
+  {id: 'g|q|1|V250', art: 'V', gruppe: 'g', quelle: 'q', nr: 1, index: 250, partie: 'g|q|1', kiFarbe: 1, komi: 7.5, brett: einStein(2)}];
 const stand = (n, pid, sha_, tots) => ({kopf: {stand: n, htmlSha256: sha_, pid}, reihenfolge: stell.map(s => s.id),
   jeId: new Map(stell.map((s, i) => [s.id, {id: s.id, aus: s.art === 'E' ? {tot: tots[i]} : s.art === 'S' ? {tot: tots[i], zaehl: leer} : {tot: tots[i], vorschau: vor},
     an: s.art === 'E' ? {tot: tots[i]} : s.art === 'S' ? {tot: tots[i], zaehl: leer} : {tot: tots[i], vorschau: vor}}]))});
-const s0ok = {pflichtfehler: {daten: [], replay: [], schnittmenge: []}};
+const s0ok = {pflichtfehler: {daten: [], replay: [], schnittmenge: []}, ausgeschlossen: {partieGleichQuelle: 0, S: {entwicklung: 0, doppelt: 0}, V: {entwicklung: 0, doppelt: 0}}};
 
 test('Fallabdeckung: leere Tot-Mengen oder ein Schalter ohne Wirkung ergeben KEIN URTEIL, nicht „gleich“', () => {
   const alle = (t) => [t, t, t];
@@ -301,6 +303,59 @@ test('Zu wenig Betroffene: Befund wird beschrieben, die Kandidatur bleibt offen'
   /* Schlechte Daten: S-Stellung mit Tot-Menge bei aus ≠ alt */
   const schlecht = stand('neu', 3, 'n', [[4], [5], [4]]); schlecht.jeId.get('E|x').an = {tot: []};
   pruefeGleich(W.vergleichen(stell, s0ok, stand('alt', 1, 'a', [[4], [4], [4]]), testS, schlecht, null).bericht.gueltig, false, 'abweichende Tot-Menge bei aus ist ungültig');
+});
+
+test('Duplikate (§14.4): gleiche Zugfolge wie Quellpartie, Entwicklungsbrett, doppeltes Brett aus anderer Zugfolge; erster Vertreter bleibt', () => {
+  const verz = fs.mkdtempSync(path.join(tmp, 'd-'));
+  /* Duplikate stehen am Dateiende: der Vertreter ist der frühere Eintrag in Dateireihenfolge */
+  const kopie = (nr, von, aender) => ({...von, nr, ...aender(von)});
+  const q2 = GRUPPE_A.find(r => r.nr === 2), p3 = GRUPPE_A.find(r => r.nr === 3), p4 = GRUPPE_A.find(r => r.nr === 4), p5 = GRUPPE_A.find(r => r.nr === 5);
+  const tausche = r => { const z = r.zuege.slice(); [z[0], z[2]] = [z[2], z[0]]; return z; };   /* zwei frühe Schwarzzüge vertauscht: andere Zugfolge, gleiche Bretter */
+  const dups = [
+    kopie(20, q2, r => ({wirFarbe: r.wirFarbe === 'S' ? 'W' : 'S', gefangen: {wir: r.gefangen.gegner, gegner: r.gefangen.wir}})),   /* gleiche Zugfolge wie Quellpartie, andere Farbe der KI */
+    kopie(21, p3, r => ({wirFarbe: r.wirFarbe === 'S' ? 'W' : 'S', gefangen: {wir: r.gefangen.gegner, gegner: r.gefangen.wir}})),   /* ganze Partie doppelt im Prüfsatz */
+    kopie(22, p4, r => ({zuege: tausche(r)}))];                                                                                    /* andere Zugfolge, gleiche Bretter */
+  schreibeEntwicklung(verz, rows => {   /* eine Entwicklungsstellung gleicht V300 der Prüfpartie 5 */
+    const sp = W.spielEin(E, W.folgeAusArchiv(p5), [300]);
+    rows[0].diagnose.anfang.brett = sp.snaps[300].brett; return rows;
+  });
+  const z = ziehe(verz, 'z', schreibeArchiv(verz, GRUPPE_A.concat(dups), GRUPPE_B));
+  pruefeGleich(z.status, 0, 'gültig: ' + z.stdout.slice(-400));
+  const s0 = liesJson(path.join(z.aus, 'schritt0.json')), a = s0.gruppen[0], ids = new Set(liesJsonl(path.join(z.aus, 'stellungen.jsonl')).map(x => x.id));
+  const k = nr => `Gruppe A|attrappe/A.jsonl.gz|${nr}`;
+  pruefeGleich(a.ausgeschlossen.partieGleichQuelle, 1, 'Partie gleich Quellpartie (ohne Farbe der KI erkannt)');
+  pruefe(![...ids].some(i => i.startsWith(k(20) + '|')), 'Partie 20 ist ganz ausgeschlossen');
+  pruefeGleich(a.pruefpartien, 12, 'Prüfpartien: 10 + 2 (die Quell-Duplikatpartie zählt nicht)');
+  pruefeGleich(a.gleicheZugfolgeImPruefsatz, 1, 'gleiche Zugfolge im Prüfsatz nur gezählt');
+  pruefe(ids.has(k(3) + '|S') && !ids.has(k(21) + '|S'), 'Partie 3 bleibt (erster Vertreter), die Kopie 21 nicht');
+  pruefe(ids.has(k(4) + '|V300') && !ids.has(k(22) + '|V300') && !ids.has(k(22) + '|S'), 'Brettvergleich: Partie 22 (andere Zugfolge, gleiche Bretter) ist ausgeschlossen');
+  pruefe(!ids.has(k(5) + '|V300') && ids.has(k(5) + '|V250') && ids.has(k(5) + '|S'), 'V300 von Partie 5 gleicht einem Entwicklungsbrett: nur diese Stellung entfällt');
+  pruefeGleich(a.ausgeschlossen.V.entwicklung, 1, 'V gleich Entwicklungsbrett: 1');
+  pruefeGleich(a.ausgeschlossen.S.doppelt, 2, 'S doppelt: Partie 21 und 22');
+  pruefe(a.ausgeschlossen.V.doppelt >= 4, 'V doppelt: mindestens je zwei Indizes der Partien 21 und 22: ' + a.ausgeschlossen.V.doppelt);
+  pruefeGleich(a.s.behalten, a.s.auswertbar - a.ausgeschlossen.S.entwicklung - a.ausgeschlossen.S.doppelt, 'S: möglich minus ausgeschlossen gleich behalten');
+  pruefeGleich(a.v[250] + a.v[300] + a.v[350] - a.vBehalten[250] - a.vBehalten[300] - a.vBehalten[350], a.ausgeschlossen.V.entwicklung + a.ausgeschlossen.V.doppelt, 'V: möglich minus behalten gleich ausgeschlossen');
+  pruefeGleich(s0.ausgeschlossen.V.doppelt, a.ausgeschlossen.V.doppelt + s0.gruppen[1].ausgeschlossen.V.doppelt, 'Summe über die Gruppen');
+  /* kein Duplikat in der Hauptprüfung, deterministisch (zweiter Lauf byte-gleich), Hash-Vergleich der Bretter */
+  const st = liesJsonl(path.join(z.aus, 'stellungen.jsonl')).filter(x => x.art === 'S' || x.art === 'V'), eb = new Set(liesJsonl(path.join(verz, 'entw', 'teile', 'teil-1.jsonl')).map(x => x.diagnose.anfang.brett));
+  for (const art of ['S', 'V']) { const b = st.filter(x => x.art === art).map(x => x.brett); pruefeGleich(new Set(b).size, b.length, `${art}: keine doppelten Bretter`); pruefe(b.every(x => !eb.has(x)), `${art}: kein Entwicklungsbrett`); }
+  const z2 = ziehe(verz, 'z2', { A: path.join(verz, 'docs/daten/attrappe/A.jsonl.gz'), B: path.join(verz, 'docs/daten/attrappe/B.jsonl.gz') });
+  pruefeGleich(fs.readFileSync(path.join(z2.aus, 'stellungen.jsonl'), 'utf8'), fs.readFileSync(path.join(z.aus, 'stellungen.jsonl'), 'utf8'), 'zweiter Lauf: gleiche Stellungen in gleicher Reihenfolge');
+  pruefe(fs.readFileSync(path.join(z.aus, 'schritt0.md'), 'utf8').includes('Duplikate'), 'Schritt-0-Bericht nennt die Ausschlüsse');
+});
+
+test('Duplikat-Kontrolle in vergleichen: Entwicklungsbrett oder doppeltes Brett in der Hauptprüfung ergibt KEIN URTEIL', () => {
+  const alle = t => [t, t, t];
+  const probe = st => W.vergleichen(st, s0ok, stand('alt', 1, 'a', alle([4])), stand('testkopie', 2, 'a', alle([4])), stand('neu', 3, 'n', alle([4])), null);
+  let r = probe(stell.map(x => (x.art === 'S' ? {...x, brett: stell[0].brett} : x)));
+  pruefeGleich(r.bericht.gueltig, false, 'S gleicht dem Entwicklungsbrett: ungültig'); pruefe(r.bericht.kontrollen.some(k => k.nr === '§14.4' && !k.ok), 'Kontrolle §14.4 schlägt an');
+  r = probe([...stell, {...stell[2], id: 'g|q|2|V300', index: 300, partie: 'g|q|2'}]);   /* gleiches Brett wie g|q|1|V250 */
+  pruefe(r.bericht.kontrollen.some(k => k.nr === '§14.4' && !k.ok), 'doppeltes V-Brett schlägt an');
+  const ok = W.vergleichen(stell.map(x => ({...x})), s0ok, stand('alt', 1, 'a', alle([4])), stand('testkopie', 2, 'a', alle([4])), stand('neu', 3, 'n', alle([4])), null);
+  pruefe(ok.bericht.kontrollen.find(k => k.nr === '§14.4').ok, 'verschiedene Bretter: Kontrolle bestanden');
+  /* S und V werden nicht gegeneinander abgeglichen */
+  const sv = stell.map(x => (x.art === 'V' ? {...x, brett: stell[1].brett} : x));
+  pruefe(W.vergleichen(sv, s0ok, stand('alt', 1, 'a', alle([4])), stand('testkopie', 2, 'a', alle([4])), stand('neu', 3, 'n', alle([4])), null).bericht.kontrollen.find(k => k.nr === '§14.4').ok, 'gleiches Brett in S und V ist erlaubt');
 });
 
 test('Workflow diagonal-pruefung.yml: nur manuell, ohne GNU Go, drei getrennte Prozesse, Fassung gebunden', () => {

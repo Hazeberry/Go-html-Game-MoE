@@ -95,15 +95,30 @@ function ziehen(E, o) {
   const schluesselA = new Set(einheiten.map(e => e.schluessel)), schluesselE = new Set(entwicklung.map(e => e.schluessel));
   if (schluesselA.size !== einheiten.length || schluesselE.size !== entwicklung.length) pflicht.daten.push('doppelte Schlüssel in den Entwicklungsdaten');
   if (schluesselA.size !== schluesselE.size || [...schluesselA].some(k => !schluesselE.has(k))) pflicht.daten.push(`Einheiten der Stufe A (${schluesselA.size}) und Ergebniszeilen der Stufe C (${schluesselE.size}) sind nicht dieselbe Menge`);
-  const stellungen = [], gruppenBericht = [], gefundeneQuellen = new Set(), pruefKeys = new Set();
-  const quellFolgen = new Set(), pruefFolgen = new Map();
+  /* Duplikate (§14.4): Brettvergleich, weil die Tot-Menge nur vom Brett abhängt. Ausgeschlossen werden (a) Partien mit gleicher Zugfolge (ohne Farbe der KI)
+     wie eine Quellpartie, (b) Prüfstellungen, deren Brett einer Entwicklungsstellung gleicht, (c) Prüfstellungen, deren Brett in derselben Stellungsart schon
+     vorkam (auch aus anderer Zugfolge). Behalten wird der ERSTE Vertreter in der Reihenfolge Gruppe (Aufrufreihenfolge), Datei, Zeile, S vor V, V aufsteigend.
+     Ausgeschlossene werden nur gezählt, nicht gerechnet. S und V werden nicht gegeneinander abgeglichen (verschiedene Verfahren). */
+  const brettVon = r => (r.diagnose && r.diagnose.anfang ? r.diagnose.anfang.brett : undefined);
+  for (const r of entwicklung) if (typeof brettVon(r) !== 'string' || !/^[.XO]{361}$/.test(brettVon(r))) pflicht.daten.push(`Entwicklungsstellung ${r.schluessel}: Brett unzulässig`);
+  const entwBretter = new Set(entwicklung.map(brettVon));
+  const stellungen = [], gruppenBericht = [], gefundeneQuellen = new Set();
+  const quellFolgen = new Set(), pruefFolgen = new Set(), gesehen = {S: new Set(), V: new Set()}, liste = [];
+  const folgeOhneFarbe = r => `${r.beginnt}|${r.zuege.join(',')}`;
+  const behalte = (art, brett, z) => {
+    if (entwBretter.has(brett)) { z.entwicklung++; return false; }
+    if (gesehen[art].has(brett)) { z.doppelt++; return false; }
+    gesehen[art].add(brett); return true;
+  };
+  /* Phase 1: Zeilen lesen, filtern, Quellpartien und ihre Zugfolgen sammeln (alle Gruppen, bevor eine Prüfpartie beurteilt wird) */
   for (const g of o.gruppen) {
     const gb = {name: g.name, dateien: g.dateien, zeilen: 0, uebersprungen: {}, quellpartienAusgeschlossen: 0, pruefpartien: 0,
-      s: {auswertbar: 0, nicht: {}}, v: Object.fromEntries(V_INDIZES.map(i => [i, 0])), laengen: [], duplikateImPruefsatz: 0, duplikateZuQuellpartie: 0,
-      gefangenGeprueft: 0, gefangenFehlt: 0};
+      s: {auswertbar: 0, behalten: 0, nicht: {}}, v: Object.fromEntries(V_INDIZES.map(i => [i, 0])), vBehalten: Object.fromEntries(V_INDIZES.map(i => [i, 0])),
+      ausgeschlossen: {partieGleichQuelle: 0, S: {entwicklung: 0, doppelt: 0}, V: {entwicklung: 0, doppelt: 0}},
+      laengen: [], gleicheZugfolgeImPruefsatz: 0, gefangenGeprueft: 0, gefangenFehlt: 0};
+    gruppenBericht.push(gb);
     const skip = grund => { gb.uebersprungen[grund] = (gb.uebersprungen[grund] || 0) + 1; };
-    const nichtS = grund => { gb.s.nicht[grund] = (gb.s.nicht[grund] || 0) + 1; };
-    const gesehenNr = new Set();
+    const gesehenNr = new Set(), mine = [];
     for (const datei of g.dateien) for (const r of L.leseJsonl(datei)) {
       gb.zeilen++;
       if (r.abgebrochen || !Array.isArray(r.zuege) || !r.wirFarbe) { skip('abgebrochen oder unvollständig'); continue; }
@@ -112,10 +127,20 @@ function ziehen(E, o) {
       const key = partieKey(g.name, datei, r.nr);
       if (gesehenNr.has(key)) { pflicht.daten.push(`${key}: Partienummer doppelt in den Archivdateien`); continue; }
       gesehenNr.add(key);
-      const folgeKey = `${r.beginnt}|${r.wirFarbe}|${r.zuege.join(',')}`;
-      if (quellKeys.has(key)) { gb.quellpartienAusgeschlossen++; gefundeneQuellen.add(key); quellFolgen.add(folgeKey); continue; }
-      gb.pruefpartien++; pruefKeys.add(key);
-      if (pruefFolgen.has(folgeKey)) gb.duplikateImPruefsatz++; else pruefFolgen.set(folgeKey, key);
+      if (quellKeys.has(key)) { gb.quellpartienAusgeschlossen++; gefundeneQuellen.add(key); quellFolgen.add(folgeOhneFarbe(r)); continue; }
+      mine.push({datei, r, key});
+    }
+    liste.push(mine);
+  }
+  /* Phase 2: Prüfpartien einspielen, Stellungen bilden, Duplikate ausschließen */
+  o.gruppen.forEach((g, gi) => {
+    const gb = gruppenBericht[gi];
+    const nichtS = grund => { gb.s.nicht[grund] = (gb.s.nicht[grund] || 0) + 1; };
+    for (const {datei, r, key} of liste[gi]) {
+      const fk = folgeOhneFarbe(r);
+      if (quellFolgen.has(fk)) { gb.ausgeschlossen.partieGleichQuelle++; continue; }
+      gb.pruefpartien++;
+      if (pruefFolgen.has(fk)) gb.gleicheZugfolgeImPruefsatz++; else pruefFolgen.add(fk);
       gb.laengen.push(r.zuege.length);
       let folge;
       try { folge = folgeAusArchiv(r); } catch (e) { pflicht.replay.push(`${key}: ${e.message}`); continue; }
@@ -131,16 +156,21 @@ function ziehen(E, o) {
       const basis = {gruppe: g.name, quelle: norm(datei), nr: r.nr, partie: key, kiFarbe: ki, komi: KOMI};
       /* S: nur reguläre Enden (zwei Pässe in Folge, keine Aufgabe, Endstand vorhanden) */
       if (r.aufgabe) nichtS('Aufgabe'); else if (!zweiPaesse(folge)) nichtS('Ende nicht mit zwei Pässen (Zuglimit oder anders)'); else if (!Number.isFinite(r.endstand)) nichtS('Endstand fehlt');
-      else { gb.s.auswertbar++; stellungen.push({id: `${key}|S`, art: 'S', ...basis, index: folge.length - 1, brett: B.brettZuText(sp.brett), caps: [sp.caps[1], sp.caps[2]]}); }
-      for (const i of halte) { gb.v[i]++; const s = sp.snaps[i]; stellungen.push({id: `${key}|V${i}`, art: 'V', ...basis, index: i, brett: s.brett, caps: [s.caps[1], s.caps[2]]}); }
+      else {
+        gb.s.auswertbar++;
+        const bt = B.brettZuText(sp.brett);
+        if (behalte('S', bt, gb.ausgeschlossen.S)) { gb.s.behalten++; stellungen.push({id: `${key}|S`, art: 'S', ...basis, index: folge.length - 1, brett: bt, caps: [sp.caps[1], sp.caps[2]]}); }
+      }
+      for (const i of halte) {
+        gb.v[i]++; const sn = sp.snaps[i];
+        if (behalte('V', sn.brett, gb.ausgeschlossen.V)) { gb.vBehalten[i]++; stellungen.push({id: `${key}|V${i}`, art: 'V', ...basis, index: i, brett: sn.brett, caps: [sn.caps[1], sn.caps[2]]}); }
+      }
     }
-    gruppenBericht.push(gb);
-  }
-  /* §7 Nr. 1: jede Quellpartie im Archiv gefunden, Schnittmenge leer */
+  });
+  /* §7 Nr. 1: jede Quellpartie im Archiv gefunden, Schnittmenge (aus den tatsächlich gebildeten Stellungen) leer */
   const fehlendeQuellen = [...quellKeys].filter(k => !gefundeneQuellen.has(k));
   if (fehlendeQuellen.length) pflicht.daten.push(`${fehlendeQuellen.length} Quellpartien der Entwicklungsdaten nicht in den angegebenen Archivdateien: ${fehlendeQuellen.slice(0, 5).join('; ')}`);
-  for (const k of pruefKeys) if (quellKeys.has(k)) pflicht.schnittmenge.push(k);
-  for (const [folgeKey, key] of pruefFolgen) if (quellFolgen.has(folgeKey)) { const gb = gruppenBericht.find(x => key.startsWith(x.name + '|')); gb.duplikateZuQuellpartie++; }
+  for (const k of new Set(stellungen.map(x => x.partie))) if (quellKeys.has(k)) pflicht.schnittmenge.push(k);
   /* H: Handpartien, nur Endstellung, nur illustrativ; E: Entwicklungsstellungen, nur für die Kontrollen */
   const hand = [];
   if (o.hand) for (const f of fs.readdirSync(o.hand).filter(x => /^hand-.*\.sgf$/.test(x)).sort()) {
@@ -168,14 +198,21 @@ function ziehen(E, o) {
       kuerzerAls251: g.laengen.filter(x => x <= 250).length, kuerzerAls301: g.laengen.filter(x => x <= 300).length, kuerzerAls351: g.laengen.filter(x => x <= 350).length} : null})),
     handpartien: hand, stellungen: {S: stellungen.filter(s => s.art === 'S').length, V: stellungen.filter(s => s.art === 'V').length, H: stellungen.filter(s => s.art === 'H').length, E: entwicklung.length},
     pflichtfehler: pflicht, gueltig: Object.values(pflicht).every(a => a.length === 0),
-    hinweis: 'Zählung vor jeder Rechnung (Schritt 0, §3.2). Duplikate: Partien mit gleicher Zugfolge zählen mehrfach, sie werden gezählt und nicht entfernt (keine Festlegung dazu).'};
+    ausgeschlossen: gruppenBericht.reduce((t, g) => ({partieGleichQuelle: t.partieGleichQuelle + g.ausgeschlossen.partieGleichQuelle,
+      S: {entwicklung: t.S.entwicklung + g.ausgeschlossen.S.entwicklung, doppelt: t.S.doppelt + g.ausgeschlossen.S.doppelt},
+      V: {entwicklung: t.V.entwicklung + g.ausgeschlossen.V.entwicklung, doppelt: t.V.doppelt + g.ausgeschlossen.V.doppelt}}),
+      {partieGleichQuelle: 0, S: {entwicklung: 0, doppelt: 0}, V: {entwicklung: 0, doppelt: 0}}),
+    hinweis: 'Zählung vor jeder Rechnung (Schritt 0, §3.2). Duplikate (§14.4): Partien mit gleicher Zugfolge wie eine Quellpartie, Stellungen mit dem Brett einer Entwicklungsstellung und Stellungen mit einem Brett, das in derselben Stellungsart schon vorkam, sind aus der Hauptprüfung ausgeschlossen, nur gezählt und nicht gerechnet; behalten wird der erste Vertreter in Dateireihenfolge.'};
   return {stellungen, schritt0};
 }
 function berichtSchritt0(s0) {
   const m = ['# Diagonalprüfung, Schritt 0: Prüfdaten', '', `Zählung vor jeder Rechnung. Quellpartien der Entwicklungsdaten (ausgeschlossen): ${s0.quellpartien} verschiedene Partien in ${s0.einheitenEntwicklung} Einheiten; Entwicklungsstellungen: ${s0.entwicklungsstellungen}.`,
     `Zugindizes für V: ${s0.vIndizes.join(', ')} (Stellung nach dem Zug mit diesem nullbasierten Index; Partie muss länger sein).`, '',
-    '| Gruppe | Zeilen | übersprungen | Quellpartien ausgeschlossen | Prüfpartien | S auswertbar | S nicht (Grund) | V250 | V300 | V350 | Duplikate im Prüfsatz | gleich einer Quellpartie |', '|---|---:|---|---:|---:|---:|---|---:|---:|---:|---:|---:|'];
-  for (const g of s0.gruppen) m.push(`| ${g.name} | ${g.zeilen} | ${JSON.stringify(g.uebersprungen)} | ${g.quellpartienAusgeschlossen} | ${g.pruefpartien} | ${g.s.auswertbar} | ${JSON.stringify(g.s.nicht)} | ${g.v[250]} | ${g.v[300]} | ${g.v[350]} | ${g.duplikateImPruefsatz} | ${g.duplikateZuQuellpartie} |`);
+    '| Gruppe | Zeilen | übersprungen | Quellpartien ausgeschlossen | gleiche Zugfolge wie Quellpartie (ausgeschlossen) | Prüfpartien | davon gleiche Zugfolge im Prüfsatz (nur gezählt) |', '|---|---:|---|---:|---:|---:|---:|'];
+  for (const g of s0.gruppen) m.push(`| ${g.name} | ${g.zeilen} | ${JSON.stringify(g.uebersprungen)} | ${g.quellpartienAusgeschlossen} | ${g.ausgeschlossen.partieGleichQuelle} | ${g.pruefpartien} | ${g.gleicheZugfolgeImPruefsatz} |`);
+  m.push('', '### Stellungen und ausgeschlossene Duplikate (Brettvergleich, §14.4)', '',
+    '| Gruppe | S möglich | S gleich Entwicklungsbrett | S doppeltes Brett | S behalten | S nicht (Grund) | V möglich (250/300/350) | V gleich Entwicklungsbrett | V doppeltes Brett | V behalten (250/300/350) |', '|---|---:|---:|---:|---:|---|---|---:|---:|---|');
+  for (const g of s0.gruppen) m.push(`| ${g.name} | ${g.s.auswertbar} | ${g.ausgeschlossen.S.entwicklung} | ${g.ausgeschlossen.S.doppelt} | ${g.s.behalten} | ${JSON.stringify(g.s.nicht)} | ${g.v[250]}/${g.v[300]}/${g.v[350]} | ${g.ausgeschlossen.V.entwicklung} | ${g.ausgeschlossen.V.doppelt} | ${g.vBehalten[250]}/${g.vBehalten[300]}/${g.vBehalten[350]} |`);
   m.push('', '### Partielängen der Prüfpartien (Züge einschließlich Pässe)', '', '| Gruppe | n | min | Q1 | Median | Q3 | max | ≤ 250 | ≤ 300 | ≤ 350 |', '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
   for (const g of s0.gruppen) { const l = g.laengen; m.push(l ? `| ${g.name} | ${l.n} | ${l.min} | ${l.q1} | ${l.median} | ${l.q3} | ${l.max} | ${l.kuerzerAls251} | ${l.kuerzerAls301} | ${l.kuerzerAls351} |` : `| ${g.name} | 0 | – | – | – | – | – | – | – | – |`); }
   m.push('', `Gefangene gegen das Archiv geprüft: ${s0.gruppen.map(g => `${g.name} ${g.gefangenGeprueft} (fehlt: ${g.gefangenFehlt})`).join('; ')}.`,
@@ -235,6 +272,15 @@ function vergleichen(stellungen, schritt0, alt, testkopie, neu, erwartetAltSha) 
   const pf = schritt0.pflichtfehler;
   kontrolle('§7 Nr. 1', 'Daten (Schritt 0), Schnittmenge mit den Quellpartien leer', [...pf.daten, ...pf.schnittmenge]);
   kontrolle('§7 Nr. 2', 'Nachspiel-Kontrolle (Einspielbarkeit, Gefangene gegen Archiv)', pf.replay);
+  /* §14.4: unabhängig von ziehen aus den Stellungen selbst: kein Prüfbrett gleicht einem Entwicklungsbrett, kein Brett kommt in derselben Stellungsart doppelt vor */
+  const dupF = [], eb = new Set(stellungen.filter(x => x.art === 'E').map(x => x.brett)), gs = {S: new Set(), V: new Set()};
+  for (const x of stellungen) {
+    if (x.art !== 'S' && x.art !== 'V') continue;
+    if (eb.has(x.brett)) dupF.push(`${x.id}: Brett gleicht einer Entwicklungsstellung`);
+    else if (gs[x.art].has(x.brett)) dupF.push(`${x.id}: Brett kommt in der Hauptprüfung doppelt vor`);
+    gs[x.art].add(x.brett);
+  }
+  kontrolle('§14.4', 'Hauptprüfung ohne Entwicklungsbretter und ohne doppelte Bretter (je Stellungsart)', dupF);
   /* Vollständigkeit und Prozesse */
   const vollst = [], ids = stellungen.map(s => s.id);
   for (const [n, st] of [['alt', alt], ['testkopie', testkopie], ['neu', neu]]) {
@@ -320,7 +366,7 @@ function vergleichen(stellungen, schritt0, alt, testkopie, neu, erwartetAltSha) 
       stand: Object.fromEntries(MODI.map(w => [w, {aus: r.nz.aus.zaehl[w].stand, an: r.nz.an.zaehl[w].stand}]))}));
     const summe = (art) => betroffenheit.find(e => e.gruppe.startsWith('Summe') && e.art === art);
     const umfang = {S: summe('S') ? summe('S').betroffen : 0, V: summe('V') ? summe('V').betroffen : 0};
-    const bericht = {gueltig, urteil: 'gültig', kontrollen, betroffenheit, wirkung: wirk, handpartien: hand, mindestumfang: {schwelle: MINDESTUMFANG, betroffenS: umfang.S, betroffenV: umfang.V, S: umfang.S >= MINDESTUMFANG, V: umfang.V >= MINDESTUMFANG},
+    const bericht = {gueltig, urteil: 'gültig', kontrollen, ausgeschlossen: schritt0.ausgeschlossen, betroffenheit, wirkung: wirk, handpartien: hand, mindestumfang: {schwelle: MINDESTUMFANG, betroffenS: umfang.S, betroffenV: umfang.V, S: umfang.S >= MINDESTUMFANG, V: umfang.V >= MINDESTUMFANG},
       entwicklung: {stellungen: stat.n.E, betroffen: stat.anDiffE, hinweis: 'nur Kontrolle, nicht Teil der Auswertung (§3.1)'}};
     return {bericht, md: berichtMd({gueltig, gruende, kontrollen, betroffenheit, wirk, hand, umfang, schritt0, stat}), betroffen};
   }
@@ -337,6 +383,9 @@ function berichtMd(x) {
   const rang = a => ({S: 0, V: 1, V250: 2, V300: 3, V350: 4}[a]);
   for (const e of [...x.betroffenheit].sort((p, q) => (p.gruppe.startsWith('Summe') - q.gruppe.startsWith('Summe')) || p.gruppe.localeCompare(q.gruppe) || rang(p.art) - rang(q.art)))
     m.push(`| ${e.gruppe} | ${e.art} | ${e.stellungen} | ${e.partien} | ${e.betroffen} | ${e.betroffenePartien} | ${e.anteil === null ? '–' : prozent(e.anteil)} | ${e.cp ? `${prozent(e.cp.unten)} bis ${prozent(e.cp.oben)}` : '–'} | ${e.steineZusaetzlichTot} | ${e.steineWiederLebend} |`);
+  const au = x.schritt0.ausgeschlossen;
+  m.push('', '## Ausgeschlossene Duplikate (nicht gerechnet, nur gezählt)', '',
+    `Aus der Hauptprüfung ausgeschlossen (§14.4, Brettvergleich; behalten wird der erste Vertreter in Dateireihenfolge): Partien mit gleicher Zugfolge wie eine Quellpartie ${au.partieGleichQuelle}; S: ${au.S.entwicklung} gleich einem Entwicklungsbrett, ${au.S.doppelt} doppeltes Brett; V: ${au.V.entwicklung} gleich einem Entwicklungsbrett, ${au.V.doppelt} doppeltes Brett. Je Gruppe: Schritt 0.`);
   const u = x.umfang;
   m.push('', `Mindestumfang für eine Kandidatur (§7 Nr. 7, Setzung ${MINDESTUMFANG} betroffene Stellungen je Stellungsart): S ${u.S} ${u.S >= MINDESTUMFANG ? '(erreicht)' : '(nicht erreicht)'}, V ${u.V} ${u.V >= MINDESTUMFANG ? '(erreicht)' : '(nicht erreicht)'}.`,
     u.S >= MINDESTUMFANG && u.V >= MINDESTUMFANG ? 'Das Erreichen der Zahl ist kein Sicherheitsnachweis.' : '**Kein Urteil über die Kandidatur: zu wenig Betroffene** (nicht „unbedenklich“). Der Befund wird trotzdem beschrieben; über eine Erweiterung der Prüfdaten entscheidet Hazeberry (E-1).');
