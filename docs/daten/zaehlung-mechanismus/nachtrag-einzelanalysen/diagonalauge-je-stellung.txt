@@ -1,0 +1,116 @@
+Klassen je Stellung (563):
+   besser | V 15
+   besser | nicht V 4
+   unveraendert | V 3
+   unveraendert | nicht V 541
+Steine insgesamt: behoben 394 | neu entstandene Abweichungen 0 | Original weicht ab 658 | Variante weicht ab 264
+Richtung der Änderung der Tot-Menge: Steine nur im Original tot 34 | nur in der Variante tot 360
+
+Stellungen mit neu entstandenen Abweichungen (Variante, nach „V“):
+
+Verbleibende V-Stellungen mit Abweichung in der Variante:
+
+  Fuego 50 Spiele|D.jsonl.gz|523|354  KI-Farbe 2  GNU B+17.5  Fläche aus Tot-Liste 17.5  Abweichung Original 32 -> Variante 32
+    nur Variante tot: Gegner 6 Steine [N19,N18,O18,O17,O16,…] Original tot
+    nur GNU tot: KI 1 Steine [R19] Original lebend | Verband 130 Steine, Augenregionen 30,1,1,2,2,2,2,4,1,2,8,1,1,2,1,3,1,1,1,4,1,2,1,4,1,1, Benson-Kette im Verband
+    nur GNU tot: KI 1 Steine [T19] Original lebend | Verband 130 Steine, Augenregionen 30,1,1,2,2,2,2,4,1,2,8,1,1,2,1,3,1,1,1,4,1,2,1,4,1,1, Benson-Kette im Verband
+    nur Variante tot: Gegner 17 Steine [Q18,R18,Q17,Q16,Q15,…] Original tot
+    nur GNU tot: KI 7 Steine [S18,S17,R17,S16,R16,…] Original lebend | Verband 130 Steine, Augenregionen 30,1,1,2,2,2,2,4,1,2,8,1,1,2,1,3,1,1,1,4,1,2,1,4,1,1, Benson-Kette im Verband
+    A B C D E F G H J K L M N O P Q R S T
+19  . . o o o o X . X X O O m . . . r . r  19
+18  . o o X o o X . X O . O m m . m m r .  18
+17  X o X X X o X X X O O O O m . m r r .  17
+16  X X . X X X X . X X O . O m . m r r r  16
+15  . . . . X . X X . X O . O m o m m r m  15
+14  X X X X . . X . . X O O O O m m m m m  14
+13  X o o o X X . X . X O X O m m O O O O  13
+12  o . . o o X . X X X X X X O m m O O O  12
+11  o o o . X X . X . X . . X O O m O . .  11
+10  o X o o X X . X X X X X O O O O O O O  10
+ 9  X X X X . X X O X O X X O . . O O x x  9
+ 8  . X X X X . X O O O X O O O O . O . .  8
+ 7  X . X X X X O O O X X O . O . O O O O  7
+ 6  X X O X X O O X X X O O . O . . . . .  6
+ 5  X O O X O O . O O X O O O . O O . O .  5
+ 4  X X O X O . O O . O . . . O . O O . O  4
+ 3  X O O O O . O . O O O O O O O . O O .  3
+ 2  X X O O . O . O . . . O . O . . . O O  2
+ 1  X X O O . O O O . O O O O O O O O . O  1
+
+  Fuego 50 Spiele|D.jsonl.gz|889|372  KI-Farbe 2  GNU B+13.5  Fläche aus Tot-Liste 13.5  Abweichung Original 28 -> Variante 28
+    nur GNU tot: KI 9 Steine [T10,T9,T8,T7,S7,…] Original lebend | Verband 141 Steine, Augenregionen 1,4,3,1,4,3,3,3,5,1,1,1,1,1,1,1,19,1,1,1,2,1,1,3,1,1,1,1,1, Benson-Kette im Verband
+    nur GNU tot: KI 4 Steine [Q6,Q5,R5,R4] Original lebend | Verband 141 Steine, Augenregionen 1,4,3,1,4,3,3,3,5,1,1,1,1,1,1,1,19,1,1,1,2,1,1,3,1,1,1,1,1, Benson-Kette im Verband
+    nur Variante tot: Gegner 3 Steine [S5,S4,S3] Original tot
+    nur GNU tot: KI 1 Steine [T5] Original lebend | Verband 141 Steine, Augenregionen 1,4,3,1,4,3,3,3,5,1,1,1,1,1,1,1,19,1,1,1,2,1,1,3,1,1,1,1,1, Benson-Kette im Verband
+    nur GNU tot: KI 4 Steine [N4,O4,P4,P3] Original lebend | Verband 141 Steine, Augenregionen 1,4,3,1,4,3,3,3,5,1,1,1,1,1,1,1,19,1,1,1,2,1,1,3,1,1,1,1,1, Benson-Kette im Verband
+    nur Variante tot: Gegner 7 Steine [Q4,Q3,Q2,P2,R2,…] Original tot
+    A B C D E F G H J K L M N O P Q R S T
+19  . . X . . . . . . . . . . . X o o . o  19
+18  . X . X X X X X X X X X X o X o o o o  18
+17  X X X O O O O O O O O O X X X X X X X  17
+16  X . . X O O . O . . O O O O O X . . .  16
+15  X . . X X O O O . O . . O O . O X . X  15
+14  . X . . X X O O . O O . O . O O X . .  14
+13  . . . . X O O . O O O O . . O O X . .  13
+12  X X X . X O O . O O . . O . O O X X .  12
+11  . . . X X O O . O . O . O O O X X . X  11
+10  X X . . X O . O . . O O O O X X X X r  10
+ 9  X X X X O O . . O O O X O O O X r X r  9
+ 8  X X O X X O O . . O X X X X X X r X r  8
+ 7  X O O O X O . O O O O X o . . . r r r  7
+ 6  X X O O O . O O X X X X X X . r . r .  6
+ 5  X O . O . O . O O O X X . . . r r m r  5
+ 4  O O O . O O O . O O O X r r r m r m .  4
+ 3  O . O O O . O O . O X X X X r m . m .  3
+ 2  . O . . O . O . O O O O O O m m m . .  2
+ 1  O O . O . O . O . O . O O m m o . . .  1
+
+  Fuego 50 Spiele|D.jsonl.gz|212|337  KI-Farbe 1  GNU W+30.5  Fläche aus Tot-Liste -30.5  Abweichung Original 27 -> Variante 2
+    nur Variante tot: Gegner 2 Steine [J19,K19] Original tot
+    A B C D E F G H J K L M N O P Q R S T
+19  . x . x x x x . n n x O x . O . . . .  19
+18  O O x O x O x x x . x O O O O . . . .  18
+17  . O . O O O O x x x x x O O . . . . .  17
+16  . . O O X O O O O O O O O . O O O . .  16
+15  . O . O X X X O O X O O . O X X O O .  15
+14  . O . O X X O O X X X O O X . X O . O  14
+13  . . . O X . X X X X X O X X X X O O X  13
+12  O O O X . X . . . X . X X . X . X X X  12
+11  O X X X . X . X X . X . . X . X . X X  11
+10  O X X . X . X . X X . . . X X X X . .  10
+ 9  O O X . X . . . . . X . X X . . . . X  9
+ 8  O O O X X . . . . X X X . . X X . X X  8
+ 7  . O O O X . . . X . . . . X . . X X O  7
+ 6  . . O X X X X X . X X X X X X X X O O  6
+ 5  . . O X X O O X . . . X O O O O O O .  5
+ 4  O O O O X X O O X . X O O . O O . . .  4
+ 3  O x x O O X O X X X X O O x O O O . .  3
+ 2  O x . x O O O O X . X X O O X X O . .  2
+ 1  x x x . x . O O O X X X X X X O O . .  1
+
+  Fuego 50 Spiele|D.jsonl.gz|622|307  KI-Farbe 1  GNU W+62.5  Fläche aus Tot-Liste -62.5  Abweichung Original 44 -> Variante 44
+    nur GNU tot: KI 15 Steine [D12,E12,D11,C11,D10,…] Original lebend | Verband 117 Steine, Augenregionen 2,17,1,4,1,4,5,13,3,4,1,1,1,1,2, Benson-Kette im Verband
+    nur Variante tot: Gegner 11 Steine [F12,F11,F10,F9,G9,…] Original tot
+    nur GNU tot: KI 18 Steine [J7,J6,K6,J5,L6,…] Original lebend | Verband 117 Steine, Augenregionen 2,17,1,4,1,4,5,13,3,4,1,1,1,1,2, Benson-Kette im Verband
+    A B C D E F G H J K L M N O P Q R S T
+19  X X X X . . X X . X . X . X O O . . .  19
+18  O X . X X X . . . . . X . X X O O O O  18
+17  O O X X O X X . . . . . . X O O x x O  17
+16  O . O O O O X . X . X X X X O . . . .  16
+15  . O . . O X X X X X . . . X X O O O O  15
+14  . . O O X X . X o o X X . X X O X X X  14
+13  . O . O O X X X X o . X X X O O X . .  13
+12  O . O q q n X . . X X X O O O X X . X  12
+11  . O q q . n X X . X . . X X X . X . .  11
+10  . x O q . n X . X . X . . X X X X X X  10
+ 9  . O O q q n n X X X . X X O X O O O X  9
+ 8  . O . O q q n n n X X O O O O . O . O  8
+ 7  . x O O O q q n q O O O O O O O . O .  7
+ 6  . O O . x O q n q q q O q q q q O . .  6
+ 5  . . . . . O q n q O q q . . q . O . .  5
+ 4  O O O O O O q q O O q q q q q O . . .  4
+ 3  O X X O X O O O O O O q O O O O . . .  3
+ 2  X X . X X X X X X X X O O . . . . . .  2
+ 1  X . X . X . X . X X O O . . . . . . .  1
+
+Legende: X/O beide lebend; x/o beide tot; q/r nur GNU tot (Schwarz/Weiß); m/n nur Variante tot (Schwarz/Weiß)

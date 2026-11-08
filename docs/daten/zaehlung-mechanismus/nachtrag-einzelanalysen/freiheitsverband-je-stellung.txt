@@ -1,0 +1,67 @@
+Variante freiheitsverband; index.html SHA-256 d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b; V-Stellungen 18
+Gespeicherte Summen V      : {"stellungen":18,"gleichTotMenge":0,"steineNurGnuTot":362,"steineNurAppTot":80} -> {"stellungen":18,"gleichTotMenge":0,"steineNurGnuTot":360,"steineNurAppTot":132}
+Gespeicherte Summen alle   : {"stellungen":563,"gleichTotMenge":528,"steineNurGnuTot":527,"steineNurAppTot":131} -> {"stellungen":563,"gleichTotMenge":525,"steineNurGnuTot":523,"steineNurAppTot":206}
+
+Je V-Stellung (Steine nur GNU tot + nur App tot; Klasse nach Ketten und Summe):
+D.jsonl.gz|390|357 Abweichung  13 ->  13 | nur GNU tot  13 ->  13 | nur App tot   0 ->   0 | gleich
+D.jsonl.gz|523|354 Abweichung  32 ->  32 | nur GNU tot   9 ->   9 | nur App tot  23 ->  23 | gleich
+D.jsonl.gz|889|372 Abweichung  28 ->  24 | nur GNU tot  18 ->  14 | nur App tot  10 ->  10 | besser
+f-D.jsonl.gz|21|428 Abweichung  45 ->  45 | nur GNU tot  45 ->  45 | nur App tot   0 ->   0 | gleich
+D.jsonl.gz|401|346 Abweichung  17 ->  17 | nur GNU tot  17 ->  17 | nur App tot   0 ->   0 | gleich
+f-D.jsonl.gz|480|319 Abweichung  13 ->  24 | nur GNU tot  13 ->  13 | nur App tot   0 ->  11 | schlechter
+D.jsonl.gz|270|449 Abweichung  52 ->  52 | nur GNU tot  52 ->  52 | nur App tot   0 ->   0 | gleich
+D.jsonl.gz|599|330 Abweichung  13 ->  26 | nur GNU tot  13 ->  13 | nur App tot   0 ->  13 | schlechter
+D.jsonl.gz|533|354 Abweichung   6 ->   6 | nur GNU tot   6 ->   6 | nur App tot   0 ->   0 | gleich
+D.jsonl.gz|903|306 Abweichung  21 ->  51 | nur GNU tot  10 ->  12 | nur App tot  11 ->  39 | schlechter
+D.jsonl.gz|212|337 Abweichung  27 ->  27 | nur GNU tot  25 ->  25 | nur App tot   2 ->   2 | gleich
+D.jsonl.gz|808|403 Abweichung  21 ->  21 | nur GNU tot  21 ->  21 | nur App tot   0 ->   0 | gleich
+D.jsonl.gz|622|307 Abweichung  44 ->  44 | nur GNU tot  33 ->  33 | nur App tot  11 ->  11 | gleich
+f-D.jsonl.gz|172|333 Abweichung  29 ->  29 | nur GNU tot  27 ->  27 | nur App tot   2 ->   2 | gleich
+f-D.jsonl.gz|175|344 Abweichung  25 ->  25 | nur GNU tot  25 ->  25 | nur App tot   0 ->   0 | gleich
+D.jsonl.gz|179|366 Abweichung  27 ->  27 | nur GNU tot   6 ->   6 | nur App tot  21 ->  21 | gleich
+D.jsonl.gz|23|340  Abweichung  13 ->  13 | nur GNU tot  13 ->  13 | nur App tot   0 ->   0 | gleich
+D.jsonl.gz|566|379 Abweichung  16 ->  16 | nur GNU tot  16 ->  16 | nur App tot   0 ->   0 | gleich
+Klassen: {"gleich":14,"besser":1,"schlechter":3,"gemischt":0}
+
+Restfälle der Diagonalauge-Gegenprobe im Einzelnen (Freiheitsverband-Variante):
+D.jsonl.gz|523|354
+    original nurGnuTot 3 Ketten, 9 Steine: KI 1, KI 1, KI 7
+    original nurAppTot 2 Ketten, 23 Steine: Gegner 6, Gegner 17
+    variante nurGnuTot 3 Ketten, 9 Steine: KI 1, KI 1, KI 7
+    variante nurAppTot 2 Ketten, 23 Steine: Gegner 6, Gegner 17
+D.jsonl.gz|889|372
+    original nurGnuTot 4 Ketten, 18 Steine: KI 9, KI 4, KI 1, KI 4
+    original nurAppTot 2 Ketten, 10 Steine: Gegner 3, Gegner 7
+    variante nurGnuTot 3 Ketten, 14 Steine: KI 9, KI 4, KI 1
+    variante nurAppTot 2 Ketten, 10 Steine: Gegner 3, Gegner 7
+D.jsonl.gz|212|337
+    original nurGnuTot 6 Ketten, 25 Steine: KI 1, KI 15, KI 1, KI 6, KI 1, KI 1
+    original nurAppTot 1 Ketten, 2 Steine: Gegner 2
+    variante nurGnuTot 6 Ketten, 25 Steine: KI 1, KI 15, KI 1, KI 6, KI 1, KI 1
+    variante nurAppTot 1 Ketten, 2 Steine: Gegner 2
+D.jsonl.gz|622|307
+    original nurGnuTot 2 Ketten, 33 Steine: KI 15, KI 18
+    original nurAppTot 1 Ketten, 11 Steine: Gegner 11
+    variante nurGnuTot 2 Ketten, 33 Steine: KI 15, KI 18
+    variante nurAppTot 1 Ketten, 11 Steine: Gegner 11
+
+Veränderte oder neue Ketten in der Variante:
+D.jsonl.gz|889|372
+    nicht mehr „nur GNU tot“: KI 4 Steine [N4,O4,P4,P3]
+f-D.jsonl.gz|480|319
+    neu „nur App tot“: Gegner 9 Steine [Q18,Q17,P17,R17,Q16,O17,…]
+    neu „nur App tot“: Gegner 2 Steine [P15,P14]
+D.jsonl.gz|599|330
+    neu „nur App tot“: Gegner 12 Steine [Q19,R19,Q18,Q17,Q16,P16,…]
+    neu „nur App tot“: Gegner 1 Steine [M17]
+D.jsonl.gz|903|306
+    neu „nur GNU tot“: KI 2 Steine [J9,J8]
+    neu „nur App tot“: Gegner 14 Steine [P14,Q14,P13,R14,O13,P12,…]
+    neu „nur App tot“: Gegner 3 Steine [L12,M12,N12]
+    neu „nur App tot“: Gegner 6 Steine [F11,G11,H11,G10,J11,K11]
+    neu „nur App tot“: Gegner 5 Steine [H9,H8,H7,H6,J6]
+
+Außerhalb von V (aus den gespeicherten Summen, Nettoänderung der Steine, nicht je Stellung gesehen):
+  nur App tot: (206 − 131) − (132 − 80) = 23
+  nur GNU tot: (523 − 527) − (360 − 362) = -2
+  Das ist die Nettozunahme beziehungsweise -abnahme, nicht zwingend die Zahl neu entstandener Fehlklassifikationen (Steine können in beide Richtungen wechseln).
