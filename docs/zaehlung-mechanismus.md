@@ -237,7 +237,9 @@ Ausgabe: `daten/zaehlung-mechanismus/nachtrag-einzelanalysen/diagonalauge-je-ste
 - **Die 34 wieder lebenden Steine** (die Änderung von „nur App tot“ 80 auf 46 in V) liegen in drei V-Stellungen: `903|306` (11 wieder lebend, 10 zusätzlich tot), `172|333` (2 und 27), `179|366` (21 und 6). In allen dreien geht die Abweichung auf 0. Die Änderung wirkt dort auf beide Seiten desselben Kampfes. **Der Mechanismus im Code ist offen**
   (die iterative Entfernung weiterer Gruppen ist eine Vermutung, nicht nachgewiesen).
 - **Die vier verbleibenden V-Stellungen:** `523|354` (32), `889|372` (28) und `622|307` (44) sind unverändert; es sind die großen Verbände mit Benson-Kette (117 bis 141 Steine). `212|337` reagiert (27 auf 2); der **verbleibende Rest** (zwei weiße Steine `J19,K19`, die die App als tot führt, GNU Go als lebend) ist dadurch nicht erklärt.
-  In allen vier stehen „nur GNU tot“-Ketten der KI und „nur Variante tot“-Ketten des Gegners nebeneinander am selben Kampf (Bretter in der Ausgabe). Dass es zwei Seiten desselben Kampfes sind, die App und GNU Go gegensätzlich entscheiden, ist eine **Hypothese**.
+  **Im Original treten in allen vier Stellungen beide Abweichungsrichtungen auf** (Steine „nur GNU tot“ und „nur App tot“: `523|354` 9 und 23, `889|372` 18 und 10, `622|307` 33 und 11, `212|337` 25 und 2; Ketten der KI und des Gegners nebeneinander, Bretter in der Ausgabe).
+  **Nach der Diagonalprüfung** bleiben beide Richtungen bei `523|354`, `889|372` und `622|307` unverändert bestehen. Bei `212|337` bleiben keine Steine „nur GNU tot“ mehr; abweichend ist nur noch die gegnerische Zweierkette `J19,K19` („nur Variante tot“, bei GNU Go lebend).
+  Dass es zwei Seiten desselben Kampfes sind, die App und GNU Go gegensätzlich entscheiden, ist eine **Hypothese**.
 
 ### 12.3 Gegenprobe „Freiheitsverband“ je V-Stellung (aus den gespeicherten Ergebnissen)
 
