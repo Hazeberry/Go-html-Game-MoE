@@ -262,3 +262,19 @@ Nichts davon ist begonnen. Jedes Paket hat ein eigenes Go; vor jedem Lauf wird g
 ## 12. Freigaben
 
 Dieses Doc enthält Vorgaben für die KI-Assistenten; Hazeberry liest es vor dem Merge. Es erteilt kein Go für die Umsetzung, Läufe, Engine-Vergleiche, Änderungen des Standards oder Merges. Die Empfehlungen in §10 sind keine Entscheidungen. Die 15 Zählabweichungen bleiben ein getrenntes Vorhaben.
+
+## 13. Stand der Umsetzung (08.11.2026)
+
+**E-0:** §10 gilt als **Arbeitsplan** (Empfehlungen übernommen); die **Wahl der Beurteiler bleibt bis vor Stufe 2 offen** (E-2), niemand ist eingeteilt. Das Go für **AP1 und AP2** wurde in der Sitzung erteilt (Antwort „Ja, AP1 und AP2“); es gilt nur für diese zwei Pakete. **Keine Archivmessung, kein GNU-Go-Lauf, kein Standardwechsel, Stufe 1 bis 3 nicht gestartet.**
+
+| AP | Stand | Inhalt |
+|---|---|---|
+| AP1 | umgesetzt (eigener Commit, **vor** der Änderung an `index.html`) | Referenz der unveränderten Fassung (Stand `c504143`, `index.html` SHA-256 `d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b`) in `tests/referenz/diagonalauge.json`: Tot-Menge und `zaehlVorschau` (Fläche, Territory) auf 90 festen Prüfbrettern (80 Zufallsbretter nach Seed, 10 SGF-Endbretter), dazu sieben Entwicklungsstellungen der Stufe C. Die Werte bei **an** stammen aus der Test-Kopie der Diagnose (`gegenprobe.js --variante diagonalauge`), ebenfalls vor der Änderung erzeugt. Generator: `auswertung/zaehlung-mechanismus/diagonalauge-referenz.js` (bricht ab, wenn die `index.html` nicht dem erwarteten Stand entspricht); Prüfbretter: `tests/diagonalauge-brett.js` |
+| AP2 | umgesetzt | `PARAMS.diagonalAugeEnde` (Standard **0**, Dashboard-Zeile 0 bis 1); `toteSteineAmEnde(board, augeGross, offenGross, diagAuge = false)`; bei an zählt ein Ein-Punkt-Auge nur mit `_diagIsTrueEye`. Aufrufer: `resolveLifeAndDeath` (Schlusszählung), Anzeige der Zählvorschau und `passNachGegnerpassPruefung` (Worker, `PARAMS`-Snapshot) reichen `PARAMS.diagonalAugeEnde >= 1` durch; `zaehlVorschau` über `opt.diagonalAuge`. Tests: `tests/diagonalauge.js`, `tests/browser-diagonalauge.js` |
+
+**Was die Tests belegen und was nicht:**
+- **Bei aus ist das Verhalten bitgleich** zur Referenz auf den 90 Brettern und den sieben Entwicklungsstellungen (Tot-Menge und Vorschau). Das ist **keine** Aussage über alle Stellungen; der Engine-Vergleich alter gegen neuer Stand an Archivstellungen (§7 Nr. 3) läuft nur in Actions (`engine-vergleich.yml`) und nur nach Go und ist **nicht** gelaufen.
+- Bei an stimmt die Umsetzung auf diesen Brettern mit der Test-Kopie der Diagnose überein (bei 11 der 90 Bretter ändert sich die Tot-Menge; bei fünf der sieben Entwicklungsstellungen). Die Konsistenzkontrolle auf allen 563 Entwicklungsstellungen (§7 Nr. 4) gehört zu Stufe 1 und ist **nicht** gelaufen.
+- Dass der Schalter an eine **Verbesserung** bringt, ist nicht gezeigt; das ist Gegenstand der Stufen 1 bis 3.
+- Lokal gelaufen sind nur die betroffenen Tests (`diagonalauge.js`, `browser-diagonalauge.js`, `zaehlvorschau.js`, `zaehlung.js`, `passregel-versuch.js`, `lizenz.js`, `browser-zaehlvorschau.js`, `browser-passregel.js`, `browser-ui.js`); die gesamte Suite prüft die reguläre CI.
+- Nicht geprüft: ob die Einstellung `diagonalAugeEnde` in einem echten Browserprofil mit gespeicherten Dashboard-Werten auf 0 fällt. Gespeichert werden nur Abweichungen von `PARAMS_DEFAULT` (`dashLoadSaved`), der neue Schlüssel steht in `PARAMS_DEFAULT` und hat dort 0; das ist gelesen, nicht im Browser nachgespielt.

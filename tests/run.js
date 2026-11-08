@@ -26,7 +26,7 @@ const HTML = pfad ? [path.resolve(pfad)] : [];
 const ALLE = ['regeln.js', 'nan-guards.js', 'resign-criterion.js', 'transfer-telemetry.js',
               'benson-transfer.js', 'benson-lebend-treppe.js', 'endspiel-netz.js', 'feste-sims.js', 'roh-dump.js',
               'influence.js', 'endspiel-gleichstand.js', 'epochen.js', 'raumrisiko.js', 'gebiet.js', 'endspiel-augen.js', 'gegnerwert.js', 'lesen.js', 'wurzel.js', 'quick-rettung.js', 'atari-verzicht.js', 'muster.js', 'gebiet-sicher.js', 'zaehlung.js', 'extern.js', 'lizenz.js', 'ko-suche.js', 'muster-endspiel.js', 'dagger.js', 'gnugo-bruecke.js', 'fuego-gegner.js', 'komponenten.js', 'pwa.js', 'komi.js', 'endspiel-abraeumen.js', 'zaehlvorschau.js', 'zeit-zerlegung.js', 'passregel-versuch.js', 'passregel-vergleich.js', 'passregel-zaehldiagnose.js', 'passregel-vorsprung.js', 'zaehlung-mechanismus.js', 'diagonalauge.js', 'diagnose-p1p2.js', 'diagnose-p2-rang.js', 'kandidaten-orakel.js', 'kandidaten-orakel-spiel.js', 'kandidaten-orakel-haupt.js', 'engine-vergleich.js', 'kandidaten-orakel-vierarm.js',
-              'training-stability.js', 'harness-smoke.js', 'browser-nan.js', 'browser-ui.js', 'browser-zaehlvorschau.js', 'browser-passregel.js', 'browser-zeiten.js'];
+              'training-stability.js', 'harness-smoke.js', 'browser-nan.js', 'browser-ui.js', 'browser-zaehlvorschau.js', 'browser-passregel.js', 'browser-diagonalauge.js', 'browser-zeiten.js'];
 const SUITEN = OHNE_BROWSER ? ALLE.filter(s => !s.startsWith('browser-')) : ALLE;
 
 /* training-stability nimmt Partien/Züge VOR dem Pfad — deshalb die Defaults

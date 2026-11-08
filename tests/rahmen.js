@@ -59,7 +59,7 @@ function ladeKI({htmlPfad = STANDARD_HTML, mitNetz = true, speicher = null} = {}
                  'leseTransferWaechter', 'removeDeadGroups', 'bensonClassify',
                  '_bnDead', '_bnAlive', 'floodFill', 'computeZobrist', 'getCrisisWeight', 'evalTsumego', 'leseWurzelWaechter', 'quickEval',
                  '_mctsKidsOrakel', '_kandSoftmax', '_kandAnheben', '_kandMax', 'leseKandidatenOrakel',
-                 'musterWert', 'musterSchluessel', 'MUSTER_TABELLE', 'setzeLebensurteil', 'lsNach', 'lsOhneTote', 'countLiberties', 'toteSteineAmEnde', 'zaehlVorschau', 'passNachGegnerpassPruefung',
+                 'musterWert', 'musterSchluessel', 'MUSTER_TABELLE', 'setzeLebensurteil', 'lsNach', 'lsOhneTote', 'countLiberties', 'toteSteineAmEnde', '_diagIsTrueEye', 'zaehlVorschau', 'passNachGegnerpassPruefung',
                  'PARAMS', 'BOARD_SIZE', 'NEIGHBORS', 'idx', 'xOf', 'yOf'];
   quelle += `
     ;globalThis.__test = {};

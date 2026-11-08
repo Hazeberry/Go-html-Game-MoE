@@ -5,6 +5,11 @@
         (80 Zufallsbretter nach Seed, die Endbretter der SGF unter tests/stellungen/) gleich den Referenzwerten, die VOR der Änderung aus der
         unveränderten Fassung erzeugt wurden (tests/referenz/diagonalauge.json, erzeugt von auswertung/zaehlung-mechanismus/diagonalauge-referenz.js).
      2. Die Tot-Mengen der sieben Entwicklungsstellungen der Stufe C bei aus sind gleich den eingefrorenen.
+     3. Bei an (Parameter diagAuge, opt.diagonalAuge) sind Tot-Menge und Vorschau gleich der Test-Kopie der Diagnose (ebenfalls vorab eingefroren), auf den
+        90 Brettern und den sieben Entwicklungsstellungen; fünf von ihnen ändern sich, zwei (523|354, 26|335) nicht.
+     4. Standard: PARAMS.diagonalAugeEnde ist 0, auch in PARAMS_DEFAULT.
+     5. Der Worker-Pfad reicht den Schalter durch: passNachGegnerpassPruefung ruft zaehlVorschau mit opt.diagonalAuge gleich dem Parameter auf.
+     (Schlusszählung im Hauptthread, Anzeige und Dashboard: tests/browser-diagonalauge.js.)
    Aufruf:  node tests/diagonalauge.js [pfad/zur/index.html] */
 'use strict';
 const fs = require('fs');
@@ -43,6 +48,43 @@ test('Entwicklungsstellungen der Stufe C: Tot-Mengen bei aus gleich den eingefro
   for (const e of REF.entwicklung) {
     pruefeGleich(JSON.stringify(B.indizes(E.toteSteineAmEnde(B.brettAusText(e.brett)))), JSON.stringify(e.totAus), `${e.schluessel}: Tot-Menge aus`);
   }
+});
+
+test('Schalter an: Tot-Menge und Vorschau gleich der Test-Kopie der Diagnose (90 Bretter)', () => {
+  let anders = 0;
+  for (const [quelle, ref] of Object.entries(REF.bretter)) {
+    const b = brettFuer(quelle);
+    pruefeGleich(B.hashTot(E.toteSteineAmEnde(b, undefined, undefined, true)), ref.an.tot, `${quelle}: Tot-Menge an`);
+    pruefeGleich(B.hashVorschau(E.zaehlVorschau(b, 7.5, {...VORSCHAU.flaeche, diagonalAuge: true})), ref.an.vorschauFlaeche, `${quelle}: Vorschau Fläche an`);
+    pruefeGleich(B.hashVorschau(E.zaehlVorschau(b, 7.5, {...VORSCHAU.territory, diagonalAuge: true})), ref.an.vorschauTerritory, `${quelle}: Vorschau Territory an`);
+    if (ref.an.tot !== ref.aus.tot) anders++;
+  }
+  pruefe(anders >= 5, `die Prüfbretter üben die Änderung (${anders} mit anderer Tot-Menge bei an)`);
+});
+
+test('Entwicklungsstellungen: an gleich der Test-Kopie; fünf ändern sich, zwei nicht', () => {
+  const unveraendert = new Set(['Fuego 50 Spiele|D.jsonl.gz|523|354', 'alte PWA|m1.jsonl.gz|26|335']);
+  for (const e of REF.entwicklung) {
+    const b = B.brettAusText(e.brett);
+    pruefeGleich(JSON.stringify(B.indizes(E.toteSteineAmEnde(b, undefined, undefined, true))), JSON.stringify(e.totAn), `${e.schluessel}: Tot-Menge an`);
+    pruefeGleich(JSON.stringify(e.totAus) === JSON.stringify(e.totAn), unveraendert.has(e.schluessel), `${e.schluessel}: ${unveraendert.has(e.schluessel) ? 'unverändert' : 'verändert'}`);
+  }
+});
+
+test('Standard: PARAMS.diagonalAugeEnde ist 0 (auch in PARAMS_DEFAULT)', () => {
+  pruefeGleich(E.PARAMS.diagonalAugeEnde, 0, 'PARAMS');
+  pruefeGleich(globalThis.PARAMS_DEFAULT.diagonalAugeEnde, 0, 'PARAMS_DEFAULT');
+});
+
+test('Worker-Pfad reicht den Schalter durch: passNachGegnerpassPruefung', () => {
+  const alt = globalThis.zaehlVorschau, gesehen = [], P = E.PARAMS, vorher = {p: P.passNachGegnerpass, d: P.diagonalAugeEnde};
+  globalThis.zaehlVorschau = function (b, k, opt) { gesehen.push(!!(opt && opt.diagonalAuge)); return alt.apply(this, arguments); };
+  try {
+    const b = B.brettAusText(REF.entwicklung[3].brett);
+    P.passNachGegnerpass = 1;
+    for (const d of [0, 1]) { P.diagonalAugeEnde = d; E.passNachGegnerpassPruefung(b, 1, {1: 0, 2: 0}, {gegnerPasste: true, wertung: 'flaeche', komi: 7.5}); }
+    pruefeGleich(gesehen.join(','), 'false,true', 'opt.diagonalAuge folgt PARAMS.diagonalAugeEnde');
+  } finally { globalThis.zaehlVorschau = alt; P.passNachGegnerpass = vorher.p; P.diagonalAugeEnde = vorher.d; }
 });
 
 laufeTests('diagonalauge.js').then(ok => { process.exitCode = ok ? 0 : 1; });
