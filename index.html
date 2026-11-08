@@ -6485,7 +6485,7 @@ function drawStateToCache() {
    deadStones. Gilt nur für genau die Stellung, für die sie berechnet wurde
    (Zugzähler und Hash); jeder Zug, Pass, Rückgängig oder Neues Spiel blendet
    sie aus. */
-function vorschauSchluessel() { return state.moveCount + ':' + state.currentHash + ':' + state.scoringMode; }
+function vorschauSchluessel() { return state.moveCount + ':' + state.currentHash + ':' + state.scoringMode + ':' + (PARAMS.diagonalAugeEnde >= 1 ? 1 : 0); }
 function vorschauStandText(stand) {
   return stand >= 0 ? `Schwarz +${stand.toFixed(1)}` : `Weiß +${(-stand).toFixed(1)}`;
 }
@@ -6522,6 +6522,13 @@ function vorschauOeffnen() {
     v: zaehlVorschau(state.board, KOMI, {modus: state.scoringMode, gefangen: state.captures, diagonalAuge: PARAMS.diagonalAugeEnde >= 1})};
   vorschauPanelAktualisieren();
   drawStateToCache(); render();
+}
+/* Ändert sich der Schalter PARAMS.diagonalAugeEnde (Dashboard, Reset, Preset), gehört eine geöffnete Vorschau sonst zur alten
+   Einstellung (Zahlen und Markierungen): neu berechnen und neu zeichnen. Ist keine offen, bleibt sie zu. */
+function vorschauNeuBerechnen() {
+  if (!state.vorschau) return;
+  if (state.gameOver) { vorschauSchliessen(); return; }
+  vorschauOeffnen();
 }
 /* Bewiesen tot: rotes Kreuz (wie bei der Schlusszählung); geschätzt tot:
    oranges Kreuz mit Fragezeichen. Unbewiesene Steine bleiben unmarkiert. */
@@ -7855,6 +7862,7 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     if (preset.values === null) {
       dashReset();
     } else {
+      const diagVorher = PARAMS.diagonalAugeEnde;
       Object.assign(PARAMS, preset.values);
       for (const [k,v] of Object.entries(preset.values)) {
         const inp = document.getElementById('pd-' + k);
@@ -7863,6 +7871,7 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
           inp.classList.toggle('changed', Math.abs(v - PARAMS_DEFAULT[k]) > 1e-9);
         }
       }
+      if (PARAMS.diagonalAugeEnde !== diagVorher) vorschauNeuBerechnen();
     }
     document.querySelectorAll('.pd-preset-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('pd-preset-' + name)?.classList.add('active');
@@ -7913,6 +7922,7 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     PARAMS[key] = raw;
     const changed = Math.abs(raw - PARAMS_DEFAULT[key]) > 1e-9;
     input.classList.toggle('changed', changed);
+    if (key === 'diagonalAugeEnde') vorschauNeuBerechnen();
     if (key === 'rolloutWeight' || key === 'scoreWeight') {
       /* Bidirektionaler Sync: egal welcher der beiden geändert wird,
          der jeweils andere folgt, sodass die Summe immer 1 bleibt.
@@ -8006,6 +8016,7 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
 
   window.dashReset = function() {
     try { localStorage.removeItem(PD_STORE); } catch (e) {}
+    const diagVorher = PARAMS.diagonalAugeEnde;
     Object.assign(PARAMS, PARAMS_DEFAULT);
     for (const key of Object.keys(PARAMS_DEFAULT)) {
       const inp = document.getElementById('pd-' + key);
@@ -8016,6 +8027,7 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
         const inp = document.getElementById('pd-' + p.key);
         if (inp) { inp.value = PARAMS[p.key]; inp.classList.remove('changed'); }
       }
+    if (PARAMS.diagonalAugeEnde !== diagVorher) vorschauNeuBerechnen();
     document.querySelectorAll('.pd-preset-btn').forEach(b=>b.classList.remove('active'));
     dashRefreshPhase();
   };
