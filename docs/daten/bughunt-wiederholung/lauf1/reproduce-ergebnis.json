@@ -1,0 +1,142 @@
+[
+  {
+    "id": "GTP-1",
+    "status": "reproduziert",
+    "evidence": {
+      "suicideAccepted": [
+        "= ",
+        "= A1"
+      ],
+      "immediateKoAccepted": [
+        "= ",
+        "= B4 A3 C3 B2",
+        "= A2 C2 B1"
+      ],
+      "recaptureAfterPassesAccepted": [
+        "= ",
+        "= B4 A3 C3 B2"
+      ]
+    }
+  },
+  {
+    "id": "GTP-3",
+    "status": "reproduziert",
+    "evidence": [
+      "? unbekannter Befehl",
+      "? unbekannter Befehl",
+      "= 2",
+      "="
+    ]
+  },
+  {
+    "id": "GTP-2",
+    "status": "reproduziert",
+    "evidence": {
+      "instrumentedAdapterArguments": {
+        "argc": 9,
+        "enabled": 1,
+        "extra": null
+      },
+      "scope": "Argumentübergabe instrumentiert; keine Suche und kein Auslösungsergebnis gemessen"
+    }
+  },
+  {
+    "id": "UI-1",
+    "status": "reproduziert",
+    "evidence": {
+      "beforeResponse": {
+        "enabled": false,
+        "thinking": true,
+        "id": 5,
+        "count": 0
+      },
+      "afterResponse": {
+        "enabled": false,
+        "count": 1,
+        "stone": 1
+      },
+      "scope": "Originalhandler und applyAIResult, Antwort kontrolliert eingespeist; kein echter Worker"
+    }
+  },
+  {
+    "id": "TRAIN-1",
+    "status": "reproduziert",
+    "evidence": {
+      "w0": 0.017907090485095978,
+      "first": {
+        "calls": [
+          1
+        ],
+        "trained": true,
+        "w": 1.0179071426391602
+      },
+      "undone": {
+        "gameOver": false,
+        "trained": true,
+        "w": 1.0179071426391602
+      },
+      "last": {
+        "calls": [
+          1
+        ],
+        "trained": true,
+        "w": 1.0179071426391602
+      },
+      "scope": "Original showFinalScore/pass/undo; Training durch aufrufzählende Gewichtsänderungs-Attrappe ersetzt; KI-Aufgabe nur statisch geprüft"
+    }
+  },
+  {
+    "id": "UI-2",
+    "status": "reproduziert",
+    "evidence": {
+      "before": "Schwarz +353.5",
+      "after": "Schwarz +353.5",
+      "mode": "territory",
+      "sgfResult": "RE[B+352.5]"
+    }
+  },
+  {
+    "id": "UI-3",
+    "status": "reproduziert",
+    "evidence": {
+      "preview": null,
+      "cache": "preview marks",
+      "shown": "preview marks",
+      "moveCount": 1,
+      "scope": "Original Passhandler und Invalidierung, instrumentierter Canvas-Cache; Pixel-Reproduktion noch offen"
+    }
+  },
+  {
+    "id": "TRAIN-2",
+    "status": "reproduziert",
+    "evidence": {
+      "keys": [
+        "inp",
+        "probs",
+        "hidden",
+        "moveIdx"
+      ],
+      "seen": [
+        {
+          "tag": 2,
+          "advantage": 1
+        },
+        {
+          "tag": 1,
+          "advantage": 1
+        }
+      ],
+      "aiColor": 1,
+      "scope": "Original Pufferaufnahme/Farbhandler/trainGame; _backward protokolliert den Reward statt Gewichte zu ändern"
+    }
+  },
+  {
+    "id": "NET-1",
+    "status": "reproduziert",
+    "evidence": {
+      "err": "storage denied",
+      "games": 17,
+      "sameWeights": true
+    }
+  }
+]
