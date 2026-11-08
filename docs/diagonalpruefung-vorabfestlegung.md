@@ -13,7 +13,7 @@ angewandt, an anderen Stellen der App schon. In den Entwicklungsdaten (§3) sind
 (`docs/zaehlung-mechanismus.md` §6.5). Eine Test-Kopie, in der ein Ein-Punkt-Auge nur mit `_diagIsTrueEye` zählt, führte an diesen Daten zu 0 neu entstandenen abweichenden Steinen und 394 geänderten Steinen in Richtung GNU Go
 (§12.2 des Docs; nachträglicher Diagnosebefund an denselben Daten, keine Verbesserungsmessung).
 
-**Frage dieser Vorabfestlegung:** Wie wirkt die Diagonalprüfung auf **neuen** Stellungen, getrennt für die Schlusszählung und für die Zählvorschau, und wie unterscheiden sich dort **Übereinstimmung mit GNU Go** und **tatsächliche Richtigkeit**? Ob der Schalter jemals Standard wird, ist **nicht** Gegenstand; das wäre eine eigene Festlegung mit eigenem Go.
+**Frage dieser Vorabfestlegung:** Wie wirkt die Diagonalprüfung auf **neuen** Stellungen, getrennt für die Schlusszählung und für die Zählvorschau, und wie unterscheiden sich dort **Übereinstimmung mit GNU Go** und **unabhängige Beurteilung** (ohne Anspruch auf eine Ground Truth)? Ob der Schalter jemals Standard wird, ist **nicht** Gegenstand; das wäre eine eigene Festlegung mit eigenem Go.
 
 ## 2. Der Schalter
 
@@ -64,7 +64,7 @@ Auf unbetroffenen Stellungen kann der Schalter weder beheben noch verschlechtern
 **Stufe 2, GNU Go in GitHub Actions (nur nach eigenem Go):** GNU Gos Tot-Liste (`final_status_list dead`, plus `final_score` bei S) für **alle betroffenen Stellungen**, nach dem Muster der Zähldiagnose (Einspielen der Archivzüge, zweimal in frischen Prozessen mit gleichem Seed, Version protokolliert, `docs/passregel-zaehldiagnose.md`).
 Zusätzlich für eine **Kontrollstichprobe unbetroffener Stellungen** (**Setzung:** gleiche Anzahl wie betroffene, feste Ziehung nach Hash aus Seed und Schlüssel), damit die Übereinstimmung der Referenz mit der App auch dort sichtbar ist (z. B. bleibende Abweichungen unabhängig vom Schalter).
 
-**Stufe 3, Beurteilung der Richtigkeit (§6):** blind; **alle** neu entstandenen Abweichungen (B1) und eine Stichprobe der übrigen betroffenen Ketten (B2). Sie beginnt erst, wenn Beurteiler benannt sind und zugesagt haben (§6.3).
+**Stufe 3, unabhängige Beurteilung (§6):** blind; **alle** neu entstandenen Abweichungen (B1) und eine Stichprobe der übrigen betroffenen Ketten (B2). Sie beginnt erst, wenn Beurteiler benannt sind und zugesagt haben (§6.3).
 
 Jede Stufe hat ein eigenes Go. Ein Ergebnis einer Stufe ist kein Go für die nächste.
 
@@ -86,10 +86,10 @@ Schicht A misst nur die **Übereinstimmung mit GNU Gos Tot-Liste**. Sie sagt nic
 Die Nettozahl (behoben minus neu entstanden) darf nur **zusätzlich** zu beiden Zahlen genannt werden: Steine können in beide Richtungen wechseln (`docs/zaehlung-mechanismus.md` §12.4).
 Anteile mit Clopper-Pearson (95 %), wie in CLAUDE.md. Die Stellungen sind nicht unabhängig voneinander im Sinn eines Zufallsmodells; Intervalle sind Modellannahmen und stehen als solche im Bericht.
 
-## 6. Tatsächliche Richtigkeit (Schicht B), getrennt von Schicht A
+## 6. Unabhängige Beurteilung (Schicht B), getrennt von Schicht A
 
 Übereinstimmung mit GNU Go ist **nicht** Richtigkeit. GNU Go kann bei Seki, Ko, unausgespielten Stellungen und umstrittenen Gruppen anders urteilen, als es die Regeln verlangen; der Referenzstand ist der Maßstab der Messung und nicht die Wahrheit (`docs/passregel-vorsprung.md` §9).
-Schicht B beurteilt deshalb Ketten **unabhängig vom Urteil von GNU Go und von der App**: die neu entstandenen Abweichungen **vollständig** und eine Stichprobe der übrigen betroffenen Ketten.
+Eine **Ground Truth gibt es hier nicht**; auch ein menschliches Urteil ist keine. Schicht B liefert deshalb **Beurteilungen mit Begründung und Unsicherheit**, nicht „die Richtigkeit“. Sie beurteilt Ketten **unabhängig vom Urteil von GNU Go und von der App**: die neu entstandenen Abweichungen **vollständig** und eine Stichprobe der übrigen betroffenen Ketten.
 
 ### 6.1 Auswahl der zu beurteilenden Ketten
 
@@ -105,28 +105,33 @@ Ein Brettbild allein reicht nicht, wenn Ko oder zugabhängiges Leben im Spiel is
 - Stellungsart (S oder V), ob die Partie zu Ende ist, Zugindex;
 - **Zugfarbe** (wer als Nächstes am Zug wäre) und **Vorgeschichte** als Kurzansicht: die letzten 10 Züge mit Farbe und Koordinate (die vollständige Geschichte steht im SGF), die Passfolge (wer zuletzt passte, wie viele Pässe in Folge), der aktuelle Ko-Punkt (falls vorhanden), der Gefangenenstand.
 
-**Antwortbogen** (fester Aufbau, je Unterlage): Kategorie **lebendig**, **tot**, **Seki**, **Ko oder zugabhängig** (dann zusätzlich das Urteil bei Zug von Schwarz und bei Zug von Weiß), **nicht entscheidbar**; dazu eine kurze Begründung nach Regelkriterien (echte Augen nach der Diagonalregel, Benson, falsche Augen, Freiheiten).
+**Antwortbogen** (fester Aufbau, je Unterlage): Kategorie **lebendig**, **tot**, **Seki**, **Ko oder zugabhängig** (dann zusätzlich das Urteil bei Zug von Schwarz und bei Zug von Weiß), **nicht entscheidbar**; dazu eine **Begründung** nach allgemeinen Go-Kriterien (echte und falsche Augen, Benson, Freiheiten, Seki, Ko) und die **Sicherheit des Urteils** (sicher, eher sicher, unsicher) mit der Angabe, was offen bleibt.
 Die Unterlagen werden in zufälliger Reihenfolge mit Zufalls-ID vorgelegt, **ohne Angabe, wer sie wie bewertet** (App aus, App an, GNU Go); die Zuordnung wird erst nach Abschluss aller Urteile aufgedeckt. Das Werkzeug, das Unterlagen und Antwortbogen erzeugt, gehört zu Stufe 3 (eigene Umsetzung, eigenes Go).
 
 ### 6.3 Wer beurteilt: nicht festgelegt, Voraussetzung für Stufe 3
 
-Im Entwurf ist **niemand eingeteilt**. Stufe 3 beginnt erst, wenn Beurteiler **benannt sind und zugesagt haben**; vorher wird der Aufwand genannt (Zahl der Unterlagen in B1 und B2, geschätzte Zeit je Unterlage). Ohne benannten Beurteiler gibt es **keine Aussage zur tatsächlichen Richtigkeit**, nur Schicht A.
+Im Entwurf ist **niemand eingeteilt**. Stufe 3 beginnt erst, wenn Beurteiler **benannt sind und zugesagt haben**; vorher wird der Aufwand genannt (Zahl der Unterlagen in B1 und B2, geschätzte Zeit je Unterlage). Ohne benannten Beurteiler gibt es **keine Beurteilung**, nur Schicht A.
+**Beurteilungen werden nach Beurteilergruppe getrennt geführt und berichtet** (KI und Mensch), jeweils mit Begründung und Unsicherheit. Dass ein Mensch beurteilt, macht das Urteil **nicht zur Ground Truth**.
 **Entscheidung offen** (Empfehlung: §10.4), möglich sind (Aufwand und Aussagekraft sind verschieden):
 - ein Mensch, der zugesagt hat; Hazeberry nur, wenn er das möchte;
-- eine **getrennte KI-Beurteilung** in einer eigenen Sitzung, die nur die Unterlagen bekommt und die Herkunft nicht kennt; sie wird als **KI-Beurteilung** berichtet und ist nicht dasselbe wie die Beurteilung durch einen Menschen;
-- beides, mit Vergleich beider Urteile auf einer Teilmenge.
+- eine **getrennte KI-Beurteilung** in einer eigenen Sitzung, die nur die Unterlagen bekommt und die Herkunft nicht kennt; sie wird als **KI-Beurteilung** berichtet;
+- beides; auf gemeinsam beurteilten Unterlagen wird die Übereinstimmung beider ausgewiesen, **Widersprüche gelten als ungeklärt**.
 
 Ob ein zweites Programm (Fuego) als zusätzliche Meinung dient, hängt davon ab, ob dort eine Tot-Liste verfügbar ist; das ist **nicht geprüft**.
 
 ### 6.4 Kennzahlen Schicht B
 
-Nur für die beurteilten Ketten, getrennt für B1 und B2 und von Schicht A:
-- Anzahl und Anteil, in denen **App an** mit dem Urteil übereinstimmt, **App aus** übereinstimmt, **GNU Go** übereinstimmt.
-- **R+** (aus falsch, an richtig), **R−** (aus richtig, an falsch), beide richtig, beide falsch und **ungeklärt** (Seki, Ko oder zugabhängig ohne einheitliches Urteil, nicht entscheidbar). R+ und R− getrennt, nie nur Saldo.
-- **Bestätigte Unbedenklichkeit** gilt nur für Fälle mit einem **entschiedenen** Urteil, in denen App an mit dem Urteil übereinstimmt. **Ungeklärte Fälle zählen nicht als bestätigte Unbedenklichkeit.** Ihre Zahl wird getrennt genannt.
-- Fälle, in denen GNU Go und das Urteil abweichen, werden einzeln aufgeführt.
+Nur für die beurteilten Ketten, getrennt für B1 und B2 und von Schicht A. **Berichtet werden Beurteilungen, keine Wahrheit**, jeweils mit Begründung und Unsicherheit.
+- **Je Beurteilergruppe getrennt** (KI, Mensch): Zahl der Urteile, Verteilung der Kategorien und der Sicherheit, Anteil, in dem **App an**, **App aus** und **GNU Go** mit dem Urteil übereinstimmen.
+- **Zwischen den Gruppen:** Übereinstimmung von KI und Mensch auf gemeinsam beurteilten Unterlagen (Zahl, Anteil, einzelne Abweichungen).
+- **Zählregeln für die Entscheidungsregel (§8):**
+  - **R−** (aus richtig, an falsch) zählt **konservativ**: Schon eine **entschiedene, nicht unsichere** Beurteilung mit diesem Ergebnis genügt.
+  - **R+ bestätigt** (aus falsch, an richtig) zählt nur, wenn **alle** vorliegenden Beurteilungen der Unterlage **entschieden, nicht unsicher und übereinstimmend** dieses Ergebnis haben.
+  - **Ungeklärt** sind: Seki, Ko oder zugabhängig ohne einheitliches Urteil, nicht entscheidbar, unsicher, **Widerspruch zwischen Beurteilern** und ungeklärte Ausfälle der Stufe 2 (§10.3). R+ und R− werden getrennt berichtet, nie nur als Saldo.
+- **Bestätigte Unbedenklichkeit** gilt nur für Fälle mit entschiedenen, nicht unsicheren und übereinstimmenden Beurteilungen, in denen App an mit ihnen übereinstimmt. **Ungeklärte Fälle zählen nicht als bestätigte Unbedenklichkeit.** Ihre Zahl wird getrennt genannt.
+- Fälle, in denen GNU Go und eine Beurteilung abweichen, werden einzeln aufgeführt.
 
-Aussagen zur Richtigkeit gelten **nur für die beurteilten Ketten**. B1 ist vollständig; B2 ist eine Ziehung, Hochrechnungen nur mit Intervall und Hinweis auf die Annahmen.
+Aussagen gelten **nur für die beurteilten Ketten** und nur als Beurteilungen. B1 ist vollständig; B2 ist eine Ziehung, Hochrechnungen nur mit Intervall und Hinweis auf die Annahmen.
 
 ## 7. Gültigkeit, Kontrollen
 
@@ -137,20 +142,22 @@ Aussagen zur Richtigkeit gelten **nur für die beurteilten Ketten**. B1 ist voll
 3. **Identitätskontrolle Schalter aus (bitgleich):** Bei Schalter aus ist die Tot-Menge in **jeder** Prüfstellung gleich der der **unveränderten Fassung** (Stand `main` vor der Umsetzung, in eigenem Prozess; „gleich“ erst nach Vorprüfung der Fallabdeckung, sonst „KEIN URTEIL“).
    Zusätzlich vor der Umsetzung festzulegen und im Test einzufrieren: Referenzwerte der unveränderten Fassung auf Zufallsbrettern und den Stellungen unter `tests/stellungen/`, erzeugt **vor** der Änderung. Engine-Vergleiche alter gegen neuer Stand laufen nur in Actions (`engine-vergleich.yml`) und nur nach Go.
 4. **Konsistenzkontrolle gegen die Diagnose:** Bei Schalter an stimmt die Tot-Menge der Umsetzung auf den **563 Entwicklungsstellungen** mit der der Test-Kopie (`gegenprobe.js --variante diagonalauge`) überein; sonst weicht die Umsetzung von dem ab, was diagnostiziert wurde (kein Urteil, bis geklärt).
-5. **GNU-Go-Lauf (Stufe 2):** Version protokolliert, Rohantworten zweier Läufe gleich, Ausfälle gezählt; die Ausfallregel (Obergrenze für Ausfälle) legt Hazeberry vor dem Lauf fest (**Entscheidung offen**; Empfehlung: §10.3, wie in Stufe C).
-6. **Beurteilung (Stufe 3):** Beurteiler benannt und zugesagt (§6.3); Unterlagen nach §6.2 (mit Zugfarbe und Vorgeschichte); Reihenfolge zufällig, Herkunft verdeckt, Kategorien vorab, Begründung je Kette; **B1 vollständig beurteilt**; die Zuordnung der Urteile zu App und GNU Go wird erst nach Abschluss aller Urteile aufgedeckt. Fehlt ein benannter Beurteiler oder ist B1 nicht vollständig beurteilt, ist Stufe 3 ungültig (kein Urteil).
-7. **Mindestumfang betroffener Stellungen:** Für ein Urteil über die Kandidatur (§8) mindestens **30** betroffene Stellungen je Stellungsart (**Setzung**). Das ist ein Mindestumfang, damit überhaupt berichtet werden kann, **kein Sicherheitsnachweis**: Das Erreichen der Zahl belegt keine Unbedenklichkeit. Weniger heißt „kein Urteil: zu wenig Betroffene“, nicht „unbedenklich“; über eine Erweiterung der Prüfdaten entscheidet Hazeberry.
+5. **GNU-Go-Lauf (Stufe 2):** Version protokolliert, Rohantworten zweier Läufe gleich, Ausfälle gezählt; die Ausfallregel (Obergrenze für Ausfälle) legt Hazeberry vor dem Lauf fest (**Entscheidung offen**; Empfehlung: §10.3).
+6. **Beurteilung (Stufe 3):** Beurteiler benannt und zugesagt (§6.3); Unterlagen nach §6.2 (mit Zugfarbe und Vorgeschichte); Reihenfolge zufällig, Herkunft verdeckt, Kategorien vorab, Begründung und Sicherheit je Urteil; **B1 vollständig beurteilt**; die Zuordnung der Urteile zu App und GNU Go wird erst nach Abschluss aller Urteile aufgedeckt. Fehlt ein benannter Beurteiler oder ist B1 nicht vollständig beurteilt, ist Stufe 3 ungültig (kein Urteil).
+7. **Mindestumfang betroffener Stellungen:** Für ein Urteil über die Kandidatur (§8) mindestens **30** betroffene Stellungen je Stellungsart (**Setzung**). Das ist ein Mindestumfang, damit überhaupt berichtet werden kann, **kein Sicherheitsnachweis**: Das Erreichen der Zahl belegt keine Unbedenklichkeit. Bei weniger Betroffenen wird **trotzdem beschrieben, was gefunden wurde** (Zahlen, Fälle, Beurteilungen); nur die **Kandidatur bleibt offen** („kein Urteil über die Kandidatur: zu wenig Betroffene“), nicht „unbedenklich“. Über eine Erweiterung der Prüfdaten entscheidet Hazeberry.
 
 ## 8. Entscheidungsregel (Vorschlag, Setzungen)
 
 Das Ergebnis ist ein **Befund, kein Go und keine Aktivierung**. Der Schalter bleibt aus. Der Ausgang ist entweder **„positive Kandidatur“** oder **„keine positive Kandidatur“** (mit Gründen). Eine positive Kandidatur verlangt **alle** der folgenden Punkte (Zahlen sind Setzungen, **Entscheidung offen**):
 
 1. Alle Pflichtprüfungen aus §7 bestanden (insbesondere bitgleich bei aus).
-2. **Bestätigter Nutzen:** mindestens **R+ ≥ 1** unter den entschieden beurteilten Ketten (die Mindestzahl ist **Entscheidung offen**; ohne bestätigte Verbesserung folgt **keine positive Kandidatur**, auch nicht bei R− = 0).
-3. **R− = 0** unter den entschieden beurteilten Ketten (B1 und B2); Fälle mit R− > 0 werden einzeln besprochen und sprechen gegen eine Kandidatur, solange sie nicht als Fehler der Beurteilung geklärt sind.
-4. **Alle B1-Fälle entschieden:** Jede neu entstandene Abweichung gegenüber GNU Go ist beurteilt und entweder als richtig im Sinn von Schicht B eingeordnet (App an stimmt mit dem entschiedenen Urteil überein) oder als GNU-Go-Fehler belegt.
-   **Ungeklärte Fälle** (Seki, Ko oder zugabhängig ohne einheitliches Urteil, nicht entscheidbar) zählen **nicht** als bestätigte Unbedenklichkeit und verhindern die positive Kandidatur, solange sie offen sind.
+2. **Bestätigter Nutzen:** mindestens **R+ ≥ 1** im Sinn von §6.4 (die Mindestzahl ist **Entscheidung offen**; ohne bestätigte Verbesserung folgt **keine positive Kandidatur**, auch nicht bei R− = 0).
+3. **R− = 0** im Sinn von §6.4 (konservativ gezählt: schon eine entschiedene, nicht unsichere Beurteilung genügt); Fälle mit R− > 0 werden einzeln besprochen und sprechen gegen eine Kandidatur, solange sie nicht als Fehler der Beurteilung geklärt sind.
+4. **Alle B1-Fälle entschieden und alle betroffenen Stellungen ausgewertet:** Jede neu entstandene Abweichung gegenüber GNU Go ist beurteilt und entweder als „App an stimmt mit allen vorliegenden Beurteilungen überein (entschieden, nicht unsicher, übereinstimmend)“ eingeordnet oder im Sinn der Beurteilungen als GNU-Go-Fehler belegt.
+   **Ungeklärte Fälle** (Seki, Ko oder zugabhängig ohne einheitliches Urteil, nicht entscheidbar, unsicher, Widerspruch zwischen Beurteilern) und **ungeklärte Ausfälle** der Stufe 2 in betroffenen Stellungen (§10.3) zählen **nicht** als bestätigte Unbedenklichkeit und verhindern die positive Kandidatur, **auch wenn ihr Anteil klein bleibt**; es gibt dafür keine Prozentgrenze.
 5. Die Wirkung auf den **Endstand** (S) ist berichtet, einschließlich der Fälle, in denen sich der Sieger ändert.
+
+**Mindestumfang:** Wird er nicht erreicht (§7 Nr. 7), wird der Befund trotzdem beschrieben; die Kandidatur bleibt dann offen.
 
 **Wortlaut:** Eine positive Kandidatur heißt nur, dass in **dieser Prüfmenge** (ausgewählte Archivpartien, §3.2) nichts Gegenteiliges gefunden wurde. Sie heißt nicht „unbedenklich“. Die Zahlen 30 (§7 Nr. 7) und die Mindestzahl für R+ sind Setzungen ohne Sicherheitswert.
 
@@ -182,18 +189,19 @@ iterative Entfernung); Browser-Test für Schlusszählung und Dashboard bei aus u
   Die Gruppen werden getrennt berichtet und nicht gewichtet. In Stufe A hat die GNU-Go-Gruppe kaum ausgelöst (2 von 960) und die V-Fälle stammten aus den Fuego-Gruppen; die Betroffenheit kann also je Gruppe stark verschieden sein.
 - **Zugindizes für V, Empfehlung:** 250, 300 und 350 beibehalten, dazu die Endstellung für S. Begründung: Sie decken den Bereich 294 bis 449 der Entwicklungsstellungen ab und sind vor jeder Sicht auf Prüfergebnisse festgelegt. Schritt 0 berichtet die Längenverteilung der Partien; die Indizes werden **vor Stufe 1 festgeschrieben** und danach nicht nachjustiert.
 - **Handpartien, Empfehlung:** ja, aber nur als **getrennter, illustrativer Absatz** (die sechs SGF `tests/stellungen/hand-*.sgf`, nur S, ohne Statistik). Begründung: Es sind die einzigen Partien gegen einen Menschen, und die Hauptauswertung gilt ausdrücklich nicht für Menschen; sie dienen nur als Blick auf reale Endstellungen. Bei „nein“ entfällt nichts Tragendes.
-- **Unsicherheit:** Die Betroffenheit ist unbekannt. In den Entwicklungsdaten waren es 19 von 563 Stellungen (3,4 %), an Auslösestellungen; das ist **nicht** übertragbar. Stufe 1 liefert die Zahl. Liegt sie unter 30 betroffenen Stellungen je Stellungsart, heißt das „kein Urteil: zu wenig Betroffene“ (§7 Nr. 7) und Hazeberry entscheidet über eine Erweiterung.
+- **Unsicherheit:** Die Betroffenheit ist unbekannt. In den Entwicklungsdaten waren es 19 von 563 Stellungen (3,4 %), an Auslösestellungen; das ist **nicht** übertragbar. Stufe 1 liefert die Zahl. Liegt sie unter 30 betroffenen Stellungen je Stellungsart, wird der Befund trotzdem beschrieben (§7 Nr. 7); nur die Kandidatur bleibt offen („kein Urteil über die Kandidatur: zu wenig Betroffene“), und Hazeberry entscheidet über eine Erweiterung.
 - **Zeitpunkt:** Indizes und Handpartien vor AP3; Erweiterung gegebenenfalls nach Stufe 1.
 
 ### 10.3 Kontrollstichprobe und Ausfallregel (Stufe 2)
 
 - **Kontrollstichprobe, Empfehlung:** gleich viele unbetroffene Stellungen wie betroffene, mindestens 50 und höchstens 200 je Stellungsart, feste Ziehung nach Hash aus Seed und Schlüssel. Zweck: sichtbar machen, ob die Referenz auch dort Abweichungen zeigt, die mit dem Schalter nichts zu tun haben (z. B. Zählabweichungen der Art aus `docs/zaehlung-mechanismus.md` §5);
   sie misst nicht die Wirkung des Schalters. Die Obergrenze hält die GNU-Go-Arbeit überschaubar.
-- **Ausfallregel, Empfehlung:** wie `docs/passregel-vergleich.md` §9 Nr. 6. Ausfall = Absturz von GNU Go (bei der Debian-Fassung 3.8 an manchen Stellungen bekannt, `gnugo-duell.js`; dort ein Neustart mit nächstem Seed), Timeout, nicht einspielbare oder nicht zählbare Stellung. Jeder Ausfall wird einzeln mit Stellung, Gruppe und Grund aufgelistet. Folgen:
-  1. Fallen mehr als **5 %** der betroffenen Stellungen einer Stellungsart aus, ist Schicht A für diese Art **ungültig** (kein Urteil, Lauf rot).
-  2. Eine betroffene Stellung mit Ausfall zählt **konservativ als „ungeklärt“**, nicht als unbedenklich (§8 Nr. 4).
+- **Ausfallregel, Empfehlung:** Ausfall = Absturz von GNU Go (bei der Debian-Fassung 3.8 löst teils die **Stellung selbst** den Absturz aus, `gnugo-duell.js`; dort ein Neustart mit nächstem Seed), Timeout, nicht einspielbare oder nicht zählbare Stellung. Ein Neustart ist erlaubt; fällt die Stellung danach noch aus, zählt sie als **ungeklärter Ausfall**.
+  Jeder Ausfall wird einzeln mit Stellung, Gruppe, Art, Partielänge und dem Unterschied der Tot-Mengen bei aus und an aufgelistet. **Ausfälle sind nicht zufällig:** Gerade schwierige Stellungen können ausfallen, ein kleiner Anteil ist deshalb keine Entwarnung. Folgen:
+  1. **Jeder ungeklärte Ausfall in einer betroffenen Stellung verhindert die positive Kandidatur**, auch wenn der Anteil klein bleibt. Er zählt als ungeklärt, nie als unbedenklich (§8 Nr. 4).
+  2. Für die **Berichtbarkeit** von Schicht A: Fallen mehr als **5 %** der betroffenen Stellungen einer Stellungsart aus, ist Schicht A für diese Art **ungültig** (kein Urteil, Lauf rot). Die 5 % sind eine **Setzung ohne Herleitung** und **nicht aus Stufe C übernommen**: Dort ging es um Paare für E2 und E3 und um eine konservative Zählung bei verlorenen Siegen.
+     Die Grenze bestimmt nur, wann Schicht A nicht mehr berichtet wird, und **erlaubt keine positive Kandidatur**.
   3. Wiederholt werden ganze Pakete, nie einzelne Stellungen.
-- **Begründung:** Dieselbe Logik wie in Stufe C (ein Ausfall darf nicht „einfach weggelassen“ werden); die 5 % sind dort die Grenze für die Paare und hier übernommen (Setzung).
 - **Zeitpunkt:** vor AP4.
 
 ### 10.4 Schicht B: Deckel, Beurteiler, Aufwand, zweites Programm
@@ -201,9 +209,10 @@ iterative Entfernung); Browser-Test für Schlusszählung und Dashboard bei aus u
 - **Deckel für B2, Empfehlung:** **60** beibehalten. Zweck von B2 ist, bestätigte Verbesserungen (R+) zu finden und die Beurteilung zu kalibrieren. Gesenkt wird er nur auf Wunsch der Beurteiler und nur **vor** Sicht auf Urteile.
 - **Beurteiler, Empfehlung (zweigleisig, damit der Plan ohne bestimmten Menschen ausführbar ist):**
   1. **KI-Beurteilung aller Fälle (B1 und B2)** durch eine **getrennte, eigene Sitzung**, die nur Unterlage und Kategorien bekommt, **nicht** die Herkunft, **nicht** dieses Doc und **nicht** die Regel der App (die Begründungsvorgaben nennen allgemeine Go-Begriffe wie echte und falsche Augen, Seki, Freiheiten, Ko, ohne `_diagIsTrueEye`).
-     Das ist **nicht unabhängig im strengen Sinn**: Engine und Diagnosen entstanden mit Claude, ein Beurteiler aus derselben Modellfamilie kann Blindstellen teilen. Das Ergebnis heißt deshalb **„KI-Beurteilung“**, nicht „tatsächliche Richtigkeit“.
-  2. **Menschliche Beurteilung einer Teilmenge**, **nur wenn ein Mensch zugesagt hat**: bis zu **20 Unterlagen** (Setzung): zuerst die Fälle, in denen die KI-Beurteilung ungeklärt ist oder GNU Go widerspricht, der Rest zufällig. Zweck: Kalibrierung der KI-Beurteilung und Entscheidung strittiger Fälle. Hazeberry übernimmt das nur, wenn er es möchte; sonst eine dritte Person.
-  Aussagen zur „tatsächlichen Richtigkeit“ gibt es **nur für Fälle, die ein Mensch beurteilt hat**; für den Rest gilt „KI-Beurteilung“. Ohne Zusage eines Menschen bleibt es bei der KI-Beurteilung, und der Bericht sagt das ausdrücklich.
+     Das ist **nicht unabhängig im strengen Sinn**: Engine und Diagnosen entstanden mit Claude, ein Beurteiler aus derselben Modellfamilie kann Blindstellen teilen. Das Ergebnis wird als **KI-Beurteilung** berichtet.
+  2. **Menschliche Beurteilung einer Teilmenge**, **nur wenn ein Mensch zugesagt hat**: bis zu **20 Unterlagen** (Setzung): zuerst die Fälle, in denen die KI-Beurteilung ungeklärt ist oder GNU Go widerspricht, der Rest zufällig. Zweck: Vergleich mit der KI-Beurteilung und Klärung strittiger Fälle. Hazeberry übernimmt das nur, wenn er es möchte; sonst eine dritte Person.
+  **Beide sind Beurteilungen, keine Ground Truth.** Sie werden **getrennt** mit Begründung und Unsicherheit berichtet, ihre Übereinstimmung auf gemeinsam beurteilten Unterlagen wird ausgewiesen, Widersprüche zählen als ungeklärt (§6.4). Ein menschliches Urteil macht ein Ergebnis nicht zu „tatsächlicher Richtigkeit“.
+  Ohne Zusage eines Menschen bleibt es bei der KI-Beurteilung, und der Bericht sagt das ausdrücklich.
 - **Aufwandsgrenze für B1, Empfehlung:** **keine Kürzung von B1.** Für die menschliche Teilmenge gilt die Grenze von 20; für die KI-Beurteilung gibt es keine. Vor Stufe 3 wird die Zahl der Unterlagen genannt und die Zeit je Unterlage an drei Probestücken (ohne Auswertung der Urteile) geschätzt; liegt die menschliche Teilmenge darüber, entscheidet Hazeberry.
 - **Zweites Programm, Empfehlung:** **nicht Voraussetzung.** Fuego kennt `final_status_list` (`docs/fuego.md` §6), die **Antwortqualität ist nicht geprüft** (dort meldet `final_score` mitten in der Partie manchmal „cannot score“). Optional eine kurze Funktionsprobe an etwa 10 archivierten Endstellungen mit eigenem Go; nur danach könnte Fuego als zusätzliche Meinung dienen.
 - **Zeitpunkt:** vor Stufe 2 (§11, E-2).
@@ -231,8 +240,8 @@ Nichts davon ist begonnen. Jedes Paket hat ein eigenes Go; vor jedem Lauf wird g
 
 **Reihenfolge mit Entscheidungspunkten:**
 1. **E-0:** Hazeberry bestätigt oder ändert §10. Danach AP1, AP2 (je Go).
-2. **Stufe 1** (AP3, Go): Ergebnis ist **nur die Betroffenheit**, keine Aussage zu Richtigkeit.
-   **E-1:** Bei weniger als 30 betroffenen Stellungen je Stellungsart: „kein Urteil: zu wenig Betroffene“; Hazeberry entscheidet über Erweiterung (§10.2).
+2. **Stufe 1** (AP3, Go): Ergebnis ist **nur die Betroffenheit**, keine Aussage zur Beurteilung.
+   **E-1:** Bei weniger als 30 betroffenen Stellungen je Stellungsart wird der Befund trotzdem beschrieben; nur die Kandidatur bleibt offen („kein Urteil über die Kandidatur: zu wenig Betroffene“); Hazeberry entscheidet über eine Erweiterung (§10.2).
 3. **E-2 (vor Stufe 2, vor Sicht auf Schicht A):** Beurteiler benannt und zugesagt (§10.4), Deckel, Kategorien, Mindestzahlen bestätigt.
 4. **Stufe 2** (AP4, Go): Schicht A. Danach wählt die Regel aus §6.1 die Ketten **mechanisch** aus (B1 vollständig, B2 gezogen); keine Entscheidung nach Sicht auf Urteile.
 5. **Stufe 3** (AP5, Go): Zahl der Unterlagen und Aufwand werden vorher genannt. Aufdeckung erst nach allen Urteilen.
