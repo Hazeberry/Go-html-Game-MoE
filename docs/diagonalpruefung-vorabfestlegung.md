@@ -101,9 +101,9 @@ Schicht B beurteilt deshalb Ketten **unabhängig vom Urteil von GNU Go und von d
 ### 6.2 Unterlage für die Beurteilung
 
 Ein Brettbild allein reicht nicht, wenn Ko oder zugabhängiges Leben im Spiel ist. Je Kette liegt eine Unterlage vor mit:
-- Brett (Textdiagramm mit Koordinaten und als SGF), die zu beurteilende Kette markiert;
+- Brett (Textdiagramm mit Koordinaten), die zu beurteilende Kette markiert, und die **vollständige Zuggeschichte als SGF** (alle Züge der Partie bis zur Stellung, mit Pässen). Für Superko reichen die letzten zehn Züge nicht immer; die Beurteilung kann sich auf frühere Stellungen der Partie stützen;
 - Stellungsart (S oder V), ob die Partie zu Ende ist, Zugindex;
-- **Zugfarbe** (wer als Nächstes am Zug wäre) und **Vorgeschichte**: die letzten 10 Züge mit Farbe und Koordinate, die Passfolge (wer zuletzt passte, wie viele Pässe in Folge), der aktuelle Ko-Punkt (falls vorhanden), der Gefangenenstand.
+- **Zugfarbe** (wer als Nächstes am Zug wäre) und **Vorgeschichte** als Kurzansicht: die letzten 10 Züge mit Farbe und Koordinate (die vollständige Geschichte steht im SGF), die Passfolge (wer zuletzt passte, wie viele Pässe in Folge), der aktuelle Ko-Punkt (falls vorhanden), der Gefangenenstand.
 
 **Antwortbogen** (fester Aufbau, je Unterlage): Kategorie **lebendig**, **tot**, **Seki**, **Ko oder zugabhängig** (dann zusätzlich das Urteil bei Zug von Schwarz und bei Zug von Weiß), **nicht entscheidbar**; dazu eine kurze Begründung nach Regelkriterien (echte Augen nach der Diagonalregel, Benson, falsche Augen, Freiheiten).
 Die Unterlagen werden in zufälliger Reihenfolge mit Zufalls-ID vorgelegt, **ohne Angabe, wer sie wie bewertet** (App aus, App an, GNU Go); die Zuordnung wird erst nach Abschluss aller Urteile aufgedeckt. Das Werkzeug, das Unterlagen und Antwortbogen erzeugt, gehört zu Stufe 3 (eigene Umsetzung, eigenes Go).
