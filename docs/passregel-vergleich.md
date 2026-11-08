@@ -441,7 +441,7 @@ geändert (§9 Nr. 5, ab Probe 2). Probe 1 bleibt ungültig.
 **Quelle: ausschließlich das Auswertungs-Log** (Job „Auswertung“, Job-ID 128258509364) des Actions-Laufs 42324497564 auf
 `main` am Merge-Commit `532874ae079a2441c92f5745f667208edfe2b24d`. Die hier berichteten Zahlen stammen ausschließlich aus dem
 Auswertungs-Log. Der berichtende Assistent konnte das Artefakt `bericht` (ID 13554508128) wegen der Proxy-Sperre (Forbidden)
-nicht herunterladen und hat die Rohdaten nicht gelesen. Sie wurden nicht unter `docs/daten/` abgelegt. Die Gültigkeit
+nicht herunterladen und hat die Rohdaten nicht gelesen. Sie wurden damals nicht unter `docs/daten/` abgelegt; die spätere Sicherung ist in §17 dokumentiert. Die Gültigkeit
 wurde durch den berichtenden Assistenten nicht unabhängig an den Rohdaten geprüft; auch die Log-Zahlen wurden durch den berichtenden Assistenten nicht unabhängig geprüft.
 
 **Probe 2** (Lauf 42324497564, Go von Hazeberry für Stufe B, laut Auswertung **„Lauf gültig“**, alle fünf Jobs grün, Dauer gut
@@ -581,3 +581,19 @@ Auf Hazeberrys Auftrag wurde das Artefakt `bericht` (ID 13557498693) des Laufs 4
 Die ZIP-Integritätsprüfung ist bestanden. Enthalten sind 29 Dateien: Stufe-A-Daten, alle 23 Ergebnispakete, Hauptbericht, `zahlen.json` und Nachspiel-Kontrolle. Die Einheitenliste und die Ergebnispakete enthalten jeweils 563 eindeutige Schlüssel; die Schlüsselmengen stimmen vollständig überein. Das Manifest nennt Größe und SHA-256 jeder Datei im ZIP. Die Archivdatei bleibt bytegleich zum Download.
 
 Das ursprüngliche Actions-Artefakt läuft am 05.02.2027 um 02:48:31 UTC ab. Die im Git-Repository gespeicherte Kopie unterliegt dieser Aufbewahrungsfrist nicht. Geprüft wurden ausschließlich Download, Dateiintegrität und Vollständigkeit; keine Partien, Fortsetzungen oder Wirkungsauswertungen wurden neu gerechnet. Dieser Nachtrag ändert weder Ergebnisse noch Gültigkeitsregeln oder Spielcode. Die noch offenen Ursachenfragen bleiben offen.
+
+## 17. Nachtrag: Rohdatensicherung Probe 2 und Vorsprung (08.11.2026)
+
+Direkter Download beider Artefakte als ZIP durch Luna am 08.11.2026 in dieser ChatGPT-Sitzung über den GitHub-Connector und dessen Download-Links, ohne zusätzlichen Actions-Workflow. Danach wurden nur Dateiintegrität, Vollständigkeit und Konsistenz gespeicherter Angaben geprüft. Keine Partien, Fortsetzungen oder Wirkungsauswertungen wurden neu gerechnet.
+
+| Quelle | Unverändertes ZIP | Bytes | GitHub-Digest (SHA-256) |
+|---|---|---:|---|
+| Vorsprung, Lauf 42340940626, Artefakt 13561398554 | [`vorsprung.zip`](daten/passregel-vorsprung/lauf-42340940626/vorsprung.zip) | 9112 | `0840c6327c92bd1b02c88bf50ae32bb54f7b1125217164d5a79b6902b1ff8c35` |
+| Probe 2, Lauf 42324497564, Artefakt 13554508128 | [`bericht.zip`](daten/passregel-vergleich/probe-2-42324497564/bericht.zip) | 18170 | `59591770ff89e7c2daa555721d33367717625caf0b1a927deb3172e10580acc8` |
+
+Beide ZIPs stimmen in Größe und SHA-256 exakt mit den direkt von GitHub gelesenen Artefaktmetadaten überein und bestehen die ZIP-Integritätsprüfung. Neben jedem ZIP liegen Manifest, `SHA256SUMS` und README mit Herkunft und Prüfungen.
+
+- **Vorsprung:** vier Dateien. `gueltigkeit.gueltig` ist wahr; `html-hauptlauf.sha256` und `kopf.htmlSha256` nennen beide `d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b`. Das prüft die gespeicherten Hashangaben, nicht die HTML-Datei selbst. Gespeichert sind V = 18 (Fläche) und 11 (Territory).
+- **Probe 2:** sieben Dateien, einschließlich Stufe-A-Daten, Ergebnispaket und Nachspiel-Kontrolle. Der Bericht meldet „Lauf gültig“, `zahlen.json` nennt elf Einheiten und elf Ergebniszeilen. Die beiden JSONL-Dateien enthalten jeweils elf eindeutige, vollständig übereinstimmende Schlüssel.
+
+Das Vorsprung-Artefakt läuft am 05.02.2027 um 05:01:37 UTC ab, das Probe-2-Artefakt am selben Tag um 01:31:15 UTC. Die Git-Kopien unterliegen dieser Artefakt-Aufbewahrungsfrist nicht. Die Konsistenzprüfung gespeicherter Angaben ist keine unabhängige Neuberechnung der Befunde. Frühere Aussagen über Claudes nicht gelesene Rohdaten bleiben historisch bestehen. Ergebnisse, Gültigkeitsregeln, offene Ursachenfragen und Spielparameter bleiben unverändert.

@@ -1,0 +1,61 @@
+{
+  "saved_date": "2026-11-08",
+  "repository": "Hazeberry/Go-html-Game-MoE",
+  "run_id": 42324497564,
+  "source_commit": "532874ae079a2441c92f5745f667208edfe2b24d",
+  "artifact_id": 13554508128,
+  "artifact_name": "bericht",
+  "artifact_expires_at": "2027-02-05T01:31:15Z",
+  "archive": "bericht.zip",
+  "archive_bytes": 18170,
+  "archive_sha256": "59591770ff89e7c2daa555721d33367717625caf0b1a927deb3172e10580acc8",
+  "github_digest": "sha256:59591770ff89e7c2daa555721d33367717625caf0b1a927deb3172e10580acc8",
+  "checks": {
+    "github_digest_matches": true,
+    "zip_integrity": true,
+    "files": 7,
+    "stored_valid": true,
+    "unit_rows": 11,
+    "result_rows": 11,
+    "unique_unit_keys": 11,
+    "unique_result_keys": 11,
+    "unit_and_result_keys_match": true
+  },
+  "files": [
+    {
+      "path": "bericht/bericht.md",
+      "bytes": 3341,
+      "sha256": "d74ab4f936620c825a46a501c40018c3129bdec45f6999999644fa0522bc11b7"
+    },
+    {
+      "path": "bericht/zahlen.json",
+      "bytes": 2211,
+      "sha256": "a1e9ce3c34c0458eef528b395fcafa3309bcce7d9efa57044d52c6f488ce8b6b"
+    },
+    {
+      "path": "stufe-a/einheiten.jsonl",
+      "bytes": 26073,
+      "sha256": "1e253f7d547377c4790e1273ff9561a22e949c369fc148cb35d6fc89ea3206aa"
+    },
+    {
+      "path": "stufe-a/stufe-a.json",
+      "bytes": 6700,
+      "sha256": "246c56346e14f82d4268449c7491d713408b9807416c0aec226a709bfb254e10"
+    },
+    {
+      "path": "stufe-a/stufe-a.md",
+      "bytes": 2733,
+      "sha256": "220eec949c1e22532d4a27e84c0bd5ecdce985eb722c3f0d0133ab2a8a044736"
+    },
+    {
+      "path": "teile/teil-1.jsonl",
+      "bytes": 47720,
+      "sha256": "988ae8993abe68a33bfba16fe6d02df964e7d347bf3706c8e2869ed820029c5a"
+    },
+    {
+      "path": "nachspiel/nachspiel.json",
+      "bytes": 785,
+      "sha256": "63c43346e3ceaae29fe8690534f9d840a7a5c86e7b642fa087cb38e7e248f8ff"
+    }
+  ]
+}

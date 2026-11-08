@@ -34,6 +34,8 @@ Die Regel `passNachGegnerpass` bleibt **ausgeschaltet** (Standard 0), `index.htm
   (`docs/passregel-vorsprung.md` §9).
 - Die Rohdaten der Stufe C sind als unverändertes Artefakt-ZIP mit Manifest und Prüfsummen unter [`docs/daten/passregel-vergleich/stufe-c-42331033107/`](docs/daten/passregel-vergleich/stufe-c-42331033107/README.md) gesichert (siehe `docs/passregel-vergleich.md` §16). Das ursprüngliche Actions-Artefakt läuft am 05.02.2027 ab; die Git-Kopie unterliegt dieser Frist nicht.
 
+- Auch die Artefakte [Vorsprung-Untersuchung](docs/daten/passregel-vorsprung/lauf-42340940626/README.md) und [Probe 2](docs/daten/passregel-vergleich/probe-2-42324497564/README.md) sind als unveränderte ZIPs mit Manifest und Prüfsummen gesichert (`docs/passregel-vergleich.md` §17).
+
 ## 4. Offene Punkte (alle ohne Go)
 
 - Ursache der Zählabweichung bei 15 Einheiten (`docs/passregel-vergleich.md` §15) und warum die Vorschau die Gruppen aus §3 nicht entfernt.

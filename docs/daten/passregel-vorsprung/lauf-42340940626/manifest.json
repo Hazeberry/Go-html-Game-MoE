@@ -1,0 +1,44 @@
+{
+  "saved_date": "2026-11-08",
+  "repository": "Hazeberry/Go-html-Game-MoE",
+  "run_id": 42340940626,
+  "source_commit": "1b38b96033d4396542bc6ae45ab9ad14eaca42a5",
+  "artifact_id": 13561398554,
+  "artifact_name": "vorsprung",
+  "artifact_expires_at": "2027-02-05T05:01:37Z",
+  "archive": "vorsprung.zip",
+  "archive_bytes": 9112,
+  "archive_sha256": "0840c6327c92bd1b02c88bf50ae32bb54f7b1125217164d5a79b6902b1ff8c35",
+  "github_digest": "sha256:0840c6327c92bd1b02c88bf50ae32bb54f7b1125217164d5a79b6902b1ff8c35",
+  "checks": {
+    "github_digest_matches": true,
+    "zip_integrity": true,
+    "files": 4,
+    "stored_valid": true,
+    "html_hashes_match": true,
+    "stored_V_area": 18,
+    "stored_V_territory": 11
+  },
+  "files": [
+    {
+      "path": "dateien.txt",
+      "bytes": 815,
+      "sha256": "5493025b6eadee673e3e6d20db1e750513cdf6ceff4a8d3c163bb72c7c7f1ebd"
+    },
+    {
+      "path": "html-hauptlauf.sha256",
+      "bytes": 86,
+      "sha256": "c75e5653e3a1305168041da513469a04c69d130e8898f0a0c194e23d54802922"
+    },
+    {
+      "path": "vorsprung.json",
+      "bytes": 61088,
+      "sha256": "3727804fac5dc5df836a15316bf438289de07b5bd6801375196367b9e61bd3cf"
+    },
+    {
+      "path": "vorsprung.md",
+      "bytes": 21605,
+      "sha256": "c20f8be74b605ed130a445f793b73d40470fd744f88e9fafb1a588aa6b9c9bea"
+    }
+  ]
+}
