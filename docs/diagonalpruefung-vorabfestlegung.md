@@ -144,7 +144,7 @@ Aussagen gelten **nur für die beurteilten Ketten** und nur als Beurteilungen. B
 4. **Konsistenzkontrolle gegen die Diagnose:** Bei Schalter an stimmt die Tot-Menge der Umsetzung auf den **563 Entwicklungsstellungen** mit der der Test-Kopie (`gegenprobe.js --variante diagonalauge`) überein; sonst weicht die Umsetzung von dem ab, was diagnostiziert wurde (kein Urteil, bis geklärt).
 5. **GNU-Go-Lauf (Stufe 2):** Version protokolliert, Rohantworten zweier Läufe gleich, Ausfälle gezählt; die Ausfallregel (Obergrenze für Ausfälle) legt Hazeberry vor dem Lauf fest (**Entscheidung offen**; Empfehlung: §10.3).
 6. **Beurteilung (Stufe 3):** Beurteiler benannt und zugesagt (§6.3); Unterlagen nach §6.2 (mit Zugfarbe und Vorgeschichte); Reihenfolge zufällig, Herkunft verdeckt, Kategorien vorab, Begründung und Sicherheit je Urteil; **B1 vollständig beurteilt**; die Zuordnung der Urteile zu App und GNU Go wird erst nach Abschluss aller Urteile aufgedeckt. Fehlt ein benannter Beurteiler oder ist B1 nicht vollständig beurteilt, ist Stufe 3 ungültig (kein Urteil).
-7. **Mindestumfang betroffener Stellungen:** Für ein Urteil über die Kandidatur (§8) mindestens **30** betroffene Stellungen je Stellungsart (**Setzung**). Das ist ein Mindestumfang, damit überhaupt berichtet werden kann, **kein Sicherheitsnachweis**: Das Erreichen der Zahl belegt keine Unbedenklichkeit. Bei weniger Betroffenen wird **trotzdem beschrieben, was gefunden wurde** (Zahlen, Fälle, Beurteilungen); nur die **Kandidatur bleibt offen** („kein Urteil über die Kandidatur: zu wenig Betroffene“), nicht „unbedenklich“. Über eine Erweiterung der Prüfdaten entscheidet Hazeberry.
+7. **Mindestumfang betroffener Stellungen:** Für ein Urteil über die Kandidatur (§8) mindestens **30** betroffene Stellungen je Stellungsart (**Setzung**). Das ist ein Mindestumfang **für die Kandidatur**, **kein Sicherheitsnachweis**: Das Erreichen der Zahl belegt keine Unbedenklichkeit. Bei weniger Betroffenen wird **trotzdem beschrieben, was gefunden wurde** (Zahlen, Fälle, Beurteilungen); nur die **Kandidatur bleibt offen** („kein Urteil über die Kandidatur: zu wenig Betroffene“), nicht „unbedenklich“. Über eine Erweiterung der Prüfdaten entscheidet Hazeberry.
 
 ## 8. Entscheidungsregel (Vorschlag, Setzungen)
 
@@ -219,7 +219,7 @@ iterative Entfernung); Browser-Test für Schlusszählung und Dashboard bei aus u
 
 ### 10.5 Mindestzahlen
 
-- **Mindestumfang 30 betroffene Stellungen je Stellungsart:** beibehalten, **nur Berichtbarkeit** (§7 Nr. 7), kein Sicherheitsnachweis.
+- **Mindestumfang 30 betroffene Stellungen je Stellungsart:** beibehalten als **Mindestumfang für eine Kandidatur** (§7 Nr. 7). Darunter werden Befunde trotzdem berichtet, nur die Kandidatur bleibt offen. Kein Sicherheitsnachweis.
 - **Mindestzahl R+, Empfehlung:** mindestens **5 bestätigte Verbesserungen aus mindestens 3 verschiedenen Partien**, mit entschiedenen Urteilen (§8 Nr. 2). Begründung: Ein einzelner Fall ist eine Anekdote; drei Partien verhindern, dass ein einzelnes Muster allein trägt. Reine Setzung ohne Sicherheitswert, sie wird mit den Intervallen berichtet.
   Der Schalter wirkt auf Schlusszählung und Vorschau zugleich; **R− = 0** gilt deshalb in **beiden** Stellungsarten.
 - **Alternative:** Hazeberry setzt eine höhere Zahl oder verlangt sie je Stellungsart.
