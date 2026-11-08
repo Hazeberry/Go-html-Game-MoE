@@ -353,9 +353,10 @@ Wenige ausgelöste Stellungen machen den Lauf nicht ungültig. Sie begrenzen die
   keine Aussage über Menschen oder andere Gegner.
 - **Eine Fortsetzung je Stellung:** Arm 0 ist eine Stichprobe aus einer Verteilung. Das Paar ist
   verrauscht, die Zahl der Einheiten und nicht die Zahl der Züge zählt für die Intervalle.
-- **GNU-Go-Absturz:** Laut `HANDOFF.md` im Repo `Hazeberry/codex` stürzt GNU Go in einer dort
-  untersuchten Fuego-Partie nach identischer Zugfolge bei `genmove` ab. Ich habe das nicht
-  nachgeprüft; ein solcher Absturz zählt hier als Ausfall (§9 Nr. 6).
+- **GNU-Go-Absturz:** Laut `HANDOFF.md` im Repo `Hazeberry/codex` (Stand `17117ae`; Querverweis in `HANDOFF.md` hier) stürzt GNU Go in der dort
+  untersuchten Partie nach identischer Zugfolge ab: in allen vier Wiederholungen bei Zug 82 (Weiß K8) mit `genmove B`. Ein eigenständiges GTP-Replay unter GDB reproduziert den SIGSEGV;
+  die Quellcodeursache ist dort offen, die frühere Vermutung „vor dem ersten Eingriff“ ist dort widerlegt. Ich habe das weder nachgeprüft noch den dort verlinkten Bericht
+  (`docs/diagnose-laufzeit-absturz.md`) gelesen. Ein solcher Absturz zählt hier als Ausfall (§9 Nr. 6); in Stufe C trat kein technischer Ausfall auf (§15).
 - **Territory** ist nur eine Zählvariante (§5).
 - Eine **Hypothese** wie „verschenkte Punkte beim Beenden“ bleibt eine, bis E2 sie belegt.
 
