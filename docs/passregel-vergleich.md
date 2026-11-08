@@ -512,7 +512,7 @@ Gegner. Ein Standardwechsel folgt daraus nicht.
 
 **Quelle des berichtenden Assistenten: ausschließlich das Auswertungs-Log** (Job „Auswertung“, Job-ID 128279543781) des
 Actions-Laufs 42331033107 auf `main` am Merge-Commit `7d57e2bf1826904be9c4e6f8a59164db632d032f`. Der berichtende Assistent
-hat die Rohdaten nicht gelesen. Die Rohdaten liegen nicht unter `docs/daten/`.
+hat die Rohdaten nicht gelesen. Zum Zeitpunkt dieses Nachtrags lagen die Rohdaten noch nicht unter `docs/daten/`; die spätere Sicherung ist in §16 dokumentiert.
 
 **Zusätzlich, getrennt davon:** 6.1 Sol (ChatGPT; 6.1 Sol ist die Modellbezeichnung) hat das Artefakt geladen, die Vollständigkeit der 563 Ergebniszeilen geprüft und
 zentrale Kennzahlen aus den Rohfeldern nachgerechnet. Laut dieser Prüfung stimmen sie mit dem Auswertungs-Log überein. Der
@@ -571,3 +571,11 @@ Archivstellungen und Gegner (§3), nicht für Menschen. **Daraus folgt keine aut
 bleibt 0. Ein Standardwechsel braucht eine eigene Festlegung mit E2 und E3 und ein Go, und E2 fällt in Territory deutlich anders aus
 als in Fläche. Eine weitere Untersuchung (etwa der Zählabweichung bei 15 Einheiten, der Vorsprungsprüfung oder der Rohdatensicherung)
 ist mit diesem Nachtrag nicht freigegeben und hat kein Go.
+
+## 16. Nachtrag: Rohdatensicherung (08.11.2026)
+
+Auf Hazeberrys Auftrag wurde das Artefakt `bericht` (ID 13557498693) des Laufs 42331033107 heruntergeladen und **unverändert** unter [`daten/passregel-vergleich/stufe-c-42331033107/`](daten/passregel-vergleich/stufe-c-42331033107/README.md) abgelegt. Das ZIP umfasst 511610 Bytes; sein SHA-256 `0d9ca865d424251c57a3c9d424cd290e0206a86fe4d6fdd37bd13b8be4720e08` stimmt exakt mit dem Digest der GitHub-Artefaktmetadaten überein.
+
+Die ZIP-Integritätsprüfung ist bestanden. Enthalten sind 29 Dateien: Stufe-A-Daten, alle 23 Ergebnispakete, Hauptbericht, `zahlen.json` und Nachspiel-Kontrolle. Die Einheitenliste und die Ergebnispakete enthalten jeweils 563 eindeutige Schlüssel; die Schlüsselmengen stimmen vollständig überein. Das Manifest nennt Größe und SHA-256 jeder Datei im ZIP. Die Archivdatei bleibt bytegleich zum Download.
+
+Das ursprüngliche Actions-Artefakt läuft am 05.02.2027 um 02:48:31 UTC ab. Die im Git-Repository gespeicherte Kopie unterliegt dieser Aufbewahrungsfrist nicht. Geprüft wurden ausschließlich Download, Dateiintegrität und Vollständigkeit; keine Partien, Fortsetzungen oder Wirkungsauswertungen wurden neu gerechnet. Dieser Nachtrag ändert weder Ergebnisse noch Gültigkeitsregeln oder Spielcode. Die noch offenen Ursachenfragen bleiben offen.

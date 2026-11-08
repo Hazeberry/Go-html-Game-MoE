@@ -32,12 +32,11 @@ Die Regel `passNachGegnerpass` bleibt **ausgeschaltet** (Standard 0), `index.htm
   Wortlaut „höchstens 2 %“ gilt unter den Modellannahmen. Zahlen und Grenzen: `docs/passregel-vergleich.md` §15. Die Reihenfolge Festlegung vor Merge ist dort vermerkt.
 - Vorsprung-Untersuchung (Lauf 42340940626) gültig: Die Zerlegung weist Gruppen aus, die GNU Gos Tot-Liste als tot führt und die Zählvorschau nicht entfernt. **Ursache und Richtigkeit der Tot-Bewertung sind offen**
   (`docs/passregel-vorsprung.md` §9).
-- Die Rohdaten der Stufe C liegen **nicht** im Repo: Artefakt `bericht` (ID 13557498693 am Lauf 42331033107) läuft am 05.02.2027 ab.
+- Die Rohdaten der Stufe C sind als unverändertes Artefakt-ZIP mit Manifest und Prüfsummen unter [`docs/daten/passregel-vergleich/stufe-c-42331033107/`](docs/daten/passregel-vergleich/stufe-c-42331033107/README.md) gesichert (siehe `docs/passregel-vergleich.md` §16). Das ursprüngliche Actions-Artefakt läuft am 05.02.2027 ab; die Git-Kopie unterliegt dieser Frist nicht.
 
 ## 4. Offene Punkte (alle ohne Go)
 
 - Ursache der Zählabweichung bei 15 Einheiten (`docs/passregel-vergleich.md` §15) und warum die Vorschau die Gruppen aus §3 nicht entfernt.
-- Sicherung der Rohdaten der Stufe C ins Repo oder an einen anderen dauerhaften Ort.
 - Ein Lauf von `browser.cjs --html index.html` gegen die `index.html` **dieses** Repos; bisher beruht die Übertragbarkeit der Bughunt-Befunde auf dem Textvergleich in `docs/bughunt-wiederholung.md` §2.
 - Ob GTP-1 und GTP-3 (`gtp-ki.js`) die Läufe berühren, in denen der Adapter als Gegner-KI diente (`gnugo-duell.js`, PWA-Vergleich, Gruppe „alte PWA“); nicht geprüft.
 - Korrekturen der Bughunt-Befunde: eigene Vorabfestlegung und Go.
