@@ -1,0 +1,6673 @@
+{
+ "htmlSha256": "d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b",
+ "zeilen": 563,
+ "testkopieGleichOriginal": 563,
+ "out": [
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|111|394",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|299|352",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|103|320",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|171|344",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|221|332",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|302|333",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|366|323",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|423|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|493|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|544|331",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|617|358",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|686|335",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|744|359",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|803|340",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|856|339",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|916|339",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|111|326",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|147|370",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|195|322",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|238|363",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|26|335",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|311|340",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|351|318",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|55|332",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|87|372",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|191|348",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|403|358",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|127|354",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|183|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|245|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|330|363",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|390|357",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": true,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 228,
+     "schutz": {
+      "ag": [
+       1,
+       2
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 13
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 12,
+     "ecke": 248,
+     "schutz": {
+      "ag": [
+       1,
+       2
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 13
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|453|342",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|519|354",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|579|350",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|648|341",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|701|340",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|771|456",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|81|324",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|885|354",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|93|348",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|129|314",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|163|362",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|207|330",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|247|324",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|284|335",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|325|322",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|37|342",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|69|318",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|99|348",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|197|344",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|411|336",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|128|333",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|187|366",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|247|342",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|331|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|393|342",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|456|351",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|521|330",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|583|350",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|649|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|70|345",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|773|332",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|820|343",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|886|375",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|941|364",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|12|307",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|169|344",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|20|361",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|24|305",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|285|306",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|326|311",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|38|315",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|70|353",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|9|310",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|19|342",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|41|358",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|131|332",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|188|345",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|249|320",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|332|343",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|398|329",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|461|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|523|354",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": true,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 16,
+     "schutz": {
+      "ag": [
+       30,
+       1,
+       1,
+       2,
+       2,
+       2,
+       2,
+       4,
+       1,
+       2,
+       8,
+       1,
+       1,
+       2,
+       1,
+       3,
+       1,
+       1,
+       1,
+       4,
+       1,
+       2,
+       1,
+       4,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 26,
+      "gross": true,
+      "offen": false,
+      "frei": 71,
+      "verbandSteine": 130
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 18,
+     "schutz": {
+      "ag": [
+       30,
+       1,
+       1,
+       2,
+       2,
+       2,
+       2,
+       4,
+       1,
+       2,
+       8,
+       1,
+       1,
+       2,
+       1,
+       3,
+       1,
+       1,
+       1,
+       4,
+       1,
+       2,
+       1,
+       4,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 26,
+      "gross": true,
+      "offen": false,
+      "frei": 71,
+      "verbandSteine": 130
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 7,
+     "ecke": 36,
+     "schutz": {
+      "ag": [
+       30,
+       1,
+       1,
+       2,
+       2,
+       2,
+       2,
+       4,
+       1,
+       2,
+       8,
+       1,
+       1,
+       2,
+       1,
+       3,
+       1,
+       1,
+       1,
+       4,
+       1,
+       2,
+       1,
+       4,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 26,
+      "gross": true,
+      "offen": false,
+      "frei": 71,
+      "verbandSteine": 130
+     }
+    }
+   ],
+   "B": [
+    {
+     "farbe": 1,
+     "steine": 6,
+     "ecke": 12
+    },
+    {
+     "farbe": 1,
+     "steine": 17,
+     "ecke": 34
+    }
+   ]
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|586|339",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|651|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|710|341",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|777|354",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|821|348",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|889|372",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": true,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 9,
+     "ecke": 189,
+     "schutz": {
+      "ag": [
+       1,
+       4,
+       3,
+       1,
+       4,
+       3,
+       3,
+       3,
+       5,
+       1,
+       1,
+       1,
+       1,
+       1,
+       1,
+       1,
+       19,
+       1,
+       1,
+       1,
+       2,
+       1,
+       1,
+       3,
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 29,
+      "gross": true,
+      "offen": false,
+      "frei": 62,
+      "verbandSteine": 141
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 4,
+     "ecke": 262,
+     "schutz": {
+      "ag": [
+       1,
+       4,
+       3,
+       1,
+       4,
+       3,
+       3,
+       3,
+       5,
+       1,
+       1,
+       1,
+       1,
+       1,
+       1,
+       1,
+       19,
+       1,
+       1,
+       1,
+       2,
+       1,
+       1,
+       3,
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 29,
+      "gross": true,
+      "offen": false,
+      "frei": 62,
+      "verbandSteine": 141
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 284,
+     "schutz": {
+      "ag": [
+       1,
+       4,
+       3,
+       1,
+       4,
+       3,
+       3,
+       3,
+       5,
+       1,
+       1,
+       1,
+       1,
+       1,
+       1,
+       1,
+       19,
+       1,
+       1,
+       1,
+       2,
+       1,
+       1,
+       3,
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 29,
+      "gross": true,
+      "offen": false,
+      "frei": 62,
+      "verbandSteine": 141
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 4,
+     "ecke": 297,
+     "schutz": {
+      "ag": [
+       1,
+       4,
+       3,
+       1,
+       4,
+       3,
+       3,
+       3,
+       5,
+       1,
+       1,
+       1,
+       1,
+       1,
+       1,
+       1,
+       19,
+       1,
+       1,
+       1,
+       2,
+       1,
+       1,
+       3,
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 29,
+      "gross": true,
+      "offen": false,
+      "frei": 62,
+      "verbandSteine": 141
+     }
+    }
+   ],
+   "B": [
+    {
+     "farbe": 1,
+     "steine": 3,
+     "ecke": 283
+    },
+    {
+     "farbe": 1,
+     "steine": 7,
+     "ecke": 300
+    }
+   ]
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|944|341",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|131|314",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|171|354",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|210|317",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|250|325",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|286|311",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|32|293",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|39|338",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|72|301",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|204|359",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|432|339",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|133|356",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|191|328",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|253|374",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|335|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|399|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|462|341",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|525|328",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|587|344",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|657|342",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|713|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|77|360",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|825|334",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|890|345",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|947|330",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|132|301",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|172|327",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|211|352",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|251|348",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|287|308",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|330|361",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|3|286",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|73|298",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|207|346",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|435|372",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|134|345",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|195|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|25|356",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|336|347",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|39|324",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|463|326",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|526|341",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|593|322",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|659|368",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|714|361",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|781|356",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|827|350",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|894|353",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|959|342",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|133|324",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|175|334",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|214|325",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 16,
+     "ecke": 41,
+     "schutz": {
+      "ag": [
+       7
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 17
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 76,
+     "schutz": {
+      "ag": [
+       7
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 17
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|254|369",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|296|315",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 8,
+     "ecke": 3,
+     "schutz": {
+      "ag": [
+       7
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 4,
+      "verbandSteine": 9
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 38,
+     "schutz": {
+      "ag": [
+       7
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 4,
+      "verbandSteine": 9
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|331|350",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|41|312",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 19,
+     "schutz": {
+      "ag": [
+       7,
+       1,
+       2,
+       8,
+       1,
+       5,
+       1,
+       1,
+       1,
+       4,
+       7,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 15,
+      "gross": true,
+      "offen": false,
+      "frei": 57,
+      "verbandSteine": 90
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|74|327",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|213|348",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|451|338",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|143|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|198|327",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|265|330",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|337|340",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|3|334",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|468|327",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|527|356",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|594|347",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|663|368",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|718|333",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|785|372",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|835|332",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|896|345",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|95|342",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|134|333",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|176|345",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|216|381",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|257|356",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|298|367",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|337|336",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|42|347",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|75|322",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|21|428",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": true,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 1,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 2,
+      "verbandSteine": 18
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 4,
+     "ecke": 15,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 2,
+      "verbandSteine": 6
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 17,
+     "ecke": 19,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 2,
+      "verbandSteine": 18
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 37,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 2,
+      "verbandSteine": 6
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 55,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 2,
+      "verbandSteine": 6
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 20,
+     "ecke": 243,
+     "schutz": {
+      "ag": [
+       1,
+       2
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 21
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 283,
+     "schutz": {
+      "ag": [
+       1,
+       2
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 21
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|459|360",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|145|376",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|201|372",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|268|333",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|339|352",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|401|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": true,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 5,
+     "ecke": 1,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 7
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 3,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 7
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 8,
+     "ecke": 15,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 10
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 23,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 7
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 33,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 10
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 53,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 10
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|469|406",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|529|364",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|595|350",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|664|353",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|719|328",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|787|332",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|837|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|897|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|97|340",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|135|348",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|177|326",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|219|324",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|259|322",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|29|320",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|338|299",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|43|292",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": [
+    {
+     "farbe": 2,
+     "steine": 12,
+     "ecke": 207
+    }
+   ]
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|77|330",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|221|342",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|45|344",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|146|335",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|207|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|269|372",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|345|364",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|402|323",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|471|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|530|415",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|598|329",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|667|360",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|71|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|788|337",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|840|359",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|899|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|99|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|137|360",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|178|343",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|21|304",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|25|350",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|2|315",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|339|314",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 19,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 15
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 14,
+     "ecke": 39,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 15
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|44|341",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|78|323",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|225|392",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|480|319",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 1,
+   "V": true,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 5,
+     "ecke": 14,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 7,
+      "verbandSteine": 13
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 8,
+     "ecke": 17,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 7,
+      "verbandSteine": 13
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|14|335",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|208|329",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|270|449",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": true,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 14,
+     "schutz": {
+      "ag": [
+       1,
+       2
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 4,
+      "verbandSteine": 9
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 8,
+     "ecke": 16,
+     "schutz": {
+      "ag": [
+       1,
+       2
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 4,
+      "verbandSteine": 9
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 94,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 2,
+      "verbandSteine": 20
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 112,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 2,
+      "verbandSteine": 20
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 18,
+     "ecke": 132,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 2,
+      "verbandSteine": 20
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 22,
+     "ecke": 298,
+     "schutz": {
+      "ag": [
+       2,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 23
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 360,
+     "schutz": {
+      "ag": [
+       2,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 23
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|348|345",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|405|344",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|474|325",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|531|360",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|599|330",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": true,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 2,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 13
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 11,
+     "ecke": 4,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 13
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 62,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 13
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|66|407",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|720|381",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|78|381",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|841|332",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|8|349",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "GNU Go ohne Vorgabe|g-D.jsonl.gz|155|224",
+   "gruppe": "GNU Go ohne Vorgabe",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 14,
+     "ecke": 311,
+     "schutz": {
+      "ag": [
+       116,
+       1,
+       1,
+       24,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 8,
+      "gross": true,
+      "offen": false,
+      "frei": 67,
+      "verbandSteine": 64
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 333,
+     "schutz": {
+      "ag": [
+       116,
+       1,
+       1,
+       24,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 8,
+      "gross": true,
+      "offen": false,
+      "frei": 67,
+      "verbandSteine": 64
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 335,
+     "schutz": {
+      "ag": [
+       116,
+       1,
+       1,
+       24,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 8,
+      "gross": true,
+      "offen": false,
+      "frei": 67,
+      "verbandSteine": 64
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 343,
+     "schutz": {
+      "ag": [
+       116,
+       1,
+       1,
+       24,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 8,
+      "gross": true,
+      "offen": false,
+      "frei": 67,
+      "verbandSteine": 64
+     }
+    }
+   ],
+   "B": [
+    {
+     "farbe": 2,
+     "steine": 11,
+     "ecke": 208
+    },
+    {
+     "farbe": 1,
+     "steine": 6,
+     "ecke": 230
+    },
+    {
+     "farbe": 2,
+     "steine": 5,
+     "ecke": 281
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 286
+    },
+    {
+     "farbe": 1,
+     "steine": 8,
+     "ecke": 288
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 324
+    }
+   ]
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|138|315",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|181|310",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|223|308",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": [
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 353
+    }
+   ]
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|260|333",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|300|329",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|341|300",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|48|325",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|79|324",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|24|349",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|53|356",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|157|354",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|209|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|278|351",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|349|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|407|340",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|47|362",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|533|354",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": true,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 5,
+     "ecke": 2,
+     "schutz": {
+      "ag": [
+       2,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 4,
+      "verbandSteine": 6
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 4,
+     "schutz": {
+      "ag": [
+       2,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 4,
+      "verbandSteine": 6
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|5|358",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|676|353",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|721|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|791|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|843|348",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|903|306",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": true,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 8,
+     "ecke": 319,
+     "schutz": {
+      "ag": [
+       9,
+       1,
+       1,
+       1,
+       4,
+       2,
+       15,
+       1,
+       4,
+       4,
+       1,
+       2,
+       2,
+       1,
+       2,
+       2,
+       1,
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 22,
+      "gross": true,
+      "offen": false,
+      "frei": 53,
+      "verbandSteine": 140
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 322,
+     "schutz": {
+      "ag": [
+       9,
+       1,
+       1,
+       1,
+       4,
+       2,
+       15,
+       1,
+       4,
+       4,
+       1,
+       2,
+       2,
+       1,
+       2,
+       2,
+       1,
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 22,
+      "gross": true,
+      "offen": false,
+      "frei": 53,
+      "verbandSteine": 140
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 356,
+     "schutz": {
+      "ag": [
+       9,
+       1,
+       1,
+       1,
+       4,
+       2,
+       15,
+       1,
+       4,
+       4,
+       1,
+       2,
+       2,
+       1,
+       2,
+       2,
+       1,
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 22,
+      "gross": true,
+      "offen": false,
+      "frei": 53,
+      "verbandSteine": 140
+     }
+    }
+   ],
+   "B": [
+    {
+     "farbe": 1,
+     "steine": 11,
+     "ecke": 243
+    }
+   ]
+  },
+  {
+   "schluessel": "GNU Go ohne Vorgabe|g-D.jsonl.gz|416|259",
+   "gruppe": "GNU Go ohne Vorgabe",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 3,
+     "ecke": 11,
+     "schutz": {
+      "ag": [
+       1,
+       3
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 14
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 11,
+     "ecke": 15,
+     "schutz": {
+      "ag": [
+       1,
+       3
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 14
+     }
+    }
+   ],
+   "B": [
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 17
+    }
+   ]
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|13|352",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|182|351",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|224|335",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|261|332",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 8,
+     "ecke": 301,
+     "schutz": {
+      "ag": [
+       6
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 4,
+      "verbandSteine": 8
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|302|333",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|344|383",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|49|318",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|7|336",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|123|354",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|315|348",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|110|357",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|172|369",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|223|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|306|343",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|368|353",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|427|324",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|497|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|545|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|619|344",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|688|349",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|747|324",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|805|334",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|857|324",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|920|327",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|112|355",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|14|321",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|196|335",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|239|312",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|273|310",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|315|258",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|352|329",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|56|335",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|89|340",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|275|308",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|59|340",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|159|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|212|337",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": true,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 1,
+     "schutz": {
+      "ag": [
+       1,
+       4
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 7,
+      "verbandSteine": 17
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 15,
+     "ecke": 3,
+     "schutz": {
+      "ag": [
+       1,
+       4
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 7,
+      "verbandSteine": 17
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 21,
+     "schutz": {
+      "ag": [
+       1,
+       4
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 7,
+      "verbandSteine": 17
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 6,
+     "ecke": 305,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 8
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 326,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 8
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 346,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 8
+     }
+    }
+   ],
+   "B": [
+    {
+     "farbe": 2,
+     "steine": 2,
+     "ecke": 8
+    }
+   ]
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|283|360",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|351|362",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|408|333",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|484|331",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|535|334",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|606|337",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|677|410",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|725|388",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|793|384",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|845|370",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|909|352",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|101|364",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|142|337",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|183|340",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|226|329",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|262|315",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": [
+    {
+     "farbe": 1,
+     "steine": 4,
+     "ecke": 29
+    }
+   ]
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|303|314",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|345|330",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|4|343",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|80|293",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": [
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 343
+    }
+   ]
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|282|351",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|71|342",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|164|337",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|215|334",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|287|358",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|353|348",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|410|321",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|485|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|537|376",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|607|314",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|679|330",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|735|376",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|795|334",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|847|354",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|911|398",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|104|357",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|143|298",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|184|325",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|228|351",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|264|317",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 6,
+     "ecke": 69,
+     "schutz": {
+      "ag": [
+       6
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 18
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 7,
+     "ecke": 71,
+     "schutz": {
+      "ag": [
+       6
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 18
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 5,
+     "ecke": 128,
+     "schutz": {
+      "ag": [
+       6
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 18
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|304|317",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|348|387",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|51|346",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|83|282",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|293|348",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|86|331",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|166|365",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|219|324",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|291|350",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|355|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|419|320",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|487|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|53|354",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|60|349",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|681|374",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|739|352",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|796|315",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|852|339",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|912|409",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|108|301",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|144|321",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|186|321",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|235|334",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|267|354",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|305|366",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|349|310",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|52|327",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|84|335",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|297|340",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|100|363",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|167|322",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|21|330",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|301|396",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|365|354",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|422|337",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|491|392",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|541|340",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|610|337",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|683|334",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|741|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|799|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|855|348",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|915|322",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|109|328",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|145|324",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|194|371",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|236|331",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|269|330",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|309|350",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|350|347",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|54|373",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|85|352",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|133|360",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|337|356",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|111|350",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|173|342",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|229|334",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|307|340",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|373|340",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|431|332",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|499|350",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|553|360",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|61|334",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|689|332",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|749|370",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|808|403",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": true,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 12,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 13
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 11,
+     "ecke": 14,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 13
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 32,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 13
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 283,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 8
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 301,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 8
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 6,
+     "ecke": 303,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 8
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|85|362",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|922|383",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|115|322",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|151|320",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|197|294",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|23|308",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|274|329",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|315|324",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|353|312",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|57|304",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 12,
+     "ecke": 278,
+     "schutz": {
+      "ag": [
+       7
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 13
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 356,
+     "schutz": {
+      "ag": [
+       7
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 13
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|8|429",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|149|360",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|350|341",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|114|343",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|174|383",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|235|356",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|310|385",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|375|364",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|436|331",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|503|322",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|554|343",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|622|307",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": true,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 15,
+     "ecke": 136,
+     "schutz": {
+      "ag": [
+       2,
+       17,
+       1,
+       4,
+       1,
+       4,
+       5,
+       13,
+       3,
+       4,
+       1,
+       1,
+       1,
+       1,
+       2
+      ],
+      "benson": true,
+      "augen": 15,
+      "gross": true,
+      "offen": false,
+      "frei": 59,
+      "verbandSteine": 117
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 18,
+     "ecke": 236,
+     "schutz": {
+      "ag": [
+       2,
+       17,
+       1,
+       4,
+       1,
+       4,
+       5,
+       13,
+       3,
+       4,
+       1,
+       1,
+       1,
+       1,
+       2
+      ],
+      "benson": true,
+      "augen": 15,
+      "gross": true,
+      "offen": false,
+      "frei": 59,
+      "verbandSteine": 117
+     }
+    }
+   ],
+   "B": [
+    {
+     "farbe": 2,
+     "steine": 11,
+     "ecke": 138
+    }
+   ]
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|691|340",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|753|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|809|364",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|862|377",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|923|350",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|118|359",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|152|309",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|198|329",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|241|354",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|276|341",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|317|326",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|355|316",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|58|313",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|91|336",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|15|364",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|35|344",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|11|362",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|175|360",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|238|327",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|311|350",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|376|367",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|438|335",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|505|330",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|560|343",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|624|357",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|692|335",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|755|358",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|80|343",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|865|326",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|927|392",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|11|336",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 13,
+     "ecke": 266,
+     "schutz": {
+      "ag": [
+       6
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 4,
+      "verbandSteine": 13
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|153|334",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|199|314",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|242|331",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|277|316",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|319|304",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|357|316",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|60|335",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|92|315",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|172|333",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 1,
+   "V": true,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 14,
+     "ecke": 17,
+     "schutz": {
+      "ag": [
+       2,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 4,
+      "verbandSteine": 15
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 91,
+     "schutz": {
+      "ag": [
+       2,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 4,
+      "verbandSteine": 15
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 7,
+     "ecke": 285,
+     "schutz": {
+      "ag": [
+       4,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 12
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 4,
+     "ecke": 310,
+     "schutz": {
+      "ag": [
+       4,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 12
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 327,
+     "schutz": {
+      "ag": [
+       4,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 12
+     }
+    }
+   ],
+   "B": [
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 323
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 343
+    }
+   ]
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|369|346",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|122|339",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|176|329",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|239|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|317|330",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|37|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|439|334",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|506|359",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|561|398",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|630|345",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|693|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|761|334",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|813|360",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|873|372",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|931|344",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|121|328",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|154|347",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|19|354",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|243|300",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|27|308",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 7,
+     "ecke": 275,
+     "schutz": {
+      "ag": [
+       6
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 11
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 4,
+     "ecke": 311,
+     "schutz": {
+      "ag": [
+       6
+      ],
+      "benson": false,
+      "augen": 1,
+      "gross": true,
+      "offen": false,
+      "frei": 6,
+      "verbandSteine": 11
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|31|334",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|358|323",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|63|322",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|93|284",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|175|344",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": true,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 20,
+     "ecke": 75,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 7,
+      "verbandSteine": 25
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 241,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 7,
+      "verbandSteine": 25
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 4,
+     "ecke": 261,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 7,
+      "verbandSteine": 25
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|373|318",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|123|328",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|179|366",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": true,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 1,
+     "schutz": {
+      "ag": [
+       24,
+       1,
+       1,
+       1,
+       10,
+       1,
+       1,
+       1,
+       2,
+       1,
+       1,
+       3,
+       4,
+       1,
+       1,
+       2,
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 21,
+      "gross": true,
+      "offen": false,
+      "frei": 55,
+      "verbandSteine": 140
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 4,
+     "ecke": 3,
+     "schutz": {
+      "ag": [
+       24,
+       1,
+       1,
+       1,
+       10,
+       1,
+       1,
+       1,
+       2,
+       1,
+       1,
+       3,
+       4,
+       1,
+       1,
+       2,
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 21,
+      "gross": true,
+      "offen": false,
+      "frei": 55,
+      "verbandSteine": 140
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 5,
+     "schutz": {
+      "ag": [
+       24,
+       1,
+       1,
+       1,
+       10,
+       1,
+       1,
+       1,
+       2,
+       1,
+       1,
+       3,
+       4,
+       1,
+       1,
+       2,
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "benson": true,
+      "augen": 21,
+      "gross": true,
+      "offen": false,
+      "frei": 55,
+      "verbandSteine": 140
+     }
+    }
+   ],
+   "B": [
+    {
+     "farbe": 1,
+     "steine": 21,
+     "ecke": 6
+    }
+   ]
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|23|340",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": true,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 12,
+     "ecke": 95,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 13
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 209,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 13
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|31|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|380|353",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|444|359",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|515|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|563|358",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|634|337",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|695|332",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|765|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|815|346",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|875|330",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|933|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|125|360",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|156|327",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|200|293",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|244|337",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|280|373",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|320|327",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|359|300",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|65|362",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|94|355",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|184|331",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|379|348",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|124|361",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|180|341",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|241|358",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|322|341",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|383|360",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|447|322",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|516|325",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|566|379",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": true,
+   "A": [
+    {
+     "farbe": 1,
+     "steine": 5,
+     "ecke": 12,
+     "schutz": {
+      "ag": [
+       1,
+       2
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 10
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 5,
+     "ecke": 17,
+     "schutz": {
+      "ag": [
+       1,
+       2
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 10
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 4,
+     "ecke": 320,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 2,
+      "verbandSteine": 6
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 358,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 2,
+      "verbandSteine": 6
+     }
+    },
+    {
+     "farbe": 1,
+     "steine": 1,
+     "ecke": 360,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 2,
+      "verbandSteine": 6
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|642|323",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|697|324",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|769|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|817|360",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|877|350",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|935|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|126|347",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|157|360",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|202|341",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|245|318",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|282|355",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|321|338",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|35|406",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|67|346",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|95|342",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|18|417",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|395|350",
+   "gruppe": "Fuego 100 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|125|352",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|181|370",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|243|344",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|32|355",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|389|326",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|451|344",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|517|344",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|56|315",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|643|338",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|699|336",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|770|339",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|819|374",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|883|350",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|939|362",
+   "gruppe": "Fuego 50 Spiele",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|127|346",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|159|342",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|206|341",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 13,
+     "ecke": 148,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 14
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 265,
+     "schutz": {
+      "ag": [
+       1,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 3,
+      "verbandSteine": 14
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|246|365",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|283|358",
+   "gruppe": "alte PWA",
+   "kiFarbe": 2,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|324|335",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [
+    {
+     "farbe": 2,
+     "steine": 11,
+     "ecke": 270,
+     "schutz": {
+      "ag": [
+       3,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 15
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 3,
+     "ecke": 324,
+     "schutz": {
+      "ag": [
+       3,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 15
+     }
+    },
+    {
+     "farbe": 2,
+     "steine": 1,
+     "ecke": 345,
+     "schutz": {
+      "ag": [
+       3,
+       1
+      ],
+      "benson": false,
+      "augen": 2,
+      "gross": false,
+      "offen": false,
+      "frei": 5,
+      "verbandSteine": 15
+     }
+    }
+   ],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|360|335",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|68|313",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|96|321",
+   "gruppe": "alte PWA",
+   "kiFarbe": 1,
+   "V": false,
+   "A": [],
+   "B": []
+  }
+ ]
+}

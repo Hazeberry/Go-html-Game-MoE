@@ -157,3 +157,9 @@ Abgelegt unter `docs/daten/bughunt-wiederholung/lauf1/`, **unverändert** übern
 ## 11. Freigaben
 
 Dieses Doc enthält Vorgaben für die KI-Assistenten; Hazeberry liest es vor dem Merge. Es erteilt kein Go für Spielkorrekturen, Messläufe, Engine-Vergleiche oder Merges.
+
+## 12. Nachtrag (08.11.2026)
+
+`browser.cjs --html index.html` ist gegen die `index.html` **dieses** Repos gelaufen (alle sieben Fälle reproduziert, nur Chromium 153; Bericht und Vergleich: `docs/zaehlung-mechanismus.md` §4,
+Ausgaben `docs/daten/zaehlung-mechanismus/browser/`). Der Hinweis in §8 („unsere `index.html` wurde nicht ausgeführt“) gilt damit für `browser.cjs` nicht mehr; `reproduce.cjs` wurde nicht gegen unsere Dateien ausgeführt.
+Zu §9: GTP-3 berührt die PWA-Läufe nach dem Gelesenen nicht; bei GTP-1 sind die vom Adapter erzeugten Züge ungeprüft (`docs/zaehlung-mechanismus.md` §3). Kein Go für Korrekturen.

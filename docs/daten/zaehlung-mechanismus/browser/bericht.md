@@ -1,0 +1,577 @@
+# Gezielte Bughunt-Browserdiagnose
+
+Zeit: 2026-11-08T02:56:37.901Z
+index.html SHA-256: d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b
+Node: v22.23.4; Browser: 153.0.8010.12
+
+**Diagnose, keine Spielstärkemessung.** Ein grüner Abschluss gilt nur für diese Abläufe.
+
+| ID | Status |
+|---|---|
+| UI-1 | reproduziert |
+| TRAIN-1.pass | reproduziert |
+| TRAIN-1.resign | reproduziert |
+| UI-2 | reproduziert |
+| UI-3 | reproduziert |
+| TRAIN-2 | reproduziert |
+| NET-1 | reproduziert |
+
+## UI-1
+
+```json
+{
+  "id": "UI-1",
+  "status": "reproduziert",
+  "evidence": {
+    "pruefbar": true,
+    "defekt": true,
+    "before": {
+      "id": 1,
+      "mc": 0,
+      "hash": 0
+    },
+    "disabled": {
+      "enabled": false,
+      "thinking": true,
+      "id": 1
+    },
+    "after": {
+      "enabled": false,
+      "thinking": false,
+      "mc": 1,
+      "board": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "delivered": true,
+      "workerDead": false
+    },
+    "hinweis": "Kontrollierter echter Worker; fehlende Zustellung nach terminate ist erlaubte Abbruchstrategie."
+  }
+}
+```
+
+## TRAIN-1.pass
+
+```json
+{
+  "id": "TRAIN-1.pass",
+  "status": "reproduziert",
+  "evidence": {
+    "pruefbar": true,
+    "defekt": true,
+    "finish": "pass",
+    "before": {
+      "games": 0,
+      "trained": false,
+      "buf": 1
+    },
+    "ended": {
+      "games": 1,
+      "trained": true
+    },
+    "undone": {
+      "games": 1,
+      "trained": true,
+      "buf": 0
+    },
+    "changedByTraining": true,
+    "unchangedByUndo": true,
+    "persistedUnchangedByUndo": true
+  }
+}
+```
+
+## TRAIN-1.resign
+
+```json
+{
+  "id": "TRAIN-1.resign",
+  "status": "reproduziert",
+  "evidence": {
+    "pruefbar": true,
+    "defekt": true,
+    "finish": "resign",
+    "before": {
+      "games": 0,
+      "trained": false,
+      "buf": 1
+    },
+    "ended": {
+      "games": 1,
+      "trained": true
+    },
+    "undone": {
+      "games": 1,
+      "trained": true,
+      "buf": 0
+    },
+    "changedByTraining": true,
+    "unchangedByUndo": true,
+    "persistedUnchangedByUndo": true
+  }
+}
+```
+
+## UI-2
+
+```json
+{
+  "id": "UI-2",
+  "status": "reproduziert",
+  "evidence": {
+    "pruefbar": true,
+    "defekt": true,
+    "before": "Schwarz +353.5",
+    "displayed": "Schwarz +353.5",
+    "expected": "Weiß +5.5",
+    "sgf": "W+5.5",
+    "area": {
+      "1": 361,
+      "2": 0
+    },
+    "territory": {
+      "1": 2,
+      "2": 0
+    }
+  }
+}
+```
+
+## UI-3
+
+```json
+{
+  "id": "UI-3",
+  "status": "reproduziert",
+  "evidence": {
+    "pruefbar": true,
+    "defekt": true,
+    "marked": {
+      "count": 8,
+      "changed": true
+    },
+    "previewNull": true,
+    "panelHidden": true,
+    "screenshotHash": "dee051bd75755c6d87115f2409ecdb5ca9c19cea098156608293fdfc675536ea",
+    "cleanHash": "9255c27ec72106f29a999235dc14591a4cb90b12781daaf18f3a282214615277",
+    "cachedHash": "dee051bd75755c6d87115f2409ecdb5ca9c19cea098156608293fdfc675536ea"
+  }
+}
+```
+
+## TRAIN-2
+
+```json
+{
+  "id": "TRAIN-2",
+  "status": "reproduziert",
+  "evidence": {
+    "pruefbar": true,
+    "defekt": true,
+    "afterSwitch": 1,
+    "rewards": [
+      {
+        "color": 2,
+        "advantage": 1
+      },
+      {
+        "color": 1,
+        "advantage": 1
+      }
+    ],
+    "hinweis": "Synthetischer Endzustand; echter trainGame/backward, Wrapper zeichnet nur Eingangsreward auf."
+  }
+}
+```
+
+## NET-1
+
+```json
+{
+  "id": "NET-1",
+  "status": "reproduziert",
+  "evidence": {
+    "pruefbar": true,
+    "defekt": true,
+    "before": {
+      "games": 17,
+      "trained": true,
+      "healthy": false
+    },
+    "after": {
+      "games": 17,
+      "trained": true,
+      "healthy": false
+    },
+    "sameWeights": true,
+    "err": {
+      "name": "SecurityError",
+      "message": "Test: Storage verweigert"
+    },
+    "hinweis": "Storage-Verweigerung nach Seitenstart injiziert; kein fremdes Browserprofil."
+  }
+}
+```
+
+Testdaten und instrumentierte Antworten sind im Aufbau beschrieben. Browserzustände stammen aus frischen
+Kontexten; es wird kein persönliches Profil und kein vorhandener Nutzerspeicher geöffnet.
