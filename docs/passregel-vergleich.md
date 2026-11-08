@@ -574,6 +574,8 @@ ist mit diesem Nachtrag nicht freigegeben und hat kein Go.
 
 ## 16. Nachtrag: Rohdatensicherung (08.11.2026)
 
+Direkter Download des Artefakts als ZIP durch Luna am 08.11.2026 in dieser ChatGPT-Sitzung über den GitHub-Connector und dessen Download-Link, ohne zusätzlichen Actions-Workflow; danach nur Dateiintegrität, Vollständigkeit und Prüfsummen geprüft.
+
 Auf Hazeberrys Auftrag wurde das Artefakt `bericht` (ID 13557498693) des Laufs 42331033107 heruntergeladen und **unverändert** unter [`daten/passregel-vergleich/stufe-c-42331033107/`](daten/passregel-vergleich/stufe-c-42331033107/README.md) abgelegt. Das ZIP umfasst 511610 Bytes; sein SHA-256 `0d9ca865d424251c57a3c9d424cd290e0206a86fe4d6fdd37bd13b8be4720e08` stimmt exakt mit dem Digest der GitHub-Artefaktmetadaten überein.
 
 Die ZIP-Integritätsprüfung ist bestanden. Enthalten sind 29 Dateien: Stufe-A-Daten, alle 23 Ergebnispakete, Hauptbericht, `zahlen.json` und Nachspiel-Kontrolle. Die Einheitenliste und die Ergebnispakete enthalten jeweils 563 eindeutige Schlüssel; die Schlüsselmengen stimmen vollständig überein. Das Manifest nennt Größe und SHA-256 jeder Datei im ZIP. Die Archivdatei bleibt bytegleich zum Download.
