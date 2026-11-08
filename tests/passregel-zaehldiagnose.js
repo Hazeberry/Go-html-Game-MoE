@@ -29,7 +29,7 @@ let _E = null;
 const engine = () => _E || (_E = S.motor(html));
 
 /* Attrappe als ausführbares Programm: spielt echte Regeln (Engine-Funktionen), antwortet mit Rohtext wie GNU Go.
-   Verhalten über Umgebungsvariablen: STUB_TOT=alleSchwarz, STUB_FINAL_OHNE_TOT=1, STUB_ZUFALL=1, STUB_ABLEHNEN=<Punkt>,
+   Verhalten über Umgebungsvariablen: STUB_TOT=alleSchwarz, STUB_FINAL_OHNE_TOT=1, STUB_SCORE_ZAEHLER=<Datei>, STUB_ABLEHNEN=<Punkt>,
    STUB_DAME_FALSCH=1 (ein Schwarz-Gebietspunkt wird als Dame gemeldet),
    STUB_ABSTURZ_BEI=<Befehlswort> mit STUB_ABSTURZ_NR=<n>: Prozess stirbt beim n-ten solchen Befehl an SIGSEGV. */
 const STUB = abs => `#!/usr/bin/env node
@@ -67,7 +67,15 @@ require('readline').createInterface({input: process.stdin}).on('line', l => {
     case 'captures': return out('= ' + caps[t[1] === 'black' ? 1 : 2]);
     case 'final_score': {
       if (process.env.STUB_SCHLECHT === 'score') return out('= B+1.2.3');
-      const s = zb(process.env.STUB_FINAL_OHNE_TOT ? new Set() : tot()).flaeche.stand + (process.env.STUB_ZUFALL ? Math.floor(Math.random() * 90) / 10 : 0);
+      /* Gemeinsamer Zähler über frische Prozesse: jede Antwort ist garantiert anders. */
+      let zusatz = 0;
+      if (process.env.STUB_SCORE_ZAEHLER) {
+        const fs = require('fs'), datei = process.env.STUB_SCORE_ZAEHLER;
+        const vorher = fs.existsSync(datei) ? Number(fs.readFileSync(datei, 'utf8')) : 0;
+        fs.writeFileSync(datei, String(vorher + 1));
+        zusatz = (vorher + 1) / 2;
+      }
+      const s = zb(process.env.STUB_FINAL_OHNE_TOT ? new Set() : tot()).flaeche.stand + zusatz;
       return out('= ' + fmt(s));
     }
     case 'final_status_list': {
@@ -222,9 +230,12 @@ test('Abweichung reproduziert: gültig, mit Unterschied; Punktabweichungen werde
 test('Ungültig (kein Urteil): nicht wiederholbar, abgelehnter Zug, falsche Stellung', () => {
   const E = engine(), w = werkstatt(), index = erstenIndex(E, handPartie()), partie = handPartie();
   try {
-    const z = lauf(w, path.join(w.dir, 'd'), index, {STUB_ZUFALL: '1'});
+    const z = lauf(w, path.join(w.dir, 'd'), index, {STUB_SCORE_ZAEHLER: path.join(w.dir, 'score-zaehler')});
     pruefeGleich(z.status, 1, 'nicht wiederholbar: Exit 1'); pruefeGleich(z.j.gueltig, false, 'ungültig'); pruefe(z.j.gruendeUngueltig.some(x => /Wiederholbarkeit/.test(x)), z.j.gruendeUngueltig.join(' | '));
     pruefeGleich(z.j.ergebnis, 'Abweichung NICHT reproduziert'.startsWith('Abweichung') ? z.j.ergebnis : '', 'Ergebnistext vorhanden'); pruefe(z.j.unterschiedeZwischenLaeufen.length >= 1, 'Unterschiede zwischen den Läufen aufgelistet');
+    const scoreUnterschied = z.j.unterschiedeZwischenLaeufen.find(x => x.befehl === 'final_score');
+    pruefe(scoreUnterschied && scoreUnterschied.lauf1 !== scoreUnterschied.lauf2, 'final_score unterscheidet sich garantiert zwischen den frischen Prozessen');
+    pruefeGleich(fs.readFileSync(path.join(w.dir, 'score-zaehler'), 'utf8'), '2', 'beide Diagnoseprozesse haben den gemeinsamen Zähler erhöht');
     const ab = lauf(w, path.join(w.dir, 'e'), index, {STUB_ABLEHNEN: partie.zuege.find((m, j) => j > 3 && m !== 'pass')});
     pruefeGleich(ab.status, 1, 'abgelehnter Zug: Exit 1'); pruefe(ab.j.gruendeUngueltig.some(x => /abgelehnt/.test(x)), ab.j.gruendeUngueltig.join(' | ')); pruefeGleich(ab.j.ergebnis, 'kein Urteil', 'kein Ergebnis ohne Analyse');
     const falsch = lauf(w, path.join(w.dir, 'f'), index - 2, {});
