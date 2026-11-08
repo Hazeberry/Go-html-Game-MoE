@@ -131,7 +131,7 @@ Workflow sind vorbereitet; **gestartet wird erst nach dem Merge dieser Umsetzung
 
 **Herkunft der Angaben (getrennt):**
 - **Zahlen:** aus Claudes Auswertung des Job-Logs (Job 128308250502, Lauf 42340940626, `main` bei `1b38b96033d4396542bc6ae45ab9ad14eaca42a5`). Die Rohdaten
-  (Artefakt `bericht` 13557498693 und das Ergebnisartefakt `vorsprung` 13561398554) hat Claude nicht geöffnet.
+  (Artefakt `bericht` 13557498693 und das Ergebnisartefakt `vorsprung` 13561398554) hat Claude nicht geöffnet. Die spätere Sicherung durch Luna steht in [`daten/passregel-vorsprung/lauf-42340940626/`](daten/passregel-vorsprung/lauf-42340940626/README.md), dokumentiert in `passregel-vergleich.md` §17; das Stufe-C-Quellartefakt ist separat in §16 gesichert.
 - **Farbzuteilung der Gruppen** (eigene Farbe der KI oder des Gegners): von Hand aus den Logzeilen gelesen, **nicht maschinell gezählt**.
 - **Gruppenzahlen und Summen** (84 Gruppen, 864 und 271 Punkte): von Hand aus den Logzeilen der 18 Fläche-Einheiten addiert, nicht vom Werkzeug berechnet.
 - **Beiträge:** vom Werkzeug rechnerisch zerlegt (Rechenidentität, §5), nicht gedeutet.
