@@ -1,0 +1,114 @@
+name: Diagonalprüfung Stufe 1
+
+# Manueller Lauf aus docs/diagonalpruefung-vorabfestlegung.md (§4 Stufe 1, §11 AP3): Betroffenheit der Prüfstellungen durch den Schalter
+# PARAMS.diagonalAugeEnde. NICHT STARTEN ohne ausdrückliches Go von Hazeberry für genau diesen Lauf (CLAUDE.md).
+# Reine Rechnung auf Archivdaten: KEIN GNU Go, keine Partie, keine Messung der Spielstärke, keine Beurteilung. Das Ergebnis ist nur,
+# bei welchen Stellungen die Tot-Menge von toteSteineAmEnde bei Schalter aus und an verschieden ist (Stufe 2 und 3 haben eigene Go).
+#
+# Ablauf (jeder Stand in EIGENEM Prozess, nie zwei Stände im selben Node-Prozess):
+#   1. Stufe-C-Artefakt (bzw. dessen Git-Kopie) gegen SHA256SUMS prüfen, in ein eigenes leeres Verzeichnis entpacken
+#   2. ziehen: Schritt 0 (Zählung), Nachspiel-Kontrolle, Stellungen S, V (Indizes 250, 300, 350), Handpartien (S, illustrativ), Entwicklung (Kontrolle)
+#   3. rechnen alt: unveränderte Fassung (Commit c504143, index.html SHA-256 gebunden), nur aus
+#   4. rechnen testkopie: Test-Kopie der Diagnose aus der unveränderten Fassung (Verfahren wie gegenprobe.js --variante diagonalauge)
+#   5. rechnen neu: index.html dieses Standes, aus und an
+#   6. vergleichen: Identität bei aus (§7 Nr. 3), Konsistenz bei an gegen die Test-Kopie (§7 Nr. 4), Betroffenheit je Gruppe und Stellungsart
+# Gültigkeit: nur zwei Zustände. Ungültig heißt „kein Urteil“ mit Grund, und der Lauf wird rot.
+#
+# Keine Eingaben: Zugindizes, Gruppen und Dateien stehen in der Vorabfestlegung.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: diagonal-pruefung
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  stufe1:
+    name: Betroffenheit (Stufe 1)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Eingaben vorbereiten
+        run: |
+          set -euo pipefail
+          d=docs/daten/passregel-vergleich/stufe-c-42331033107
+          erwartet=$(grep ' bericht.zip$' "$d/SHA256SUMS" | cut -d' ' -f1)
+          ist=$(sha256sum "$d/bericht.zip" | cut -d' ' -f1)
+          echo "bericht.zip SHA-256: $ist (erwartet $erwartet)"
+          test "$ist" = "$erwartet"
+          mkdir -p stufec alt ergebnis
+          unzip -q "$d/bericht.zip" -d stufec
+          test -f stufec/stufe-a/einheiten.jsonl
+          test -d stufec/teile
+          git show c504143:index.html > alt/index.html
+          alt_sha=$(sha256sum alt/index.html | cut -d' ' -f1)
+          echo "unveränderte Fassung (c504143): $alt_sha"
+          test "$alt_sha" = "d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b"
+          node --version
+
+      - name: Schritt 0 (ziehen)
+        run: |
+          set -uo pipefail
+          status=0
+          d=docs/daten
+          node auswertung/endspiel/diagonal-pruefung.js ziehen --aus ergebnis --html index.html \
+            --entwicklung stufec --ausschluss stufec/stufe-a/einheiten.jsonl --hand tests/stellungen \
+            --gruppe "GNU Go ohne Vorgabe=$d/leeres-brett/lauf1/g-D.jsonl.gz,$d/muster-ohne-vorgabe/lauf1/g-D.jsonl.gz" \
+            --gruppe "Fuego 100 Spiele=$d/muster-ohne-vorgabe/lauf1/f-D.jsonl.gz" \
+            --gruppe "Fuego 50 Spiele=$d/fuego-siege/lauf1/D.jsonl.gz" \
+            --gruppe "alte PWA=$d/pwa-vergleich/lauf1/m1.jsonl.gz" > ergebnis/ziehen.log || status=$?
+          cat ergebnis/schritt0.md >> "$GITHUB_STEP_SUMMARY" || true
+          exit "$status"
+
+      - name: Stand alt (unveränderte Fassung, eigener Prozess)
+        run: |
+          set -uo pipefail
+          status=0
+          node auswertung/endspiel/diagonal-pruefung.js rechnen --stand alt --html alt/index.html --stellungen ergebnis/stellungen.jsonl \
+            --aus ergebnis/alt.jsonl --erwartet-sha d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b || status=$?
+          exit "$status"
+
+      - name: Stand testkopie (Test-Kopie der Diagnose, eigener Prozess)
+        run: |
+          set -uo pipefail
+          status=0
+          node auswertung/endspiel/diagonal-pruefung.js rechnen --stand testkopie --html alt/index.html --stellungen ergebnis/stellungen.jsonl \
+            --aus ergebnis/testkopie.jsonl --tmp testkopie-tmp || status=$?
+          exit "$status"
+
+      - name: Stand neu (index.html mit Schalter, eigener Prozess)
+        run: |
+          set -uo pipefail
+          status=0
+          node auswertung/endspiel/diagonal-pruefung.js rechnen --stand neu --html index.html --stellungen ergebnis/stellungen.jsonl \
+            --aus ergebnis/neu.jsonl || status=$?
+          exit "$status"
+
+      - name: Vergleichen (Kontrollen und Betroffenheit)
+        run: |
+          set -uo pipefail
+          status=0
+          node auswertung/endspiel/diagonal-pruefung.js vergleichen --aus ergebnis --stellungen ergebnis/stellungen.jsonl \
+            --schritt0 ergebnis/schritt0.json --alt ergebnis/alt.jsonl --testkopie ergebnis/testkopie.jsonl --neu ergebnis/neu.jsonl \
+            --erwartet-sha-alt d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b > ergebnis/vergleichen.log || status=$?
+          cat ergebnis/bericht.md >> "$GITHUB_STEP_SUMMARY" || true
+          exit "$status"
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: diagonal-pruefung-stufe1
+          path: ergebnis/
+          retention-days: 90
