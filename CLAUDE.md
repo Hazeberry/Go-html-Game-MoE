@@ -71,4 +71,5 @@ A17 war der ausgeschaltete V8-Optimierer in Chrome), `docs/endspiel-abraeumen.md
 `docs/zaehlvorschau.md`, `docs/passregel-versuch.md`, `docs/skalierung.md` (mehr Suche bringt
 +75 und +55 Elo je Verdopplung: niedrigere Punktschätzung bei der zweiten Verdopplung, Abflachen
 nicht gesichert; die Bewertung ist als Engpass vermutet, nicht nachgewiesen), `docs/komponenten.md`
-(was welcher Teil bringt), `docs/fuego.md`, `docs/pwa-vergleich.md`.
+(was welcher Teil bringt), `docs/fuego.md`, `docs/pwa-vergleich.md`. `HANDOFF.md`: Querverweis auf das Schwesterrepo
+`Hazeberry/codex` (was wo steht, Stand der Passregel); keine Regeln, kein Go.
