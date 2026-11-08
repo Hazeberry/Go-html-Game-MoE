@@ -111,4 +111,6 @@ test('lauf.sh übernimmt den Exitcode des Browserteils in den Gesamtstatus', () 
   pruefe(!/browser-exit\.txt/.test(t), 'kein loses Aufschreiben des Exitcodes in lauf.sh');
 });
 
-laufeTests('zaehlung-mechanismus.js');
+laufeTests('zaehlung-mechanismus.js').then(ok => {
+  process.exitCode = ok ? 0 : 1;
+});
