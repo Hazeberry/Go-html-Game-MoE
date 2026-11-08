@@ -20,6 +20,7 @@ Stand 08.11.2026, `main` dieses Repos bei `35e3581`. **Zweck:** zeigen, was wo s
 | Einzelfall-Diagnosen: Aufgabe nach Zug 113, `deathTransfer`, Gefangenenwert und Rollouts, Gefangenendeckel-Fortsetzungen | codex | `HANDOFF.md`; `docs/untersuchung-aufgabe-113.md`, `docs/death-transfer-diagnose.md`, `docs/gefangene-rollout-aufgabe.md`, `docs/gefangenendeckel-fortsetzungen.md` |
 | Bughunts: neun Prüfaufträge (UI, TRAIN, NET, GTP) und deren Verifikation (PR #20) | codex | `HANDOFF.md`; `docs/bughunt-verifikation.md`, `docs/bughunt-browser.md` auf dem Branch `claude/bughunt-verifikation` (Merge-Stand von PR #20 nicht geprüft) |
 | **Wiederholung** der Bughunt-Prüfung (Ausführung durch Claude, Rohdaten und Screenshots) | dieses Repo | `docs/bughunt-wiederholung.md`, `docs/daten/bughunt-wiederholung/lauf1/` |
+| Diagnosezustand 08.11.2026: Zählabweichung (15 Einheiten), Vorschau gegen GNU-Go-Tot-Liste, `browser.cjs` gegen die eigene `index.html`, GTP-1/GTP-3 (gelesen) | dieses Repo | `docs/zaehlung-mechanismus.md`, `docs/daten/zaehlung-mechanismus/`, `auswertung/zaehlung-mechanismus/` |
 | Passregel: Versuch, Vergleich (Stufen A bis C), Zähldiagnose, Vorsprung-Untersuchung | dieses Repo | `docs/passregel-versuch.md`, `docs/passregel-vergleich.md` (§13 bis §15), `docs/passregel-zaehldiagnose.md`, `docs/passregel-vorsprung.md` (§9) |
 | Stärkemessungen, Komponenten, Skalierung, Fuego, PWA-Vergleich, Kandidaten-Orakel (älterer Stand) | dieses Repo (in codex als übernommene Historie) | `docs/skalierung.md`, `docs/komponenten.md`, `docs/fuego.md`, `docs/pwa-vergleich.md`, `docs/kandidaten-orakel.md`, `docs/kandidaten-orakel-vierarm.md` |
 
@@ -38,9 +39,14 @@ Die Regel `passNachGegnerpass` bleibt **ausgeschaltet** (Standard 0), `index.htm
 
 ## 4. Offene Punkte (alle ohne Go)
 
-- Ursache der Zählabweichung bei 15 Einheiten (`docs/passregel-vergleich.md` §15) und warum die Vorschau die Gruppen aus §3 nicht entfernt.
-- Ein Lauf von `browser.cjs --html index.html` gegen die `index.html` **dieses** Repos; bisher beruht die Übertragbarkeit der Bughunt-Befunde auf dem Textvergleich in `docs/bughunt-wiederholung.md` §2.
-- Ob GTP-1 und GTP-3 (`gtp-ki.js`) die Läufe berühren, in denen der Adapter als Gegner-KI diente (`gnugo-duell.js`, PWA-Vergleich, Gruppe „alte PWA“); nicht geprüft.
+Stand der Diagnose: `docs/zaehlung-mechanismus.md` (lokal, nur lesend; keine Spieländerung, kein Actions-Lauf).
+
+- Ursache der Zählabweichung bei 15 Einheiten (`docs/passregel-vergleich.md` §15): **nicht untersucht**; sie braucht GNU Gos Punktklassen je Stellung (Actions, eigene Vorabfestlegung und Go). Beschrieben ist nur das Muster (`docs/zaehlung-mechanismus.md` §5).
+- Warum die Vorschau von GNU Go als tot geführte Gruppen behält: als Diagnose beschrieben (§6: Verbände, zwei Augen, Ein-Punkt-Augen ohne Diagonalprüfung in `toteSteineAmEnde`). Die Gegenprobe mit Diagonalprüfung ist ein **nachträglicher Diagnosebefund**, keine Verbesserungsmessung;
+  46 „nur App tot“-Steine in V sind ungeprüft. Ob GNU Gos Tot-Bewertung richtig ist, bleibt offen. **Vorabfestlegung für eine Augenprüfung: getrennt zu besprechen, kein Go.**
+- Abweichende Gruppenzahlen (hier 71 und 10 Ketten, `docs/passregel-vorsprung.md` §9: 76 und 8 Gruppen): **nicht abgeglichen** (§6.7).
+- `browser.cjs --html index.html` gegen die `index.html` dieses Repos: **gelaufen**, alle sieben Fälle reproduziert (§4 des Docs; nur Chromium 153).
+- GTP-3 berührt die PWA-Läufe nach dem Gelesenen nicht. GTP-1: eingehende `play`-Züge sind durch GNU Go vorgeschaltet geschützt; **vom Adapter selbst erzeugte `genmove`-Züge sind nicht geprüft** (§3), „PWA-Läufe nicht betroffen“ ist nicht gesichert.
 - Korrekturen der Bughunt-Befunde: eigene Vorabfestlegung und Go.
 
 ## 5. Pflege

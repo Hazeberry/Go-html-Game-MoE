@@ -1,0 +1,2 @@
+alle Gegnersteine zählen   : {"ketten":71,"einpunktAugen":88,"falsch":70,"kettenMitFalschem":67,"kettenMitZweiEchten":0}
+GNU-tote Gegnersteine aus  : {"ketten":71,"einpunktAugen":88,"falsch":70,"kettenMitFalschem":67,"kettenMitZweiEchten":0}

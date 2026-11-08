@@ -1,0 +1,9 @@
+eigene index.html SHA-256 d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b | Browser 153.0.8010.12 | Startfehler -
+Lauf 1             SHA-256 a14ac4d4058072ec552ca524832095f628412224b96ff7159806e35499fcb4b6 | Browser 153.0.8010.12
+UI-1: reproduziert (Lauf 1: reproduziert); Seitenfehler: []; abweichende Felder: keine
+TRAIN-1.pass: reproduziert (Lauf 1: reproduziert); Seitenfehler: []; abweichende Felder: keine
+TRAIN-1.resign: reproduziert (Lauf 1: reproduziert); Seitenfehler: []; abweichende Felder: keine
+UI-2: reproduziert (Lauf 1: reproduziert); Seitenfehler: []; abweichende Felder: keine
+UI-3: reproduziert (Lauf 1: reproduziert); Seitenfehler: []; abweichende Felder: evidence.screenshotHash, evidence.cleanHash, evidence.cachedHash
+TRAIN-2: reproduziert (Lauf 1: reproduziert); Seitenfehler: []; abweichende Felder: keine
+NET-1: reproduziert (Lauf 1: reproduziert); Seitenfehler: []; abweichende Felder: keine

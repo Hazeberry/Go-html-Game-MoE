@@ -1,0 +1,10 @@
+Variante freiheitsverband | index.html SHA-256 d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b
+Original   alle   : {"stellungen":563,"gleichTotMenge":528,"steineNurGnuTot":527,"steineNurAppTot":131}
+Variante   alle   : {"stellungen":563,"gleichTotMenge":525,"steineNurGnuTot":523,"steineNurAppTot":206}
+Original   nur V  : {"stellungen":18,"gleichTotMenge":0,"steineNurGnuTot":362,"steineNurAppTot":80}
+Variante   nur V  : {"stellungen":18,"gleichTotMenge":0,"steineNurGnuTot":360,"steineNurAppTot":132}
+V, Original: Ketten „nur GNU tot“: 71 Ketten, 362 Steine (KI-Farbe 71, Gegner 0)
+V, Original: Ketten „nur App tot“: 10 Ketten, 80 Steine (KI-Farbe 0, Gegner 10)
+V, Variante: Ketten „nur GNU tot“: 71 Ketten, 360 Steine (KI-Farbe 71, Gegner 0)
+V, Variante: Ketten „nur App tot“: 18 Ketten, 132 Steine (KI-Farbe 0, Gegner 18)
+V, Variante: Ketten „nur App tot“: 18 (132 Steine), davon KI-Farbe 0, Gegner 18; Einzelliste in gegenprobe-freiheitsverband.json

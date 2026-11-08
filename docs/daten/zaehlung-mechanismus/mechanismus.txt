@@ -1,0 +1,2 @@
+index.html SHA-256 d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b
+Zeilen 563 | Test-Kopie == Original (Tot-Menge) bei 563 von 563

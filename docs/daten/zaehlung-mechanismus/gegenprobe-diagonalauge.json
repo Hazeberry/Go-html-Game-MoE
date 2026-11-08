@@ -1,0 +1,1404 @@
+{
+ "variante": "diagonalauge",
+ "htmlSha256": "d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b",
+ "kennzahlen": {
+  "alleOriginal": {
+   "stellungen": 563,
+   "gleichTotMenge": 528,
+   "steineNurGnuTot": 527,
+   "steineNurAppTot": 131
+  },
+  "alleVariante": {
+   "stellungen": 563,
+   "gleichTotMenge": 545,
+   "steineNurGnuTot": 167,
+   "steineNurAppTot": 97
+  },
+  "vOriginal": {
+   "stellungen": 18,
+   "gleichTotMenge": 0,
+   "steineNurGnuTot": 362,
+   "steineNurAppTot": 80
+  },
+  "vVariante": {
+   "stellungen": 18,
+   "gleichTotMenge": 14,
+   "steineNurGnuTot": 60,
+   "steineNurAppTot": 46
+  }
+ },
+ "vStellungenEinzeln": [
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|390|357",
+   "kiFarbe": 1,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "A7"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 12,
+      "punkte": [
+       "B6",
+       "B5",
+       "A5",
+       "C5",
+       "C4",
+       "C3",
+       "B3",
+       "D3",
+       "A3",
+       "A2",
+       "A1",
+       "B1"
+      ]
+     }
+    ],
+    "nurAppTot": []
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|523|354",
+   "kiFarbe": 2,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "R19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "T19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 7,
+      "punkte": [
+       "S18",
+       "S17",
+       "R17",
+       "S16",
+       "R16",
+       "T16",
+       "S15"
+      ]
+     }
+    ],
+    "nurAppTot": [
+     {
+      "farbe": "Gegner",
+      "steine": 6,
+      "punkte": [
+       "N19",
+       "N18",
+       "O18",
+       "O17",
+       "O16",
+       "O15"
+      ]
+     },
+     {
+      "farbe": "Gegner",
+      "steine": 17,
+      "punkte": [
+       "Q18",
+       "R18",
+       "Q17",
+       "Q16",
+       "Q15",
+       "R15",
+       "Q14",
+       "R14",
+       "P14",
+       "S14",
+       "P13",
+       "T14",
+       "O13",
+       "P12",
+       "T15",
+       "Q12",
+       "Q11"
+      ]
+     }
+    ]
+   },
+   "variante": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "R19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "T19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 7,
+      "punkte": [
+       "S18",
+       "S17",
+       "R17",
+       "S16",
+       "R16",
+       "T16",
+       "S15"
+      ]
+     }
+    ],
+    "nurAppTot": [
+     {
+      "farbe": "Gegner",
+      "steine": 6,
+      "punkte": [
+       "N19",
+       "N18",
+       "O18",
+       "O17",
+       "O16",
+       "O15"
+      ]
+     },
+     {
+      "farbe": "Gegner",
+      "steine": 17,
+      "punkte": [
+       "Q18",
+       "R18",
+       "Q17",
+       "Q16",
+       "Q15",
+       "R15",
+       "Q14",
+       "R14",
+       "P14",
+       "S14",
+       "P13",
+       "T14",
+       "O13",
+       "P12",
+       "T15",
+       "Q12",
+       "Q11"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|889|372",
+   "kiFarbe": 2,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 9,
+      "punkte": [
+       "T10",
+       "T9",
+       "T8",
+       "T7",
+       "S7",
+       "R7",
+       "S6",
+       "R8",
+       "R9"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 4,
+      "punkte": [
+       "Q6",
+       "Q5",
+       "R5",
+       "R4"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "T5"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 4,
+      "punkte": [
+       "N4",
+       "O4",
+       "P4",
+       "P3"
+      ]
+     }
+    ],
+    "nurAppTot": [
+     {
+      "farbe": "Gegner",
+      "steine": 3,
+      "punkte": [
+       "S5",
+       "S4",
+       "S3"
+      ]
+     },
+     {
+      "farbe": "Gegner",
+      "steine": 7,
+      "punkte": [
+       "Q4",
+       "Q3",
+       "Q2",
+       "P2",
+       "R2",
+       "P1",
+       "O1"
+      ]
+     }
+    ]
+   },
+   "variante": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 9,
+      "punkte": [
+       "T10",
+       "T9",
+       "T8",
+       "T7",
+       "S7",
+       "R7",
+       "S6",
+       "R8",
+       "R9"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 4,
+      "punkte": [
+       "Q6",
+       "Q5",
+       "R5",
+       "R4"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "T5"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 4,
+      "punkte": [
+       "N4",
+       "O4",
+       "P4",
+       "P3"
+      ]
+     }
+    ],
+    "nurAppTot": [
+     {
+      "farbe": "Gegner",
+      "steine": 3,
+      "punkte": [
+       "S5",
+       "S4",
+       "S3"
+      ]
+     },
+     {
+      "farbe": "Gegner",
+      "steine": 7,
+      "punkte": [
+       "Q4",
+       "Q3",
+       "Q2",
+       "P2",
+       "R2",
+       "P1",
+       "O1"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|21|428",
+   "kiFarbe": 2,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "B19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 4,
+      "punkte": [
+       "Q19",
+       "R19",
+       "S19",
+       "R18"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 17,
+      "punkte": [
+       "A18",
+       "A17",
+       "B17",
+       "A16",
+       "C17",
+       "A15",
+       "C16",
+       "A14",
+       "B14",
+       "A13",
+       "B13",
+       "B12",
+       "C12",
+       "B11",
+       "C11",
+       "A11",
+       "D11"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "T18"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "S17"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 20,
+      "punkte": [
+       "Q7",
+       "Q6",
+       "P6",
+       "R6",
+       "Q5",
+       "P5",
+       "Q4",
+       "P4",
+       "R4",
+       "Q3",
+       "R3",
+       "Q2",
+       "S3",
+       "R2",
+       "P2",
+       "Q1",
+       "T3",
+       "R1",
+       "S1",
+       "T1"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "S5"
+      ]
+     }
+    ],
+    "nurAppTot": []
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|401|346",
+   "kiFarbe": 2,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 5,
+      "punkte": [
+       "B19",
+       "B18",
+       "C18",
+       "C17",
+       "D17"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "D19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 8,
+      "punkte": [
+       "Q19",
+       "R19",
+       "R18",
+       "S18",
+       "T18",
+       "S17",
+       "T19",
+       "T17"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "E18"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "P18"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "Q17"
+      ]
+     }
+    ],
+    "nurAppTot": []
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|480|319",
+   "kiFarbe": 1,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 5,
+      "punkte": [
+       "P19",
+       "Q19",
+       "P18",
+       "O18",
+       "N18"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 8,
+      "punkte": [
+       "S19",
+       "S18",
+       "R18",
+       "T18",
+       "T17",
+       "T16",
+       "S16",
+       "S15"
+      ]
+     }
+    ],
+    "nurAppTot": []
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|270|449",
+   "kiFarbe": 1,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "P19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 8,
+      "punkte": [
+       "R19",
+       "R18",
+       "Q18",
+       "S18",
+       "R17",
+       "T18",
+       "R16",
+       "T17"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "T15"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "S14"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 18,
+      "punkte": [
+       "T13",
+       "T12",
+       "S12",
+       "T11",
+       "S11",
+       "S10",
+       "S9",
+       "R9",
+       "T9",
+       "S8",
+       "Q9",
+       "R8",
+       "T8",
+       "Q8",
+       "T7",
+       "Q7",
+       "T6",
+       "S6"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 22,
+      "punkte": [
+       "O4",
+       "O3",
+       "N3",
+       "O2",
+       "N2",
+       "O1",
+       "M2",
+       "N1",
+       "P1",
+       "L2",
+       "Q1",
+       "K2",
+       "R1",
+       "Q2",
+       "J2",
+       "K3",
+       "K1",
+       "R2",
+       "J3",
+       "S2",
+       "R3",
+       "H3"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "T1"
+      ]
+     }
+    ],
+    "nurAppTot": []
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|599|330",
+   "kiFarbe": 2,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "C19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 11,
+      "punkte": [
+       "E19",
+       "E18",
+       "D18",
+       "F18",
+       "E17",
+       "G18",
+       "H18",
+       "G17",
+       "H17",
+       "J17",
+       "H16"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "F16"
+      ]
+     }
+    ],
+    "nurAppTot": []
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|533|354",
+   "kiFarbe": 2,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 5,
+      "punkte": [
+       "C19",
+       "C18",
+       "B18",
+       "D18",
+       "A18"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "E19"
+      ]
+     }
+    ],
+    "nurAppTot": []
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|903|306",
+   "kiFarbe": 2,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 8,
+      "punkte": [
+       "Q3",
+       "R3",
+       "Q2",
+       "R2",
+       "S2",
+       "R1",
+       "S1",
+       "T1"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "T3"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "P1"
+      ]
+     }
+    ],
+    "nurAppTot": [
+     {
+      "farbe": "Gegner",
+      "steine": 11,
+      "punkte": [
+       "Q7",
+       "Q6",
+       "R6",
+       "Q5",
+       "S6",
+       "P5",
+       "Q4",
+       "T6",
+       "R4",
+       "S4",
+       "S3"
+      ]
+     }
+    ]
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|212|337",
+   "kiFarbe": 1,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "B19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 15,
+      "punkte": [
+       "D19",
+       "E19",
+       "F19",
+       "E18",
+       "G19",
+       "G18",
+       "H18",
+       "J18",
+       "H17",
+       "J17",
+       "K17",
+       "L17",
+       "M17",
+       "L18",
+       "L19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "C18"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 6,
+      "punkte": [
+       "B3",
+       "C3",
+       "B2",
+       "B1",
+       "A1",
+       "C1"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "D2"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "E1"
+      ]
+     }
+    ],
+    "nurAppTot": [
+     {
+      "farbe": "Gegner",
+      "steine": 2,
+      "punkte": [
+       "J19",
+       "K19"
+      ]
+     }
+    ]
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": [
+     {
+      "farbe": "Gegner",
+      "steine": 2,
+      "punkte": [
+       "J19",
+       "K19"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|808|403",
+   "kiFarbe": 1,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "N19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 11,
+      "punkte": [
+       "P19",
+       "Q19",
+       "R19",
+       "Q18",
+       "R18",
+       "S18",
+       "R17",
+       "T18",
+       "S17",
+       "T19",
+       "T17"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "O18"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "S5"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "R4"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 6,
+      "punkte": [
+       "T4",
+       "T3",
+       "S3",
+       "T2",
+       "S2",
+       "S1"
+      ]
+     }
+    ],
+    "nurAppTot": []
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|622|307",
+   "kiFarbe": 1,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 15,
+      "punkte": [
+       "D12",
+       "E12",
+       "D11",
+       "C11",
+       "D10",
+       "D9",
+       "E9",
+       "E8",
+       "F8",
+       "F7",
+       "G7",
+       "G6",
+       "G5",
+       "G4",
+       "H4"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 18,
+      "punkte": [
+       "J7",
+       "J6",
+       "K6",
+       "J5",
+       "L6",
+       "L5",
+       "M5",
+       "L4",
+       "M4",
+       "N4",
+       "M3",
+       "O4",
+       "P4",
+       "P5",
+       "P6",
+       "O6",
+       "Q6",
+       "N6"
+      ]
+     }
+    ],
+    "nurAppTot": [
+     {
+      "farbe": "Gegner",
+      "steine": 11,
+      "punkte": [
+       "F12",
+       "F11",
+       "F10",
+       "F9",
+       "G9",
+       "G8",
+       "H8",
+       "J8",
+       "H7",
+       "H6",
+       "H5"
+      ]
+     }
+    ]
+   },
+   "variante": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 15,
+      "punkte": [
+       "D12",
+       "E12",
+       "D11",
+       "C11",
+       "D10",
+       "D9",
+       "E9",
+       "E8",
+       "F8",
+       "F7",
+       "G7",
+       "G6",
+       "G5",
+       "G4",
+       "H4"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 18,
+      "punkte": [
+       "J7",
+       "J6",
+       "K6",
+       "J5",
+       "L6",
+       "L5",
+       "M5",
+       "L4",
+       "M4",
+       "N4",
+       "M3",
+       "O4",
+       "P4",
+       "P5",
+       "P6",
+       "O6",
+       "Q6",
+       "N6"
+      ]
+     }
+    ],
+    "nurAppTot": [
+     {
+      "farbe": "Gegner",
+      "steine": 11,
+      "punkte": [
+       "F12",
+       "F11",
+       "F10",
+       "F9",
+       "G9",
+       "G8",
+       "H8",
+       "J8",
+       "H7",
+       "H6",
+       "H5"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|172|333",
+   "kiFarbe": 1,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 14,
+      "punkte": [
+       "S19",
+       "S18",
+       "R18",
+       "S17",
+       "Q18",
+       "R17",
+       "T17",
+       "Q17",
+       "R16",
+       "T16",
+       "P17",
+       "T15",
+       "P16",
+       "T14"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "Q15"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 7,
+      "punkte": [
+       "A4",
+       "A3",
+       "B3",
+       "C3",
+       "C2",
+       "C1",
+       "D1"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 4,
+      "punkte": [
+       "G3",
+       "G2",
+       "G1",
+       "F1"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "E2"
+      ]
+     }
+    ],
+    "nurAppTot": [
+     {
+      "farbe": "Gegner",
+      "steine": 1,
+      "punkte": [
+       "A2"
+      ]
+     },
+     {
+      "farbe": "Gegner",
+      "steine": 1,
+      "punkte": [
+       "B1"
+      ]
+     }
+    ]
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|175|344",
+   "kiFarbe": 2,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 20,
+      "punkte": [
+       "T16",
+       "T15",
+       "S15",
+       "S14",
+       "S13",
+       "R13",
+       "T13",
+       "T12",
+       "T11",
+       "S11",
+       "T10",
+       "R11",
+       "S10",
+       "T9",
+       "R10",
+       "Q10",
+       "Q9",
+       "Q8",
+       "P8",
+       "Q7"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "O7"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 4,
+      "punkte": [
+       "P6",
+       "P5",
+       "O5",
+       "N5"
+      ]
+     }
+    ],
+    "nurAppTot": []
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|179|366",
+   "kiFarbe": 2,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "B19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 4,
+      "punkte": [
+       "D19",
+       "D18",
+       "C18",
+       "E18"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "F19"
+      ]
+     }
+    ],
+    "nurAppTot": [
+     {
+      "farbe": "Gegner",
+      "steine": 21,
+      "punkte": [
+       "G19",
+       "H19",
+       "J19",
+       "H18",
+       "H17",
+       "G17",
+       "J17",
+       "H16",
+       "F17",
+       "J16",
+       "H15",
+       "E17",
+       "F18",
+       "D17",
+       "D16",
+       "C16",
+       "B16",
+       "B17",
+       "A17",
+       "B18",
+       "A18"
+      ]
+     }
+    ]
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|23|340",
+   "kiFarbe": 2,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 12,
+      "punkte": [
+       "A14",
+       "B14",
+       "A13",
+       "C14",
+       "B13",
+       "C13",
+       "B12",
+       "B11",
+       "A11",
+       "B10",
+       "A10",
+       "B9"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "A8"
+      ]
+     }
+    ],
+    "nurAppTot": []
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|566|379",
+   "kiFarbe": 1,
+   "original": {
+    "nurGnuTot": [
+     {
+      "farbe": "KI",
+      "steine": 5,
+      "punkte": [
+       "N19",
+       "O19",
+       "P19",
+       "O18",
+       "Q19"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 5,
+      "punkte": [
+       "S19",
+       "S18",
+       "R18",
+       "S17",
+       "T17"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 4,
+      "punkte": [
+       "R3",
+       "S3",
+       "T3",
+       "S2"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "R1"
+      ]
+     },
+     {
+      "farbe": "KI",
+      "steine": 1,
+      "punkte": [
+       "T1"
+      ]
+     }
+    ],
+    "nurAppTot": []
+   },
+   "variante": {
+    "nurGnuTot": [],
+    "nurAppTot": []
+   }
+  }
+ ]
+}

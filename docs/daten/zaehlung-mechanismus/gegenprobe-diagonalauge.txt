@@ -1,0 +1,10 @@
+Variante diagonalauge | index.html SHA-256 d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b
+Original   alle   : {"stellungen":563,"gleichTotMenge":528,"steineNurGnuTot":527,"steineNurAppTot":131}
+Variante   alle   : {"stellungen":563,"gleichTotMenge":545,"steineNurGnuTot":167,"steineNurAppTot":97}
+Original   nur V  : {"stellungen":18,"gleichTotMenge":0,"steineNurGnuTot":362,"steineNurAppTot":80}
+Variante   nur V  : {"stellungen":18,"gleichTotMenge":14,"steineNurGnuTot":60,"steineNurAppTot":46}
+V, Original: Ketten „nur GNU tot“: 71 Ketten, 362 Steine (KI-Farbe 71, Gegner 0)
+V, Original: Ketten „nur App tot“: 10 Ketten, 80 Steine (KI-Farbe 0, Gegner 10)
+V, Variante: Ketten „nur GNU tot“: 9 Ketten, 60 Steine (KI-Farbe 9, Gegner 0)
+V, Variante: Ketten „nur App tot“: 6 Ketten, 46 Steine (KI-Farbe 0, Gegner 6)
+V, Variante: Ketten „nur App tot“: 6 (46 Steine), davon KI-Farbe 0, Gegner 6; Einzelliste in gegenprobe-diagonalauge.json

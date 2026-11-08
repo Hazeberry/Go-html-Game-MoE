@@ -1,0 +1,8 @@
+UI-1: reproduziert
+TRAIN-1.pass: reproduziert
+TRAIN-1.resign: reproduziert
+UI-2: reproduziert
+UI-3: reproduziert
+TRAIN-2: reproduziert
+NET-1: reproduziert
+Bericht: /home/user/Go-html-Game-MoE/docs/daten/zaehlung-mechanismus/browser/bericht.md; Exit 1

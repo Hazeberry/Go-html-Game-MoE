@@ -179,3 +179,10 @@ Ecke.
   nicht die Wahrheit. Ursache im Programm und Richtigkeit der Bewertung sind nicht gezeigt.
 - Das Ergebnis gilt für diese Archivstellungen und Gegner. Es ändert nichts am Spiel, an `passMarge` oder an der Passregel (bleibt aus). Eine weitere Untersuchung hat kein Go.
 
+
+## 10. Nachtrag (08.11.2026): Mechanismus, lokal beschrieben
+
+Diagnose der Frage aus §9 („warum entfernt die Vorschau diese Gruppen nicht“): `docs/zaehlung-mechanismus.md` §6 (Ausgaben `docs/daten/zaehlung-mechanismus/`). Kurz: Die behaltenen Ketten liegen in Verbänden, die durch zwei Augen,
+ein großes Auge oder eine Benson-Kette im Verband leben; 20 von 27 geschützten Verbänden in V leben nur durch Regionen mit höchstens 2 Punkten, und `toteSteineAmEnde` prüft Ein-Punkt-Augen nicht mit `_diagIsTrueEye`. Die Gegenprobe mit
+dieser Prüfung ist ein nachträglicher Diagnosebefund an denselben Daten, keine Verbesserungsmessung. **Die Gruppenzahlen aus §9 (76 und 8) sind mit den dort maschinell gezählten Ketten (71 und 10) nicht abgeglichen.**
+Ob GNU Gos Tot-Bewertung richtig ist, bleibt offen. Keine Änderung am Spiel, kein Go.
