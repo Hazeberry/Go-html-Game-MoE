@@ -1,0 +1,1431 @@
+{
+ "_beschreibung": "Eingefrorene Referenz zur Diagonalprüfung (docs/diagonalpruefung-vorabfestlegung.md). aus = unveränderte Fassung; an = Test-Kopie der Diagnose. Erzeugt vor der Änderung von index.html.",
+ "quelle": {
+  "commit": "c50414333648c7585c9a0f2c2db59d0e41f676c5",
+  "indexHtmlSha256": "d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b",
+  "verfahrenAn": "Test-Kopie wie auswertung/zaehlung-mechanismus/gegenprobe.js --variante diagonalauge",
+  "stufeCZipSha256": "0d9ca865d424251c57a3c9d424cd290e0206a86fe4d6fdd37bd13b8be4720e08"
+ },
+ "bretter": {
+  "zufall-1": {
+   "aus": {
+    "tot": "9df3de6f49c44242b313dfb404121c053b3a7f96d2e4302f843cc62ac0c0620b",
+    "vorschauFlaeche": "ce910bec15238e3c1893fe8fdecc6fb3da7b1a617c7f288688bd89adc5ebb181",
+    "vorschauTerritory": "b0a1d0dd62422fd6057cfb37e4a260c0d9a364934b609747e785a712dc1d3305"
+   },
+   "an": {
+    "tot": "9df3de6f49c44242b313dfb404121c053b3a7f96d2e4302f843cc62ac0c0620b",
+    "vorschauFlaeche": "ce910bec15238e3c1893fe8fdecc6fb3da7b1a617c7f288688bd89adc5ebb181",
+    "vorschauTerritory": "b0a1d0dd62422fd6057cfb37e4a260c0d9a364934b609747e785a712dc1d3305"
+   }
+  },
+  "zufall-2": {
+   "aus": {
+    "tot": "ed50ce245dfc1308f896e057825af7d2f65f7523c6f95644e84ef17d6644b4d0",
+    "vorschauFlaeche": "60efc13e4f385f95368262521fb9a0fe0f3bd412dad5d1ad84f06f96d5b028a1",
+    "vorschauTerritory": "45acb0b823202f1b78bc798c5aee725e29b7d4abbcf7262bf51fa82f0316f399"
+   },
+   "an": {
+    "tot": "ed50ce245dfc1308f896e057825af7d2f65f7523c6f95644e84ef17d6644b4d0",
+    "vorschauFlaeche": "60efc13e4f385f95368262521fb9a0fe0f3bd412dad5d1ad84f06f96d5b028a1",
+    "vorschauTerritory": "45acb0b823202f1b78bc798c5aee725e29b7d4abbcf7262bf51fa82f0316f399"
+   }
+  },
+  "zufall-3": {
+   "aus": {
+    "tot": "b3ae0ad92945d21ddf31bf88c372f2958b1d104fc93408b5a7d85f6041c38423",
+    "vorschauFlaeche": "0f56a92b4ee43d7bcd0f75475cf2658c66cc87bbc2ed0f85d7d0497b3632720c",
+    "vorschauTerritory": "fb40dd5297c4722bd2a112e767ad1b2913848f512bbe1b21a533a7253b376194"
+   },
+   "an": {
+    "tot": "b3ae0ad92945d21ddf31bf88c372f2958b1d104fc93408b5a7d85f6041c38423",
+    "vorschauFlaeche": "0f56a92b4ee43d7bcd0f75475cf2658c66cc87bbc2ed0f85d7d0497b3632720c",
+    "vorschauTerritory": "fb40dd5297c4722bd2a112e767ad1b2913848f512bbe1b21a533a7253b376194"
+   }
+  },
+  "zufall-4": {
+   "aus": {
+    "tot": "e7573f2a971999a6367604780929d858f964e3e7d66d728fe7d463a1fa30435d",
+    "vorschauFlaeche": "c4ea55ee008cc4d9623161b7367ddd0f9b1f87db98b68231c9e009a8d6a218f9",
+    "vorschauTerritory": "2783d6d7dcd02bd7c9c4b198490d5c3b98d46061571c6ddb7d67db6164c9e4be"
+   },
+   "an": {
+    "tot": "e7573f2a971999a6367604780929d858f964e3e7d66d728fe7d463a1fa30435d",
+    "vorschauFlaeche": "c4ea55ee008cc4d9623161b7367ddd0f9b1f87db98b68231c9e009a8d6a218f9",
+    "vorschauTerritory": "2783d6d7dcd02bd7c9c4b198490d5c3b98d46061571c6ddb7d67db6164c9e4be"
+   }
+  },
+  "zufall-5": {
+   "aus": {
+    "tot": "e696761904d3e0c58cb9d27dc6686ac64d8b1c99a02d3661a73b544dec9d257f",
+    "vorschauFlaeche": "1ce9d322aa990da47f833a62b2147737436853b3a07b02a92c555159c29ebf07",
+    "vorschauTerritory": "b3a7c2166c8b406d5caaece251b5d3dd7b94596f7283516dd0eee2af5f8afe53"
+   },
+   "an": {
+    "tot": "d65c581062ef8ac6bca24a6ac6028920ca8067c165d75887525f23a8b43e71de",
+    "vorschauFlaeche": "f6e53b5aeb3be149377ade4db8bc524a23b6021293875854c8244aff71dbe83a",
+    "vorschauTerritory": "d7d8fcfcaf01acd035173c1cfe389d8561248169ca117c4e0b8d11181aad9d10"
+   }
+  },
+  "zufall-6": {
+   "aus": {
+    "tot": "49408d8d0aea0b2569d92392f7e2ca0d8da0ba89fcf1354bb12384d1412919d9",
+    "vorschauFlaeche": "a96c7283e04212d4fc33d135e15621c9b2fefda62b1750cd7585d446b6bfa5f6",
+    "vorschauTerritory": "97eb842e6188fc6f143c568e05857013b5766568a89d0fe0e897e4fc93832592"
+   },
+   "an": {
+    "tot": "49408d8d0aea0b2569d92392f7e2ca0d8da0ba89fcf1354bb12384d1412919d9",
+    "vorschauFlaeche": "a96c7283e04212d4fc33d135e15621c9b2fefda62b1750cd7585d446b6bfa5f6",
+    "vorschauTerritory": "97eb842e6188fc6f143c568e05857013b5766568a89d0fe0e897e4fc93832592"
+   }
+  },
+  "zufall-7": {
+   "aus": {
+    "tot": "dc1ce79a47874108c1159c21e31b699ea9f3d7f8bb8e986f91edc391b007d8a0",
+    "vorschauFlaeche": "22c8a5045edc279d5ab6582a31e4e0b18505e0e4933c748984e853ab0a9f27de",
+    "vorschauTerritory": "67e861432943e219c99f516da37186f4095e01a6152598610c9a1421b7d416aa"
+   },
+   "an": {
+    "tot": "41a702cf0adffacb82a6095b8c90989ee036a11174d11e6ded31d0f181c67009",
+    "vorschauFlaeche": "fb9d69303926982a2003be75c66b7bd43cc9f5d5e73610e6ad7ce4c5af9bf810",
+    "vorschauTerritory": "7ce1bc8cae9a0db466fbc75729cd155545f727e055b46f2b361e29276444dea0"
+   }
+  },
+  "zufall-8": {
+   "aus": {
+    "tot": "f541bfe50f4fbe71875ee6e8664c4aa19a56f8fa1d529d9e5295b9a36ec30a84",
+    "vorschauFlaeche": "d9fa326cb3792a5b31f76bf7766b5b2b727501c900eb25a6b2e0bf66f8ea2447",
+    "vorschauTerritory": "4d4b382e2e1443c56427e3058aeb452ea5af615ee2380016e0b0480c486603de"
+   },
+   "an": {
+    "tot": "f541bfe50f4fbe71875ee6e8664c4aa19a56f8fa1d529d9e5295b9a36ec30a84",
+    "vorschauFlaeche": "d9fa326cb3792a5b31f76bf7766b5b2b727501c900eb25a6b2e0bf66f8ea2447",
+    "vorschauTerritory": "4d4b382e2e1443c56427e3058aeb452ea5af615ee2380016e0b0480c486603de"
+   }
+  },
+  "zufall-9": {
+   "aus": {
+    "tot": "19d8fb0619f488354c38953b4a31ae5c4fe733022843d9c50c36f92a96dd409b",
+    "vorschauFlaeche": "ec77b9d7addea8f7ff3bba30e3d436f3344b50f9b8d65176da686466efae5c8b",
+    "vorschauTerritory": "bd55768848f6d6cb8ab638a0984b25ce49cf30d11277bf35530e49733f36aeb1"
+   },
+   "an": {
+    "tot": "3f4d2e8fb5e84aa03cfa5a7128764c0215fe8e922a0a4492f17b6f6b83936b9d",
+    "vorschauFlaeche": "02e93b1001a529073e0d65fe588cf5af0b784fcd30961af6d2ba8f4a3b177ab6",
+    "vorschauTerritory": "7e40973ced0cdeeabe20bffbb79c149e146d19ae9f471277e953351aa8719c0d"
+   }
+  },
+  "zufall-10": {
+   "aus": {
+    "tot": "bc841cc0d7faffe9cc8147c875da6332c2ca4cf2a196d32d4b16509cc07c9138",
+    "vorschauFlaeche": "112cc612b70d5ab1b6176fe03be4fc924700d29cd82439964ac718cfe1cce32c",
+    "vorschauTerritory": "1da2132cc6f798a5883cdd2f23862fc891109ea1f9f78521bb3a8f492fd932b2"
+   },
+   "an": {
+    "tot": "bc841cc0d7faffe9cc8147c875da6332c2ca4cf2a196d32d4b16509cc07c9138",
+    "vorschauFlaeche": "112cc612b70d5ab1b6176fe03be4fc924700d29cd82439964ac718cfe1cce32c",
+    "vorschauTerritory": "1da2132cc6f798a5883cdd2f23862fc891109ea1f9f78521bb3a8f492fd932b2"
+   }
+  },
+  "zufall-11": {
+   "aus": {
+    "tot": "989a3ac74882c19a776f78bd1cf952081ec03e647f3b040eac8fd6ca47bc8cf4",
+    "vorschauFlaeche": "856e7ae43e8dbd9b857264ac73fe0732cfba1844f9388e26f7bb09873ee783cc",
+    "vorschauTerritory": "f412a6716b78afc5af3564340a1d6637d216a260115f563d2eec58dad94c0c56"
+   },
+   "an": {
+    "tot": "989a3ac74882c19a776f78bd1cf952081ec03e647f3b040eac8fd6ca47bc8cf4",
+    "vorschauFlaeche": "856e7ae43e8dbd9b857264ac73fe0732cfba1844f9388e26f7bb09873ee783cc",
+    "vorschauTerritory": "f412a6716b78afc5af3564340a1d6637d216a260115f563d2eec58dad94c0c56"
+   }
+  },
+  "zufall-12": {
+   "aus": {
+    "tot": "8da15a1830fce10e37725a6234dca65d68f8443eccd27b896813b0cee984dbf2",
+    "vorschauFlaeche": "71245f41f69bc5c866994f4eee96705022d7248781a5655841f1aa980a6047e6",
+    "vorschauTerritory": "338f1211f0f331ddf0d2bbf4e04ee1a89c1af872de0e8f61b3092b0049e8e5da"
+   },
+   "an": {
+    "tot": "8da15a1830fce10e37725a6234dca65d68f8443eccd27b896813b0cee984dbf2",
+    "vorschauFlaeche": "71245f41f69bc5c866994f4eee96705022d7248781a5655841f1aa980a6047e6",
+    "vorschauTerritory": "338f1211f0f331ddf0d2bbf4e04ee1a89c1af872de0e8f61b3092b0049e8e5da"
+   }
+  },
+  "zufall-13": {
+   "aus": {
+    "tot": "43610d0a0841aa9d5e6a58564adee0d59526dbe24f663cb1bc08c274fa5a4f4c",
+    "vorschauFlaeche": "f2aa1ead5e6dea634a295c85432c4deeaa98f09573555d56ff2862a451fb7c60",
+    "vorschauTerritory": "75cb04134dd1099666303a62ff623aa7a62c6287bf76c73593d16970702ddbee"
+   },
+   "an": {
+    "tot": "43610d0a0841aa9d5e6a58564adee0d59526dbe24f663cb1bc08c274fa5a4f4c",
+    "vorschauFlaeche": "f2aa1ead5e6dea634a295c85432c4deeaa98f09573555d56ff2862a451fb7c60",
+    "vorschauTerritory": "75cb04134dd1099666303a62ff623aa7a62c6287bf76c73593d16970702ddbee"
+   }
+  },
+  "zufall-14": {
+   "aus": {
+    "tot": "19d2f13729dff0e11dd01eed9c98b032c15f396d8a6572d07b14e828981ab3df",
+    "vorschauFlaeche": "9f03fc43786e3188f983da0eb9ba4fb2356a518d1434fd4e42f25cb248de7adc",
+    "vorschauTerritory": "f8b2fffada54c3ab8a231155999d91a96d7952851d813a9186f423dba9572e81"
+   },
+   "an": {
+    "tot": "19d2f13729dff0e11dd01eed9c98b032c15f396d8a6572d07b14e828981ab3df",
+    "vorschauFlaeche": "9f03fc43786e3188f983da0eb9ba4fb2356a518d1434fd4e42f25cb248de7adc",
+    "vorschauTerritory": "f8b2fffada54c3ab8a231155999d91a96d7952851d813a9186f423dba9572e81"
+   }
+  },
+  "zufall-15": {
+   "aus": {
+    "tot": "c19190a40107bd7d16729bea5b228278377bb8ce1360d2d89b6bacc5f6b58913",
+    "vorschauFlaeche": "11bec673e896a9c4524ceb86277d2e8490b5accf01d65691a02bf5dce6bb5f09",
+    "vorschauTerritory": "be0a887adec1319c92033f68489054914e6fb6c78e51396f007e91745da97488"
+   },
+   "an": {
+    "tot": "c19190a40107bd7d16729bea5b228278377bb8ce1360d2d89b6bacc5f6b58913",
+    "vorschauFlaeche": "11bec673e896a9c4524ceb86277d2e8490b5accf01d65691a02bf5dce6bb5f09",
+    "vorschauTerritory": "be0a887adec1319c92033f68489054914e6fb6c78e51396f007e91745da97488"
+   }
+  },
+  "zufall-16": {
+   "aus": {
+    "tot": "91aeb94d99380a1fc19a5f2f8d1d4771bd1e26ad03678c9092677660541b5a9b",
+    "vorschauFlaeche": "a91f1025d22b75b2b66125bd631d277974f68434f2a8cfba0211486f910362fb",
+    "vorschauTerritory": "e9ffc0d48d478a1af803d590033ec17a68b5e8d16605c3e2d238e542b7494df7"
+   },
+   "an": {
+    "tot": "91aeb94d99380a1fc19a5f2f8d1d4771bd1e26ad03678c9092677660541b5a9b",
+    "vorschauFlaeche": "a91f1025d22b75b2b66125bd631d277974f68434f2a8cfba0211486f910362fb",
+    "vorschauTerritory": "e9ffc0d48d478a1af803d590033ec17a68b5e8d16605c3e2d238e542b7494df7"
+   }
+  },
+  "zufall-17": {
+   "aus": {
+    "tot": "e247498cb3184bba185930c009db25b89e32152ac9d2f6454c0ebf49dcbc55ce",
+    "vorschauFlaeche": "0f8a1946110929fb336552979a93e00c6b515e3e72016cebb492d1c431c1c772",
+    "vorschauTerritory": "c4751c3da7d60e7a2f2992a33a00b4ca427457c039128125c03be867004a33a3"
+   },
+   "an": {
+    "tot": "e247498cb3184bba185930c009db25b89e32152ac9d2f6454c0ebf49dcbc55ce",
+    "vorschauFlaeche": "0f8a1946110929fb336552979a93e00c6b515e3e72016cebb492d1c431c1c772",
+    "vorschauTerritory": "c4751c3da7d60e7a2f2992a33a00b4ca427457c039128125c03be867004a33a3"
+   }
+  },
+  "zufall-18": {
+   "aus": {
+    "tot": "9e01e80428ee2432ced44d1f6a14400009448f0cc3d5befb0db28557fa41e59d",
+    "vorschauFlaeche": "ede2ae140fb35a4cf3df2902f07b9430345da5abafa602cf8c36d5551f8a8719",
+    "vorschauTerritory": "b0272a7819ea2f9806e3ee268cbc19caf8f1aa38fde89ad52263736dea1c95b0"
+   },
+   "an": {
+    "tot": "9e01e80428ee2432ced44d1f6a14400009448f0cc3d5befb0db28557fa41e59d",
+    "vorschauFlaeche": "ede2ae140fb35a4cf3df2902f07b9430345da5abafa602cf8c36d5551f8a8719",
+    "vorschauTerritory": "b0272a7819ea2f9806e3ee268cbc19caf8f1aa38fde89ad52263736dea1c95b0"
+   }
+  },
+  "zufall-19": {
+   "aus": {
+    "tot": "672269e7b5b6641ef1d321042154d8462fffba965c33c71922e48d54fc753563",
+    "vorschauFlaeche": "098a52b5455a00beb6e76b1c86f6eb5fa5e9d68eb34388cf9836fa44ca70216b",
+    "vorschauTerritory": "a2d8d47b0b70f2dbf74d94e5c62501bf0354c25988d397e04f12581cf10b2c39"
+   },
+   "an": {
+    "tot": "672269e7b5b6641ef1d321042154d8462fffba965c33c71922e48d54fc753563",
+    "vorschauFlaeche": "098a52b5455a00beb6e76b1c86f6eb5fa5e9d68eb34388cf9836fa44ca70216b",
+    "vorschauTerritory": "a2d8d47b0b70f2dbf74d94e5c62501bf0354c25988d397e04f12581cf10b2c39"
+   }
+  },
+  "zufall-20": {
+   "aus": {
+    "tot": "1d99830dc425530673614dce3ab26491fe82528fe9800b55bcc35a7c4cdc8554",
+    "vorschauFlaeche": "770055d4bbf0873a03ec6337fa97ab9d738d0d09befaa3665d1ff1d9720da22a",
+    "vorschauTerritory": "9da1fad71d39b967cade171324b465192f680afea43aa36a7f9576255732c7e9"
+   },
+   "an": {
+    "tot": "1d99830dc425530673614dce3ab26491fe82528fe9800b55bcc35a7c4cdc8554",
+    "vorschauFlaeche": "770055d4bbf0873a03ec6337fa97ab9d738d0d09befaa3665d1ff1d9720da22a",
+    "vorschauTerritory": "9da1fad71d39b967cade171324b465192f680afea43aa36a7f9576255732c7e9"
+   }
+  },
+  "zufall-21": {
+   "aus": {
+    "tot": "b450d124b7117a32b030c1ca9befdffd48f912b1a737e7cd9e4eaee793e0e042",
+    "vorschauFlaeche": "f2de78765321e0da25dea08f79a76eadf0414d561be5bda14ea52f464e80fba4",
+    "vorschauTerritory": "61fc0a5cc2c58a520b88e51c10dc33edcf5f08e556da55c0fdb344a7b38845d9"
+   },
+   "an": {
+    "tot": "b450d124b7117a32b030c1ca9befdffd48f912b1a737e7cd9e4eaee793e0e042",
+    "vorschauFlaeche": "f2de78765321e0da25dea08f79a76eadf0414d561be5bda14ea52f464e80fba4",
+    "vorschauTerritory": "61fc0a5cc2c58a520b88e51c10dc33edcf5f08e556da55c0fdb344a7b38845d9"
+   }
+  },
+  "zufall-22": {
+   "aus": {
+    "tot": "4cb59ddb8b0a5544d108ad9e9091193b66a416648f2d8fedc9688dde91e06fcb",
+    "vorschauFlaeche": "7a7b6fac87655eb509b88e4e6ce28c4ded8baf03cf37c962968399f1989c6cf5",
+    "vorschauTerritory": "26f910df2966075251848826262b8c4bbbe4182af34841c720b43c0767122459"
+   },
+   "an": {
+    "tot": "4cb59ddb8b0a5544d108ad9e9091193b66a416648f2d8fedc9688dde91e06fcb",
+    "vorschauFlaeche": "7a7b6fac87655eb509b88e4e6ce28c4ded8baf03cf37c962968399f1989c6cf5",
+    "vorschauTerritory": "26f910df2966075251848826262b8c4bbbe4182af34841c720b43c0767122459"
+   }
+  },
+  "zufall-23": {
+   "aus": {
+    "tot": "73149ec10431f2822f43373ed6d5cec145a08c4724f912c3f33d968dac246721",
+    "vorschauFlaeche": "f8cd0bb5a2b54055d41b51eca083ec738a5b9ed7a3dd823873e387d91e0d9280",
+    "vorschauTerritory": "8f3904059af548752686bad9bf3e6b24e2fc364f79e1cf84c183f6e4c76e00c0"
+   },
+   "an": {
+    "tot": "73149ec10431f2822f43373ed6d5cec145a08c4724f912c3f33d968dac246721",
+    "vorschauFlaeche": "f8cd0bb5a2b54055d41b51eca083ec738a5b9ed7a3dd823873e387d91e0d9280",
+    "vorschauTerritory": "8f3904059af548752686bad9bf3e6b24e2fc364f79e1cf84c183f6e4c76e00c0"
+   }
+  },
+  "zufall-24": {
+   "aus": {
+    "tot": "633362c5e6bd7b92727d755f558f89fb923c4e0b0c7828f2732b806d1f134b60",
+    "vorschauFlaeche": "010e2d4649183919b4fd6b89e451bdb98137ff18d1bbfd62073f72609d1b5d0c",
+    "vorschauTerritory": "9be31e61f037cb482d440068a3f6bdf80893fd04251cc0d1a67bf16b483cd9cb"
+   },
+   "an": {
+    "tot": "633362c5e6bd7b92727d755f558f89fb923c4e0b0c7828f2732b806d1f134b60",
+    "vorschauFlaeche": "010e2d4649183919b4fd6b89e451bdb98137ff18d1bbfd62073f72609d1b5d0c",
+    "vorschauTerritory": "9be31e61f037cb482d440068a3f6bdf80893fd04251cc0d1a67bf16b483cd9cb"
+   }
+  },
+  "zufall-25": {
+   "aus": {
+    "tot": "ac95eee42d069905fd75bf906f409fca35d5c0ebf759900fde4d952ebaa608d3",
+    "vorschauFlaeche": "88d1852e17a641e3f2130215cb4273e50b35810980af4d792ef5e598962e6536",
+    "vorschauTerritory": "14d1940e6f20cbbd5bf8342cb4df9301a3a959fa9a3367c70e234e4b6ef414e2"
+   },
+   "an": {
+    "tot": "ac95eee42d069905fd75bf906f409fca35d5c0ebf759900fde4d952ebaa608d3",
+    "vorschauFlaeche": "88d1852e17a641e3f2130215cb4273e50b35810980af4d792ef5e598962e6536",
+    "vorschauTerritory": "14d1940e6f20cbbd5bf8342cb4df9301a3a959fa9a3367c70e234e4b6ef414e2"
+   }
+  },
+  "zufall-26": {
+   "aus": {
+    "tot": "d98888da910fb3f6e2b91413970fa930e8dd61f19704c16d86114d8f111455a0",
+    "vorschauFlaeche": "09db4c0e41d97a298e5a7c57ae023c7a64be8c59bc0ae666fb2e26a9cf82933a",
+    "vorschauTerritory": "ddaca2d70b9a468956efc9d903ece65717cbfd6978ac17d01593377aed1fbca0"
+   },
+   "an": {
+    "tot": "d98888da910fb3f6e2b91413970fa930e8dd61f19704c16d86114d8f111455a0",
+    "vorschauFlaeche": "09db4c0e41d97a298e5a7c57ae023c7a64be8c59bc0ae666fb2e26a9cf82933a",
+    "vorschauTerritory": "ddaca2d70b9a468956efc9d903ece65717cbfd6978ac17d01593377aed1fbca0"
+   }
+  },
+  "zufall-27": {
+   "aus": {
+    "tot": "f4f35c80db2d9ce50a20c0ab49e8de7666774bb00d537202d2b0a2eb987a37e8",
+    "vorschauFlaeche": "14daddb50be8e4761dd99f22e85b945d3c1fa6b60c5af9384b5a300425d458c5",
+    "vorschauTerritory": "ea950b42b15507577d09fd14d2861762d83bbb67a40b993abd3d3b72f542ed93"
+   },
+   "an": {
+    "tot": "f4f35c80db2d9ce50a20c0ab49e8de7666774bb00d537202d2b0a2eb987a37e8",
+    "vorschauFlaeche": "14daddb50be8e4761dd99f22e85b945d3c1fa6b60c5af9384b5a300425d458c5",
+    "vorschauTerritory": "ea950b42b15507577d09fd14d2861762d83bbb67a40b993abd3d3b72f542ed93"
+   }
+  },
+  "zufall-28": {
+   "aus": {
+    "tot": "c08348bbc59134be94439d792891adf813594a7b08e2c26b3fe3d2975c45eb52",
+    "vorschauFlaeche": "89b4f2095e41861678a1508b9d9838ad161a6b058dbfccd74252fdc839a95387",
+    "vorschauTerritory": "741e1f3d0d8f4225243d574c63080c582e2541887e7727a742dee770dd3f083a"
+   },
+   "an": {
+    "tot": "c08348bbc59134be94439d792891adf813594a7b08e2c26b3fe3d2975c45eb52",
+    "vorschauFlaeche": "89b4f2095e41861678a1508b9d9838ad161a6b058dbfccd74252fdc839a95387",
+    "vorschauTerritory": "741e1f3d0d8f4225243d574c63080c582e2541887e7727a742dee770dd3f083a"
+   }
+  },
+  "zufall-29": {
+   "aus": {
+    "tot": "62e0bca736d1fc9eced6caa45fd4fcad2b01a7695cafe4b204861d05e9596e71",
+    "vorschauFlaeche": "c69e90b8ef78952c8f9ea8446633b2362150544c2f960ea6fe7b1e6dc82da9bc",
+    "vorschauTerritory": "2e6f1b2338af5dd22cfb63a77b11d1e2a6b221f80966675f74fa62b269e641a0"
+   },
+   "an": {
+    "tot": "62e0bca736d1fc9eced6caa45fd4fcad2b01a7695cafe4b204861d05e9596e71",
+    "vorschauFlaeche": "c69e90b8ef78952c8f9ea8446633b2362150544c2f960ea6fe7b1e6dc82da9bc",
+    "vorschauTerritory": "2e6f1b2338af5dd22cfb63a77b11d1e2a6b221f80966675f74fa62b269e641a0"
+   }
+  },
+  "zufall-30": {
+   "aus": {
+    "tot": "009d451074964318b4f45510ea2a326410ad7352bd603931d34e4d9f2ec4343b",
+    "vorschauFlaeche": "712286e0e7609c97c807bd9ce2e12d8b2799d4faf430957e7dee55d7f7ad3c80",
+    "vorschauTerritory": "6a3ffd0fdfe178d166b4c0e61467e7ad7828e598fb23fe1c10590742291bffdf"
+   },
+   "an": {
+    "tot": "009d451074964318b4f45510ea2a326410ad7352bd603931d34e4d9f2ec4343b",
+    "vorschauFlaeche": "712286e0e7609c97c807bd9ce2e12d8b2799d4faf430957e7dee55d7f7ad3c80",
+    "vorschauTerritory": "6a3ffd0fdfe178d166b4c0e61467e7ad7828e598fb23fe1c10590742291bffdf"
+   }
+  },
+  "zufall-31": {
+   "aus": {
+    "tot": "351e2379663ca2202605216110922805f5bf15870d02856f90f99c2eb5f799b7",
+    "vorschauFlaeche": "9af661b074544da73e0ccf2d2010eb9d0d5cb3577fd75280d278587bf8e1d7b8",
+    "vorschauTerritory": "8ea8b0bd534aed2274f13e6093ce4fa90043cb3087f13f63aff10a7ed2cf00a5"
+   },
+   "an": {
+    "tot": "351e2379663ca2202605216110922805f5bf15870d02856f90f99c2eb5f799b7",
+    "vorschauFlaeche": "9af661b074544da73e0ccf2d2010eb9d0d5cb3577fd75280d278587bf8e1d7b8",
+    "vorschauTerritory": "8ea8b0bd534aed2274f13e6093ce4fa90043cb3087f13f63aff10a7ed2cf00a5"
+   }
+  },
+  "zufall-32": {
+   "aus": {
+    "tot": "155b033484ea29ceba41ff1134191b1392d8934a8d47815ee59b52a3fb8d7d73",
+    "vorschauFlaeche": "f3cb54e9ea328642de0c3cbdd2a4d508c6cee35465af4f51857cdf6360e976c7",
+    "vorschauTerritory": "32e01b6f7ddb74221db38e5704bb8d8d93d32046166d3c2e0c190e4f9cdf1b1b"
+   },
+   "an": {
+    "tot": "155b033484ea29ceba41ff1134191b1392d8934a8d47815ee59b52a3fb8d7d73",
+    "vorschauFlaeche": "f3cb54e9ea328642de0c3cbdd2a4d508c6cee35465af4f51857cdf6360e976c7",
+    "vorschauTerritory": "32e01b6f7ddb74221db38e5704bb8d8d93d32046166d3c2e0c190e4f9cdf1b1b"
+   }
+  },
+  "zufall-33": {
+   "aus": {
+    "tot": "fc24484e1af0e4fc541747e126c958713744a7cf6b4f13e6f77e7792dd938d22",
+    "vorschauFlaeche": "745c57285d87146a042c1c86a862bd017cb5bb9d61570ef327e783f038693ed4",
+    "vorschauTerritory": "822f35e035b89cee28e589ac4230a31fa8ef4af37f049977c22a4b9ee29da08d"
+   },
+   "an": {
+    "tot": "fc24484e1af0e4fc541747e126c958713744a7cf6b4f13e6f77e7792dd938d22",
+    "vorschauFlaeche": "745c57285d87146a042c1c86a862bd017cb5bb9d61570ef327e783f038693ed4",
+    "vorschauTerritory": "822f35e035b89cee28e589ac4230a31fa8ef4af37f049977c22a4b9ee29da08d"
+   }
+  },
+  "zufall-34": {
+   "aus": {
+    "tot": "c1a72e65f2bea5780d99be2f39b01c1cac4df6967058b37ef8f44cc2302d1c8a",
+    "vorschauFlaeche": "cdf729a939131ca1e0ecc3d40e7fc585a0a97c0ddad3b86d0f3cc47323de6fa5",
+    "vorschauTerritory": "dc0e09b928b5427e75973c8761a9f712c58a2a72b923fc65e6e22a5a0b3f61f7"
+   },
+   "an": {
+    "tot": "c1a72e65f2bea5780d99be2f39b01c1cac4df6967058b37ef8f44cc2302d1c8a",
+    "vorschauFlaeche": "cdf729a939131ca1e0ecc3d40e7fc585a0a97c0ddad3b86d0f3cc47323de6fa5",
+    "vorschauTerritory": "dc0e09b928b5427e75973c8761a9f712c58a2a72b923fc65e6e22a5a0b3f61f7"
+   }
+  },
+  "zufall-35": {
+   "aus": {
+    "tot": "ae200d1cd07eaaa2740a8cf85aa92f13a7460c855e65401835de7f745ff4b6b2",
+    "vorschauFlaeche": "5dc5cc6e1fc1831dfb680a1cd275e38c062e58650b01bc33c6ed01a62cd0e253",
+    "vorschauTerritory": "6943f381330b7105637ea8a6a12c717e15fc3c56bbd80cab93710afaa6cc9b83"
+   },
+   "an": {
+    "tot": "ae200d1cd07eaaa2740a8cf85aa92f13a7460c855e65401835de7f745ff4b6b2",
+    "vorschauFlaeche": "5dc5cc6e1fc1831dfb680a1cd275e38c062e58650b01bc33c6ed01a62cd0e253",
+    "vorschauTerritory": "6943f381330b7105637ea8a6a12c717e15fc3c56bbd80cab93710afaa6cc9b83"
+   }
+  },
+  "zufall-36": {
+   "aus": {
+    "tot": "34a483d444930e853009614085c08de7483d56555278a41db1fd8b430d309601",
+    "vorschauFlaeche": "62da5df06d00780ac021092a93b460ebb5eca03e830614aca655a9e64da2e0ba",
+    "vorschauTerritory": "ec95452954959a12270bbb4a0e46eb9349bac71cf2003bd2b9981ec5f8beff4d"
+   },
+   "an": {
+    "tot": "34a483d444930e853009614085c08de7483d56555278a41db1fd8b430d309601",
+    "vorschauFlaeche": "62da5df06d00780ac021092a93b460ebb5eca03e830614aca655a9e64da2e0ba",
+    "vorschauTerritory": "ec95452954959a12270bbb4a0e46eb9349bac71cf2003bd2b9981ec5f8beff4d"
+   }
+  },
+  "zufall-37": {
+   "aus": {
+    "tot": "eb04a18a32ea601a28ba68e715dd9669ac171de6559e57a694b2439ac4986501",
+    "vorschauFlaeche": "eb5babe31fe4bcbfcaf6e6d1087884b42bc3802e7da73e542e2eea0c1a597d98",
+    "vorschauTerritory": "2b8330e6e56cd97ee832904cfa5a33620d0f7116ec27f5b0e2ade08983dc5c01"
+   },
+   "an": {
+    "tot": "eb04a18a32ea601a28ba68e715dd9669ac171de6559e57a694b2439ac4986501",
+    "vorschauFlaeche": "eb5babe31fe4bcbfcaf6e6d1087884b42bc3802e7da73e542e2eea0c1a597d98",
+    "vorschauTerritory": "2b8330e6e56cd97ee832904cfa5a33620d0f7116ec27f5b0e2ade08983dc5c01"
+   }
+  },
+  "zufall-38": {
+   "aus": {
+    "tot": "ae61aa29c006518ca099ac521bacedd6214106c196e7f63e94ea87696ef2e60c",
+    "vorschauFlaeche": "28045117bb79551a6e7cdc9c4317f3674c5a7226ed688ca290ac85d01e0cd78a",
+    "vorschauTerritory": "b54f749688e0eff08169af5d9683a71bb907c3da25819b971a6644b1bbbd2317"
+   },
+   "an": {
+    "tot": "ae61aa29c006518ca099ac521bacedd6214106c196e7f63e94ea87696ef2e60c",
+    "vorschauFlaeche": "28045117bb79551a6e7cdc9c4317f3674c5a7226ed688ca290ac85d01e0cd78a",
+    "vorschauTerritory": "b54f749688e0eff08169af5d9683a71bb907c3da25819b971a6644b1bbbd2317"
+   }
+  },
+  "zufall-39": {
+   "aus": {
+    "tot": "bc5531fd3175d6f8a55d06087808eb487758db946fdca385740cbad5a41ee3a0",
+    "vorschauFlaeche": "a41ff03176d37e98375f16d390d6d8d7ae678ff235533ad311f64e681164467c",
+    "vorschauTerritory": "861ad18df66a1a6b9711b9a07c2793bf2f69bc11d09259aff2004306418cb1d5"
+   },
+   "an": {
+    "tot": "bc5531fd3175d6f8a55d06087808eb487758db946fdca385740cbad5a41ee3a0",
+    "vorschauFlaeche": "a41ff03176d37e98375f16d390d6d8d7ae678ff235533ad311f64e681164467c",
+    "vorschauTerritory": "861ad18df66a1a6b9711b9a07c2793bf2f69bc11d09259aff2004306418cb1d5"
+   }
+  },
+  "zufall-40": {
+   "aus": {
+    "tot": "f29a32f99c921210a8f1b224c0b74dcee9a5f8ca13b2d5144362f308f2219068",
+    "vorschauFlaeche": "c7207fdc5458ca9c9994b8237dd00949289e125e617c16b7f13eccbf93e3925d",
+    "vorschauTerritory": "5e05a19dbe98013a4216fe55d1bde84ca9b4803bad5c23e41aacf9576a4e1cd9"
+   },
+   "an": {
+    "tot": "3aa8a1c5cb133fbb0e9170621e774a938b0db26731ae3d2706b528e85414c094",
+    "vorschauFlaeche": "645e3cb9e1d039c8ecdf13a0bd318c3fc2c9d87a7e7477bde46299a050d78a71",
+    "vorschauTerritory": "ce4a6929d44717c87c85ea2a0988968936a286e09ee1f42d9434d9bd05e24a25"
+   }
+  },
+  "zufall-41": {
+   "aus": {
+    "tot": "470707d1cad3bd746cf4b846fedde6acd213b147ce7b8413889b074e949c99f1",
+    "vorschauFlaeche": "ef9b72c8da372e01801aa8575d69757a3648ab3cbf6333f8cedd3c9264c8dd57",
+    "vorschauTerritory": "5c03063a09a430d805228743ded8ece59b887855b3d15fb78f801839ef36faa3"
+   },
+   "an": {
+    "tot": "470707d1cad3bd746cf4b846fedde6acd213b147ce7b8413889b074e949c99f1",
+    "vorschauFlaeche": "ef9b72c8da372e01801aa8575d69757a3648ab3cbf6333f8cedd3c9264c8dd57",
+    "vorschauTerritory": "5c03063a09a430d805228743ded8ece59b887855b3d15fb78f801839ef36faa3"
+   }
+  },
+  "zufall-42": {
+   "aus": {
+    "tot": "e6ef658e67e8b575d2560c6ae43bb7bfe36b63181b3aee66741640c24bdc905c",
+    "vorschauFlaeche": "11e9ef441d858260e57cb21ffcd0d84fe42865cff18eaf756d6aa2b5ece25251",
+    "vorschauTerritory": "f41e634d28e047d133b077580e46528f18bde3deb64948524fe73efda26b0da1"
+   },
+   "an": {
+    "tot": "ef73b6c2522149e93818fb69d7b8ddef33b1adf301c967e38289cf8a454991bf",
+    "vorschauFlaeche": "f5e19cec55413ae43a6221aeb70d0fed2b28e0a9de418ebfdac545736c366f46",
+    "vorschauTerritory": "ca03acefe8f838f94d226fb3e022da448a7836fbfa7b042c07c51dc5c128d297"
+   }
+  },
+  "zufall-43": {
+   "aus": {
+    "tot": "c893e6e8535a3655f7a8ca352fb982f41fd4501a2f1a178a18b35ddbdb5a02dd",
+    "vorschauFlaeche": "9e7fb1f689ffa0076d71f56c5e9e1515dbc862643ed4d65752a86171c530e6a8",
+    "vorschauTerritory": "6c762b30cab2a0568a6f5b5d416e117a8dcdca2a5d50ea52feba2e78571e413b"
+   },
+   "an": {
+    "tot": "c893e6e8535a3655f7a8ca352fb982f41fd4501a2f1a178a18b35ddbdb5a02dd",
+    "vorschauFlaeche": "9e7fb1f689ffa0076d71f56c5e9e1515dbc862643ed4d65752a86171c530e6a8",
+    "vorschauTerritory": "6c762b30cab2a0568a6f5b5d416e117a8dcdca2a5d50ea52feba2e78571e413b"
+   }
+  },
+  "zufall-44": {
+   "aus": {
+    "tot": "b9a8b49a4dd684f92dbf915d3f145343580a2b201842eec9ff8ae06437ae5a82",
+    "vorschauFlaeche": "66efa1602cfc4034932d9a57cbc2a37932b17f046c758141078a5c7efa9a7445",
+    "vorschauTerritory": "5448ec83755aae7e6cc7a32e09a427b94056faafc9138239600288cc19d97a8b"
+   },
+   "an": {
+    "tot": "a054e71b56d298ca74e4c0291dd368dd2994651ddb6b026e9b2830167c1731fb",
+    "vorschauFlaeche": "33a5ccfbb254330118ab6af335d714a670bd634b4770b9be7671ef82327d1e4e",
+    "vorschauTerritory": "66d7a03fad016cce06b7fd161d26b3b1090f2051710f49156ac5ecf9d660e6d9"
+   }
+  },
+  "zufall-45": {
+   "aus": {
+    "tot": "db92204623e0478223f0adadd4c61358e6ccb2fc95b8002428852bbadb0270a8",
+    "vorschauFlaeche": "856edcb044e061229fbf5873eb8892c7d03935895540342c5972719a52afa01b",
+    "vorschauTerritory": "25cf36829aa529db1109d937238da9c63097144664906d68dd98130d24abfcef"
+   },
+   "an": {
+    "tot": "db92204623e0478223f0adadd4c61358e6ccb2fc95b8002428852bbadb0270a8",
+    "vorschauFlaeche": "856edcb044e061229fbf5873eb8892c7d03935895540342c5972719a52afa01b",
+    "vorschauTerritory": "25cf36829aa529db1109d937238da9c63097144664906d68dd98130d24abfcef"
+   }
+  },
+  "zufall-46": {
+   "aus": {
+    "tot": "dcde75a0a96f4cea2ab81a23f049ae89dee4a1f4870ab2a8b3f09f0e90ba2456",
+    "vorschauFlaeche": "d631411764445d26cec517911e7274a12352b8930cfce7a043ac608001caa4dd",
+    "vorschauTerritory": "d6ba8ddddf2bd5e9d7519643093f47dde7c10d3110384af11678f6fe502c5d52"
+   },
+   "an": {
+    "tot": "dcde75a0a96f4cea2ab81a23f049ae89dee4a1f4870ab2a8b3f09f0e90ba2456",
+    "vorschauFlaeche": "d631411764445d26cec517911e7274a12352b8930cfce7a043ac608001caa4dd",
+    "vorschauTerritory": "d6ba8ddddf2bd5e9d7519643093f47dde7c10d3110384af11678f6fe502c5d52"
+   }
+  },
+  "zufall-47": {
+   "aus": {
+    "tot": "5fbcf0ff459276c05088191ac1e034e4a7910e8ef9f41688119418aa37fb38a2",
+    "vorschauFlaeche": "fe987ad5ab3115e98512df5d946cd98afe5169b3c2830435d3cfda3ea814db91",
+    "vorschauTerritory": "60208937c1f04fafc77d20dbb04dba5dcecf0ff7b1f01b28adaa1c98290ed21c"
+   },
+   "an": {
+    "tot": "5fbcf0ff459276c05088191ac1e034e4a7910e8ef9f41688119418aa37fb38a2",
+    "vorschauFlaeche": "fe987ad5ab3115e98512df5d946cd98afe5169b3c2830435d3cfda3ea814db91",
+    "vorschauTerritory": "60208937c1f04fafc77d20dbb04dba5dcecf0ff7b1f01b28adaa1c98290ed21c"
+   }
+  },
+  "zufall-48": {
+   "aus": {
+    "tot": "dff2e4dcfaf2f9a4f05007b96b73c0366cae53b0bc2eeced4733180af58056bb",
+    "vorschauFlaeche": "c35066be3836d7315bcd3b0de259339e2135042059febf4df820f95b07f88ae8",
+    "vorschauTerritory": "59552b8e94d2d6507fe9867597a7ccd54d8a6a27751af926df61875d7e594259"
+   },
+   "an": {
+    "tot": "dff2e4dcfaf2f9a4f05007b96b73c0366cae53b0bc2eeced4733180af58056bb",
+    "vorschauFlaeche": "c35066be3836d7315bcd3b0de259339e2135042059febf4df820f95b07f88ae8",
+    "vorschauTerritory": "59552b8e94d2d6507fe9867597a7ccd54d8a6a27751af926df61875d7e594259"
+   }
+  },
+  "zufall-49": {
+   "aus": {
+    "tot": "8dc0c28b309f406737a273ccbfc904dec621e4c1a80d3d8ad212c7dbfe22f485",
+    "vorschauFlaeche": "df12f249a28ab874ff4bda627147d0cd3e8130a581795d1cc878598773e99cac",
+    "vorschauTerritory": "290c1a193dc1bc549ae6350df49eaf5d4dcd4d64629f64dee039c76c9bd48373"
+   },
+   "an": {
+    "tot": "294af25c4df6675958383951c2f57e92cf646b4752e27d559ed7e8a1e11f8ff3",
+    "vorschauFlaeche": "bf902f3ddce3b148da0dadb8e07b22dd751b9a4ed2318d52283534a58abf6a4d",
+    "vorschauTerritory": "c59d0bd5d7e9e89c8beee895420104081647c4f1a655dbcb5fe52fde5ec17713"
+   }
+  },
+  "zufall-50": {
+   "aus": {
+    "tot": "e3dae95fb91511c2939c34c8c92ca667f2bd3551c50916f7a126b08eb0def1fc",
+    "vorschauFlaeche": "a61ac9e224ee880a18ccbd8280da52d0bfd049bc4208a99142dc931765c9aa31",
+    "vorschauTerritory": "3276980b43666fbc3b16cdbc139a7140a0da40209495dc2b4f3282963b2f29f4"
+   },
+   "an": {
+    "tot": "7d840f06c0b0d554004d7516f972f7559e3d2d83fcc4eaf14634e69926dfcd23",
+    "vorschauFlaeche": "2c54535de0aedcdfc94b5b2e16362b1d2e3862948d43de477d91f62bb5ea6df5",
+    "vorschauTerritory": "f8cb036369d9bcdcccad499ee12e3bc1d55dba37b12ad8fe054de8e176eb7d8d"
+   }
+  },
+  "zufall-51": {
+   "aus": {
+    "tot": "219516140942b031f9bb43da25cd8d99aa861f792a3c0f07cab4d45bb2b8fc60",
+    "vorschauFlaeche": "344402308cdde38b46628cd2d4e4e04d590a61af3228a75124add0ead5038236",
+    "vorschauTerritory": "91d58f15246600cbae26dabad1cde4a87e199465b829d9bfbf42d89fd800646e"
+   },
+   "an": {
+    "tot": "1718dcd9fc5dce99c3aac4d48ba197d70a4c4e6faa5e0bcb306f14b605e88ef8",
+    "vorschauFlaeche": "bba7d3f3a78ce01753cb91a896f2aa30a8411c8e6ae56541c79681501d7163e4",
+    "vorschauTerritory": "0ded3d7a7781eaa22483417b9f62d64b19aba96d9e018da39869c24d6a4904c2"
+   }
+  },
+  "zufall-52": {
+   "aus": {
+    "tot": "119a6353b7c962d50852387c97c684075a45a0b48d0d8e2fe371bbc9aa5e2852",
+    "vorschauFlaeche": "e9d0bba239ba4532a84f6ae7ba1959467a50719d04ce526c8326b50e79e2920b",
+    "vorschauTerritory": "be838236c4508c507e77e2278ee6a05a9eaa4b66f960a6fe62bc4347345a6441"
+   },
+   "an": {
+    "tot": "119a6353b7c962d50852387c97c684075a45a0b48d0d8e2fe371bbc9aa5e2852",
+    "vorschauFlaeche": "e9d0bba239ba4532a84f6ae7ba1959467a50719d04ce526c8326b50e79e2920b",
+    "vorschauTerritory": "be838236c4508c507e77e2278ee6a05a9eaa4b66f960a6fe62bc4347345a6441"
+   }
+  },
+  "zufall-53": {
+   "aus": {
+    "tot": "9725c1d4c7184a5ce5e29b28af051f9ab1df3753ab2c3522c9cf760b4f8f2d3e",
+    "vorschauFlaeche": "8637926ffb148223b4ce0edc2d93ed344e003fab82b3adb36b68317937265ff9",
+    "vorschauTerritory": "33d03a687448b87906cf0cd5b95d60d6a182d9502c03ce8de7ff4e710ac0beb7"
+   },
+   "an": {
+    "tot": "9725c1d4c7184a5ce5e29b28af051f9ab1df3753ab2c3522c9cf760b4f8f2d3e",
+    "vorschauFlaeche": "8637926ffb148223b4ce0edc2d93ed344e003fab82b3adb36b68317937265ff9",
+    "vorschauTerritory": "33d03a687448b87906cf0cd5b95d60d6a182d9502c03ce8de7ff4e710ac0beb7"
+   }
+  },
+  "zufall-54": {
+   "aus": {
+    "tot": "7a2bcaf4f16a34785956b83bce1b8e4825320f7278b82c63a5dca04bdb3ead15",
+    "vorschauFlaeche": "bc4677a1bd992d589cc166d142021a028f3080f978d6dd121cc7485e3c7819a1",
+    "vorschauTerritory": "b2083d761a41e5c07997c3fd91dcf6eb015915f57fd6336ad3371a0d9305e58d"
+   },
+   "an": {
+    "tot": "7a2bcaf4f16a34785956b83bce1b8e4825320f7278b82c63a5dca04bdb3ead15",
+    "vorschauFlaeche": "bc4677a1bd992d589cc166d142021a028f3080f978d6dd121cc7485e3c7819a1",
+    "vorschauTerritory": "b2083d761a41e5c07997c3fd91dcf6eb015915f57fd6336ad3371a0d9305e58d"
+   }
+  },
+  "zufall-55": {
+   "aus": {
+    "tot": "52ba680e5dce9e74a5251f70644a82db5435dd4b8e2509fefc600832ff2e796b",
+    "vorschauFlaeche": "8e442574b33831506f88083fa9919893ab4b30fffc45ae178a53740c19fb3c42",
+    "vorschauTerritory": "c056395e07ea0d6b59551b264fbea76a7b14691dc4b84a79afaef50bc4ff84df"
+   },
+   "an": {
+    "tot": "52ba680e5dce9e74a5251f70644a82db5435dd4b8e2509fefc600832ff2e796b",
+    "vorschauFlaeche": "8e442574b33831506f88083fa9919893ab4b30fffc45ae178a53740c19fb3c42",
+    "vorschauTerritory": "c056395e07ea0d6b59551b264fbea76a7b14691dc4b84a79afaef50bc4ff84df"
+   }
+  },
+  "zufall-56": {
+   "aus": {
+    "tot": "7167d6169ed1aa49079d9ff41de5c75b9744adc9a1c3fc8c478c02e155182dc2",
+    "vorschauFlaeche": "3f5c847debbf8de3a796a7f605bf8b51448b18514211c4fedb64577b15d6e2df",
+    "vorschauTerritory": "eb6bab491d23e57584e79068118a870959c21eac7a5e50ce5e1b1d9db41c0bcb"
+   },
+   "an": {
+    "tot": "7167d6169ed1aa49079d9ff41de5c75b9744adc9a1c3fc8c478c02e155182dc2",
+    "vorschauFlaeche": "3f5c847debbf8de3a796a7f605bf8b51448b18514211c4fedb64577b15d6e2df",
+    "vorschauTerritory": "eb6bab491d23e57584e79068118a870959c21eac7a5e50ce5e1b1d9db41c0bcb"
+   }
+  },
+  "zufall-57": {
+   "aus": {
+    "tot": "31d7639471a0cb91cb84c03e457c166b3afee594c92205080f3753c60db5c349",
+    "vorschauFlaeche": "ba9be142bd50de3a9d1c26f7d9ef26db16d6c8bbc63dff4398c9d33a236b7a31",
+    "vorschauTerritory": "ee0d634cbd1286bb4f7da42d10419fe4c44477272f5eb66e13b21524f9c92c13"
+   },
+   "an": {
+    "tot": "31d7639471a0cb91cb84c03e457c166b3afee594c92205080f3753c60db5c349",
+    "vorschauFlaeche": "ba9be142bd50de3a9d1c26f7d9ef26db16d6c8bbc63dff4398c9d33a236b7a31",
+    "vorschauTerritory": "ee0d634cbd1286bb4f7da42d10419fe4c44477272f5eb66e13b21524f9c92c13"
+   }
+  },
+  "zufall-58": {
+   "aus": {
+    "tot": "f4a5c5387d062a389c0c4a0ec6e9e9a58b2acafa6973bd92f615e2d8ef50d3f8",
+    "vorschauFlaeche": "0dda18683bdcda39a688826285111163fe32316ff51d880c2a52ba5b44de1f85",
+    "vorschauTerritory": "547c042305ac92447ca1bc929c7daa8bd702f602e3b161d1fb9f96ae3b144915"
+   },
+   "an": {
+    "tot": "f4a5c5387d062a389c0c4a0ec6e9e9a58b2acafa6973bd92f615e2d8ef50d3f8",
+    "vorschauFlaeche": "0dda18683bdcda39a688826285111163fe32316ff51d880c2a52ba5b44de1f85",
+    "vorschauTerritory": "547c042305ac92447ca1bc929c7daa8bd702f602e3b161d1fb9f96ae3b144915"
+   }
+  },
+  "zufall-59": {
+   "aus": {
+    "tot": "a7393c0829b3b1f38521bd4de3b83c0e035d155c86caee9c6c4f2bc2660fbd98",
+    "vorschauFlaeche": "820d1334d31d73e1caa158fedfa2ec2f122b544c40429e11e8ab42bf3036e3bd",
+    "vorschauTerritory": "04e09ce26de2453b80d3c389bde902e8dd261d8d747130191d7e7c0144e0e41c"
+   },
+   "an": {
+    "tot": "a7393c0829b3b1f38521bd4de3b83c0e035d155c86caee9c6c4f2bc2660fbd98",
+    "vorschauFlaeche": "820d1334d31d73e1caa158fedfa2ec2f122b544c40429e11e8ab42bf3036e3bd",
+    "vorschauTerritory": "04e09ce26de2453b80d3c389bde902e8dd261d8d747130191d7e7c0144e0e41c"
+   }
+  },
+  "zufall-60": {
+   "aus": {
+    "tot": "67d7a036aaf851cb164fc7171e72d23377bd7bc89e61715b79e1e4c758099018",
+    "vorschauFlaeche": "e05531366a7ec2be989686ffea4c9d21f767d23e0713950465b5945fefca6a31",
+    "vorschauTerritory": "2676c88ec63e5645649937cc7edf2a67b382b19030a109910db2c0042395db70"
+   },
+   "an": {
+    "tot": "67d7a036aaf851cb164fc7171e72d23377bd7bc89e61715b79e1e4c758099018",
+    "vorschauFlaeche": "e05531366a7ec2be989686ffea4c9d21f767d23e0713950465b5945fefca6a31",
+    "vorschauTerritory": "2676c88ec63e5645649937cc7edf2a67b382b19030a109910db2c0042395db70"
+   }
+  },
+  "zufall-61": {
+   "aus": {
+    "tot": "c4e9653b8da148c3fa382ed2cfee2fb7647774ddb7ec8180563dfcc26cbb936b",
+    "vorschauFlaeche": "4adb6363e52a85fe9482cd4e86d467b45571baf7f8b496cdd8a7594dcade4f84",
+    "vorschauTerritory": "a08c8b03f2544abcabee15dd7ccc5ad085a225a2da5026ee85f45d699f699362"
+   },
+   "an": {
+    "tot": "c4e9653b8da148c3fa382ed2cfee2fb7647774ddb7ec8180563dfcc26cbb936b",
+    "vorschauFlaeche": "4adb6363e52a85fe9482cd4e86d467b45571baf7f8b496cdd8a7594dcade4f84",
+    "vorschauTerritory": "a08c8b03f2544abcabee15dd7ccc5ad085a225a2da5026ee85f45d699f699362"
+   }
+  },
+  "zufall-62": {
+   "aus": {
+    "tot": "326b7349d9262d6b142080006fe638e8f7fac49ace223c32877af6729088627c",
+    "vorschauFlaeche": "da6a659d196569372aca65264a3e49e894ed54ba1caa78b17bde2f13987c8379",
+    "vorschauTerritory": "d3e3a8a3562b9d562f3348c57fa093a40033ef9ba7992f24d48f7eab6fcf4222"
+   },
+   "an": {
+    "tot": "326b7349d9262d6b142080006fe638e8f7fac49ace223c32877af6729088627c",
+    "vorschauFlaeche": "da6a659d196569372aca65264a3e49e894ed54ba1caa78b17bde2f13987c8379",
+    "vorschauTerritory": "d3e3a8a3562b9d562f3348c57fa093a40033ef9ba7992f24d48f7eab6fcf4222"
+   }
+  },
+  "zufall-63": {
+   "aus": {
+    "tot": "31f8244cfd43e3c92163036953e2dabe8a71d6a06026210ae630e46123c6ce7d",
+    "vorschauFlaeche": "e46cc36331505f006a9ceeded74e8c0a7ecc5211f1c9875e5ee02fdf6a870ed2",
+    "vorschauTerritory": "3650b65d747221cd884b9f4fccadbe172bf4cdaa73396c1030be8f0902836bfb"
+   },
+   "an": {
+    "tot": "31f8244cfd43e3c92163036953e2dabe8a71d6a06026210ae630e46123c6ce7d",
+    "vorschauFlaeche": "e46cc36331505f006a9ceeded74e8c0a7ecc5211f1c9875e5ee02fdf6a870ed2",
+    "vorschauTerritory": "3650b65d747221cd884b9f4fccadbe172bf4cdaa73396c1030be8f0902836bfb"
+   }
+  },
+  "zufall-64": {
+   "aus": {
+    "tot": "2abca432185aafdb6f7a35ca98f790fa579562caa4e1f4d8db1d4e0d61d2a8b2",
+    "vorschauFlaeche": "3b3919424b2f14d63a7923e8fe3c5047531f5116d5256f12b09da5b9803f980f",
+    "vorschauTerritory": "c122358524aeec791a480fac46e28829e6d22da65e33b566b4259343b02e334c"
+   },
+   "an": {
+    "tot": "2abca432185aafdb6f7a35ca98f790fa579562caa4e1f4d8db1d4e0d61d2a8b2",
+    "vorschauFlaeche": "3b3919424b2f14d63a7923e8fe3c5047531f5116d5256f12b09da5b9803f980f",
+    "vorschauTerritory": "c122358524aeec791a480fac46e28829e6d22da65e33b566b4259343b02e334c"
+   }
+  },
+  "zufall-65": {
+   "aus": {
+    "tot": "0a90b63866c93120c590b30b3f9a910f18433358e4c1d3a856abbf23fc1f9e8e",
+    "vorschauFlaeche": "f7f633483915bc56d3aa12cfa084f102afbcd39a444322e557ccd324a5bfa6d8",
+    "vorschauTerritory": "28d7bea553b7bfb8b627c293c5528838befc5287207b7950d4d8836e637d97da"
+   },
+   "an": {
+    "tot": "d51b4c4f3f3ac4909537d6604ec1b585e4ee2fe0da8fd6f63f5b8ef122c99ae8",
+    "vorschauFlaeche": "92a22aadf06c2f4dea4f3c417a97f46864c9b9750bb13dee1c496f656eb4a817",
+    "vorschauTerritory": "75370797fcdbda9a8f949ecfd2b11788a2ba5bd1fcc68ad18ab9d0b4563bbcfb"
+   }
+  },
+  "zufall-66": {
+   "aus": {
+    "tot": "d07363b7c7863b7ddb708fe8211b0d95c7983833078791b00f581e5d6c78a3ee",
+    "vorschauFlaeche": "d15f1a53efe8d540ddb2f35d1bad3f217806b2dadf3c7510be7babc829615d73",
+    "vorschauTerritory": "8e64dc4e90cc0ed68f0a148f19f7d077ef4191234cfe9e2477e740677efaf03d"
+   },
+   "an": {
+    "tot": "d07363b7c7863b7ddb708fe8211b0d95c7983833078791b00f581e5d6c78a3ee",
+    "vorschauFlaeche": "d15f1a53efe8d540ddb2f35d1bad3f217806b2dadf3c7510be7babc829615d73",
+    "vorschauTerritory": "8e64dc4e90cc0ed68f0a148f19f7d077ef4191234cfe9e2477e740677efaf03d"
+   }
+  },
+  "zufall-67": {
+   "aus": {
+    "tot": "90381ff68a8e59cf51aeea5269a3837004d627bd90b900d2ba75dd7bb7d95e06",
+    "vorschauFlaeche": "81fd25ac00970d0ec432005d2fd15914b885167a4fdff0e69701d69a8d630af0",
+    "vorschauTerritory": "9114202fa43a1ce7a7939bde0136605c7f7ff5cd84242da034dcf1e3e9b3b7a0"
+   },
+   "an": {
+    "tot": "90381ff68a8e59cf51aeea5269a3837004d627bd90b900d2ba75dd7bb7d95e06",
+    "vorschauFlaeche": "81fd25ac00970d0ec432005d2fd15914b885167a4fdff0e69701d69a8d630af0",
+    "vorschauTerritory": "9114202fa43a1ce7a7939bde0136605c7f7ff5cd84242da034dcf1e3e9b3b7a0"
+   }
+  },
+  "zufall-68": {
+   "aus": {
+    "tot": "bcc28bbd53a03a855944aaec1c3b41946fbd134ee35929b6ca42c7c5fef90a56",
+    "vorschauFlaeche": "b0b6050e2176b7158090cb8fc0b55f2feee157a511289a2c49843857c1b6b6f3",
+    "vorschauTerritory": "5c7936ddc04812db49db0212f0660c55338a17acd8f8fab4cd7bbe4d6aa4c251"
+   },
+   "an": {
+    "tot": "bcc28bbd53a03a855944aaec1c3b41946fbd134ee35929b6ca42c7c5fef90a56",
+    "vorschauFlaeche": "b0b6050e2176b7158090cb8fc0b55f2feee157a511289a2c49843857c1b6b6f3",
+    "vorschauTerritory": "5c7936ddc04812db49db0212f0660c55338a17acd8f8fab4cd7bbe4d6aa4c251"
+   }
+  },
+  "zufall-69": {
+   "aus": {
+    "tot": "05574bd9d1c3c7b00b135ca418da45d60866444e46543bd0e40f822f22980f99",
+    "vorschauFlaeche": "df5af39dfed1c07409a1b194bf48c06048875389ec71b521a53c68e68c870387",
+    "vorschauTerritory": "79e7da7efa32ed77991d36a4637be5a608917c43a0cded9638a4bb3db61aedf9"
+   },
+   "an": {
+    "tot": "05574bd9d1c3c7b00b135ca418da45d60866444e46543bd0e40f822f22980f99",
+    "vorschauFlaeche": "df5af39dfed1c07409a1b194bf48c06048875389ec71b521a53c68e68c870387",
+    "vorschauTerritory": "79e7da7efa32ed77991d36a4637be5a608917c43a0cded9638a4bb3db61aedf9"
+   }
+  },
+  "zufall-70": {
+   "aus": {
+    "tot": "4c3292f166041d7b6f3da2228ccb80b74a8352ee2e9fde9978d29a6e64e9c59d",
+    "vorschauFlaeche": "b670b947ee8de0cca2e6e1df849269c318285e7588f419f3e5816eedca3710ab",
+    "vorschauTerritory": "f6d25a082d286a604b2e17a098af78a15b062b3ef62c3d25b9dab45d2e7b0e23"
+   },
+   "an": {
+    "tot": "4c3292f166041d7b6f3da2228ccb80b74a8352ee2e9fde9978d29a6e64e9c59d",
+    "vorschauFlaeche": "b670b947ee8de0cca2e6e1df849269c318285e7588f419f3e5816eedca3710ab",
+    "vorschauTerritory": "f6d25a082d286a604b2e17a098af78a15b062b3ef62c3d25b9dab45d2e7b0e23"
+   }
+  },
+  "zufall-71": {
+   "aus": {
+    "tot": "f05032b2414b7405a4d90e46e3b7c4f21c0c2709a635a8c453b7dffef5f5ccf4",
+    "vorschauFlaeche": "3b42459fdfc61337acb936ed7b4805996db3c486f62d0b19e14b53e1f8b40e1c",
+    "vorschauTerritory": "40b74977d30c04f4b5492bae5b31a4014a79a5fe41014aa327bb87b5ffc5e83d"
+   },
+   "an": {
+    "tot": "f05032b2414b7405a4d90e46e3b7c4f21c0c2709a635a8c453b7dffef5f5ccf4",
+    "vorschauFlaeche": "3b42459fdfc61337acb936ed7b4805996db3c486f62d0b19e14b53e1f8b40e1c",
+    "vorschauTerritory": "40b74977d30c04f4b5492bae5b31a4014a79a5fe41014aa327bb87b5ffc5e83d"
+   }
+  },
+  "zufall-72": {
+   "aus": {
+    "tot": "1479dc9d122fb2a9f26c8288ae9a76f7d9ea0d9d6ab39e5e797a69869bef39d7",
+    "vorschauFlaeche": "a9ddee1468a0ae2026d52164363b7fd333909633e98a4db16f01cc015888d544",
+    "vorschauTerritory": "01117ecf363ae70298e1d4a25633680037e27c72e2c6a039f118e032987743c8"
+   },
+   "an": {
+    "tot": "1479dc9d122fb2a9f26c8288ae9a76f7d9ea0d9d6ab39e5e797a69869bef39d7",
+    "vorschauFlaeche": "a9ddee1468a0ae2026d52164363b7fd333909633e98a4db16f01cc015888d544",
+    "vorschauTerritory": "01117ecf363ae70298e1d4a25633680037e27c72e2c6a039f118e032987743c8"
+   }
+  },
+  "zufall-73": {
+   "aus": {
+    "tot": "3b39ae51088e3a84138b23a4c76012c8821e044211efcc8431915b5d04315e1e",
+    "vorschauFlaeche": "9f793d8f0385e171b58a4551b9e67e5dde8b11c41f309a83d76141d722e6858f",
+    "vorschauTerritory": "c92b7b7e8288a864219097a1753cc2a07f46ea8667caa98133e50ea52cc3f6f7"
+   },
+   "an": {
+    "tot": "3b39ae51088e3a84138b23a4c76012c8821e044211efcc8431915b5d04315e1e",
+    "vorschauFlaeche": "9f793d8f0385e171b58a4551b9e67e5dde8b11c41f309a83d76141d722e6858f",
+    "vorschauTerritory": "c92b7b7e8288a864219097a1753cc2a07f46ea8667caa98133e50ea52cc3f6f7"
+   }
+  },
+  "zufall-74": {
+   "aus": {
+    "tot": "798c4f82ddfd1dc17b8cde5468f35cfba12da5ac72b61c99cc60c941955d88fd",
+    "vorschauFlaeche": "5ee25559e1e2bf397282ff451797e7e4ab926b5d592d733c00165c9b1c0885e8",
+    "vorschauTerritory": "367e12f5b91001451788c155d9e937739cd20b0cf444fe99f19eca223e7d4516"
+   },
+   "an": {
+    "tot": "798c4f82ddfd1dc17b8cde5468f35cfba12da5ac72b61c99cc60c941955d88fd",
+    "vorschauFlaeche": "5ee25559e1e2bf397282ff451797e7e4ab926b5d592d733c00165c9b1c0885e8",
+    "vorschauTerritory": "367e12f5b91001451788c155d9e937739cd20b0cf444fe99f19eca223e7d4516"
+   }
+  },
+  "zufall-75": {
+   "aus": {
+    "tot": "73010ae19188a6e262020fad7638bb915792ca8a5a22dcb83614a606c850c7a4",
+    "vorschauFlaeche": "bfffe77cc5d4dab97a7c626db7700b1b227bb7646f66f22b858235f506ed54f5",
+    "vorschauTerritory": "8109588a8a52e03ee6db9d094d48e12da8fd03a338ff3eaca5ef5d883cfe23f0"
+   },
+   "an": {
+    "tot": "73010ae19188a6e262020fad7638bb915792ca8a5a22dcb83614a606c850c7a4",
+    "vorschauFlaeche": "bfffe77cc5d4dab97a7c626db7700b1b227bb7646f66f22b858235f506ed54f5",
+    "vorschauTerritory": "8109588a8a52e03ee6db9d094d48e12da8fd03a338ff3eaca5ef5d883cfe23f0"
+   }
+  },
+  "zufall-76": {
+   "aus": {
+    "tot": "74cd97fcf5f903f11a6dc312eac9d50d9a211b5fd960fa038eb316d6175b21a8",
+    "vorschauFlaeche": "e7e36682229edcaca0664fa4cdfc440644433153a7bfea8ad95ebac4eca1051a",
+    "vorschauTerritory": "9ecece78043deff9bed7d0f522822d9e364ea4504f036cad231c6ab358c3d753"
+   },
+   "an": {
+    "tot": "74cd97fcf5f903f11a6dc312eac9d50d9a211b5fd960fa038eb316d6175b21a8",
+    "vorschauFlaeche": "e7e36682229edcaca0664fa4cdfc440644433153a7bfea8ad95ebac4eca1051a",
+    "vorschauTerritory": "9ecece78043deff9bed7d0f522822d9e364ea4504f036cad231c6ab358c3d753"
+   }
+  },
+  "zufall-77": {
+   "aus": {
+    "tot": "5eaa5627a6c0c370c7eb3db3a8245060bc31bbad3e55e50cc24e7db43dd50a09",
+    "vorschauFlaeche": "e1640b9cbae1cdf904eb483d3f7a35049cdd91c5a6897c4468f5679f5ecebadd",
+    "vorschauTerritory": "0fb307838c7938becdd42987d3b84398254367eff2a8a89c83d700a2ee87df64"
+   },
+   "an": {
+    "tot": "8db2eac48aa47d776ad19ebe67e041606a62e85f1495eddc84ebf681b0de75ff",
+    "vorschauFlaeche": "5ebe3dc00f940c750cd707d06906c6ad19695f850961f08c4194e9a559a62258",
+    "vorschauTerritory": "6a93b0f9039833ef87325d499eed9212a7f0d4de5c0f2178488df1863450325b"
+   }
+  },
+  "zufall-78": {
+   "aus": {
+    "tot": "1b8daa5c8c9b9fc3f30965f2febe400d7df0e3df1ecaf73183a49e3c50e5a152",
+    "vorschauFlaeche": "eb415aedd683119afa3ff8367a84e969c4b5285ecffa05eeb20bad3039d536fd",
+    "vorschauTerritory": "4e2cf871ca81b441292a9ffd860c09a4ff54381607c37453218e86fe8c6b0c54"
+   },
+   "an": {
+    "tot": "1b8daa5c8c9b9fc3f30965f2febe400d7df0e3df1ecaf73183a49e3c50e5a152",
+    "vorschauFlaeche": "eb415aedd683119afa3ff8367a84e969c4b5285ecffa05eeb20bad3039d536fd",
+    "vorschauTerritory": "4e2cf871ca81b441292a9ffd860c09a4ff54381607c37453218e86fe8c6b0c54"
+   }
+  },
+  "zufall-79": {
+   "aus": {
+    "tot": "16cc62dbb49c689ee1d50b27cd6e1f95fbdfc43594c7ab280d6a6807d17c69fc",
+    "vorschauFlaeche": "fe0215103d366b9f8fd5d11cd6501a425057479cced705b02343e5be3ff6de33",
+    "vorschauTerritory": "147c985b8d2367ef7a5c8f3994d2505dd8562d1b2c970b2a10cd30f6ae1d5f31"
+   },
+   "an": {
+    "tot": "16cc62dbb49c689ee1d50b27cd6e1f95fbdfc43594c7ab280d6a6807d17c69fc",
+    "vorschauFlaeche": "fe0215103d366b9f8fd5d11cd6501a425057479cced705b02343e5be3ff6de33",
+    "vorschauTerritory": "147c985b8d2367ef7a5c8f3994d2505dd8562d1b2c970b2a10cd30f6ae1d5f31"
+   }
+  },
+  "zufall-80": {
+   "aus": {
+    "tot": "88f02b7a7d20eb42529d74fcaf624456408d9087b4c5325bda52993f8a7e1cad",
+    "vorschauFlaeche": "a8ccec2f1603033054ba1a5dedb913188d04ce7ecccfacbf46c2745adcb61613",
+    "vorschauTerritory": "f73fe8e41a68cac907a51e343121d4aeeeaa3de26506140fd2eb766d4524da8b"
+   },
+   "an": {
+    "tot": "88f02b7a7d20eb42529d74fcaf624456408d9087b4c5325bda52993f8a7e1cad",
+    "vorschauFlaeche": "a8ccec2f1603033054ba1a5dedb913188d04ce7ecccfacbf46c2745adcb61613",
+    "vorschauTerritory": "f73fe8e41a68cac907a51e343121d4aeeeaa3de26506140fd2eb766d4524da8b"
+   }
+  },
+  "sgf-aufgabe-151.sgf": {
+   "aus": {
+    "tot": "1a665c61bf814e6b1083ed9e32a8ca876dd87c2b336ac26bf12f213bb6475fc7",
+    "vorschauFlaeche": "316517d2a0ad12759842661bba2b984a79a2c2c1dd3bc5b0c2f78163b34b67bb",
+    "vorschauTerritory": "60ba8a989fcf057ecaf1075c35be9b5109a00fd886aae363cd400581d911f539"
+   },
+   "an": {
+    "tot": "1a665c61bf814e6b1083ed9e32a8ca876dd87c2b336ac26bf12f213bb6475fc7",
+    "vorschauFlaeche": "316517d2a0ad12759842661bba2b984a79a2c2c1dd3bc5b0c2f78163b34b67bb",
+    "vorschauTerritory": "60ba8a989fcf057ecaf1075c35be9b5109a00fd886aae363cd400581d911f539"
+   }
+  },
+  "sgf-auge-479.sgf": {
+   "aus": {
+    "tot": "fe8837bac731cba91411f9c3f3cc80bde5949c9f290bd3d9de385e9185864a35",
+    "vorschauFlaeche": "15bb87f2a4302c601c399a7793b0e58b9152ed3069cc4328eb602facf2cc75d0",
+    "vorschauTerritory": "f50c41b6e10fc942157060c4602f497f26e1ed7a8d1da0e5c64491459e1e4202"
+   },
+   "an": {
+    "tot": "fe8837bac731cba91411f9c3f3cc80bde5949c9f290bd3d9de385e9185864a35",
+    "vorschauFlaeche": "15bb87f2a4302c601c399a7793b0e58b9152ed3069cc4328eb602facf2cc75d0",
+    "vorschauTerritory": "f50c41b6e10fc942157060c4602f497f26e1ed7a8d1da0e5c64491459e1e4202"
+   }
+  },
+  "sgf-hand-117.sgf": {
+   "aus": {
+    "tot": "2e691a004324077367b82eb56791d8e8a6192253d9b82fda8a1b2876b73d1d87",
+    "vorschauFlaeche": "a78bfc4ab7b8ba1efd2154cb59df612ed345c95db74c732ab4d7ae5a9ecde03d",
+    "vorschauTerritory": "632034fcb76eabbc771430ace9ca71baf8037629de10ea1b38209c39e75ae3ef"
+   },
+   "an": {
+    "tot": "2e691a004324077367b82eb56791d8e8a6192253d9b82fda8a1b2876b73d1d87",
+    "vorschauFlaeche": "a78bfc4ab7b8ba1efd2154cb59df612ed345c95db74c732ab4d7ae5a9ecde03d",
+    "vorschauTerritory": "632034fcb76eabbc771430ace9ca71baf8037629de10ea1b38209c39e75ae3ef"
+   }
+  },
+  "sgf-hand-364.sgf": {
+   "aus": {
+    "tot": "91531d4f976a98fc3386af17fe9f87b19f0178f4de0ef68abc1fa35d05be8c6e",
+    "vorschauFlaeche": "a13cf79e57b1bff00d759fe05afcf27ae00642c1a070555dbd637642b1db2566",
+    "vorschauTerritory": "8bb13e9e1da42f37c7ba9e3fe38f4b40c048de508cf7f427f639e845093fda81"
+   },
+   "an": {
+    "tot": "91531d4f976a98fc3386af17fe9f87b19f0178f4de0ef68abc1fa35d05be8c6e",
+    "vorschauFlaeche": "a13cf79e57b1bff00d759fe05afcf27ae00642c1a070555dbd637642b1db2566",
+    "vorschauTerritory": "8bb13e9e1da42f37c7ba9e3fe38f4b40c048de508cf7f427f639e845093fda81"
+   }
+  },
+  "sgf-hand-392.sgf": {
+   "aus": {
+    "tot": "fe8837bac731cba91411f9c3f3cc80bde5949c9f290bd3d9de385e9185864a35",
+    "vorschauFlaeche": "f3a2720a6a02e1f17950e84644cea04100d00e4e336fc291cb6cdb00ae2d9414",
+    "vorschauTerritory": "50dbbbb19f6d02252a7fac6efc9019a9230c50a679af1980916ee18e604f18dd"
+   },
+   "an": {
+    "tot": "fe8837bac731cba91411f9c3f3cc80bde5949c9f290bd3d9de385e9185864a35",
+    "vorschauFlaeche": "f3a2720a6a02e1f17950e84644cea04100d00e4e336fc291cb6cdb00ae2d9414",
+    "vorschauTerritory": "50dbbbb19f6d02252a7fac6efc9019a9230c50a679af1980916ee18e604f18dd"
+   }
+  },
+  "sgf-hand-427.sgf": {
+   "aus": {
+    "tot": "fe8837bac731cba91411f9c3f3cc80bde5949c9f290bd3d9de385e9185864a35",
+    "vorschauFlaeche": "083e7d182629866e56c68d01b0bfe938f5342ca588742247d646ab2c224d8eb1",
+    "vorschauTerritory": "66fe6cd35aaf9693bbf320de768c6785519202360676caa35ee0f231fe8553e2"
+   },
+   "an": {
+    "tot": "fe8837bac731cba91411f9c3f3cc80bde5949c9f290bd3d9de385e9185864a35",
+    "vorschauFlaeche": "083e7d182629866e56c68d01b0bfe938f5342ca588742247d646ab2c224d8eb1",
+    "vorschauTerritory": "66fe6cd35aaf9693bbf320de768c6785519202360676caa35ee0f231fe8553e2"
+   }
+  },
+  "sgf-hand-455.sgf": {
+   "aus": {
+    "tot": "fe8837bac731cba91411f9c3f3cc80bde5949c9f290bd3d9de385e9185864a35",
+    "vorschauFlaeche": "efaf10dad47d8f94fd44a6343c47a236f8bc9275ce8e7873914abbd96ed7e91b",
+    "vorschauTerritory": "12c5a04253b890f5abde1376ca541e8da0db031e2712f39c117ba301f351c6ae"
+   },
+   "an": {
+    "tot": "fe8837bac731cba91411f9c3f3cc80bde5949c9f290bd3d9de385e9185864a35",
+    "vorschauFlaeche": "efaf10dad47d8f94fd44a6343c47a236f8bc9275ce8e7873914abbd96ed7e91b",
+    "vorschauTerritory": "12c5a04253b890f5abde1376ca541e8da0db031e2712f39c117ba301f351c6ae"
+   }
+  },
+  "sgf-hand-478.sgf": {
+   "aus": {
+    "tot": "fe8837bac731cba91411f9c3f3cc80bde5949c9f290bd3d9de385e9185864a35",
+    "vorschauFlaeche": "15bb87f2a4302c601c399a7793b0e58b9152ed3069cc4328eb602facf2cc75d0",
+    "vorschauTerritory": "f50c41b6e10fc942157060c4602f497f26e1ed7a8d1da0e5c64491459e1e4202"
+   },
+   "an": {
+    "tot": "fe8837bac731cba91411f9c3f3cc80bde5949c9f290bd3d9de385e9185864a35",
+    "vorschauFlaeche": "15bb87f2a4302c601c399a7793b0e58b9152ed3069cc4328eb602facf2cc75d0",
+    "vorschauTerritory": "f50c41b6e10fc942157060c4602f497f26e1ed7a8d1da0e5c64491459e1e4202"
+   }
+  },
+  "sgf-laufkampf-211.sgf": {
+   "aus": {
+    "tot": "81f9787ecd48e1337cc1a1844cb1c265bb0597d389bdb14713da3a59f498ee29",
+    "vorschauFlaeche": "63ea20c7d7b5d3619733a34f92ffe952c2334f696b659dfac0633c007c06830c",
+    "vorschauTerritory": "c3525a91c5ed5faab771b7bc861edfe0cae6cfc64e81a47584a7a058af07e68d"
+   },
+   "an": {
+    "tot": "81f9787ecd48e1337cc1a1844cb1c265bb0597d389bdb14713da3a59f498ee29",
+    "vorschauFlaeche": "63ea20c7d7b5d3619733a34f92ffe952c2334f696b659dfac0633c007c06830c",
+    "vorschauTerritory": "c3525a91c5ed5faab771b7bc861edfe0cae6cfc64e81a47584a7a058af07e68d"
+   }
+  },
+  "sgf-zaehlung-358.sgf": {
+   "aus": {
+    "tot": "c5d5039da18dc0a40f1b6f587697decf0020415fadcef4c1b6165dfef6fc1878",
+    "vorschauFlaeche": "5d7947527b07018001655680939086e95b8fec4373770a242b433d38f25ead24",
+    "vorschauTerritory": "7b807328b475315fd92c69b8d1fb3a1d352c5312be494dfec4d1358509ef5188"
+   },
+   "an": {
+    "tot": "c5d5039da18dc0a40f1b6f587697decf0020415fadcef4c1b6165dfef6fc1878",
+    "vorschauFlaeche": "5d7947527b07018001655680939086e95b8fec4373770a242b433d38f25ead24",
+    "vorschauTerritory": "7b807328b475315fd92c69b8d1fb3a1d352c5312be494dfec4d1358509ef5188"
+   }
+  }
+ },
+ "entwicklung": [
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|270|449",
+   "brett": "......O..O.O..X.X..OO.O.O.OOOOOOOOXXXXXO...OOXXOXOXOOOXOXXXOOOXX.XXXXXXXOXOOXXXXOXXXXXX...XOOOX.X.XXXXXXXXXXXXXOX.X.X.XXXXX.XX..XOOOXXX.XXXXXXXXXX.XXOXXX.X.XXX.XXX...XXOXXXX.XXOXX...XXXXOOX.X.XXXOOXXXXX.XOXXXXXXXXOOXX.XX.XOOXXXXXOXOOXXXXXXXXXOXOOXXOOOXXX.XXXXOOOOOXXOOOXXXXXXOOOOO...OOOXOOOXOOOOO.OXOOOO.XXXXOOOXXXOOXXOOXOOX.XOOO.OXXXXXXOXXXO.XOOOOOOOX..XXXXX.X",
+   "totAus": [],
+   "totAn": [
+    14,
+    16,
+    34,
+    35,
+    36,
+    37,
+    54,
+    56,
+    73,
+    94,
+    112,
+    132,
+    150,
+    151,
+    169,
+    170,
+    188,
+    205,
+    206,
+    207,
+    208,
+    224,
+    225,
+    226,
+    227,
+    243,
+    246,
+    264,
+    265,
+    298,
+    311,
+    312,
+    313,
+    316,
+    317,
+    320,
+    331,
+    332,
+    333,
+    334,
+    335,
+    336,
+    338,
+    339,
+    340,
+    351,
+    354,
+    355,
+    356,
+    357,
+    358,
+    360
+   ]
+  },
+  {
+   "schluessel": "Fuego 100 Spiele|f-D.jsonl.gz|21|428",
+   "brett": ".OXXXOOOOOOOOOXOOO.OXXXXO...O..OXXXO.OOOOXOOOOOOOOOX..XOXOXOXXOXO.OXOX.XXXXXOXXX.XXXOOXXXXX...XOOX.XX.XXOOXOOX.XXXOOX..XXOO.OO.OOXX.X.OOXXXOO.O.OOOXX.X.OOOOXOOOOOOO.OOXX.XXXXXXXOXXXOXOOX....OOXOXXXXOOOXXXXXX..O.OOOXOOOOOOX.XX.XX.OOOOOO..O.OXXXOX.XO..OOOOO.OOOOXOOOXX.OO..OO.O..OOXOO.OXO.O.O..OOOOOOXOOOXX..OO..OO.OOXXXXOOOOO.....O.O.OOOXOOO..O.OOOO.O.OOOXXXOOOO",
+   "totAus": [],
+   "totAn": [
+    1,
+    15,
+    16,
+    17,
+    19,
+    35,
+    37,
+    38,
+    39,
+    40,
+    55,
+    57,
+    59,
+    76,
+    95,
+    96,
+    114,
+    115,
+    134,
+    135,
+    152,
+    153,
+    154,
+    155,
+    243,
+    261,
+    262,
+    263,
+    280,
+    281,
+    283,
+    299,
+    300,
+    301,
+    319,
+    320,
+    321,
+    322,
+    337,
+    338,
+    339,
+    357,
+    358,
+    359,
+    360
+   ]
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|903|306",
+   "brett": "...X.XOOXXXX....X....X.XXOOOXOXX..X.XX..X.XXXOOOOOXXXX.XO.X.XOXXXO..OXOOXXOO..XXOOOXO..OOOOOOOO..XOOXXXO....OXXXO..XXO.OOXO.OOOXXOOOOX.XOOOOOOOXXX.XXXO..XOOOXXXXX....XOOOOX.XXXOX....X..XXXO..X.XOOOXO..XOOXXOO...XOO.OXO..XXXOOO..XXXXO.OX.XXXOOOXOOOOOOOOOOXXOOOO.OXXXXO..O..OOO.O..OXX.....O..OO..O.OOOOXXX.OOOOO.OOOOOXXXXOOXO..O.OXO.OXXX..XOOO.OO.O.OOOXX.X.XO.OOO",
+   "totAus": [
+    198,
+    202,
+    203,
+    217,
+    243,
+    262,
+    263,
+    264,
+    265,
+    280,
+    281,
+    300,
+    301,
+    302,
+    321,
+    328
+   ],
+   "totAn": [
+    198,
+    202,
+    203,
+    217,
+    319,
+    320,
+    322,
+    328,
+    338,
+    339,
+    340,
+    356,
+    358,
+    359,
+    360
+   ]
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|212|337",
+   "brett": ".X.XXXX.OOXOX.O....OOXOXOXXX.XOOOO.....O.OOOOXXXXXOO.......OOXOOOOOOOO.OOO...O.OXXXOOXOO.OXXOO..O.OXXOOXXXOOX.XO.O...OX.XXXXXOXXXXOOXOOOX.X...X.XX.X.XXXOXXX.X.XX.X..X.X.XXOXX.X.X.XX...XXXX..OOX.X.....X.XX....XOOOXX....XXX..XX.XX.OOOX...X....X..XXO..OXXXXX.XXXXXXXXOO..OXXOOX...XOOOOOO.OOOOXXOOX.XOO.OO...OXXOOXOXXXXOOXOOO..OX.XOOOOX.XXOOXXO..XXX.X.OOOXXXXXXOO..",
+   "totAus": [
+    8,
+    9,
+    12,
+    317
+   ],
+   "totAn": [
+    1,
+    3,
+    4,
+    5,
+    6,
+    8,
+    9,
+    10,
+    12,
+    21,
+    23,
+    25,
+    26,
+    27,
+    29,
+    45,
+    46,
+    47,
+    48,
+    49,
+    305,
+    306,
+    317,
+    324,
+    326,
+    342,
+    343,
+    344,
+    346
+   ]
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|339|314",
+   "brett": "......X...XXO..O...OXX..X.X.X.XO.O.OOO.OX..X.X.XXOO.OOXXOOOX..XX.XXO..OOOOXXOOOXXX.XXOOOOO.OOX..OOOXXXXOOO.O.OXXX.OOXOOX.XXOXO.OXX...XXXOXXXXXOXOOXXX......XOXOOXOXOOOX.X....XXOOOOOO..OXXX.X..XXO.OO..OOOOX.XX.XXXOO.O.O...OOOXXXXXOXXO.....OOO.OXOXOOOXOOOOOO..OOOOXOXO.OO.O.OXOOOXOOOOOXO..O.OOXXXOO.OO...O.OO.OOX..XXOOO.OO.OO..OOXX.XXO.O..O...O.OOXX.XOOOOO...OOO..",
+   "totAus": [
+    124,
+    143,
+    162,
+    276
+   ],
+   "totAn": [
+    19,
+    39,
+    57,
+    58,
+    76,
+    77,
+    78,
+    96,
+    97,
+    98,
+    114,
+    115,
+    117,
+    118,
+    124,
+    136,
+    143,
+    162,
+    276
+   ]
+  },
+  {
+   "schluessel": "Fuego 50 Spiele|D.jsonl.gz|523|354",
+   "brett": "..OOOOX.XXOOX...O.O.OOXOOX.XO.OXX.XXO.XOXXXOXXXOOOOX.XOO.XX.XXXX.XXO.OX.XOOO....X.XX.XO.OXOXXOXXXXX..X..XOOOOXXXXXXOOOXX.X.XOXOXXOOOOO..OOX.XXXXXXOXXOOOOOO.XX.X.X..XOOXO..OXOOXX.XXXXXOOOOOOOXXXX.XXOXOXXO..OOXX.XXXX.XOOOXOOOO.O..X.XXXXOOOXXO.O.OOOOXXOXXOOXXXOO.O.....XOOXOO.OOXOOO.OO.O.XXOXO.OO.O...O.OO.OXOOOO.O.OOOOOOO.OO.XXOO.O.O...O.O...OOXXOO.OOO.OOOOOOOO.O",
+   "totAus": [
+    2,
+    3,
+    4,
+    5,
+    12,
+    20,
+    21,
+    23,
+    24,
+    31,
+    32,
+    34,
+    35,
+    39,
+    43,
+    51,
+    53,
+    70,
+    72,
+    89,
+    90,
+    91,
+    92,
+    94,
+    109,
+    110,
+    111,
+    112,
+    113,
+    115,
+    116,
+    117,
+    127,
+    128,
+    133,
+    136,
+    137,
+    147,
+    148,
+    152,
+    153,
+    154,
+    167,
+    171,
+    173,
+    174,
+    207,
+    208
+   ],
+   "totAn": [
+    2,
+    3,
+    4,
+    5,
+    12,
+    20,
+    21,
+    23,
+    24,
+    31,
+    32,
+    34,
+    35,
+    39,
+    43,
+    51,
+    53,
+    70,
+    72,
+    89,
+    90,
+    91,
+    92,
+    94,
+    109,
+    110,
+    111,
+    112,
+    113,
+    115,
+    116,
+    117,
+    127,
+    128,
+    133,
+    136,
+    137,
+    147,
+    148,
+    152,
+    153,
+    154,
+    167,
+    171,
+    173,
+    174,
+    207,
+    208
+   ]
+  },
+  {
+   "schluessel": "alte PWA|m1.jsonl.gz|26|335",
+   "brett": "XXXOOOO...OOX.XXO....XXO..O..OXXXXOO..X.XOOOO.OOOOOXXXO..XXO.OOOOOOOXX.XOO...XOOOXOXXOX.XXXXOOOXXXXOXXXXOXXXOXXXXXOX.XOOX.XXXOOOOOX..OOXXXOOXXOO....OX..O.OXXXX.XOO...OX.XX.OOX.X.XXXOOOOOX.X.OOX.XXX.X.XXXOXX..XXXXXX.XXXX.XXXXOXX...XX.XXXX.XOOXOOX.X.XXOX.XOX.XXOXO.OX..XX.XXX.XXXOOOOOOXXX..XXX.X.XOOOOOOXXOX.XX...X.XXOXXOOOOO.X.X.X.XX.XXXOO.......XX.XX.X.XOO.....",
+   "totAus": [
+    250,
+    254
+   ],
+   "totAn": [
+    250,
+    254
+   ]
+  }
+ ]
+}
