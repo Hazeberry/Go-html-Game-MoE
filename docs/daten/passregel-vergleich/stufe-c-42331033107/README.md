@@ -2,6 +2,8 @@
 
 Gesichert am 08.11.2026 aus [Actions-Lauf 42331033107](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/42331033107), Quellencommit `7d57e2bf1826904be9c4e6f8a59164db632d032f`.
 
+Direkter Download des Artefakts als ZIP durch Luna am 08.11.2026 in dieser ChatGPT-Sitzung über den GitHub-Connector und dessen Download-Link, ohne zusätzlichen Actions-Workflow; danach nur Dateiintegrität, Vollständigkeit und Prüfsummen geprüft.
+
 `bericht.zip` ist das unveränderte GitHub-Artefakt **bericht** (ID 13557498693, 511610 Bytes). Sein SHA-256 stimmt mit dem von GitHub gelieferten Digest überein:
 
 ```
