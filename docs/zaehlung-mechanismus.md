@@ -117,7 +117,7 @@ Eine eigene Benson-Implementierung (Lehrbuchform, `benson-unabhaengig.js`) stimm
 
 In der Test-Kopie ohne diese Verbandsbildung (Verbände nur über gemeinsame Augen) ändert sich in V fast nichts: Steine „nur GNU tot“ 362 auf 360, Steine „nur App tot“ 80 auf 132, in V weiterhin 0 von 18 Stellungen mit gleicher Tot-Menge.
 **Die Gegenprobe spricht gegen die Verbandsbildung über gemeinsame Freiheiten als Hauptursache in diesen Stellungen.** Sie schließt nicht aus, dass sie in anderen Stellungen oder zusammen mit anderen Teilen der Regel
-(Verbandsbildung über gemeinsame Augen, Schutz durch Benson im Verband) eine Rolle spielt. Meine erste Vermutung während der Untersuchung war diese Verbandsbildung; sie hat sich in dieser Gegenprobe nicht gehalten.
+(Verbandsbildung über gemeinsame Augen, Schutz durch Benson im Verband) eine Rolle spielt. Meine erste Vermutung während der Untersuchung war diese Verbandsbildung; sie hat sich in dieser Gegenprobe nicht gehalten. Einzelanalyse je V-Stellung: §12.3.
 
 ### 6.5 Ein-Punkt-Augen (gemessen, `falschesauge.txt`)
 
@@ -148,7 +148,7 @@ Test-Kopie, in der ein Ein-Punkt-Auge nur zählt, wenn `_diagIsTrueEye` es best�
   die Änderung etwas verloren hätte, ist nicht untersucht. Dasselbe gilt für die 97 Steine „nur App tot“ über alle 563 Stellungen und für die verbleibenden 60 Steine „nur GNU tot“.
 - Die Stellungen sind Auslösestellungen aus Fortsetzungen, keine Endstellungen von Partien mit Menschen. `toteSteineAmEnde` steckt auch in `resolveLifeAndDeath` (Schlusszählung) und `zaehlVorschau`; eine Folge für
   echte Partien ist eine **Hypothese**, nicht gemessen.
-- Eine Änderung am Spiel folgt daraus nicht. Sie brauchte eine eigene Vorabfestlegung (Schalter, Standard aus, bitgleich bei aus) und ein Go (§9).
+- Eine Änderung am Spiel folgt daraus nicht. Sie brauchte eine eigene Vorabfestlegung (Schalter, Standard aus, bitgleich bei aus) und ein Go (§9). Einzelanalyse je Stellung (besser, schlechter, unverändert) und die vier verbleibenden V-Stellungen: §12.2.
 
 ### 6.7 Abweichende Gruppenzahlen: ungeklärt
 
@@ -197,7 +197,7 @@ Getrennt zu besprechen (Vorabfestlegung und Go jeweils für genau einen Punkt):
 ## 10. Dateien und Reproduktion
 
 Skripte (alle mit Lizenzkopf): [`../auswertung/zaehlung-mechanismus/`](../auswertung/zaehlung-mechanismus/): `lauf.sh` (feste Reihenfolge), `gemeinsam.js`, `zaehl-liste.js`, `mechanismus.js`, `kennzahlen.js`, `benson-unabhaengig.js`,
-`gegenprobe.js`, `falschesauge.js`, `browser-teil.sh`, `browser-vergleich.js`; Test: `tests/zaehlung-mechanismus.js`. Ausgaben und Prüfsummen: [`daten/zaehlung-mechanismus/`](daten/zaehlung-mechanismus/README.md).
+`gegenprobe.js`, `falschesauge.js`, `browser-teil.sh`, `browser-vergleich.js`; Test: `tests/zaehlung-mechanismus.js`. Ausgaben und Prüfsummen: [`daten/zaehlung-mechanismus/`](daten/zaehlung-mechanismus/README.md). Nachtrag §12: `diagonalauge-je-stellung.js`, `freiheitsverband-je-stellung.js` und [`daten/zaehlung-mechanismus/nachtrag-einzelanalysen/`](daten/zaehlung-mechanismus/nachtrag-einzelanalysen/README.md).
 
 ```sh
 bash auswertung/zaehlung-mechanismus/lauf.sh docs/daten/passregel-vergleich/stufe-c-42331033107/bericht.zip <Arbeitsverzeichnis außerhalb des Repos> <Ausgabeverzeichnis> [<codex-Checkout>]
@@ -208,3 +208,72 @@ Der Ablauf braucht rund zehn Sekunden. Er ist kein Messlauf im Sinn von CLAUDE.m
 ## 11. Freigaben
 
 Dieses Doc enthält Vorgaben für die KI-Assistenten; Hazeberry liest es vor dem Merge. Es erteilt kein Go für Spielkorrekturen, Schalter, Messläufe, Engine-Vergleiche oder Merges.
+
+## 12. Nachtrag: Einzelanalysen der beiden Gegenproben (08.11.2026)
+
+Nur Dokumentation, Skripte und Ausgaben. Keine Spieländerung, kein Actions-Lauf, kein GNU Go, kein Browser, keine kombinierte Gegenprobe. Dieser Nachtrag erteilt kein Go; die Vorabfestlegung zur Diagonalprüfung wird getrennt besprochen.
+
+### 12.1 Anlass und Herkunft der Zahlen
+
+Auf Hinweis von Hazeberry und Luna wurden die beiden Gegenproben aus §6 je Stellung statt nur in der Summe ausgewertet. Herkunft getrennt:
+- **Diagonalauge je Stellung** (§12.2): gerechnet in der Sitzung mit demselben Verfahren wie §6 auf den 563 Anfangsstellungen der Stufe C (lokal, nur lesend, Test-Kopie von `index.html`). Das Skript steht als `diagonalauge-je-stellung.js` im Repo; die abgelegte
+  Fassung unterscheidet sich vom ausgeführten nur in Lizenzkopf, Kommentar und `require`-Pfad und wurde nach dem Ablegen **nicht erneut ausgeführt** (Näheres: `daten/zaehlung-mechanismus/nachtrag-einzelanalysen/README.md`).
+- **Freiheitsverband je V-Stellung** (§12.3): nur aus der gespeicherten `gegenprobe-freiheitsverband.json`, nichts neu gerechnet außer Summen. Dort sind die Einzellisten nur für die 18 V-Stellungen gespeichert; für die übrigen 545 Stellungen gibt es nur Summen.
+
+### 12.2 Gegenprobe „Diagonalauge“ je Stellung (gemessen)
+
+Ausgabe: `daten/zaehlung-mechanismus/nachtrag-einzelanalysen/diagonalauge-je-stellung.txt` und `.json`. „Unverändert“ heißt: die Tot-Menge ist **gleich der des Originals**, nicht zwingend gleich GNU Gos Tot-Liste. Besser oder schlechter ist an GNU Gos Tot-Liste gemessen, die der Maßstab dieser Messung ist und nicht die Wahrheit.
+
+| Klasse | V | nicht V | zusammen |
+|---|---:|---:|---:|
+| unverändert gegenüber dem Original | 3 | 541 | 544 |
+| besser | 15 | 4 | 19 |
+| schlechter | 0 | 0 | 0 |
+| gemischt | 0 | 0 | 0 |
+
+- **Neu entstandene Abweichungen:** 0 Steine. Alle 394 geänderten Steine bewegen sich auf GNU Gos Urteil zu: 360 gelten zusätzlich als tot, 34 gelten wieder als lebend. Die Zahl der von GNU Go abweichenden Steine sinkt von 658 auf 264.
+- **19 verbesserte Stellungen:** 17 gehen auf Abweichung 0. Zwei behalten einen Rest: `Fuego 50 Spiele|D|212|337` (27 auf 2 Steine) und `GNU Go ohne Vorgabe|g-D|416|259` (15 auf 1). Je Gruppe: Fuego 100 Spiele 4, Fuego 50 Spiele 11, alte PWA 3, GNU Go ohne Vorgabe 1.
+  Außerhalb von V sind es `alte PWA|m1|339|314` (15 auf 0), `206|341` (14 auf 0), `324|335` (15 auf 0) und die GNU-Go-Stellung. `206|341` ist die Einheit aus Probe 1 und der Zähldiagnose; deren Zählabweichung (§5) ist unberührt, weil sie `toteSteineAmEnde` nicht benutzt.
+- **Die 34 wieder lebenden Steine** (die Änderung von „nur App tot“ 80 auf 46 in V) liegen in drei V-Stellungen: `903|306` (11 wieder lebend, 10 zusätzlich tot), `172|333` (2 und 27), `179|366` (21 und 6). In allen dreien geht die Abweichung auf 0. Die Änderung wirkt dort auf beide Seiten desselben Kampfes. **Der Mechanismus im Code ist offen**
+  (die iterative Entfernung weiterer Gruppen ist eine Vermutung, nicht nachgewiesen).
+- **Die vier verbleibenden V-Stellungen:** `523|354` (32), `889|372` (28) und `622|307` (44) sind unverändert; es sind die großen Verbände mit Benson-Kette (117 bis 141 Steine). `212|337` reagiert (27 auf 2); der **verbleibende Rest** (zwei weiße Steine `J19,K19`, die die App als tot führt, GNU Go als lebend) ist dadurch nicht erklärt.
+  In allen vier stehen „nur GNU tot“-Ketten der KI und „nur Variante tot“-Ketten des Gegners nebeneinander am selben Kampf (Bretter in der Ausgabe). Dass es zwei Seiten desselben Kampfes sind, die App und GNU Go gegensätzlich entscheiden, ist eine **Hypothese**.
+
+### 12.3 Gegenprobe „Freiheitsverband“ je V-Stellung (aus den gespeicherten Ergebnissen)
+
+Ausgabe: `daten/zaehlung-mechanismus/nachtrag-einzelanalysen/freiheitsverband-je-stellung.txt`. Klasse nach Ketten und Summe der Steine „nur GNU tot“ plus „nur App tot“.
+
+| Klasse (18 V-Stellungen) | Stellungen |
+|---|---:|
+| gleich wie im Original | 14 |
+| besser | 1 (`889\|372`, 28 auf 24) |
+| schlechter | 3 (`480\|319` 13 auf 24, `599\|330` 13 auf 26, `903\|306` 21 auf 51) |
+| gemischt | 0 |
+
+- **Restfälle:** `523|354`, `622|307` und `212|337` sind unverändert (32, 44, 27). Bei `889|372` ändert sich **eine Kette**: die KI-Kette `N4,O4,P4,P3` (4 Steine) ist nicht mehr „nur GNU tot“; alle anderen Ketten und die 10 Steine „nur App tot“ bleiben.
+- **Verschlechterungen:** neue „nur App tot“-Ketten des Gegners bei `480|319` (9 und 2 Steine), `599|330` (12 und 1) und `903|306` (14, 3, 6 und 5); bei `903|306` zusätzlich eine neue „nur GNU tot“-Kette der KI (2 Steine, `J9,J8`).
+- **Einordnung:** Es gibt keinen ausreichenden Hinweis auf einen tragfähigen Hebel der Freiheitsverbände für die großen Restfälle. Eine Beteiligung ist **nicht ausgeschlossen**: bei `889|372` ändern sich vier Steine, und in drei Stellungen entstehen neue Abweichungen.
+- **Außerhalb von V (aus den gespeicherten Summen):** „nur App tot“ (206 − 131) − (132 − 80) = **23** Steine Nettozunahme; „nur GNU tot“ (523 − 527) − (360 − 362) = −2. Das ist die **Nettoänderung**, nicht zwingend die Zahl neu entstandener Fehlklassifikationen, und nicht je Stellung gesehen.
+- **Kombinierte Variante (Diagonalauge plus Freiheitsverband):** nicht gerechnet. Sie wäre eine neue Gegenprobe; die Einzelanalyse zeigt keinen ausreichenden Hinweis, dass die Freiheitsverbände die Restfälle tragfähig beeinflussen.
+
+### 12.4 Korrekturen an meinen früheren Aussagen
+
+- „Die Diagonalprüfung ändert am zweiten Phänomen nichts“ war falsch: Die Steine „nur App tot“ in V sinken von 80 auf 46 (12.2). Der Mechanismus ist offen.
+- „Kein Einfluss auf die großen Restfälle“ (Freiheitsverband) war zu absolut. Richtig: kein ausreichender Hinweis auf einen tragfähigen Hebel; bei `889|372` ändern sich vier Steine.
+- `212|337` gehört nicht zu den Fällen ohne Reaktion auf die geprüften Änderungen: Es reagiert auf die Diagonalprüfung (27 auf 2). Nur der verbleibende Rest ist unerklärt.
+- Die „23 zusätzlichen Steine“ außerhalb von V sind die Nettozunahme (12.3).
+- „Unverändert“ bedeutet unverändert gegenüber dem Original (544 Stellungen, davon 541 außerhalb von V), nicht Übereinstimmung mit GNU Go.
+- Benson ist für diese 563 Stellungen gegen eine unabhängige Implementierung geprüft (§6.3), damit nicht allgemein als korrekt bewiesen.
+- Die Freiheitsverbände sind kein alleiniger Haupthebel; ihre Beteiligung ist nicht ausgeschlossen.
+- „Zwei verschiedene Phänomene“ (KI-Gruppen behalten, Gegner-Gruppen entfernen) ist als Einordnung nicht gesichert; die Befunde in 12.2 sprechen eher für zwei Seiten desselben Kampfes (Hypothese).
+
+### 12.5 Grenzen
+
+- Dieselben Daten, an denen die Auffälligkeit gefunden wurde (nachträglicher Diagnosebefund, keine Verbesserungsmessung). „0 neu entstandene Abweichungen“ gilt für die Steine dieser 563 Anfangsstellungen und für die eine Änderung (Ein-Punkt-Augen); es ist keine Aussage über andere Stellungen oder die Spielwirkung.
+- Die Einzellisten der Freiheitsverband-Gegenprobe gibt es nur für V; die 545 übrigen Stellungen sind dort nicht je Stellung gesehen.
+- Maßstab ist GNU Gos Tot-Liste; ob sie in den Restfällen richtig ist, ist nicht gezeigt. Die 46 Steine „nur App tot“ in V bleiben ungeprüft (§6.6).
+- Das abgelegte Skript `diagonalauge-je-stellung.js` wurde nach dem Ablegen nicht erneut ausgeführt (12.1).
+
+### 12.6 Offen und ohne Go
+
+Vorabfestlegung zur Diagonalprüfung (Schalter, Standard aus, bitgleich bei aus; getrennt zu besprechen); Mechanismus der 34 wieder lebenden Steine; Schutz durch die Benson-Kette im Verband als Kandidat für die drei großen Restfälle (nicht geprüft); Ursache der 15 Zählabweichungen (Actions); GTP-1 an den Archivzügen; Abgleich der Gruppenzahlen (§6.7); Gegenverweis in `Hazeberry/codex`.
