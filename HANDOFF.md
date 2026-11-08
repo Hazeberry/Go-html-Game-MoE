@@ -6,7 +6,7 @@ Stand 08.11.2026, `main` dieses Repos bei `35e3581`. **Zweck:** zeigen, was wo s
 ## 1. Zwei Repos, ein Ursprung
 
 - `Hazeberry/codex` ist laut der dortigen `HANDOFF.md` ein Import dieses Repos mit Historie (übernommen aus Commit `818ba2a54763a9977b802f48b74b9f41aaee868b`, dort PR #1).
-  Dieselbe Datei nennt `Hazeberry/codex` als „Ziel der weiteren Arbeit“ (Stand der Datei: `17117ae`, gelesen am 07.11.2026). Hier liefen danach die Passregel-Arbeit (PR #275 bis #286) und die Bughunt-Wiederholung.
+  Dieselbe Datei nennt `Hazeberry/codex` als „Ziel der weiteren Arbeit“ (Stand der Datei: `17117ae`, gelesen am 07.11.2026). Hier liefen danach die Passregel-Arbeit (PR #275 bis #285) und die Bughunt-Wiederholung (PR #286).
 - Beide Repos haben sich seitdem unterschieden. Gemessener Stand: `gtp-ki.js` ist byteidentisch; `index.html` weicht in 150 Zeilen ab, nur im Engine-Bereich
   (codex `17117ae` gegen dieses Repo `f360445`, siehe `docs/bughunt-wiederholung.md` §2). Was dort an Code oder Messungen entstanden ist, gilt hier **nicht automatisch**.
 - **Maßgeblich ist jeweils die Datei im Repo, in dem das Thema liegt** (§2). Dort steht der Stand; hier steht nur der Hinweis.
