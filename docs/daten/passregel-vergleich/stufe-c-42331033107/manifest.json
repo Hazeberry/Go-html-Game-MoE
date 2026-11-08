@@ -1,0 +1,171 @@
+{
+  "saved_date": "2026-11-08",
+  "repository": "Hazeberry/Go-html-Game-MoE",
+  "run_id": 42331033107,
+  "source_commit": "7d57e2bf1826904be9c4e6f8a59164db632d032f",
+  "artifact_id": 13557498693,
+  "artifact_name": "bericht",
+  "artifact_expires_at": "2027-02-05T02:48:31Z",
+  "archive": "bericht.zip",
+  "archive_bytes": 511610,
+  "archive_sha256": "0d9ca865d424251c57a3c9d424cd290e0206a86fe4d6fdd37bd13b8be4720e08",
+  "github_digest": "sha256:0d9ca865d424251c57a3c9d424cd290e0206a86fe4d6fdd37bd13b8be4720e08",
+  "checks": {
+    "github_digest_matches": true,
+    "zip_integrity": true,
+    "files": 29,
+    "packages": 23,
+    "unit_rows": 563,
+    "result_rows": 563,
+    "unique_unit_keys": 563,
+    "unique_result_keys": 563,
+    "unit_and_result_keys_match": true
+  },
+  "files": [
+    {
+      "path": "bericht/bericht.md",
+      "bytes": 18024,
+      "sha256": "e1d5fe93fe5a7cb8ba42b6c6443efd87254316489b0fbdaef6c7217f7e92ab50"
+    },
+    {
+      "path": "bericht/zahlen.json",
+      "bytes": 20861,
+      "sha256": "671e6057eb7c30a029ad3ddeabce141bc702d68adb19ad982f394d2209eceff4"
+    },
+    {
+      "path": "stufe-a/einheiten.jsonl",
+      "bytes": 1407315,
+      "sha256": "9d7cbb6ff4be586961c87c2df931dd7708538c24ef6edd0a8b39df52c0cb6753"
+    },
+    {
+      "path": "stufe-a/stufe-a.json",
+      "bytes": 6845,
+      "sha256": "e521a62c7a8af8eeca1a2c6158327e9234b39e032b274345257fd87378cde8e5"
+    },
+    {
+      "path": "stufe-a/stufe-a.md",
+      "bytes": 2741,
+      "sha256": "6d145875cdb772f3b13c964e7bbd2b518e635afd985a518c2fbaf2455e32d58a"
+    },
+    {
+      "path": "teile/teil-1.jsonl",
+      "bytes": 61625,
+      "sha256": "273f1f4c725dfdca986812e0176b6254fa6b18d0fd66c70358277aac62cd7412"
+    },
+    {
+      "path": "teile/teil-10.jsonl",
+      "bytes": 51298,
+      "sha256": "237651ba5d15ff75c2bce06d92bc7ded4c42632c0aac0b016bae5b72d4d849d4"
+    },
+    {
+      "path": "teile/teil-11.jsonl",
+      "bytes": 53336,
+      "sha256": "39b4af86672dd1f7b6ecefdfe74d631bb62300099bd33e164e1bb74ab306e646"
+    },
+    {
+      "path": "teile/teil-12.jsonl",
+      "bytes": 57402,
+      "sha256": "7213af46645b7b858ce654e7fb874b016705fdf6bae32a7d67ddd7ef875c6b5d"
+    },
+    {
+      "path": "teile/teil-13.jsonl",
+      "bytes": 56315,
+      "sha256": "980176f9dd518e5e9bac432fd47f3dfff00eff60d9e1e11f3cf0565006bfd84d"
+    },
+    {
+      "path": "teile/teil-14.jsonl",
+      "bytes": 57297,
+      "sha256": "e57834ceff3818e2370434736cac2e5dcbe9d706f8b905fda0eaf88cda51cfda"
+    },
+    {
+      "path": "teile/teil-15.jsonl",
+      "bytes": 48853,
+      "sha256": "dab84798bafffc87960223e69db2dfe72d938ec7485cc5ca546d344f21ceea10"
+    },
+    {
+      "path": "teile/teil-16.jsonl",
+      "bytes": 51766,
+      "sha256": "b254727eeb2db38695d05634d5dac14f0e528e01c65c33a38cd68a4c79005db2"
+    },
+    {
+      "path": "teile/teil-17.jsonl",
+      "bytes": 49756,
+      "sha256": "24bfb847c3579552e1c09a45f7196341c4473e6cd6acf37e8d1237c36830cd7e"
+    },
+    {
+      "path": "teile/teil-18.jsonl",
+      "bytes": 51903,
+      "sha256": "929fb2826647f2eacd9a9c90044c724f4dfb7e7acc884c2af3fe1d86391b16c0"
+    },
+    {
+      "path": "teile/teil-19.jsonl",
+      "bytes": 54883,
+      "sha256": "09d3c28fba5997fb117bf795957c1062702a3c4711d3e9e4aa77081707553717"
+    },
+    {
+      "path": "teile/teil-2.jsonl",
+      "bytes": 51447,
+      "sha256": "fa27fcf7cdc0dbbaf35b65d73e9d799367f95c3d205c46b58356ac6f7d76b7e3"
+    },
+    {
+      "path": "teile/teil-20.jsonl",
+      "bytes": 66806,
+      "sha256": "3e195fe23631e55cea1870b9728a1fe6d901f75fbb4ec9611bc37d7112328ef8"
+    },
+    {
+      "path": "teile/teil-21.jsonl",
+      "bytes": 50794,
+      "sha256": "ee276aae68508ff839521c9885ef5fe3b1678ce72d6db1da0e372f25dfe8b38e"
+    },
+    {
+      "path": "teile/teil-22.jsonl",
+      "bytes": 53271,
+      "sha256": "c756afe8e9a576eeb5196c48bb3a09d2547fb4688bfff3dcd2991beae71810ca"
+    },
+    {
+      "path": "teile/teil-23.jsonl",
+      "bytes": 50042,
+      "sha256": "c437a6260b23e02237a55ae3e0b5ffa598229d16111b30bf817c5ef971326a3f"
+    },
+    {
+      "path": "teile/teil-3.jsonl",
+      "bytes": 53942,
+      "sha256": "cdb0203ad7b572a766c5ac12121802df89460d322348778d09a85b597f2cf3ef"
+    },
+    {
+      "path": "teile/teil-4.jsonl",
+      "bytes": 53012,
+      "sha256": "3014c9eb7756a7e1993413d082f967dc537516b3ee8d9272371baeb880f34e54"
+    },
+    {
+      "path": "teile/teil-5.jsonl",
+      "bytes": 53706,
+      "sha256": "d1666bcea64bb1eb2a08616e6cedafddc117fa48e6320547f80c01a2e8cf561c"
+    },
+    {
+      "path": "teile/teil-6.jsonl",
+      "bytes": 55653,
+      "sha256": "ebdf12deb72634afff7c7fcae86d76fa851726aff7405a365c7eb7a65430d26d"
+    },
+    {
+      "path": "teile/teil-7.jsonl",
+      "bytes": 52794,
+      "sha256": "21ef9bdf4fc1a7884941eb4a84d8f10d0b85e0882d01c6dbc964c217319be9dd"
+    },
+    {
+      "path": "teile/teil-8.jsonl",
+      "bytes": 52735,
+      "sha256": "b77c8832efc81f3a9452b117d6ea3e26ab92598b4d08f6ba56198bf7dd28237e"
+    },
+    {
+      "path": "teile/teil-9.jsonl",
+      "bytes": 66185,
+      "sha256": "1fc740ba74c7c4f4668c23e2a516b413bed0dc3fbc5041013db8ccf21bdbd5ca"
+    },
+    {
+      "path": "nachspiel/nachspiel.json",
+      "bytes": 785,
+      "sha256": "63c43346e3ceaae29fe8690534f9d840a7a5c86e7b642fa087cb38e7e248f8ff"
+    }
+  ]
+}
