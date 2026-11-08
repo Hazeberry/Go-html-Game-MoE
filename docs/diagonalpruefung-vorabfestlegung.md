@@ -335,3 +335,43 @@ Das sind Festlegungen, die der Entwurf offen ließ und die ich beim Bau treffen 
 ### 14.5 Freigaben
 
 Dieser Abschnitt (14.5) erteilt kein Go für einen Lauf, Stufe 2 oder 3, einen Engine-Vergleich, einen Standardwechsel oder einen Merge. Das Doc enthält Vorgaben; Hazeberry liest es vor dem Merge. Offen bleiben die Beurteilerwahl (E-2) und alles aus „Offen ohne Go“.
+
+## 15. Ergebnisnachtrag Stufe 1 (08.11.2026)
+
+Die von Hazeberry bereitgestellte `diagonal-pruefung-stufe1.zip` ist unter
+[`docs/daten/diagonal-pruefung/stufe1/`](daten/diagonal-pruefung/stufe1/README.md)
+unverändert gesichert. [Bericht](daten/diagonal-pruefung/stufe1/bericht.md),
+[Schritt 0](daten/diagonal-pruefung/stufe1/schritt0.md), JSON-Fassungen,
+Manifest und Prüfsummen liegen daneben. Die Aussagen „nicht gelaufen“ in §13–14
+beschreiben den damaligen Vorbereitungsstand; dieser Nachtrag dokumentiert das
+nun gelieferte Ergebnis. Ein Actions-Lauf oder Quellencommit wurde dem ZIP nicht
+separat zugeordnet; die HTML-Prüfsummen stehen im Manifest.
+
+**Befund laut geliefertem Bericht:** gültig, alle Pflichtkontrollen bestanden.
+Die Identitätskontrolle bei aus umfasst 7.881 Stellungen einschließlich 563
+Entwicklungsstellungen und sechs Handpartien; die Konsistenzkontrolle bei an
+stimmt mit der Test-Kopie überein. Diese Angaben wurden bei der Übernahme nicht
+neu gerechnet. Geprüft wurden Dateiintegrität, Lesbarkeit, eindeutige Kennungen
+und vollständige Zuordnung der drei Ergebnisdateien zur Stellungsliste.
+
+| Hauptprüfung | Stellungen | betroffen | Anteil |
+|---|---:|---:|---:|
+| S (Schlusszählung) | 2.192 | 658 | 30,0 % |
+| V (Vorschau) | 5.120 | 1.060 | 20,7 % |
+
+Die Mindestzahl von 30 betroffenen Stellungen je Art ist erreicht, aber kein
+Sicherheitsnachweis. Ausgeschlossen wurden fünf doppelte S-Bretter und elf
+doppelte V-Bretter; kein Prüfbrett entsprach einem Entwicklungsbrett.
+Auf den 563 Entwicklungsstellungen sind 19 betroffen (nur Kontrolle).
+Die sechs Handpartien bleiben bei der Tot-Menge unverändert und werden getrennt,
+ohne Statistik geführt. „Nur Bewiesenes“ bleibt laut Bericht unverändert.
+
+**Grenzen und Folgerung:** Betroffenheit sagt nicht, ob die Zählung richtiger wird.
+Mehrere Stellungen derselben Partie sind abhängig; die im Bericht genannten
+Intervalle stehen unter Modellannahmen. Ko und Superko wurden bei der
+Nachspiel-Kontrolle nicht geprüft. Die Prüfdaten stammen aus denselben Archiven
+wie die Entwicklungsdaten und begründen keine Aussage für menschliche Partien.
+Stufe 2 und 3 bleiben offen. Dieser Nachtrag erteilt kein Go für weitere Läufe,
+einen Standardwechsel oder einen Merge; `diagonalAugeEnde` bleibt standardmäßig 0.
+
+

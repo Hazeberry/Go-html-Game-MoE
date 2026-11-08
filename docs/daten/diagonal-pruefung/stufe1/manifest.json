@@ -1,0 +1,96 @@
+{
+  "quelle": "Von Hazeberry in dieser Sitzung bereitgestellte ZIP-Datei; Actions-Lauf und Quellencommit nicht separat zugeordnet.",
+  "gesichertAm": "2026-11-08",
+  "archiv": {
+    "datei": "diagonal-pruefung-stufe1.zip",
+    "bytes": 3311095,
+    "sha256": "8c835dfb5b6ed7cb5af951de92351de2fd67643151025ab56fad51a89c133740"
+  },
+  "dateien": [
+    {
+      "datei": "alt.jsonl",
+      "bytes": 3868377,
+      "sha256": "cba17fec567e10ed4504a63e8cbdf534767852f7466e6d3f3e67ae7842858baa"
+    },
+    {
+      "datei": "bericht.json",
+      "bytes": 14814,
+      "sha256": "83b7e769b88ca00fe78f0a335c84abd4698523830189ba97db5a80e7a35391a1"
+    },
+    {
+      "datei": "bericht.md",
+      "bytes": 7146,
+      "sha256": "e6188e44eef61683ddef21ae2c392f2279b6846f170ad2fe09fdc95216bd3c18"
+    },
+    {
+      "datei": "betroffen.jsonl",
+      "bytes": 673465,
+      "sha256": "912d9b105f1379ac9a85ffa14a7d96d5a9793a03ae87faaa49a0a9b0140dcedc"
+    },
+    {
+      "datei": "neu.jsonl",
+      "bytes": 7303793,
+      "sha256": "0b5628040f5f5efe437ff7c4456ffc65a3ec4a6f852c33a69646ebbdee5e908c"
+    },
+    {
+      "datei": "schritt0.json",
+      "bytes": 5564,
+      "sha256": "0cfa2f455330790d11843582370a4d179230f9898720d0f1596affb30fccc17a"
+    },
+    {
+      "datei": "schritt0.md",
+      "bytes": 2558,
+      "sha256": "57bf5ad9558dcc8cb96e53d8e1c1f8b0ac6729f32740cd9282d53ebe8b858f69"
+    },
+    {
+      "datei": "stellungen.jsonl",
+      "bytes": 5042017,
+      "sha256": "0e7e6e02bc4a287539359cb542a9057d12d0d3649c8600733af8e2dcb56b3c74"
+    },
+    {
+      "datei": "testkopie.jsonl",
+      "bytes": 3964951,
+      "sha256": "0608623377c6c507a17fc03ed182c113606c410734ad85123ee28382ecaa5157"
+    },
+    {
+      "datei": "vergleichen.log",
+      "bytes": 7147,
+      "sha256": "8371ab696f55269151db9930ca56de9ff4fb46066bf12c59480e31855d64bd97"
+    },
+    {
+      "datei": "ziehen.log",
+      "bytes": 2559,
+      "sha256": "184477529ba8e3d9aa284aaa9debeb510f970aedc05fbfb899856200be6164b1"
+    }
+  ],
+  "koepfe": {
+    "alt": {
+      "stand": "alt",
+      "htmlSha256": "d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b",
+      "pid": 2079,
+      "n": 7881,
+      "node": "v22.23.4"
+    },
+    "neu": {
+      "stand": "neu",
+      "htmlSha256": "3570ca10e4e25c24795485f24dbf9003a44d1201b03451fee49b46ea76f1fc72",
+      "pid": 2096,
+      "n": 7881,
+      "node": "v22.23.4"
+    },
+    "testkopie": {
+      "stand": "testkopie",
+      "htmlSha256": "d3bcb1cc54c56f0729cf80d36a462fd564a69ed4561fccbe2d42efba461fa69b",
+      "pid": 2087,
+      "n": 7881,
+      "node": "v22.23.4"
+    }
+  },
+  "zeilen": {
+    "stellungen": 7881,
+    "alt": 7881,
+    "neu": 7881,
+    "testkopie": 7881,
+    "betroffen": 1718
+  }
+}
