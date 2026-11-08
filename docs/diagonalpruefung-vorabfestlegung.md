@@ -111,7 +111,7 @@ Die Unterlagen werden in zufälliger Reihenfolge mit Zufalls-ID vorgelegt, **ohn
 ### 6.3 Wer beurteilt: nicht festgelegt, Voraussetzung für Stufe 3
 
 Im Entwurf ist **niemand eingeteilt**. Stufe 3 beginnt erst, wenn Beurteiler **benannt sind und zugesagt haben**; vorher wird der Aufwand genannt (Zahl der Unterlagen in B1 und B2, geschätzte Zeit je Unterlage). Ohne benannten Beurteiler gibt es **keine Aussage zur tatsächlichen Richtigkeit**, nur Schicht A.
-**Entscheidung offen**, möglich sind (Aufwand und Aussagekraft sind verschieden):
+**Entscheidung offen** (Empfehlung: §10.4), möglich sind (Aufwand und Aussagekraft sind verschieden):
 - ein Mensch, der zugesagt hat; Hazeberry nur, wenn er das möchte;
 - eine **getrennte KI-Beurteilung** in einer eigenen Sitzung, die nur die Unterlagen bekommt und die Herkunft nicht kennt; sie wird als **KI-Beurteilung** berichtet und ist nicht dasselbe wie die Beurteilung durch einen Menschen;
 - beides, mit Vergleich beider Urteile auf einer Teilmenge.
@@ -137,7 +137,7 @@ Aussagen zur Richtigkeit gelten **nur für die beurteilten Ketten**. B1 ist voll
 3. **Identitätskontrolle Schalter aus (bitgleich):** Bei Schalter aus ist die Tot-Menge in **jeder** Prüfstellung gleich der der **unveränderten Fassung** (Stand `main` vor der Umsetzung, in eigenem Prozess; „gleich“ erst nach Vorprüfung der Fallabdeckung, sonst „KEIN URTEIL“).
    Zusätzlich vor der Umsetzung festzulegen und im Test einzufrieren: Referenzwerte der unveränderten Fassung auf Zufallsbrettern und den Stellungen unter `tests/stellungen/`, erzeugt **vor** der Änderung. Engine-Vergleiche alter gegen neuer Stand laufen nur in Actions (`engine-vergleich.yml`) und nur nach Go.
 4. **Konsistenzkontrolle gegen die Diagnose:** Bei Schalter an stimmt die Tot-Menge der Umsetzung auf den **563 Entwicklungsstellungen** mit der der Test-Kopie (`gegenprobe.js --variante diagonalauge`) überein; sonst weicht die Umsetzung von dem ab, was diagnostiziert wurde (kein Urteil, bis geklärt).
-5. **GNU-Go-Lauf (Stufe 2):** Version protokolliert, Rohantworten zweier Läufe gleich, Ausfälle gezählt; die Ausfallregel (Obergrenze für Ausfälle) legt Hazeberry vor dem Lauf fest (**Entscheidung offen**; Vorschlag wie bei den Fuego-Messungen).
+5. **GNU-Go-Lauf (Stufe 2):** Version protokolliert, Rohantworten zweier Läufe gleich, Ausfälle gezählt; die Ausfallregel (Obergrenze für Ausfälle) legt Hazeberry vor dem Lauf fest (**Entscheidung offen**; Empfehlung: §10.3, wie in Stufe C).
 6. **Beurteilung (Stufe 3):** Beurteiler benannt und zugesagt (§6.3); Unterlagen nach §6.2 (mit Zugfarbe und Vorgeschichte); Reihenfolge zufällig, Herkunft verdeckt, Kategorien vorab, Begründung je Kette; **B1 vollständig beurteilt**; die Zuordnung der Urteile zu App und GNU Go wird erst nach Abschluss aller Urteile aufgedeckt. Fehlt ein benannter Beurteiler oder ist B1 nicht vollständig beurteilt, ist Stufe 3 ungültig (kein Urteil).
 7. **Mindestumfang betroffener Stellungen:** Für ein Urteil über die Kandidatur (§8) mindestens **30** betroffene Stellungen je Stellungsart (**Setzung**). Das ist ein Mindestumfang, damit überhaupt berichtet werden kann, **kein Sicherheitsnachweis**: Das Erreichen der Zahl belegt keine Unbedenklichkeit. Weniger heißt „kein Urteil: zu wenig Betroffene“, nicht „unbedenklich“; über eine Erweiterung der Prüfdaten entscheidet Hazeberry.
 
@@ -161,14 +161,83 @@ Ein Standardwechsel bräuchte danach eine **eigene Vorabfestlegung** (mit Umfang
 Erst nach Freigabe dieses Docs und einem eigenen Go: Referenzwerte der unveränderten Fassung erzeugen und einfrieren; Parameter und Schalter (Standard aus); Aufrufer durchreichen; Tests (aus gleich wie vorher; an: konstruierte Stellungen mit falschem und echtem Ein-Punkt-Auge, Kante und Ecke, Verbände,
 iterative Entfernung); Browser-Test für Schlusszählung und Dashboard bei aus unverändert; Doc. Danach getrennt: Stufe 1, Stufe 2, Stufe 3, je eigenes Go. Ablauf je Schritt nach CLAUDE.md: Vorabfestlegung (dieses Doc) → PR → grüne CI → Merge.
 
-## 10. Offene Entscheidungen für Hazeberry
+## 10. Entscheidungen, mit Empfehlung
 
-1. Schalter: Name `diagonalAugeEnde`, Ort (Parameter von `toteSteineAmEnde` mit Durchreichen durch die Aufrufer, wie vorgeschlagen).
-2. Prüfdaten: Zugindizes 250, 300, 350 für V; Umfang; Handpartien als Zusatzmaterial ja oder nein.
-3. Kontrollstichprobe der unbetroffenen Stellungen (Größe), Ausfallregel für Stufe 2.
-4. Schicht B: Deckel für B2 (60), **wer beurteilt** (im Entwurf niemand eingeteilt, §6.3; Aufwandsgrenze für B1), ob eine KI-Beurteilung zugelassen ist, ob ein zweites Programm als Meinung dient.
-5. Mindestumfang in §7 Nr. 7 (30, nur Berichtbarkeit) und Mindestzahl R+ für eine positive Kandidatur (§8 Nr. 2).
+**Status:** Empfehlungen von Claude, damit aus dem Entwurf ein ausführbarer Plan wird. **Die Entscheidung bleibt bei Hazeberry**; kein Wert gilt, bevor er bestätigt oder geändert ist. Alle Zahlen sind **Setzungen** und kein Sicherheitsnachweis.
+**Regel zur Reihenfolge:** Alle Festlegungen für Stufe 3 (Auswahl, Deckel, Beurteiler, Kategorien) werden **vor Stufe 2** getroffen, damit sie nicht von Ergebnissen der Schicht A abhängen. Was erst nach Stufe 1 sinnvoll feststeht, steht mit seinem Entscheidungszeitpunkt dabei (§11).
 
-## 11. Freigaben
+### 10.1 Schalter: Name und Ort
 
-Dieses Doc enthält Vorgaben für die KI-Assistenten; Hazeberry liest es vor dem Merge. Es erteilt kein Go für die Umsetzung, Läufe, Engine-Vergleiche, Änderungen des Standards oder Merges. Die 15 Zählabweichungen bleiben ein getrenntes Vorhaben.
+- **Empfehlung:** `PARAMS.diagonalAugeEnde` (0 oder 1, Standard 0). `toteSteineAmEnde(board, augeGross, offenGross, diagAuge = false)` bekommt den Wert als vierten Parameter; die Aufrufer reichen `PARAMS.diagonalAugeEnde >= 1` durch (bei den beiden ersten Parametern `undefined`, damit deren Standardwerte gelten;
+  `zaehlVorschau` über `opt.diagonalAuge`).
+- **Begründung:** Die gemeinsame Spiellogik bleibt frei von `PARAMS` (sie liest dort nur die Konstanten `AUGE_GROSS` und `OFFEN_GROSS`), die Funktion bleibt direkt testbar, und jeder Aufrufer entscheidet sichtbar. Dasselbe Muster wie `passNachGegnerpass` (PARAMS, Dashboard-Zeile mit Schritt 1, Bereich 0 bis 1).
+- **In der Umsetzung zu prüfen (nicht entschieden):** wie `PARAMS` an den Worker gelangen; dass gespeicherte Dashboard-Werte ohne den neuen Schlüssel auf 0 fallen; ob es außer den drei Aufrufern aus §2 weitere gibt (vollständige Suche).
+- **Alternative:** Optionsobjekt statt vierten Parameters; größerer Eingriff in die Signatur, deshalb nicht empfohlen.
+- **Zeitpunkt:** vor AP2 (§11).
+
+### 10.2 Prüfdaten
+
+- **Umfang, Empfehlung:** **alle** bisher unbenutzten Partien, keine Stichprobe. Begründung: Stufe 1 ist deterministisch und billig (die Rechnung über 563 Stellungen brauchte in der Diagnose unter einer Sekunde); mehr Partien heißt mehr betroffene Stellungen. Höchstens **2197** Partien
+  (2760 aus Stufe A minus 563 Quellpartien; nach Abzug unbrauchbarer Partien weniger), nach den Zahlen aus Stufe A etwa GNU Go ohne Vorgabe 958, Fuego 100 Spiele 435, Fuego 50 Spiele 643, alte PWA 161. **Schritt 0 zählt die tatsächlichen Zahlen.**
+  Die Gruppen werden getrennt berichtet und nicht gewichtet. In Stufe A hat die GNU-Go-Gruppe kaum ausgelöst (2 von 960) und die V-Fälle stammten aus den Fuego-Gruppen; die Betroffenheit kann also je Gruppe stark verschieden sein.
+- **Zugindizes für V, Empfehlung:** 250, 300 und 350 beibehalten, dazu die Endstellung für S. Begründung: Sie decken den Bereich 294 bis 449 der Entwicklungsstellungen ab und sind vor jeder Sicht auf Prüfergebnisse festgelegt. Schritt 0 berichtet die Längenverteilung der Partien; die Indizes werden **vor Stufe 1 festgeschrieben** und danach nicht nachjustiert.
+- **Handpartien, Empfehlung:** ja, aber nur als **getrennter, illustrativer Absatz** (die sechs SGF `tests/stellungen/hand-*.sgf`, nur S, ohne Statistik). Begründung: Es sind die einzigen Partien gegen einen Menschen, und die Hauptauswertung gilt ausdrücklich nicht für Menschen; sie dienen nur als Blick auf reale Endstellungen. Bei „nein“ entfällt nichts Tragendes.
+- **Unsicherheit:** Die Betroffenheit ist unbekannt. In den Entwicklungsdaten waren es 19 von 563 Stellungen (3,4 %), an Auslösestellungen; das ist **nicht** übertragbar. Stufe 1 liefert die Zahl. Liegt sie unter 30 betroffenen Stellungen je Stellungsart, heißt das „kein Urteil: zu wenig Betroffene“ (§7 Nr. 7) und Hazeberry entscheidet über eine Erweiterung.
+- **Zeitpunkt:** Indizes und Handpartien vor AP3; Erweiterung gegebenenfalls nach Stufe 1.
+
+### 10.3 Kontrollstichprobe und Ausfallregel (Stufe 2)
+
+- **Kontrollstichprobe, Empfehlung:** gleich viele unbetroffene Stellungen wie betroffene, mindestens 50 und höchstens 200 je Stellungsart, feste Ziehung nach Hash aus Seed und Schlüssel. Zweck: sichtbar machen, ob die Referenz auch dort Abweichungen zeigt, die mit dem Schalter nichts zu tun haben (z. B. Zählabweichungen der Art aus `docs/zaehlung-mechanismus.md` §5);
+  sie misst nicht die Wirkung des Schalters. Die Obergrenze hält die GNU-Go-Arbeit überschaubar.
+- **Ausfallregel, Empfehlung:** wie `docs/passregel-vergleich.md` §9 Nr. 6. Ausfall = Absturz von GNU Go (bei der Debian-Fassung 3.8 an manchen Stellungen bekannt, `gnugo-duell.js`; dort ein Neustart mit nächstem Seed), Timeout, nicht einspielbare oder nicht zählbare Stellung. Jeder Ausfall wird einzeln mit Stellung, Gruppe und Grund aufgelistet. Folgen:
+  1. Fallen mehr als **5 %** der betroffenen Stellungen einer Stellungsart aus, ist Schicht A für diese Art **ungültig** (kein Urteil, Lauf rot).
+  2. Eine betroffene Stellung mit Ausfall zählt **konservativ als „ungeklärt“**, nicht als unbedenklich (§8 Nr. 4).
+  3. Wiederholt werden ganze Pakete, nie einzelne Stellungen.
+- **Begründung:** Dieselbe Logik wie in Stufe C (ein Ausfall darf nicht „einfach weggelassen“ werden); die 5 % sind dort die Grenze für die Paare und hier übernommen (Setzung).
+- **Zeitpunkt:** vor AP4.
+
+### 10.4 Schicht B: Deckel, Beurteiler, Aufwand, zweites Programm
+
+- **Deckel für B2, Empfehlung:** **60** beibehalten. Zweck von B2 ist, bestätigte Verbesserungen (R+) zu finden und die Beurteilung zu kalibrieren. Gesenkt wird er nur auf Wunsch der Beurteiler und nur **vor** Sicht auf Urteile.
+- **Beurteiler, Empfehlung (zweigleisig, damit der Plan ohne bestimmten Menschen ausführbar ist):**
+  1. **KI-Beurteilung aller Fälle (B1 und B2)** durch eine **getrennte, eigene Sitzung**, die nur Unterlage und Kategorien bekommt, **nicht** die Herkunft, **nicht** dieses Doc und **nicht** die Regel der App (die Begründungsvorgaben nennen allgemeine Go-Begriffe wie echte und falsche Augen, Seki, Freiheiten, Ko, ohne `_diagIsTrueEye`).
+     Das ist **nicht unabhängig im strengen Sinn**: Engine und Diagnosen entstanden mit Claude, ein Beurteiler aus derselben Modellfamilie kann Blindstellen teilen. Das Ergebnis heißt deshalb **„KI-Beurteilung“**, nicht „tatsächliche Richtigkeit“.
+  2. **Menschliche Beurteilung einer Teilmenge**, **nur wenn ein Mensch zugesagt hat**: bis zu **20 Unterlagen** (Setzung): zuerst die Fälle, in denen die KI-Beurteilung ungeklärt ist oder GNU Go widerspricht, der Rest zufällig. Zweck: Kalibrierung der KI-Beurteilung und Entscheidung strittiger Fälle. Hazeberry übernimmt das nur, wenn er es möchte; sonst eine dritte Person.
+  Aussagen zur „tatsächlichen Richtigkeit“ gibt es **nur für Fälle, die ein Mensch beurteilt hat**; für den Rest gilt „KI-Beurteilung“. Ohne Zusage eines Menschen bleibt es bei der KI-Beurteilung, und der Bericht sagt das ausdrücklich.
+- **Aufwandsgrenze für B1, Empfehlung:** **keine Kürzung von B1.** Für die menschliche Teilmenge gilt die Grenze von 20; für die KI-Beurteilung gibt es keine. Vor Stufe 3 wird die Zahl der Unterlagen genannt und die Zeit je Unterlage an drei Probestücken (ohne Auswertung der Urteile) geschätzt; liegt die menschliche Teilmenge darüber, entscheidet Hazeberry.
+- **Zweites Programm, Empfehlung:** **nicht Voraussetzung.** Fuego kennt `final_status_list` (`docs/fuego.md` §6), die **Antwortqualität ist nicht geprüft** (dort meldet `final_score` mitten in der Partie manchmal „cannot score“). Optional eine kurze Funktionsprobe an etwa 10 archivierten Endstellungen mit eigenem Go; nur danach könnte Fuego als zusätzliche Meinung dienen.
+- **Zeitpunkt:** vor Stufe 2 (§11, E-2).
+
+### 10.5 Mindestzahlen
+
+- **Mindestumfang 30 betroffene Stellungen je Stellungsart:** beibehalten, **nur Berichtbarkeit** (§7 Nr. 7), kein Sicherheitsnachweis.
+- **Mindestzahl R+, Empfehlung:** mindestens **5 bestätigte Verbesserungen aus mindestens 3 verschiedenen Partien**, mit entschiedenen Urteilen (§8 Nr. 2). Begründung: Ein einzelner Fall ist eine Anekdote; drei Partien verhindern, dass ein einzelnes Muster allein trägt. Reine Setzung ohne Sicherheitswert, sie wird mit den Intervallen berichtet.
+  Der Schalter wirkt auf Schlusszählung und Vorschau zugleich; **R− = 0** gilt deshalb in **beiden** Stellungsarten.
+- **Alternative:** Hazeberry setzt eine höhere Zahl oder verlangt sie je Stellungsart.
+- **Zeitpunkt:** vor Stufe 2.
+
+## 11. Arbeitspakete und Reihenfolge (nach Freigabe, je eigenes Go)
+
+Nichts davon ist begonnen. Jedes Paket hat ein eigenes Go; vor jedem Lauf wird genannt, was läuft, wo und welches Go gilt (CLAUDE.md). Messungen und GNU Go laufen in GitHub Actions.
+
+| AP | Inhalt | Ergebnis | Ort |
+|---|---|---|---|
+| AP1 | Referenzwerte der **unveränderten** Fassung einfrieren: Tot-Mengen auf Zufallsbrettern (feste Seeds) und `tests/stellungen/` | Datei mit Referenzwerten im Test, erzeugt **vor** der Änderung | lokal, kurz |
+| AP2 | Schalter nach §10.1: `PARAMS`, Dashboard, vierter Parameter, Aufrufer; Tests (aus gleich Referenz, an: konstruierte Stellungen mit echtem und falschem Ein-Punkt-Auge, Rand, Ecke, Verbände, iterative Entfernung); Browser-Test | PR mit grüner CI | lokal, kurz; CI |
+| AP3 | Stufe-1-Werkzeug: Prüfdaten ziehen (Ausschluss der 563 Quellpartien, Schritt 0), Einspielen, Tot-Menge aus und an, Identitäts- und Konsistenzkontrolle (§7 Nr. 3 und 4), Betroffenheit je Gruppe und Stellungsart; Test mit Attrappe; Workflow `diagonal-pruefung.yml` | Bericht „betroffene Stellungen“ | Actions |
+| AP4 | Stufe-2-Werkzeug nach dem Muster der Zähldiagnose (`passregel-zaehldiagnose.js`): Archivzüge einspielen, zweimal, `final_status_list dead` und `final_score`, Ausfallregel, Kontrollstichprobe | Schicht A: behoben und neu entstanden getrennt | Actions (GNU Go) |
+| AP5 | Stufe-3-Werkzeug: Unterlagen-Generator (SGF mit voller Zuggeschichte, Textdiagramm, Zugfarbe, Kurzansicht, Zufalls-ID), Antwortbogen-Schema mit Prüfung, Auswerter mit Aufdeckung (R+, R−, ungeklärt); Test | Unterlagen und Auswertung | lokal; Beurteilung durch die Beurteiler |
+| AP6 | Bericht als Nachtrag mit Rohdaten und Gültigkeit | Doc-PR | lokal |
+
+**Reihenfolge mit Entscheidungspunkten:**
+1. **E-0:** Hazeberry bestätigt oder ändert §10. Danach AP1, AP2 (je Go).
+2. **Stufe 1** (AP3, Go): Ergebnis ist **nur die Betroffenheit**, keine Aussage zu Richtigkeit.
+   **E-1:** Bei weniger als 30 betroffenen Stellungen je Stellungsart: „kein Urteil: zu wenig Betroffene“; Hazeberry entscheidet über Erweiterung (§10.2).
+3. **E-2 (vor Stufe 2, vor Sicht auf Schicht A):** Beurteiler benannt und zugesagt (§10.4), Deckel, Kategorien, Mindestzahlen bestätigt.
+4. **Stufe 2** (AP4, Go): Schicht A. Danach wählt die Regel aus §6.1 die Ketten **mechanisch** aus (B1 vollständig, B2 gezogen); keine Entscheidung nach Sicht auf Urteile.
+5. **Stufe 3** (AP5, Go): Zahl der Unterlagen und Aufwand werden vorher genannt. Aufdeckung erst nach allen Urteilen.
+6. **AP6:** Bericht. Das Ergebnis ist ein Befund und kein Go (§8).
+
+## 12. Freigaben
+
+Dieses Doc enthält Vorgaben für die KI-Assistenten; Hazeberry liest es vor dem Merge. Es erteilt kein Go für die Umsetzung, Läufe, Engine-Vergleiche, Änderungen des Standards oder Merges. Die Empfehlungen in §10 sind keine Entscheidungen. Die 15 Zählabweichungen bleiben ein getrenntes Vorhaben.
