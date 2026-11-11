@@ -335,3 +335,9 @@ Das sind Festlegungen, die der Entwurf offen ließ und die ich beim Bau treffen 
 ### 14.5 Freigaben
 
 Dieser Abschnitt (14.5) erteilt kein Go für einen Lauf, Stufe 2 oder 3, einen Engine-Vergleich, einen Standardwechsel oder einen Merge. Das Doc enthält Vorgaben; Hazeberry liest es vor dem Merge. Offen bleiben die Beurteilerwahl (E-2) und alles aus „Offen ohne Go“.
+
+## 15. Ergebnisablage Stufe 1 (Upload, 11.11.2026)
+
+Die von Hazeberry gelieferte ZIP ist unverändert unter [`daten/diagonal-pruefung/stufe1/`](daten/diagonal-pruefung/stufe1/README.md) gesichert, einschließlich Manifest und SHA-256-Prüfsummen. Der [gespeicherte Bericht](daten/diagonal-pruefung/stufe1/bericht.md) meldet alle Kontrollen bestanden: 658 von 2192 Schlussstellungen (30,0 %) und 1060 von 5120 Vorschau-Stellungen (20,7 %) sind betroffen. Entwicklungsstellungen und Handpartien bleiben getrennt.
+
+Hier geprüft: ZIP-Integrität und JSON-/JSONL-Syntax; keine Neuberechnung der Befunde. Ein konkreter Actions-Lauf ist aus dem Upload nicht belegt. Betroffenheit ist kein Nachweis einer Verbesserung oder Richtigkeit. Diese Ablage ändert keine Vorgaben und erteilt kein Go für Stufe 2, Stufe 3 oder einen Standardwechsel.
