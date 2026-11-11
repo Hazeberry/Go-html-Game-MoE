@@ -336,7 +336,7 @@ Das sind Festlegungen, die der Entwurf offen ließ und die ich beim Bau treffen 
 
 Dieser Abschnitt (14.5) erteilt kein Go für einen Lauf, Stufe 2 oder 3, einen Engine-Vergleich, einen Standardwechsel oder einen Merge. Das Doc enthält Vorgaben; Hazeberry liest es vor dem Merge. Offen bleiben die Beurteilerwahl (E-2) und alles aus „Offen ohne Go“.
 
-## 15. Ergebnisnachtrag Stufe 1 (08.11.2026)
+## 15. Ergebnisnachtrag Stufe 1 (08.11.2026, korrigiert 11.11.2026)
 
 Die von Hazeberry bereitgestellte `diagonal-pruefung-stufe1.zip` ist unter
 [`docs/daten/diagonal-pruefung/stufe1/`](daten/diagonal-pruefung/stufe1/README.md)
@@ -344,34 +344,92 @@ unverändert gesichert. [Bericht](daten/diagonal-pruefung/stufe1/bericht.md),
 [Schritt 0](daten/diagonal-pruefung/stufe1/schritt0.md), JSON-Fassungen,
 Manifest und Prüfsummen liegen daneben. Die Aussagen „nicht gelaufen“ in §13–14
 beschreiben den damaligen Vorbereitungsstand; dieser Nachtrag dokumentiert das
-nun gelieferte Ergebnis. Ein Actions-Lauf oder Quellencommit wurde dem ZIP nicht
-separat zugeordnet; die HTML-Prüfsummen stehen im Manifest.
+nun gelieferte Ergebnis. Der Originalbericht im ZIP und seine Kopien bleiben
+unverändert; Korrekturen stehen nur hier (15.5).
 
-**Befund laut geliefertem Bericht:** gültig, alle Pflichtkontrollen bestanden.
-Die Identitätskontrolle bei aus umfasst 7.881 Stellungen einschließlich 563
-Entwicklungsstellungen und sechs Handpartien; die Konsistenzkontrolle bei an
-stimmt mit der Test-Kopie überein. Diese Angaben wurden bei der Übernahme nicht
-neu gerechnet. Geprüft wurden Dateiintegrität, Lesbarkeit, eindeutige Kennungen
-und vollständige Zuordnung der drei Ergebnisdateien zur Stellungsliste.
+### 15.1 Herkunft (Zuordnung zu Lauf und Commit)
 
-| Hauptprüfung | Stellungen | betroffen | Anteil |
-|---|---:|---:|---:|
-| S (Schlusszählung) | 2.192 | 658 | 30,0 % |
-| V (Vorschau) | 5.120 | 1.060 | 20,7 % |
+Das ZIP ist das Artefakt `diagonal-pruefung-stufe1` (ID `13606944528`) des
+Actions-Laufs **`42456406985`** (Workflow `diagonal-pruefung.yml`, `workflow_dispatch`
+auf `main`, Run 1, 08.11.2026) auf Commit **`0887732170090390ce9aa28f08d954b550225830`**
+(Merge von #296). Die SHA-256 des ZIP `8c835dfb…c133740` ist gleich dem von Actions
+gemeldeten Artefakt-Digest. Quellen: Actions-Metadaten und Job-Log, am 08.11.2026 gelesen.
+Das Job-Log nennt die Prüfsumme des Stufe-C-ZIP (gleich der erwarteten), die
+unveränderte Fassung aus `c504143` (`index.html` SHA-256 `d3bcb1cc…fa69b`, wie gebunden) und
+je 7.881 Stellungen für die Stände `alt`, `testkopie` und `neu`. Die `index.html` des Standes
+`neu` hat die SHA-256 `3570ca10…1fc72`; sie ist gleich der `index.html` auf `main` (am
+08.11.2026 gegengerechnet). README und Manifest dieser Ablage nennen die Zuordnung noch
+nicht (dort steht „nicht zugeordnet“); maßgeblich ist dieser Abschnitt.
 
-Die Mindestzahl von 30 betroffenen Stellungen je Art ist erreicht, aber kein
-Sicherheitsnachweis. Ausgeschlossen wurden fünf doppelte S-Bretter und elf
-doppelte V-Bretter; kein Prüfbrett entsprach einem Entwicklungsbrett.
-Auf den 563 Entwicklungsstellungen sind 19 betroffen (nur Kontrolle).
-Die sechs Handpartien bleiben bei der Tot-Menge unverändert und werden getrennt,
-ohne Statistik geführt. „Nur Bewiesenes“ bleibt laut Bericht unverändert.
+### 15.2 Befund laut Bericht
 
-**Grenzen und Folgerung:** Betroffenheit sagt nicht, ob die Zählung richtiger wird.
-Mehrere Stellungen derselben Partie sind abhängig; die im Bericht genannten
-Intervalle stehen unter Modellannahmen. Ko und Superko wurden bei der
-Nachspiel-Kontrolle nicht geprüft. Die Prüfdaten stammen aus denselben Archiven
-wie die Entwicklungsdaten und begründen keine Aussage für menschliche Partien.
-Stufe 2 und 3 bleiben offen. Dieser Nachtrag erteilt kein Go für weitere Läufe,
-einen Standardwechsel oder einen Merge; `diagonalAugeEnde` bleibt standardmäßig 0.
+Gültig, alle neun Kontrollen bestanden (`bericht.json`). Die Identitätskontrolle bei aus
+umfasst 7.881 Stellungen einschließlich 563 Entwicklungsstellungen und sechs Handpartien;
+die Konsistenzkontrolle bei an stimmt mit der Test-Kopie überein. Auf den 563
+Entwicklungsstellungen sind 19 betroffen, wie in der Diagnose (§12.2 in `zaehlung-mechanismus.md`).
+Die Kontrollen und die Wirkung auf Stand und Vorschau wurden bei der Übernahme nicht
+neu gerechnet. Gegengezählt wurden an den Rohdateien (am 08.11.2026): `betroffen.jsonl` hat
+1.718 eindeutige Zeilen (658 plus 1.060), jede steht in `stellungen.jsonl`, und Steinzahlen je
+Gruppe stimmen mit dem Bericht überein.
 
+### 15.3 Schritt 0 und Ausschlüsse (`schritt0.md`)
 
+| Gruppe | Prüfpartien | S behalten | V behalten (250/300/350) | S doppeltes Brett | V doppeltes Brett |
+|---|---:|---:|---|---:|---:|
+| GNU Go ohne Vorgabe | 958 | 953 | 928/652/229 | 5 | 11 |
+| Fuego 100 Spiele | 435 | 434 | 435/426/287 | 0 | 0 |
+| Fuego 50 Spiele | 643 | 643 | 643/637/424 | 0 | 0 |
+| alte PWA | 162 | 162 | 162/162/135 | 0 | 0 |
+
+- Quellpartien der Entwicklungsdaten: 562 verschiedene Partien in 563 Einheiten (§14.1 Nr. 4).
+- Ausgeschlossen: Partien mit gleicher Zugfolge wie eine Quellpartie 0; Stellungen mit dem Brett
+  einer Entwicklungsstellung 0; doppelte Bretter S 5 und V 11, alle in der GNU-Go-Gruppe.
+  Eine Partie im Prüfsatz hat dieselbe Zugfolge wie eine andere (GNU Go, nur gezählt; ihre
+  Stellungen entfallen über den Brettvergleich).
+- S enthält nur Endstellungen mit zwei abschließenden Pässen ohne Aufgabe. Eine Partie der Gruppe
+  Fuego 100 Spiele erfüllt das nicht und fehlt in S.
+- Gefangene gegen das Archiv: 2.198 von 2.198 gleich. Behalten: S 2.192, V 5.120 (Summe der Gruppen).
+
+### 15.4 Betroffenheit und Wirkung
+
+| Hauptprüfung | Stellungen | betroffen | Anteil | Partien (betroffen) |
+|---|---:|---:|---:|---|
+| S (Schlusszählung) | 2.192 | 658 | 30,0 % | 2.192 (658) |
+| V (Vorschau) | 5.120 | 1.060 | 20,7 % | 2.169 (730) |
+
+Nach Gruppe (S, V; Clopper-Pearson 95 % im Bericht, Modellannahmen, Stellungen derselben Partie
+sind nicht unabhängig): GNU Go ohne Vorgabe 45,1 % und 40,6 %; Fuego 100 Spiele 21,9 % und 11,4 %;
+Fuego 50 Spiele 20,7 % und 10,2 %; alte PWA 0,0 % (0 von 162) und 4,6 %. **Sicher ist zunächst nur:
+In diesen Daten unterscheiden sich die Anteile nach Gruppe und Stellungsart.** Ein Zusammenhang
+mit der Partielänge ist **nicht belegt**: Die verglichenen Teilmengen sind verschieden (V350 enthält
+nur lange Partien), und der Verlauf über V250, V300 und V350 geht nicht in eine Richtung (Fuego und
+GNU Go steigen, alte PWA fällt von 8,0 % auf 0,0 %). Warum die Anteile sich unterscheiden, ist nicht untersucht.
+
+Die Mindestzahl von 30 betroffenen Stellungen je Art ist erreicht (S 658, V 1.060), aber kein
+Sicherheitsnachweis. Wirkung auf die betroffenen Stellungen (`an` minus `aus`, laut Bericht): Der Stand
+ändert sich in allen 658 (S) und in allen 1.060 Vorschau-Stellungen mit Annahmen. Der Sieger wechselt in S
+bei 195 (Fläche) und 68 (Territory), in V bei 263 und 186. Der Median der Standänderung liegt bei −19
+(S) und +14 (V), die Spanne bei −150 bis +204 (S) und −394 bis +315 (V). „Nur Bewiesenes“ bleibt unverändert.
+Die sechs Handpartien bleiben bei der Tot-Menge unverändert und werden getrennt, ohne Statistik geführt.
+**Der Schalter verändert die Zählung häufig und teils stark; ob er sie verbessert, ist offen.**
+
+### 15.5 Korrekturen
+
+- **Veralteter Satz im Originalbericht (und im Werkzeug):** Der Abschnitt „Grenzen“ in `bericht.md`
+  sagt „Duplikate (gleiche Zugfolge) zählen mehrfach (Schritt 0 nennt ihre Zahl)“. Das stimmt seit
+  §14.4 nicht mehr: Duplikate werden aus der Hauptprüfung ausgeschlossen und nur gezählt (15.3).
+  Die Zahlen des Berichts sind davon nicht berührt. Der Originalbericht bleibt unverändert; der Text
+  im Werkzeug (`auswertung/endspiel/diagonal-pruefung.js`) ist **noch nicht berichtigt** (eigener Schritt).
+- **Aussagen in der Berichterstattung der Sitzung:** „S gibt es nur ohne ein Ende mit zwei Pässen“ war
+  falsch formuliert (richtig: 15.3), und „die Betroffenheit steigt mit der Partielänge“ war zu allgemein
+  (richtig: 15.4). Beides stand nicht in den gesicherten Dateien.
+
+### 15.6 Grenzen, Folgerung, Freigaben
+
+Betroffenheit sagt nicht, ob die Zählung richtiger wird. Mehrere Stellungen derselben Partie sind
+abhängig. Ko und Superko wurden bei der Nachspiel-Kontrolle nicht geprüft. Die Prüfdaten stammen aus
+denselben Archiven wie die Entwicklungsdaten und begründen keine Aussage für menschliche Partien.
+**Plan für Stufe 2 unverändert:** alle betroffenen Stellungen (hier 1.718) werden geprüft; eine
+Verkleinerung wäre eine ausdrückliche Planänderung. Vollständig beurteilt wird in Stufe 3 nur B1; B2
+bleibt auf 60 begrenzt (§6.1). Die Beurteilerwahl (E-2) ist offen. Dieser Nachtrag erteilt kein Go für
+weitere Läufe, Stufe 2 oder 3, einen Standardwechsel oder einen Merge; `diagonalAugeEnde` bleibt standardmäßig 0.
