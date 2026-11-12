@@ -646,3 +646,42 @@ Der Auswerter ordnet jede Stellung genau einer der vier Kategorien zu. In V summ
 - **Rohdaten:** [Actions-Artefakt `diagonal-pruefung-stufe2`](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/43274198340/artifacts/13970480435), ID `13970480435`, 1.593.388 Bytes, SHA-256 laut Upload-Log `d3f92b964891a176aedf128e834138816cb92399b0edfa6fe2d1c4c263f49d95`, verfügbar bis 10.02.2027. Enthält unter anderem `bericht.md`, `bericht.json`, 43 Paketdateien und `auswahl-stufe3.json`.
 
 Die Ergebnisse beschreiben Schicht A, die Übereinstimmung mit der Referenz aus GNU Gos Tot-Liste. Die Beurteilung der Steinbewertungen in Stufe 3 steht aus.
+
+
+## 18. Stand der Umsetzung AP5: Stufe-3-Werkzeug (12.11.2026)
+
+Hazeberry hat das Go zum **Bauen** von AP5 erteilt („Und bau von AP5“). Es gilt nur für das Bauen. **Kein Lauf, kein Paket erzeugt, kein Beurteiler gestartet, keine Rechnung auf den Archiven.** Paket, Probe, Beurteilung und Auswertung brauchen je ein eigenes Go. Die Beurteilung macht eine getrennte KI-Sitzung (E-2, §17.5.2) außerhalb dieses Werkzeugs; die Sitzung, die das Werkzeug gebaut hat, beurteilt nicht.
+
+| AP | Stand | Inhalt |
+|---|---|---|
+| AP5 | gebaut, nicht gelaufen | `auswertung/endspiel/diagonal-pruefung-stufe3.js` (`unterlagen`, `pruefen`, `auswerten`), Workflow `.github/workflows/diagonal-pruefung-stufe3.yml` (nur `workflow_dispatch`, Modi `probe`, `unterlagen`, `auswerten`, kein GNU Go), Test `tests/diagonal-pruefung-stufe3.js` (Attrappe, 17 Fälle, lokal grün) |
+
+### 18.1 Ablauf
+
+1. **Paket bauen** (Modus `unterlagen`): aus dem gesicherten Stufe-1-ZIP und dem gültigen Stufe-2-ZIP (`stufe2-hauptlauf-43274198340`, je gegen ihre SHA-256 geprüft). Das Werkzeug prüft vorher, dass `auswahl-stufe3.json` gleich der Auswahl ist, die sich aus den Paketdaten ergibt, und dass der Bericht der Stufe 2 gültig ist und den Modus `haupt` hat; sonst KEIN URTEIL. Ergebnis: Artefakt `beurteiler-paket` (das bekommt der Beurteiler) und Artefakt `stufe3-geheim` (Zuordnung; **nicht** an den Beurteiler geben).
+2. **Probe** (Modus `probe`, §10.4): 3 Unterlagen für die Zeitschätzung. Die Urteile dazu werden **nicht** ausgewertet; ein Bogen zum Probe-Paket wird von `auswerten` abgelehnt (anderes Manifest).
+3. **Beurteilung:** Die getrennte Sitzung bekommt nur `beurteiler-paket` (Unterlagen, Anleitung, Schema, Vorlage, Manifest) und liefert eine JSON-Datei nach `bogen-schema.json`. Die Datei wird in einem PR unter `docs/daten/diagonal-pruefung/stufe3/` abgelegt.
+4. **Auswertung** (Modus `auswerten`, Eingabe `bogen`): Das Paket wird aus denselben Eingaben neu gebaut, der Bogen muss zum Manifest passen (`manifestSha256`), jede Kennung genau einmal beantwortet sein. Erst dann wird aufgedeckt.
+
+### 18.2 Konkretisierungen beim Bau (Setzungen, Entscheidung bei Hazeberry)
+
+1. **Keine Herkunft im Paket (§6.2):** Kennung `U-xxxxxx` und Reihenfolge sind Hash-Zufall (nicht sortiert nach Menge, Art oder Partie). Die Unterlagen nennen weder Programm, Gruppe, Datei, B1 oder B2, noch Urteile von App oder GNU Go, noch die Regel der App. Ein Test prüft jede Datei des Pakets auf diese Begriffe und auf Schlüssel und Stellungskennungen. B1 und B2 sind Brettkoordinaten und werden deshalb in den Unterlagen nicht als Wort gesucht.
+2. **Inhalt einer Unterlage (§6.2):** markierte Kette (`@`, Farbe, Zahl der Steine, Koordinaten), Textdiagramm mit Koordinaten (A bis T ohne I), Zugnummer (ab 1, Pässe eingerechnet), ob die Partie beendet ist (nur die Endstellung S, zwei Pässe in Folge), Zugfarbe (wer als Nächstes am Zug wäre), Regeln (chinesisch, Komi 7,5), Gefangene, Pässe am Ende, Ko-Punkt, letzte zehn Züge, vollständige Zuggeschichte als SGF (eingebettet und als Datei).
+3. **Ko-Punkt:** einfaches Ko (genau ein Stein geschlagen, schlagender Einzelstein mit genau einer Freiheit am geschlagenen Punkt). Superko wird nicht erkannt; dafür dient die vollständige Zuggeschichte.
+4. **Antwortbogen:** Felder `id`, `kategorie` (lebendig, tot, seki, ko_zugabhaengig, nicht_entscheidbar), bei Ko zusätzlich `urteilSchwarzAmZug` und `urteilWeissAmZug`, `begruendung` (mindestens 20 Zeichen, Setzung), `sicherheit` (sicher, eher_sicher, unsicher), `offen` (Pflicht bei eher_sicher, unsicher und nicht_entscheidbar). Teilurteile bei anderen Kategorien sind nicht erlaubt.
+5. **Bewertung einer Kette (§6.4):** Ein Urteil zählt, wenn es entschieden (lebendig oder tot) und nicht unsicher ist; ein Ko-Urteil mit gleichem Teilurteil für beide Seiten gilt als dieses Urteil, sonst ungeklärt; Seki und nicht entscheidbar sind ungeklärt. **R+** (aus falsch, an richtig): alle Urteile zählen und stimmen mit „an“ überein. **R−** (aus richtig, an falsch): schon ein zählendes Urteil gleich „aus“ (konservativ), auch bei Widerspruch zwischen Beurteilern; der Widerspruch wird zusätzlich vermerkt. Bleibt die App bei aus und an gleich, sind die Ergebnisse „gleich richtig“ und „gleich falsch“. Ist die Kette bei der App teils tot, teils lebend (nicht erwartet), ist sie ungeklärt und wird genannt.
+6. **Entscheidungsregel (§8) als fünf einzeln berichtete Bedingungen:** (1) Pflichtprüfungen (Stufe 2 gültig, Bögen geprüft), (2) mindestens 5 R+ aus mindestens 3 verschiedenen Partien (§10.5), (3) R− = 0 in beiden Stellungsarten, (4) kein ungeklärter B1-Fall und keine Ausfälle in betroffenen Stellungen, (5) Mindestumfang 30 betroffene Stellungen je Art. Der Befund lautet „positive Kandidatur“ oder „keine positive Kandidatur“ mit den einzelnen Bedingungen; er ist kein Go und heißt nie „unbedenklich“.
+7. **Auslegung, offen zur Bestätigung:** §8 Nr. 4 nennt „alle B1-Fälle“; **ungeklärte B2-Fälle verhindern die Kandidatur daher nicht**, werden aber einzeln und gezählt berichtet. Wer sie auch verhindern lassen will, ändert Bedingung 4 vor der Auswertung.
+8. **Gültigkeit:** Stufe 3 ist ungültig (KEIN URTEIL, Exit 1), wenn ein Bogen nicht zum Paket passt oder eine Kennung fehlt, doppelt oder ungültig beantwortet ist. Das schließt §7 Nr. 6 ein: B1 ist vollständig beurteilt oder der Lauf ungültig.
+9. **Bericht der Stufe 2:** Die Spaltenüberschriften „Stellungen mit behoben / mit neu“ sind zu „nur behoben / nur neu“ berichtigt (die Zählung war schon ausschließlich; §17.6).
+
+### 18.3 Was die Tests belegen und was nicht
+
+- `tests/diagonal-pruefung-stufe3.js` prüft das Werkzeug an einer **Attrappe** (12 Zufallspartien, Stufe-1-Dateien vom Werkzeug von Stufe 1 gerechnet, Stufe-2-Ergebnisse synthetisch) und mit selbst geschriebenen Antworten. Geprüft sind: Einspielen mit Ko, Pässen und Gefangenen, SGF-Rundreise, Diagramm, Nachprüfung der Auswahl, Inhalt der Unterlagen, Determinismus, Zufälligkeit, **keine Herkunft in irgendeiner Datei des Pakets**, Antwortbögen, Bewertung nach §6.4 einschließlich zweier Beurteilergruppen, der ganze Ablauf in eigenen Prozessen mit allen fünf Bedingungen, ungültige Bögen, Probe-Paket und Workflow-Datei.
+- **Mutationsprobe bestanden:** R− nicht mehr konservativ, R+ ohne „alle Urteile zählen“, Ko-Erkennung entfernt, Reihenfolge nach Menge statt zufällig, Menge in der Unterlage, Bedingung R− = 0 entfernt, ungeklärter B1-Fall ohne Wirkung und Seki als lebendig lassen je mindestens einen Test fehlschlagen. Die Mutation „Menge in der Unterlage“ blieb zuerst unbemerkt (B1 und B2 sind Brettkoordinaten); der Test sucht jetzt auch nach Menge, Zelle, Klasse und Richtung.
+- **Nicht geprüft:** der Workflow in Actions; die echten Archive und die echten 416 Ketten (Dauer, Größe der Unterlagen, Ko-Fälle); ob die Anleitung für die getrennte Sitzung verständlich genug ist (erst die Probe zeigt es); die Qualität irgendeiner Beurteilung.
+- Lokal gelaufen sind nur die betroffenen Tests (`diagonal-pruefung-stufe3.js`, `diagonal-pruefung-stufe2.js`, `diagonal-pruefung.js`, `lizenz.js`); die gesamte Suite prüft die reguläre CI.
+
+### 18.4 Freigaben
+
+Dieser Abschnitt erteilt kein Go für ein Paket, die Probe, die Beurteilung, die Auswertung, einen Engine-Vergleich, einen Standardwechsel oder einen Merge. Reihenfolge: Merge dieses PR (Hazeberry liest vorher) → **Go zur Probe** (Modus `probe`) → Zeitschätzung an drei Probestücken, Zahl der Unterlagen (416) nennen → **Go zum Paket** (Modus `unterlagen`) → Beurteilung durch die getrennte Sitzung → Ablage des Bogens im Repo (PR) → **Go zur Auswertung** (Modus `auswerten`). `diagonalAugeEnde` bleibt standardmäßig 0, `passNachGegnerpass` bleibt aus.

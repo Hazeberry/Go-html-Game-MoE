@@ -512,7 +512,7 @@ function berichtMd(b) {
   if (!b.gueltig) return m.join('\n') + '\n';
   m.push('## Kennzahlen (Steine; behoben und neu entstanden getrennt, nie nur als Saldo)', '',
     'behoben = bei aus von GNU Go abweichend, bei an gleich; neu entstanden = bei aus gleich, bei an abweichend; unverändert abweichend = bei beiden abweichend. „zusätzlich tot“ = bei an tot, bei aus lebend; „wieder lebendig“ umgekehrt. Stellungen derselben Partie sind nicht unabhängig.', '',
-    '| Art | Kategorie | Gruppe | Stellungen | Steine behoben (zusätzlich tot / wieder lebendig) | Steine neu entstanden (zusätzlich tot / wieder lebendig) | Steine unverändert abweichend (GNU tot / GNU lebend) | Stellungen mit behoben | mit neu | beides | ohne Änderung |', '|---|---|---|---:|---|---|---|---:|---:|---:|---:|');
+    '| Art | Kategorie | Gruppe | Stellungen | Steine behoben (zusätzlich tot / wieder lebendig) | Steine neu entstanden (zusätzlich tot / wieder lebendig) | Steine unverändert abweichend (GNU tot / GNU lebend) | Stellungen nur behoben | nur neu | beides | ohne Änderung |', '|---|---|---|---:|---|---|---|---:|---:|---:|---:|');
   for (const k of Object.values(b.schichtA).sort((p, q) => (p.art + p.kategorie + p.gruppe).localeCompare(q.art + q.kategorie + q.gruppe))) {
     const s = k.steine, e = k.stellungsebene;
     m.push(`| ${k.art} | ${k.kategorie} | ${k.gruppe} | ${k.stellungen} | ${s.behoben} (${s.behobenZusaetzlichTot} / ${s.behobenWiederLebendig}) | ${s.neu} (${s.neuZusaetzlichTot} / ${s.neuWiederLebendig}) | ${s.unveraendert} (${s.unveraendertGnuTot} / ${s.unveraendertGnuLebend}) | ${e.behoben} | ${e.neu} | ${e.gemischt} | ${e.ohneAenderung} |`);
