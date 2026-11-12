@@ -24,6 +24,7 @@ const wurzel = path.join(__dirname, '..');
 const werkzeug = path.join(wurzel, 'auswertung/endspiel/diagonal-pruefung-stufe3.js');
 const htmlPfad = path.join(wurzel, 'index.html');
 const E = ladeKI({htmlPfad, mitNetz: false});
+const STUFE1_BERICHT = path.join(wurzel, 'docs/daten/diagonal-pruefung/stufe1/bericht.json');
 const sha = t => crypto.createHash('sha256').update(t).digest('hex');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'diagonal-stufe3-'));
 process.on('exit', () => { if (process.env.DIAGONAL_STUFE3_BEHALTEN) { console.log('Arbeitsverzeichnis: ' + tmp); return; } try { fs.rmSync(tmp, {recursive: true, force: true}); } catch (e) { /* egal */ } });
@@ -66,7 +67,7 @@ function baueGrund(betroffenS = 658, betroffenV = 1060) {
   const neu = W.rechnen(E, {stand: 'neu'}, stellungen, sha(fs.readFileSync(htmlPfad))), jeId = new Map(neu.slice(1).map(z => [z.id, z]));
   const betroffen = stellungen.filter(s => JSON.stringify(jeId.get(s.id).aus.tot) !== JSON.stringify(jeId.get(s.id).an.tot));
   const s1 = path.join(verz, 'stufe1'); fs.mkdirSync(s1);
-  fs.writeFileSync(path.join(s1, 'bericht.json'), JSON.stringify({gueltig: true, wirkung: {S: {flaeche: {stand: {n: 658, aendert: 658, siegerwechsel: 195, median: -19}}, territory: {stand: {n: 658, aendert: 658, siegerwechsel: 68, median: -19}}}}}));
+  fs.copyFileSync(STUFE1_BERICHT, path.join(s1, 'bericht.json'));   /* tatsächliche Ausgabe von Stufe 1 (Lauf 42456406985), im Repo gesichert */
   schreibeJsonl(path.join(s1, 'stellungen.jsonl'), stellungen); schreibeJsonl(path.join(s1, 'neu.jsonl'), neu); schreibeJsonl(path.join(s1, 'betroffen.jsonl'), betroffen.map(s => ({id: s.id})));
   /* Stufe 2 synthetisch: GNU Gos Tot-Liste wie App mit Diagonalprüfung (behoben), wie App ohne (neu entstanden) oder leer (unverändert abweichend) */
   const zeilen = betroffen.map((s, i) => {
@@ -289,18 +290,41 @@ test('Auswertung: zwei Beurteilergruppen mit Widerspruch; Bogen eines anderen Pa
   pruefeGleich(probeBogen.status, 1, 'Bogen des Probe-Pakets wird in der Auswertung nicht angenommen'); pruefe(pm.manifestSha256 !== manifest.manifestSha256, 'das Probe-Paket hat ein anderes Manifest als das Hauptpaket');
 });
 test('Auswertung: nicht erreichter Mindestumfang (Bericht der Stufe 2 nennt weniger als 30) verhindert die Kandidatur, auch bei bester Beurteilung', () => {
-  const g = baueGrund(10, 10), a = ablauf(g), aufd = liesJson(path.join(a.aus, 'geheim', 'aufdeckung.json')), man = liesJson(path.join(a.aus, 'beurteiler-paket', 'manifest.json'));
+  const g = baueGrund(10, 10); { const b = liesJson(path.join(g.s1, 'bericht.json')); for (const m of ['flaeche', 'territory']) b.wirkung.S[m].stand.n = 10, b.wirkung.S[m].stand.aendert = 10, b.wirkung.S[m].stand.siegerwechsel = 4; fs.writeFileSync(path.join(g.s1, 'bericht.json'), JSON.stringify(b)); }
+  const a = ablauf(g), aufd = liesJson(path.join(a.aus, 'geheim', 'aufdeckung.json')), man = liesJson(path.join(a.aus, 'beurteiler-paket', 'manifest.json'));
   const r = auswerten(g, a.aus, {KI: schreibeBogen(a.aus, 'klein.json', man, man.reihenfolge.map(id => antwort(id, wertVon(aufd[id].appAn))))});
   pruefeGleich(r.status, 0, 'gültig: ' + r.stderr); pruefeGleich(r.json.mindestumfang.erfuellt, false, 'Mindestumfang nicht erreicht'); pruefeGleich(r.json.bedingungen.find(b => b.nr === 5).erfuellt, true, '§8 Nr. 5 ist davon unabhängig erfüllt');
   pruefe(/^Kandidatur offen/.test(r.json.befund), 'Befund: Kandidatur offen (zu wenig Betroffene), nicht „keine positive Kandidatur“: ' + r.json.befund); pruefe(/kein Urteil über die Kandidatur, zu wenig Betroffene/.test(r.md), 'Wortlaut aus §7 Nr. 7 im Bericht');
 });
 
-test('Auswertung: fehlt die Wirkung auf den Endstand im Bericht der Stufe 1, ist §8 Nr. 5 nicht erfüllt und der Bericht sagt es', () => {
-  const g = baueGrund(658, 1060); fs.writeFileSync(path.join(g.s1, 'bericht.json'), JSON.stringify({gueltig: true}));
+function endstandFall(aendere) {
+  const g = baueGrund(658, 1060), b = liesJson(path.join(g.s1, 'bericht.json')); aendere(b); fs.writeFileSync(path.join(g.s1, 'bericht.json'), JSON.stringify(b));
   const a = ablauf(g), aufd = liesJson(path.join(a.aus, 'geheim', 'aufdeckung.json')), man = liesJson(path.join(a.aus, 'beurteiler-paket', 'manifest.json'));
-  const r = auswerten(g, a.aus, {KI: schreibeBogen(a.aus, 'ohne-endstand.json', man, man.reihenfolge.map(id => antwort(id, wertVon(aufd[id].appAn))))});
-  pruefeGleich(r.status, 0, 'gültig: ' + r.stderr); pruefeGleich(r.json.bedingungen.find(b => b.nr === 5).erfuellt, false, 'Nr. 5 nicht erfüllt'); pruefeGleich(r.json.befund, 'keine positive Kandidatur', 'keine positive Kandidatur');
-  pruefe(/\*\*Fehlt:\*\* Der Bericht der Stufe 1 enthält die Wirkung auf den Endstand nicht/.test(r.md), 'Bericht nennt das Fehlen');
+  return auswerten(g, a.aus, {KI: schreibeBogen(a.aus, 'e.json', man, man.reihenfolge.map(id => antwort(id, wertVon(aufd[id].appAn))))});
+}
+test('Stufe 3 liest die tatsächliche Ausgabe von Stufe 1: Aufbau von bericht.json (wirkung.S.<Wertung>.stand mit n, aendert, siegerwechsel) gleich dem Code von Stufe 1', () => {
+  const real = liesJson(STUFE1_BERICHT);
+  for (const m of ['flaeche', 'territory']) { const x = real.wirkung.S[m].stand; pruefe(['n', 'aendert', 'siegerwechsel'].every(f => Number.isFinite(x[f])), `echter Bericht: ${m} hat n, aendert, siegerwechsel`); }
+  const q = fs.readFileSync(path.join(wurzel, 'auswertung/endspiel/diagonal-pruefung.js'), 'utf8');
+  pruefe(/wirk\[art\]\[w\] = \{stand: wirkung\(/.test(q) && /return \{n: paare\.length, aendert: [^}]*siegerwechsel:/.test(q.replace(/\n\s*/g, ' ')) || /function wirkung\(paare\)[\s\S]*aendert:[\s\S]*siegerwechsel:/.test(q), 'Stufe 1 schreibt wirkung.S.<Wertung>.stand mit aendert und siegerwechsel');
+  const r = endstandFall(() => {}); pruefeGleich(r.status, 0, 'gültig: ' + r.stderr); const b5 = r.json.bedingungen.find(b => b.nr === 5); pruefeGleich(b5.erfuellt, true, 'Nr. 5 mit dem echten Bericht erfüllt: ' + b5.detail);
+  pruefeGleich(r.json.endstand.flaeche.aendert, 658, 'aendert Fläche gelesen'); pruefe(!/undefined/.test(r.md), 'im Bericht steht kein undefined');
+});
+test('Regression §8 Nr. 5: unvollständiger oder unplausibler Bericht der Stufe 1 (aendert fehlt in EINER Wertung, kein Block fehlt ganz) erfüllt Nr. 5 nicht, und im Bericht steht kein undefined', () => {
+  const fall = (name, aendere, muster) => {
+    const r = endstandFall(aendere), b5 = r.json.bedingungen.find(b => b.nr === 5);
+    pruefeGleich(r.status, 0, `${name}: Auswertung gültig: ` + r.stderr); pruefeGleich(b5.erfuellt, false, `${name}: Nr. 5 nicht erfüllt`); pruefe(muster.test(b5.detail), `${name}: Detail nennt den Grund: ${b5.detail}`);
+    pruefe(!/undefined|NaN/.test(r.md), `${name}: kein undefined im Bericht`); pruefe(/Fehlt oder unvollständig \(Bedingung 5 nicht erfüllt\)/.test(r.md), `${name}: Bericht nennt es`); pruefeGleich(r.json.befund, 'keine positive Kandidatur', `${name}: keine positive Kandidatur`);
+  };
+  fall('aendert fehlt (Territory)', b => { delete b.wirkung.S.territory.stand.aendert; }, /Territory: aendert fehlt/);
+  fall('aendert fehlt (Fläche)', b => { delete b.wirkung.S.flaeche.stand.aendert; }, /Fläche: aendert fehlt/);
+  fall('siegerwechsel fehlt', b => { delete b.wirkung.S.flaeche.stand.siegerwechsel; }, /Fläche: siegerwechsel fehlt/);
+  fall('n fehlt', b => { delete b.wirkung.S.territory.stand.n; }, /Territory: n fehlt/);
+  fall('aendert keine Zahl', b => { b.wirkung.S.flaeche.stand.aendert = '658'; }, /Fläche: aendert fehlt oder ist keine Zahl/);
+  fall('Wertung fehlt ganz', b => { delete b.wirkung.S.territory; }, /Territory: wirkung\.S\.territory\.stand fehlt/);
+  fall('Block wirkung fehlt ganz', b => { delete b.wirkung; }, /wirkung\.S fehlt/);
+  fall('unplausibel (siegerwechsel größer als aendert)', b => { b.wirkung.S.flaeche.stand.siegerwechsel = 700; }, /unplausibel/);
+  fall('Bericht gehört nicht zu diesem Lauf (n ungleich)', b => { b.wirkung.S.flaeche.stand.n = 600; b.wirkung.S.flaeche.stand.aendert = 600; }, /ungleich der Zahl betroffener S-Stellungen/);
 });
 
 /* ── 6 Workflow und Werkzeug ──────────────────────────────────────────── */

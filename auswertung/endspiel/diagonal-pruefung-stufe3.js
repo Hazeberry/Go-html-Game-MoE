@@ -294,20 +294,30 @@ function auswertung(aufdeckung, boegen, ein) {
   const b1Ungeklaert = je('B1').filter(x => x.ergebnis === 'ungeklaert');
   const betroffen = ein.bericht2.plan.zahlen.betroffen, ausfaelleBetroffen = ein.bericht2.ausfaelleBetroffen === undefined ? ein.bericht2.ausfaelle.filter(a => a.kategorie === 'betroffen').length : ein.bericht2.ausfaelleBetroffen;
   /* §8 Nr. 5: Wirkung auf den Endstand (S), einschließlich der Siegerwechsel. Sie steht im Bericht der Stufe 1 (§15.4, `wirkung.S`) und wird hier nur übernommen und gezeigt, nicht neu gerechnet. */
-  const w1 = ein.s1bericht && ein.s1bericht.wirkung && ein.s1bericht.wirkung.S, MODI = ['flaeche', 'territory'];
-  const endstand = {}; let endstandDa = !!w1;
-  for (const m of MODI) { const x = w1 && w1[m] && w1[m].stand; if (!x || !Number.isFinite(x.n) || !Number.isFinite(x.siegerwechsel)) { endstandDa = false; continue; } endstand[m] = {n: x.n, aendert: x.aendert, siegerwechsel: x.siegerwechsel, median: x.median};
-    const pa = ein.bericht2.schichtA && ein.bericht2.schichtA['S|betroffen|Summe (nicht gewichtet)']; if (pa && pa.punkte && pa.punkte[m]) endstand[m].siegerWieReferenz = {aus: pa.punkte[m].siegerGleichAus, an: pa.punkte[m].siegerGleichAn, n: pa.punkte[m].n}; }
+  const w1 = ein.s1bericht && ein.s1bericht.wirkung && ein.s1bericht.wirkung.S, MODI = ['flaeche', 'territory'], NAMEN = {flaeche: 'Fläche', territory: 'Territory'};
+  const endstand = {}, endstandProbleme = [];
+  if (!w1) endstandProbleme.push('wirkung.S fehlt im Bericht der Stufe 1');
+  else for (const m of MODI) {
+    const x = w1[m] && w1[m].stand;
+    if (!x) { endstandProbleme.push(`${NAMEN[m]}: wirkung.S.${m}.stand fehlt`); continue; }
+    const fehlt = ['n', 'aendert', 'siegerwechsel'].filter(f => !Number.isFinite(x[f]));
+    if (fehlt.length) { endstandProbleme.push(`${NAMEN[m]}: ${fehlt.join(', ')} fehlt oder ist keine Zahl`); continue; }
+    if (!(x.siegerwechsel >= 0 && x.siegerwechsel <= x.aendert && x.aendert <= x.n)) { endstandProbleme.push(`${NAMEN[m]}: unplausibel (siegerwechsel ${x.siegerwechsel}, aendert ${x.aendert}, n ${x.n}; erwartet 0 ≤ siegerwechsel ≤ aendert ≤ n)`); continue; }
+    if (x.n !== ein.bericht2.plan.zahlen.betroffen.S) { endstandProbleme.push(`${NAMEN[m]}: n ${x.n} ist ungleich der Zahl betroffener S-Stellungen der Stufe 2 (${ein.bericht2.plan.zahlen.betroffen.S}); der Bericht gehört nicht zu diesem Lauf`); continue; }
+    endstand[m] = {n: x.n, aendert: x.aendert, siegerwechsel: x.siegerwechsel, median: x.median};
+    const pa = ein.bericht2.schichtA && ein.bericht2.schichtA['S|betroffen|Summe (nicht gewichtet)']; if (pa && pa.punkte && pa.punkte[m]) endstand[m].siegerWieReferenz = {aus: pa.punkte[m].siegerGleichAus, an: pa.punkte[m].siegerGleichAn, n: pa.punkte[m].n};
+  }
+  const endstandDa = endstandProbleme.length === 0;
   const bed = [
     {nr: 1, text: 'Pflichtprüfungen der Stufen 1 bis 3 bestanden (Stufe 2 gültig, Bögen geprüft)', erfuellt: true},
     {nr: 2, text: `Bestätigter Nutzen: mindestens ${R_PLUS_MIN} R+ aus mindestens ${R_PLUS_PARTIEN_MIN} verschiedenen Partien (§10.5, Setzung)`, erfuellt: rPlus.length >= R_PLUS_MIN && partienPlus.size >= R_PLUS_PARTIEN_MIN, detail: `${rPlus.length} R+ aus ${partienPlus.size} Partien`},
     {nr: 3, text: 'R− = 0 in beiden Stellungsarten (konservativ gezählt)', erfuellt: rMinus.length === 0, detail: `S ${zaehle(rMinus, x => x.art === 'S')}, V ${zaehle(rMinus, x => x.art === 'V')}`},
     {nr: 4, text: 'Alle B1-Fälle entschieden (kein ungeklärter B1-Fall) und alle betroffenen Stellungen ausgewertet (keine Ausfälle in betroffenen Stellungen)', erfuellt: b1Ungeklaert.length === 0 && ausfaelleBetroffen === 0, detail: `ungeklärte B1-Fälle ${b1Ungeklaert.length}, Ausfälle in betroffenen Stellungen ${ausfaelleBetroffen}`},
-    {nr: 5, text: 'Wirkung auf den Endstand (S) berichtet, einschließlich der Fälle, in denen sich der Sieger ändert (Bericht der Stufe 1, §15.4)', erfuellt: endstandDa, detail: endstandDa ? MODI.map(m => `${m === 'flaeche' ? 'Fläche' : 'Territory'}: Stand ändert sich bei ${endstand[m].aendert} von ${endstand[m].n}, Sieger wechselt bei ${endstand[m].siegerwechsel}`).join('; ') : 'Bericht der Stufe 1 (bericht.json, wirkung.S) fehlt oder ist unvollständig'}];
+    {nr: 5, text: 'Wirkung auf den Endstand (S) berichtet, einschließlich der Fälle, in denen sich der Sieger ändert (Bericht der Stufe 1, §15.4)', erfuellt: endstandDa, detail: endstandDa ? MODI.map(m => `${NAMEN[m]}: Stand ändert sich bei ${endstand[m].aendert} von ${endstand[m].n}, Sieger wechselt bei ${endstand[m].siegerwechsel}`).join('; ') : endstandProbleme.join('; ')}];
   /* Mindestumfang (§7 Nr. 7) ist eine eigene Bedingung, keine Nummer von §8: nicht erreicht heißt „Kandidatur offen“ (zu wenig Betroffene), nicht „keine positive Kandidatur“ */
   const mindest = {schwelle: MINDESTUMFANG, S: betroffen.S, V: betroffen.V, erfuellt: betroffen.S >= MINDESTUMFANG && betroffen.V >= MINDESTUMFANG};
   const positiv = bed.every(b => b.erfuellt) && mindest.erfuellt;
-  return {proKette, uebersicht, uebereinstimmung, verteilung, rPlus: rPlus.length, partienRPlus: partienPlus.size, rMinus: rMinus.length, abweichungGnu, bedingungen: bed, endstand, mindestumfang: mindest, befund: !mindest.erfuellt ? 'Kandidatur offen (zu wenig Betroffene)' : positiv ? 'positive Kandidatur' : 'keine positive Kandidatur',
+  return {proKette, uebersicht, uebereinstimmung, verteilung, rPlus: rPlus.length, partienRPlus: partienPlus.size, rMinus: rMinus.length, abweichungGnu, bedingungen: bed, endstand, endstandProbleme, mindestumfang: mindest, befund: !mindest.erfuellt ? 'Kandidatur offen (zu wenig Betroffene)' : positiv ? 'positive Kandidatur' : 'keine positive Kandidatur',
     ungeklaertB2: je('B2').filter(x => x.ergebnis === 'ungeklaert').length, b1Ungeklaert: b1Ungeklaert.length};
 }
 function berichtMd(r, gruppen, paketInfo) {
@@ -326,7 +336,7 @@ function berichtMd(r, gruppen, paketInfo) {
   m.push(`### GNU Go weicht von einem zählenden Urteil ab (${r.abweichungGnu.length})`, '');
   if (!r.abweichungGnu.length) m.push('Keine.', ''); else { m.push('| Kennung | Menge | Art | GNU Go | Urteile |', '|---|---|---|---|---|'); for (const x of r.abweichungGnu) m.push(`| ${x.id} | ${x.menge} | ${x.art} | ${x.gnu} | ${x.urteile.join('; ')} |`); m.push(''); }
   m.push('## Wirkung auf den Endstand (S, §8 Nr. 5)', '', 'Aus dem Bericht der Stufe 1 übernommen (nicht neu gerechnet): betroffene Schlusszählungen, bei denen der Schalter den Stand ändert, und Siegerwechsel; dazu aus der Stufe 2 die Zahl der Stände, deren Sieger mit der Referenz aus GNU Gos Tot-Liste übereinstimmt.', '');
-  if (r.endstand.flaeche && r.endstand.territory) { m.push('| Wertung | betroffene Stellungen | Stand ändert sich | Sieger wechselt | Sieger wie Referenz, aus | Sieger wie Referenz, an |', '|---|---:|---:|---:|---:|---:|'); for (const [k, n] of [['flaeche', 'Fläche'], ['territory', 'Territory']]) { const e = r.endstand[k], sr = e.siegerWieReferenz; m.push(`| ${n} | ${e.n} | ${e.aendert} | ${e.siegerwechsel} | ${sr ? sr.aus : '–'} | ${sr ? sr.an : '–'} |`); } m.push(''); } else m.push('**Fehlt:** Der Bericht der Stufe 1 enthält die Wirkung auf den Endstand nicht (Bedingung 5 nicht erfüllt).', '');
+  if (!r.endstandProbleme.length && r.endstand.flaeche && r.endstand.territory) { m.push('| Wertung | betroffene Stellungen | Stand ändert sich | Sieger wechselt | Sieger wie Referenz, aus | Sieger wie Referenz, an |', '|---|---:|---:|---:|---:|---:|'); for (const [k, n] of [['flaeche', 'Fläche'], ['territory', 'Territory']]) { const e = r.endstand[k], sr = e.siegerWieReferenz; m.push(`| ${n} | ${e.n} | ${e.aendert} | ${e.siegerwechsel} | ${sr ? sr.aus : '–'} | ${sr ? sr.an : '–'} |`); } m.push(''); } else m.push(`**Fehlt oder unvollständig (Bedingung 5 nicht erfüllt):** ${r.endstandProbleme.join('; ')}.`, '');
   m.push('## Entscheidungsregel (§8)', '', '| Nr. | Bedingung | erfüllt | Detail |', '|---|---|---|---|');
   for (const b of r.bedingungen) m.push(`| ${b.nr} | ${b.text} | ${b.erfuellt ? 'ja' : '**nein**'} | ${b.detail || ''} |`);
   m.push('', `**Mindestumfang (§7 Nr. 7, eigene Bedingung):** mindestens ${r.mindestumfang.schwelle} betroffene Stellungen je Stellungsart; S ${r.mindestumfang.S}, V ${r.mindestumfang.V}: ${r.mindestumfang.erfuellt ? 'erreicht' : '**nicht erreicht**'}. Nicht erreicht heißt: kein Urteil über die Kandidatur, zu wenig Betroffene.`);
@@ -376,7 +386,7 @@ function main() {
     if (gruende.length) { fs.writeFileSync(path.join(o.aus, 'bericht-stufe3.md'), `# Diagonalprüfung, Stufe 3\n\n**UNGÜLTIG, KEIN URTEIL.** ${gruende.join(' ; ')}\n`); console.error('KEIN URTEIL: ' + gruende.join(' ; ')); process.exit(1); }
     const r = auswertung(p.aufdeckung, boegen, ein), md = berichtMd(r, Object.keys(boegen), {unterlagen: p.manifest.unterlagen, anzahlB1: p.anzahlB1, anzahlB2: p.anzahlB2});
     fs.writeFileSync(path.join(o.aus, 'bericht-stufe3.md'), md);
-    fs.writeFileSync(path.join(o.aus, 'bericht-stufe3.json'), JSON.stringify({befund: r.befund, uebersicht: r.uebersicht, uebereinstimmung: r.uebereinstimmung, verteilung: r.verteilung, bedingungen: r.bedingungen, mindestumfang: r.mindestumfang, endstand: r.endstand, rPlus: r.rPlus, partienRPlus: r.partienRPlus, rMinus: r.rMinus, manifestSha256: p.manifest.manifestSha256}, null, 1));
+    fs.writeFileSync(path.join(o.aus, 'bericht-stufe3.json'), JSON.stringify({befund: r.befund, uebersicht: r.uebersicht, uebereinstimmung: r.uebereinstimmung, verteilung: r.verteilung, bedingungen: r.bedingungen, mindestumfang: r.mindestumfang, endstand: r.endstand, rPlus: r.rPlus, partienRPlus: r.partienRPlus, rMinus: r.rMinus, endstandProbleme: r.endstandProbleme, manifestSha256: p.manifest.manifestSha256}, null, 1));
     fs.writeFileSync(path.join(o.aus, 'ketten-stufe3.jsonl'), r.proKette.map(x => JSON.stringify(x)).join('\n') + '\n');
     console.log(md);
   } else if (befehl === 'pruefen') {
