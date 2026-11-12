@@ -459,4 +459,4 @@ function main() {
   } else throw new Error('Aufruf: node diagonal-pruefung.js ziehen|rechnen|vergleichen ...');
 }
 if (require.main === module) { try { main(); } catch (e) { console.error(e.stack || e.message); process.exit(2); } }
-module.exports = {spielEin, folgeAusArchiv, leseSgf, ziehen, berichtSchritt0, rechnen, vergleichen, ladeStand, V_INDIZES, MINDESTUMFANG};
+module.exports = {spielEin, folgeAusArchiv, leseSgf, ziehen, berichtSchritt0, rechnen, rechneStellung, indizesVon, vergleichen, ladeStand, V_INDIZES, MINDESTUMFANG};

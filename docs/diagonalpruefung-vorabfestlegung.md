@@ -542,3 +542,50 @@ Reihenfolge: dieser Doc-PR → Merge (Hazeberry liest vorher) → **Go zum Bauen
 ### 16.12 Freigaben
 
 Dieser Abschnitt erteilt kein Go für den Bau, einen Lauf, Stufe 2 oder 3, einen Engine-Vergleich, einen Standardwechsel oder einen Merge. Das Doc enthält Vorgaben; Hazeberry liest es vor dem Merge. `diagonalAugeEnde` bleibt standardmäßig 0, `passNachGegnerpass` bleibt aus.
+
+## 17. Stand der Umsetzung AP4 (12.11.2026)
+
+Hazeberry hat die Vorschläge aus §16.11 als Grundlage für den Bau bestätigt und das Go zum **Bauen** des Stufe-2-Werkzeugs, des Workflows und der Tests nach §16.10 erteilt („Go zum Bauen des Stufe-2-Werkzeugs“). Es gilt nur für das Bauen. **Kein Lauf, kein GNU Go, kein Workflow gestartet, keine Rechnung auf den Archiven.** Die Probe, die Entscheidung über die Paketgröße, E-2 und der Hauptlauf brauchen je ein eigenes Go bzw. eine eigene Entscheidung.
+
+| AP | Stand | Inhalt |
+|---|---|---|
+| AP4 | gebaut, nicht gelaufen | `auswertung/endspiel/diagonal-pruefung-stufe2.js` (`plan`, `paket`, `auswerten`), Workflow `.github/workflows/diagonal-pruefung-stufe2.yml` (nur `workflow_dispatch`, Modus `probe` oder `haupt`), Test `tests/diagonal-pruefung-stufe2.js` (Attrappe, 28 Fälle, lokal grün). Am Werkzeug von Stufe 1 ist nur die Exportzeile erweitert (`rechneStellung`, `indizesVon`); dessen 12 Fälle laufen unverändert grün. |
+
+### 17.1 Konkretisierungen beim Bau (Setzungen, Entscheidung bei Hazeberry)
+
+§16 ließ einiges offen oder nannte es nicht; das habe ich beim Bau so festgelegt. Jeder Punkt ist ohne Aufwand änderbar.
+
+1. **Eingabe:** Das Werkzeug liest ein entpacktes Stufe-1-Verzeichnis. Die Prüfung des ZIP (SHA-256 gegen den gebundenen Wert `8c835dfb…c133740` und `SHA256SUMS`) macht der Workflow; die Hashes der drei Dateien stehen im Plan und werden in jedem Paket neu geprüft. Die SHA-256 der `index.html` kommt aus dem Kopf von `neu.jsonl` (kein fester Wert im Werkzeug); weicht die `index.html` des Laufs ab, ist das ein Pflichtfehler des Pakets.
+2. **Ausfall oder Pflichtfehler (§10.3):** Absturz oder Ende des Prozesses und Timeout sind Ausfälle und bekommen genau einen Wiederholungsversuch (gleicher Seed, frischer Prozess). Eine Fehlerantwort „?“ auf `final_score` oder `final_status_list` („cannot score“) ist ein Ausfall **ohne** Wiederholung. Eine Fehlerantwort auf Kopfbefehl, Zug (abgelehnter Archivzug), `list_stones` oder `captures` ist ein Pflichtfehler. Ein Brett von GNU Go, das von Stufe 1 abweicht, abweichende Gefangene, ungültige Koordinaten oder Zahlen und ein App-Ergebnis, das von `neu.jsonl` abweicht, sind Pflichtfehler.
+3. **Zeitgrenzen (§16.3 Nr. 7):** 120 s je Befehl, 600 s je Referenzlauf, als Optionen des Werkzeugs; die Werte sind Setzungen ohne Messung.
+4. **Kontrolle:** Gibt es von einer Stellungsart keine Stellung, entfällt ihre Kontrolle (in den echten Daten nicht der Fall). `--kontrolle N` überschreibt die Regel „gleich viele wie betroffene, 50 bis 200“ und ist für Tests und die Probe gedacht.
+5. **Probe-Auswahl (§16.6):** betroffene S nach höchstem Zugindex, bei Gleichstand nach Hash; betroffene V nur V350, nach Hash `fnv32("diagonal-pruefung-v1|probe|1|" + id)`; Kontrolle: die ersten 2 S und 2 V der Kontroll-Reihenfolge. In der Probe stehen weder Tot-Mengen noch Tot-Listen im Ergebnis, und der Bericht enthält keine Zahlen der Schicht A.
+6. **Speicherung (Hauptlauf):** Von R1 und R2 werden die Rohantworten von `final_status_list dead/alive/seki`, `captures` und `final_score` abgelegt; `list_stones` nur als SHA-256 und als Ergebnis des Brettabgleichs; die Antworten auf die Züge nur in der SHA-256 des ganzen Protokolls, die beide Läufe zeichengleich haben müssen. §16.8 sagt „Rohantworten von R1 und R2“; das ist damit enger gefasst.
+7. **Kalibrierung von `captures`:** je Paket einmal wie in der Zähldiagnose, mit einem aus `fortsetzungsSeed(Basis, "kalibrierung", "kalibrierung", 0, 0)` abgeleiteten Seed. Scheitert sie, ist das ein Paketfehler (Pflichtfehler).
+8. **Kennzahlen „Punkte“ (§5):** Abstand des Standes zum Referenzstand aus GNU Gos Tot-Liste, je Art, Kategorie und Gruppe: gleich bei aus, gleich bei an, bei an näher, bei an weiter, Abstand gleich, Sieger wie die Referenz. Referenz bei S und Fläche ist `final_score`, sonst die App-Rechnung auf GNU Gos Tot-Liste; bei V steht kein `final_score` zur Verfügung (§16.3 Nr. 2) und gemessen wird „mit Annahmen“.
+9. **Verteilung der B2-Plätze (§16.8):** Mindestens 1 je nicht leerer Zelle, danach geht jeder weitere Platz an die Zelle mit der größten Lücke zum proportionalen Anteil (Gleichstand: Zellname), nie mehr als die Zellgröße. Das setzt die Formulierung „proportional, größter Rest“ als schrittweise Vergabe um. Bei höchstens 12 Zellen und Deckel 60 geht das Minimum nie über den Deckel; bei einem kleineren Deckel (nur im Test) hat das Minimum Vorrang.
+10. **Kettenschlüssel:** Stellungskennung und der **kleinste Brettindex** der Kette (Zeile für Zeile von oben links), als Koordinate geschrieben.
+11. **Auswertung:** Die Fallabdeckung (§16.9) gilt je Stellungsart für gültige Stellungen mit nicht leerer `dead`-Liste; die Ausfallgrenze wird je Art und je Kategorie (betroffen, Kontrolle) geprüft (ganzzahlig: Ausfälle · 100 > 5 · n). Der Auswertungsjob läuft mit `always()` und nennt fehlende Pakete mit Nummer und den ersten Kennungen.
+12. **Workflow-Sperre:** Im Modus `haupt` verlangt der Plan-Job die Eingabe `e2_entschieden` (E-2 und die Paketgröße nach der Probe entschieden). Das ist eine Sperre gegen Versehen und **ersetzt kein Go**.
+
+### 17.2 Was die Tests belegen und was nicht
+
+- `tests/diagonal-pruefung-stufe2.js` läuft das ganze Werkzeug als eigene Prozesse an einer **Attrappe** (16 Zufallspartien, Stufe-1-Dateien vom Werkzeug von Stufe 1 gerechnet, GNU Go als ausführbares Programm, das mit den Engine-Funktionen spielt). Geprüft sind: Plan (Hash-Ziehung, Zuteilung, Reihenfolgeunabhängigkeit), Ausfallgrenze an den Schwellen, Zuordnung der Ketten und Verteilung der Plätze, Betroffene gleich einer unabhängigen Rechnung, Ausfall gegen Pflichtfehler, Wiederholungsversuch, fehlende Pakete, abweichende Version, falscher Seed, Probe und Workflow-Datei.
+- **Mutationsprobe bestanden:** Entfernen des B1-Vorrangs, Ausfallgrenze 10 statt 5, vertauschte Richtung, kein Wiederholungsversuch, Wiederholbarkeit nicht geprüft und entfernter Brettvergleich lassen je mindestens einen Test fehlschlagen (der Brettvergleich erst nach einem Zusatzfall im Test).
+- **Nicht geprüft:** das **echte GNU Go** (Antwortformat von `final_status_list` und `list_stones` bei langen Listen, Dauer, Absturzverhalten bei der Debian-Fassung 3.8); der **Workflow in Actions** (nur die YAML-Datei geladen und im Test auf ihre Bestandteile geprüft); die Dauer je Stellung (die 10 s aus §16.6 sind unverändert eine Annahme); die Archive und die Daten aus Stufe 1 (der Test nutzt eine Attrappe).
+- Lokal gelaufen sind nur `tests/diagonal-pruefung-stufe2.js`, `tests/diagonal-pruefung.js` und `tests/lizenz.js`; die gesamte Suite prüft die reguläre CI.
+
+### 17.4 Korrekturen nach der Durchsicht von #302 (12.11.2026)
+
+Hazeberry hat am Stand `513075a` drei Fehler gefunden (aus Code, Workflow und Tests gelesen). Alle drei sind berichtigt; sie hätten die Auswertung der Probe verfälscht oder Datenfehler durchgelassen.
+
+1. **Langsame R1-Ausfälle fehlten in der Laufzeitstatistik.** `dauerMs.gesamt` wurde erst nach R2 gesetzt; bei einem Ausfall oder Pflichtfehler in R1 kehrte die Stellung vorher zurück, und der Probebericht (der nur Zeilen mit diesem Wert zählt) ließ gerade die langsamsten Fälle aus dem Maximum, was eine zu große Paketgröße nahegelegt hätte. Jetzt gilt `gesamt` schon nach R1 und wird nach R2 fortgeschrieben. Test: R1 zweimal Timeout steht mit mindestens 2 × der Zeitgrenze im Bericht, die Statistik zählt alle Stellungen, und das Maximum ist gleich dem größten Wert der Ergebniszeilen.
+2. **Doppelte Kennungen innerhalb eines Pakets wurden übersehen.** Die Prüfung sah nur Kennungen aus früheren Paketen. Jetzt wird auch innerhalb jedes Pakets auf Duplikate geprüft (Grund „mehrfach im Paket n“). Test: eine zusätzliche Kopie einer Zeile bei sonst vollständigem Paket, und eine Kennung doppelt statt der fehlenden.
+3. **Zeilen ohne gültigen Status konnten unbemerkt verschwinden.** Jede Ergebniszeile braucht jetzt einen der Werte `gueltig`, `ausfall`, `pflichtfehler` mit den zugehörigen Feldern (Dauer bei gültig und Ausfall; Ursache bei Ausfall; Grund bei Pflichtfehler; bei gültig wiederholbar, im Hauptlauf auch GNU-Go-Liste und App-Tot-Mengen); sonst ist der Lauf ungültig (KEIN URTEIL, Exit 1). Test: sieben Varianten (unbekannter Status, fehlender Status, fehlende Dauer, nicht wiederholbar, fehlende Liste, Ausfall ohne Ursache, Pflichtfehler ohne Grund).
+4. **Folgefehler, beim Test gefunden:** Fehlte bei einer „gültigen“ Zeile die GNU-Go-Liste, stürzte die Fallabdeckung mit Exit 2 ab, bevor die Statusprüfung greifen konnte. Die Fallabdeckung überspringt jetzt solche Zeilen; die Statusprüfung meldet sie.
+
+**Mutationsprobe:** Wird jede der drei Korrekturen einzeln zurückgenommen, schlägt genau der zugehörige Test fehl.
+
+### 17.3 Reihenfolge und Freigaben
+
+Nächste Schritte, je eigenes Go: Merge dieses PR (Hazeberry liest vorher) → **Go zur Probe** (`diagonal-pruefung-stufe2.yml`, Modus `probe`) → Auswertung der Dauer, Entscheidung über die Paketgröße (bei G < 36 Neuentscheidung der Paketgrenze, §16.6) → **E-2 entschieden** → **Go zum Hauptlauf** (Modus `haupt`, `e2_entschieden` gesetzt). Dieser Abschnitt erteilt kein Go für einen Lauf, Stufe 3, einen Engine-Vergleich, einen Standardwechsel oder einen Merge. `diagonalAugeEnde` bleibt standardmäßig 0, `passNachGegnerpass` bleibt aus.
