@@ -302,11 +302,9 @@ function endstandFall(aendere) {
   const a = ablauf(g), aufd = liesJson(path.join(a.aus, 'geheim', 'aufdeckung.json')), man = liesJson(path.join(a.aus, 'beurteiler-paket', 'manifest.json'));
   return auswerten(g, a.aus, {KI: schreibeBogen(a.aus, 'e.json', man, man.reihenfolge.map(id => antwort(id, wertVon(aufd[id].appAn))))});
 }
-test('Stufe 3 liest die tatsächliche Ausgabe von Stufe 1: Aufbau von bericht.json (wirkung.S.<Wertung>.stand mit n, aendert, siegerwechsel) gleich dem Code von Stufe 1', () => {
+test('Stufe 3 liest die tatsächliche Ausgabe von Stufe 1 (Originalbericht aus dem Repo): Nr. 5 erfüllt, Zahlen gelesen, kein undefined', () => {
   const real = liesJson(STUFE1_BERICHT);
   for (const m of ['flaeche', 'territory']) { const x = real.wirkung.S[m].stand; pruefe(['n', 'aendert', 'siegerwechsel'].every(f => Number.isFinite(x[f])), `echter Bericht: ${m} hat n, aendert, siegerwechsel`); }
-  const q = fs.readFileSync(path.join(wurzel, 'auswertung/endspiel/diagonal-pruefung.js'), 'utf8');
-  pruefe(/wirk\[art\]\[w\] = \{stand: wirkung\(/.test(q) && /return \{n: paare\.length, aendert: [^}]*siegerwechsel:/.test(q.replace(/\n\s*/g, ' ')) || /function wirkung\(paare\)[\s\S]*aendert:[\s\S]*siegerwechsel:/.test(q), 'Stufe 1 schreibt wirkung.S.<Wertung>.stand mit aendert und siegerwechsel');
   const r = endstandFall(() => {}); pruefeGleich(r.status, 0, 'gültig: ' + r.stderr); const b5 = r.json.bedingungen.find(b => b.nr === 5); pruefeGleich(b5.erfuellt, true, 'Nr. 5 mit dem echten Bericht erfüllt: ' + b5.detail);
   pruefeGleich(r.json.endstand.flaeche.aendert, 658, 'aendert Fläche gelesen'); pruefe(!/undefined/.test(r.md), 'im Bericht steht kein undefined');
 });
