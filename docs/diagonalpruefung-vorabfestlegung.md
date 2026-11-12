@@ -418,8 +418,11 @@ Die sechs Handpartien bleiben bei der Tot-Menge unverändert und werden getrennt
 - **Veralteter Satz im Originalbericht (und im Werkzeug):** Der Abschnitt „Grenzen“ in `bericht.md`
   sagt „Duplikate (gleiche Zugfolge) zählen mehrfach (Schritt 0 nennt ihre Zahl)“. Das stimmt seit
   §14.4 nicht mehr: Duplikate werden aus der Hauptprüfung ausgeschlossen und nur gezählt (15.3).
-  Die Zahlen des Berichts sind davon nicht berührt. Der Originalbericht bleibt unverändert; der Text
-  im Werkzeug (`auswertung/endspiel/diagonal-pruefung.js`) ist **noch nicht berichtigt** (eigener Schritt).
+  Die Zahlen des Berichts sind davon nicht berührt. Der gesicherte Originalbericht des Laufs
+  `42456406985` bleibt unverändert und trägt den alten Satz, weil der Lauf mit dem damaligen
+  Werkzeugtext entstand. Der Text im Werkzeug (`auswertung/endspiel/diagonal-pruefung.js`) ist
+  berichtigt (Test: `tests/diagonal-pruefung.js`); ein künftiger Lauf erzeugt den berichtigten Satz.
+  Berechnung und Zahlen sind davon nicht berührt.
 - **Aussagen in der Berichterstattung der Sitzung:** „S gibt es nur ohne ein Ende mit zwei Pässen“ war
   falsch formuliert (richtig: 15.3), und „die Betroffenheit steigt mit der Partielänge“ war zu allgemein
   (richtig: 15.4). Beides stand nicht in den gesicherten Dateien.
