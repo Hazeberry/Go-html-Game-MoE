@@ -66,6 +66,7 @@ function baueGrund(betroffenS = 658, betroffenV = 1060) {
   const neu = W.rechnen(E, {stand: 'neu'}, stellungen, sha(fs.readFileSync(htmlPfad))), jeId = new Map(neu.slice(1).map(z => [z.id, z]));
   const betroffen = stellungen.filter(s => JSON.stringify(jeId.get(s.id).aus.tot) !== JSON.stringify(jeId.get(s.id).an.tot));
   const s1 = path.join(verz, 'stufe1'); fs.mkdirSync(s1);
+  fs.writeFileSync(path.join(s1, 'bericht.json'), JSON.stringify({gueltig: true, wirkung: {S: {flaeche: {stand: {n: 658, aendert: 658, siegerwechsel: 195, median: -19}}, territory: {stand: {n: 658, aendert: 658, siegerwechsel: 68, median: -19}}}}}));
   schreibeJsonl(path.join(s1, 'stellungen.jsonl'), stellungen); schreibeJsonl(path.join(s1, 'neu.jsonl'), neu); schreibeJsonl(path.join(s1, 'betroffen.jsonl'), betroffen.map(s => ({id: s.id})));
   /* Stufe 2 synthetisch: GNU Gos Tot-Liste wie App mit Diagonalprüfung (behoben), wie App ohne (neu entstanden) oder leer (unverändert abweichend) */
   const zeilen = betroffen.map((s, i) => {
@@ -249,9 +250,10 @@ test('Auswertung, Beurteilung folgt App MIT Diagonalprüfung: R− = 0, R+ vorha
   const veraendert = Object.values(aufd).filter(k => k.appAus !== k.appAn).length;
   pruefeGleich(j.rMinus, 0, 'R− = 0'); pruefeGleich(j.uebersicht.gesamt['R+'], veraendert, 'R+ = alle Ketten, deren App-Urteil sich ändert'); pruefeGleich(j.uebersicht.gesamt['R-'], 0, 'R− in der Übersicht');
   const bed = Object.fromEntries(j.bedingungen.map(b => [b.nr, b.erfuellt]));
-  pruefeGleich(bed[3], true, 'Bedingung 3 (R− = 0)'); pruefeGleich(bed[5], true, 'Bedingung 5 (Mindestumfang, Bericht der Stufe 2 nennt 658 und 1060)');
+  pruefeGleich(bed[3], true, 'Bedingung 3 (R− = 0)'); pruefeGleich(bed[5], true, 'Bedingung 5 (§8 Nr. 5: Wirkung auf den Endstand aus dem Bericht der Stufe 1)'); pruefeGleich(j.mindestumfang.erfuellt, true, 'Mindestumfang (§7 Nr. 7) als eigene Bedingung erfüllt (658 und 1060)');
+  pruefeGleich(j.endstand.flaeche.siegerwechsel, 195, 'Siegerwechsel Fläche aus dem Bericht der Stufe 1'); pruefeGleich(j.endstand.territory.siegerwechsel, 68, 'Siegerwechsel Territory'); pruefe(/## Wirkung auf den Endstand \(S, §8 Nr\. 5\)/.test(r.md) && /\| Fläche \| 658 \| 658 \| 195 \|/.test(r.md), 'Bericht zeigt die Endstandwirkung');
   pruefeGleich(bed[2], j.rPlus >= S3.R_PLUS_MIN && j.partienRPlus >= S3.R_PLUS_PARTIEN_MIN, 'Bedingung 2 gleich 5 R+ aus 3 Partien');
-  pruefeGleich(j.befund, j.bedingungen.every(b => b.erfuellt) ? 'positive Kandidatur' : 'keine positive Kandidatur', 'Befund folgt aus den Bedingungen');
+  pruefeGleich(j.befund, j.bedingungen.every(b => b.erfuellt) && j.mindestumfang.erfuellt ? 'positive Kandidatur' : 'keine positive Kandidatur', 'Befund folgt aus den fünf Bedingungen von §8 und dem Mindestumfang');
   pruefe(/Beurteilungen, keine Ground Truth/.test(r.md) && /kein Go/.test(r.md) && /erst nach allen Urteilen/.test(r.md), 'Bericht: keine Ground Truth, kein Go, Aufdeckung erst nach den Urteilen');
   pruefe(/### R\+/.test(r.md) && /### R−/.test(r.md) && /### Ungeklärt/.test(r.md) && /GNU Go weicht von einem zählenden Urteil ab/.test(r.md), 'Einzelfälle aufgeführt');
   pruefe(j.befund === 'positive Kandidatur' ? /nicht „unbedenklich“/.test(r.md) : /keine Aussage über die Richtigkeit/.test(r.md), 'Wortlaut des Befunds ohne „unbedenklich“');
@@ -289,7 +291,16 @@ test('Auswertung: zwei Beurteilergruppen mit Widerspruch; Bogen eines anderen Pa
 test('Auswertung: nicht erreichter Mindestumfang (Bericht der Stufe 2 nennt weniger als 30) verhindert die Kandidatur, auch bei bester Beurteilung', () => {
   const g = baueGrund(10, 10), a = ablauf(g), aufd = liesJson(path.join(a.aus, 'geheim', 'aufdeckung.json')), man = liesJson(path.join(a.aus, 'beurteiler-paket', 'manifest.json'));
   const r = auswerten(g, a.aus, {KI: schreibeBogen(a.aus, 'klein.json', man, man.reihenfolge.map(id => antwort(id, wertVon(aufd[id].appAn))))});
-  pruefeGleich(r.status, 0, 'gültig: ' + r.stderr); const b5 = r.json.bedingungen.find(b => b.nr === 5); pruefeGleich(b5.erfuellt, false, 'Mindestumfang nicht erreicht'); pruefeGleich(r.json.befund, 'keine positive Kandidatur', 'keine positive Kandidatur');
+  pruefeGleich(r.status, 0, 'gültig: ' + r.stderr); pruefeGleich(r.json.mindestumfang.erfuellt, false, 'Mindestumfang nicht erreicht'); pruefeGleich(r.json.bedingungen.find(b => b.nr === 5).erfuellt, true, '§8 Nr. 5 ist davon unabhängig erfüllt');
+  pruefe(/^Kandidatur offen/.test(r.json.befund), 'Befund: Kandidatur offen (zu wenig Betroffene), nicht „keine positive Kandidatur“: ' + r.json.befund); pruefe(/kein Urteil über die Kandidatur, zu wenig Betroffene/.test(r.md), 'Wortlaut aus §7 Nr. 7 im Bericht');
+});
+
+test('Auswertung: fehlt die Wirkung auf den Endstand im Bericht der Stufe 1, ist §8 Nr. 5 nicht erfüllt und der Bericht sagt es', () => {
+  const g = baueGrund(658, 1060); fs.writeFileSync(path.join(g.s1, 'bericht.json'), JSON.stringify({gueltig: true}));
+  const a = ablauf(g), aufd = liesJson(path.join(a.aus, 'geheim', 'aufdeckung.json')), man = liesJson(path.join(a.aus, 'beurteiler-paket', 'manifest.json'));
+  const r = auswerten(g, a.aus, {KI: schreibeBogen(a.aus, 'ohne-endstand.json', man, man.reihenfolge.map(id => antwort(id, wertVon(aufd[id].appAn))))});
+  pruefeGleich(r.status, 0, 'gültig: ' + r.stderr); pruefeGleich(r.json.bedingungen.find(b => b.nr === 5).erfuellt, false, 'Nr. 5 nicht erfüllt'); pruefeGleich(r.json.befund, 'keine positive Kandidatur', 'keine positive Kandidatur');
+  pruefe(/\*\*Fehlt:\*\* Der Bericht der Stufe 1 enthält die Wirkung auf den Endstand nicht/.test(r.md), 'Bericht nennt das Fehlen');
 });
 
 /* ── 6 Workflow und Werkzeug ──────────────────────────────────────────── */
