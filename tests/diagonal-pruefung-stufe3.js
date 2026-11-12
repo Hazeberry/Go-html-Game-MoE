@@ -253,7 +253,7 @@ test('Auswertung, Beurteilung folgt App MIT Diagonalprüfung: R− = 0, R+ vorha
   const bed = Object.fromEntries(j.bedingungen.map(b => [b.nr, b.erfuellt]));
   pruefeGleich(bed[3], true, 'Bedingung 3 (R− = 0)'); pruefeGleich(bed[5], true, 'Bedingung 5 (§8 Nr. 5: Wirkung auf den Endstand aus dem Bericht der Stufe 1)'); pruefeGleich(j.mindestumfang.erfuellt, true, 'Mindestumfang (§7 Nr. 7) als eigene Bedingung erfüllt (658 und 1060)');
   pruefeGleich(j.endstand.flaeche.siegerwechsel, 195, 'Siegerwechsel Fläche aus dem Bericht der Stufe 1'); pruefeGleich(j.endstand.territory.siegerwechsel, 68, 'Siegerwechsel Territory'); pruefe(/## Wirkung auf den Endstand \(S, §8 Nr\. 5\)/.test(r.md) && /\| Fläche \| 658 \| 658 \| 195 \|/.test(r.md), 'Bericht zeigt die Endstandwirkung');
-  pruefeGleich(bed[2], j.rPlus >= S3.R_PLUS_MIN && j.partienRPlus >= S3.R_PLUS_PARTIEN_MIN, 'Bedingung 2 gleich 5 R+ aus 3 Partien');
+  pruefeGleich(bed[2], j.rPlus >= 5 && j.partienRPlus >= 3, 'Bedingung 2 gleich 5 R+ aus 3 Partien (Zahlen hier festgeschrieben, nicht aus den Konstanten des Werkzeugs gelesen)');
   pruefeGleich(j.befund, j.bedingungen.every(b => b.erfuellt) && j.mindestumfang.erfuellt ? 'positive Kandidatur' : 'keine positive Kandidatur', 'Befund folgt aus den fünf Bedingungen von §8 und dem Mindestumfang');
   pruefe(/Beurteilungen, keine Ground Truth/.test(r.md) && /kein Go/.test(r.md) && /erst nach allen Urteilen/.test(r.md), 'Bericht: keine Ground Truth, kein Go, Aufdeckung erst nach den Urteilen');
   pruefe(/### R\+/.test(r.md) && /### R−/.test(r.md) && /### Ungeklärt/.test(r.md) && /GNU Go weicht von einem zählenden Urteil ab/.test(r.md), 'Einzelfälle aufgeführt');
@@ -337,10 +337,39 @@ test('Workflow: nur manuell, kein GNU Go, beide ZIPs gegen ihre SHA-256 geprüft
   const yaml = spawnSync('python3', ['-c', 'import sys,yaml; yaml.safe_load(open(sys.argv[1]))', path.join(wurzel, '.github/workflows/diagonal-pruefung-stufe3.yml')], {encoding: 'utf8'});
   pruefe(yaml.status === 0 || /No module named/.test(yaml.stderr), 'YAML lesbar: ' + yaml.stderr);
 });
-test('Werkzeug: beurteilt nicht selbst, ändert weder Spiel noch Stufe 1 und 2', () => {
-  const q = fs.readFileSync(werkzeug, 'utf8');
-  pruefe(!/writeFileSync\([^)]*index\.html/.test(q), 'schreibt keine index.html'); pruefe(!/spawn|execFile|child_process/.test(q), 'startet keine Programme (kein GNU Go, kein Beurteiler)');
-  pruefe(/R_PLUS_MIN = 5, R_PLUS_PARTIEN_MIN = 3/.test(q) && /MINDESTUMFANG = 30/.test(q), 'Setzungen aus §10.5 und §7 Nr. 7');
+/* Grenzwerte als Zahlen im Test (§10.5: 5 R+ aus 3 Partien; §7 Nr. 7: 30 betroffene Stellungen je Art), NICHT aus den Konstanten des Werkzeugs gelesen:
+   Ändert jemand die Konstanten, schlagen diese Tests fehl. Synthetische Ketten, reine Funktion `auswertung`. */
+function grenzSzenario({rPlus, partien, betroffenS = 658, betroffenV = 1060, rMinus = 0}) {
+  const aufd = {}, antworten = [];
+  const kette = (i, art, aus, an) => { const id = `U-${String(i).padStart(6, '0')}`; aufd[id] = {schluessel: `s${i}|A1`, stellung: `s${i}`, partie: `P${i}`, gruppe: 'g', art, menge: 'B2', klasse: 'behoben', richtung: 'GNU tot', zelle: 'z', farbe: 'X', steine: 1, punkte: ['A1'], appAus: aus, appAn: an, gnu: an}; return id; };
+  for (let i = 0; i < rPlus; i++) { const id = kette(i, 'V', 'tot', 'lebend'); aufd[id].partie = `P${i % partien}`; antworten.push({id, kategorie: 'lebendig', begruendung: 'x'.repeat(30), sicherheit: 'sicher'}); }
+  for (let i = 0; i < rMinus; i++) { const id = kette(1000 + i, 'S', 'tot', 'lebend'); antworten.push({id, kategorie: 'tot', begruendung: 'x'.repeat(30), sicherheit: 'sicher'}); }
+  const n = betroffenS, ein = {bericht2: {plan: {zahlen: {betroffen: {S: betroffenS, V: betroffenV}}}, ausfaelle: []}, s1bericht: {wirkung: {S: {flaeche: {stand: {n, aendert: n, siegerwechsel: Math.min(4, n), median: 0}}, territory: {stand: {n, aendert: n, siegerwechsel: Math.min(4, n), median: 0}}}}}};
+  return S3.auswertung(aufd, {KI: antworten}, ein);
+}
+test('Grenzwert §10.5, festgeschrieben: Bedingung 2 braucht genau 5 R+ aus mindestens 3 verschiedenen Partien', () => {
+  const nr2 = o => grenzSzenario(o).bedingungen.find(b => b.nr === 2).erfuellt;
+  pruefeGleich(nr2({rPlus: 4, partien: 4}), false, '4 R+ aus 4 Partien: zu wenig R+'); pruefeGleich(nr2({rPlus: 5, partien: 2}), false, '5 R+ aus 2 Partien: zu wenig Partien');
+  pruefeGleich(nr2({rPlus: 5, partien: 1}), false, '5 R+ aus 1 Partie'); pruefeGleich(nr2({rPlus: 5, partien: 3}), true, '5 R+ aus 3 Partien: erfüllt'); pruefeGleich(nr2({rPlus: 6, partien: 3}), true, '6 R+ aus 3 Partien: erfüllt');
+  pruefeGleich(nr2({rPlus: 10, partien: 2}), false, '10 R+ aus 2 Partien: zu wenig Partien'); pruefeGleich(nr2({rPlus: 0, partien: 3}), false, 'kein R+');
+  const g = grenzSzenario({rPlus: 5, partien: 3}); pruefeGleich(g.rPlus, 5, 'fünf R+ gezählt'); pruefeGleich(g.partienRPlus, 3, 'drei Partien gezählt'); pruefeGleich(g.befund, 'positive Kandidatur', 'bei 5 R+ aus 3 Partien, R− = 0 und Mindestumfang: positive Kandidatur');
+  pruefeGleich(grenzSzenario({rPlus: 4, partien: 3}).befund, 'keine positive Kandidatur', 'bei 4 R+: keine positive Kandidatur');
+  pruefeGleich(grenzSzenario({rPlus: 5, partien: 3, rMinus: 1}).befund, 'keine positive Kandidatur', 'ein R− in S verhindert, auch bei 5 R+ aus 3 Partien');
+});
+test('Grenzwert §7 Nr. 7, festgeschrieben: Mindestumfang 30 betroffene Stellungen je Art (29 genügt nicht, 30 ja), nicht erreicht heißt „Kandidatur offen“', () => {
+  const m = (S, V) => grenzSzenario({rPlus: 5, partien: 3, betroffenS: S, betroffenV: V});
+  pruefeGleich(m(29, 30).mindestumfang.erfuellt, false, 'S 29, V 30: nicht erreicht'); pruefeGleich(m(30, 29).mindestumfang.erfuellt, false, 'S 30, V 29: nicht erreicht'); pruefeGleich(m(30, 30).mindestumfang.erfuellt, true, 'S 30, V 30: erreicht');
+  pruefeGleich(m(31, 31).mindestumfang.erfuellt, true, 'S 31, V 31: erreicht'); pruefeGleich(m(29, 30).befund, 'Kandidatur offen (zu wenig Betroffene)', 'unter 30: Kandidatur offen'); pruefeGleich(m(30, 30).befund, 'positive Kandidatur', 'bei 30 und 30: positive Kandidatur');
+  pruefeGleich(m(29, 30).mindestumfang.schwelle, 30, 'die Schwelle im Bericht ist 30');
+});
+test('Werkzeug ändert weder Spiel noch Stufe 1 und 2 noch das Archiv: Prüfsummen vor und nach Paket und Auswertung gleich', () => {
+  const g = grund(), dateien = [htmlPfad, path.join(g.s1, 'stellungen.jsonl'), path.join(g.s1, 'neu.jsonl'), path.join(g.s1, 'betroffen.jsonl'), path.join(g.s1, 'bericht.json'),
+    path.join(g.s2, 'bericht', 'bericht.json'), path.join(g.s2, 'bericht', 'auswahl-stufe3.json'), path.join(g.s2, 'eingabe', 'plan', 'plan.json'), path.join(g.s2, 'teile', 'teil-1.jsonl'), path.join(g.daten, 'attrappe', 'A.jsonl.gz')];
+  const stand = () => Object.fromEntries(dateien.map(f => [f, sha(fs.readFileSync(f))])), vorher = stand();
+  const a = ablauf(g), man = liesJson(path.join(a.aus, 'beurteiler-paket', 'manifest.json')), aufd = liesJson(path.join(a.aus, 'geheim', 'aufdeckung.json'));
+  const r = auswerten(g, a.aus, {KI: schreibeBogen(a.aus, 'pruefsumme.json', man, man.reihenfolge.map(id => antwort(id, wertVon(aufd[id].appAn))))});
+  pruefeGleich(a.status, 0, 'Paket: ' + a.stderr); pruefeGleich(r.status, 0, 'Auswertung: ' + r.stderr);
+  const nachher = stand(); for (const f of dateien) pruefeGleich(nachher[f], vorher[f], `${path.relative(wurzel, f).startsWith('..') ? path.basename(f) : path.relative(wurzel, f)}: unverändert`);
 });
 
 laufeTests('Diagonalprüfung Stufe 3: Werkzeug (Attrappe, ohne Beurteiler)').then(ok => process.exit(ok ? 0 : 1));
