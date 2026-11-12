@@ -580,11 +580,32 @@ test('Workflow: nur manuell, fail-fast false, Auswertung mit always(), Prüfsumm
   const yaml = spawnSync('python3', ['-c', 'import sys,yaml; yaml.safe_load(open(sys.argv[1]))', path.join(wurzel, '.github/workflows/diagonal-pruefung-stufe2.yml')], {encoding: 'utf8'});
   pruefe(yaml.status === 0 || /No module named/.test(yaml.stderr), 'YAML lesbar: ' + yaml.stderr);
 });
-test('Werkzeug: keine Spieländerung, kein Eingriff in den Stand von Stufe 1', () => {
-  const q = fs.readFileSync(werkzeug, 'utf8');
-  pruefe(!/writeFileSync\([^)]*index\.html/.test(q), 'schreibt keine index.html');
-  pruefe(/E\.PARAMS\.diagonalAugeEnde !== 0/.test(q), 'verlangt den Standard 0 des Schalters');
-  pruefe(/plan\.erwarteteHtmlSha/.test(q), 'bindet die Fassung der index.html an Stufe 1');
+test('Aktivierter Schalter diagonalAugeEnde wird zurückgewiesen (nur dieser eine Grund), eine vom Plan abweichende index.html ebenfalls (nur dieser eine Grund); in beiden Fällen wird keine Stellung gerechnet und die Auswertung ist ungültig', () => {
+  const ids = betroffeneIds().slice(0, 2), orig = fs.readFileSync(htmlPfad, 'utf8'), anker = '  diagonalAugeEnde: 0,\n';
+  pruefeGleich(orig.split(anker).length, 2, 'Anker für den Standardwert genau einmal in index.html');
+  const fall = (name, htmlText, planSha) => {
+    const aus = sonderPlan(ids), planDatei = path.join(aus, 'plan.json'), html = path.join(aus, `index-${name}.html`), f = path.join(aus, 'teil-1.jsonl');
+    fs.writeFileSync(html, htmlText);
+    const plan = liesJson(planDatei); if (planSha) plan.erwarteteHtmlSha = sha(fs.readFileSync(html)); fs.writeFileSync(planDatei, JSON.stringify(plan));
+    const r = lauf(['paket', '--plan', planDatei, '--teil', '1', '--stufe1', grund().s1, '--archiv', grund().daten, '--aus', f, '--gnugo', gnugo(), '--html', html], {STUB_DEAD: 'an'});
+    const z = liesJsonl(f), probleme = z[0].kopf.pflichtfehlerPaket;
+    pruefeGleich(r.status, 1, `${name}: Paket endet mit Exit 1`); pruefeGleich(z.length, 1, `${name}: nur der Kopf, keine Stellung gerechnet`);
+    const a = werteAus(aus, [f], name); pruefeGleich(a.status, 1, `${name}: Auswertung ungültig`); pruefe(a.bericht.urteil === 'KEIN URTEIL' && /Köpfe/.test(JSON.stringify(a.bericht.gruende)), `${name}: KEIN URTEIL wegen des Paketfehlers`);
+    return probleme;
+  };
+  /* Schalter an: der Plan kennt die Prüfsumme der geänderten Datei, so dass NUR der Schalter beanstandet werden kann */
+  const schalter = fall('schalter-an', orig.replace(anker, '  diagonalAugeEnde: 1,\n'), true);
+  pruefeGleich(schalter.length, 1, 'Schalter an: genau ein Grund'); pruefe(/diagonalAugeEnde ist 1, erwartet 0/.test(schalter[0]), 'Grund nennt den Schalter: ' + schalter.join(' | '));
+  /* andere index.html bei Schalter aus: die Prüfsumme weicht vom Plan ab, der Schalter steht richtig */
+  const sha2 = fall('andere-datei', orig + '\n<!-- anders -->\n', false);
+  pruefeGleich(sha2.length, 1, 'andere Datei: genau ein Grund'); pruefe(/index\.html SHA-256/.test(sha2[0]) && !/diagonalAugeEnde/.test(sha2[0]), 'Grund nennt die Prüfsumme und nicht den Schalter: ' + sha2.join(' | '));
+});
+test('Werkzeug ändert weder Spiel noch Stufe 1 noch das Archiv: Prüfsummen von index.html und den Stufe-1-Eingaben vor und nach Plan, Paket und Auswertung gleich', () => {
+  const g = grund(), dateien = [htmlPfad, path.join(g.s1, 'stellungen.jsonl'), path.join(g.s1, 'neu.jsonl'), path.join(g.s1, 'betroffen.jsonl'), path.join(g.daten, 'attrappe', 'A.jsonl.gz')];
+  const stand = () => Object.fromEntries(dateien.map(f => [f, sha(fs.readFileSync(f))])), vorher = stand();
+  const p = planLauf(g.verz, ['--paketgroesse', '5', '--kontrolle', '3']), d = alleLaeufe(p.aus, {STUB_DEAD: 'an'}), a = werteAus(p.aus, d.map(x => x.f));
+  pruefeGleich(p.status, 0, 'Plan: ' + p.stderr); for (const x of d) pruefeGleich(x.status, 0, 'Paket: ' + x.out.slice(0, 200)); pruefeGleich(a.status, 0, 'Auswertung: ' + (a.stdout || '').slice(0, 200) + a.stderr);
+  const nachher = stand(); for (const f of dateien) pruefeGleich(nachher[f], vorher[f], `${path.basename(f)}: unverändert`);
 });
 
 laufeTests('Diagonalprüfung Stufe 2: Werkzeug (Attrappe, ohne echtes GNU Go)');
