@@ -618,3 +618,31 @@ E-2 bestätigt: getrennte KI-Beurteilung für alle B1-Fälle und höchstens 60 B
 
 **17.5.5 Freigaben**
 Dieser Abschnitt erteilt kein Go für einen neuen Hauptlauf, Stufe 3, einen Engine-Vergleich, einen Standardwechsel oder einen Merge. Ein neuer Hauptlauf braucht nach dem Merge der Korrektur ein eigenes Go (Modus `haupt`, `e2_entschieden` an). `diagonalAugeEnde` bleibt standardmäßig 0, `passNachGegnerpass` bleibt aus.
+
+### 17.6 Zweiter Hauptlauf (12.11.2026)
+
+[Lauf 43274198340, Auswertungsjob](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/43274198340/job/131380168385), Run 3, `main` bei `f43fa4d65e8c90079266c2457e246fb5b0163dbb`, Modus `haupt`, Paketgröße 50, `e2_entschieden` gesetzt, mit Go von Hazeberry. Quelle ist der Bericht im Job-Log. Die Paketdateien wurden für diesen Nachtrag nicht geprüft.
+
+- **Gültig:** alle acht Pflichtkontrollen bestanden. 2.118 Stellungen in 43 Paketen (betroffen S 658, V 1.060, Kontrolle je 200), 0 Ausfälle und 0 Pflichtfehler.
+- **Runner-Images:** `20261101.360.1` in 27 Paketen, `20261111.370.1` in 12 und `20261111.127.1` in 4. GNU-Go-Version, Paketversion und Argumente waren gleich. Ohne die Korrektur aus #304 hätte der frühere Image-Vergleich den Lauf wegen der unterschiedlichen Images als ungültig gewertet.
+
+| Art | Betroffene Stellungen | Steine behoben | Steine neu entstanden | Steine unverändert abweichend | Nur behoben (Stellungen) | Nur neu (Stellungen) | Beides | Ohne Änderung |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| S | 658 | 10.704 | 7 | 319 | 657 | 1 | 0 | 0 |
+| V | 1.060 | 18.460 | 1.602 | 3.218 | 981 | 52 | 27 | 0 |
+
+Der Auswerter ordnet jede Stellung genau einer der vier Kategorien zu. In V summieren sie sich zu 981 + 52 + 27 + 0 = 1.060. Die sieben neu entstandenen Abweichungen in S waren alle „zusätzlich tot“ und lagen in einer Stellung aus Fuego 50 Spiele. In V waren es 1.390 „zusätzlich tot“ und 212 „wieder lebendig“.
+
+| Art | Wertung | Sieger wie Referenz, aus | Sieger wie Referenz, an | Bei an näher | Bei an weiter |
+|---|---|---:|---:|---:|---:|
+| S | Fläche | 460 | 655 | 653 | 5 |
+| S | Territory | 588 | 656 | 653 | 5 |
+| V | Fläche | 784 | 1.011 | 976 | 84 |
+| V | Territory | 867 | 1.015 | 976 | 84 |
+
+„Sieger wie Referenz“ zählt gleiche Vorzeichen des Stands. In der Kontrollstichprobe änderte der Schalter keine Steinbewertung. Unverändert von der Referenz abweichend waren 175 Steine in S und 1.493 in V. In V wich der Stand bei beiden Wertungen in 74 von 200 Kontrollstellungen von der Referenz ab.
+
+- **Auswahl für Stufe 3:** B1 umfasst 356 Ketten. Für B2 wurden 60 aus 6.820 Kandidaten in acht Zellen gezogen. Die größten Zuteilungen entfallen auf „behoben, GNU tot“ (V 30, S 18). Zwei Stellungen haben einen Seki-Eintrag bei GNU Go. Für die 416 Unterlagen sieht §10.4 vorab eine Zeitschätzung an drei Probestücken vor.
+- **Rohdaten:** [Actions-Artefakt `diagonal-pruefung-stufe2`](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/43274198340/artifacts/13970480435), ID `13970480435`, 1.593.388 Bytes, SHA-256 laut Upload-Log `d3f92b964891a176aedf128e834138816cb92399b0edfa6fe2d1c4c263f49d95`, verfügbar bis 10.02.2027. Enthält unter anderem `bericht.md`, `bericht.json`, 43 Paketdateien und `auswahl-stufe3.json`.
+
+Die Ergebnisse beschreiben Schicht A, die Übereinstimmung mit der Referenz aus GNU Gos Tot-Liste. Die Beurteilung der Steinbewertungen in Stufe 3 steht aus.
