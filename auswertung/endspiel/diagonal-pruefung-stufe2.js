@@ -228,7 +228,7 @@ async function bearbeiteStellung(ctx, s, kategorie) {
   /* 3. zwei Referenzläufe, derselbe Seed, je ein Wiederholungsversuch nach Absturz oder Timeout */
   const r1 = await mitWiederholung(o, seed, zuege, farben, mitScore);
   z.versuche = {r1: r1.versuche};
-  const zeit = {r1: r1.dauerGesamtMs};
+  const zeit = {r1: r1.dauerGesamtMs, gesamt: r1.dauerGesamtMs};   /* gesamt gilt schon nach R1, damit auch ein früher Rücksprung (R1 Ausfall oder Pflichtfehler) in der Laufzeitstatistik steht */
   const fertig = (status, extra) => ({...z, status, dauerMs: zeit, ...extra});
   if (r1.art === 'pflichtfehler') return {...pflicht(`R1: ${r1.grund}`), dauerMs: zeit};
   if (r1.art === 'ausfall') return fertig('ausfall', {grund: `R1: ${r1.grund}`, ursache: ursacheVon(r1.grund)});
@@ -405,8 +405,11 @@ function auswerten(plan, s1, teile, E) {
   const jeId = new Map(), vollst = [];
   for (const t of teile) {
     const soll = plan.pakete.find(p => p.nr === t.kopf.teil); if (!soll) continue;
-    const ids = t.zeilen.map(z => z.id);
-    for (const id of ids) { if (jeId.has(id)) vollst.push(`${id}: mehrfach im Ergebnis`); }
+    const ids = t.zeilen.map(z => z.id), imPaket = new Set();
+    for (const id of ids) {
+      if (jeId.has(id) || imPaket.has(id)) vollst.push(`${id}: mehrfach im Ergebnis${imPaket.has(id) ? ` (mehrfach im Paket ${t.kopf.teil})` : ''}`);
+      imPaket.add(id);
+    }
     for (const x of soll.stellungen) if (!ids.includes(x.id)) vollst.push(`${x.id}: fehlt im Paket ${t.kopf.teil}`);
     for (const id of ids) if (!soll.stellungen.some(x => x.id === id)) vollst.push(`${id}: gehört nicht zu Paket ${t.kopf.teil}`);
     for (const z of t.zeilen) jeId.set(z.id, z);
@@ -420,7 +423,21 @@ function auswerten(plan, s1, teile, E) {
   const seedF = [];
   for (const z of jeId.values()) { const s = pro.get(z.id); if (s && z.seed !== L.fortsetzungsSeed(plan.basis, s.gruppe, s.quelle, s.nr, s.index)) seedF.push(`${z.id}: Seed ${z.seed} weicht von fortsetzungsSeed ab`); }
   kontrolle('Seeds gleich fortsetzungsSeed(Basis, Gruppe, Quelle, Nr., Index)', seedF);
-  const zeilen = [...jeId.values()], pflichtF = zeilen.filter(z => z.status === 'pflichtfehler');
+  const zeilen = [...jeId.values()];
+  /* jede Ergebniszeile braucht einen bekannten Status und die zugehörigen Felder; sonst fehlte sie unbemerkt in den Kennzahlen */
+  const statusF = [];
+  for (const z of zeilen) {
+    if (!['gueltig', 'ausfall', 'pflichtfehler'].includes(z.status)) { statusF.push(`${z.id}: Status ${JSON.stringify(z.status)} ist unbekannt oder fehlt`); continue; }
+    if ((z.status === 'gueltig' || z.status === 'ausfall') && !(z.dauerMs && Number.isFinite(z.dauerMs.gesamt))) statusF.push(`${z.id}: Dauer fehlt (Status ${z.status})`);
+    if (z.status === 'ausfall' && (typeof z.ursache !== 'string' || !z.ursache)) statusF.push(`${z.id}: Ausfall ohne Ursache`);
+    if (z.status === 'pflichtfehler' && (typeof z.grund !== 'string' || !z.grund)) statusF.push(`${z.id}: Pflichtfehler ohne Grund`);
+    if (z.status === 'gueltig') {
+      if (z.wiederholbar !== true) statusF.push(`${z.id}: gültig, aber nicht als wiederholbar belegt`);
+      if (!probe && !(z.gnu && Array.isArray(z.gnu.dead) && z.appTot && Array.isArray(z.appTot.aus) && Array.isArray(z.appTot.an))) statusF.push(`${z.id}: gültig, aber ohne GNU-Go-Liste oder App-Tot-Mengen`);
+    }
+  }
+  kontrolle('Status jeder Ergebniszeile (gueltig, ausfall oder pflichtfehler, mit den zugehörigen Feldern)', statusF);
+  const pflichtF = zeilen.filter(z => z.status === 'pflichtfehler');
   kontrolle('Pflichtfehler (Daten, Replay, abweichendes Brett, ungültige Antworten, Abgleich mit Stufe 1)', pflichtF.map(z => `${z.id}: ${z.grund}`));
   const ausfaelle = zeilen.filter(z => z.status === 'ausfall');
   /* Ausfallgrenze (§16.7): mehr als 5 % der betroffenen Stellungen je Art, und der Kontrollstichprobe je Art */
@@ -434,7 +451,7 @@ function auswerten(plan, s1, teile, E) {
   /* Fallabdeckung: „R1 gleich R2“ zählt nur, wenn je Stellungsart mindestens eine gültige Stellung eine nicht leere dead-Liste hat (nicht in der Probe: dort keine Listen) */
   if (!probe) {
     const abd = [];
-    for (const art of ['S', 'V']) { const g = zeilen.filter(z => z.art === art && z.status === 'gueltig'); if (g.length && !g.some(z => z.gnu.dead.length)) abd.push(`Stellungsart ${art}: keine gültige Stellung mit nicht leerer dead-Liste`); }
+    for (const art of ['S', 'V']) { const g = zeilen.filter(z => z.art === art && z.status === 'gueltig'); if (g.length && !g.some(z => z.gnu && Array.isArray(z.gnu.dead) && z.gnu.dead.length)) abd.push(`Stellungsart ${art}: keine gültige Stellung mit nicht leerer dead-Liste`); }
     kontrolle('Fallabdeckung der Wiederholbarkeit (sonst KEIN URTEIL)', abd);
   }
   const gueltig = gruende.length === 0;

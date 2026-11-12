@@ -438,6 +438,53 @@ test('Auswertung: Pflichtfehler und Ausfall über der Grenze machen den Lauf ung
   pruefeGleich(b.status, 1, 'Pflichtfehler: ungültig'); pruefe(/Pflichtfehler/.test(JSON.stringify(b.bericht.gruende)), 'Grund: Pflichtfehler');
 });
 
+/* ── 4b Laufzeitstatistik, Duplikate im Paket, Status jeder Zeile ───────── */
+test('Probe: auch ein Ausfall schon bei R1 (zweimal Timeout) steht mit seiner Gesamtzeit in der Laufzeitstatistik', () => {
+  const vIds = grund().betroffen.filter(b => b.art === 'V').map(b => b.id), ids = vIds.slice(0, 3), aus = sonderPlan(ids, {}, 'probe'), plan = path.join(aus, 'plan.json'), f = path.join(aus, 'teil-1.jsonl');
+  const r = paketLauf(plan, 1, f, {STUB_DEAD: 'an', STUB_TIMEOUT_SEEDS: String(seedVon(stellungVon(ids[0])))}, ['--timeout-befehl-ms', '1500']);
+  pruefeGleich(r.status, 0, 'Ausfall ist kein Pflichtfehler: ' + r.stdout + r.stderr);
+  const e = Object.fromEntries(liesJsonl(f).slice(1).map(l => [l.id, l]));
+  pruefeGleich(e[ids[0]].status, 'ausfall', 'R1 zweimal Timeout: Ausfall'); pruefeGleich(e[ids[0]].ursache, 'timeout', 'Ursache Timeout'); pruefeGleich(e[ids[0]].versuche.r1, 2, 'zwei Versuche bei R1');
+  pruefe(e[ids[0]].dauerMs && e[ids[0]].dauerMs.gesamt >= 3000, 'Gesamtzeit schon beim frühen Rücksprung gesetzt (mindestens 2 × 1,5 s): ' + JSON.stringify(e[ids[0]].dauerMs));
+  pruefeGleich(e[ids[0]].dauerMs.r2, undefined, 'R2 lief nicht');
+  const a = werteAus(aus, [f]);
+  pruefeGleich(a.status, 0, 'Probe gültig (Ausfälle machen die Probe nicht ungültig): ' + (a.stdout || '').slice(0, 300) + a.stderr);
+  pruefeGleich(a.bericht.dauerSekundenJeStellung.alle.n, 3, 'alle drei Stellungen in der Statistik, auch der Ausfall');
+  pruefe(a.bericht.dauerSekundenJeStellung.alle.max >= 3, 'das Maximum ist die langsame Stellung (mindestens 3 s), nicht die schnellen');
+  pruefe(a.bericht.dauerSekundenJeStellung.alle.max === Math.max(...Object.values(e).map(l => l.dauerMs.gesamt)) / 1000, 'Maximum gleich dem größten Wert der Ergebniszeilen');
+});
+test('Auswertung: doppelte Kennung innerhalb eines Pakets wird erkannt, auch wenn alle geplanten Kennungen vorhanden sind', () => {
+  const ids = grund().betroffen.filter(b => b.art === 'V').map(b => b.id).slice(0, 3), aus = sonderPlan(ids), plan = path.join(aus, 'plan.json'), f = path.join(aus, 'teil-1.jsonl');
+  paketLauf(plan, 1, f, {STUB_DEAD: 'an'});
+  const ok = werteAus(aus, [f], 'ok');
+  pruefeGleich(ok.status, 0, 'Ausgangslage gültig: ' + (ok.stdout || '').slice(0, 300) + ok.stderr);
+  const z = liesJsonl(f), dup = path.join(aus, 'dup.jsonl'); schreibeJsonl(dup, [...z, z[2]]);
+  const a = werteAus(aus, [dup], 'dup');
+  pruefeGleich(a.status, 1, 'doppelte Kennung: Exit 1'); pruefeGleich(a.bericht.urteil, 'KEIN URTEIL', 'KEIN URTEIL');
+  pruefe(/mehrfach im Paket 1/.test(JSON.stringify(a.bericht.gruende)), 'Grund: mehrfach im Paket 1');
+  const dup2 = path.join(aus, 'dup2.jsonl'); schreibeJsonl(dup2, [z[0], z[1], z[1]]);
+  pruefe(/mehrfach/.test(JSON.stringify(werteAus(aus, [dup2], 'dup2').bericht.gruende)), 'auch eine Kennung doppelt statt der fehlenden');
+});
+test('Auswertung: jede Ergebniszeile braucht einen bekannten Status und die zugehörigen Felder (sonst KEIN URTEIL)', () => {
+  const ids = grund().betroffen.filter(b => b.art === 'V').map(b => b.id).slice(0, 3), aus = sonderPlan(ids), plan = path.join(aus, 'plan.json'), f = path.join(aus, 'teil-1.jsonl');
+  paketLauf(plan, 1, f, {STUB_DEAD: 'an'});
+  const z = liesJsonl(f);
+  const pruefeVariante = (name, aendere, muster) => {
+    const k = z.map(l => JSON.parse(JSON.stringify(l))); aendere(k[1]);
+    const d = path.join(aus, `status-${name}.jsonl`); schreibeJsonl(d, k);
+    const a = werteAus(aus, [d], name);
+    pruefeGleich(a.status, 1, `${name}: Exit 1`); pruefeGleich(a.bericht.urteil, 'KEIN URTEIL', `${name}: KEIN URTEIL`); pruefe(muster.test(JSON.stringify(a.bericht.gruende)), `${name}: Grund ${muster}: ${JSON.stringify(a.bericht.gruende).slice(0, 200)}`);
+  };
+  pruefeVariante('unbekannt', l => { l.status = 'fertig'; }, /Status .{1,3}fertig.{1,3} ist unbekannt/);
+  pruefeVariante('fehlt', l => { delete l.status; }, /unbekannt oder fehlt/);
+  pruefeVariante('ohne-dauer', l => { delete l.dauerMs; }, /Dauer fehlt/);
+  pruefeVariante('nicht-wiederholbar', l => { l.wiederholbar = false; }, /nicht als wiederholbar belegt/);
+  pruefeVariante('ohne-liste', l => { delete l.gnu; }, /ohne GNU-Go-Liste/);
+  pruefeVariante('ausfall-ohne-ursache', l => { l.status = 'ausfall'; delete l.ursache; }, /Ausfall ohne Ursache/);
+  pruefeVariante('pflichtfehler-ohne-grund', l => { l.status = 'pflichtfehler'; delete l.grund; }, /Pflichtfehler ohne Grund/);
+  pruefeGleich(werteAus(aus, [f], 'unveraendert').status, 0, 'unveränderte Datei bleibt gültig');
+});
+
 /* ── 5 Pakete fehlen, unvollständig, Versionen ────────────────────────── */
 test('Auswertung: fehlendes Paket wird mit Nummer genannt und der Lauf endet rot; Paket ohne Kennung; abweichende GNU-Go-Version', () => {
   const p = planLauf(grund().verz, ['--paketgroesse', '5', '--kontrolle', '3']), plan = liesJson(path.join(p.aus, 'plan.json'));

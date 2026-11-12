@@ -549,7 +549,7 @@ Hazeberry hat die Vorschläge aus §16.11 als Grundlage für den Bau bestätigt 
 
 | AP | Stand | Inhalt |
 |---|---|---|
-| AP4 | gebaut, nicht gelaufen | `auswertung/endspiel/diagonal-pruefung-stufe2.js` (`plan`, `paket`, `auswerten`), Workflow `.github/workflows/diagonal-pruefung-stufe2.yml` (nur `workflow_dispatch`, Modus `probe` oder `haupt`), Test `tests/diagonal-pruefung-stufe2.js` (Attrappe, 25 Fälle, lokal grün). Am Werkzeug von Stufe 1 ist nur die Exportzeile erweitert (`rechneStellung`, `indizesVon`); dessen 12 Fälle laufen unverändert grün. |
+| AP4 | gebaut, nicht gelaufen | `auswertung/endspiel/diagonal-pruefung-stufe2.js` (`plan`, `paket`, `auswerten`), Workflow `.github/workflows/diagonal-pruefung-stufe2.yml` (nur `workflow_dispatch`, Modus `probe` oder `haupt`), Test `tests/diagonal-pruefung-stufe2.js` (Attrappe, 28 Fälle, lokal grün). Am Werkzeug von Stufe 1 ist nur die Exportzeile erweitert (`rechneStellung`, `indizesVon`); dessen 12 Fälle laufen unverändert grün. |
 
 ### 17.1 Konkretisierungen beim Bau (Setzungen, Entscheidung bei Hazeberry)
 
@@ -574,6 +574,17 @@ Hazeberry hat die Vorschläge aus §16.11 als Grundlage für den Bau bestätigt 
 - **Mutationsprobe bestanden:** Entfernen des B1-Vorrangs, Ausfallgrenze 10 statt 5, vertauschte Richtung, kein Wiederholungsversuch, Wiederholbarkeit nicht geprüft und entfernter Brettvergleich lassen je mindestens einen Test fehlschlagen (der Brettvergleich erst nach einem Zusatzfall im Test).
 - **Nicht geprüft:** das **echte GNU Go** (Antwortformat von `final_status_list` und `list_stones` bei langen Listen, Dauer, Absturzverhalten bei der Debian-Fassung 3.8); der **Workflow in Actions** (nur die YAML-Datei geladen und im Test auf ihre Bestandteile geprüft); die Dauer je Stellung (die 10 s aus §16.6 sind unverändert eine Annahme); die Archive und die Daten aus Stufe 1 (der Test nutzt eine Attrappe).
 - Lokal gelaufen sind nur `tests/diagonal-pruefung-stufe2.js`, `tests/diagonal-pruefung.js` und `tests/lizenz.js`; die gesamte Suite prüft die reguläre CI.
+
+### 17.4 Korrekturen nach der Durchsicht von #302 (12.11.2026)
+
+Hazeberry hat am Stand `513075a` drei Fehler gefunden (aus Code, Workflow und Tests gelesen). Alle drei sind berichtigt; sie hätten die Auswertung der Probe verfälscht oder Datenfehler durchgelassen.
+
+1. **Langsame R1-Ausfälle fehlten in der Laufzeitstatistik.** `dauerMs.gesamt` wurde erst nach R2 gesetzt; bei einem Ausfall oder Pflichtfehler in R1 kehrte die Stellung vorher zurück, und der Probebericht (der nur Zeilen mit diesem Wert zählt) ließ gerade die langsamsten Fälle aus dem Maximum, was eine zu große Paketgröße nahegelegt hätte. Jetzt gilt `gesamt` schon nach R1 und wird nach R2 fortgeschrieben. Test: R1 zweimal Timeout steht mit mindestens 2 × der Zeitgrenze im Bericht, die Statistik zählt alle Stellungen, und das Maximum ist gleich dem größten Wert der Ergebniszeilen.
+2. **Doppelte Kennungen innerhalb eines Pakets wurden übersehen.** Die Prüfung sah nur Kennungen aus früheren Paketen. Jetzt wird auch innerhalb jedes Pakets auf Duplikate geprüft (Grund „mehrfach im Paket n“). Test: eine zusätzliche Kopie einer Zeile bei sonst vollständigem Paket, und eine Kennung doppelt statt der fehlenden.
+3. **Zeilen ohne gültigen Status konnten unbemerkt verschwinden.** Jede Ergebniszeile braucht jetzt einen der Werte `gueltig`, `ausfall`, `pflichtfehler` mit den zugehörigen Feldern (Dauer bei gültig und Ausfall; Ursache bei Ausfall; Grund bei Pflichtfehler; bei gültig wiederholbar, im Hauptlauf auch GNU-Go-Liste und App-Tot-Mengen); sonst ist der Lauf ungültig (KEIN URTEIL, Exit 1). Test: sieben Varianten (unbekannter Status, fehlender Status, fehlende Dauer, nicht wiederholbar, fehlende Liste, Ausfall ohne Ursache, Pflichtfehler ohne Grund).
+4. **Folgefehler, beim Test gefunden:** Fehlte bei einer „gültigen“ Zeile die GNU-Go-Liste, stürzte die Fallabdeckung mit Exit 2 ab, bevor die Statusprüfung greifen konnte. Die Fallabdeckung überspringt jetzt solche Zeilen; die Statusprüfung meldet sie.
+
+**Mutationsprobe:** Wird jede der drei Korrekturen einzeln zurückgenommen, schlägt genau der zugehörige Test fehl.
 
 ### 17.3 Reihenfolge und Freigaben
 
