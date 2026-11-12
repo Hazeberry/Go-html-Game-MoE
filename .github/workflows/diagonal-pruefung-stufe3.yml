@@ -1,0 +1,126 @@
+name: Diagonalprüfung Stufe 3
+
+# Manueller Lauf aus docs/diagonalpruefung-vorabfestlegung.md (§6, §10.4, §11 AP5): Unterlagen für die unabhängige Beurteilung bauen und die Antwortbögen
+# auswerten. NICHT STARTEN ohne ausdrückliches Go von Hazeberry für genau diesen Lauf (CLAUDE.md). Reine Rechnung auf Archivdaten: KEIN GNU Go und KEIN Beurteiler;
+# die Beurteilung macht eine getrennte KI-Sitzung außerhalb dieses Workflows (E-2, §17.5.2), sie bekommt nur das Artefakt „beurteiler-paket“.
+#
+# Modi:
+#   probe       3 Unterlagen (Artefakt „probe-paket“) für die Zeitschätzung an drei Probestücken (§10.4). Die Urteile dazu werden NICHT ausgewertet.
+#   unterlagen  das ganze Paket (B1 vollständig, B2 höchstens 60): Artefakt „beurteiler-paket“ (das bekommt der Beurteiler) und Artefakt „stufe3-geheim“
+#               (Zuordnung zu App aus, App an und GNU Go; NICHT an den Beurteiler geben, erst nach allen Urteilen benutzen).
+#   auswerten   prüft den Antwortbogen aus dem Repo (Eingabe `bogen`), deckt auf und berichtet nach §6.4 und §8. Das Paket wird dafür aus denselben Eingaben neu
+#               gebaut; der Bogen muss zum Manifest passen.
+# Eingaben: die in Git gesicherten ZIPs von Stufe 1 und dem gültigen zweiten Hauptlauf von Stufe 2, je gegen ihre SHA-256 geprüft.
+# Gültigkeit: nur zwei Zustände. Ungültig heißt „kein Urteil“ mit Grund, und der Lauf wird rot.
+on:
+  workflow_dispatch:
+    inputs:
+      modus:
+        description: 'probe (3 Unterlagen), unterlagen (ganzes Paket) oder auswerten (Antwortbogen auswerten)'
+        type: choice
+        options: [probe, unterlagen, auswerten]
+        default: unterlagen
+      bogen:
+        description: 'Nur auswerten: Pfad des Antwortbogens im Repo, z. B. docs/daten/diagonal-pruefung/stufe3/bogen-ki.json'
+        default: ''
+      bogen_name:
+        description: 'Nur auswerten: Name der Beurteilergruppe (KI oder Mensch)'
+        default: 'KI'
+
+concurrency:
+  group: diagonal-pruefung-stufe3
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  stufe3:
+    name: Stufe 3 (${{ inputs.modus }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Eingaben prüfen und entpacken
+        run: |
+          set -euo pipefail
+          pruefe() {
+            zip="$1"; erwartet="$2"; sums="$3"
+            ist=$(sha256sum "$zip" | cut -d' ' -f1)
+            liste=$(grep " $(basename "$zip")\$" "$sums" | cut -d' ' -f1)
+            echo "$zip: SHA-256 $ist (gebunden $erwartet, SHA256SUMS $liste)"
+            test "$ist" = "$erwartet"
+            test "$liste" = "$erwartet"
+          }
+          d1=docs/daten/diagonal-pruefung/stufe1
+          d2=docs/daten/diagonal-pruefung/stufe2-hauptlauf-43274198340
+          pruefe "$d1/diagonal-pruefung-stufe1.zip" 8c835dfb5b6ed7cb5af951de92351de2fd67643151025ab56fad51a89c133740 "$d1/SHA256SUMS"
+          pruefe "$d2/diagonal-pruefung-stufe2.zip" d3f92b964891a176aedf128e834138816cb92399b0edfa6fe2d1c4c263f49d95 "$d2/SHA256SUMS"
+          mkdir -p stufe1 stufe2 ergebnis
+          unzip -q "$d1/diagonal-pruefung-stufe1.zip" -d stufe1
+          unzip -q "$d2/diagonal-pruefung-stufe2.zip" -d stufe2
+          test -f stufe1/stellungen.jsonl
+          test -f stufe2/bericht/auswahl-stufe3.json
+          node --version
+
+      - name: Unterlagen oder Probe
+        if: ${{ inputs.modus != 'auswerten' }}
+        env:
+          MODUS: ${{ inputs.modus }}
+        run: |
+          set -uo pipefail
+          status=0
+          probe=()
+          [ "$MODUS" = "probe" ] && probe=(--probe 3)
+          node auswertung/endspiel/diagonal-pruefung-stufe3.js unterlagen --stufe1 stufe1 --stufe2 stufe2 --archiv docs/daten --aus ergebnis "${probe[@]}" || status=$?
+          if [ "$status" -eq 0 ]; then
+            if [ "$MODUS" = "probe" ]; then cat ergebnis/probe-paket/manifest.json | head -5 >> "$GITHUB_STEP_SUMMARY"; else cat ergebnis/beurteiler-paket/manifest.json | head -5 >> "$GITHUB_STEP_SUMMARY"; fi
+          fi
+          exit "$status"
+
+      - name: Auswerten
+        if: ${{ inputs.modus == 'auswerten' }}
+        env:
+          BOGEN: ${{ inputs.bogen }}
+          NAME: ${{ inputs.bogen_name }}
+        run: |
+          set -uo pipefail
+          [ -n "$BOGEN" ] && [ -f "$BOGEN" ] || { echo "Eingabe bogen fehlt oder die Datei existiert nicht: $BOGEN" >&2; exit 2; }
+          status=0
+          node auswertung/endspiel/diagonal-pruefung-stufe3.js auswerten --stufe1 stufe1 --stufe2 stufe2 --archiv docs/daten --bogen "$NAME=$BOGEN" --aus ergebnis || status=$?
+          cat ergebnis/bericht-stufe3.md >> "$GITHUB_STEP_SUMMARY" || true
+          exit "$status"
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ always() && inputs.modus == 'unterlagen' }}
+        with:
+          name: beurteiler-paket
+          path: ergebnis/beurteiler-paket/
+          retention-days: 90
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ always() && inputs.modus == 'unterlagen' }}
+        with:
+          name: stufe3-geheim
+          path: ergebnis/geheim/
+          retention-days: 90
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ always() && inputs.modus == 'probe' }}
+        with:
+          name: probe-paket
+          path: ergebnis/probe-paket/
+          retention-days: 90
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ always() && inputs.modus == 'auswerten' }}
+        with:
+          name: stufe3-bericht
+          path: ergebnis/
+          retention-days: 90
