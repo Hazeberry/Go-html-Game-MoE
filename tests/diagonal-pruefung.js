@@ -202,6 +202,8 @@ test('Ganze Kette (drei Stände in drei Prozessen): gültig, Betroffene gleich e
   pruefeGleich(b.handpartien.length, 6, 'sechs Handpartien getrennt berichtet');
   pruefe(b.entwicklung.hinweis.includes('nicht Teil der Auswertung'), 'Entwicklungsstellungen nicht in der Auswertung');
   const md = fs.readFileSync(path.join(g.v.aus, 'bericht.md'), 'utf8');
+  pruefe(md.includes('Partien mit gleicher Zugfolge wie eine Quellpartie und Stellungen mit einem Entwicklungsbrett oder einem bereits in derselben Stellungsart erfassten Brett werden aus der Hauptprüfung ausgeschlossen (§14.4).'), 'Bericht erklärt die Ausschlüsse nach §14.4');
+  pruefe(!md.includes('Duplikate (gleiche Zugfolge) zählen mehrfach'), 'Bericht enthält den veralteten Duplikatsatz nicht');
   pruefe(md.includes('zu wenig Betroffene') && /Keine Aussage|keine Aussage zur Richtigkeit/.test(md), 'Bericht: zu wenig Betroffene, keine Aussage zur Richtigkeit');
 });
 

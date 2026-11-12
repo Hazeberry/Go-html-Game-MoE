@@ -400,7 +400,8 @@ function berichtMd(x) {
     '## Grenzen', '',
     '- Ohne GNU Go, ohne Maßstab: Betroffenheit sagt nicht, ob die Änderung die Zählung verbessert oder verschlechtert.',
     '- Die Prüfdaten stammen aus denselben Archiven wie die Entwicklungsdaten (gleiche Gruppen, teils gleiche Engine-Stände und Gegner); sie sind keine unabhängige Verteilung und gelten nicht für Menschen.',
-    '- Duplikate (gleiche Zugfolge) zählen mehrfach (Schritt 0 nennt ihre Zahl); die Einspiel-Kontrolle prüft Ko und Superko nicht.',
+    '- Partien mit gleicher Zugfolge wie eine Quellpartie und Stellungen mit einem Entwicklungsbrett oder einem bereits in derselben Stellungsart erfassten Brett werden aus der Hauptprüfung ausgeschlossen (§14.4). Schritt 0 weist die Ausschlüsse aus.',
+    '- Die Einspiel-Kontrolle prüft Ko und Superko nicht.',
     '- S: nur reguläre Enden (zwei Pässe in Folge, keine Aufgabe); Zuglimit und andere Enden sind im Archiv nicht getrennt erkennbar und fallen unter „Ende nicht mit zwei Pässen“.');
   return m.join('\n') + '\n';
 }
