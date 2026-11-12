@@ -1,0 +1,206 @@
+name: Diagonalprüfung Stufe 2
+
+# Manueller Lauf aus docs/diagonalpruefung-vorabfestlegung.md (§16, AP4): GNU Gos Tot-Liste für die betroffenen Stellungen aus Stufe 1 und für
+# eine Kontrollstichprobe unbetroffener Stellungen (Schicht A: Übereinstimmung mit GNU Go, keine Aussage zur Richtigkeit).
+# NICHT STARTEN ohne ausdrückliches Go von Hazeberry für genau diesen Lauf (CLAUDE.md). Zwei Läufe, je ein eigenes Go:
+#   modus probe   24 Stellungen in einem Paket; nur Dauer, Status und technische Kontrollen, keine Tot-Listen, keine Zahlen der Schicht A (§16.6).
+#   modus haupt   alle betroffenen Stellungen und die Kontrollstichprobe in Paketen (§16.1, §16.4, §16.6). Nur nach der Probe, nach der Entscheidung über
+#                 die Paketgröße und nach E-2 (Beurteilerwahl): e2_entschieden ist eine Sperre gegen Versehen und ersetzt kein Go.
+# Ablauf:
+#   plan     das gesicherte Stufe-1-ZIP gegen die gebundene SHA-256 prüfen, entpacken, Kontrollstichprobe ziehen, Pakete bilden (Hash, §16.4, §16.6)
+#   paket    je Paket (Matrix, fail-fast false): Einspielen, Abgleich mit Stufe 1, zwei Referenzläufe je Stellung in frischen Prozessen mit demselben Seed
+#   ergebnis Auswertung auch bei Paketfehlern (always): nennt fehlende Pakete, Gültigkeit nach §16.9, Ausfallgrenze nach §16.7, Auswahl B1/B2 nach §16.8
+# Gültigkeit: nur zwei Zustände. Ungültig heißt „kein Urteil“ mit Grund, und der Lauf wird rot.
+on:
+  workflow_dispatch:
+    inputs:
+      modus:
+        description: 'probe (24 Stellungen, nur technisch) oder haupt (alle betroffenen Stellungen und Kontrolle; nur nach Probe und E-2)'
+        type: choice
+        options: [probe, haupt]
+        default: probe
+      paketgroesse:
+        description: 'Stellungen je Paket (nur Hauptlauf; nach der Probe festgelegt, Vorschlag 50)'
+        default: '50'
+      e2_entschieden:
+        description: 'Nur Hauptlauf: E-2 (Beurteilerwahl) entschieden und Paketgröße nach der Probe bestätigt. Ersetzt kein Go.'
+        type: boolean
+        default: false
+
+concurrency:
+  group: diagonal-pruefung-stufe2
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    name: Plan (Eingabe prüfen, Pakete bilden)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      teile: ${{ steps.plan.outputs.teile }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Sperre und Eingaben prüfen
+        env:
+          MODUS: ${{ inputs.modus }}
+          PAKETGROESSE: ${{ inputs.paketgroesse }}
+          E2: ${{ inputs.e2_entschieden }}
+        run: |
+          set -euo pipefail
+          if [ "$MODUS" = "haupt" ] && [ "$E2" != "true" ]; then
+            echo "Hauptlauf ohne e2_entschieden: E-2 und die Paketgröße nach der Probe müssen vorher entschieden sein (§16.6, §16.11)." >&2
+            exit 1
+          fi
+          [[ "$PAKETGROESSE" =~ ^[0-9]+$ ]] && [ "$PAKETGROESSE" -ge 1 ] || { echo "paketgroesse muss eine ganze Zahl ≥ 1 sein" >&2; exit 2; }
+
+      - name: Stufe-1-ZIP prüfen und entpacken
+        run: |
+          set -euo pipefail
+          d=docs/daten/diagonal-pruefung/stufe1
+          erwartet=8c835dfb5b6ed7cb5af951de92351de2fd67643151025ab56fad51a89c133740
+          ist=$(sha256sum "$d/diagonal-pruefung-stufe1.zip" | cut -d' ' -f1)
+          liste=$(grep ' diagonal-pruefung-stufe1.zip$' "$d/SHA256SUMS" | cut -d' ' -f1)
+          echo "ZIP SHA-256: $ist (gebunden $erwartet, SHA256SUMS $liste)"
+          test "$ist" = "$erwartet"
+          test "$liste" = "$erwartet"
+          mkdir -p stufe1
+          unzip -q "$d/diagonal-pruefung-stufe1.zip" -d stufe1
+          test -f stufe1/stellungen.jsonl
+          test -f stufe1/neu.jsonl
+          test -f stufe1/betroffen.jsonl
+          node --version
+
+      - name: Plan
+        id: plan
+        env:
+          MODUS: ${{ inputs.modus }}
+          PAKETGROESSE: ${{ inputs.paketgroesse }}
+        run: |
+          set -uo pipefail
+          mkdir -p plan
+          status=0
+          node auswertung/endspiel/diagonal-pruefung-stufe2.js plan --stufe1 stufe1 --aus plan --modus "$MODUS" --paketgroesse "$PAKETGROESSE" || status=$?
+          [ "$status" -eq 0 ] || exit "$status"
+          echo "teile=$(cat plan/teile.json)" >> "$GITHUB_OUTPUT"
+          echo "Plan ($MODUS): $(cat plan/teile.json)" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: stufe2-plan
+          path: |
+            plan/
+            stufe1/
+          retention-days: 90
+
+  paket:
+    name: Paket ${{ matrix.teil }}
+    needs: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        teil: ${{ fromJSON(needs.plan.outputs.teile) }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: stufe2-plan
+          path: eingabe
+
+      - name: Paket bearbeiten
+        env:
+          TEIL: ${{ matrix.teil }}
+        run: |
+          set -uo pipefail
+          mkdir -p ergebnisse
+          paket=$(dpkg-query -W -f='${Package} ${Version}' gnugo)
+          status=0
+          node auswertung/endspiel/diagonal-pruefung-stufe2.js paket --plan eingabe/plan/plan.json --teil "$TEIL" --stufe1 eingabe/stufe1 \
+            --archiv docs/daten --aus "ergebnisse/teil-${TEIL}.jsonl" --gnugo /usr/games/gnugo --html index.html --paket-version "$paket" || status=$?
+          echo "Paket ${TEIL}, Ausgang ${status}, GNU Go ${paket}" >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ergebnisse-teil-${{ matrix.teil }}
+          path: ergebnisse/
+          retention-days: 90
+
+  ergebnis:
+    name: Auswertung
+    needs: [plan, paket]
+    if: ${{ always() && needs.plan.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: stufe2-plan
+          path: eingabe
+
+      - uses: actions/download-artifact@v7
+        continue-on-error: true
+        with:
+          pattern: ergebnisse-teil-*
+          path: teile
+          merge-multiple: true
+
+      - name: Auswerten
+        env:
+          TEILE: ${{ needs.plan.outputs.teile }}
+        run: |
+          set -uo pipefail
+          mkdir -p bericht teile
+          erwartet=$(node -e "console.log(JSON.parse(process.env.TEILE).length)")
+          vorhanden=$(ls teile/teil-*.jsonl 2>/dev/null | wc -l || true)
+          status=0
+          if [ "$vorhanden" -ne "$erwartet" ]; then
+            echo "FEHLENDE PAKETE: ${vorhanden} von ${erwartet}. Welche, steht im Bericht. Ganze Pakete wiederholen, nie einzelne Stellungen; darüber entscheidet Hazeberry." | tee -a "$GITHUB_STEP_SUMMARY" >&2
+            status=1
+          fi
+          dateien=$(ls teile/teil-*.jsonl 2>/dev/null | paste -sd, - || true)
+          node auswertung/endspiel/diagonal-pruefung-stufe2.js auswerten --plan eingabe/plan/plan.json --stufe1 eingabe/stufe1 \
+            --ergebnisse "$dateien" --aus bericht --html index.html || status=$?
+          cat bericht/bericht.md >> "$GITHUB_STEP_SUMMARY" || true
+          exit "$status"
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: diagonal-pruefung-stufe2
+          path: |
+            bericht/
+            eingabe/plan/
+            teile/
+          retention-days: 90
