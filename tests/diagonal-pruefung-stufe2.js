@@ -508,6 +508,26 @@ test('Auswertung: fehlendes Paket wird mit Nummer genannt und der Lauf endet rot
   pruefeGleich(s.status, 1, 'falscher Seed: Exit 1'); pruefe(/Seed/.test(JSON.stringify(s.bericht.gruende)), 'Grund: Seed');
 });
 
+test('Runner-Image: verschiedene Images in den Paketen sind kein Ungültigkeitsgrund, werden aber im Bericht genannt; andere GNU-Go-Paketversion bleibt ungültig', () => {
+  const ids = grund().betroffen.filter(b => b.art === 'V').map(b => b.id).slice(0, 4), aus = sonderPlan(ids), plan = liesJson(path.join(aus, 'plan.json'));
+  plan.pakete = [{nr: 1, stellungen: ids.slice(0, 2).map(id => ({id, kategorie: 'betroffen'}))}, {nr: 2, stellungen: ids.slice(2).map(id => ({id, kategorie: 'betroffen'}))}];
+  fs.writeFileSync(path.join(aus, 'plan.json'), JSON.stringify(plan));
+  const f1 = path.join(aus, 'teil-1.jsonl'), f2 = path.join(aus, 'teil-2.jsonl');
+  pruefeGleich(paketLauf(path.join(aus, 'plan.json'), 1, f1, {STUB_DEAD: 'an', ImageVersion: '20261101.360.1'}).status, 0, 'Paket 1 grün');
+  pruefeGleich(paketLauf(path.join(aus, 'plan.json'), 2, f2, {STUB_DEAD: 'an', ImageVersion: '20261111.370.1'}).status, 0, 'Paket 2 grün');
+  pruefeGleich(liesJsonl(f1)[0].kopf.imageVersion, '20261101.360.1', 'Paket 1: Image protokolliert'); pruefeGleich(liesJsonl(f2)[0].kopf.imageVersion, '20261111.370.1', 'Paket 2: anderes Image protokolliert');
+  const a = werteAus(aus, [f1, f2], 'images');
+  pruefeGleich(a.status, 0, 'verschiedene Images: gültig: ' + (a.stdout || '').slice(0, 300) + a.stderr);
+  pruefeGleich(JSON.stringify(a.bericht.runnerImages), JSON.stringify({'20261101.360.1': 1, '20261111.370.1': 1}), 'Images im Bericht');
+  pruefe(/Runner-Image der Pakete \(nur protokolliert, kein Gültigkeitskriterium/.test(fs.readFileSync(path.join(a.aus, 'bericht.md'), 'utf8')), 'Bericht nennt die Images als Hinweis');
+  /* andere GNU-Go-Paketversion in einem Paket bleibt ein Ungültigkeitsgrund, ebenso eine andere Version von GNU Go */
+  for (const [feld, wert] of [['paketVersion', 'gnugo 3.9-1'], ['gnugoVersionAusgabe', 'GNU Go 3.9'], ['argumenteOhneSeed', '--mode gtp --level 10']]) {
+    const z = liesJsonl(f2); z[0].kopf[feld] = wert; const d = path.join(aus, `abw-${feld}.jsonl`); schreibeJsonl(d, z);
+    const b = werteAus(aus, [f1, d], 'abw-' + feld);
+    pruefeGleich(b.status, 1, `${feld} verschieden: Exit 1`); pruefe(new RegExp(feld).test(JSON.stringify(b.bericht.gruende)), `Grund: ${feld}`);
+  }
+});
+
 /* ── 6 Probe ──────────────────────────────────────────────────────────── */
 test('Probe: 10 betroffene S mit dem höchsten Zugindex, betroffene V350, 2 + 2 Kontrolle, ein Paket, Auswahl nur nach Index und Hash', () => {
   const g = grund(), ab = new Set(g.betroffen.map(b => b.id));

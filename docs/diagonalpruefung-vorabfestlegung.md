@@ -589,3 +589,32 @@ Hazeberry hat am Stand `513075a` drei Fehler gefunden (aus Code, Workflow und Te
 ### 17.3 Reihenfolge und Freigaben
 
 Nächste Schritte, je eigenes Go: Merge dieses PR (Hazeberry liest vorher) → **Go zur Probe** (`diagonal-pruefung-stufe2.yml`, Modus `probe`) → Auswertung der Dauer, Entscheidung über die Paketgröße (bei G < 36 Neuentscheidung der Paketgrenze, §16.6) → **E-2 entschieden** → **Go zum Hauptlauf** (Modus `haupt`, `e2_entschieden` gesetzt). Dieser Abschnitt erteilt kein Go für einen Lauf, Stufe 3, einen Engine-Vergleich, einen Standardwechsel oder einen Merge. `diagonalAugeEnde` bleibt standardmäßig 0, `passNachGegnerpass` bleibt aus.
+
+### 17.5 Probe, erster Hauptlauf und Korrektur des Image-Vergleichs (12.11.2026)
+
+Die Aussagen „nicht gelaufen“ in 17.2 und die Reihenfolge in 17.3 beschreiben den Stand beim Bau; dieser Abschnitt hält fest, was danach geschah. Quellen: Job-Logs und Berichte der Läufe (gelesen), das gesicherte ZIP der Probe (am 12.11.2026 aus dem Branch von #303 geholt und selbst geprüft).
+
+**17.5.1 Probe (Lauf `43193672197`, Run 1, `main` bei `a4102db`, Modus `probe`, Go von Hazeberry)**
+- Gültig (technisch), alle Kontrollen bestanden, 24 Stellungen gültig (betroffen S 10 und V 10, Kontrolle S 2 und V 2), 0 Ausfälle, kein Wiederholungsversuch; R1 und R2 mit demselben Seed zeichengleich; Brett, Gefangene und App-Ergebnis gleich Stufe 1.
+- Dauer je Stellung (beide Referenzläufe): Median 0,46 s, 95 %-Quantil 0,81 s, Maximum 1,47 s (S höchstens 0,6 s, V höchstens 1,5 s). Regel aus §16.6: Maximum × 50 ≤ 60 Minuten, Paketgröße 50 bleibt. Die Annahme von 10 s je Stellung war rund 20-mal zu hoch.
+- Umgebung laut Paketkopf: GNU Go 3.8, Paket `gnugo 3.8-11build2`, Runner-Image `20261101.360.1`, `captures`-Konvention „gefangen-von“.
+- Grenzen: nur 24 Stellungen (die längsten betroffenen S-Stellungen und V350); ein Absturz, ein Timeout und „cannot score“ traten nicht auf, diese Pfade sind mit dem echten GNU Go weiter nur mit der Attrappe geprüft. Es gibt keine Tot-Listen und keine Zahlen der Schicht A.
+- Rohdaten: Artefakt `diagonal-pruefung-stufe2` (ID `13931074517`, 5.466 Bytes, SHA-256 `6fb25e46395912ca14f1a65f23e1b8249f2ee9a0296e5420d633e6f091043435`, gleich dem Actions-Digest). Die Git-Kopie liegt in PR #303 unter `docs/daten/diagonal-pruefung/stufe2-probe-43193672197/` (zum Zeitpunkt dieses Textes noch nicht gemergt); das GitHub-Artefakt läuft am 10.02.2027 ab.
+
+**17.5.2 Entscheidungen von Hazeberry (12.11.2026)**
+E-2 bestätigt: getrennte KI-Beurteilung für alle B1-Fälle und höchstens 60 B2-Fälle, ohne menschliche Teilmenge und ohne optionale Fuego-Probe (§10.4). Paketgröße 50 bestätigt. Beurteilungen sind weiterhin keine Ground Truth.
+
+**17.5.3 Erster Hauptlauf (Lauf `43197546660`, Run 2, `main` bei `a4102db`, Modus `haupt`, Paketgröße 50, `e2_entschieden` an, Go von Hazeberry): ungültig, KEIN URTEIL**
+- 43 Pakete mit 2.118 Stellungen (betroffen S 658 und V 1.060, Kontrolle S 200 und V 200). Gesamtdauer des Laufs etwa vier Minuten.
+- Bestanden laut Bericht: Pakete vollständig, Vollständigkeit (jede Kennung genau einmal), Seeds, Status jeder Zeile, Pflichtfehler (keine), Ausfallgrenze (keine Ausfälle), Fallabdeckung der Wiederholbarkeit.
+- **Nicht bestanden:** die Kontrolle „Köpfe“. Die Pakete 19 und 22 liefen auf dem Runner-Image `20261111.370.1`, die übrigen auf `20261101.360.1`; GitHub hat das Image während des Laufs offenbar gewechselt. GNU-Go-Version, Paketversion, Argumente, Plan und `index.html` waren dabei in allen Paketen gleich (sonst stünden sie in der Fehlerliste).
+- **Wegen der Ungültigkeit gibt es keine Zahlen der Schicht A und keine Auswahl B1 und B2.** Aus den Paketdateien wurde nichts gerechnet.
+- Rohdaten: Artefakt `diagonal-pruefung-stufe2` (ID `13933992030`, 1.580.039 Bytes, Actions-Digest SHA-256 `b916b83e0f4e34502754dbdf1361b2783b3fd3dc175773760899f9f6444f0000`) und 43 Einzelartefakte `ergebnisse-teil-<n>`; nicht in Git gesichert, Ablauf am 10.02.2027. Eine Sicherung ist nach Angabe von Hazeberry bei Luna vorbereitet; ein PR dazu war beim Schreiben nicht gesehen.
+
+**17.5.4 Ursache und Korrektur (Fehler im Bau, offen berichtigt)**
+- **Ursache:** Der Kopfvergleich der Auswertung machte auch die Runner-Image-Version zur Pflicht. §16.3 Nr. 6 und §16.9 verlangen dagegen gleiche GNU-Go-Version und gleiche Argumente; das Image wird nur protokolliert. Das Werkzeug war damit strenger als die Vorabfestlegung. Das stand nicht in 17.1 und fiel in der Attrappe nicht auf.
+- **Korrektur:** `imageVersion` wird nur noch protokolliert; der Bericht nennt die Images der Pakete mit Anzahl. Weiter verglichen und bei Abweichung ungültig: GNU-Go-Version, Paketversion, Argumente, `index.html`, Plan, Modus, jeder Paketfehler. Test: zwei Pakete auf verschiedenen Images sind gültig und der Bericht nennt beide; abweichende GNU-Go-Version, Paketversion oder Argumente bleiben ungültig. Mutationsprobe: Wird der Image-Vergleich wieder zur Pflicht oder der Vergleich der Paketversion entfernt, schlägt dieser Test fehl.
+- **Einordnung:** Das ist eine Änderung einer Gültigkeitsregel nach einem roten Lauf. Sie hängt nicht von Ergebnissen ab (es gibt keine) und stellt den in §16.3 und §16.9 vorab festgelegten Wortlaut wieder her. Der erste Hauptlauf bleibt als ungültig dokumentiert und wird **nicht** verrechnet; ein neuer Hauptlauf rechnet alle 2.118 Stellungen neu.
+
+**17.5.5 Freigaben**
+Dieser Abschnitt erteilt kein Go für einen neuen Hauptlauf, Stufe 3, einen Engine-Vergleich, einen Standardwechsel oder einen Merge. Ein neuer Hauptlauf braucht nach dem Merge der Korrektur ein eigenes Go (Modus `haupt`, `e2_entschieden` an). `diagonalAugeEnde` bleibt standardmäßig 0, `passNachGegnerpass` bleibt aus.

@@ -397,7 +397,7 @@ function auswerten(plan, s1, teile, E) {
   const gleich = (feld, soll) => { for (const t of teile) if (t.kopf[feld] !== soll) kopfFehler.push(`Paket ${t.kopf.teil}: ${feld} ${JSON.stringify(t.kopf[feld])} statt ${JSON.stringify(soll)}`); };
   if (teile.length) {
     gleich('htmlSha256', plan.erwarteteHtmlSha); gleich('planSha256', teile[0].kopf.planSha256); gleich('gnugoVersionAusgabe', teile[0].kopf.gnugoVersionAusgabe); gleich('paketVersion', teile[0].kopf.paketVersion);
-    gleich('argumenteOhneSeed', teile[0].kopf.argumenteOhneSeed); gleich('imageVersion', teile[0].kopf.imageVersion); gleich('modus', plan.modus);
+    gleich('argumenteOhneSeed', teile[0].kopf.argumenteOhneSeed); gleich('modus', plan.modus);   /* das Runner-Image wird nur protokolliert (§16.3 Nr. 6), kein Gültigkeitskriterium: maßgeblich sind GNU-Go-Version, Paketversion und Argumente */
     for (const t of teile) for (const g of t.kopf.pflichtfehlerPaket || []) kopfFehler.push(`Paket ${t.kopf.teil}: ${g}`);
   }
   kontrolle('Köpfe: gleiche Fassung der Engine, gleicher Plan, gleiche GNU-Go-Version und -Argumente, kein Paketfehler', [...k2, ...kopfFehler]);
@@ -455,7 +455,9 @@ function auswerten(plan, s1, teile, E) {
     kontrolle('Fallabdeckung der Wiederholbarkeit (sonst KEIN URTEIL)', abd);
   }
   const gueltig = gruende.length === 0;
-  const basisBericht = {gueltig, urteil: gueltig ? 'gültig' : 'KEIN URTEIL', gruende, kontrollen, modus: plan.modus, plan: {basis: plan.basis, paketgroesse: plan.paketgroesse, zahlen: plan.zahlen}};
+  const runnerImages = {};
+  for (const t of teile) { const k = t.kopf.imageVersion || 'unbekannt'; runnerImages[k] = (runnerImages[k] || 0) + 1; }
+  const basisBericht = {gueltig, urteil: gueltig ? 'gültig' : 'KEIN URTEIL', gruende, kontrollen, runnerImages, modus: plan.modus, plan: {basis: plan.basis, paketgroesse: plan.paketgroesse, zahlen: plan.zahlen}};
   const ausfallListe = ausfaelle.map(z => ({id: z.id, art: z.art, gruppe: z.gruppe, kategorie: z.kategorie, partieLaenge: z.partieLaenge, ursache: z.ursache, grund: z.grund, versuche: z.versuche,
     totMengeUnterschied: z.appTot ? {zusaetzlichTot: z.appTot.an.filter(i => !z.appTot.aus.includes(i)).length, wiederLebend: z.appTot.aus.filter(i => !z.appTot.an.includes(i)).length} : null}));
   if (probe) return probeBericht(basisBericht, zeilen, ausfallListe);
@@ -475,6 +477,8 @@ function auswerten(plan, s1, teile, E) {
     stellungenMitGnuSeki: seki, gueltigeStellungen: nutz.length, ausfaelleBetroffen: ausfaelle.filter(z => z.kategorie === 'betroffen').length};
   return {bericht, md: berichtMd(bericht), auswahl};
 }
+/* Runner-Images der Pakete: nur protokolliert (§16.3 Nr. 6), kein Gültigkeitskriterium */
+const imagesZeile = r => `Runner-Image der Pakete (nur protokolliert, kein Gültigkeitskriterium; gleich geprüft werden GNU-Go-Version, Paketversion und Argumente): ${Object.entries(r || {}).map(([k, n]) => `${k} in ${n} Paket${n === 1 ? '' : 'en'}`).join('; ') || '–'}.`;
 function probeBericht(basis, zeilen, ausfallListe) {
   const d = art => zeilen.filter(z => (art ? z.art === art : true) && z.dauerMs && Number.isFinite(z.dauerMs.gesamt)).map(z => z.dauerMs.gesamt / 1000);
   const stat = a => ({n: a.length, median: median(a), p95: quantil(a, 0.95), max: a.length ? Math.max(...a) : null});
@@ -486,6 +490,7 @@ function probeBericht(basis, zeilen, ausfallListe) {
     `Plan: ${basis.plan.zahlen.gesamt} Stellungen (betroffen S ${basis.plan.zahlen.betroffen.S}, V ${basis.plan.zahlen.betroffen.V}; Kontrolle S ${basis.plan.zahlen.kontrolle.S}, V ${basis.plan.zahlen.kontrolle.V}).`, '', '## Kontrollen', '', '| Kontrolle | Ergebnis |', '|---|---|',
     ...basis.kontrollen.map(k => `| ${k.name} | ${k.ok ? 'bestanden' : `**NICHT bestanden** (${k.anzahlFehler}): ${k.fehler.slice(0, 3).join(' | ')}`} |`), '',
     `**${basis.gueltig ? 'Probe gültig (technisch).' : 'Probe UNGÜLTIG, KEIN URTEIL.'}**${basis.gueltig ? '' : ' Gründe: ' + basis.gruende.join(' ; ')}`, '',
+    imagesZeile(basis.runnerImages), '',
     '## Dauer je Stellung (beide Referenzläufe samt Wiederholungsversuchen, Sekunden)', '', '| Art | n | Median | 95 %-Quantil | Maximum |', '|---|---:|---:|---:|---:|',
     ...Object.entries(dauer).map(([k, v]) => `| ${k} | ${v.n} | ${komma(v.median)} | ${komma(v.p95)} | ${komma(v.max)} |`), '',
     `Regel für die Paketgröße (§16.6): ${regel}. Das ist ein rechnerischer Hinweis; die Entscheidung steht vor dem Go zum Hauptlauf im Doc.`, '',
@@ -499,6 +504,7 @@ function berichtMd(b) {
     '## Kontrollen', '', '| Kontrolle | Ergebnis |', '|---|---|', ...b.kontrollen.map(k => `| ${k.name} | ${k.ok ? 'bestanden' : `**NICHT bestanden** (${k.anzahlFehler}): ${k.fehler.slice(0, 3).join(' | ')}`} |`), ''];
   if (!b.gueltig) { m.push(`**UNGÜLTIG, KEIN URTEIL.** Gründe: ${b.gruende.join(' ; ')}`, ''); }
   else m.push('Alle Pflichtkontrollen bestanden.', '');
+  m.push(imagesZeile(b.runnerImages), '');
   m.push('## Ausfälle (einzeln, §16.7)', '', 'Ausfälle sind nicht zufällig (schwierige Stellungen, Absturz durch die Stellung selbst). **Jeder ungeklärte Ausfall in einer betroffenen Stellung verhindert die positive Kandidatur**, auch unter der Berichtsgrenze.', '');
   if (!b.ausfaelle.length) m.push('Keine Ausfälle.', '');
   else { m.push('| Stellung | Art | Gruppe | Kategorie | Partielänge | Ursache | Unterschied der Tot-Mengen aus/an |', '|---|---|---|---|---:|---|---|');
