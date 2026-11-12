@@ -2,8 +2,12 @@
 
 Gesichert am 08.11.2026 aus der von Hazeberry bereitgestellten Datei
 `diagonal-pruefung-stufe1.zip`. Das ZIP bleibt unverändert erhalten.
-Ein Actions-Lauf oder Quellencommit wurde dieser Datei nicht separat zugeordnet;
-die im Archiv enthaltenen HTML-Prüfsummen stehen in `manifest.json`.
+Herkunft: Artefakt `diagonal-pruefung-stufe1` (ID `13606944528`) des Actions-Laufs
+`42456406985` (Workflow `diagonal-pruefung.yml`, `workflow_dispatch` auf `main`, 08.11.2026)
+auf Commit `0887732170090390ce9aa28f08d954b550225830`. Die SHA-256 des ZIP ist gleich dem von
+Actions gemeldeten Artefakt-Digest (Quellen: Actions-Metadaten und Job-Log, gelesen am
+08.11.2026; Näheres in der Vorabfestlegung, §15.1). Die im Archiv enthaltenen
+HTML-Prüfsummen stehen in `manifest.json`.
 
 ## Inhalt
 
@@ -32,4 +36,4 @@ unzip diagonal-pruefung-stufe1.zip -d entpackt
 Bei dieser Übernahme wurden keine Engine-Rechnungen oder Messläufe wiederholt.
 Die bestandenen fachlichen Kontrollen sind Angaben des gelieferten Berichts.
 Stufe 1 beschreibt Betroffenheit, keine Verbesserung oder Richtigkeit.
-Ergebnisnachtrag: [Vorabfestlegung, §15](../../../diagonalpruefung-vorabfestlegung.md#15-ergebnisnachtrag-stufe-1-08112026).
+Ergebnisnachtrag: [Vorabfestlegung, §15](../../../diagonalpruefung-vorabfestlegung.md#15-ergebnisnachtrag-stufe-1-08112026-korrigiert-11112026).

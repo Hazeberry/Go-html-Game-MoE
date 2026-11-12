@@ -1,5 +1,15 @@
 {
-  "quelle": "Von Hazeberry in dieser Sitzung bereitgestellte ZIP-Datei; Actions-Lauf und Quellencommit nicht separat zugeordnet.",
+  "quelle": "Von Hazeberry bereitgestellte ZIP-Datei; Zuordnung zu Actions-Lauf und Commit siehe herkunft.",
+  "herkunft": {
+    "workflow": "diagonal-pruefung.yml",
+    "ereignis": "workflow_dispatch auf main",
+    "lauf": 42456406985,
+    "commit": "0887732170090390ce9aa28f08d954b550225830",
+    "artefaktName": "diagonal-pruefung-stufe1",
+    "artefaktId": 13606944528,
+    "digestGleichZipSha256": true,
+    "belege": "Actions-Metadaten und Job-Log, gelesen am 08.11.2026; Vorabfestlegung §15.1"
+  },
   "gesichertAm": "2026-11-08",
   "archiv": {
     "datei": "diagonal-pruefung-stufe1.zip",

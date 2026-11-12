@@ -358,8 +358,8 @@ Das Job-Log nennt die Prüfsumme des Stufe-C-ZIP (gleich der erwarteten), die
 unveränderte Fassung aus `c504143` (`index.html` SHA-256 `d3bcb1cc…fa69b`, wie gebunden) und
 je 7.881 Stellungen für die Stände `alt`, `testkopie` und `neu`. Die `index.html` des Standes
 `neu` hat die SHA-256 `3570ca10…1fc72`; sie ist gleich der `index.html` auf `main` (am
-08.11.2026 gegengerechnet). README und Manifest dieser Ablage nennen die Zuordnung noch
-nicht (dort steht „nicht zugeordnet“); maßgeblich ist dieser Abschnitt.
+08.11.2026 gegengerechnet). README und Manifest dieser Ablage nennen dieselbe Zuordnung
+(Korrektur vom 11.11.2026; die erste Fassung der Ablage sagte dort „nicht zugeordnet“).
 
 ### 15.2 Befund laut Bericht
 
