@@ -436,3 +436,109 @@ denselben Archiven wie die Entwicklungsdaten und begründen keine Aussage für m
 Verkleinerung wäre eine ausdrückliche Planänderung. Vollständig beurteilt wird in Stufe 3 nur B1; B2
 bleibt auf 60 begrenzt (§6.1). Die Beurteilerwahl (E-2) ist offen. Dieser Nachtrag erteilt kein Go für
 weitere Läufe, Stufe 2 oder 3, einen Standardwechsel oder einen Merge; `diagonalAugeEnde` bleibt standardmäßig 0.
+
+## 16. Vorabfestlegung AP4: Stufe-2-Werkzeug (Entwurf, 12.11.2026)
+
+**Status: Entwurf, nicht freigegeben.** Das Go von Hazeberry gilt ausschließlich für diesen Doc-PR („Go für die AP4-Vorabfestlegung als Doc-PR“). **Kein Bau, kein Workflow, kein Lauf, kein GNU Go, keine Rechnung auf Archivdaten.**
+Alle Zahlen sind **Setzungen oder Annahmen** und kein Messergebnis; mit **Vorschlag** markierte Werte sind von Hazeberry noch nicht bestätigt (insbesondere die Ausfallgrenze in 16.7). **E-2 (Beurteilerwahl, §10.4, §11) ist offen und muss geklärt sein, bevor Stufe 2 gestartet wird;** dieser Entwurf hängt davon nicht ab, weil Schicht A und die mechanische Auswahl nach 16.8 keine Urteile kennen.
+Muster: Zähldiagnose (`docs/passregel-zaehldiagnose.md`, `passregel-zaehldiagnose.js`) und Stufe C (`passregel-vergleich.yml`, Pakete). Gelesen, nicht nachgerechnet.
+
+### 16.1 Zweck und Umfang
+
+Stufe 2 liefert **Schicht A** (§5): GNU Gos Tot-Liste für **alle betroffenen Stellungen aus Stufe 1 (S 658, V 1.060, zusammen 1.718; `betroffen.jsonl`)** und für eine **Kontrollstichprobe unbetroffener Stellungen** (16.4). Eine Verkleinerung der betroffenen Menge wäre eine ausdrückliche Planänderung (§15.6). Stufe 2 sagt nur etwas über die **Übereinstimmung mit GNU Go**, nicht über Richtigkeit (§5, §6).
+Die Entwicklungsstellungen (E) und Handpartien (H) gehen **nicht** in Stufe 2 ein.
+
+### 16.2 Eingabe
+
+- Das in Git gesicherte Stufe-1-ZIP (`docs/daten/diagonal-pruefung/stufe1/diagonal-pruefung-stufe1.zip`; SHA-256 `8c835dfb5b6ed7cb5af951de92351de2fd67643151025ab56fad51a89c133740`) wird im Lauf gegen `SHA256SUMS` und `manifest.json` geprüft und in ein leeres Verzeichnis entpackt; daraus `stellungen.jsonl`, `betroffen.jsonl` und `neu.jsonl`. **Pflicht:** die Menge der betroffenen Kennungen ist gleich der Menge in `neu.jsonl` mit Tot-Menge an ≠ aus (S und V); sonst ungültig.
+- Die Archivzüge kommen aus den Archivdateien (`quelle` der Stellung, Pfad ab `docs/daten/`), nicht aus dem ZIP. **Pflicht:** das Einspielen ergibt je Stellung **dasselbe Brett** wie in `stellungen.jsonl` (361 Zeichen) und die Gefangenen von dort; sonst ist die Stufe ungültig (Pflichtfehler, §7 Nr. 2).
+- Die Tot-Mengen der App bei aus und an werden im Lauf **neu gerechnet** (Stand `neu`, ein Prozess, `toteSteineAmEnde` mit und ohne Diagonalprüfung) und müssen **gleich `neu.jsonl`** sein; sonst ungültig. Das schließt aus, dass Stufe 2 an einer anderen Fassung der Engine misst als Stufe 1 (SHA-256 der `index.html` im Kopf wie in Stufe 1, Stand `neu`: `3570ca10…1fc72`, im Lauf geprüft).
+
+### 16.3 Ablauf je Stellung (nach dem Muster der Zähldiagnose)
+
+1. GNU Go (`gnugoArgumente(seed)`: `--mode gtp --level 1 --chinese-rules --komi 7.5 --seed S --never-resign`) in **frischem Prozess**: Kopfbefehle, `clear_board`, `komi 7.5`, jeder Archivzug als `play` bis zum Index der Stellung; jeder Befehl muss mit „=“ beantwortet werden, bei der ersten Fehlerantwort endet dieser Referenzlauf als Pflichtfehler, nichts wird weiter gesendet (wie Zähldiagnose §4 Nr. 4).
+2. Abfragen am Ende: `list_stones` und `captures` (beide Farben), `final_status_list` mit `dead`, `alive` und `seki`; **`final_score` nur bei S** (§4). Bei V wird `final_score` **nicht** abgefragt: Mitten in der Partie kann es „cannot score“ melden, und das würde sonst Ausfälle erzeugen, die mit der Frage nichts zu tun haben. Der Vorschau-Stand bei V wird aus GNU Gos `dead`-Liste mit der App-Rechnung gebildet (§5, Zeile „Punkte (V)“).
+3. **Zwei Referenzläufe R1 und R2** mit demselben Seed S0; Rohantworten **ungetrimmt, Zeichen für Zeichen gleich**; sonst „nicht wiederholbar“ = ungeklärter Ausfall (§10.3). Genau ein automatischer Wiederholungsversuch je Referenzlauf nur nach Absturz oder Timeout, frischer Prozess, derselbe Seed (§10.3).
+4. **Pflichtkontrollen je Stellung:** Steinlisten von GNU Go und App gleich; Gefangene gleich der kalibrierten `captures`-Konvention (`kalibriereCaptures`); Koordinaten in Punktlisten gültig (kein `pass`, nichts außerhalb); `final_score` (S) lesbar und endlich.
+5. Zur S-Stellung steht im Archiv der `endstand`. **Hinweis, keine Pflicht:** Gleichheit von `final_score` mit `endstand` wird je Gruppe gezählt und berichtet; die GNU-Go-Fassung des Archivlaufs ist nicht protokolliert, ein Unterschied wäre also nicht zwingend ein Fehler (**Vorschlag**).
+6. **Version und Umgebung** werden protokolliert (`gnugo --version`, GTP `name`/`version` roh, `dpkg-query`, `apt-cache policy`, Runner-Image, Node). Die Version muss in allen Paketen **gleich** sein (Pflicht); sie wird nicht auf einen bestimmten Wert festgelegt.
+7. **Zeitgrenzen (Setzung ohne Messung, beim Bau mit den vorhandenen Funktionen abgleichen):** 120 s je Abfragebefehl, 600 s je Referenzlauf. Ein Überschreiten ist ein **Timeout** und damit ein Ausfall, kein Pflichtfehler. Eine Messung der GNU-Go-Dauer für Einspielen und `final_status_list` liegt mir nicht vor.
+
+### 16.4 Kontrollstichprobe (je Stellungsart konkret)
+
+**Vorschlag:** Je Stellungsart **200** unbetroffene Stellungen, **S 200 und V 200, zusammen 400**. Begründung: Die Regel aus §10.3 („gleich viele wie betroffene, mindestens 50, höchstens 200“) ergibt bei S 658 und V 1.060 Betroffenen beide Male die Obergrenze 200; die Zahl steht damit schon fest und hängt von keinem Ergebnis ab.
+- **Grundgesamtheit:** unbetroffene S- bzw. V-Stellungen der Hauptprüfung aus `stellungen.jsonl` (Duplikate nach §14.4 sind schon ausgeschlossen); **nicht** E und H. Unbetroffen heißt: Tot-Menge bei an gleich aus (Stufe 1).
+- **Ziehung:** feste Ziehung nach Hash aus Seed und Kennung, **ohne Schichtung**: aufsteigend nach `fnv32("diagonal-pruefung-v1|kontrolle|" + Basis + "|" + id)`, bei Gleichstand nach `id`; die ersten 200 je Art. **Basis = 1.** Die Gruppenanteile der Ziehung werden im Bericht genannt; die Ziehung stellt nicht sicher, dass kleine Gruppen vertreten sind (Alternative: Schichtung nach Gruppe, größerer Aufwand, hier nicht vorgeschlagen).
+- **Zweck und Grenze:** Sie zeigt, ob GNU Go auch dort von der App abweicht, wo der Schalter nichts ändert (z. B. die Zählabweichungen aus `zaehlung-mechanismus.md` §5). Sie misst **nicht** die Wirkung des Schalters und geht in keine Kennzahl der betroffenen Stellungen ein.
+- Die Kontrolle wird mit **demselben Ablauf und denselben Pflichtkontrollen** wie die betroffenen Stellungen behandelt (16.3), in **denselben Paketen** (16.6).
+
+### 16.5 Basis für `fortsetzungsSeed`
+
+**Vorschlag: Basis 1**, wie in der Zähldiagnose und im Plan von §10.3. Der Seed je Stellung ist `fortsetzungsSeed(1, gruppe, quelle, nr, index)` aus `passregel-lib.js` (Funktion **unverändert**, ihr Festwert im Test `tests/passregel-vergleich.js` bleibt gültig).
+- **Abweichung von der Zähldiagnose, mit Grund:** statt des Dateinamens (`path.basename`) geht der **volle `quelle`-Pfad ab `docs/daten/`** ein, weil die Gruppe „GNU Go ohne Vorgabe“ zwei Dateien `g-D.jsonl.gz` hat und der Basisname dort nicht eindeutig wäre (§14.1 Nr. 3).
+- `index` ist der Zugindex der Stellung (bei S der letzte Eintrag, bei V 250, 300 oder 350). Gleicher Index in derselben Partie heißt gleiches Brett; ein gleicher Seed ist dort kein Nachteil. Die beiden Referenzläufe R1 und R2 einer Stellung haben **denselben** Seed, es gibt **keinen Seedwechsel** (§10.3).
+- Ein Seed aus Zeit, Paketnummer oder Reihenfolge ist ausgeschlossen: Eine Stellung bekommt in jedem Paket und bei jeder Wiederholung denselben Seed. **Im Test festzuhalten:** Festwerte, die das Werkzeug beim Bau selbst erzeugt, plus der Nachweis, dass Paketzuteilung und Reihenfolge den Seed nicht ändern. Die Festwerte stehen noch nicht fest; ich habe keine berechnet.
+- Basis 1 teilt mit Stufe C und Zähldiagnose nur die Ableitungsfunktion; die Schlüsselmengen sind disjunkt (Prüfdaten gegen Entwicklungsdaten, §3.2), also entstehen keine gleichen Seeds für gleiche Stellungen.
+
+### 16.6 Paketgröße
+
+**Vorschlag: 50 Stellungen je Paket, 43 Pakete** (1.718 + 400 = 2.118 Stellungen; 2.118 / 50 aufgerundet = 43; Workflow-Grenze wie in Stufe C: höchstens 60 Pakete).
+- **Zuteilung:** Alle 2.118 Stellungen (betroffene und Kontrolle gemischt) werden nach `fnv32("diagonal-pruefung-v1|paket|1|" + id)` (bei Gleichstand nach `id`) sortiert und in Blöcke der nach der Probe festgelegten Paketgröße geteilt (Vorschlag vor der Probe: 50); die Paketgröße ist ein Parameter des Werkzeugs, nicht im Code festgeschrieben. So fehlt bei einem ausgefallenen Paket keine Art ganz, und die Zuteilung hängt nicht von Gruppe oder Dateireihenfolge ab.
+- **Zeitbudget (Annahme, nicht gemessen):** Bei 10 s je Stellung für zwei Referenzläufe wären das etwa 8 Minuten je Paket und rund 6 Stunden Rechenzeit insgesamt (2.118 × 10 s), auf Pakete verteilt; mit dem Sicherheitsfaktor 10 bliebe ein Paket bei rund 83 Minuten, unter einer Job-Grenze von 340 Minuten (wie Stufe C). Die 10 s sind eine Setzung; Messwerte gibt es nicht. Deshalb vor dem Hauptlauf eine **Probe** (nächster Punkt). Vor dem Hauptlauf wird die Schätzung genannt; zeigt ein Paket weit mehr, berichtet die KI das und fragt, ob der Lauf abgebrochen wird (wie Stufe C, §14 Nr. 2).
+- **Probe in Actions vor dem Hauptlauf (Vorschlag, eigenes Go, eigener Workflow-Lauf; keine Bedingung von E-2):** Sie misst die **Dauer** und prüft, dass der Ablauf aus 16.3 mit echtem GNU Go funktioniert. **Umfang:** 20 betroffene Stellungen, **die 10 mit dem höchsten Zugindex in S** (längste Partien) und **10 aus V350** (Kennung nach Hash, Basis 1); dazu 4 Kontrollstellungen aus der Ziehung von 16.4 (2 S, 2 V; die ersten der Hash-Reihenfolge). Auswahl rein nach Index und Hash aus Stufe 1, nicht nach Ergebnis. **Auswertung nur technisch:** Dauer je Stellung und je Referenzlauf (Median, Maximum), Status, Pflichtkontrollen, Wiederholbarkeit R1 gleich R2; **keine** Schicht-A-Zahlen und keine Tot-Listen im Log (wie `--probe` in Stufe C), die Probe geht in keine Kennzahl ein und ersetzt keine Stellung des Hauptlaufs, alle 2.118 Stellungen laufen im Hauptlauf neu. Eine Probe, die einen Pflichtfehler zeigt, ist ein Befund über Werkzeug oder Umgebung; die Fehler werden behoben, bevor ein Hauptlauf ein Go bekommt.
+- **Paketgröße nach der Probe (Setzung):** Die Größe bleibt 50, wenn **Maximum je Stellung × 50 ≤ 60 Minuten** (Rechenzeit eines Pakets, ohne Installation). Sonst ist die größte ganze Zahl **G = ⌊3.600 s / Maximum je Stellung⌋** die Obergrenze für das Budget. Die Zahl der Pakete ist dann ⌈2.118 / G⌉.
+  - **Ist G ≥ 36** (also höchstens 60 Pakete), gilt G, höchstens 50.
+  - **Ist G < 36** (Beispiel: 120 s je Stellung ergeben G = 30 und 71 Pakete), lassen sich Budget und Paketgrenze nicht zugleich einhalten. **Die 36 ist dann keine Untergrenze und wird nicht automatisch eingesetzt.** Die Grenze von 60 Paketen stammt aus dem vorgesehenen Workflow (wie in Stufe C), nicht aus einer Vorgabe von GitHub; sie wird **neu entschieden**: Hazeberry entscheidet vor dem Go zum Hauptlauf, ob die Paketgrenze erhöht, das Budget je Paket (60 Minuten, Setzung; die Job-Grenze von 340 Minuten bliebe) gelockert oder der Plan geändert wird. Bis dahin gibt es keinen Hauptlauf.
+  - Die Entscheidung und die gewählte Paketgröße stehen vor dem Go zum Hauptlauf im Doc.
+- **Fortsetzungslauf (später, nur mit Go):** ganze Pakete, nie einzelne Stellungen, nur bei technisch bedingtem Nichtausführen; ein wiederholtes Paket **ersetzt** das erste vollständig (§10.3 Ebene 3). Pakete mit einzelnen Ausfällen werden nicht wiederholt.
+- **Alternative:** 25 je Paket (85 Pakete, über der Grenze von 60 ohne Änderung des Workflows) oder 100 je Paket (22 Pakete, längere Einzeljobs, größerer Verlust bei einem Abbruch). 50 ist ein Mittelweg ohne Herleitung.
+
+### 16.7 Ausfallgrenze (Vorschlag, nicht bestätigt)
+
+**Vorschlag: die 5 % aus §10.3**, jetzt mit Zahlen. Sie bleibt ein **Vorschlag**, bis Hazeberry sie bestätigt oder ändert; sie ist eine Setzung ohne Herleitung und **nicht** aus Stufe C übernommen.
+- **Betroffene Stellungen, je Stellungsart:** Schicht A ist für diese Art **ungültig** (KEIN URTEIL, Lauf rot), wenn **mehr als 5 %** der betroffenen Stellungen ausfallen (einschließlich nicht wiederholbarer). Mit den Zahlen aus Stufe 1: **S: ab 33 Ausfällen** (5 % von 658 sind 32,9) und **V: ab 54 Ausfällen** (5 % von 1.060 sind 53).
+- **Kontrollstichprobe, je Art (Vorschlag):** mehr als 5 % der 200 Kontrollstellungen, also **ab 11 Ausfällen je Art**, macht die **Kontrolle** dieser Art ungültig; da die Kontrolle Pflichtbestandteil von Stufe 2 ist, ist dann die Stufe ungültig und der Lauf rot.
+- **Wirkung kleiner Anteile:** Die Grenze bestimmt nur, wann Schicht A **nicht mehr berichtet** wird. **Jeder** ungeklärte Ausfall in einer betroffenen Stellung verhindert die positive Kandidatur (§10.3, §8 Nr. 4), auch unter der Grenze. Ausfälle sind nicht zufällig (schwierige Stellungen, Absturz durch die Stellung selbst); sie werden einzeln mit Stellung, Gruppe, Art, Partielänge, Ursache und dem Unterschied der Tot-Mengen aus und an aufgelistet.
+- **Pflichtfehler** (Datenfehler, Replay-Fehler, abweichendes Brett, unerwartete Ausnahme, Versionsunterschied zwischen Paketen, nicht bestandene Kontrollen aus 16.2) werden **nicht** als Ausfall gezählt und machen die Stufe ungültig, unabhängig von der Grenze.
+- **Fehlende Pakete:** Fehlt ein Paket oder bricht es ab, ist der Lauf ungültig (KEIN URTEIL); der Auswertungsjob nennt die fehlenden Pakete (16.10). Über die Wiederholung ganzer Pakete entscheidet Hazeberry.
+
+### 16.8 Ausgabe und mechanische Auswahl für Stufe 3
+
+- **Je Stellung** (JSONL): Kennung, Art, Gruppe, Seed, Rohantworten von R1 und R2, `dead`/`alive`/`seki`, `final_score` (S), Tot-Mengen der App bei aus und an, Zuordnung zu betroffen oder Kontrolle, Status (gültig, Ausfall mit Ursache, Pflichtfehler). Dazu Bericht (`bericht.json/.md`), Protokoll von Version und Umgebung, Paketliste.
+- **Kennzahlen:** nach §5, **behoben und neu entstanden getrennt**, nie nur als Saldo, je Art und Gruppe, mit Clopper-Pearson (95 %, Modellannahmen). Kontrolle und betroffene Stellungen getrennt.
+- **Mechanische Auswahl der Ketten (§6.1, §11 Nr. 4), im selben Lauf und ohne Sicht auf Urteile:**
+  - **B1:** **alle** neu entstandenen Abweichungen (Kette bei aus gleich GNU Go, bei an abweichend), S und V, **ohne Deckel**.
+  - **B2:** Ketten aus betroffenen Stellungen, die nicht in B1 liegen und mindestens einen von GNU Go abweichenden Stein haben. **Deckel 60** (§10.4). Ziehung nach Hash (`fnv32("diagonal-pruefung-v1|b2|" + Basis + "|" + Kettenschlüssel)`, Basis 1) aus den **Zellen** Art (S, V) × Klasse × Richtung nach der Definition unten. Verteilung der 60 Plätze **proportional zur Zellgröße** (größter Rest, bei Gleichstand nach Zellname), **mindestens 1 je nicht leerer Zelle**; sind es insgesamt höchstens 60 Ketten, werden alle genommen (**Vorschlag**, §6.1 verlangt „geschichtet“, nennt die Verteilung nicht).
+  - **Eindeutige Zuordnung einer Kette** (jede Kette bekommt genau eine Zuordnung, geprüft in dieser Reihenfolge):
+    1. **B1**, wenn mindestens ein Stein der Kette neu entstanden ist (bei aus gleich GNU Go, bei an abweichend). B1 hat Vorrang, damit B1 vollständig bleibt; eine solche Kette liegt nie zugleich in B2.
+    2. Sonst **B2-Klasse „behoben“**, wenn mindestens ein Stein der Kette behoben ist (bei aus abweichend, bei an gleich GNU Go); sonst **Klasse „unverändert abweichend“** (mindestens ein Stein weicht bei aus und bei an ab). Eine Kette ohne abweichenden Stein ist weder in B1 noch in B2.
+    3. **Richtung** (für beide Klassen gleich definiert, **aus der Abweichung bei aus gegenüber GNU Gos Tot-Liste**, nicht aus einem Wechsel zwischen aus und an, der bei „unverändert abweichend“ nicht stattfindet): **„GNU tot“**: GNU Go führt die abweichenden Steine als tot, die App bei aus nicht (hier kann der Schalter mit „zusätzlich tot“ helfen). **„GNU lebend“**: GNU Go führt sie als lebend, die App bei aus als tot (hier kann der Schalter mit „wieder lebendig“ helfen). **„gemischt“**: die abweichenden Steine einer Kette liegen in beiden Richtungen (GNU Go listet Steine einzeln, daher möglich). Zellen: 2 Arten × 2 Klassen × 3 Richtungen, höchstens 12.
+    4. Jede B2-Kette weicht **bei aus** ab: Weicht sie bei aus nicht ab und bei an doch, ist sie neu entstanden (Nr. 1); weicht sie bei aus ab und ändert die App bei an den Status, ist sie behoben, es sei denn, ein Stein ist neu entstanden (Nr. 1). Damit ist die Richtung für jede B2-Kette definiert.
+    5. Bei „behoben“ ist die Richtung gleich der Richtung des Wechsels in Schicht A (§5: „zusätzlich tot“ = „GNU tot“, „wieder lebendig“ = „GNU lebend“); die Schicht-A-Begriffe bleiben für Ketten mit Wechsel, die Zellbegriffe gelten nur für die Ziehung.
+    6. **Nicht geprüft:** dass eine Kette bei der App immer ganz tot oder ganz lebend ist (gelesen: `toteSteineAmEnde` entfernt Verbände aus ganzen Ketten, nicht am Code nachgespielt); der Test deckt den Fall einer Kette mit teilweise abweichenden Steinen ab.
+  - **Kettenschlüssel:** Stellungskennung plus kleinster Punkt der Kette (Koordinate); eine Kette ist ein Zusammenhang gleichfarbiger Steine (§6 von `zaehlung-mechanismus.md`).
+- **Klarstellung zu §10.4:** Bei der KI-Beurteilung heißt „alle Fälle“ **alle B1-Fälle plus höchstens 60 B2-Fälle**; B2 wird nicht vollständig beurteilt, B1 nie gekürzt. Der Satz „KI-Beurteilung aller Fälle (B1 und B2)“ in §10.4 ist in diesem Sinn zu lesen.
+- Ausfälle in betroffenen Stellungen haben **keine** GNU-Go-Liste und gehen deshalb weder in B1 noch in B2 ein; sie stehen als ungeklärt im Bericht (§8 Nr. 4).
+
+### 16.9 Gültigkeit
+
+Nur zwei Zustände. **Ungültig = KEIN URTEIL mit Grund, Lauf rot** bei: nicht bestandener Eingabeprüfung (16.2), Pflichtfehler (16.3, 16.7), Überschreiten der Ausfallgrenze (16.7), fehlenden Paketen, unterschiedlichen GNU-Go-Versionen oder -Argumenten, Paketergebnissen aus unterschiedlichen Ständen der Engine oder des Werkzeugs, fehlender Vollständigkeit (jede der 2.118 Kennungen genau einmal im Ergebnis, mit Status). Die Fallabdeckung („gleich“ erst nach Vorprüfung, CLAUDE.md) gilt für die Wiederholbarkeit von R1 und R2 sinngemäß: Ein Befund „R1 gleich R2“ zählt nur, wenn mindestens eine Stellung je Art eine nicht leere `dead`-Liste hat; sonst KEIN URTEIL.
+
+### 16.10 Umsetzung (nach Freigabe und eigenem Go, nicht jetzt)
+
+Werkzeug `auswertung/endspiel/diagonal-pruefung-stufe2.js` (Name **Vorschlag**), Workflow `.github/workflows/diagonal-pruefung-stufe2.yml` (nur `workflow_dispatch`, GNU Go auf `ubuntu-24.04`, Matrix über Pakete mit `fail-fast: false`, Auswertungsjob mit Gültigkeit), Test `tests/diagonal-pruefung-stufe2.js` mit Attrappe statt GNU Go (in `tests/run.js`, `tests/README.md` und `tests.yml` eintragen; Lizenzzeilen nach `tests/lizenz.js`). Der Test soll abdecken: Seed-Festwerte und Unabhängigkeit von Paketzuteilung, Ziehung und Zuteilung bytegleich bei Wiederholung, Ausfallgrenze an der Schwelle (32/33 und 53/54, 10/11), Pflichtfehler gegen Ausfall, nicht wiederholbare Stellung, Vollständigkeit, B1 vollständig, B2-Zellverteilung **für alle drei Richtungen und beide Klassen**: je ein Fall „unverändert abweichend“ mit Richtung „GNU tot“ und mit „GNU lebend“, ein Fall „behoben“ je Richtung, eine Kette mit gemischten Richtungen, eine Kette mit neu entstandenem und behobenem Stein (muss B1 sein, nie B2), und eine Kette ohne Abweichung (in keiner Menge). **Den echten Ablauf mit GNU Go kann der lokale Test nicht prüfen.**
+**Workflow, Isolation der Pakete:** Die Matrix läuft mit `fail-fast: false`, damit ein fehlgeschlagenes Paket die übrigen nicht abbricht. Jedes Paket lädt sein Ergebnis mit `if: always()` hoch. Der Auswertungsjob hängt von allen Paketen ab und läuft mit `if: always()`; er vergleicht die erwartete Paketliste (aus der Planung) mit den vorhandenen Ergebnissen, **nennt die fehlenden Pakete mit Nummer und Kennungen** und schließt den Lauf **rot** ab, wenn Pakete fehlen oder die Gültigkeit nach 16.9 nicht besteht (Muster: Stufe C, `passregel-vergleich.yml`, Auswertungsjob). Ein Paketfehler wird nie im Auswertungsjob verdeckt. Der Test der Auswertung deckt „Paket fehlt“ und „Paket ohne Ergebnisdatei“ ab. Der Workflow selbst lässt sich nur in Actions prüfen.
+Reihenfolge: dieser Doc-PR → Merge (Hazeberry liest vorher) → **Go zum Bauen** → PR → CI → Merge → **Go zur Probe** (16.6) → Ergebnis der Probe, Paketgröße bestätigt → **E-2 geklärt** → **Go zum Hauptlauf** (vorher: was läuft, wo, welches Go).
+
+### 16.11 Offene Entscheidungen (Hazeberry)
+
+1. Ausfallgrenze 5 % in der Form von 16.7 (Betroffene und Kontrolle) bestätigen oder ändern.
+2. Kontrollstichprobe 200 je Art ohne Schichtung (16.4).
+3. Seed-Basis 1 und voller Quellpfad im Seed (16.5).
+4. Paketgröße 50, 43 Pakete, die Annahme von 10 s je Stellung, die Probe mit 24 Stellungen und die Regel „Maximum × 50 ≤ 60 Minuten“ mit der Neuentscheidung der Paketgrenze bei G < 36 (16.6); Zeitgrenzen 16.3 Nr. 7.
+5. Zellen und Verteilung der 60 B2-Plätze (16.8, Richtung aus der Abweichung bei aus, höchstens 12 Zellen) und Hinweis-Vergleich `final_score` gegen `endstand` (16.3 Nr. 5).
+6. **E-2** bleibt offen (§10.4) und ist Voraussetzung für das Go zu Stufe 2.
+
+### 16.12 Freigaben
+
+Dieser Abschnitt erteilt kein Go für den Bau, einen Lauf, Stufe 2 oder 3, einen Engine-Vergleich, einen Standardwechsel oder einen Merge. Das Doc enthält Vorgaben; Hazeberry liest es vor dem Merge. `diagonalAugeEnde` bleibt standardmäßig 0, `passNachGegnerpass` bleibt aus.
