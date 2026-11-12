@@ -1,0 +1,744 @@
+{
+ "gueltig": true,
+ "urteil": "gültig",
+ "kontrollen": [
+  {
+   "nr": "§7 Nr. 1",
+   "name": "Daten (Schritt 0), Schnittmenge mit den Quellpartien leer",
+   "ok": true,
+   "fehler": [],
+   "anzahlFehler": 0
+  },
+  {
+   "nr": "§7 Nr. 2",
+   "name": "Nachspiel-Kontrolle (Einspielbarkeit, Gefangene gegen Archiv)",
+   "ok": true,
+   "fehler": [],
+   "anzahlFehler": 0
+  },
+  {
+   "nr": "§14.4",
+   "name": "Hauptprüfung ohne Entwicklungsbretter und ohne doppelte Bretter (je Stellungsart)",
+   "ok": true,
+   "fehler": [],
+   "anzahlFehler": 0
+  },
+  {
+   "nr": "Vollständigkeit",
+   "name": "Ergebnisdateien: gleiche Stellungen, drei Prozesse, erwartete Fassung",
+   "ok": true,
+   "fehler": [],
+   "anzahlFehler": 0
+  },
+  {
+   "nr": "§7 Nr. 3",
+   "name": "Identität bei aus: Tot-Menge und Zählstände gleich der unveränderten Fassung",
+   "ok": true,
+   "fehler": [],
+   "anzahlFehler": 0,
+   "stellungen": 7881
+  },
+  {
+   "nr": "Vorprüfung",
+   "name": "Fallabdeckung der Identitätskontrolle (sonst KEIN URTEIL)",
+   "ok": true,
+   "fehler": [],
+   "anzahlFehler": 0,
+   "mitTotMenge": {
+    "S": 1927,
+    "V": 5018,
+    "E": 452,
+    "H": 2
+   },
+   "stellungen": {
+    "S": 2192,
+    "V": 5120,
+    "E": 563,
+    "H": 6
+   },
+   "entwicklungBetroffen": 19
+  },
+  {
+   "nr": "§7 Nr. 4",
+   "name": "Konsistenz bei an: Tot-Menge gleich der Test-Kopie der Diagnose (Entwicklungsstellungen)",
+   "ok": true,
+   "fehler": [],
+   "anzahlFehler": 0,
+   "entwicklungBetroffen": 19,
+   "entwicklung": 563
+  },
+  {
+   "nr": "Setzung",
+   "name": "Konsistenz bei an auf den Prüfstellungen und Handpartien gleich der Test-Kopie (zusätzlich, über §7 Nr. 4 hinaus)",
+   "ok": true,
+   "fehler": [],
+   "anzahlFehler": 0
+  },
+  {
+   "nr": "Innere Konsistenz",
+   "name": "gleiche Tot-Menge heißt gleiche Zählstände; „nur Bewiesenes“ unverändert",
+   "ok": true,
+   "fehler": [],
+   "anzahlFehler": 0
+  }
+ ],
+ "ausgeschlossen": {
+  "partieGleichQuelle": 0,
+  "S": {
+   "entwicklung": 0,
+   "doppelt": 5
+  },
+  "V": {
+   "entwicklung": 0,
+   "doppelt": 11
+  }
+ },
+ "betroffenheit": [
+  {
+   "gruppe": "GNU Go ohne Vorgabe",
+   "art": "S",
+   "stellungen": 953,
+   "partien": 953,
+   "betroffen": 430,
+   "betroffenePartien": 430,
+   "anteil": 0.45120671563483733,
+   "cp": {
+    "k": 430,
+    "n": 953,
+    "anteil": 0.45120671563483733,
+    "unten": 0.419281513130045,
+    "oben": 0.4834343057800222
+   },
+   "steineZusaetzlichTot": 6988,
+   "steineWiederLebend": 312
+  },
+  {
+   "gruppe": "Summe (nicht gewichtet)",
+   "art": "S",
+   "stellungen": 2192,
+   "partien": 2192,
+   "betroffen": 658,
+   "betroffenePartien": 658,
+   "anteil": 0.3001824817518248,
+   "cp": {
+    "k": 658,
+    "n": 2192,
+    "anteil": 0.3001824817518248,
+    "unten": 0.28104473324562107,
+    "oben": 0.3198558249096829
+   },
+   "steineZusaetzlichTot": 10173,
+   "steineWiederLebend": 538
+  },
+  {
+   "gruppe": "GNU Go ohne Vorgabe",
+   "art": "V",
+   "stellungen": 1809,
+   "partien": 929,
+   "betroffen": 734,
+   "betroffenePartien": 467,
+   "anteil": 0.40574903261470424,
+   "cp": {
+    "k": 734,
+    "n": 1809,
+    "anteil": 0.40574903261470424,
+    "unten": 0.383013207064396,
+    "oben": 0.4287910636549098
+   },
+   "steineZusaetzlichTot": 12877,
+   "steineWiederLebend": 1394
+  },
+  {
+   "gruppe": "Summe (nicht gewichtet)",
+   "art": "V",
+   "stellungen": 5120,
+   "partien": 2169,
+   "betroffen": 1060,
+   "betroffenePartien": 730,
+   "anteil": 0.20703125,
+   "cp": {
+    "k": 1060,
+    "n": 5120,
+    "anteil": 0.20703125,
+    "unten": 0.19600466072246475,
+    "oben": 0.21839282154371104
+   },
+   "steineZusaetzlichTot": 18051,
+   "steineWiederLebend": 2011
+  },
+  {
+   "gruppe": "GNU Go ohne Vorgabe",
+   "art": "V250",
+   "stellungen": 928,
+   "partien": 928,
+   "betroffen": 331,
+   "betroffenePartien": 331,
+   "anteil": 0.3566810344827586,
+   "cp": {
+    "k": 331,
+    "n": 928,
+    "anteil": 0.3566810344827586,
+    "unten": 0.32581908708603213,
+    "oben": 0.3884560812533654
+   },
+   "steineZusaetzlichTot": 5726,
+   "steineWiederLebend": 891
+  },
+  {
+   "gruppe": "Summe (nicht gewichtet)",
+   "art": "V250",
+   "stellungen": 2168,
+   "partien": 2168,
+   "betroffen": 418,
+   "betroffenePartien": 418,
+   "anteil": 0.19280442804428044,
+   "cp": {
+    "k": 418,
+    "n": 2168,
+    "anteil": 0.19280442804428044,
+    "unten": 0.1763916475095903,
+    "oben": 0.2100518727139558
+   },
+   "steineZusaetzlichTot": 7328,
+   "steineWiederLebend": 1141
+  },
+  {
+   "gruppe": "GNU Go ohne Vorgabe",
+   "art": "V300",
+   "stellungen": 652,
+   "partien": 652,
+   "betroffen": 291,
+   "betroffenePartien": 291,
+   "anteil": 0.44631901840490795,
+   "cp": {
+    "k": 291,
+    "n": 652,
+    "anteil": 0.44631901840490795,
+    "unten": 0.407712663863519,
+    "oben": 0.48541344840659095
+   },
+   "steineZusaetzlichTot": 5152,
+   "steineWiederLebend": 447
+  },
+  {
+   "gruppe": "Summe (nicht gewichtet)",
+   "art": "V300",
+   "stellungen": 1877,
+   "partien": 1877,
+   "betroffen": 403,
+   "betroffenePartien": 403,
+   "anteil": 0.21470431539690996,
+   "cp": {
+    "k": 403,
+    "n": 1877,
+    "anteil": 0.21470431539690996,
+    "unten": 0.1963190709231321,
+    "oben": 0.23398532433961566
+   },
+   "steineZusaetzlichTot": 6879,
+   "steineWiederLebend": 658
+  },
+  {
+   "gruppe": "GNU Go ohne Vorgabe",
+   "art": "V350",
+   "stellungen": 229,
+   "partien": 229,
+   "betroffen": 112,
+   "betroffenePartien": 112,
+   "anteil": 0.4890829694323144,
+   "cp": {
+    "k": 112,
+    "n": 229,
+    "anteil": 0.4890829694323144,
+    "unten": 0.42266743988775224,
+    "oben": 0.5557847356301964
+   },
+   "steineZusaetzlichTot": 1999,
+   "steineWiederLebend": 56
+  },
+  {
+   "gruppe": "Summe (nicht gewichtet)",
+   "art": "V350",
+   "stellungen": 1075,
+   "partien": 1075,
+   "betroffen": 239,
+   "betroffenePartien": 239,
+   "anteil": 0.22232558139534883,
+   "cp": {
+    "k": 239,
+    "n": 1075,
+    "anteil": 0.22232558139534883,
+    "unten": 0.19779159072624514,
+    "oben": 0.24838945658490702
+   },
+   "steineZusaetzlichTot": 3844,
+   "steineWiederLebend": 212
+  },
+  {
+   "gruppe": "Fuego 100 Spiele",
+   "art": "S",
+   "stellungen": 434,
+   "partien": 434,
+   "betroffen": 95,
+   "betroffenePartien": 95,
+   "anteil": 0.21889400921658986,
+   "cp": {
+    "k": 95,
+    "n": 434,
+    "anteil": 0.21889400921658986,
+    "unten": 0.180869418694172,
+    "oben": 0.26079968255624675
+   },
+   "steineZusaetzlichTot": 1407,
+   "steineWiederLebend": 99
+  },
+  {
+   "gruppe": "Fuego 100 Spiele",
+   "art": "V",
+   "stellungen": 1148,
+   "partien": 435,
+   "betroffen": 131,
+   "betroffenePartien": 103,
+   "anteil": 0.11411149825783973,
+   "cp": {
+    "k": 131,
+    "n": 1148,
+    "anteil": 0.11411149825783973,
+    "unten": 0.09629083044590775,
+    "oben": 0.13393571544680277
+   },
+   "steineZusaetzlichTot": 2257,
+   "steineWiederLebend": 231
+  },
+  {
+   "gruppe": "Fuego 100 Spiele",
+   "art": "V250",
+   "stellungen": 435,
+   "partien": 435,
+   "betroffen": 28,
+   "betroffenePartien": 28,
+   "anteil": 0.06436781609195402,
+   "cp": {
+    "k": 28,
+    "n": 435,
+    "anteil": 0.06436781609195402,
+    "unten": 0.043194531620170784,
+    "oben": 0.09168827733504986
+   },
+   "steineZusaetzlichTot": 663,
+   "steineWiederLebend": 68
+  },
+  {
+   "gruppe": "Fuego 100 Spiele",
+   "art": "V300",
+   "stellungen": 426,
+   "partien": 426,
+   "betroffen": 49,
+   "betroffenePartien": 49,
+   "anteil": 0.11502347417840375,
+   "cp": {
+    "k": 49,
+    "n": 426,
+    "anteil": 0.11502347417840375,
+    "unten": 0.08631713790090917,
+    "oben": 0.14920463867488015
+   },
+   "steineZusaetzlichTot": 739,
+   "steineWiederLebend": 87
+  },
+  {
+   "gruppe": "Fuego 100 Spiele",
+   "art": "V350",
+   "stellungen": 287,
+   "partien": 287,
+   "betroffen": 54,
+   "betroffenePartien": 54,
+   "anteil": 0.18815331010452963,
+   "cp": {
+    "k": 54,
+    "n": 287,
+    "anteil": 0.18815331010452963,
+    "unten": 0.14462260091834783,
+    "oben": 0.23825425569918662
+   },
+   "steineZusaetzlichTot": 855,
+   "steineWiederLebend": 76
+  },
+  {
+   "gruppe": "Fuego 50 Spiele",
+   "art": "S",
+   "stellungen": 643,
+   "partien": 643,
+   "betroffen": 133,
+   "betroffenePartien": 133,
+   "anteil": 0.20684292379471228,
+   "cp": {
+    "k": 133,
+    "n": 643,
+    "anteil": 0.20684292379471228,
+    "unten": 0.17616347798730098,
+    "oben": 0.24024110996155318
+   },
+   "steineZusaetzlichTot": 1778,
+   "steineWiederLebend": 127
+  },
+  {
+   "gruppe": "Fuego 50 Spiele",
+   "art": "V",
+   "stellungen": 1704,
+   "partien": 643,
+   "betroffen": 174,
+   "betroffenePartien": 141,
+   "anteil": 0.10211267605633803,
+   "cp": {
+    "k": 174,
+    "n": 1704,
+    "anteil": 0.10211267605633803,
+    "unten": 0.08813698218328653,
+    "oben": 0.11747502008276195
+   },
+   "steineZusaetzlichTot": 2582,
+   "steineWiederLebend": 348
+  },
+  {
+   "gruppe": "Fuego 50 Spiele",
+   "art": "V250",
+   "stellungen": 643,
+   "partien": 643,
+   "betroffen": 46,
+   "betroffenePartien": 46,
+   "anteil": 0.07153965785381027,
+   "cp": {
+    "k": 46,
+    "n": 643,
+    "anteil": 0.07153965785381027,
+    "unten": 0.052848833489500036,
+    "oben": 0.09427342254812293
+   },
+   "steineZusaetzlichTot": 743,
+   "steineWiederLebend": 161
+  },
+  {
+   "gruppe": "Fuego 50 Spiele",
+   "art": "V300",
+   "stellungen": 637,
+   "partien": 637,
+   "betroffen": 55,
+   "betroffenePartien": 55,
+   "anteil": 0.08634222919937205,
+   "cp": {
+    "k": 55,
+    "n": 637,
+    "anteil": 0.08634222919937205,
+    "unten": 0.06570577701117536,
+    "oben": 0.1109042394400272
+   },
+   "steineZusaetzlichTot": 849,
+   "steineWiederLebend": 107
+  },
+  {
+   "gruppe": "Fuego 50 Spiele",
+   "art": "V350",
+   "stellungen": 424,
+   "partien": 424,
+   "betroffen": 73,
+   "betroffenePartien": 73,
+   "anteil": 0.1721698113207547,
+   "cp": {
+    "k": 73,
+    "n": 424,
+    "anteil": 0.1721698113207547,
+    "unten": 0.13745041021158338,
+    "oben": 0.21153993260615972
+   },
+   "steineZusaetzlichTot": 990,
+   "steineWiederLebend": 80
+  },
+  {
+   "gruppe": "alte PWA",
+   "art": "S",
+   "stellungen": 162,
+   "partien": 162,
+   "betroffen": 0,
+   "betroffenePartien": 0,
+   "anteil": 0,
+   "cp": {
+    "k": 0,
+    "n": 162,
+    "anteil": 0,
+    "unten": 0,
+    "oben": 0.02251356145280553
+   },
+   "steineZusaetzlichTot": 0,
+   "steineWiederLebend": 0
+  },
+  {
+   "gruppe": "alte PWA",
+   "art": "V",
+   "stellungen": 459,
+   "partien": 162,
+   "betroffen": 21,
+   "betroffenePartien": 19,
+   "anteil": 0.0457516339869281,
+   "cp": {
+    "k": 21,
+    "n": 459,
+    "anteil": 0.0457516339869281,
+    "unten": 0.028540723349849195,
+    "oben": 0.06908815780161409
+   },
+   "steineZusaetzlichTot": 335,
+   "steineWiederLebend": 38
+  },
+  {
+   "gruppe": "alte PWA",
+   "art": "V250",
+   "stellungen": 162,
+   "partien": 162,
+   "betroffen": 13,
+   "betroffenePartien": 13,
+   "anteil": 0.08024691358024691,
+   "cp": {
+    "k": 13,
+    "n": 162,
+    "anteil": 0.08024691358024691,
+    "unten": 0.04341973614451139,
+    "oben": 0.13331539074138216
+   },
+   "steineZusaetzlichTot": 196,
+   "steineWiederLebend": 21
+  },
+  {
+   "gruppe": "alte PWA",
+   "art": "V300",
+   "stellungen": 162,
+   "partien": 162,
+   "betroffen": 8,
+   "betroffenePartien": 8,
+   "anteil": 0.04938271604938271,
+   "cp": {
+    "k": 8,
+    "n": 162,
+    "anteil": 0.04938271604938271,
+    "unten": 0.021558119905398188,
+    "oben": 0.09498282691766397
+   },
+   "steineZusaetzlichTot": 139,
+   "steineWiederLebend": 17
+  },
+  {
+   "gruppe": "alte PWA",
+   "art": "V350",
+   "stellungen": 135,
+   "partien": 135,
+   "betroffen": 0,
+   "betroffenePartien": 0,
+   "anteil": 0,
+   "cp": {
+    "k": 0,
+    "n": 135,
+    "anteil": 0,
+    "unten": 0,
+    "oben": 0.026955081583182883
+   },
+   "steineZusaetzlichTot": 0,
+   "steineWiederLebend": 0
+  }
+ ],
+ "wirkung": {
+  "S": {
+   "flaeche": {
+    "stand": {
+     "n": 658,
+     "aendert": 658,
+     "siegerwechsel": 195,
+     "min": -150,
+     "median": -19,
+     "max": 204
+    }
+   },
+   "territory": {
+    "stand": {
+     "n": 658,
+     "aendert": 658,
+     "siegerwechsel": 68,
+     "min": -150,
+     "median": -19,
+     "max": 204
+    }
+   }
+  },
+  "V": {
+   "flaeche": {
+    "mitAnnahmen": {
+     "n": 1060,
+     "aendert": 1060,
+     "siegerwechsel": 263,
+     "min": -394,
+     "median": 14,
+     "max": 315
+    },
+    "nurBewiesen": {
+     "n": 1060,
+     "aendert": 0,
+     "siegerwechsel": 0,
+     "min": 0,
+     "median": 0,
+     "max": 0
+    }
+   },
+   "territory": {
+    "mitAnnahmen": {
+     "n": 1060,
+     "aendert": 1060,
+     "siegerwechsel": 186,
+     "min": -394,
+     "median": 14,
+     "max": 315
+    },
+    "nurBewiesen": {
+     "n": 1060,
+     "aendert": 0,
+     "siegerwechsel": 0,
+     "min": 0,
+     "median": 0,
+     "max": 0
+    }
+   }
+  }
+ },
+ "handpartien": [
+  {
+   "datei": "hand-117.sgf",
+   "regulaer": false,
+   "komi": 7.5,
+   "totAus": 1,
+   "totAn": 1,
+   "betroffen": false,
+   "zusaetzlichTot": 0,
+   "wiederLebend": 0,
+   "stand": {
+    "flaeche": {
+     "aus": 50.5,
+     "an": 50.5
+    },
+    "territory": {
+     "aus": 49.5,
+     "an": 49.5
+    }
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "regulaer": true,
+   "komi": 7.5,
+   "totAus": 2,
+   "totAn": 2,
+   "betroffen": false,
+   "zusaetzlichTot": 0,
+   "wiederLebend": 0,
+   "stand": {
+    "flaeche": {
+     "aus": -98.5,
+     "an": -98.5
+    },
+    "territory": {
+     "aus": -102.5,
+     "an": -102.5
+    }
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "regulaer": true,
+   "komi": 7.5,
+   "totAus": 0,
+   "totAn": 0,
+   "betroffen": false,
+   "zusaetzlichTot": 0,
+   "wiederLebend": 0,
+   "stand": {
+    "flaeche": {
+     "aus": -106.5,
+     "an": -106.5
+    },
+    "territory": {
+     "aus": -108.5,
+     "an": -108.5
+    }
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "regulaer": true,
+   "komi": 7.5,
+   "totAus": 0,
+   "totAn": 0,
+   "betroffen": false,
+   "zusaetzlichTot": 0,
+   "wiederLebend": 0,
+   "stand": {
+    "flaeche": {
+     "aus": 67.5,
+     "an": 67.5
+    },
+    "territory": {
+     "aus": 38.5,
+     "an": 38.5
+    }
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "regulaer": true,
+   "komi": 7.5,
+   "totAus": 0,
+   "totAn": 0,
+   "betroffen": false,
+   "zusaetzlichTot": 0,
+   "wiederLebend": 0,
+   "stand": {
+    "flaeche": {
+     "aus": 61.5,
+     "an": 61.5
+    },
+    "territory": {
+     "aus": 19.5,
+     "an": 19.5
+    }
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "regulaer": false,
+   "komi": 7.5,
+   "totAus": 0,
+   "totAn": 0,
+   "betroffen": false,
+   "zusaetzlichTot": 0,
+   "wiederLebend": 0,
+   "stand": {
+    "flaeche": {
+     "aus": 93.5,
+     "an": 93.5
+    },
+    "territory": {
+     "aus": 18.5,
+     "an": 18.5
+    }
+   }
+  }
+ ],
+ "mindestumfang": {
+  "schwelle": 30,
+  "betroffenS": 658,
+  "betroffenV": 1060,
+  "S": true,
+  "V": true
+ },
+ "entwicklung": {
+  "stellungen": 563,
+  "betroffen": 19,
+  "hinweis": "nur Kontrolle, nicht Teil der Auswertung (§3.1)"
+ }
+}

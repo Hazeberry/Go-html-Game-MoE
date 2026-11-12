@@ -1,0 +1,296 @@
+{
+ "version": 1,
+ "vIndizes": [
+  250,
+  300,
+  350
+ ],
+ "quellpartien": 562,
+ "einheitenEntwicklung": 563,
+ "entwicklungsstellungen": 563,
+ "gruppen": [
+  {
+   "name": "GNU Go ohne Vorgabe",
+   "dateien": [
+    "docs/daten/leeres-brett/lauf1/g-D.jsonl.gz",
+    "docs/daten/muster-ohne-vorgabe/lauf1/g-D.jsonl.gz"
+   ],
+   "zeilen": 960,
+   "uebersprungen": {},
+   "quellpartienAusgeschlossen": 2,
+   "pruefpartien": 958,
+   "s": {
+    "auswertbar": 958,
+    "behalten": 953,
+    "nicht": {}
+   },
+   "v": {
+    "250": 934,
+    "300": 657,
+    "350": 229
+   },
+   "vBehalten": {
+    "250": 928,
+    "300": 652,
+    "350": 229
+   },
+   "ausgeschlossen": {
+    "partieGleichQuelle": 0,
+    "S": {
+     "entwicklung": 0,
+     "doppelt": 5
+    },
+    "V": {
+     "entwicklung": 0,
+     "doppelt": 11
+    }
+   },
+   "laengen": {
+    "n": 958,
+    "min": 222,
+    "q1": 292,
+    "median": 321,
+    "q3": 349,
+    "max": 478,
+    "kuerzerAls251": 24,
+    "kuerzerAls301": 301,
+    "kuerzerAls351": 729
+   },
+   "gleicheZugfolgeImPruefsatz": 1,
+   "gefangenGeprueft": 958,
+   "gefangenFehlt": 0
+  },
+  {
+   "name": "Fuego 100 Spiele",
+   "dateien": [
+    "docs/daten/muster-ohne-vorgabe/lauf1/f-D.jsonl.gz"
+   ],
+   "zeilen": 480,
+   "uebersprungen": {},
+   "quellpartienAusgeschlossen": 45,
+   "pruefpartien": 435,
+   "s": {
+    "auswertbar": 434,
+    "behalten": 434,
+    "nicht": {
+     "Ende nicht mit zwei Pässen (Zuglimit oder anders)": 1
+    }
+   },
+   "v": {
+    "250": 435,
+    "300": 426,
+    "350": 287
+   },
+   "vBehalten": {
+    "250": 435,
+    "300": 426,
+    "350": 287
+   },
+   "ausgeschlossen": {
+    "partieGleichQuelle": 0,
+    "S": {
+     "entwicklung": 0,
+     "doppelt": 0
+    },
+    "V": {
+     "entwicklung": 0,
+     "doppelt": 0
+    }
+   },
+   "laengen": {
+    "n": 435,
+    "min": 288,
+    "q1": 341,
+    "median": 367,
+    "q3": 394,
+    "max": 600,
+    "kuerzerAls251": 0,
+    "kuerzerAls301": 9,
+    "kuerzerAls351": 148
+   },
+   "gleicheZugfolgeImPruefsatz": 0,
+   "gefangenGeprueft": 435,
+   "gefangenFehlt": 0
+  },
+  {
+   "name": "Fuego 50 Spiele",
+   "dateien": [
+    "docs/daten/fuego-siege/lauf1/D.jsonl.gz"
+   ],
+   "zeilen": 960,
+   "uebersprungen": {},
+   "quellpartienAusgeschlossen": 317,
+   "pruefpartien": 643,
+   "s": {
+    "auswertbar": 643,
+    "behalten": 643,
+    "nicht": {}
+   },
+   "v": {
+    "250": 643,
+    "300": 637,
+    "350": 424
+   },
+   "vBehalten": {
+    "250": 643,
+    "300": 637,
+    "350": 424
+   },
+   "ausgeschlossen": {
+    "partieGleichQuelle": 0,
+    "S": {
+     "entwicklung": 0,
+     "doppelt": 0
+    },
+    "V": {
+     "entwicklung": 0,
+     "doppelt": 0
+    }
+   },
+   "laengen": {
+    "n": 643,
+    "min": 269,
+    "q1": 343,
+    "median": 365,
+    "q3": 389,
+    "max": 587,
+    "kuerzerAls251": 0,
+    "kuerzerAls301": 6,
+    "kuerzerAls351": 219
+   },
+   "gleicheZugfolgeImPruefsatz": 0,
+   "gefangenGeprueft": 643,
+   "gefangenFehlt": 0
+  },
+  {
+   "name": "alte PWA",
+   "dateien": [
+    "docs/daten/pwa-vergleich/lauf1/m1.jsonl.gz"
+   ],
+   "zeilen": 360,
+   "uebersprungen": {},
+   "quellpartienAusgeschlossen": 198,
+   "pruefpartien": 162,
+   "s": {
+    "auswertbar": 162,
+    "behalten": 162,
+    "nicht": {}
+   },
+   "v": {
+    "250": 162,
+    "300": 162,
+    "350": 135
+   },
+   "vBehalten": {
+    "250": 162,
+    "300": 162,
+    "350": 135
+   },
+   "ausgeschlossen": {
+    "partieGleichQuelle": 0,
+    "S": {
+     "entwicklung": 0,
+     "doppelt": 0
+    },
+    "V": {
+     "entwicklung": 0,
+     "doppelt": 0
+    }
+   },
+   "laengen": {
+    "n": 162,
+    "min": 319,
+    "q1": 359,
+    "median": 376,
+    "q3": 397,
+    "max": 472,
+    "kuerzerAls251": 0,
+    "kuerzerAls301": 0,
+    "kuerzerAls351": 27
+   },
+   "gleicheZugfolgeImPruefsatz": 0,
+   "gefangenGeprueft": 162,
+   "gefangenFehlt": 0
+  }
+ ],
+ "handpartien": [
+  {
+   "datei": "hand-117.sgf",
+   "zuege": 117,
+   "ergebnis": "B+R",
+   "komi": 7.5,
+   "regulaer": false,
+   "grundNichtRegulaer": "Aufgabe",
+   "komiStandard": true
+  },
+  {
+   "datei": "hand-364.sgf",
+   "zuege": 364,
+   "ergebnis": "W+98.5",
+   "komi": 7.5,
+   "regulaer": true,
+   "grundNichtRegulaer": null,
+   "komiStandard": true
+  },
+  {
+   "datei": "hand-392.sgf",
+   "zuege": 392,
+   "ergebnis": "W+106.5",
+   "komi": 7.5,
+   "regulaer": true,
+   "grundNichtRegulaer": null,
+   "komiStandard": true
+  },
+  {
+   "datei": "hand-427.sgf",
+   "zuege": 427,
+   "ergebnis": "B+67.5",
+   "komi": 7.5,
+   "regulaer": true,
+   "grundNichtRegulaer": null,
+   "komiStandard": true
+  },
+  {
+   "datei": "hand-455.sgf",
+   "zuege": 455,
+   "ergebnis": "B+61.5",
+   "komi": 7.5,
+   "regulaer": true,
+   "grundNichtRegulaer": null,
+   "komiStandard": true
+  },
+  {
+   "datei": "hand-478.sgf",
+   "zuege": 478,
+   "ergebnis": "",
+   "komi": 7.5,
+   "regulaer": false,
+   "grundNichtRegulaer": "Ende nicht mit zwei Pässen",
+   "komiStandard": true
+  }
+ ],
+ "stellungen": {
+  "S": 2192,
+  "V": 5120,
+  "H": 6,
+  "E": 563
+ },
+ "pflichtfehler": {
+  "daten": [],
+  "replay": [],
+  "schnittmenge": []
+ },
+ "gueltig": true,
+ "ausgeschlossen": {
+  "partieGleichQuelle": 0,
+  "S": {
+   "entwicklung": 0,
+   "doppelt": 5
+  },
+  "V": {
+   "entwicklung": 0,
+   "doppelt": 11
+  }
+ },
+ "hinweis": "Zählung vor jeder Rechnung (Schritt 0, §3.2). Duplikate (§14.4): Partien mit gleicher Zugfolge wie eine Quellpartie, Stellungen mit dem Brett einer Entwicklungsstellung und Stellungen mit einem Brett, das in derselben Stellungsart schon vorkam, sind aus der Hauptprüfung ausgeschlossen, nur gezählt und nicht gerechnet; behalten wird der erste Vertreter in Dateireihenfolge."
+}
