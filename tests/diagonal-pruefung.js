@@ -202,6 +202,9 @@ test('Ganze Kette (drei Stände in drei Prozessen): gültig, Betroffene gleich e
   pruefeGleich(b.handpartien.length, 6, 'sechs Handpartien getrennt berichtet');
   pruefe(b.entwicklung.hinweis.includes('nicht Teil der Auswertung'), 'Entwicklungsstellungen nicht in der Auswertung');
   const md = fs.readFileSync(path.join(g.v.aus, 'bericht.md'), 'utf8');
+  pruefe(md.includes('sind aus der Hauptprüfung ausgeschlossen, nur gezählt und nicht gerechnet; behalten wird der erste Vertreter in Dateireihenfolge'), 'Bericht (Grenzen) erklärt den Ausschluss der Duplikate nach §14.4');
+  pruefe(!/zählen mehrfach/.test(md), 'Bericht enthält den veralteten Duplikatsatz („zählen mehrfach“) nicht');
+  pruefe(md.includes('Die Einspiel-Kontrolle prüft Ko und Superko nicht.'), 'Bericht nennt weiter, dass Ko und Superko nicht geprüft werden');
   pruefe(md.includes('zu wenig Betroffene') && /Keine Aussage|keine Aussage zur Richtigkeit/.test(md), 'Bericht: zu wenig Betroffene, keine Aussage zur Richtigkeit');
 });
 
