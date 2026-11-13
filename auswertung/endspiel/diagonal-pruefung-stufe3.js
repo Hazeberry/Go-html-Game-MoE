@@ -4,19 +4,21 @@
    Das Werkzeug beurteilt NICHT. Es baut die Unterlagen für eine getrennte Beurteilung, prüft deren Antwortbögen und deckt erst danach auf,
    was App aus, App an und GNU Go zu jeder Kette sagten (R+, R−, ungeklärt). Beurteilungen sind keine Ground Truth (§6).
 
-   Drei Teilschritte:
+   Teilschritte:
      unterlagen  baut aus der Auswahl der Stufe 2 (B1 vollständig, B2 höchstens 60) das Paket für die Beurteiler: je Kette eine Unterlage (Markdown mit
                  Textdiagramm, Zugfarbe, Kurzansicht, vollständiger Zuggeschichte als SGF), Anleitung, Antwortbogen-Schema, Vorlage, Manifest. Das Paket
                  enthält KEINE Herkunft (weder Programm noch Gruppe noch Schalter noch die Urteile von App oder GNU Go). Die Zuordnung steht getrennt in
                  geheim/aufdeckung.json und wird erst nach allen Urteilen benutzt. Reihenfolge und Kennungen sind Hash-Zufall (§6.2).
-     pruefen     prüft einen Antwortbogen gegen das Manifest (jede Kennung genau einmal, Kategorien, Begründung, Sicherheit).
+     pruefen     prüft einen Antwortbogen gegen das Manifest (jede Kennung genau einmal, Kategorien, Begründung, Sicherheit); mit --teil ja einen Teilbogen.
+     zusammenfuegen  vereint Teilbögen mechanisch zu einem Bogen (§18.6); schreibt nur, wenn jede Kennung genau einmal beantwortet ist.
      auswerten   prüft alle Bögen, deckt auf und berichtet nach §6.4 und §8: R+ (aus falsch, an richtig), R− (aus richtig, an falsch), ungeklärt,
                  getrennt nach Beurteilergruppe und nach B1 und B2; Befund nach §8 („positive Kandidatur“ oder „keine positive Kandidatur“, kein Go).
    Gültigkeit: nur zwei Zustände. Ungültig heißt „kein Urteil“ mit Grund, Exit 1.
 
    Aufrufe (Optionen als --name wert):
-     node diagonal-pruefung-stufe3.js unterlagen --stufe1 verz --stufe2 verz --archiv docs/daten --aus verz [--probe 3]
-     node diagonal-pruefung-stufe3.js pruefen --bogen datei --manifest manifest.json
+     node diagonal-pruefung-stufe3.js unterlagen --stufe1 verz --stufe2 verz --archiv docs/daten --aus verz [--probe 3 [--probe-ziehung 1]]
+     node diagonal-pruefung-stufe3.js pruefen --bogen datei --manifest manifest.json [--teil ja]
+     node diagonal-pruefung-stufe3.js zusammenfuegen --manifest manifest.json --teil datei [--teil datei …] --aus bogen.json
      node diagonal-pruefung-stufe3.js auswerten --stufe1 verz --stufe2 verz --archiv docs/daten --bogen NAME=datei [--bogen NAME=datei] --aus verz
         (--stufe1: entpacktes Stufe-1-ZIP; --stufe2: entpacktes Stufe-2-ZIP mit bericht/, eingabe/plan/, teile/) */
 'use strict';
@@ -140,33 +142,72 @@ Du bekommst eine Reihe von Unterlagen (\`unterlagen/U-….md\`, dazu je eine SGF
 
 ## Aufgabe
 
-Beurteile, ob die markierte Kette bei bestem Spiel beider Seiten (chinesische Regeln, Flächenzählung) **bestehen bleibt oder gefangen wird**. Die Stellung kann beendet oder mitten in der Partie sein; die Unterlage sagt es. Nutze die vollständige Zuggeschichte (SGF), wenn Ko, Superko oder die Reihenfolge der Züge eine Rolle spielen.
+Beurteile, ob die markierte Kette bei bestem Spiel beider Seiten (chinesische Regeln, Flächenzählung) **bestehen bleibt oder gefangen wird**. Die Stellung kann beendet oder mitten in der Partie sein; die Unterlage sagt es. Beurteile die Stellung, wie sie auf dem Brett steht, nicht, was im weiteren Verlauf der Partie vermutlich geschehen wäre.
 
 ## Kategorien (genau eine je Unterlage)
 
 - \`lebendig\`: Die Kette bleibt bestehen (zwei echte Augen, ausreichende Freiheiten im Kampf oder Verbindung mit einer lebenden Gruppe), auch wenn die Gegenseite zuerst zieht.
 - \`tot\`: Die Kette wird gefangen, auch wenn die eigene Seite zuerst zieht.
 - \`seki\`: Beide Seiten können die Kette bzw. die gegnerische Gruppe nicht fangen; beide bleiben bestehen, ohne Gebiet.
-- \`ko_zugabhaengig\`: Das Ergebnis hängt von einem Ko oder davon ab, wer am Zug ist. Gib dann **zusätzlich** das Urteil bei Zug von Schwarz (\`urteilSchwarzAmZug\`) und bei Zug von Weiß (\`urteilWeissAmZug\`) an, jeweils \`lebendig\`, \`tot\`, \`seki\` oder \`nicht_entscheidbar\`.
+- \`ko_zugabhaengig\`: Das Ergebnis ist bei Zug von Schwarz **ein anderes** als bei Zug von Weiß (wegen eines Kos oder weil der erste Zug am entscheidenden Punkt entscheidet). Gib dann **zusätzlich** das Urteil bei Zug von Schwarz (\`urteilSchwarzAmZug\`) und bei Zug von Weiß (\`urteilWeissAmZug\`) an, jeweils \`lebendig\`, \`tot\`, \`seki\` oder \`nicht_entscheidbar\`. Die beiden Teilurteile müssen sich unterscheiden.
 - \`nicht_entscheidbar\`: Du kannst es nach sorgfältigem Lesen nicht entscheiden. Das ist eine ehrliche Antwort und besser als Raten.
+
+## Zugrecht
+
+Die Unterlage nennt, wer als Nächstes am Zug wäre. **Dein Urteil gilt trotzdem für beide Fälle:** Lies die Stellung einmal mit Schwarz am Zug und einmal mit Weiß am Zug.
+
+- Kommst du in beiden Fällen zum selben Ergebnis, trage dieses Ergebnis als Kategorie ein (\`lebendig\`, \`tot\`, \`seki\` oder \`nicht_entscheidbar\`), **nicht** \`ko_zugabhaengig\`.
+- Kommst du zu verschiedenen Ergebnissen, trage \`ko_zugabhaengig\` mit beiden Teilurteilen ein. Trage nie nur das Urteil für die Seite ein, die laut Unterlage am Zug ist.
+- Das angegebene Zugrecht brauchst du für das Ko-Verbot: Der genannte Ko-Punkt ist nur für die Seite gesperrt, die laut Unterlage am Zug ist, und nur für ihren nächsten Zug. Liest du den anderen Fall (die andere Seite zieht zuerst), gilt am Anfang kein Ko-Verbot.
+
+## Ko
+
+Für jedes Ko gilt eine feste Annahme: **Keine Seite hat Ko-Drohungen außerhalb des Kampfes um die markierte Kette.** Wer nicht sofort zurückschlagen darf, kann also nur am Ort weiterspielen oder passen; danach darf die Gegenseite das Ko beenden. Du zählst keine Ko-Drohungen auf dem übrigen Brett.
+
+Daraus folgt:
+
+- **Ko, das nur eine Seite beenden kann** (die andere könnte nur immer wieder zurückschlagen, das Ko aber nie auflösen): Das Ergebnis ist für beide Zugrechte dasselbe. Trage es direkt ein, also \`tot\`, wenn die Kette am Ende fällt, und \`lebendig\`, wenn sie am Ende steht. Nenne das Ko in der Begründung.
+- **Ko, das beide Seiten beenden können:** Wer es zuerst schlagen darf, gewinnt es. Meist sind die Ergebnisse dann verschieden, und die Kategorie ist \`ko_zugabhaengig\` mit beiden Teilurteilen.
+- **Doppel-Ko und mehrstufiges Ko** liest du mit derselben Annahme zu Ende; ein Doppel-Ko kann eine Kette sicher leben lassen oder sicher fallen lassen.
+- **Superko:** Du prüfst nicht, ob sich eine Stellung aus der Zuggeschichte wiederholt. Entsteht in deiner Lesung ein Kreislauf, den nur ein Wiederholungsverbot über mehrere Züge auflöst (zum Beispiel ein Dreifach-Ko), trage \`nicht_entscheidbar\` ein und nenne den Kreislauf.
+
+## Lesetiefe
+
+- Lies den **Kampf um die markierte Kette bis zum Ergebnis**: Die Kette ist geschlagen, sie hat zwei echte Augen oder eine nicht trennbare Verbindung zu einer Gruppe mit zwei echten Augen, es ist Seki, oder es bleibt ein Ko (siehe oben). Zum Kampf gehören alle Ketten und leeren Punkte, von denen das Schicksal der markierten Kette abhängt; das kann eine große Gruppe sein.
+- **Nicht verlangt** sind: Ko-Drohungen auf dem übrigen Brett, Superko gegen die Zuggeschichte, der Punktestand, die Frage, wer die Partie gewinnt, und die Frage, ob sich ein Zug für eine Seite insgesamt lohnt. Was nicht verlangt ist, mindert die Sicherheit nicht und gehört nicht unter \`offen\`.
+- Es gibt **keine Zeitvorgabe** je Unterlage. Kommst du nach sorgfältigem Lesen nicht zu einem Ergebnis, ist \`nicht_entscheidbar\` die richtige Antwort.
 
 ## Begründung und Sicherheit
 
 Schreibe zu jeder Unterlage eine **Begründung** nach allgemeinen Go-Kriterien: echte und falsche Augen, Freiheiten, Verbindungen und Schnittpunkte, Randlage und Ecke, Seki, Ko, Lesen der entscheidenden Zugfolge. Nenne die Koordinaten der entscheidenden Punkte. Gib die **Sicherheit** an:
 
-- \`sicher\`: Du hast die Stellung bis zum Ergebnis gelesen und siehst keine Alternative.
-- \`eher_sicher\`: Du hältst das Urteil für richtig, hast aber nicht jede Variante zu Ende gelesen.
+- \`sicher\`: Du hast den Kampf um die Kette in allen Varianten bis zum Ergebnis gelesen und siehst keine Alternative.
+- \`eher_sicher\`: Du hältst das Urteil für richtig, hast aber nicht jede Variante des Kampfes zu Ende gelesen.
 - \`unsicher\`: Du bist dir nicht sicher. Dann schreibe unter \`offen\`, was offen bleibt.
 
 Bei \`eher_sicher\`, \`unsicher\` und \`nicht_entscheidbar\` ist \`offen\` Pflicht.
 
+## Hilfsmittel
+
+- **Erlaubt** sind Skripte, die du in dieser Arbeit selbst schreibst und die nur mechanisch arbeiten: SGF nachspielen, Brett anzeigen, Freiheiten zählen, prüfen, ob ein Zug erlaubt ist, eine von dir gewählte Zugfolge durchspielen. Das Urteil und die entscheidende Zugfolge kommen von dir; ein Skript prüft sie nach, es sucht sie nicht.
+- **Nicht erlaubt** sind fremde Go-Software jeder Art (Spiel- und Analysesoftware, Löser für Leben und Tod, neuronale Netze), eine selbst geschriebene automatische Suche nach dem Ergebnis, Nachschlagen im Internet oder in Datenbanken und das Befragen anderer.
+- Trage im Bogen unter \`hilfsmittel\` ein, was du benutzt hast (zum Beispiel „keine“ oder „eigenes Skript zum Nachspielen und Freiheitenzählen“).
+
+## Arbeiten in Etappen
+
+Du darfst die Unterlagen in mehreren Etappen bearbeiten und **Teilbögen** abgeben. Ein Teilbogen hat dasselbe Format und dasselbe \`manifestSha256\`, enthält aber nur die Kennungen dieser Etappe. Halte die Reihenfolge der Vorlage ein. Jede Kennung steht in genau einem Teilbogen; ein abgegebenes Urteil wird später nicht geändert. Die Teilbögen werden danach mechanisch zu einem Bogen vereint.
+
+Wenn du die Zeit je Unterlage mit einer Uhr messen kannst, trage sie als \`dauerSekunden\` ein. Schätze sie nicht; ohne Messung lass das Feld weg.
+
 ## Antwortformat
 
-Gib **eine JSON-Datei** zurück:
+Gib **eine JSON-Datei** je Bogen oder Teilbogen zurück:
 
 \`\`\`json
 {
   "manifestSha256": "<Wert aus manifest.json, Feld manifestSha256>",
+  "beurteiler": "KI",
+  "hilfsmittel": "keine",
   "antworten": [
     {"id": "U-xxxxxx", "kategorie": "tot", "begruendung": "…", "sicherheit": "sicher"},
     {"id": "U-yyyyyy", "kategorie": "ko_zugabhaengig", "urteilSchwarzAmZug": "lebendig", "urteilWeissAmZug": "tot", "begruendung": "…", "sicherheit": "eher_sicher", "offen": "…"}
@@ -174,7 +215,7 @@ Gib **eine JSON-Datei** zurück:
 }
 \`\`\`
 
-Jede Kennung der Vorlage (\`bogen-vorlage.json\`) kommt **genau einmal** vor. Das Schema steht in \`bogen-schema.json\`.
+Im vollständigen Bogen kommt jede Kennung der Vorlage (\`bogen-vorlage.json\`) **genau einmal** vor. Das Schema steht in \`bogen-schema.json\`.
 
 ## Wichtig
 
@@ -184,9 +225,9 @@ Jede Kennung der Vorlage (\`bogen-vorlage.json\`) kommt **genau einmal** vor. Da
 `;
 const SCHEMA = {
   $schema: 'https://json-schema.org/draft/2020-12/schema', title: 'Antwortbogen', type: 'object', required: ['manifestSha256', 'antworten'],
-  properties: {manifestSha256: {type: 'string'}, beurteiler: {type: 'string'}, antworten: {type: 'array', items: {type: 'object', required: ['id', 'kategorie', 'begruendung', 'sicherheit'],
+  properties: {manifestSha256: {type: 'string'}, beurteiler: {type: 'string'}, hilfsmittel: {type: 'string'}, antworten: {type: 'array', items: {type: 'object', required: ['id', 'kategorie', 'begruendung', 'sicherheit'],
     properties: {id: {type: 'string', pattern: '^U-[0-9a-f]{6}$'}, kategorie: {enum: KATEGORIEN}, urteilSchwarzAmZug: {enum: TEILURTEILE}, urteilWeissAmZug: {enum: TEILURTEILE},
-      begruendung: {type: 'string', minLength: BEGRUENDUNG_MIN}, sicherheit: {enum: SICHERHEIT}, offen: {type: 'string'}}}}}};
+      begruendung: {type: 'string', minLength: BEGRUENDUNG_MIN}, sicherheit: {enum: SICHERHEIT}, offen: {type: 'string'}, dauerSekunden: {type: 'number', minimum: 0}}}}}};
 
 /* ── Paket: deterministisch aus den Eingaben ───────────────────────────── */
 function erzeugePaket(E, ein, ketten, opt = {}) {
@@ -205,7 +246,8 @@ function erzeugePaket(E, ein, ketten, opt = {}) {
       farbe: k.farbe, steine: k.steine, punkte: k.punkte, appAus: k.appAus, appAn: k.appAn, gnu: k.gnu};
   }
   let waehl = reihenfolge;
-  if (opt.probe) waehl = nachHash(reihenfolge, id => `stufe3|probe|${basis}|${id}`).slice(0, opt.probe);
+  /* ziehung 0 ist die Ziehung der ersten Probe (§18.5); jede andere Zahl zieht unabhängig davon neu (§18.6) */
+  if (opt.probe) waehl = nachHash(reihenfolge, id => `stufe3|probe${opt.ziehung ? '|' + opt.ziehung : ''}|${basis}|${id}`).slice(0, opt.probe);
   const dateien = {};
   for (const id of waehl) { dateien[`unterlagen/${id}.md`] = unterlagen.get(id).md; dateien[`unterlagen/${id}.sgf`] = unterlagen.get(id).sgf; }
   dateien['anleitung-beurteiler.md'] = ANLEITUNG; dateien['bogen-schema.json'] = JSON.stringify(SCHEMA, null, 1);
@@ -218,10 +260,12 @@ function erzeugePaket(E, ein, ketten, opt = {}) {
 }
 
 /* ── Antwortbögen prüfen ───────────────────────────────────────────────── */
-function pruefeBogen(bogen, manifest) {
+/* opt.teil: Teilbogen (§18.6), fehlende Kennungen sind dann kein Fehler */
+function pruefeBogen(bogen, manifest, opt = {}) {
   const f = [];
   if (!bogen || typeof bogen !== 'object' || !Array.isArray(bogen.antworten)) return ['Bogen ist kein Objekt mit einer Liste „antworten“'];
   if (bogen.manifestSha256 !== manifest.manifestSha256) f.push(`manifestSha256 ${JSON.stringify(bogen.manifestSha256)} gehört nicht zu diesem Paket (erwartet ${manifest.manifestSha256})`);
+  if (bogen.hilfsmittel !== undefined && typeof bogen.hilfsmittel !== 'string') f.push('hilfsmittel ist kein Text');
   const erwartet = new Set(manifest.reihenfolge), gesehen = new Set();
   for (const a of bogen.antworten) {
     const id = a && a.id;
@@ -233,11 +277,33 @@ function pruefeBogen(bogen, manifest) {
     if (typeof a.begruendung !== 'string' || a.begruendung.trim().length < BEGRUENDUNG_MIN) f.push(`${id}: Begründung fehlt oder ist kürzer als ${BEGRUENDUNG_MIN} Zeichen`);
     if (a.kategorie === 'ko_zugabhaengig') {
       for (const feld of ['urteilSchwarzAmZug', 'urteilWeissAmZug']) if (!TEILURTEILE.includes(a[feld])) f.push(`${id}: ${feld} ${JSON.stringify(a[feld])} ungültig (bei ko_zugabhaengig Pflicht)`);
+      if (TEILURTEILE.includes(a.urteilSchwarzAmZug) && a.urteilSchwarzAmZug === a.urteilWeissAmZug) f.push(`${id}: bei ko_zugabhaengig müssen sich die Teilurteile unterscheiden; gleiches Ergebnis für beide Zugrechte direkt als Kategorie ${a.urteilSchwarzAmZug} eintragen`);
     } else for (const feld of ['urteilSchwarzAmZug', 'urteilWeissAmZug']) if (a[feld] !== undefined) f.push(`${id}: ${feld} nur bei ko_zugabhaengig erlaubt`);
+    if (a.dauerSekunden !== undefined && !(typeof a.dauerSekunden === 'number' && Number.isFinite(a.dauerSekunden) && a.dauerSekunden >= 0)) f.push(`${id}: dauerSekunden ist keine Zahl ab 0`);
     if ((a.sicherheit !== 'sicher' || a.kategorie === 'nicht_entscheidbar') && (typeof a.offen !== 'string' || !a.offen.trim())) f.push(`${id}: „offen“ fehlt (Pflicht bei eher_sicher, unsicher und nicht_entscheidbar)`);
   }
-  for (const id of erwartet) if (!gesehen.has(id)) f.push(`${id}: nicht beantwortet`);
+  if (!opt.teil) for (const id of erwartet) if (!gesehen.has(id)) f.push(`${id}: nicht beantwortet`);
   return f;
+}
+/* Teilbögen vereinen (§18.6): rein mechanisch, ändert kein Urteil. Jeder Teilbogen muss für sich gültig sein und zum Manifest passen; keine Kennung darf in zwei
+   Teilbögen stehen (auch nicht gleichlautend); „beurteiler“ muss überall gleich sein. Ergebnis in der Reihenfolge des Manifests. bogen ist null, solange etwas fehlt. */
+function fuegeZusammen(teile, manifest) {
+  const fehler = [], nachId = new Map(), hilfsmittel = [], beurteiler = new Set();
+  teile.forEach(({name, bogen}) => {
+    const f = pruefeBogen(bogen, manifest, {teil: true});
+    if (f.length) { fehler.push(`${name}: ${f.length} Fehler (z. B. ${f[0]})`); return; }
+    beurteiler.add(bogen.beurteiler === undefined ? null : bogen.beurteiler);
+    if (bogen.hilfsmittel !== undefined && !hilfsmittel.includes(bogen.hilfsmittel)) hilfsmittel.push(bogen.hilfsmittel);
+    for (const a of bogen.antworten) { if (nachId.has(a.id)) fehler.push(`${a.id}: in ${nachId.get(a.id).name} und in ${name} beantwortet`); else nachId.set(a.id, {name, a}); }
+  });
+  if (beurteiler.size > 1) fehler.push(`„beurteiler“ ist nicht in allen Teilbögen gleich: ${[...beurteiler].map(b => JSON.stringify(b)).join(', ')}`);
+  const fehlend = manifest.reihenfolge.filter(id => !nachId.has(id));
+  if (fehler.length || fehlend.length) return {bogen: null, fehler, fehlend, beantwortet: nachId.size};
+  const bogen = {manifestSha256: manifest.manifestSha256};
+  const b = [...beurteiler][0]; if (b !== null) bogen.beurteiler = b;
+  if (hilfsmittel.length) bogen.hilfsmittel = hilfsmittel.join('; ');
+  bogen.antworten = manifest.reihenfolge.map(id => nachId.get(id).a);
+  return {bogen, fehler: pruefeBogen(bogen, manifest), fehlend, beantwortet: nachId.size};
 }
 
 /* ── Auswertung (rein) ─────────────────────────────────────────────────── */
@@ -362,13 +428,14 @@ function main() {
   const [befehl, ...rest] = process.argv.slice(2);
   const html = path.join(__dirname, '..', '..', 'index.html');
   if (befehl === 'unterlagen' || befehl === 'auswerten') {
-    const o = optionen(rest, ['stufe1', 'stufe2', 'archiv', 'aus', 'probe', 'bogen'], ['stufe1', 'stufe2', 'archiv', 'aus'], ['bogen']);
+    const o = optionen(rest, ['stufe1', 'stufe2', 'archiv', 'aus', 'probe', 'probe-ziehung', 'bogen'], ['stufe1', 'stufe2', 'archiv', 'aus'], ['bogen']);
     const ein = ladeEingabe(o), E = ladeKI({htmlPfad: html, mitNetz: false}), pe = pruefeEingabe(ein);
     if (pe.gruende.length) { console.error('KEIN URTEIL: ' + pe.gruende.join(' ; ')); process.exit(1); }
     fs.mkdirSync(o.aus, {recursive: true});
     if (befehl === 'unterlagen') {
-      const probe = o.probe === undefined ? 0 : +o.probe;
-      const p = erzeugePaket(E, ein, pe.ketten, {probe});
+      const probe = o.probe === undefined ? 0 : +o.probe, ziehung = o['probe-ziehung'] === undefined ? 0 : +o['probe-ziehung'];
+      if (!Number.isInteger(probe) || probe < 0 || !Number.isInteger(ziehung) || ziehung < 0 || (ziehung && !probe)) throw new Error('--probe und --probe-ziehung sind ganze Zahlen ab 0; --probe-ziehung nur zusammen mit --probe');
+      const p = erzeugePaket(E, ein, pe.ketten, {probe, ziehung});
       schreibe(path.join(o.aus, probe ? 'probe-paket' : 'beurteiler-paket'), p.dateien);
       fs.mkdirSync(path.join(o.aus, 'geheim'), {recursive: true});
       fs.writeFileSync(path.join(o.aus, 'geheim', probe ? 'aufdeckung-probe.json' : 'aufdeckung.json'), JSON.stringify(p.aufdeckung, null, 1));
@@ -390,11 +457,23 @@ function main() {
     fs.writeFileSync(path.join(o.aus, 'ketten-stufe3.jsonl'), r.proKette.map(x => JSON.stringify(x)).join('\n') + '\n');
     console.log(md);
   } else if (befehl === 'pruefen') {
-    const o = optionen(rest, ['bogen', 'manifest'], ['bogen', 'manifest']);
-    const f = pruefeBogen(JSON.parse(fs.readFileSync(o.bogen, 'utf8')), JSON.parse(fs.readFileSync(o.manifest, 'utf8')));
+    const o = optionen(rest, ['bogen', 'manifest', 'teil'], ['bogen', 'manifest']);
+    if (o.teil !== undefined && o.teil !== 'ja') throw new Error('--teil kennt nur den Wert ja');
+    const f = pruefeBogen(JSON.parse(fs.readFileSync(o.bogen, 'utf8')), JSON.parse(fs.readFileSync(o.manifest, 'utf8')), {teil: o.teil === 'ja'});
     if (f.length) { console.error(`BOGEN UNGÜLTIG (${f.length}):\n` + f.slice(0, 50).join('\n')); process.exit(1); }
-    console.log('Bogen gültig: jede Kennung genau einmal, alle Felder zulässig.');
-  } else throw new Error('Aufruf: node diagonal-pruefung-stufe3.js unterlagen|pruefen|auswerten ...');
+    console.log(o.teil === 'ja' ? 'Teilbogen gültig: keine Kennung doppelt oder unbekannt, alle Felder zulässig.' : 'Bogen gültig: jede Kennung genau einmal, alle Felder zulässig.');
+  } else if (befehl === 'zusammenfuegen') {
+    const o = optionen(rest, ['teil', 'manifest', 'aus'], ['teil', 'manifest', 'aus'], ['teil']);
+    const manifest = JSON.parse(fs.readFileSync(o.manifest, 'utf8')), teile = [];
+    for (const datei of o.teil) { let bogen = null; try { bogen = JSON.parse(fs.readFileSync(datei, 'utf8')); } catch (e) { bogen = null; } teile.push({name: path.basename(datei), bogen}); }
+    if (new Set(teile.map(t => t.name)).size !== teile.length) throw new Error('Zwei Teilbögen haben denselben Dateinamen');
+    const r = fuegeZusammen(teile, manifest);
+    console.log(`Teilbögen: ${teile.length}; beantwortet ${r.beantwortet} von ${manifest.reihenfolge.length}.`);
+    if (r.fehler.length) { console.error(`NICHT VEREINT (${r.fehler.length} Fehler):\n` + r.fehler.slice(0, 50).join('\n')); process.exit(1); }
+    if (r.fehlend.length) { console.error(`NICHT VEREINT: ${r.fehlend.length} Kennungen fehlen noch (z. B. ${r.fehlend.slice(0, 5).join(', ')}). Es wurde keine Datei geschrieben.`); process.exit(1); }
+    fs.mkdirSync(path.dirname(path.resolve(o.aus)), {recursive: true}); fs.writeFileSync(o.aus, JSON.stringify(r.bogen, null, 1) + '\n');
+    console.log(`Bogen geschrieben: ${o.aus} (SHA-256 ${sha256(fs.readFileSync(o.aus, 'utf8'))}).`);
+  } else throw new Error('Aufruf: node diagonal-pruefung-stufe3.js unterlagen|pruefen|zusammenfuegen|auswerten ...');
 }
 if (require.main === module) { try { main(); } catch (e) { console.error(e.stack || e.message); process.exit(2); } }
-module.exports = {ladeEingabe, pruefeEingabe, spielMitKo, sgfVon, diagramm, unterlage, erzeugePaket, pruefeBogen, normiere, bewerteKette, auswertung, berichtMd, ANLEITUNG, SCHEMA, KATEGORIEN, SICHERHEIT, R_PLUS_MIN, R_PLUS_PARTIEN_MIN, MINDESTUMFANG};
+module.exports = {ladeEingabe, pruefeEingabe, spielMitKo, sgfVon, diagramm, unterlage, erzeugePaket, pruefeBogen, fuegeZusammen, normiere, bewerteKette, auswertung, berichtMd, ANLEITUNG, SCHEMA, KATEGORIEN, SICHERHEIT, R_PLUS_MIN, R_PLUS_PARTIEN_MIN, MINDESTUMFANG};
