@@ -325,6 +325,63 @@ test('Regression §8 Nr. 5: unvollständiger oder unplausibler Bericht der Stufe
   fall('Bericht gehört nicht zu diesem Lauf (n ungleich)', b => { b.wirkung.S.flaeche.stand.n = 600; b.wirkung.S.flaeche.stand.aendert = 600; }, /ungleich der Zahl betroffener S-Stellungen/);
 });
 
+/* ── 5b Präzisierte Anleitung, Teilbögen, zweite Probe-Ziehung (§18.6) ─── */
+test('Anleitung (§18.6): Zugrecht, Ko ohne Drohungen von außen, Lesetiefe, Hilfsmittel, Etappen; Ko mit gleichen Teilurteilen ist kein gültiger Eintrag', () => {
+  const a = S3.ANLEITUNG;
+  for (const kopf of ['## Zugrecht', '## Ko', '## Lesetiefe', '## Hilfsmittel', '## Arbeiten in Etappen']) pruefe(a.includes('\n' + kopf + '\n'), 'Abschnitt ' + kopf);
+  pruefe(/Keine Seite hat Ko-Drohungen außerhalb des Kampfes um die markierte Kette/.test(a), 'feste Annahme zu Ko-Drohungen');
+  pruefe(/Ko, das nur eine Seite beenden kann/.test(a) && /Trage es direkt ein/.test(a), 'einseitiges Ko wird direkt eingetragen');
+  pruefe(/Dein Urteil gilt trotzdem für beide Fälle/.test(a) && /Trage nie nur das Urteil für die Seite ein, die laut Unterlage am Zug ist/.test(a), 'Urteil für beide Zugrechte');
+  pruefe(/Die beiden Teilurteile müssen sich unterscheiden/.test(a), 'Teilurteile verschieden'); pruefe(/keine Zeitvorgabe/.test(a) && /mindert die Sicherheit nicht/.test(a), 'Lesetiefe ohne Zeitvorgabe');
+  pruefe(/Nicht erlaubt.*fremde Go-Software/.test(a) && /es sucht sie nicht/.test(a), 'Hilfsmittel begrenzt'); pruefe(/"hilfsmittel"/.test(a) && S3.SCHEMA.properties.hilfsmittel.type === 'string', 'Feld hilfsmittel in Beispiel und Schema');
+  const {p} = paket(), ids = p.manifest.reihenfolge, mitKo = (s, w) => { const b = ALT(p, ids.map(id => antwort(id))); b.antworten[0] = antwort(ids[0], 'ko_zugabhaengig', {urteilSchwarzAmZug: s, urteilWeissAmZug: w, sicherheit: 'eher_sicher', offen: 'Nicht jede Variante gelesen.'}); return S3.pruefeBogen(b, p.manifest); };
+  for (const t of ['lebendig', 'tot', 'seki', 'nicht_entscheidbar']) pruefe(mitKo(t, t).some(x => /Teilurteile unterscheiden/.test(x)), `Ko mit zweimal ${t} wird abgelehnt`);
+  pruefeGleich(mitKo('tot', 'lebendig').length, 0, 'Ko mit verschiedenen Teilurteilen gültig'); pruefeGleich(mitKo('seki', 'nicht_entscheidbar').length, 0, 'verschieden, auch ohne lebendig oder tot');
+  const feld = (aendere, muster, name) => { const b = ALT(p, ids.map(id => antwort(id))); aendere(b); const f = S3.pruefeBogen(b, p.manifest); pruefe(muster ? f.some(x => muster.test(x)) : f.length === 0, `${name}: ${f.slice(0, 2).join(' | ') || 'keine Fehler'}`); };
+  feld(b => { b.hilfsmittel = 'eigenes Skript zum Nachspielen'; b.antworten[0].dauerSekunden = 12.5; }, null, 'hilfsmittel und dauerSekunden zulässig');
+  feld(b => { b.hilfsmittel = ['x']; }, /hilfsmittel ist kein Text/, 'hilfsmittel als Liste'); feld(b => { b.antworten[0].dauerSekunden = -1; }, /dauerSekunden/, 'negative Dauer'); feld(b => { b.antworten[0].dauerSekunden = '60'; }, /dauerSekunden/, 'Dauer als Text');
+});
+test('Teilbögen: „pruefen --teil ja“ lässt fehlende Kennungen zu; fuegeZusammen vereint mechanisch, in Manifest-Reihenfolge, ohne ein Urteil zu ändern', () => {
+  const {p} = paket(), ids = p.manifest.reihenfolge, m = p.manifest, n = ids.length; pruefe(n >= 6, 'genug Unterlagen in der Attrappe: ' + n);
+  const alle = ids.map((id, i) => (i % 3 === 0 ? antwort(id, 'lebendig', {dauerSekunden: i}) : i % 3 === 1 ? antwort(id) : antwort(id, 'ko_zugabhaengig', {urteilSchwarzAmZug: 'tot', urteilWeissAmZug: 'lebendig', sicherheit: 'eher_sicher', offen: 'Nicht jede Variante gelesen.'})));
+  const teil = (a, extra = {}) => ({manifestSha256: m.manifestSha256, beurteiler: 'KI', ...extra, antworten: a}), k = Math.floor(n / 3);
+  const t1 = teil(alle.slice(0, k), {hilfsmittel: 'keine'}), t2 = teil(alle.slice(k, 2 * k), {hilfsmittel: 'eigenes Skript'}), t3 = teil(alle.slice(2 * k), {hilfsmittel: 'keine'});
+  pruefe(S3.pruefeBogen(t1, m).some(x => /nicht beantwortet/.test(x)), 'Teilbogen ist als ganzer Bogen ungültig'); pruefeGleich(S3.pruefeBogen(t1, m, {teil: true}).length, 0, 'als Teilbogen gültig');
+  const r = S3.fuegeZusammen([{name: 'c', bogen: t3}, {name: 'a', bogen: t1}, {name: 'b', bogen: t2}], m);
+  pruefeGleich(r.fehler.length, 0, 'keine Fehler: ' + r.fehler[0]); pruefeGleich(r.fehlend.length, 0, 'nichts fehlt'); pruefeGleich(r.beantwortet, n, 'alle beantwortet');
+  pruefeGleich(JSON.stringify(r.bogen.antworten), JSON.stringify(alle), 'Antworten unverändert und in der Reihenfolge des Manifests, unabhängig von der Reihenfolge der Teilbögen');
+  pruefeGleich(S3.pruefeBogen(r.bogen, m).length, 0, 'vereinter Bogen ist gültig'); pruefeGleich(r.bogen.hilfsmittel, 'keine; eigenes Skript', 'Hilfsmittel zusammengeführt'); pruefeGleich(r.bogen.beurteiler, 'KI', 'Beurteiler übernommen');
+  const fall = (teile, muster, name) => { const x = S3.fuegeZusammen(teile.map((b, i) => ({name: 't' + i, bogen: b})), m); pruefe(x.bogen === null, name + ': kein Bogen'); if (muster) pruefe(x.fehler.some(f => muster.test(f)), `${name}: ${x.fehler.slice(0, 2).join(' | ') || 'keine Fehler'}`); return x; };
+  const fehlt = fall([t1, t2], null, 'ein Teil fehlt'); pruefeGleich(fehlt.fehlend.length, n - 2 * k, 'fehlende Kennungen gezählt'); pruefeGleich(fehlt.fehler.length, 0, 'fehlend ist kein Formatfehler');
+  fall([t1, t2, t3, teil([alle[0]])], /in t0 und in t3 beantwortet/, 'Kennung in zwei Teilbögen (gleichlautend)');
+  fall([t1, t2, teil([{...alle[0], kategorie: 'tot'}, ...alle.slice(2 * k)])], /in t0 und in t2 beantwortet/, 'Kennung in zwei Teilbögen (anderes Urteil)');
+  fall([t1, t2, {...t3, beurteiler: 'Mensch'}], /nicht in allen Teilbögen gleich/, 'verschiedene Beurteiler'); fall([t1, t2, {...t3, manifestSha256: 'x'}], /gehört nicht zu diesem Paket/, 'Teilbogen eines anderen Pakets');
+  fall([t1, t2, teil([...alle.slice(2 * k, n - 1), {...alle[n - 1], kategorie: 'vielleicht'}])], /Kategorie .* ungültig/, 'ungültiger Teilbogen'); fall([t1, t2, null], /Liste/, 'unlesbarer Teilbogen');
+});
+test('Ablauf „zusammenfuegen“: schreibt nur einen vollständigen Bogen (Exit 0), sonst Exit 1 ohne Datei; der vereinte Bogen besteht „pruefen“', () => {
+  const {a, manifest} = ablaufGrund(), ids = manifest.reihenfolge, mp = path.join(a.aus, 'beurteiler-paket', 'manifest.json'), h = Math.ceil(ids.length / 2);
+  const ta = schreibeBogen(a.aus, 'teil-a.json', manifest, ids.slice(0, h).map(id => antwort(id))), tb = schreibeBogen(a.aus, 'teil-b.json', manifest, ids.slice(h).map(id => antwort(id, 'lebendig')));
+  const pt = lauf(['pruefen', '--bogen', ta, '--manifest', mp, '--teil', 'ja']); pruefeGleich(pt.status, 0, 'Teilbogen gültig: ' + pt.stderr); pruefe(/Teilbogen gültig/.test(pt.stdout), 'Meldung Teilbogen');
+  pruefeGleich(lauf(['pruefen', '--bogen', ta, '--manifest', mp]).status, 1, 'ohne --teil bleibt der Teilbogen ungültig');
+  const halb = path.join(a.aus, 'halb.json'), un = lauf(['zusammenfuegen', '--manifest', mp, '--teil', ta, '--aus', halb]);
+  pruefeGleich(un.status, 1, 'unvollständig: Exit 1'); pruefe(/Kennungen fehlen noch/.test(un.stderr) && !fs.existsSync(halb), 'Meldung und keine Datei');
+  const ganz = path.join(a.aus, 'vereint', 'bogen.json'), ok = lauf(['zusammenfuegen', '--manifest', mp, '--teil', tb, '--teil', ta, '--aus', ganz]);
+  pruefeGleich(ok.status, 0, 'vollständig: ' + ok.stderr); pruefe(new RegExp(`beantwortet ${ids.length} von ${ids.length}`).test(ok.stdout), 'Zahl gemeldet');
+  const b = liesJson(ganz); pruefeGleich(b.antworten.map(x => x.id).join(), ids.join(), 'Reihenfolge des Manifests'); pruefeGleich(b.antworten[0].kategorie, 'tot', 'Urteil aus Teil a'); pruefeGleich(b.antworten[ids.length - 1].kategorie, 'lebendig', 'Urteil aus Teil b');
+  pruefeGleich(lauf(['pruefen', '--bogen', ganz, '--manifest', mp]).status, 0, 'vereinter Bogen besteht pruefen');
+  const doppelt = path.join(a.aus, 'doppelt.json'), dd = lauf(['zusammenfuegen', '--manifest', mp, '--teil', ta, '--teil', tb, '--teil', schreibeBogen(a.aus, 'teil-c.json', manifest, [antwort(ids[0])]), '--aus', doppelt]);
+  pruefeGleich(dd.status, 1, 'doppelte Kennung: Exit 1'); pruefe(/NICHT VEREINT/.test(dd.stderr) && !fs.existsSync(doppelt), 'Meldung und keine Datei');
+});
+test('Probe: Ziehung 0 ist die bisherige Ziehung, eine andere Ziehung wählt deterministisch neu; Workflow reicht Zahl und Ziehung durch', () => {
+  const g = grund(), alt = paket(g, {probe: 3}).p, null_ = paket(g, {probe: 3, ziehung: 0}).p, eins = paket(g, {probe: 6, ziehung: 1}).p, eins2 = paket(g, {probe: 6, ziehung: 1}).p, zwei = paket(g, {probe: 6, ziehung: 2}).p, haupt = paket(g).p;
+  pruefeGleich(null_.manifest.manifestSha256, alt.manifest.manifestSha256, 'Ziehung 0 gleich der Ziehung ohne Angabe'); pruefeGleich(eins.manifest.manifestSha256, eins2.manifest.manifestSha256, 'deterministisch');
+  pruefeGleich(eins.manifest.unterlagen, 6, 'sechs Unterlagen'); pruefe(eins.manifest.reihenfolge.every(i => haupt.manifest.reihenfolge.includes(i)), 'Kennungen wie im Hauptpaket');
+  pruefe(eins.manifest.reihenfolge.join() !== zwei.manifest.reihenfolge.join() && eins.manifest.reihenfolge.slice(0, 3).join() !== alt.manifest.reihenfolge.join(), 'andere Ziehung, andere Auswahl');
+  const y = fs.readFileSync(path.join(wurzel, '.github/workflows/diagonal-pruefung-stufe3.yml'), 'utf8');
+  pruefe(/probe_anzahl:/.test(y) && /probe_ziehung:/.test(y) && /--probe "\$ANZAHL" --probe-ziehung "\$ZIEHUNG"/.test(y), 'Eingaben probe_anzahl und probe_ziehung'); pruefe(/\^\[0-9\]\+\$/.test(y), 'Eingaben als Zahlen geprüft');
+  const falsch = lauf(['unterlagen', '--stufe1', g.s1, '--stufe2', g.s2, '--archiv', g.daten, '--aus', path.join(tmp, 'ziehung-ohne-probe'), '--probe-ziehung', '1']); pruefeGleich(falsch.status, 2, 'Ziehung ohne Probe wird abgelehnt');
+});
+
 /* ── 6 Workflow und Werkzeug ──────────────────────────────────────────── */
 test('Workflow: nur manuell, kein GNU Go, beide ZIPs gegen ihre SHA-256 geprüft, Aufdeckung getrennt hochgeladen', () => {
   const y = fs.readFileSync(path.join(wurzel, '.github/workflows/diagonal-pruefung-stufe3.yml'), 'utf8');

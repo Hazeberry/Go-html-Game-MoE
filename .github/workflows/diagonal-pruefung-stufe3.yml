@@ -5,7 +5,8 @@ name: Diagonalprüfung Stufe 3
 # die Beurteilung macht eine getrennte KI-Sitzung außerhalb dieses Workflows (E-2, §17.5.2), sie bekommt nur das Artefakt „beurteiler-paket“.
 #
 # Modi:
-#   probe       3 Unterlagen (Artefakt „probe-paket“) für die Zeitschätzung an drei Probestücken (§10.4). Die Urteile dazu werden NICHT ausgewertet.
+#   probe       wenige Unterlagen (Artefakt „probe-paket“) für die Zeitschätzung und die Prüfung der Anleitung (§10.4, §18.6). Vorgabe: 3 Unterlagen, Ziehung 0
+#               (die Ziehung der ersten Probe, §18.5). Eine andere `probe_ziehung` zieht unabhängig davon neu. Die Urteile dazu werden NICHT ausgewertet.
 #   unterlagen  das ganze Paket (B1 vollständig, B2 höchstens 60): Artefakt „beurteiler-paket“ (das bekommt der Beurteiler) und Artefakt „stufe3-geheim“
 #               (Zuordnung zu App aus, App an und GNU Go; NICHT an den Beurteiler geben, erst nach allen Urteilen benutzen).
 #   auswerten   prüft den Antwortbogen aus dem Repo (Eingabe `bogen`), deckt auf und berichtet nach §6.4 und §8. Das Paket wird dafür aus denselben Eingaben neu
@@ -20,6 +21,12 @@ on:
         type: choice
         options: [probe, unterlagen, auswerten]
         default: unterlagen
+      probe_anzahl:
+        description: 'Nur probe: Zahl der Unterlagen'
+        default: '3'
+      probe_ziehung:
+        description: 'Nur probe: Nummer der Ziehung (0 = Ziehung der ersten Probe, jede andere Zahl zieht neu)'
+        default: '0'
       bogen:
         description: 'Nur auswerten: Pfad des Antwortbogens im Repo, z. B. docs/daten/diagonal-pruefung/stufe3/bogen-ki.json'
         default: ''
@@ -73,11 +80,16 @@ jobs:
         if: ${{ inputs.modus != 'auswerten' }}
         env:
           MODUS: ${{ inputs.modus }}
+          ANZAHL: ${{ inputs.probe_anzahl }}
+          ZIEHUNG: ${{ inputs.probe_ziehung }}
         run: |
           set -uo pipefail
           status=0
           probe=()
-          [ "$MODUS" = "probe" ] && probe=(--probe 3)
+          if [ "$MODUS" = "probe" ]; then
+            [[ "$ANZAHL" =~ ^[0-9]+$ ]] && [ "$ANZAHL" -ge 1 ] && [[ "$ZIEHUNG" =~ ^[0-9]+$ ]] || { echo "probe_anzahl (ab 1) und probe_ziehung (ab 0) müssen ganze Zahlen sein: $ANZAHL, $ZIEHUNG" >&2; exit 2; }
+            probe=(--probe "$ANZAHL" --probe-ziehung "$ZIEHUNG")
+          fi
           node auswertung/endspiel/diagonal-pruefung-stufe3.js unterlagen --stufe1 stufe1 --stufe2 stufe2 --archiv docs/daten --aus ergebnis "${probe[@]}" || status=$?
           if [ "$status" -eq 0 ]; then
             if [ "$MODUS" = "probe" ]; then cat ergebnis/probe-paket/manifest.json | head -5 >> "$GITHUB_STEP_SUMMARY"; else cat ergebnis/beurteiler-paket/manifest.json | head -5 >> "$GITHUB_STEP_SUMMARY"; fi
