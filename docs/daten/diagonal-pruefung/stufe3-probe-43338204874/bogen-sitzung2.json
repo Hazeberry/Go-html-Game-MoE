@@ -1,0 +1,29 @@
+{
+ "manifestSha256": "37b3a59aceb45f5ad4535d8aa7407eaae6b7ad563785a1944e03093f1118bdf0",
+ "beurteiler": "KI",
+ "antworten": [
+  {
+   "id": "U-6d01cf",
+   "kategorie": "ko_zugabhaengig",
+   "urteilSchwarzAmZug": "tot",
+   "urteilWeissAmZug": "lebendig",
+   "begruendung": "H6 (Freiheiten G6, H7) gehört zu einer eingeschlossenen weißen Gruppe aus der 12er-Kette A1…E6/F4 (nur 2 Freiheiten: F5, F6), der Kette F7-G7-G8-G9-H8 (F6, G6, H7), G5 (F5, G6) und J7 (H7, K7). Der Augenraum besteht aus F5, F6, G6, H7; entscheidender Punkt ist F6. Weiß am Zug (so steht es in der Unterlage; der Ko-Punkt A3 spielt dafür keine Rolle): Weiß F6 verbindet beide großen Ketten. Danach sind F5, G6 und H7 für Schwarz nicht spielbar (Selbstmord). Schwarz kann nur K7 spielen (Atari auf J7); Weiß verbindet auf H7 und hat zwei echte Augen auf F5 und G6 (G5 grenzt an beide und ist nicht schlagbar). H6 ist dann Teil der lebenden Gruppe. Schwarz am Zug (hypothetisch): Schwarz F6 setzt die 12er-Kette ins Atari (nur noch F5). Weiß G6 scheitert an Schwarz F5 (schlägt 12 Steine, Rest mit einer Freiheit H7), Weiß F5 scheitert an Schwarz G6 (schlägt 14). Einzige Verteidigung ist Weiß A3 (schlägt A2, gewinnt die Freiheit A2). Darauf Schwarz F5 (Atari), Weiß G6 schlägt zwei Steine (erzwungen, füllt aber das eigene Auge G6), Schwarz A2 nimmt das Ko zurück, Weiß F6, Schwarz A3 verbindet. Weiß hat dann nur das Auge F5; H7 ist unecht, weil J7 nach Schwarz K7 nur durch Selbstatari auf H7 zu retten ist. Schwarz K7, H7 (schlägt J7) und F5 fangen alles einschließlich H6.",
+   "sicherheit": "eher_sicher",
+   "offen": "Das Urteil bei Weiß am Zug habe ich vollständig gelesen (alle schwarzen Antworten auf F6 sind illegal oder führen zu zwei Augen). Bei Schwarz am Zug hängt die Tötung an zwei Kos (A2/A3 und H7/J7): Weiß hat im A3-Ko Drohungen gegen die schwarze Gruppe C1-D1-D2-E2-F2-F3 / G4-H5-H4-H3-H2 (z. B. G1, G2), die Schwarz beantworten muss. Ich halte diese Gruppe für lebensfähig (G2/G3 und E1/F1 als Augenraum) und die weißen Drohungen für endlich, habe den Ko-Kampf samt Drohungen auf dem ganzen Brett aber nicht zu Ende gezählt. Superko habe ich nicht gegen die Zuggeschichte geprüft."
+  },
+  {
+   "id": "U-f56b4d",
+   "kategorie": "tot",
+   "begruendung": "Die Kette hat genau zwei Freiheiten: H3 und H1. H3 ist ein echtes Auge (alle vier Nachbarn G3, J3, H4, H2 gehören zur Kette). H1 ist kein Auge: Der schwarze Stein J1 hat nur die Freiheit H1. Weiß H1 schlägt J1 und setzt die Kette ins Atari (nur noch H3); danach schlägt Weiß H3 alle 10 Steine. Schwarz darf J1 wegen Ko nicht sofort zurückschlagen, H3 ist Selbstmord, und Verbinden auf H1 (vorbeugend) ist Selbstatari: Weiß H3 schlägt dann 12 Steine. Schwarz kann das Ko nie selbst beenden, weil dafür die weißen Steine K1/J2 fallen müssten. Deren Kette (22 Steine) hat die Freiheiten L1 und L5, und beide sind für Schwarz Selbstmord (L5 ist zugleich die letzte Freiheit der schwarzen Kette L6-M2…N4). Auch die linke weiße Gruppe (F1, F3, F4 …) ist nicht fangbar: Augen B5 und A9. Schwarz bräuchte also bei jedem Durchgang eine neue Ko-Drohung, Weiß keine einzige. Die Kette fällt auch, wenn Schwarz zuerst zieht.",
+   "sicherheit": "eher_sicher",
+   "offen": "Formal läuft die Gefangennahme über ein Ko (H1/J1). Ich werte es als einseitig, weil nur Weiß es beenden kann, habe aber nicht gezählt, wie viele Ko-Drohungen Schwarz auf dem übrigen Brett hat; mit einer genügend großen Drohung bekäme Schwarz Ausgleich anderswo, die Kette selbst rettet das nicht dauerhaft. Superko habe ich nicht gegen die Zuggeschichte geprüft."
+  },
+  {
+   "id": "U-8300dc",
+   "kategorie": "tot",
+   "begruendung": "Die Kette hat genau zwei Freiheiten: H18 und J19. H18 ist ein echtes Auge (G18, H19, H17, J18 gehören alle zur Kette). J19 ist kein Auge: Der schwarze Stein K19 hat nur die Freiheit J19. Weiß J19 schlägt K19 und setzt die Kette ins Atari (nur noch H18); danach schlägt Weiß H18 alle 10 Steine. Schwarz darf K19 wegen Ko nicht sofort zurückschlagen, H18 ist Selbstmord, und Verbinden auf J19 ist Selbstatari (Weiß H18 schlägt dann 12 Steine). Um das Ko zu beenden, müsste Schwarz die weiße Kette H16…K18-M18 fangen. Sie hat die Freiheiten L18 und M19, beide für Schwarz Selbstmord. Der Umweg Schwarz O19 (Atari auf N19) scheitert: Weiß O18 schlägt O19 samt N17/N18; und ignoriert Weiß O19 und spielt J19, hat die weiße Kette danach die neue Freiheit K19, sodass Schwarz M19 kein Atari mehr ist und Weiß H18 trotzdem schlägt. Die weiße Eckgruppe (A16…F19) hat zwar keine Außenfreiheiten und nur den Sechser-Augenraum A18-C19, aber Schwarz fehlt die Zeit: Weiß braucht nur J19 und H18, und nach dem Schlagen bekommt die Eckgruppe Außenfreiheiten. Die Kette fällt auch, wenn Schwarz zuerst zieht.",
+   "sicherheit": "eher_sicher",
+   "offen": "Formal läuft die Gefangennahme über ein Ko (J19/K19), das nur Weiß beenden kann. Nicht gezählt habe ich die schwarzen Ko-Drohungen auf dem übrigen Brett; die lokalen Drohungen (O19, Züge im Eck-Augenraum A18-C19) verfallen, sobald Weiß die Kette schlägt. Ob Schwarz nach dem Schlagen im frei gewordenen Raum noch etwas anstellen kann, habe ich nicht ausgelesen, es ändert aber nichts am Schicksal der markierten Steine. Superko habe ich nicht gegen die Zuggeschichte geprüft."
+  }
+ ]
+}

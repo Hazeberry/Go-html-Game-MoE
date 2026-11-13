@@ -1,0 +1,17 @@
+{
+ "manifestSha256": "37b3a59aceb45f5ad4535d8aa7407eaae6b7ad563785a1944e03093f1118bdf0",
+ "beurteiler": "KI",
+ "messung": "Wanduhrzeit zwischen Start- und Endstempel je Unterlage, inklusive Nachspielen der Zugfolgen per Skript",
+ "zeiten": {
+  "U-6d01cf": {
+   "sekunden": 422
+  },
+  "U-f56b4d": {
+   "sekunden": 98
+  },
+  "U-8300dc": {
+   "sekunden": 126
+  }
+ },
+ "summeSekunden": 646
+}
