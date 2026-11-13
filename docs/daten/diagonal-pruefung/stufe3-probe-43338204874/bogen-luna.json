@@ -1,0 +1,9 @@
+{
+  "manifestSha256": "37b3a59aceb45f5ad4535d8aa7407eaae6b7ad563785a1944e03093f1118bdf0",
+  "beurteiler": "Luna",
+  "antworten": [
+    {"id": "U-6d01cf", "kategorie": "nicht_entscheidbar", "sicherheit": "unsicher", "begruendung": "Nach Schwarz F6, Weiß H7, Schwarz K7 und Weiß G6 schlägt Schwarz F5 die markierte Kette. Nach Schwarz F6, Weiß G6 und Schwarz K7 schlägt Weiß F5 dagegen den schwarzen Stein auf F6. Die weiße Kette hat danach F6 und H7 als Freiheiten.", "offen": "Ob Weiß H6 nach Schwarz F6 gegen bestes Spiel halten kann, bleibt offen. Die geprüften Folgen decken die Alternativen nicht vollständig ab."},
+    {"id": "U-f56b4d", "kategorie": "ko_zugabhaengig", "urteilSchwarzAmZug": "nicht_entscheidbar", "urteilWeissAmZug": "nicht_entscheidbar", "sicherheit": "eher_sicher", "begruendung": "Weiß H1 schlägt J1. Der sofortige Rückschlag auf J1 stellt die vorige Brettstellung wieder her und ist verboten. Spielt Schwarz zuerst H1 oder H3, schlägt Weiß die markierte Kette auf dem jeweils anderen Punkt.", "offen": "Die Ko-Drohungen auf dem gesamten Brett und damit der Ausgang bei beiden Zugrechten bleiben offen."},
+    {"id": "U-8300dc", "kategorie": "ko_zugabhaengig", "urteilSchwarzAmZug": "nicht_entscheidbar", "urteilWeissAmZug": "nicht_entscheidbar", "sicherheit": "eher_sicher", "begruendung": "Weiß J19 schlägt K19. Der sofortige Rückschlag auf K19 stellt die vorige Brettstellung wieder her und ist verboten. Spielt Schwarz zuerst J19 oder H18, schlägt Weiß die markierte Kette auf dem jeweils anderen Punkt.", "offen": "Die Ko-Drohungen auf dem gesamten Brett und damit der Ausgang bei beiden Zugrechten bleiben offen."}
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "manifestSha256": "37b3a59aceb45f5ad4535d8aa7407eaae6b7ad563785a1944e03093f1118bdf0",
+  "beurteiler": "KI",
+  "antworten": [
+    {
+      "id": "U-6d01cf",
+      "kategorie": "nicht_entscheidbar",
+      "sicherheit": "unsicher",
+      "begruendung": "H6 hat G6 und H7 als Freiheiten. Weiß F6 verbindet die Ketten um E6 und G7. Auf Schwarz K7 folgt Weiß H7, das H6 anschließt. F5 und G6 sind dann für Schwarz gesperrt, da beide Punkte an den weißen Einzelstein G5 und an die verbundene weiße Kette grenzen und ein schwarzer Einwurf keine dieser Ketten schlägt. Schwarz G6 als Erstzug lässt sich durch Weiß F6 schlagen. Der im SGF verzeichnete unmittelbare Ko-Punkt A3 liegt abseits.",
+      "offen": "Nach Schwarz F6 als Erstzug führen Weiß G6 und Weiß H7 in unterschiedliche Freiheitskämpfe um F5, G6 und K7. Ob Weiß H6 in dieser Variante gegen bestes Spiel halten kann, bleibt offen.",
+      "dauerSekunden": 60.2
+    },
+    {
+      "id": "U-f56b4d",
+      "kategorie": "ko_zugabhaengig",
+      "urteilSchwarzAmZug": "nicht_entscheidbar",
+      "urteilWeissAmZug": "nicht_entscheidbar",
+      "sicherheit": "eher_sicher",
+      "begruendung": "H3 ist ein echtes Auge. H1 ist ein falsches Randauge, weil der schwarze Stein J1 nur H1 als Freiheit hat. Weiß H1 schlägt J1 und droht, die markierte Kette auf H3 zu schlagen. Schwarz J1 würde die Stellung unmittelbar wiederholen und ist als sofortiger Ko-Rückschlag verboten. Besetzt Schwarz zuerst H1, schlägt Weiß auf H3. Besetzt Schwarz zuerst H3, schlägt Weiß auf H1.",
+      "offen": "Der Ausgang des Kos H1/J1 bei bestem Spiel auf dem ganzen Brett bleibt für beide Zugrechte offen. Dazu müssten die verfügbaren Ko-Drohungen und ihre Folgen für die Flächenwertung bewertet werden.",
+      "dauerSekunden": 29.4
+    },
+    {
+      "id": "U-8300dc",
+      "kategorie": "ko_zugabhaengig",
+      "urteilSchwarzAmZug": "nicht_entscheidbar",
+      "urteilWeissAmZug": "nicht_entscheidbar",
+      "sicherheit": "eher_sicher",
+      "begruendung": "H18 ist ein echtes Auge. J19 ist ein falsches Randauge, weil K19 nur J19 als Freiheit hat. Weiß J19 schlägt K19, lässt der markierten Kette nur H18 und droht dort zu schlagen. Der unmittelbare schwarze Rückschlag auf K19 würde die Ausgangsstellung wiederholen. Schwarz kann das Ko durch Füllen eines Augenpunkts nicht verhindern und zugleich überleben. Nach Schwarz J19 fängt Weiß auf H18, nach Schwarz H18 auf J19.",
+      "offen": "Ob Schwarz das Ko J19/K19 bei einem der beiden Zugrechte halten kann, hängt von den Drohungen auf dem ganzen Brett ab. Deren Ausgang bleibt offen.",
+      "dauerSekunden": 25.8
+    }
+  ]
+}
