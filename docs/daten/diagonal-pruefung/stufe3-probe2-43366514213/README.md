@@ -14,17 +14,18 @@ Artefakt des [Actions-Laufs 43366514213](https://github.com/Hazeberry/Go-html-Ga
 
 | Datei | Herkunft | Zeit |
 |---|---|---|
-| `bogen-sitzung3.json` | frische KI-Sitzung, die die erste Probe nicht gesehen hat; Modell nicht angegeben (nicht GLM, siehe unten). Hilfsmittel laut Bogen: Textanzeige, Zeitmessung, Schemaprüfung, keine Go-Software | im Bogen (`dauerSekunden`, gemessen mit `time.monotonic()`, nur Lesen und Urteilen): 24,8 / 17,0 / 44,6 / 24,7 / 18,2 / 39,3 s |
+| `bogen-sitzung3.json` | frische KI-Sitzung „Astra“ (nach Angabe von Hazeberry), die die erste Probe nicht gesehen hat. **Von Hazeberry nicht als gültig gewertet:** rund 4 Minuten Wanduhrzeit für alle sechs Unterlagen, drei Aufgaben nicht wirklich untersucht. Hilfsmittel laut Bogen: Textanzeige, Zeitmessung, Schemaprüfung, keine Go-Software | im Bogen (`dauerSekunden`, gemessen mit `time.monotonic()`, nur Lesen und Urteilen): 24,8 / 17,0 / 44,6 / 24,7 / 18,2 / 39,3 s |
 
-| `bogen-sitzung4.json` | weitere frische KI-Sitzung mit GLM (laut Hazeberry), nur das Probe-Paket und der Auftrag. Hilfsmittel laut Bogen: eigenes Python-Skript zum Nachspielen, Freiheitenzählen und Durchspielen selbst gewählter Zugfolgen, keine Suche, keine Go-Software | im Bogen (`dauerSekunden`, Unix-Uhr je Unterlage): 1065 / 361 / 947 / 325 / 586 / 176 s |
+| `bogen-sitzung4.json` | weitere frische KI-Sitzung mit GLM 5.3 auf Einstellung Max (laut Hazeberry), nur das Probe-Paket und der Auftrag; von Hazeberry als gültig gewertet. Wanduhrzeit rund 2 Stunden (Hazeberry; der Zähler stand im letzten Screenshot bei 92 min, rund 355.000 Token). Hilfsmittel laut Bogen: eigenes Python-Skript zum Nachspielen, Freiheitenzählen und Durchspielen selbst gewählter Zugfolgen, keine Suche, keine Go-Software | im Bogen (`dauerSekunden`, Unix-Uhr je Unterlage): 1065 / 361 / 947 / 325 / 586 / 176 s |
+| `bogen-sitzung5.json` | Claude Sonnet 5.5, Einstellung Mittel (laut Dateiname und Hazeberry), nur das Probe-Paket und der Auftrag. Hilfsmittel laut Bogen: eigenes Skript zum Nachspielen, Brettanzeige, Freiheitenzählen und Legalitätsprüfung, keine Go-Software, keine Suche, kein Internet | im Bogen (`dauerSekunden`, Wanduhr im Container, einschließlich Nachdenken und teils Wartezeit auf Rückfragen): 513 / 68 / 55 / 93 / 319 s, für U-f4bb91 keine brauchbare Zeit (Messung enthielt eine lange Pause) |
 
-`bogen-sitzung3.json` ist die von Hazeberry hochgeladene Datei, unverändert. `bogen-sitzung4.json` ist aus dem Chat-Verlauf gespeichert, den Hazeberry hochgeladen hat (Inhalt unverändert, Formatierung neu); der ganze Verlauf liegt als `protokoll-sitzung4.txt` bei.
+`bogen-sitzung3.json` ist die von Hazeberry hochgeladene Datei, unverändert. `bogen-sitzung5.json` ist die von Hazeberry hochgeladene Datei (Inhalt unverändert, Formatierung neu); `protokoll-sitzung5.txt` ist der Begleittext, den Hazeberry dazu kopiert hat. `bogen-sitzung4.json` ist aus dem Chat-Verlauf gespeichert, den Hazeberry hochgeladen hat (Inhalt unverändert, Formatierung neu); der ganze Verlauf liegt als `protokoll-sitzung4.txt` bei.
 
-**Korrektur (14.11.2026):** In der ersten Fassung dieser Datei und in §18.7 stand, `bogen-sitzung3.json` stamme „laut Dateiname“ von GLM 5.3. Der Dateiname gehörte zum hochgeladenen Probe-Paket, nicht zum Bogen. Nach Angabe von Hazeberry ist `bogen-sitzung4.json` die GLM-Probe; das Modell von Sitzung 3 ist nicht angegeben.
+**Korrektur (14.11.2026):** In der ersten Fassung dieser Datei und in §18.7 stand, `bogen-sitzung3.json` stamme „laut Dateiname“ von GLM 5.3. Der Dateiname gehörte zum hochgeladenen Probe-Paket, nicht zum Bogen. Nach Angabe von Hazeberry ist `bogen-sitzung4.json` die GLM-Probe und `bogen-sitzung3.json` die von Astra (14.11.2026).
 
 ## Bei der Sicherung geprüft
 
-- `node auswertung/endspiel/diagonal-pruefung-stufe3.js pruefen --bogen … --manifest manifest.json` (Manifest aus dem ZIP): Exit 0 für `bogen-sitzung3.json` und `bogen-sitzung4.json`.
+- `node auswertung/endspiel/diagonal-pruefung-stufe3.js pruefen --bogen … --manifest manifest.json` (Manifest aus dem ZIP): Exit 0 für `bogen-sitzung3.json`, `bogen-sitzung4.json` und `bogen-sitzung5.json`.
 - Prüfsummen aller Paketdateien gleich dem Manifest; `unzip -t` fehlerfrei.
 - Nicht geprüft: die fachliche Richtigkeit irgendeines Urteils.
 

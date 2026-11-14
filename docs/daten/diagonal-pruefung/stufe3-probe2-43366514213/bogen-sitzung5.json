@@ -1,0 +1,54 @@
+{
+ "manifestSha256": "a6a4c945de8800744423ed9733c9aa2b1d77332e306e5d9fd61b2fe102849fce",
+ "beurteiler": "KI",
+ "hilfsmittel": "eigenes Skript zum Nachspielen der SGF, Brettanzeige, Freiheitenzählen und Legalitätsprüfung von mir gewählter Zugfolgen; keine Go-Software, keine automatische Suche, kein Internet. Zeit je Unterlage mit der Uhr im Container (Wanduhr) gemessen.",
+ "antworten": [
+  {
+   "id": "U-2173a8",
+   "kategorie": "lebendig",
+   "sicherheit": "eher_sicher",
+   "dauerSekunden": 513.2,
+   "begruendung": "Schwarz A5 gehört zu der linken Gruppe um B6/C5/B4/D6-D7/C8. Mit Schwarz am Zug schlägt B2 den Stein B3 (Atari über B2) und macht A4, B3 und B5 zu Augenpunkten, die Weiß nicht betreten kann. Mit Weiß am Zug ist A4 (schlägt A3) der stärkste Versuch; Schwarz muss B5 verbinden. Danach reicht der Augenraum A6-A8/B7/B8/C6/C7: Gegen B8 antwortet B7, gegen C9 (Atari auf C8) C7 und gegen A8 A7. Das ergibt Augen auf A6 und C6. Gegen B7 spielt Schwarz C7 und kann die eingedrungenen Steine über A8/B9 fangen. Gegen A7 spielt Schwarz B9 oder A6.",
+   "offen": "Nicht jede Variante des Weiß-Einbruchs oben links (B9/B10/A9 mit Ko-ähnlichen Folgen um A7/A8) bis zum Ende gelesen. Eine Linie (A7, A6, B9) blieb nicht ganz geklärt."
+  },
+  {
+   "id": "U-15d04c",
+   "kategorie": "lebendig",
+   "sicherheit": "eher_sicher",
+   "dauerSekunden": 68.4,
+   "begruendung": "Die weiße Kette P5 N4 O4 P4 (Freiheiten M4, N5, O5, P6) liegt in einem großen weißen Gebiet. P6 verbindet sie mit Q6, einer Kette mit sieben Freiheiten. Dazu kommen die Verbindungen M4/N5 zum Stein M5 und weiter zur K-Kette. Auch wenn Schwarz zuerst P6 besetzt, verbindet Weiß über N5 und L5 oder fängt den Schwarzstein. Die große Gruppe hat innen reichlich Augenraum (M8/M9 und L3-P7).",
+   "offen": "Das Leben der großen weißen Gesamtgruppe habe ich nicht in jeder Einbruchsvariante von Schwarz ausgelesen. Der enge Augenraum M8/M9 und der große Innenraum sprechen klar dafür."
+  },
+  {
+   "id": "U-351c82",
+   "kategorie": "ko_zugabhaengig",
+   "urteilSchwarzAmZug": "tot",
+   "urteilWeissAmZug": "lebendig",
+   "sicherheit": "sicher",
+   "dauerSekunden": 54.7,
+   "begruendung": "Weißes S19 und T18 hängen mit der Kette Q17 R17 S17 R18 an S18. Diese Kette hat nur die Freiheit S18, und R19 ist ein Schwarzstein im Atari (Freiheit Q19). Schwarz am Zug spielt S18 und fängt die vier Steine; S19 und T18 haben danach nur noch T19, T19 ist für Weiß Selbstmord, S19 ist tot. Weiß am Zug schlägt zuerst Q19xR19 und erzeugt ein Ko um R19. Schwarz darf R19 nicht sofort zurücknehmen. S18 und T19 sind für Schwarz verboten (Selbstmord). Weiß verbindet danach R19, die Gruppe behält die Augen S18 und T19 und bleibt stehen. Das Skript hat beide Folgen bestätigt."
+  },
+  {
+   "id": "U-49f79f",
+   "kategorie": "lebendig",
+   "sicherheit": "eher_sicher",
+   "dauerSekunden": 93.3,
+   "begruendung": "Die weiße Kette O3 N2 O2 verbindet sich über P3 oder P2 mit der Kette P4 Q4 Q3 Q2 R2. Schwarz kann nicht beide Punkte besetzen: Schwarz P3 wird durch P2 geschlagen, Schwarz P2 durch P3 oder P1 beantwortet. Die Gesamtgruppe hat viel Augenraum (P3/P2, Reihe 1, R3/R4/S4). R3/R4/S4 ist ein Krummdrei, und Weiß R4 ergibt dort zwei Augen, bei Schwarz R4 entsteht ein Auge. Schwarz kann nicht alle Bereiche zugleich angreifen.",
+   "offen": "Nicht jede Einbruchsvariante in Reihe 1 (N1-R1) und gegen die rechten Randsteine bis zum Ende gelesen."
+  },
+  {
+   "id": "U-dea5f6",
+   "kategorie": "tot",
+   "sicherheit": "unsicher",
+   "dauerSekunden": 319.3,
+   "begruendung": "Die schwarzen Steine B2-B4 stehen auf der zweiten Linie, Augenraum nur A2-A4 (gerade Drei) und wenig Platz. Mit Weiß am Zug (B5 oder B1) sehe ich kein Doppelauge: Nach B5 (Weiß) kann Schwarz oben nicht erweitern, nach B1 scheitert die Erweiterung B5/B6 an A4/A1. Mit Schwarz am Zug versagen B5 (Weiß B1, danach B6, Weiß A4) und B1 (Weiß B5, danach A2 als Vitalpunkt) in meiner Lesung. Das spricht für tot bei beiden Zugrechten.",
+   "offen": "Schwarz am Zug ist nicht abgeschlossen gelesen. Opferlinien um A1/A2/B1/C1 (Schwarz A1 gegen Weiß B1, Schwarz C1) führen zu Ko-ähnlichen Folgen, die ich nicht ausgelesen habe. Ist Schwarz zuerst am Zug lebendig, wäre ko_zugabhaengig (Schwarz lebendig, Weiß tot) richtig."
+  },
+  {
+   "id": "U-f4bb91",
+   "kategorie": "lebendig",
+   "sicherheit": "sicher",
+   "begruendung": "Die Kette hat die Freiheiten Q13, S11, T12. Auge 1 ist die Zweier-Lücke P14/Q13, umgeben von P13, Q14, P15, O14, Q12, R13. Weiß kann dort nicht spielen (Selbstmord). Auge 2 entsteht, wenn Schwarz T13 den weißen Stein S13 schlägt (S13 hat nur T13). Weiß T13 scheitert an Schwarz T12 und T15, das T14 und T16 schlägt. Weiß S11, T12 oder R16 ändern nichts: Schwarz T13 schlägt, S13 wird Auge, und S13 ist für Weiß Selbstmord. T14 schlägt Schwarz mit T15 (fängt auch T16). Mit Schwarz am Zug lebt die Kette ohnehin."
+  }
+ ]
+}
