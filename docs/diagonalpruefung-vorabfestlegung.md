@@ -729,7 +729,7 @@ Hazeberry hat die offenen Entscheidungen aus §18.5 Nr. 5 abgegeben („mach du 
 Lauf `43366514213` (`main` bei `e2a5d11`, Modus `probe`, 6 Unterlagen, Ziehung 1, Go von Hazeberry). Rohdaten: `docs/daten/diagonal-pruefung/stufe3-probe2-43366514213/`. **Die Urteile sind nicht ausgewertet, die Aufdeckung ist nicht geöffnet, und dieser Abschnitt erteilt kein Go für das Paket.**
 
 1. **Paket:** sechs Unterlagen, alle aus B1 (Ausgabe des Laufs: „B1 6, B2 0“), alle Art V. Keine hat einen Ko-Punkt.
-2. **Bogen formal gültig:** Eine frische KI-Sitzung (laut Dateiname GLM 5.3) hat einen Bogen abgegeben, der `pruefen` gegen das Probe-Manifest besteht. Sie nennt ihre Hilfsmittel wie verlangt und keine Go-Software.
+2. **Bogen formal gültig:** Eine frische KI-Sitzung (Modell nicht angegeben; die erste Fassung nannte hier fälschlich GLM 5.3, siehe §18.8) hat einen Bogen abgegeben, der `pruefen` gegen das Probe-Manifest besteht. Sie nennt ihre Hilfsmittel wie verlangt und keine Go-Software.
 3. **Was die Anleitung erreicht hat:** Kein Eintrag `ko_zugabhaengig`. Bei U-351c82 nennt die Begründung ein Ko, das der verteidigenden Seite nicht hilft, und trägt nach der Annahme „keine Drohungen von außen“ direkt `tot` ein (§18.6 Nr. 3). Die Ko-Regel wurde also so angewendet, wie sie gemeint ist; eine Stichprobe von einem Fall.
 4. **Was sie nicht erreicht hat:** Drei der sechs Antworten sind `nicht_entscheidbar` und `unsicher`, die übrigen drei `eher_sicher`, keine `sicher`. Die Begründungen der drei nicht entschiedenen Fälle sagen selbst, dass der Kampf nicht zu Ende gelesen wurde; die Lesezeiten liegen bei 18 bis 39 Sekunden. §18.6 Nr. 4 verlangt das Lesen bis zum Ergebnis ohne Zeitvorgabe. Die Anleitung allein hat das nicht bewirkt.
 5. **Zeit:** gemessen 17,0 bis 44,6 s je Unterlage, Mittel 28,1 s, nur Lesen und Urteilen. Hochgerechnet auf 416 Unterlagen rund 3,3 h (mit der Spanne der Einzelwerte 2,0 bis 5,2 h). Sechs Fälle, alle V; die Zahl gilt nur für diese Lesetiefe und ist nicht belastbar.
@@ -739,7 +739,7 @@ Lauf `43366514213` (`main` bei `e2a5d11`, Modus `probe`, 6 Unterlagen, Ziehung 1
 
 ### 18.8 Zweite Probe, zweiter Bogen (14.11.2026)
 
-Eine weitere frische KI-Sitzung hat dasselbe Probe-Paket (Lauf `43366514213`) mit demselben Auftrag beurteilt (`bogen-sitzung4.json`, Verlauf in `protokoll-sitzung4.txt`). **Nicht ausgewertet, Aufdeckung nicht geöffnet, kein Go.** Ob ein Urteil richtig ist, ist nicht geprüft; die Sitzung, die diesen Abschnitt schreibt, beurteilt die Stellungen nicht.
+Eine weitere frische KI-Sitzung (nach Angabe von Hazeberry GLM; **Korrektur:** §18.7 Nr. 2 schrieb GLM zuerst fälschlich Sitzung 3 zu, nach dem Dateinamen des hochgeladenen Pakets) hat dasselbe Probe-Paket (Lauf `43366514213`) mit demselben Auftrag beurteilt (`bogen-sitzung4.json`, Verlauf in `protokoll-sitzung4.txt`). **Nicht ausgewertet, Aufdeckung nicht geöffnet, kein Go.** Ob ein Urteil richtig ist, ist nicht geprüft; die Sitzung, die diesen Abschnitt schreibt, beurteilt die Stellungen nicht.
 
 1. **Formal gültig:** `pruefen` gegen das Probe-Manifest Exit 0. Hilfsmittel nach §18.6 Nr. 5 (eigenes Skript zum Nachspielen und Durchspielen gewählter Zugfolgen, keine Suche, keine Go-Software); das Skript hat nach dem Verlauf alle sechs Bretter aus dem SGF richtig nachgespielt.
 2. **Lesetiefe:** Diese Sitzung hat die Kämpfe ausgelesen: vier Urteile `sicher`, zwei `eher_sicher`, kein `nicht_entscheidbar`. Damit ist belegt, dass die Anleitung tiefes Lesen zulässt; dass sie es erzwingt, ist nicht belegt (Sitzung 3, §18.7, las flach).
