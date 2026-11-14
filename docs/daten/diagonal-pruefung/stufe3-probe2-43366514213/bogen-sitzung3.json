@@ -1,0 +1,55 @@
+{
+  "manifestSha256": "a6a4c945de8800744423ed9733c9aa2b1d77332e306e5d9fd61b2fe102849fce",
+  "beurteiler": "KI",
+  "hilfsmittel": "Textanzeige der bereitgestellten Markdown-/SGF-Unterlagen; eigene Python-Aufrufe mit time.monotonic() zur Messung der jeweiligen Lese- und Beurteilungsphase (ohne anschließende JSON-Ausformulierung und Dateiverwaltung); JSON-Schemaprüfung. Keine Go-Software, keine automatische Zug- oder Ergebnissuche, keine externen Quellen, keine weiteren Beurteiler.",
+  "antworten": [
+    {
+      "id": "U-2173a8",
+      "kategorie": "nicht_entscheidbar",
+      "sicherheit": "unsicher",
+      "begruendung": "A5 hat die Freiheiten A4, B5 und A6 und noch kein Auge. B5 verbindet mit B4, B6 und C5; A6 verbindet mit B6. Weiß kann mit A4 den Stein A3 schlagen, fängt damit aber A5 nicht. Für beide Zugrechte hängt das Ergebnis vom weiteren Kampf links der weißen Steine D9 bis D12 sowie von den Verbindungen über C6 und D5 ab. Eine erzwungene Gefangennahme oder zwei gesicherte Augen habe ich nicht zu Ende gelesen.",
+      "offen": "Offen bleiben die Angriffsvarianten gegen die Verbindungen bei B5, A6, C6 und D5 und die Augenbildung der dadurch entstehenden größeren schwarzen Gruppe; deshalb für beide Zugrechte kein belastbares Endurteil.",
+      "dauerSekunden": 24.83
+    },
+    {
+      "id": "U-15d04c",
+      "kategorie": "lebendig",
+      "sicherheit": "eher_sicher",
+      "begruendung": "Die markierte weiße Kette hat die Freiheiten P6, O5, N5 und M4. N5 und M4 sind alternative Verbindungen zum weißen Stein M5; P6 verbindet unmittelbar mit Q6 und der weißen Kette über Q7 und Q8. Im von Weiß umgebenen Raum zwischen L4 und P7 liegt erheblicher Raum zur Augenbildung. Ich halte die Kette sowohl bei Schwarz als auch bei Weiß am Zug für lebensfähig: Ein einzelner schwarzer Schnitt nimmt nicht gleichzeitig die Verbindung zu M5 und den Anschluss bei P6.",
+      "offen": "Die vollständige Abwehr schwarzer Einbrüche in den Augenraum L4 bis P7 und sämtliche Fortsetzungen nach einem Schnitt bei P6 sind nicht bis zu zwei endgültig gesicherten Augen gelesen.",
+      "dauerSekunden": 16.98
+    },
+    {
+      "id": "U-351c82",
+      "kategorie": "tot",
+      "sicherheit": "eher_sicher",
+      "begruendung": "S19 hat nur S18 und T19 als Freiheiten. Die weiße Kette Q17–S17 mit R18 steht auf S18 im Atari. Weiß Q19 schlägt zwar R19 und erzeugt ein Ko, rettet die Kette aber nach meiner Lesung nicht: Nach Weiß Q19, Schwarz S18, Weiß R19 schlägt Schwarz T19 die verbundenen weißen Steine; nach Weiß Q19, Schwarz S18, Weiß T19 schlägt Schwarz R19. Weiß S18 oder T19 unmittelbar wird durch Besetzen der jeweils anderen Freiheit widerlegt. Bei Schwarz am Zug folgt Schwarz S18; auf Weiß Q19 kann Schwarz T19, Weiß R19, Schwarz R18 die markierte Kette fangen. Das Ko bei Q19/R19 bietet Weiß somit keine dauerhafte Rettung; ohne äußere Ko-Drohungen beurteile ich beide Zugrechte als tot.",
+      "offen": "Die angegebenen Hauptvarianten sind gelesen; nicht jede abweichende lokale Zwischenzugfolge und jeder mögliche Angriff auf die umschließende schwarze Gruppe wurde vollständig ausgeschlossen.",
+      "dauerSekunden": 44.635
+    },
+    {
+      "id": "U-49f79f",
+      "kategorie": "lebendig",
+      "sicherheit": "eher_sicher",
+      "begruendung": "Die markierte Kette hat die Freiheiten P3, P2, N1 und O1. P3 und P2 sind alternative unmittelbare Anschlüsse an die zusammenhängenden weißen Steine Q3 und Q2: Nach Schwarz P3 verbindet Weiß P2, nach Schwarz P2 verbindet Weiß P3. Weiß am Zug kann sofort einen dieser Anschlüsse wählen. Der angeschlossenen Gruppe stehen der untere Rand von N1 bis R1 sowie der Raum rechts von Q3 und Q4 zur Augenbildung offen. Daher halte ich die markierte Kette bei beiden Zugrechten für lebendig.",
+      "offen": "Die Lebensfähigkeit der gesamten angeschlossenen weißen Gruppe ist nicht in allen Varianten bewiesen; insbesondere die Fortsetzungen des schwarzen Steins S2 und Einbrüche bei R3/R4 sowie am unteren Rand sind nicht vollständig ausgelesen.",
+      "dauerSekunden": 24.747
+    },
+    {
+      "id": "U-dea5f6",
+      "kategorie": "nicht_entscheidbar",
+      "sicherheit": "unsicher",
+      "begruendung": "B4–B2 hat die sechs Freiheiten A4, C4, B5, A3, A2 und B1, aber noch keine zwei echten Augen. Schwarz kann über B5 in den Raum A5–C6 oder über B1 zum unteren Rand erweitern. Die weißen Steine C2/C3 und D4/D5 begrenzen die Kette rechts, B7/C7 begrenzen den oberen Ausweg. Die bloße Zahl der Freiheiten beweist weder Leben noch Tod. Für keines der beiden Zugrechte habe ich Augenbildung beziehungsweise Gefangennahme erzwungen zu Ende gelesen.",
+      "offen": "Offen bleibt, ob Weiß mit Reduktionen bei B5, A4 und C4 die Augenbildung verhindern kann und ob Schwarz über B1 am unteren Rand sicher zwei Augen erhält. Auch der mögliche Anschluss in Richtung D6 ist nicht abschließend geklärt.",
+      "dauerSekunden": 18.173
+    },
+    {
+      "id": "U-f4bb91",
+      "kategorie": "nicht_entscheidbar",
+      "sicherheit": "unsicher",
+      "begruendung": "Die markierte schwarze Kette hat zunächst nur Q13, S11 und T12 als Freiheiten. Schwarz Q13 verbindet mit P13 und Q14; über P14 ist anschließend ein Anschluss an die schwarzen Steine O14 und P15 möglich. Das beweist noch kein Leben, da auch deren Augenraum bei O15 und N16/O16 untersucht werden muss. Rechts steht Weiß S13 auf T13 im Atari; die Folgen von T13, T12 und T14 beeinflussen den Anschluss an Schwarz S14/S15. Weiß Q13 kann den direkten oberen Anschluss zunächst unterbrechen. Ich kann die entstehenden Kämpfe für beide Zugrechte nicht zuverlässig bis zu Leben oder Gefangennahme lesen.",
+      "offen": "Offen bleiben die Lebensfähigkeit der über Q13/P14 erreichbaren schwarzen Gruppe und die vollständigen Fang- und Verbindungsfolgen am rechten Rand um S13, T13, T12 und T14. Daher ist auch ein Unterschied zwischen den beiden Zugrechten nicht nachgewiesen.",
+      "dauerSekunden": 39.312
+    }
+  ]
+}
