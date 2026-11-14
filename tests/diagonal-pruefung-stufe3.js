@@ -74,6 +74,7 @@ function baueGrund(betroffenS = 658, betroffenV = 1060) {
     const z = jeId.get(s.id), dead = i % 3 === 0 ? z.an.tot : i % 3 === 1 ? z.aus.tot : [];
     return {id: s.id, art: s.art, gruppe: s.gruppe, quelle: s.quelle, nr: s.nr, index: s.index, kategorie: 'betroffen', status: 'gueltig', appTot: {aus: z.aus.tot, an: z.an.tot}, gnu: {dead}};
   });
+  const kontrollZeilen = stellungen.filter(s => !betroffen.includes(s)).map(s => { const z = jeId.get(s.id); return {id: s.id, art: s.art, gruppe: s.gruppe, quelle: s.quelle, nr: s.nr, index: s.index, kategorie: 'kontrolle', status: 'gueltig', appTot: {aus: z.aus.tot, an: z.an.tot}, gnu: {dead: z.aus.tot}}; });
   const nutz = zeilen.map(z => ({id: z.id, art: z.art, brett: stellungen.find(s => s.id === z.id).brett, appTotAus: z.appTot.aus, appTotAn: z.appTot.an, gnuDead: z.gnu.dead}));
   const auswahl = S2.waehleKetten(nutz, 1);
   const s2 = path.join(verz, 'stufe2'); for (const d of ['bericht', 'eingabe/plan', 'teile']) fs.mkdirSync(path.join(s2, d), {recursive: true});
@@ -81,8 +82,8 @@ function baueGrund(betroffenS = 658, betroffenV = 1060) {
   fs.writeFileSync(path.join(s2, 'bericht', 'bericht.json'), JSON.stringify(bericht(betroffenS, betroffenV)));
   fs.writeFileSync(path.join(s2, 'bericht', 'auswahl-stufe3.json'), JSON.stringify(auswahl));
   fs.writeFileSync(path.join(s2, 'eingabe', 'plan', 'plan.json'), JSON.stringify({basis: 1}));
-  schreibeJsonl(path.join(s2, 'teile', 'teil-1.jsonl'), [{kopf: {teil: 1}}, ...zeilen]);
-  return {verz, daten: path.join(verz, 'daten'), s1, s2, stellungen, auswahl, nutz, zeilen, bericht};
+  schreibeJsonl(path.join(s2, 'teile', 'teil-1.jsonl'), [{kopf: {teil: 1}}, ...zeilen, ...kontrollZeilen]);
+  return {verz, daten: path.join(verz, 'daten'), s1, s2, stellungen, auswahl, nutz, zeilen, kontrollZeilen, bericht};
 }
 let GR = null;
 const grund = () => GR || (GR = baueGrund());
@@ -388,6 +389,8 @@ const KO_FOLGE = ['C4', 'E5', 'D5', 'E3', 'D3', 'F4', 'pass', 'D4', 'E4'];   /* 
 const legal = (st, farbe, n) => { const r = []; for (let i = 0; i < 361 && r.length < n; i++) if (!st.brett[i] && S3.spieleVariante(E, st, farbe, [L.zuGtp(i)]) === null) r.push(L.zuGtp(i)); return r; };
 /* n verschiedene mögliche Zugfolgen je Zugrecht (ein Zug, dann Pass); bei n = 1: [0] Schwarz beginnt, [1] Weiß beginnt */
 const zf = (st, n = 1) => [...legal(st, 1, n).map(z => ({beginnt: 'Schwarz', zuege: [z, 'pass'], ergebnis: 'Nichts ändert sich an der Kette.'})), ...legal(st, 2, n).map(z => ({beginnt: 'Weiß', zuege: [z, 'pass'], ergebnis: 'Nichts ändert sich an der Kette.'}))];
+const KS = {lebend: 3, tot: 1};   /* Kontrollketten in der kleinen Attrappe; die Festlegung (12 und 4) prüft ein eigener Test */
+const paketS = (g = grund()) => paket(g, {art: 'S', kontrollen: KS});
 const antwortV2 = (id, st, kat = 'tot', extra = {}) => antwort(id, kat, {dauerSekunden: 300, varianten: zf(st), ...extra});
 test('SGF der Unterlage: folgeAusSgf liest zurück, was sgfVon schreibt (mit Pässen)', () => {
   const f = folgeVon(['D4', 'Q16', 'pass', 'C3', 'T19', 'A1', 'pass', 'pass']);
@@ -408,11 +411,21 @@ test('spieleVariante: Ko-Verbot nur am Anfang und nur für die Seite am Zug, bes
   pruefeGleich(S3.spieleVariante(E, st, 1, ['pass', 'pass']), null, 'Pässe sind möglich');
 });
 test('S-Paket: nur S-Ketten, Fassung 2, dieselben Kennungen in derselben Reihenfolge wie im Gesamtpaket; das alte Paket bleibt Fassung 1', () => {
-  const ganz = paket().p, s = paket(grund(), {art: 'S'}).p, ids = s.manifest.reihenfolge;
+  const ganz = paket().p, s = paketS().p, alle = s.manifest.reihenfolge, ids = alle.filter(id => s.aufdeckung[id].menge !== 'K'), kid = alle.filter(id => s.aufdeckung[id].menge === 'K');
   pruefe(ids.length > 0, 'S-Ketten vorhanden: ' + ids.length);
   pruefe(Object.values(s.aufdeckung).every(k => k.art === 'S'), 'alle Ketten Art S');
   pruefeGleich(ids.length, Object.values(ganz.aufdeckung).filter(k => k.art === 'S').length, 'alle S-Ketten des Gesamtpakets');
-  pruefeGleich(ids.join(), ganz.manifest.reihenfolge.filter(id => ganz.aufdeckung[id].art === 'S').join(), 'Kennungen und Reihenfolge wie im Gesamtpaket');
+  pruefeGleich(ids.join(), ganz.manifest.reihenfolge.filter(id => ganz.aufdeckung[id].art === 'S').join(), 'Kennungen und Reihenfolge der geprüften Ketten wie im Gesamtpaket');
+  /* Kontrollketten: Zahl wie verlangt, App und GNU Go einig, je Stellung eine, keine Stellung der geprüften Ketten, nicht größer als die größte geprüfte Kette, im Paket nicht erkennbar */
+  const K = kid.map(id => s.aufdeckung[id]), gepr = ids.map(id => s.aufdeckung[id]);
+  pruefeGleich(K.filter(k => k.gnu === 'lebend').length, KS.lebend, 'Kontrollketten lebend'); pruefeGleich(K.filter(k => k.gnu === 'tot').length, KS.tot, 'Kontrollketten tot'); pruefeGleich(s.anzahlK, KS.lebend + KS.tot, 'anzahlK');
+  pruefe(K.every(k => k.appAus === k.gnu && k.appAn === k.gnu && k.gnu !== 'gemischt'), 'App aus, App an und GNU Go einig'); pruefeGleich(new Set(K.map(k => k.stellung)).size, K.length, 'je Stellung eine Kontrollkette');
+  pruefe(K.every(k => !gepr.some(x => x.stellung === k.stellung)), 'keine Stellung der geprüften Ketten'); pruefe(K.every(k => k.steine <= Math.max(...gepr.map(x => x.steine))), 'nicht größer als die größte geprüfte Kette');
+  pruefe(!/kontroll/i.test(JSON.stringify(s.dateien)) && !/"menge"/.test(JSON.stringify(s.dateien)), 'Paketdateien nennen keine Kontrolle'); pruefe(!('kontrollen' in s.manifest), 'Manifest nennt keine Kontrolle');
+  pruefe(kid.some(id => alle.indexOf(id) < alle.indexOf(ids[ids.length - 1])), 'Kontrollketten stehen zwischen den geprüften, nicht am Ende');
+  pruefeGleich(paketS().p.manifest.manifestSha256, s.manifest.manifestSha256, 'deterministisch');
+  let knapp = null; try { paket(grund(), {art: 'S', kontrollen: {lebend: 500, tot: 0}}); } catch (e) { knapp = e.message; } pruefe(/Kontrollketten: nur \d+ von 500/.test(knapp || ''), 'zu wenige Kandidaten: Fehler statt kleinerem Paket');
+  pruefeGleich(JSON.stringify(S3.K_SOLL), JSON.stringify({lebend: 12, tot: 4}), 'Festlegung: 12 lebend, 4 tot'); pruefeGleich(S3.K_ABWEICHUNG_MAX, 1, 'Festlegung: höchstens eine Abweichung');
   pruefeGleich(s.manifest.version, 2, 'Version 2'); pruefeGleich(s.manifest.art, 'S', 'Art im Manifest');
   pruefeGleich(s.dateien['anleitung-beurteiler.md'], S3.ANLEITUNG_V2, 'Anleitung Fassung 2'); pruefeGleich(JSON.parse(s.dateien['bogen-schema.json']).title, 'Antwortbogen (Fassung 2)', 'Schema Fassung 2');
   pruefe(JSON.parse(s.dateien['bogen-vorlage.json']).antworten.every(a => Array.isArray(a.varianten) && 'dauerSekunden' in a), 'Vorlage mit varianten und dauerSekunden');
@@ -429,8 +442,26 @@ test('Anleitung Fassung 2: Zugfolgen Pflicht, nicht_entscheidbar ist keine Abkü
   for (const kopf of ['## Zugrecht', '## Ko', '## Lesetiefe', '## Hilfsmittel', '## Arbeiten in Etappen']) pruefe(a.includes('\n' + kopf + '\n'), 'Abschnitt ' + kopf);
   pruefeGleich(S3.VARIANTEN_MIN, 1, 'Mindestzahl je Zugrecht'); pruefeGleich(S3.VARIANTEN_MIN_OFFEN, 3, 'Mindestzahl je Zugrecht bei offen');
 });
+test('Kontrollketten wählen: nur S-Kontrollstellungen, App und GNU Go einig, Größe begrenzt, je Stellung eine, Hälfte Einzelsteine', () => {
+  const brett = punkte => { const b = Array(361).fill('.'); for (const [i, f] of punkte) b[i] = f; return b.join(''); };
+  /* je Stellung: Einzelstein Schwarz auf 0, Dreierkette Weiß auf 40..42, Einzelstein Weiß auf 200 */
+  const std = brett([[0, 'X'], [40, 'O'], [41, 'O'], [42, 'O'], [200, 'O']]);
+  const zeile = (id, extra = {}) => ({id, art: 'S', kategorie: 'kontrolle', status: 'gueltig', appTot: {aus: [], an: []}, gnu: {dead: []}, ...extra});
+  const ein = z => ({plan: {basis: 1}, zeilen: z, pro: new Map(z.map(x => [x.id, {brett: std}]))});
+  const wahl = (z, soll, max = 27) => S3.waehleKontrollen(ein(z), soll, max);
+  const sechs = ['a', 'b', 'c', 'd', 'e', 'f'].map(id => zeile(id)), w = wahl(sechs, {lebend: 4, tot: 0});
+  pruefeGleich(w.length, 4, 'vier gewählt'); pruefeGleich(new Set(w.map(k => k.stellung)).size, 4, 'vier verschiedene Stellungen'); pruefeGleich(w.filter(k => k.steine === 1).length, 2, 'Hälfte Einzelsteine'); pruefeGleich(w.filter(k => k.steine === 3).length, 2, 'Hälfte größere');
+  pruefe(w.every(k => k.menge === 'K' && k.appAus === 'lebend' && k.appAn === 'lebend' && k.gnu === 'lebend' && k.art === 'S'), 'Felder'); pruefeGleich(JSON.stringify(wahl(sechs, {lebend: 4, tot: 0})), JSON.stringify(w), 'deterministisch');
+  pruefe(wahl(sechs, {lebend: 4, tot: 0}, 2).every(k => k.steine === 1), 'Größe begrenzt: die Dreierkette fällt weg, Einzelsteine füllen auf');
+  /* GNU Go sieht den Einzelstein auf 0 anders als die App: er kommt nicht vor; ebenso eine teils tote Kette */
+  const uneinig = sechs.map(z => ({...z, gnu: {dead: [0, 40]}})), wu = wahl(uneinig, {lebend: 4, tot: 0});
+  pruefe(wu.every(k => k.punkte.join() === 'L9'), 'nur die Kette, bei der alle einig sind: ' + [...new Set(wu.map(k => k.punkte.join()))].join(' '));
+  const tot = sechs.map(z => ({...z, appTot: {aus: [200], an: [200]}, gnu: {dead: [200]}})), wt = wahl(tot, {lebend: 2, tot: 2});
+  pruefeGleich(wt.filter(k => k.gnu === 'tot').length, 2, 'zwei tote'); pruefe(wt.filter(k => k.gnu === 'tot').every(k => k.punkte.join() === 'L9'), 'die toten sind die als tot geführten'); pruefeGleich(new Set(wt.map(k => k.stellung)).size, 4, 'tot und lebend aus verschiedenen Stellungen');
+  for (const [name, z] of [['betroffen', {kategorie: 'betroffen'}], ['Art V', {art: 'V'}], ['Ausfall', {status: 'ausfall'}]]) { let f = null; try { wahl(sechs.map(x => ({...x, ...z})), {lebend: 1, tot: 0}); } catch (e) { f = e.message; } pruefe(/nur 0 von 1/.test(f || ''), `${name}: keine Kandidaten`); }
+});
 test('Fassung 2 prüfen: Zugfolgen je Zugrecht, mögliche Züge, mehr Zugfolgen bei nicht_entscheidbar und unsicher, Zeit Pflicht', () => {
-  const {p} = paket(grund(), {art: 'S'}), m = p.manifest, ids = m.reihenfolge, stellungen = S3.stellungenAusDateien(E, p.dateien, ids), opt = {stellungen, E};
+  const {p} = paketS(), m = p.manifest, ids = m.reihenfolge, stellungen = S3.stellungenAusDateien(E, p.dateien, ids), opt = {stellungen, E};
   const bogen = aend => { const b = ALT(p, ids.map(id => antwortV2(id, stellungen[id]))); if (aend) aend(b.antworten[0], b); return S3.pruefeBogen(b, m, opt); };
   pruefeGleich(bogen().join(' | '), '', 'gültig mit je einer Zugfolge');
   const st = stellungen[ids[0]], besetzt = L.zuGtp([...st.brett.keys()].find(i => st.brett[i])), frei = L.zuGtp([...st.brett.keys()].find(i => !st.brett[i] && S3.spieleVariante(E, st, 1, [L.zuGtp(i)]) === null));
@@ -453,35 +484,52 @@ test('Fassung 2 prüfen: Zugfolgen je Zugrecht, mögliche Züge, mehr Zugfolgen 
   if (ids.length > 1) { const t3 = ALT(p, ids.slice(h).map(id => antwortV2(id, stellungen[id], 'tot', {varianten: [zf(stellungen[id])[0]]}))); pruefe(S3.fuegeZusammen([{name: 'a', bogen: t1}, {name: 'b', bogen: t3}], m, opt).fehler.some(x => /zu wenige/.test(x)), 'Teilbogen wird mit Zugfolgen geprüft'); }
 });
 test('Ablauf S: Paket „beurteiler-paket-S“ und „aufdeckung-S.json“; pruefen spielt die Zugfolgen aus den SGF nach; auswerten nimmt genau einen Bogen', () => {
-  const g = grund(), aus = fs.mkdtempSync(path.join(tmp, 's-')), r = lauf(['unterlagen', '--stufe1', g.s1, '--stufe2', g.s2, '--archiv', g.daten, '--aus', aus, '--art', 'S']);
-  pruefeGleich(r.status, 0, 'unterlagen --art S: ' + r.stderr); pruefe(/Paket S: /.test(r.stdout), 'Meldung');
+  const g = grund(), aus = fs.mkdtempSync(path.join(tmp, 's-')), r = lauf(['unterlagen', '--stufe1', g.s1, '--stufe2', g.s2, '--archiv', g.daten, '--aus', aus, '--art', 'S', '--kontrollen', '3,1']);
+  pruefeGleich(r.status, 0, 'unterlagen --art S: ' + r.stderr); pruefe(/Paket S: .*Kontrolle 4\)/.test(r.stdout), 'Meldung');
   const pv = path.join(aus, 'beurteiler-paket-S'), mp = path.join(pv, 'manifest.json'), m = liesJson(mp), aufd = liesJson(path.join(aus, 'geheim', 'aufdeckung-S.json'));
   pruefe(!fs.existsSync(path.join(aus, 'beurteiler-paket')), 'kein Gesamtpaket geschrieben'); pruefeGleich(Object.keys(aufd).join(), m.reihenfolge.join(), 'Aufdeckung passt zum Paket');
   const sts = Object.fromEntries(m.reihenfolge.map(id => [id, S3.stellungAusSgf(E, fs.readFileSync(path.join(pv, 'unterlagen', id + '.sgf'), 'utf8'))])), st = sts[m.reihenfolge[0]], besetzt = L.zuGtp([...st.brett.keys()].find(i => st.brett[i]));
-  const gut = schreibeBogen(aus, 'gut.json', m, m.reihenfolge.map(id => antwortV2(id, sts[id]))), schlecht = schreibeBogen(aus, 'schlecht.json', m, m.reihenfolge.map((id, k) => antwortV2(id, sts[id], 'tot', k ? {} : {varianten: [{beginnt: 'Schwarz', zuege: [besetzt], ergebnis: 'Der Zug ist nicht möglich.'}, zf(sts[id])[1]]})));
+  const richtig = id => (aufd[id].menge === 'K' ? wertVon(aufd[id].gnu) : 'tot');
+  const gut = schreibeBogen(aus, 'gut.json', m, m.reihenfolge.map(id => antwortV2(id, sts[id], richtig(id)))), schlecht = schreibeBogen(aus, 'schlecht.json', m, m.reihenfolge.map((id, k) => antwortV2(id, sts[id], richtig(id), k ? {} : {varianten: [{beginnt: 'Schwarz', zuege: [besetzt], ergebnis: 'Der Zug ist nicht möglich.'}, zf(sts[id])[1]]})));
   pruefeGleich(lauf(['pruefen', '--bogen', gut, '--manifest', mp]).status, 0, 'gültiger Bogen');
   const rs = lauf(['pruefen', '--bogen', schlecht, '--manifest', mp]); pruefeGleich(rs.status, 1, 'unmöglicher Zug: Exit 1'); pruefe(/Punkt besetzt/.test(rs.stderr + rs.stdout), 'Grund genannt');
   const sgf = path.join(pv, 'unterlagen', m.reihenfolge[0] + '.sgf'), orig = fs.readFileSync(sgf, 'utf8');
   fs.writeFileSync(sgf, orig.replace(';B[', ';W[')); const rt = lauf(['pruefen', '--bogen', gut, '--manifest', mp]); fs.writeFileSync(sgf, orig);
   pruefe(rt.status !== 0 && /Prüfsumme passt nicht/.test(rt.stderr + rt.stdout), 'veränderte SGF wird erkannt');
-  const args = ['auswerten', '--stufe1', g.s1, '--stufe2', g.s2, '--archiv', g.daten, '--art', 'S'];
+  const args = ['auswerten', '--stufe1', g.s1, '--stufe2', g.s2, '--archiv', g.daten, '--art', 'S', '--kontrollen', '3,1'];
   const zwei = lauf([...args, '--aus', path.join(aus, 'a2'), '--bogen', 'KI=' + gut, '--bogen', 'K2=' + gut]); pruefeGleich(zwei.status, 1, 'zwei Bögen: Exit 1'); pruefe(/genau ein Bogen/.test(zwei.stderr), 'Grund genannt');
   const eins = lauf([...args, '--aus', path.join(aus, 'a1'), '--bogen', 'KI=' + gut]); pruefeGleich(eins.status, 0, 'ein Bogen: ' + eins.stderr);
   const j = liesJson(path.join(aus, 'a1', 'bericht-stufe3.json')); pruefe(/Schlusszählung/.test(j.bedingungen.find(b => b.nr === 3).text), 'Bedingung 3 nennt die Schlusszählung');
   pruefeGleich(lauf([...args, '--aus', path.join(aus, 'a3'), '--bogen', 'KI=' + schlecht]).status, 1, 'auswerten prüft die Zugfolgen ebenfalls');
+  /* Kontrollketten: Bericht nennt sie; andere Zahlen als die Festlegung erfüllen Bedingung 1 nie; ein Bogen, der überall „tot“ sagt, ergibt kein Urteil */
+  pruefeGleich(j.kontrolle.n, 4, 'vier Kontrollketten im Bericht'); pruefeGleich(j.kontrolle.abweichend.length, 0, 'keine Abweichung'); pruefeGleich(j.bedingungen.find(b => b.nr === 1).erfuellt, false, 'Bedingung 1 nicht erfüllt bei 3 und 1 statt 12 und 4');
+  pruefe(j.befund !== 'positive Kandidatur', 'keine positive Kandidatur mit abweichender Kontrollzahl'); pruefe(/## Kontrollketten/.test(fs.readFileSync(path.join(aus, 'a1', 'bericht-stufe3.md'), 'utf8')), 'Abschnitt im Bericht');
+  pruefe(liesJson(path.join(aus, 'a1', 'bericht-stufe3.json')).uebersicht.gesamt['R+'] + j.uebersicht.gesamt['R-'] + j.uebersicht.gesamt['gleich-richtig'] + j.uebersicht.gesamt['gleich-falsch'] + j.uebersicht.gesamt.ungeklaert === m.reihenfolge.length - 4, 'Kontrollketten zählen nicht in der Übersicht');
+  const allesTot = schreibeBogen(aus, 'allestot.json', m, m.reihenfolge.map(id => antwortV2(id, sts[id], 'tot'))), rk = lauf([...args, '--aus', path.join(aus, 'a4'), '--bogen', 'KI=' + allesTot]);
+  pruefeGleich(rk.status, 1, 'überall „tot“: Exit 1'); pruefe(/KEIN URTEIL: Kontrollketten: 3 Kontrollketten weichen/.test(rk.stderr), 'Grund: ' + rk.stderr.slice(0, 120));
+  const mdk = fs.readFileSync(path.join(aus, 'a4', 'bericht-stufe3.md'), 'utf8'); pruefe(/UNGÜLTIG, KEIN URTEIL/.test(mdk) && !/R\+/.test(mdk) && !fs.existsSync(path.join(aus, 'a4', 'bericht-stufe3.json')), 'ungültiger Bericht zeigt weder R+ noch R−');
+  const ohne = lauf(['unterlagen', '--stufe1', g.s1, '--stufe2', g.s2, '--archiv', g.daten, '--aus', path.join(aus, 'x'), '--kontrollen', '3,1']); pruefeGleich(ohne.status, 2, '--kontrollen ohne --art S wird abgelehnt');
 });
 test('Auswertung S: Mindestumfang nur für S, R− nur in S; ohne Art wie bisher', () => {
-  const mit = (S, V, art) => { const aufd = {}, ant = []; for (let i = 0; i < 5; i++) { const id = `U-${String(i).padStart(6, '0')}`; aufd[id] = {schluessel: `s${i}|A1`, stellung: `s${i}`, partie: `P${i % 3}`, gruppe: 'g', art: 'S', menge: 'B2', klasse: 'behoben', richtung: 'GNU tot', zelle: 'z', farbe: 'X', steine: 1, punkte: ['A1'], appAus: 'lebend', appAn: 'tot', gnu: 'tot'}; ant.push({id, kategorie: 'tot', begruendung: 'x'.repeat(30), sicherheit: 'sicher'}); }
+  const mit = (S, V, art, kAbw = 0, kOffen = 0, kLebend = 12) => { const aufd = {}, ant = [];
+    if (art) for (let i = 0; i < kLebend + 4; i++) { const id = `U-k${String(i).padStart(5, '0')}`, ref = i < kLebend ? 'lebend' : 'tot'; aufd[id] = {schluessel: `k${i}|A1`, stellung: `k${i}`, partie: `K${i}`, gruppe: 'g', art: 'S', menge: 'K', farbe: 'X', steine: 1, punkte: ['A1'], appAus: ref, appAn: ref, gnu: ref};
+      ant.push({id, kategorie: i < kAbw ? 'tot' : i < kAbw + kOffen ? 'nicht_entscheidbar' : wertVon(ref), begruendung: 'x'.repeat(30), sicherheit: 'sicher'}); }
+    for (let i = 0; i < 5; i++) { const id = `U-${String(i).padStart(6, '0')}`; aufd[id] = {schluessel: `s${i}|A1`, stellung: `s${i}`, partie: `P${i % 3}`, gruppe: 'g', art: 'S', menge: 'B2', klasse: 'behoben', richtung: 'GNU tot', zelle: 'z', farbe: 'X', steine: 1, punkte: ['A1'], appAus: 'lebend', appAn: 'tot', gnu: 'tot'}; ant.push({id, kategorie: 'tot', begruendung: 'x'.repeat(30), sicherheit: 'sicher'}); }
     const ein = {bericht2: {plan: {zahlen: {betroffen: {S, V}}}, ausfaelle: []}, s1bericht: {wirkung: {S: {flaeche: {stand: {n: S, aendert: S, siegerwechsel: 1, median: 0}}, territory: {stand: {n: S, aendert: S, siegerwechsel: 1, median: 0}}}}}};
     return S3.auswertung(aufd, {KI: ant}, ein, art ? {art} : {}); };
   pruefeGleich(mit(658, 0, 'S').mindestumfang.erfuellt, true, 'S 658, V 0, Art S: erreicht'); pruefeGleich(mit(658, 0, 'S').befund, 'positive Kandidatur', 'Art S: 5 R+ aus 3 Partien genügen');
-  pruefeGleich(mit(658, 0).mindestumfang.erfuellt, false, 'ohne Art verlangt auch V'); pruefeGleich(mit(29, 0, 'S').mindestumfang.erfuellt, false, 'S 29 reicht auch bei Art S nicht');
+  pruefeGleich(mit(658, 0).mindestumfang.erfuellt, false, 'ohne Art verlangt auch V'); pruefeGleich(mit(658, 0).kontrolle, null, 'ohne Art keine Kontrollprüfung');
+  const k0 = mit(658, 0, 'S'); pruefeGleich(k0.kontrolle.gueltig, true, 'alle Kontrollen wie Referenz: gültig'); pruefeGleich(k0.rPlus, 5, 'Kontrollketten zählen nicht als R+'); pruefeGleich(k0.proKette.length, 5, 'Kontrollketten nicht unter den geprüften');
+  pruefeGleich(mit(658, 0, 'S', 1).kontrolle.gueltig, true, 'eine Abweichung: gültig'); pruefeGleich(mit(658, 0, 'S', 1).befund, 'positive Kandidatur', 'eine Abweichung verhindert die Kandidatur nicht');
+  const k2 = mit(658, 0, 'S', 2); pruefeGleich(k2.kontrolle.gueltig, false, 'zwei Abweichungen: ungültig'); pruefe(/2 Kontrollketten weichen/.test(k2.kontrolle.gruende[0]), 'Grund genannt');
+  pruefeGleich(mit(658, 0, 'S', 0, 4).kontrolle.gueltig, true, '12 von 16 zählend: gültig'); const k5 = mit(658, 0, 'S', 0, 5); pruefeGleich(k5.kontrolle.gueltig, false, '11 von 16 zählend: ungültig'); pruefe(/nur 11 von 16/.test(k5.kontrolle.gruende[0]), 'Grund genannt');
+  const k11 = mit(658, 0, 'S', 0, 0, 11); pruefeGleich(k11.bedingungen.find(b => b.nr === 1).erfuellt, false, '11 statt 12 lebende Kontrollketten: Bedingung 1 nicht erfüllt'); pruefeGleich(k11.befund, 'keine positive Kandidatur', 'dann keine positive Kandidatur'); pruefeGleich(mit(29, 0, 'S').mindestumfang.erfuellt, false, 'S 29 reicht auch bei Art S nicht');
 });
 test('Workflow: Eingabe art (alle oder S) wird geprüft und an unterlagen und auswerten weitergegeben; eigene Artefakte für S', () => {
   const y = fs.readFileSync(path.join(wurzel, '.github/workflows/diagonal-pruefung-stufe3.yml'), 'utf8');
   pruefe(/\n      art:\n/.test(y) && /options: \[alle, S\]/.test(y), 'Eingabe art');
   pruefeGleich((y.match(/"\$\{art\[@\]\}"/g) || []).length, 2, 'art an unterlagen und auswerten');
-  pruefe(/name: beurteiler-paket-S/.test(y) && /name: stufe3-geheim-S/.test(y), 'eigene Artefakte für S');
+  pruefe(/name: beurteiler-paket-S/.test(y) && /name: stufe3-geheim-S/.test(y), 'eigene Artefakte für S'); pruefe(!/--kontrollen/.test(y), 'der Workflow ändert die Zahl der Kontrollketten nicht');
   pruefe(y.split('\n').some(z => /\[ "\$MODUS" = "probe" \] && \[ "\$ART" = "S" \]/.test(z) && /zusammen sind nicht vorgesehen/.test(z) && /exit 2/.test(z)), 'probe und art S zusammen werden abgelehnt (Exit 2)');
 });
 

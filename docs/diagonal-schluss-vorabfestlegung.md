@@ -48,7 +48,7 @@ In der Schlusszählung zeigt Schicht A (Übereinstimmung mit GNU Go, alt §17.6;
 
 ### 4.1 Umfang
 
-23 Ketten aus 22 Stellungen und 22 Partien (aus `auswahl-stufe3.json` des gültigen Stufe-2-Laufs, ohne Urteile):
+23 geprüfte Ketten aus 22 Stellungen und 22 Partien (aus `auswahl-stufe3.json` des gültigen Stufe-2-Laufs, ohne Urteile); dazu kommen 16 Kontrollketten (§4.4a), das Paket hat also 39 Unterlagen:
 
 | Menge | Zelle | Ketten |
 |---|---|---:|
@@ -77,7 +77,7 @@ Was Fassung 2 anders macht:
 
 **Grenzen, offen benannt:** Das Werkzeug prüft, ob eine Zugfolge möglich ist, nicht, ob sie gut gewählt ist. Ein beliebiger möglicher Zug mit anschließendem Pass besteht die Prüfung. Die Pflicht macht das Weglassen sichtbar und die Lesung nachlesbar; erzwingen kann sie gründliches Lesen nicht. Dass eine Sitzung mit Fassung 2 so liest wie GLM 5.3 auf Max in der zweiten Probe, ist eine Hypothese; sie ist nicht in einer Probe geprüft.
 
-Tests: `tests/diagonal-pruefung-stufe3.js` (33 Fälle, acht davon neu für Fassung 2 und S), unter anderem Rundweg der SGF, Ko-Verbot am Anfang und im Verlauf, besetzter Punkt, Selbstmord, ungültige Koordinaten, Mindestzahlen 1 und 3, nur Pässe, doppelte Zugfolgen, veränderte SGF wird erkannt, Teilbögen werden mit Zugfolgen geprüft. Mutationsprobe bestanden für: Ko nicht durchgesetzt, drei Zugfolgen bei offen fehlen, Pass-Folgen erlaubt, Doppelte zählen mehrfach, kein S-Filter, mehrere Bögen erlaubt, Mindestumfang verlangt V auch bei S, SGF-Prüfsumme ungeprüft.
+Tests: `tests/diagonal-pruefung-stufe3.js` (34 Fälle, neun davon neu für Fassung 2, S und die Kontrollketten), unter anderem Rundweg der SGF, Ko-Verbot am Anfang und im Verlauf, besetzter Punkt, Selbstmord, ungültige Koordinaten, Mindestzahlen 1 und 3, nur Pässe, doppelte Zugfolgen, veränderte SGF wird erkannt, Teilbögen werden mit Zugfolgen geprüft. Mutationsprobe bestanden für: Ko nicht durchgesetzt, drei Zugfolgen bei offen fehlen, Pass-Folgen erlaubt, Doppelte zählen mehrfach, kein S-Filter, mehrere Bögen erlaubt, Mindestumfang verlangt V auch bei S, SGF-Prüfsumme ungeprüft; für die Kontrollketten: Kontrollen zählen mit, Abweichungen ohne Folge, nicht zählende ohne Folge, GNU Go muss nicht übereinstimmen, mehrere je Stellung, Kontrollzahl egal, ungültige Kontrolle wird trotzdem ausgewertet, Größe unbegrenzt, auch betroffene Stellungen.
 
 ### 4.3 Beurteiler (Setzungen und offene Entscheidungen)
 
@@ -91,7 +91,7 @@ Tests: `tests/diagonal-pruefung-stufe3.js` (33 Fälle, acht davon neu für Fassu
 
 Ein Befund „positive Kandidatur“ verlangt alle Bedingungen:
 
-1. Pflichtprüfungen bestanden (Eingaben gegen ihre Prüfsummen, Bogen gültig nach Fassung 2, genau ein Bogen).
+1. Pflichtprüfungen bestanden (Eingaben gegen ihre Prüfsummen, Bogen gültig nach Fassung 2, genau ein Bogen, Kontrollketten wie festgelegt: 12 lebend und 4 tot, und nach §4.4a gültig).
 2. **Bestätigter Nutzen:** mindestens 5 R+ aus mindestens 3 verschiedenen Partien (alt §10.5, unverändert). Möglich sind höchstens 19 R+ aus 19 Partien (die behobenen Ketten).
 3. **R− = 0 in der Schlusszählung**, konservativ gezählt (ein entschiedenes, nicht unsicheres Urteil gleich „aus“ genügt).
 4. **Beide B1-Fälle entschieden** (kein ungeklärter B1-Fall) und keine Ausfälle in betroffenen Stellungen (Stufe 2: 0).
@@ -101,19 +101,25 @@ Ein Befund „positive Kandidatur“ verlangt alle Bedingungen:
 
 Die Zahlen 5, 3 und 30 sind Setzungen ohne Sicherheitswert. Eine positive Kandidatur heißt nur: In dieser Prüfmenge wurde nichts Gegenteiliges gefunden. Sie ist kein Go.
 
-### 4.4a Schwäche der Regel: Schieflage der 23 Ketten (Entscheidung offen, E-S5)
+### 4.4a Schwäche der Regel: Schieflage der 23 Ketten, und Kontrollketten dagegen (E-S5)
 
 Die Regel prüft den Beurteiler fast nur in eine Richtung. Von den 21 Ketten, bei denen der Schalter etwas ändert, ist bei 20 „tot“ die Antwort zugunsten des Schalters: 18 behobene Ketten (GNU Go: tot) und die beiden B1-Ketten (alt §17.6: alle sieben neu abweichenden S-Steine sind „zusätzlich tot“). Nur bei einer Kette (behoben, GNU Go: lebend) führt „tot“ zu R−. Ein Beurteiler, der zu „tot“ neigt, erfüllt Bedingung 2 und 3 also fast von selbst, und ob er auch lebende Ketten als lebend erkennt, zeigt das Paket nur an dieser einen Kette und an den zwei unveränderten. Das ist keine Aussage über die Urteile, die noch niemand abgegeben hat, sondern über die Trennschärfe der Regel.
 
-**Vorschlag (nicht umgesetzt):** Kontrollketten beimischen, bei denen App (aus und an gleich) und GNU Go übereinstimmen, überwiegend „lebend“, gezogen per Hash aus den 200 S-Kontrollstellungen der Stufe 2, für den Beurteiler nicht erkennbar. Vorab festgelegte Folge: Weicht der Bogen bei mehr als einer vorab festgelegten Zahl von Kontrollketten mit einem entschiedenen, nicht unsicheren Urteil von der gemeinsamen Referenz ab, heißt das Ergebnis „kein Urteil“. Die gemeinsame Referenz ist keine Ground Truth; einzelne Abweichungen werden deshalb berichtet und nicht als Fehler gewertet. Kosten: mehr Unterlagen (bei 16 Kontrollketten 39 statt 23, also grob 10 bis 13 statt 6 bis 8 Stunden, Hypothese), neue Auswahl im Werkzeug mit Tests. **Ohne diese Entscheidung sollte das Paket nicht gebaut werden**, weil sie seine Zusammensetzung ändert.
+**Entschieden (Go von Hazeberry, 14.11.2026) und umgesetzt: Kontrollketten.** Dem S-Paket werden 16 Kontrollketten beigemischt, für den Beurteiler nicht erkennbar (weder Anleitung noch Manifest noch Unterlagen nennen sie; die Zuordnung steht nur in der Aufdeckung).
+
+- **Herkunft:** die gültigen S-Kontrollstellungen der Stufe 2 (200 Stellungen, in denen der Schalter nichts ändert). Kandidat ist eine Kette, die App (aus und an) und GNU Go übereinstimmend ganz als lebend oder ganz als tot führen.
+- **Auswahl (Setzungen):** 12 lebend und 4 tot; je Stellung höchstens eine Kette; höchstens so viele Steine wie die größte geprüfte S-Kette (27); je Status die Hälfte Einzelsteine, weil 12 der 23 geprüften Ketten Einzelsteine sind; gezogen nach Hash. Reichen die Kandidaten nicht, bricht das Werkzeug ab, statt ein kleineres Paket zu bauen.
+- **Folge (Gültigkeit, vorab festgelegt):** Weichen mehr als **eine** Kontrollkette mit einem entschiedenen, nicht unsicheren Urteil von der gemeinsamen Referenz ab, oder haben weniger als **12 von 16** ein solches Urteil, heißt das Ergebnis „kein Urteil“. Der Bericht zeigt dann nur die Kontrollketten und weder R+ noch R−. Kontrollketten zählen nie zu R+, R− oder den Übersichten.
+- **Grenze:** Die gemeinsame Referenz von App und GNU Go ist keine Ground Truth. Eine Abweichung kann auch ein richtiges Urteil sein; deshalb ist eine erlaubt, und jede wird einzeln berichtet. Die Kontrollketten zeigen eine Neigung zu „tot“ oder zu „lebend“ und das Ausweichen auf `nicht_entscheidbar`; ob der Bogen bei den strittigen Ketten richtig liegt, zeigen sie nicht.
+- **Trockenlauf (lokal, 14.11.2026, kein Messlauf):** Das Werkzeug baut aus den gesicherten ZIPs der Stufen 1 und 2 ein Paket mit 39 Unterlagen (B1 2, B2 21, Kontrolle 16). Die Kontrollketten: lebend 6 Einzelsteine und 6 größere, tot 2 und 2, aus 16 Stellungen und 16 Partien (GNU Go ohne Vorgabe 7, Fuego 50 Spiele 4, alte PWA 4, Fuego 100 Spiele 1). Das Paket des Trockenlaufs wurde verworfen und nicht gelesen; maßgeblich ist das Paket aus Actions (§5 Nr. 2).
 
 ### 4.5 Auftragstext für den Beurteiler (Setzung)
 
-> Im Anhang ist ein Paket mit Unterlagen zu Go-Stellungen. Lies zuerst `anleitung-beurteiler.md` und halte dich genau daran, besonders an den Abschnitt „Gelesene Zugfolgen (Pflicht)“. Beurteile alle Unterlagen und gib mir einen Antwortbogen als JSON-Datei nach `bogen-schema.json` zurück. Miss die Zeit je Unterlage mit einer Uhr. Du darfst in Etappen arbeiten und Teilbögen abgeben.
+> Im Anhang ist ein Paket mit 39 Unterlagen zu Go-Stellungen. Lies zuerst `anleitung-beurteiler.md` und halte dich genau daran, besonders an den Abschnitt „Gelesene Zugfolgen (Pflicht)“. Beurteile alle Unterlagen und gib mir einen Antwortbogen als JSON-Datei nach `bogen-schema.json` zurück. Miss die Zeit je Unterlage mit einer Uhr. Du darfst in Etappen arbeiten und Teilbögen abgeben.
 
 ### 4.6 Aufwand (Hypothese)
 
-23 Unterlagen. Bei der Lesetiefe von GLM 5.3 auf Max in der zweiten Probe (rund 15 bis 20 Minuten je Unterlage, alt §18.9 Nr. 4) rund 6 bis 8 Stunden Arbeit der Sitzung. Die Pflicht zu Zugfolgen kostet zusätzlich Zeit. Nicht gemessen.
+39 Unterlagen (23 geprüfte Ketten und 16 Kontrollketten). Bei der Lesetiefe von GLM 5.3 auf Max in der zweiten Probe (rund 15 bis 20 Minuten je Unterlage, alt §18.9 Nr. 4) rund 10 bis 13 Stunden Arbeit der Sitzung. Die Pflicht zu Zugfolgen kostet zusätzlich Zeit. Nicht gemessen.
 
 ## 5. Ablauf und Gültigkeit
 
@@ -123,7 +129,7 @@ Die Regel prüft den Beurteiler fast nur in eine Richtung. Von den 21 Ketten, be
 4. Der Bogen (oder die Teilbögen) wird mit `pruefen` beziehungsweise `zusammenfuegen` geprüft und per PR unter `docs/daten/diagonal-pruefung/stufe3-S/` abgelegt.
 5. **Go zur Auswertung:** derselbe Workflow, Modus `auswerten`, `art` S. Ergebnis als Nachtrag in diesem Doc.
 
-**Gültigkeit:** nur zwei Zustände. Ungültig heißt „kein Urteil“ mit Grund, und der Lauf wird rot (Eingaben falsch, Bogen ungültig, mehr als ein Bogen).
+**Gültigkeit:** nur zwei Zustände. Ungültig heißt „kein Urteil“ mit Grund, und der Lauf wird rot (Eingaben falsch, Bogen ungültig, mehr als ein Bogen, Kontrollketten nach §4.4a nicht bestanden).
 
 ## 6. Punkt 3: Bedingungen für einen Standardwechsel (Vorabfestlegung, kein Go)
 
@@ -146,7 +152,7 @@ Ein Wechsel von `diagonalAugeSchluss` auf Standard 1 kommt nur in Frage, wenn **
 | E-S1 | Wer beurteilt? | frische Sitzung GLM 5.3 auf Max, nicht Astra (§4.3) |
 | E-S2 | Mindestzahlen der Zugfolgen | 1 je Zugrecht, 3 bei `nicht_entscheidbar` oder `unsicher` (§4.2) |
 | E-S3 | Entscheidungsregel für S | wie §4.4 (alt §8 auf S beschränkt, sonst unverändert) |
-| E-S5 | Kontrollketten gegen die Schieflage (§4.4a) | ja, 16 Kontrollketten (12 lebend, 4 tot), höchstens 1 Abweichung; **vor dem Paket zu entscheiden** |
+| E-S5 | Kontrollketten gegen die Schieflage (§4.4a) | **entschieden am 14.11.2026:** ja, 16 Kontrollketten (12 lebend, 4 tot), höchstens 1 Abweichung, mindestens 12 zählende Urteile |
 | E-S4 | Unterschied Vorschau und Schlusszählung bei einem späteren Wechsel | vor dem Wechsel entscheiden (§6 Nr. 4) |
 
 **Freigaben:** Der Merge dieses PR erteilt kein Go für einen Lauf. Reihenfolge: Merge → Go zum Paket (§5 Nr. 2) → Beurteilung → Ablage → Go zur Auswertung → Nachtrag → gegebenenfalls eigene Festlegung und Go zum Standardwechsel (§6). `diagonalAugeEnde` und `diagonalAugeSchluss` bleiben standardmäßig 0.

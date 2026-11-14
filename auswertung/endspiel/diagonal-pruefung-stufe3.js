@@ -72,6 +72,33 @@ function pruefeEingabe(ein) {
   return {gruende, ketten};
 }
 
+/* ── Kontrollketten für das S-Paket (docs/diagonal-schluss-vorabfestlegung.md §4.4a) ──
+   Ketten aus den gültigen S-Kontrollstellungen der Stufe 2 (der Schalter ändert dort nichts), bei denen App und GNU Go dasselbe sagen (ganz tot oder ganz
+   lebend). Je Stellung höchstens eine Kette, höchstens so groß wie die größte geprüfte S-Kette, je Status die Hälfte Einzelsteine (ersatzweise andere).
+   Gezogen nach Hash. Sie messen nur, ob der Bogen dort, wo sich alle einig sind, in beide Richtungen urteilt; die gemeinsame Referenz ist keine Ground Truth. */
+const K_SOLL = Object.freeze({lebend: 12, tot: 4}), K_ABWEICHUNG_MAX = 1, K_ZAEHLEND_ANTEIL = 0.75;
+function waehleKontrollen(ein, soll, steineMax) {
+  const basis = ein.plan.basis, kand = [];
+  for (const z of ein.zeilen) {
+    if (z.status !== 'gueltig' || z.kategorie !== 'kontrolle' || z.art !== 'S') continue;
+    const st = ein.pro.get(z.id); if (!st) continue;
+    const aus = new Set(z.appTot.aus), an = new Set(z.appTot.an), gnu = new Set(z.gnu.dead);
+    for (const k of S2.ketten(st.brett)) {
+      if (k.punkte.length > steineMax) continue;
+      const status = m => { const n = k.punkte.filter(i => m.has(i)).length; return n === k.punkte.length ? 'tot' : n === 0 ? 'lebend' : 'gemischt'; };
+      const a = status(aus); if (a === 'gemischt' || status(an) !== a || status(gnu) !== a) continue;
+      kand.push({schluessel: `${z.id}|${L.zuGtp(k.punkte[0])}`, stellung: z.id, art: 'S', farbe: k.farbe, steine: k.punkte.length, punkte: k.punkte.map(L.zuGtp), menge: 'K', appAus: a, appAn: a, gnu: a});
+    }
+  }
+  const sortiert = nachHash(kand, k => `stufe3|kontrolle|${basis}|${k.schluessel}`), benutzt = new Set(), wahl = [];
+  const nimm = (status, n, passt) => { let c = 0; for (const k of sortiert) { if (c >= n) break; if (k.appAus !== status || benutzt.has(k.stellung) || !passt(k)) continue; benutzt.add(k.stellung); wahl.push(k); c++; } return c; };
+  for (const status of ['tot', 'lebend']) {   /* tot zuerst: die selteneren Kandidaten bekommen ihre Stellungen */
+    const n = soll[status]; let c = nimm(status, Math.floor(n / 2), k => k.steine === 1); c += nimm(status, n - c, k => k.steine > 1); if (c < n) c += nimm(status, n - c, () => true);
+    if (c < n) throw new Error(`Kontrollketten: nur ${c} von ${n} (${status}) verfügbar`);
+  }
+  return wahl;
+}
+
 /* ── Einspielen mit Ko, Pässen, letzten Zügen ─────────────────────────── */
 function spielMitKo(E, folge) {
   const b = new Uint8Array(N), caps = {1: 0, 2: 0};
@@ -412,7 +439,10 @@ function pruefeVarianten(a, id, st, E, f) {
 /* ── Paket: deterministisch aus den Eingaben ───────────────────────────── */
 function erzeugePaket(E, ein, ketten, opt = {}) {
   if (opt.art && opt.probe) throw new Error('--art und --probe zusammen sind nicht vorgesehen');
-  if (opt.art) ketten = ketten.filter(k => k.art === opt.art);   /* Kennungen und Reihenfolge hängen nur am Schlüssel: dieselben wie im Gesamtpaket */
+  if (opt.art) {   /* Kennungen hängen nur am Schlüssel: für die geprüften Ketten dieselben wie im Gesamtpaket; dazu die Kontrollketten (für den Beurteiler nicht erkennbar) */
+    ketten = ketten.filter(k => k.art === opt.art);
+    ketten = ketten.concat(waehleKontrollen(ein, opt.kontrollen || K_SOLL, Math.max(1, ...ketten.map(k => k.steine))));
+  }
   const version = opt.art ? 2 : 1;
   const basis = ein.plan.basis, ids = new Map();
   for (const k of ketten) {
@@ -439,7 +469,7 @@ function erzeugePaket(E, ein, ketten, opt = {}) {
   manifest.manifestSha256 = sha256(JSON.stringify(opt.art ? {version, modus: manifest.modus, art: opt.art, reihenfolge: manifest.reihenfolge, dateien: manifest.dateien} : {modus: manifest.modus, reihenfolge: manifest.reihenfolge, dateien: manifest.dateien}));
   dateien['manifest.json'] = JSON.stringify(manifest, null, 1);
   const geheim = Object.fromEntries(waehl.map(id => [id, aufdeckung[id]]));
-  return {dateien, manifest, aufdeckung: geheim, anzahlB1: waehl.filter(id => aufdeckung[id].menge === 'B1').length, anzahlB2: waehl.filter(id => aufdeckung[id].menge === 'B2').length};
+  return {dateien, manifest, aufdeckung: geheim, anzahlK: waehl.filter(id => aufdeckung[id].menge === 'K').length, anzahlB1: waehl.filter(id => aufdeckung[id].menge === 'B1').length, anzahlB2: waehl.filter(id => aufdeckung[id].menge === 'B2').length};
 }
 
 /* ── Antwortbögen prüfen ───────────────────────────────────────────────── */
@@ -521,10 +551,21 @@ function bewerteKette(k, urteile) {
 function auswertung(aufdeckung, boegen, ein, opt = {}) {
   const nurS = opt.art === 'S';
   const gruppen = Object.keys(boegen), ids = Object.keys(aufdeckung);
-  const proKette = ids.map(id => {
+  const alleKetten = ids.map(id => {
     const k = aufdeckung[id], urteile = gruppen.map(g => { const a = boegen[g].find(x => x.id === id); return {gruppe: g, ...normiere(a), kategorie: a.kategorie, sicherheit: a.sicherheit}; });
     return {id, ...k, ...bewerteKette(k, urteile), urteileRoh: urteile};
   });
+  /* Kontrollketten (Menge K) zählen nicht zu R+, R− oder den Übersichten; sie entscheiden nur über die Gültigkeit des Bogens */
+  const proKette = alleKetten.filter(x => x.menge !== 'K'), kKetten = alleKetten.filter(x => x.menge === 'K');
+  let kontrolle = null;
+  if (nurS) {
+    const zaehlend = kKetten.filter(x => x.ergebnis === 'gleich-richtig' || x.ergebnis === 'gleich-falsch'), abweichend = kKetten.filter(x => x.ergebnis === 'gleich-falsch');
+    const ist = {lebend: kKetten.filter(x => x.gnu === 'lebend').length, tot: kKetten.filter(x => x.gnu === 'tot').length}, mindestZaehlend = Math.ceil(K_ZAEHLEND_ANTEIL * kKetten.length), gruende = [];
+    if (abweichend.length > K_ABWEICHUNG_MAX) gruende.push(`${abweichend.length} Kontrollketten weichen von der gemeinsamen Referenz ab (erlaubt höchstens ${K_ABWEICHUNG_MAX}): ${abweichend.map(x => x.id).join(', ')}`);
+    if (zaehlend.length < mindestZaehlend) gruende.push(`nur ${zaehlend.length} von ${kKetten.length} Kontrollketten mit einem zählenden Urteil (verlangt mindestens ${mindestZaehlend})`);
+    kontrolle = {n: kKetten.length, ist, soll: {...K_SOLL}, wieFestgelegt: ist.lebend === K_SOLL.lebend && ist.tot === K_SOLL.tot, zaehlend: zaehlend.length, mindestZaehlend, abweichend: abweichend.map(x => x.id), abweichungMax: K_ABWEICHUNG_MAX, gueltig: gruende.length === 0, gruende,
+      ketten: kKetten.map(x => ({id: x.id, referenz: x.gnu, steine: x.steine, ergebnis: x.ergebnis, urteile: x.urteileRoh.map(u => `${u.kategorie}/${u.sicherheit}`)}))};
+  }
   const zaehle = (liste, f) => liste.filter(f).length;
   const je = (menge, art) => proKette.filter(x => (!menge || x.menge === menge) && (!art || x.art === art));
   const erg = l => Object.fromEntries(['R+', 'R-', 'gleich-richtig', 'gleich-falsch', 'ungeklaert'].map(e => [e, zaehle(l, x => x.ergebnis === e)]));
@@ -560,7 +601,7 @@ function auswertung(aufdeckung, boegen, ein, opt = {}) {
   }
   const endstandDa = endstandProbleme.length === 0;
   const bed = [
-    {nr: 1, text: 'Pflichtprüfungen der Stufen 1 bis 3 bestanden (Stufe 2 gültig, Bögen geprüft)', erfuellt: true},
+    {nr: 1, text: nurS ? `Pflichtprüfungen bestanden (Stufe 2 gültig, Bogen geprüft, Kontrollketten wie festgelegt: ${K_SOLL.lebend} lebend, ${K_SOLL.tot} tot)` : 'Pflichtprüfungen der Stufen 1 bis 3 bestanden (Stufe 2 gültig, Bögen geprüft)', erfuellt: !nurS || kontrolle.wieFestgelegt, ...(nurS ? {detail: `Kontrollketten ${kontrolle.ist.lebend} lebend, ${kontrolle.ist.tot} tot`} : {})},
     {nr: 2, text: `Bestätigter Nutzen: mindestens ${R_PLUS_MIN} R+ aus mindestens ${R_PLUS_PARTIEN_MIN} verschiedenen Partien (§10.5, Setzung)`, erfuellt: rPlus.length >= R_PLUS_MIN && partienPlus.size >= R_PLUS_PARTIEN_MIN, detail: `${rPlus.length} R+ aus ${partienPlus.size} Partien`},
     {nr: 3, text: nurS ? 'R− = 0 in der Schlusszählung (S; konservativ gezählt)' : 'R− = 0 in beiden Stellungsarten (konservativ gezählt)', erfuellt: rMinus.length === 0, detail: `S ${zaehle(rMinus, x => x.art === 'S')}, V ${zaehle(rMinus, x => x.art === 'V')}`},
     {nr: 4, text: 'Alle B1-Fälle entschieden (kein ungeklärter B1-Fall) und alle betroffenen Stellungen ausgewertet (keine Ausfälle in betroffenen Stellungen)', erfuellt: b1Ungeklaert.length === 0 && ausfaelleBetroffen === 0, detail: `ungeklärte B1-Fälle ${b1Ungeklaert.length}, Ausfälle in betroffenen Stellungen ${ausfaelleBetroffen}`},
@@ -568,16 +609,21 @@ function auswertung(aufdeckung, boegen, ein, opt = {}) {
   /* Mindestumfang (§7 Nr. 7) ist eine eigene Bedingung, keine Nummer von §8: nicht erreicht heißt „Kandidatur offen“ (zu wenig Betroffene), nicht „keine positive Kandidatur“ */
   const mindest = {schwelle: MINDESTUMFANG, S: betroffen.S, V: betroffen.V, nurS, erfuellt: betroffen.S >= MINDESTUMFANG && (nurS || betroffen.V >= MINDESTUMFANG)};
   const positiv = bed.every(b => b.erfuellt) && mindest.erfuellt;
-  return {proKette, uebersicht, uebereinstimmung, verteilung, rPlus: rPlus.length, partienRPlus: partienPlus.size, rMinus: rMinus.length, abweichungGnu, bedingungen: bed, endstand, endstandProbleme, mindestumfang: mindest, befund: !mindest.erfuellt ? 'Kandidatur offen (zu wenig Betroffene)' : positiv ? 'positive Kandidatur' : 'keine positive Kandidatur',
+  return {proKette, kontrolle, kontrollKetten: kKetten, uebersicht, uebereinstimmung, verteilung, rPlus: rPlus.length, partienRPlus: partienPlus.size, rMinus: rMinus.length, abweichungGnu, bedingungen: bed, endstand, endstandProbleme, mindestumfang: mindest, befund: !mindest.erfuellt ? 'Kandidatur offen (zu wenig Betroffene)' : positiv ? 'positive Kandidatur' : 'keine positive Kandidatur',
     ungeklaertB2: je('B2').filter(x => x.ergebnis === 'ungeklaert').length, b1Ungeklaert: b1Ungeklaert.length};
 }
 function berichtMd(r, gruppen, paketInfo) {
   const m = ['# Diagonalprüfung, Stufe 3: Beurteilung (Schicht B)', '',
     '**Beurteilungen, keine Ground Truth** (§6). Beurteilergruppen werden getrennt geführt (KI, Mensch). Die Zuordnung zu App aus, App an und GNU Go wurde **erst nach allen Urteilen** aufgedeckt. Das Ergebnis ist ein Befund und kein Go (§8).', '',
-    `Unterlagen: ${paketInfo.unterlagen} (B1 ${paketInfo.anzahlB1}, B2 ${paketInfo.anzahlB2}); Beurteilergruppen: ${gruppen.join(', ')}.`, '', '## Verteilung der Urteile', '', '| Gruppe | lebendig | tot | seki | ko_zugabhaengig | nicht_entscheidbar | sicher | eher sicher | unsicher |', '|---|---:|---:|---:|---:|---:|---:|---:|---:|'];
+    `Unterlagen: ${paketInfo.unterlagen} (B1 ${paketInfo.anzahlB1}, B2 ${paketInfo.anzahlB2}${paketInfo.anzahlK ? `, Kontrolle ${paketInfo.anzahlK}` : ''}); Beurteilergruppen: ${gruppen.join(', ')}.`, '', '## Verteilung der Urteile', '', '| Gruppe | lebendig | tot | seki | ko_zugabhaengig | nicht_entscheidbar | sicher | eher sicher | unsicher |', '|---|---:|---:|---:|---:|---:|---:|---:|---:|'];
   for (const g of gruppen) { const v = r.verteilung[g]; m.push(`| ${g} | ${KATEGORIEN.map(c => v.kategorie[c]).join(' | ')} | ${SICHERHEIT.map(c => v.sicherheit[c]).join(' | ')} |`); }
   m.push('', '## Übereinstimmung der Beurteilung mit App aus, App an und GNU Go', '', 'Nur entschiedene, nicht unsichere Urteile. „App uneinheitlich“ und „GNU Go uneinheitlich“ (Kette teils tot, teils lebend) sind nicht eingerechnet.', '', '| Gruppe | Urteile | zählend | App aus | App an | GNU Go |', '|---|---:|---:|---|---|---|');
   for (const g of gruppen) { const u = r.uebereinstimmung[g], p = x => `${x.gleich} von ${x.n} (${x.n ? prozent(x.gleich / x.n) : '–'})`; m.push(`| ${g} | ${u.urteile} | ${u.zaehlend} | ${p(u.appAus)} | ${p(u.appAn)} | ${p(u.gnu)} |`); }
+  if (r.kontrolle) {
+    const k = r.kontrolle;
+    m.push('', '## Kontrollketten', '', `${k.n} Kontrollketten (${k.ist.lebend} lebend, ${k.ist.tot} tot nach gemeinsamer Referenz von App und GNU Go; keine Ground Truth). Zählende Urteile: ${k.zaehlend} (verlangt mindestens ${k.mindestZaehlend}). Abweichend: ${k.abweichend.length} (erlaubt höchstens ${k.abweichungMax}). Sie zählen nicht zu R+ und R−.`, '', '| Kennung | Referenz | Steine | Urteil | Ergebnis |', '|---|---|---:|---|---|');
+    for (const x of k.ketten) m.push(`| ${x.id} | ${x.referenz} | ${x.steine} | ${x.urteile.join(', ')} | ${x.ergebnis === 'gleich-richtig' ? 'wie Referenz' : x.ergebnis === 'gleich-falsch' ? 'abweichend' : 'nicht zählend'} |`);
+  }
   m.push('', '## Ergebnis je Kette (getrennt nach B1 und B2)', '', '| Menge | R+ | R− | gleich richtig | gleich falsch | ungeklärt |', '|---|---:|---:|---:|---:|---:|');
   for (const k of ['B1', 'B2', 'S', 'V', 'gesamt']) { const u = r.uebersicht[k]; m.push(`| ${k === 'S' || k === 'V' ? 'Art ' + k : k} | ${u['R+']} | ${u['R-']} | ${u['gleich-richtig']} | ${u['gleich-falsch']} | ${u.ungeklaert} |`); }
   m.push('', 'R+ = aus falsch, an richtig (nur wenn alle Urteile entschieden, nicht unsicher und übereinstimmend); R− = aus richtig, an falsch (konservativ: schon ein entschiedenes, nicht unsicheres Urteil genügt); „gleich“ = App bei aus und an gleich. Ungeklärt zählt nie als Unbedenklichkeit.', '',
@@ -627,24 +673,27 @@ function main() {
   const [befehl, ...rest] = process.argv.slice(2);
   const html = path.join(__dirname, '..', '..', 'index.html');
   if (befehl === 'unterlagen' || befehl === 'auswerten') {
-    const o = optionen(rest, ['stufe1', 'stufe2', 'archiv', 'aus', 'probe', 'probe-ziehung', 'bogen', 'art'], ['stufe1', 'stufe2', 'archiv', 'aus'], ['bogen']);
+    const o = optionen(rest, ['stufe1', 'stufe2', 'archiv', 'aus', 'probe', 'probe-ziehung', 'bogen', 'art', 'kontrollen'], ['stufe1', 'stufe2', 'archiv', 'aus'], ['bogen']);
     if (o.art !== undefined && o.art !== 'S') throw new Error('--art kennt nur den Wert S');
     const art = o.art || null;
+    /* --kontrollen L,T ist nur für Tests an kleinen Attrappen gedacht: mit anderen Zahlen als der Festlegung ist Bedingung 1 nie erfüllt */
+    let kontrollen;
+    if (o.kontrollen !== undefined) { const m = /^(\d+),(\d+)$/.exec(o.kontrollen); if (!m || !art) throw new Error('--kontrollen erwartet LEBEND,TOT und gilt nur mit --art S'); kontrollen = {lebend: +m[1], tot: +m[2]}; }
     const ein = ladeEingabe(o), E = ladeKI({htmlPfad: html, mitNetz: false}), pe = pruefeEingabe(ein);
     if (pe.gruende.length) { console.error('KEIN URTEIL: ' + pe.gruende.join(' ; ')); process.exit(1); }
     fs.mkdirSync(o.aus, {recursive: true});
     if (befehl === 'unterlagen') {
       const probe = o.probe === undefined ? 0 : +o.probe, ziehung = o['probe-ziehung'] === undefined ? 0 : +o['probe-ziehung'];
       if (!Number.isInteger(probe) || probe < 0 || !Number.isInteger(ziehung) || ziehung < 0 || (ziehung && !probe)) throw new Error('--probe und --probe-ziehung sind ganze Zahlen ab 0; --probe-ziehung nur zusammen mit --probe');
-      const p = erzeugePaket(E, ein, pe.ketten, {probe, ziehung, art});
+      const p = erzeugePaket(E, ein, pe.ketten, {probe, ziehung, art, kontrollen});
       schreibe(path.join(o.aus, probe ? 'probe-paket' : art ? 'beurteiler-paket-' + art : 'beurteiler-paket'), p.dateien);
       fs.mkdirSync(path.join(o.aus, 'geheim'), {recursive: true});
       fs.writeFileSync(path.join(o.aus, 'geheim', probe ? 'aufdeckung-probe.json' : art ? `aufdeckung-${art}.json` : 'aufdeckung.json'), JSON.stringify(p.aufdeckung, null, 1));
-      console.log(`${probe ? 'Probe-Paket' : art ? 'Paket ' + art : 'Paket'}: ${p.manifest.unterlagen} Unterlagen (B1 ${p.anzahlB1}, B2 ${p.anzahlB2}); manifestSha256 ${p.manifest.manifestSha256}`);
+      console.log(`${probe ? 'Probe-Paket' : art ? 'Paket ' + art : 'Paket'}: ${p.manifest.unterlagen} Unterlagen (B1 ${p.anzahlB1}, B2 ${p.anzahlB2}${art ? `, Kontrolle ${p.anzahlK}` : ''}); manifestSha256 ${p.manifest.manifestSha256}`);
       return;
     }
     if (!o.bogen || !o.bogen.length) throw new Error('Option fehlt: --bogen NAME=datei');
-    const p = erzeugePaket(E, ein, pe.ketten, {art}), boegen = {}, gruende = [], stellungen = stellungenAusDateien(E, p.dateien, p.manifest.reihenfolge);
+    const p = erzeugePaket(E, ein, pe.ketten, {art, kontrollen}), boegen = {}, gruende = [], stellungen = stellungenAusDateien(E, p.dateien, p.manifest.reihenfolge);
     /* Setzung (docs/diagonal-schluss-vorabfestlegung.md §5): im S-Paket wird genau ein Bogen ausgewertet */
     if (art && o.bogen.length !== 1) { console.error(`KEIN URTEIL: im Paket ${art} wird genau ein Bogen ausgewertet, übergeben ${o.bogen.length}`); process.exit(1); }
     for (const b of o.bogen) {
@@ -654,10 +703,17 @@ function main() {
       if (f.length) gruende.push(`${name}: ${f.length} Fehler (z. B. ${f[0]})`); else boegen[name] = bogen.antworten;
     }
     if (gruende.length) { fs.writeFileSync(path.join(o.aus, 'bericht-stufe3.md'), `# Diagonalprüfung, Stufe 3\n\n**UNGÜLTIG, KEIN URTEIL.** ${gruende.join(' ; ')}\n`); console.error('KEIN URTEIL: ' + gruende.join(' ; ')); process.exit(1); }
-    const r = auswertung(p.aufdeckung, boegen, ein, {art}), md = berichtMd(r, Object.keys(boegen), {unterlagen: p.manifest.unterlagen, anzahlB1: p.anzahlB1, anzahlB2: p.anzahlB2});
+    const r = auswertung(p.aufdeckung, boegen, ein, {art});
+    /* Kontrollketten entscheiden über die Gültigkeit: ungültig heißt „kein Urteil“, ohne R+ und R− zu zeigen */
+    if (r.kontrolle && !r.kontrolle.gueltig) {
+      const k = r.kontrolle, zeilen = k.ketten.map(x => `| ${x.id} | ${x.referenz} | ${x.urteile.join(', ')} | ${x.ergebnis === 'gleich-richtig' ? 'wie Referenz' : x.ergebnis === 'gleich-falsch' ? 'abweichend' : 'nicht zählend'} |`);
+      fs.writeFileSync(path.join(o.aus, 'bericht-stufe3.md'), `# Diagonalprüfung, Stufe 3\n\n**UNGÜLTIG, KEIN URTEIL.** Kontrollketten: ${k.gruende.join(' ; ')}\n\nDie übrigen Ketten wurden nicht ausgewertet.\n\n| Kennung | Referenz | Urteil | Ergebnis |\n|---|---|---|---|\n${zeilen.join('\n')}\n`);
+      console.error('KEIN URTEIL: Kontrollketten: ' + k.gruende.join(' ; ')); process.exit(1);
+    }
+    const md = berichtMd(r, Object.keys(boegen), {unterlagen: p.manifest.unterlagen, anzahlB1: p.anzahlB1, anzahlB2: p.anzahlB2, anzahlK: p.anzahlK});
     fs.writeFileSync(path.join(o.aus, 'bericht-stufe3.md'), md);
-    fs.writeFileSync(path.join(o.aus, 'bericht-stufe3.json'), JSON.stringify({befund: r.befund, uebersicht: r.uebersicht, uebereinstimmung: r.uebereinstimmung, verteilung: r.verteilung, bedingungen: r.bedingungen, mindestumfang: r.mindestumfang, endstand: r.endstand, rPlus: r.rPlus, partienRPlus: r.partienRPlus, rMinus: r.rMinus, endstandProbleme: r.endstandProbleme, manifestSha256: p.manifest.manifestSha256}, null, 1));
-    fs.writeFileSync(path.join(o.aus, 'ketten-stufe3.jsonl'), r.proKette.map(x => JSON.stringify(x)).join('\n') + '\n');
+    fs.writeFileSync(path.join(o.aus, 'bericht-stufe3.json'), JSON.stringify({befund: r.befund, uebersicht: r.uebersicht, uebereinstimmung: r.uebereinstimmung, verteilung: r.verteilung, bedingungen: r.bedingungen, kontrolle: r.kontrolle, mindestumfang: r.mindestumfang, endstand: r.endstand, rPlus: r.rPlus, partienRPlus: r.partienRPlus, rMinus: r.rMinus, endstandProbleme: r.endstandProbleme, manifestSha256: p.manifest.manifestSha256}, null, 1));
+    fs.writeFileSync(path.join(o.aus, 'ketten-stufe3.jsonl'), [...r.proKette, ...r.kontrollKetten].map(x => JSON.stringify(x)).join('\n') + '\n');
     console.log(md);
   } else if (befehl === 'pruefen') {
     const o = optionen(rest, ['bogen', 'manifest', 'teil'], ['bogen', 'manifest']);
@@ -680,4 +736,4 @@ function main() {
   } else throw new Error('Aufruf: node diagonal-pruefung-stufe3.js unterlagen|pruefen|zusammenfuegen|auswerten ...');
 }
 if (require.main === module) { try { main(); } catch (e) { console.error(e.stack || e.message); process.exit(2); } }
-module.exports = {ladeEingabe, pruefeEingabe, spielMitKo, sgfVon, folgeAusSgf, stellungAusSgf, spieleVariante, stellungenAusDateien, pruefeVarianten, diagramm, unterlage, erzeugePaket, pruefeBogen, fuegeZusammen, normiere, bewerteKette, auswertung, berichtMd, ANLEITUNG, ANLEITUNG_V2, SCHEMA, SCHEMA_V2, VARIANTEN_MIN, VARIANTEN_MIN_OFFEN, KATEGORIEN, SICHERHEIT, R_PLUS_MIN, R_PLUS_PARTIEN_MIN, MINDESTUMFANG};
+module.exports = {ladeEingabe, pruefeEingabe, spielMitKo, sgfVon, folgeAusSgf, stellungAusSgf, spieleVariante, stellungenAusDateien, pruefeVarianten, diagramm, unterlage, erzeugePaket, pruefeBogen, fuegeZusammen, normiere, bewerteKette, auswertung, berichtMd, waehleKontrollen, K_SOLL, K_ABWEICHUNG_MAX, ANLEITUNG, ANLEITUNG_V2, SCHEMA, SCHEMA_V2, VARIANTEN_MIN, VARIANTEN_MIN_OFFEN, KATEGORIEN, SICHERHEIT, R_PLUS_MIN, R_PLUS_PARTIEN_MIN, MINDESTUMFANG};

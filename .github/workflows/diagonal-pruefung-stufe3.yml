@@ -12,7 +12,8 @@ name: Diagonalprüfung Stufe 3
 #   auswerten   prüft den Antwortbogen aus dem Repo (Eingabe `bogen`), deckt auf und berichtet nach §6.4 und §8. Das Paket wird dafür aus denselben Eingaben neu
 #               gebaut; der Bogen muss zum Manifest passen.
 # Eingabe art: alle (Vorgabe, wie bisher) oder S (nur die Ketten der Schlusszählung, Anleitung Fassung 2, docs/diagonal-schluss-vorabfestlegung.md). Bei S heißen
-#   die Artefakte „beurteiler-paket-S“ und „stufe3-geheim-S“, und auswerten nimmt genau einen Bogen. probe und art S zusammen sind nicht vorgesehen.
+#   die Artefakte „beurteiler-paket-S“ und „stufe3-geheim-S“, und auswerten nimmt genau einen Bogen. Das S-Paket enthält zusätzlich 16 Kontrollketten (§4.4a),
+#   die nur in „stufe3-geheim-S“ als solche erkennbar sind. probe und art S zusammen sind nicht vorgesehen.
 # Eingaben: die in Git gesicherten ZIPs von Stufe 1 und dem gültigen zweiten Hauptlauf von Stufe 2, je gegen ihre SHA-256 geprüft.
 # Gültigkeit: nur zwei Zustände. Ungültig heißt „kein Urteil“ mit Grund, und der Lauf wird rot.
 on:
