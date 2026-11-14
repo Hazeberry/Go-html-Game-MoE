@@ -736,3 +736,25 @@ Lauf `43366514213` (`main` bei `e2a5d11`, Modus `probe`, 6 Unterlagen, Ziehung 1
 6. **Folge für §8 Nr. 4 (Hypothese aus sechs Fällen):** Alle sechs Stücke sind B1. Bei drei ungeklärten von sechs wären unter den 356 B1-Ketten weit mehr als ein ungeklärter Fall zu erwarten; schon einer genügt für „keine positive Kandidatur“.
 7. **Eine weitere Sitzung (Grok) hat nicht beurteilt.** Ihr wurde statt des Probe-Pakets das Stufe-2-ZIP gegeben (SHA-256 `d3f92b96…`, gleich dem gültigen Hauptlauf). Sie hat Stufe 2 nachgerechnet und meldet keinen Widerspruch zu den nachrechenbaren Zahlen; nicht nachgerechnet hat sie unter anderem die Ziehung der 60 B2-Ketten und `fortsetzungsSeed` (beides steht im Werkzeug, das sie nicht hatte). Diese Datei ist kein Antwortbogen und wird nicht abgelegt. **Diese Sitzung kennt die Auswahl und die Urteile von App und GNU Go und scheidet als Beurteiler aus.**
 8. **Offen (Entscheidung bei Hazeberry):** (a) Anleitung verschärfen (`nicht_entscheidbar` nur mit den gelesenen Varianten, mechanisches Nachspielen ausdrücklich empfohlen) und mit neuer Ziehung erneut proben; (b) das Hauptpaket mit dieser Anleitung beurteilen lassen; (c) Stufe 3 hier beenden, Schalter bleibt aus. Die Sitzung der zweiten Probe beurteilt das Hauptpaket nicht (die Stücke liegen mit gleicher Kennung auch dort).
+
+### 18.8 Zweite Probe, zweiter Bogen (14.11.2026)
+
+Eine weitere frische KI-Sitzung hat dasselbe Probe-Paket (Lauf `43366514213`) mit demselben Auftrag beurteilt (`bogen-sitzung4.json`, Verlauf in `protokoll-sitzung4.txt`). **Nicht ausgewertet, Aufdeckung nicht geöffnet, kein Go.** Ob ein Urteil richtig ist, ist nicht geprüft; die Sitzung, die diesen Abschnitt schreibt, beurteilt die Stellungen nicht.
+
+1. **Formal gültig:** `pruefen` gegen das Probe-Manifest Exit 0. Hilfsmittel nach §18.6 Nr. 5 (eigenes Skript zum Nachspielen und Durchspielen gewählter Zugfolgen, keine Suche, keine Go-Software); das Skript hat nach dem Verlauf alle sechs Bretter aus dem SGF richtig nachgespielt.
+2. **Lesetiefe:** Diese Sitzung hat die Kämpfe ausgelesen: vier Urteile `sicher`, zwei `eher_sicher`, kein `nicht_entscheidbar`. Damit ist belegt, dass die Anleitung tiefes Lesen zulässt; dass sie es erzwingt, ist nicht belegt (Sitzung 3, §18.7, las flach).
+3. **Zeit:** 176 bis 1065 s je Unterlage, Summe 3460 s, Mittel 577 s. Hochgerechnet auf 416 Unterlagen rund 67 h (mit der Spanne der Einzelwerte 20 bis 123 h). Sechs Fälle, alle V; nicht belastbar, aber rund das Zwanzigfache von Sitzung 3.
+4. **Vergleich mit Sitzung 3 auf denselben sechs Stücken:**
+
+| Kennung | Sitzung 3 | Sitzung 4 |
+|---|---|---|
+| U-2173a8 | nicht_entscheidbar, unsicher | lebendig, sicher |
+| U-15d04c | lebendig, eher_sicher | lebendig, sicher |
+| U-351c82 | tot, eher_sicher | ko_zugabhaengig (Schwarz am Zug tot, Weiß am Zug lebendig), sicher |
+| U-49f79f | lebendig, eher_sicher | lebendig, sicher |
+| U-dea5f6 | nicht_entscheidbar, unsicher | lebendig, eher_sicher |
+| U-f4bb91 | nicht_entscheidbar, unsicher | lebendig, eher_sicher |
+
+   Gleich in 2 von 6 (beide `lebendig`). Bei U-351c82 widersprechen sich die entschiedenen Lesarten: Sitzung 3 hält das Ko für eines, das Weiß nicht rettet, Sitzung 4 liest, dass Weiß am Zug mit Q19 schlägt und danach verbindet, Schwarz am Zug dagegen zuerst S18 schlägt. Unter der Ko-Annahme von §18.6 Nr. 3 sind beide Einträge formal zulässig; welche Lesart stimmt, ist nicht geprüft.
+5. **Folgen (Hypothesen aus sechs Fällen):** (a) Mit einer tief lesenden Sitzung wären nach §6.4 vier dieser sechs B1-Fälle entschieden und nicht unsicher; die anderen zwei sind `eher_sicher` und zählen damit ebenfalls (nur `unsicher` zählt nicht). U-351c82 wäre als `ko_zugabhaengig` mit verschiedenen Teilurteilen ungeklärt und verhinderte nach §8 Nr. 4 die positive Kandidatur. (b) Würden zwei Sitzungen dasselbe Paket beurteilen, wären Widersprüche wie bei U-351c82 nach §6.4 ungeklärt. (c) Der Aufwand für 416 Unterlagen bei dieser Lesetiefe liegt eher bei Tagen als bei Stunden und verlangt Etappen (`zusammenfuegen`).
+6. **Offen (Entscheidung bei Hazeberry):** wie §18.7 Nr. 8. Zusätzlich: ob eine Sitzung mit der Arbeitsweise von Sitzung 4 das Hauptpaket in Etappen beurteilt. Beide Sitzungen der zweiten Probe beurteilen das Hauptpaket nicht.
