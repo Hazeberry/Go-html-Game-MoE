@@ -1,0 +1,53 @@
+{
+ "manifestSha256": "a6a4c945de8800744423ed9733c9aa2b1d77332e306e5d9fd61b2fe102849fce",
+ "beurteiler": "KI",
+ "hilfsmittel": "eigenes Skript (Python) zum mechanischen Nachspielen der SGF-Züge, Anzeigen der Bretter, Freiheitenzählen sowie Prüfen und Durchspielen selbst gewählter Zugfolgen; keine automatische Suche, keine fremde Go-Software",
+ "antworten": [
+  {
+   "id": "U-2173a8",
+   "kategorie": "lebendig",
+   "begruendung": "Der markierte Schwarze Einzelstein A5 steht am linken Rand, aber der einzige freie Verbindungspunkt B5 ist für Weiß unspielbar: Alle vier Nachbarn von B5 (A5, B4, B6, C5) sind schwarz und haben jeweils weitere Freiheiten, Weiß B5 wäre Selbstmord (skriptgeprüft). Zieht Weiß zuerst A4 und schlägt damit A3, antwortet Schwarz B5 und verbindet A5 mit B4/B6/C5 zu einer Kette mit Freiheiten A6, B7, C6, D5; das nachfolgende Weiß A6 verliert sofort an Schwarz A7 (verifizierte Zugfolge A4-B5-A6-A7). Zieht Schwarz zuerst, spielt es B5 selbst und steht ebenso verbunden. Da Weiß den Punkt B5 nie besetzen kann, gibt es keinen Weg, der markierten Kette alle Freiheiten zu nehmen; sie bleibt in allen gelesenen Varianten bestehen.",
+   "sicherheit": "sicher",
+   "dauerSekunden": 1065
+  },
+  {
+   "id": "U-15d04c",
+   "kategorie": "lebendig",
+   "begruendung": "Die markierte Weiß-Kette P5/N4/O4/P4 hat vier Freiheiten (M4, N5, O5, P6) und zwei unabhängige Verbindungen: P6 zur starken Gruppe Q6-R7/N8-R7 (7 Freiheiten) und über M4/M5 zur Gruppe J2-K7/L4 (8 Freiheiten). Alle ersten Züge von Schwarz scheitern: O5 (Atari) wird mit M4 beantwortet, und nach N5/N6 nimmt Weiß mit O6 den Stein O5 wieder und behält Freiheiten (L4, L5, O5-Bereich); der Schnitt P6 wird durch N5 sofort geschlagen oder verbunden; der Vorstoß N5 wird durch M4 kontert; M6 als erster Zug lässt Weiß über L5/L4/K1 in die linksseitige Gruppe entkommen (verifiziert). Schwarz kann nie beide Verbindungspunkte gleichzeitig schneiden, zumal die eigenen Angreiferketten O9-T7 (3 Freiheiten) und T4 (2 Freiheiten) kaum Reserven haben. Weiß am Zug verbindet sofort mit P6. Beide Zugrechte: Die Kette bleibt ungetrennt und dauerhaft auf dem Brett.",
+   "sicherheit": "sicher",
+   "dauerSekunden": 361
+  },
+  {
+   "id": "U-351c82",
+   "kategorie": "ko_zugabhaengig",
+   "urteilSchwarzAmZug": "tot",
+   "urteilWeissAmZug": "lebendig",
+   "begruendung": "Eckenkampf um den markierten Einzelstein S19: Seine Freiheiten sind S18 und T19; die weiße Gruppe Q17/R17/R18/S17 steht in Atari auf S18, der schwarze Stein R19 steht in Atari auf Q19, und T18 hat zwei Freiheiten (S18, T19). Weiß am Zug: Q19 schlägt R19; Schwarz darf nicht sofort zurückschlagen (einfaches Ko, skriptbestätigt), und S18 sowie T19 wären Selbstmord. Nach der Festannahme (keine Ko-Drohungen außerhalb) kann Schwarz nur am Ort spielen oder passen, worauf Weiß mit R19 verbindet: Die Gruppe Q17-S19/T18 hat dann zwei echte Augen S18 und T19 und ist nicht mehr fangbar (alle Füllversuche sind Selbstmord). Schwarz am Zug: S18 schlägt sofort Q17/R17/R18/S17 (deren letzte Freiheit); danach stehen S19 und T18 in Atari auf T19, Weiß T19 wäre Selbstmord, und alle Erweiterungsversuche (R19, R18, R17, Q17, S17) scheitern an Q19/R18 bzw. werden geschlagen, bis T19 die Kette nimmt. Die Teilurteile unterscheiden sich, also ko_zugabhaengig; das einfache Ko um Q19/R19 kann nur Weiß beenden.",
+   "sicherheit": "sicher",
+   "dauerSekunden": 947
+  },
+  {
+   "id": "U-49f79f",
+   "kategorie": "lebendig",
+   "begruendung": "Die markierte Kette N2/O2/O3 hat vier Freiheiten (N1, O1, P2, P3) und ist über die beiden Punkte P2 und P3 doppelt mit der Gruppe P4/Q2-Q4/R2 (6 Freiheiten) verbunden. Jeder schwarze Schnitt wird sofort bestraft: B P3 schlägt W P2 den Schneidestein; B P2 wird durch W P3 verbunden, und die Eindringlinge P1/O1/Q1 räumt Weiß ab (verifizierte Folge: O1-N1-P1-R1-Q1-S4-P3 schlägt P2/Q1/O1/P1). Auch umgekehrt (erst P3, dann O1/P1) bleiben Weiß immer Schlagzüge, weil die schwarzen Steine am Rand nur Freiheiten auf Punkten haben, die Weiß kontrolliert. Weiß am Zug verbindet mit P3 sofort. Nach dem Abraum bleiben zwei echte Augen (der Raum O1/P2/P3 und der Raum Q1/R1/S1), in allen gelesenen Linien bleibt die Kette ungetrennt: lebendig bei beiden Zugrechten.",
+   "sicherheit": "sicher",
+   "dauerSekunden": 325
+  },
+  {
+   "id": "U-dea5f6",
+   "kategorie": "lebendig",
+   "begruendung": "Die markierte Kette B2/B3/B4 in der linken unteren Ecke hat sechs Freiheiten (A2, A3, A4, B1, B5, C4), und die gesamte A-Linie bis A11 ist offen; die weißen Nachbarn C2/C3 haben nur vier Freiheiten (C1, C4, D2, D3). Schwarz am Zug macht mit A4 und A2 zwei Augen: Nach A4-B5-A2-B1-C1-A1 schlägt Schwarz den weißen Stein B1, und A3 sowie der Raum um A1/B1/C1 werden Augenraum (skriptverifiziert). Weiß am Zug: Der Vitalpunkt B5 wird mit A4 beantwortet, wonach Weiß mit A2/B1/C1 zwar Druck macht, aber Schwarz über A1/A3 stets schlägt oder Augen behält; der Vorstoß C4 wird durch B5 kontert, und Schwarz gewinnt jeden Freiheitenkampf (6 gegen 4 Freiheiten) zusätzlich mit Fluchtfeld über die offene A-Linie nach oben. Die Kette bleibt bei beiden Zugrechten bestehen.",
+   "sicherheit": "eher_sicher",
+   "offen": "Die tiefsten weißen Randbehinderungen (Aufbau von C1/D1 her und Vorstöße über C4 mit nachfolgendem Auffüllen der A-Linie) habe ich nicht in jede Verzweigung hinein gelesen; da Schwarz jeden Freiheitenkampf mit 6 gegen 4 Freiheiten und offener Fluchtlinie gewinnt, halte ich das Urteil trotzdem für richtig.",
+   "dauerSekunden": 586
+  },
+  {
+   "id": "U-f4bb91",
+   "kategorie": "lebendig",
+   "begruendung": "Die markierte Kette P9-S12 hat zwar nur drei Freiheiten (Q13, S11, T12), aber beide Verbindungspunkte sind für Weiß unspielbar: Q13 und P14 wären Selbstmord, weil alle ihre Nachbarn schwarz sind und die umgebenden schwarzen Ketten weitere Freiheiten behalten (skriptgeprüft); gleiches gilt für R16 und T15 gegenüber der Gruppe S14-S18. Weiß S11 wird mit T12, T11 und T13x widerlegt: Schwarz schlägt den weißen Stein S13, und S13 wird ein echtes Auge. Weiß T12 wird mit Q13 (Verbindung zu Q14/P13) und P14 (Verbindung zu M14/N14/N15/O14/P15/P16) beantwortet, sodass eine große Kette mit Freiheiten N16, O15, O16, S13 entsteht. Weiß T13 wird mit S11, T12, Q13 kontert. In der tiefsten gelesenen Zwickmühle (Weiß O16, O15, N17) verbindet Schwarz über S13 an die Gruppe S14-S18 und hält die zwei nicht füllbaren Punkte R16 und T15. Die Kette bleibt bei beiden Zugrechten bestehen.",
+   "sicherheit": "eher_sicher",
+   "offen": "Die Feinvarianten der weißen Randzwickmühle im Raum N16/O15/O16 (Reihenfolgevertauschungen des Auffüllens von außen) habe ich nicht vollständig erschöpft; in allen gelesenen Linien endete die Stellung mit zwei echten Augen oder zwei für Weiß nicht füllbaren Freiheiten.",
+   "dauerSekunden": 176
+  }
+ ]
+}

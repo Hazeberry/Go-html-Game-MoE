@@ -1,0 +1,132 @@
+Beurteilung Unterlagen - JSON Antwort
+Im Anhang ist ein Paket mit sechs Unterlagen. Lies zuerst anleitung-beurteiler.md und halte dich genau daran. Beurteile alle sechs Unterlagen und gib mir einen Antwortbogen als JSON-Datei nach bogen-schema.json zurück. Miss die Zeit je Unterlage mit einer Uhr, wenn du kannst. 
+
+Thought Process
+Ich habe die Anleitung gelesen. Wichtigste Punkte: jede Unterlage einzeln beurteilen (markierte @-Kette), Urteil gilt für beide Zugrechte, Ko-Annahme ohne externe Drohungen, Hilfsmittel nur mechanische eigene Skripte (keine automatische Suche), Zeit messen. Jetzt prüfe ich die Integrität und lese die Unterlagen.
+
+Ich habe Anleitung, Schema, Vorlage und Manifest gelesen und die Prüfsummen verifiziert (alle Dateien stimmen mit dem Manifest überein; das Manifest-Feld manifestSha256 ist a6a4c945…). Jetzt lese ich die sechs Unterlagen.
+
+Alle sechs Unterlagen sind gelesen. Es sind Go-Stellungen (19×19) mit je einer markierten Kette — links oben (U-2173a8, U-dea5f6), rechts (U-f4bb91), Ecken/Rand (U-351c82, U-49f79f) und Mitte (U-15d04c). Jetzt schreide ich das erlaubte mechanische Hilfsmittel: ein eigenes Skript zum Nachspielen, Freiheitenzählen und Prüfen von Zugfolgen (keine automatische Suche, wie die Anleitung verlangt).
+
+Zwei Fehler gefunden: mein SGF-Koordinatenmapping (y muss von oben gezählt werden) und die Regex „Stein/Steine". Ich korrigiere das Skript.
+
+Meine frühere Korrektur hat einen Zeilenumbruch verschluckt — der def neighbors klebt jetzt am Kommentar. Ich repariere das.
+
+Alle sechs Bretter stimmen mit ihren SGF-Historien überein — das Werkzeug arbeitet korrekt. Jetzt beginne ich mit der eigentlichen Beurteilung, je Unterlage mit Uhrzeitmessung. U-2173a8 zuerst (markierter Stein: Schwarz A5, links oben).
+
+U-2173a8, lokale Lage: Markierter Einzelstein Schwarz A5 mit 3 Freiheiten (A4, A6, B5); Schwarze Nachbarn B4 (2 Frh.), A3 (1 Frh.!), B6, C5, C3; Weiße Angreifer C4/D4 (3 Frh.), B3 (nur 1 Frh.!), A2 (2 Frh.). Der entscheidende Punkt ist B5 — Verbindung von A5 mit B4/B6/C5. Ich prüfe die Hauptvarianten durch.
+
+U-2173a8 ist klar: Der Schlüsselpunkt B5 ist für Weiß Selbstmord (alle vier Nachbarn A5/B4/B6/C5 sind schwarz mit weiteren Freiheiten), für Schwarz verbindet er die markierte Kette zu einer großen Gruppe. Ich halte das Ergebnis fest und stoppe die Uhr.
+
+U-2173a8 fertig: lebendig (sicher), 1065 s. Kurzbegründung: A5 sitzt mit vier verbündeten Steinen um den einzigen freien Schnitt B5; B5 wäre für Weiß Selbstmord, für Schwarz der verbindende Zug. Nun U-15d04c (markiert: Weiß P5/N4/O4/P4, rechts).
+
+U-15d04c: Markierte Weiß-Kette P5/N4/O4/P4 (4 Frh.: M4, N5, O5, P6) — P6 ist zugleich Verbindungspunkt zur starken Weiß-Gruppe Q6–R7 (7 Frh.); die schwarze Angreiferkette O9–T7 hat nur 3 Freiheiten (R5, S4, T6), und weißer Einzelstein T5 sitzt in Atari auf T6. Ich prüfe die Varianten.
+
+U-15d04c ist entschieden: Alle schwarzen Angriffe (O5, P6, N5, M4 als Erstzug) scheitern — die markierte Kette hat zwei unabhängige Verbindungsrouten (P6 zur starken Gruppe mit 7 Freiheiten; M4–M5–L4 zur linken Gruppe mit 8 Freiheiten), und die schwarzen Angreiferketten haben selbst nur 2–3 Freiheiten. Ich stoppe die Uhr und fahre fort.
+
+U-15d04c fertig: lebendig (sicher), 361 s. Nun U-351c82 — markiert ist ein einzelner weißer Eckstein S19.
+
+U-351c82 ist eine klassische Ecken-Fangfreude: Markiert S19 (2 Frh. S18/T19), weiße Gruppe Q17–S17 in Atari auf S18, schwarzer R19 in Atari auf Q19, T18 mit 2 Frh. Ich verifiziere die entscheidenden Zugfolgen mit dem Werkzeug.
+
+U-351c82 vollständig gelesen — das Ergebnis hängt vom Zugrecht ab:
+
+Weiß zuerst (laut Unterlage am Zug): W Q19 schlägt R19 (dessen einzige Freiheit). Schwarz kann nicht sofort zurückschlagen (einfaches Ko), S18/T19 wären Selbstmord; ohne externe Ko-Drohungen verbindet Weiß R19 → die Kette Q17–T18 hat zwei echte Augen S18 und T19 → lebendig.
+Schwarz zuerst: S18 schlägt die vier Steine Q17/R17/R18/S17 (letzte Freiheit); danach sind S19+T18 in Atari auf T19, W T19 wäre Selbstmord, alle Erweiterungen (R19, R18, R17, Q17, S17) scheitern an Q19/R18 → tot.
+U-49f79f: Markierte Kette N2/O2/O3 (4 Frh.: N1, O1, P2, P3) mit zwei Verbindungspunkten P2/P3 zur starken Gruppe P4–R2 (6 Frh.). Ich verifiziere die Schneide-Varianten.
+
+U-49f79f ist entschieden: lebendig für beide Zugrechte. Alle Schnitte (P2, P3) werden sofort geschlagen oder verbinden Weiß; die清理-Reihenfolge N1/O1/P1/Q1/R1 endet immer damit, dass Weiß die Eindringlinge schlägt und danach zwei Augen (O1/P2/P3-Raum und Q1/R1/S1-Raum) behält. Uhr stoppen, weiter mit U-dea5f6.
+
+U-dea5f6: Markierte Schwarze Kette B2/B3/B4 mit 6 Freiheiten (A2, A3, A4, B1, B5, C4), die gesamte A-Linie ist bis A13 offen, weiße Nachbarn C2/C3 haben nur 4 Freiheiten. Ich verifiziere die Augenausbildung und die weißen Angriffsversuche.
+
+U-dea5f6: Die markierte Kette B2–B4 hat 6 Freiheiten, die gesamte A-Linie bis A13 ist offen (Fluchtfeld), Schwarz hat Anschlusssteine B8–B10 und D6 in der Nähe, und die weißen Nachbarn C2/C3 haben nur 4 Freiheiten. Ich verifiziere die kritischsten weißen Angriffe (B1 als Vitalpunkt, C4 als Schneide).
+
+U-f4bb91: Markierte Kette P9–S12 (8 Steine) mit nur 3 Freiheiten (Q13, S11, T12), weißer S13-Stein in Atari auf T13, schwarze Gruppen Q14/P13 (2 Frh.) und S14–T17 (3 Frh.) in der Nähe — ein echter Fangkampf. Ich spiele die Hauptlinien durch.
+
+U-f4bb91 ist entschieden: lebendig — Q13/P14 (Verbindungspunkte) sind für Weiß Selbstmord, S11/T12/T13-Angriffe werden widerlegt, und in der tiefsten Zwickmühle hält Schwarz zwei nicht füllbare Punkte (R16/T15). Jetzt erzeuge ich den Antwortbogen.
+
+Alles validiert. Kurzer letzter Textcheck der Begründungen auf versehentliche Fremdsprachen-Fetzen, dann fertig.
+
+Fertig. Alle sechs Unterlagen sind beurteilt und der Antwortbogen ist validiert in download/ gespeichert.
+
+Datei: /home/z/my-project/download/antwortbogen.json (Schema-konform, alle 6 Kennungen in Vorlagenreihenfolge, manifestSha256 aus dem Manifest übernommen)
+
+Ergebnisse im Überblick:
+
+Unterlage
+Urteil
+Sicherheit
+Dauer
+U-2173a8 (A5)	lebendig	sicher	1065 s
+U-15d04c (P5/N4/O4/P4)	lebendig	sicher	361 s
+U-351c82 (S19)	ko_zugabhaengig — Schwarz am Zug: tot / Weiß am Zug: lebendig	sicher	947 s
+U-49f79f (O3/N2/O2)	lebendig	sicher	325 s
+U-dea5f6 (B4/B3/B2)	lebendig	eher_sicher	586 s
+U-f4bb91 (R13/Q12/R12/S12/Q11/P10/Q10/Q9)	lebendig	eher_sicher	176 s
+
+Vorgehen (nach Anleitung): Jede Unterlage einzeln gelesen, je einmal mit Schwarz- und einmal mit Weiß-Zugrecht. Als Hilfsmittel nur ein selbst geschriebenes, rein mechanisches Python-Skript (scripts/gotool.py): SGF-Replay (alle sechs Bretter stimmten exakt mit der Zuggeschichte überein), Freiheitenzählen, Legalitätsprüfung (Selbstmord/Ko) und Durchspielen der von mir gewählten Zugfolgen — keine automatische Suche, keine fremde Go-Software. Die Zeiten habe ich mit der Unix-Uhr je Unterlage gemessen (dauerSekunden eingetragen).
+
+Kurz zu den Urteilen: U-351c82 ist der eigentliche Eckenkampf — Weiß (laut Unterlage am Zug) schlägt mit Q19 den schwarzen R19-Stein im einfachen Ko und lebt danach mit zwei Augen S18/T19; zieht Schwarz zuerst, nimmt S18 die weiße Randgruppe und die Kette fällt. Bei den anderen vier Lebens-Urteilen waren die entscheidenden Punkte jeweils für den Angreifer Selbstmord (B5 in U-2173a8, Q13/P14 in U-f4bb91) bzw. wurden die Schnitte sofort geschlagen (P2/P3 in U-49f79f, O5/P6 in U-15d04c); bei U-dea5f6 und U-f4bb91 habe ich die tiefsten Zwickmühlen-Varianten nicht vollständig erschöpft, deshalb eher_sicher mit offen-Angaben im Bogen.
+
+All files in task
+1
+
+antwortbogen
+· json
+Send a Message
+
+Chat controls
+
+antwortbogen.json
+{
+  "manifestSha256": "a6a4c945de8800744423ed9733c9aa2b1d77332e306e5d9fd61b2fe102849fce",
+  "beurteiler": "KI",
+  "hilfsmittel": "eigenes Skript (Python) zum mechanischen Nachspielen der SGF-Züge, Anzeigen der Bretter, Freiheitenzählen sowie Prüfen und Durchspielen selbst gewählter Zugfolgen; keine automatische Suche, keine fremde Go-Software",
+  "antworten": [
+    {
+      "id": "U-2173a8",
+      "kategorie": "lebendig",
+      "begruendung": "Der markierte Schwarze Einzelstein A5 steht am linken Rand, aber der einzige freie Verbindungspunkt B5 ist für Weiß unspielbar: Alle vier Nachbarn von B5 (A5, B4, B6, C5) sind schwarz und haben jeweils weitere Freiheiten, Weiß B5 wäre Selbstmord (skriptgeprüft). Zieht Weiß zuerst A4 und schlägt damit A3, antwortet Schwarz B5 und verbindet A5 mit B4/B6/C5 zu einer Kette mit Freiheiten A6, B7, C6, D5; das nachfolgende Weiß A6 verliert sofort an Schwarz A7 (verifizierte Zugfolge A4-B5-A6-A7). Zieht Schwarz zuerst, spielt es B5 selbst und steht ebenso verbunden. Da Weiß den Punkt B5 nie besetzen kann, gibt es keinen Weg, der markierten Kette alle Freiheiten zu nehmen; sie bleibt in allen gelesenen Varianten bestehen.",
+      "sicherheit": "sicher",
+      "dauerSekunden": 1065
+    },
+    {
+      "id": "U-15d04c",
+      "kategorie": "lebendig",
+      "begruendung": "Die markierte Weiß-Kette P5/N4/O4/P4 hat vier Freiheiten (M4, N5, O5, P6) und zwei unabhängige Verbindungen: P6 zur starken Gruppe Q6-R7/N8-R7 (7 Freiheiten) und über M4/M5 zur Gruppe J2-K7/L4 (8 Freiheiten). Alle ersten Züge von Schwarz scheitern: O5 (Atari) wird mit M4 beantwortet, und nach N5/N6 nimmt Weiß mit O6 den Stein O5 wieder und behält Freiheiten (L4, L5, O5-Bereich); der Schnitt P6 wird durch N5 sofort geschlagen oder verbunden; der Vorstoß N5 wird durch M4 kontert; M6 als erster Zug lässt Weiß über L5/L4/K1 in die linksseitige Gruppe entkommen (verifiziert). Schwarz kann nie beide Verbindungspunkte gleichzeitig schneiden, zumal die eigenen Angreiferketten O9-T7 (3 Freiheiten) und T4 (2 Freiheiten) kaum Reserven haben. Weiß am Zug verbindet sofort mit P6. Beide Zugrechte: Die Kette bleibt ungetrennt und dauerhaft auf dem Brett.",
+      "sicherheit": "sicher",
+      "dauerSekunden": 361
+    },
+    {
+      "id": "U-351c82",
+      "kategorie": "ko_zugabhaengig",
+      "urteilSchwarzAmZug": "tot",
+      "urteilWeissAmZug": "lebendig",
+      "begruendung": "Eckenkampf um den markierten Einzelstein S19: Seine Freiheiten sind S18 und T19; die weiße Gruppe Q17/R17/R18/S17 steht in Atari auf S18, der schwarze Stein R19 steht in Atari auf Q19, und T18 hat zwei Freiheiten (S18, T19). Weiß am Zug: Q19 schlägt R19; Schwarz darf nicht sofort zurückschlagen (einfaches Ko, skriptbestätigt), und S18 sowie T19 wären Selbstmord. Nach der Festannahme (keine Ko-Drohungen außerhalb) kann Schwarz nur am Ort spielen oder passen, worauf Weiß mit R19 verbindet: Die Gruppe Q17-S19/T18 hat dann zwei echte Augen S18 und T19 und ist nicht mehr fangbar (alle Füllversuche sind Selbstmord). Schwarz am Zug: S18 schlägt sofort Q17/R17/R18/S17 (deren letzte Freiheit); danach stehen S19 und T18 in Atari auf T19, Weiß T19 wäre Selbstmord, und alle Erweiterungsversuche (R19, R18, R17, Q17, S17) scheitern an Q19/R18 bzw. werden geschlagen, bis T19 die Kette nimmt. Die Teilurteile unterscheiden sich, also ko_zugabhaengig; das einfache Ko um Q19/R19 kann nur Weiß beenden.",
+      "sicherheit": "sicher",
+      "dauerSekunden": 947
+    },
+    {
+      "id": "U-49f79f",
+      "kategorie": "lebendig",
+      "begruendung": "Die markierte Kette N2/O2/O3 hat vier Freiheiten (N1, O1, P2, P3) und ist über die beiden Punkte P2 und P3 doppelt mit der Gruppe P4/Q2-Q4/R2 (6 Freiheiten) verbunden. Jeder schwarze Schnitt wird sofort bestraft: B P3 schlägt W P2 den Schneidestein; B P2 wird durch W P3 verbunden, und die Eindringlinge P1/O1/Q1 räumt Weiß ab (verifizierte Folge: O1-N1-P1-R1-Q1-S4-P3 schlägt P2/Q1/O1/P1). Auch umgekehrt (erst P3, dann O1/P1) bleiben Weiß immer Schlagzüge, weil die schwarzen Steine am Rand nur Freiheiten auf Punkten haben, die Weiß kontrolliert. Weiß am Zug verbindet mit P3 sofort. Nach dem Abraum bleiben zwei echte Augen (der Raum O1/P2/P3 und der Raum Q1/R1/S1), in allen gelesenen Linien bleibt die Kette ungetrennt: lebendig bei beiden Zugrechten.",
+      "sicherheit": "sicher",
+      "dauerSekunden": 325
+    },
+    {
+      "id": "U-dea5f6",
+      "kategorie": "lebendig",
+      "begruendung": "Die markierte Kette B2/B3/B4 in der linken unteren Ecke hat sechs Freiheiten (A2, A3, A4, B1, B5, C4), und die gesamte A-Linie bis A11 ist offen; die weißen Nachbarn C2/C3 haben nur vier Freiheiten (C1, C4, D2, D3). Schwarz am Zug macht mit A4 und A2 zwei Augen: Nach A4-B5-A2-B1-C1-A1 schlägt Schwarz den weißen Stein B1, und A3 sowie der Raum um A1/B1/C1 werden Augenraum (skriptverifiziert). Weiß am Zug: Der Vitalpunkt B5 wird mit A4 beantwortet, wonach Weiß mit A2/B1/C1 zwar Druck macht, aber Schwarz über A1/A3 stets schlägt oder Augen behält; der Vorstoß C4 wird durch B5 kontert, und Schwarz gewinnt jeden Freiheitenkampf (6 gegen 4 Freiheiten) zusätzlich mit Fluchtfeld über die offene A-Linie nach oben. Die Kette bleibt bei beiden Zugrechten bestehen.",
+      "sicherheit": "eher_sicher",
+      "offen": "Die tiefsten weißen Randbehinderungen (Aufbau von C1/D1 her und Vorstöße über C4 mit nachfolgendem Auffüllen der A-Linie) habe ich nicht in jede Verzweigung hinein gelesen; da Schwarz jeden Freiheitenkampf mit 6 gegen 4 Freiheiten und offener Fluchtlinie gewinnt, halte ich das Urteil trotzdem für richtig.",
+      "dauerSekunden": 586
+    },
+    {
+      "id": "U-f4bb91",
+      "kategorie": "lebendig",
+      "begruendung": "Die markierte Kette P9-S12 hat zwar nur drei Freiheiten (Q13, S11, T12), aber beide Verbindungspunkte sind für Weiß unspielbar: Q13 und P14 wären Selbstmord, weil alle ihre Nachbarn schwarz sind und die umgebenden schwarzen Ketten weitere Freiheiten behalten (skriptgeprüft); gleiches gilt für R16 und T15 gegenüber der Gruppe S14-S18. Weiß S11 wird mit T12, T11 und T13x widerlegt: Schwarz schlägt den weißen Stein S13, und S13 wird ein echtes Auge. Weiß T12 wird mit Q13 (Verbindung zu Q14/P13) und P14 (Verbindung zu M14/N14/N15/O14/P15/P16) beantwortet, sodass eine große Kette mit Freiheiten N16, O15, O16, S13 entsteht. Weiß T13 wird mit S11, T12, Q13 kontert. In der tiefsten gelesenen Zwickmühle (Weiß O16, O15, N17) verbindet Schwarz über S13 an die Gruppe S14-S18 und hält die zwei nicht füllbaren Punkte R16 und T15. Die Kette bleibt bei beiden Zugrechten bestehen.",
+      "sicherheit": "eher_sicher",
+      "offen": "Die Feinvarianten der weißen Randzwickmühle im Raum N16/O15/O16 (Reihenfolgevertauschungen des Auffüllens von außen) habe ich nicht vollständig erschöpft; in allen gelesenen Linien endete die Stellung mit zwei echten Augen oder zwei für Weiß nicht füllbaren Freiheiten.",
+      "dauerSekunden": 176
+    }
+  ]
+}

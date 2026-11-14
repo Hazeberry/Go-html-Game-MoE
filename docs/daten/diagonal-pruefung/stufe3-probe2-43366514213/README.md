@@ -16,11 +16,13 @@ Artefakt des [Actions-Laufs 43366514213](https://github.com/Hazeberry/Go-html-Ga
 |---|---|---|
 | `bogen-sitzung3.json` | frische KI-Sitzung, die die erste Probe nicht gesehen hat; laut Dateiname des hochgeladenen Pakets GLM 5.3 (nicht weiter geprüft). Hilfsmittel laut Bogen: Textanzeige, Zeitmessung, Schemaprüfung, keine Go-Software | im Bogen (`dauerSekunden`, gemessen mit `time.monotonic()`, nur Lesen und Urteilen): 24,8 / 17,0 / 44,6 / 24,7 / 18,2 / 39,3 s |
 
-Die Datei ist die von Hazeberry hochgeladene, unverändert.
+| `bogen-sitzung4.json` | weitere frische KI-Sitzung, nur das Probe-Paket und der Auftrag; Anbieter nicht angegeben (Arbeitsverzeichnis `/home/z/…`). Hilfsmittel laut Bogen: eigenes Python-Skript zum Nachspielen, Freiheitenzählen und Durchspielen selbst gewählter Zugfolgen, keine Suche, keine Go-Software | im Bogen (`dauerSekunden`, Unix-Uhr je Unterlage): 1065 / 361 / 947 / 325 / 586 / 176 s |
+
+`bogen-sitzung3.json` ist die von Hazeberry hochgeladene Datei, unverändert. `bogen-sitzung4.json` ist aus dem Chat-Verlauf gespeichert, den Hazeberry hochgeladen hat (Inhalt unverändert, Formatierung neu); der ganze Verlauf liegt als `protokoll-sitzung4.txt` bei.
 
 ## Bei der Sicherung geprüft
 
-- `node auswertung/endspiel/diagonal-pruefung-stufe3.js pruefen --bogen bogen-sitzung3.json --manifest manifest.json` (Manifest aus dem ZIP): Exit 0.
+- `node auswertung/endspiel/diagonal-pruefung-stufe3.js pruefen --bogen … --manifest manifest.json` (Manifest aus dem ZIP): Exit 0 für `bogen-sitzung3.json` und `bogen-sitzung4.json`.
 - Prüfsummen aller Paketdateien gleich dem Manifest; `unzip -t` fehlerfrei.
 - Nicht geprüft: die fachliche Richtigkeit irgendeines Urteils.
 
