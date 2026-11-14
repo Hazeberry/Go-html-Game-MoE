@@ -8,6 +8,9 @@
         bei aus und bei an.
      4. Eine bereits geöffnete Vorschau folgt dem Schalter: Ändern des Dashboard-Felds, Reset und Preset „Std“ berechnen sie neu (Mengen und
         Panel-Text gleich einer frisch geöffneten Vorschau); eine geschlossene Vorschau bleibt geschlossen; der Cache-Schlüssel enthält den Schalter.
+     5. Schalter nur für die Schlusszählung (PARAMS.diagonalAugeSchluss, docs/diagonal-schluss-vorabfestlegung.md): Standard 0 mit Dashboard-Zeile;
+        bei diagonalAugeSchluss = 1 und diagonalAugeEnde = 0 entfernt die Schlusszählung die Menge „an“, die Zählvorschau zeigt weiter die
+        Menge „aus“; eine geöffnete Vorschau bleibt beim Ändern des Felds unverändert (Mengen, Panel-Text, Cache-Schlüssel).
    Die Mengen stammen aus tests/referenz/diagonalauge.json (vor der Änderung eingefroren).
    Aufruf:  node tests/browser-diagonalauge.js [pfad/zur/index.html] */
 'use strict';
@@ -147,6 +150,59 @@ test('Geöffnete Vorschau folgt dem Schalter: Dashboard-Feld, Reset und Preset �
   pruefeGleich(JSON.stringify(a3.tot), JSON.stringify(e.totAus), 'nach Preset Std: Mengen gleich aus');
   pruefeGleich(a3.text, aus.text, 'nach Preset Std: Panel-Text gleich einer frischen Vorschau bei aus');
   await ctx.close();
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('Nur Schlusszählung: Standard 0 mit Dashboard-Zeile; Schlusszählung an, Vorschau aus', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  {
+    const {s, ctx, fehler} = await seite();
+    const w = await s.evaluate(() => { const i = document.getElementById('pd-diagonalAugeSchluss'); return {p: PARAMS.diagonalAugeSchluss, d: PARAMS_DEFAULT.diagonalAugeSchluss, zeile: !!i, wert: i && i.value, min: i && i.min, max: i && i.max}; });
+    await ctx.close();
+    pruefeGleich(w.p, 0, 'PARAMS'); pruefeGleich(w.d, 0, 'PARAMS_DEFAULT'); pruefe(w.zeile, 'Dashboard-Zeile pd-diagonalAugeSchluss vorhanden');
+    pruefeGleich(w.wert, '0', 'Dashboard-Wert 0'); pruefeGleich(w.min, '0', 'min'); pruefeGleich(w.max, '1', 'max');
+    pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+  }
+  for (const k of STELLUNGEN) {
+    const e = fix(k);
+    for (const [schalter, sollSchluss, was] of [[0, e.totAus, 'aus'], [1, e.totAn, 'an']]) {
+      const {s, ctx, fehler} = await seite();
+      const r = await s.evaluate(([brett, sw]) => {
+        const setze = () => { for (let i = 0; i < brett.length; i++) state.board[i] = brett[i] === 'X' ? 1 : brett[i] === 'O' ? 2 : 0; };
+        PARAMS.diagonalAugeEnde = 0; PARAMS.diagonalAugeSchluss = sw;
+        setze(); vorschauOeffnen();
+        const v = state.vorschau && state.vorschau.v, vorschau = [];
+        if (v) for (let i = 0; i < v.bewiesenTot.length; i++) if (v.bewiesenTot[i] || v.geschaetztTot[i]) vorschau.push(i);
+        const schluessel = state.vorschau && state.vorschau.schluessel;
+        setze(); resolveLifeAndDeath();
+        return {schluss: [...state.deadStones].sort((a, b) => a - b), vorschau, schluessel};
+      }, [e.brett, schalter]);
+      await ctx.close();
+      pruefeGleich(JSON.stringify(r.schluss), JSON.stringify(sollSchluss), `${k}: Schlusszählung bei diagonalAugeSchluss ${was}`);
+      pruefeGleich(JSON.stringify(r.vorschau), JSON.stringify(e.totAus), `${k}: Vorschau bleibt aus bei diagonalAugeSchluss ${was}`);
+      pruefe(r.schluessel && r.schluessel.endsWith(':0'), `${k}: Cache-Schlüssel der Vorschau zeigt aus (${r.schluessel})`);
+      pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+    }
+  }
+});
+
+test('Nur Schlusszählung: eine geöffnete Vorschau bleibt beim Ändern des Felds unverändert', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const e = fix('Fuego 50 Spiele|D.jsonl.gz|212|337');
+  const {s, ctx, fehler} = await seite();
+  const lies = () => s.evaluate(() => {
+    const v = state.vorschau && state.vorschau.v, tot = [];
+    if (v) for (let i = 0; i < v.bewiesenTot.length; i++) if (v.bewiesenTot[i] || v.geschaetztTot[i]) tot.push(i);
+    return {offen: !!state.vorschau, tot, text: document.getElementById('zv-panel').textContent, schluessel: state.vorschau && state.vorschau.schluessel, schalter: PARAMS.diagonalAugeSchluss};
+  });
+  await s.evaluate(brett => { for (let i = 0; i < brett.length; i++) state.board[i] = brett[i] === 'X' ? 1 : brett[i] === 'O' ? 2 : 0; vorschauOeffnen(); }, e.brett);
+  const a0 = await lies();
+  await s.evaluate(() => { const i = document.getElementById('pd-diagonalAugeSchluss'); i.value = '1'; i.dispatchEvent(new Event('change')); });
+  const a1 = await lies();
+  await ctx.close();
+  pruefeGleich(a1.schalter, 1, 'Feld setzt PARAMS.diagonalAugeSchluss auf 1'); pruefe(a1.offen, 'Vorschau bleibt offen');
+  pruefeGleich(JSON.stringify(a1.tot), JSON.stringify(e.totAus), 'Mengen bleiben aus'); pruefeGleich(a1.text, a0.text, 'Panel-Text unverändert');
+  pruefeGleich(a1.schluessel, a0.schluessel, 'Cache-Schlüssel unverändert');
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 

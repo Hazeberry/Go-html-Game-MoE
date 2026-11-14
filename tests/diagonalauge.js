@@ -9,6 +9,9 @@
         90 Brettern und den sieben Entwicklungsstellungen; fünf von ihnen ändern sich, zwei (523|354, 26|335) nicht.
      4. Standard: PARAMS.diagonalAugeEnde ist 0, auch in PARAMS_DEFAULT.
      5. Der Worker-Pfad reicht den Schalter durch: passNachGegnerpassPruefung ruft zaehlVorschau mit opt.diagonalAuge gleich dem Parameter auf.
+     6. Schalter nur für die Schlusszählung (PARAMS.diagonalAugeSchluss, docs/diagonal-schluss-vorabfestlegung.md): Standard 0; der Name kommt in
+        index.html nur in PARAMS, in resolveLifeAndDeath und in der Dashboard-Zeile vor (also weder in der Zählvorschau noch in der KI); der
+        Worker-Pfad (passNachGegnerpassPruefung) bleibt bei diagonalAugeSchluss = 1 ohne Diagonalprüfung.
      (Schlusszählung im Hauptthread, Anzeige und Dashboard: tests/browser-diagonalauge.js.)
    Aufruf:  node tests/diagonalauge.js [pfad/zur/index.html] */
 'use strict';
@@ -85,6 +88,35 @@ test('Worker-Pfad reicht den Schalter durch: passNachGegnerpassPruefung', () => 
     for (const d of [0, 1]) { P.diagonalAugeEnde = d; E.passNachGegnerpassPruefung(b, 1, {1: 0, 2: 0}, {gegnerPasste: true, wertung: 'flaeche', komi: 7.5}); }
     pruefeGleich(gesehen.join(','), 'false,true', 'opt.diagonalAuge folgt PARAMS.diagonalAugeEnde');
   } finally { globalThis.zaehlVorschau = alt; P.passNachGegnerpass = vorher.p; P.diagonalAugeEnde = vorher.d; }
+});
+
+test('Nur Schlusszählung: PARAMS.diagonalAugeSchluss ist 0 (auch in PARAMS_DEFAULT)', () => {
+  pruefeGleich(E.PARAMS.diagonalAugeSchluss, 0, 'PARAMS');
+  pruefeGleich(globalThis.PARAMS_DEFAULT.diagonalAugeSchluss, 0, 'PARAMS_DEFAULT');
+});
+
+test('Nur Schlusszählung: diagonalAugeSchluss steht nur in PARAMS, resolveLifeAndDeath und der Dashboard-Zeile', () => {
+  const html = fs.readFileSync(process.argv[2] || require('./rahmen').STANDARD_HTML, 'utf8'), zeilen = html.split('\n'), orte = [];
+  zeilen.forEach((z, i) => {
+    if (!z.includes('diagonalAugeSchluss')) return;
+    let fn = null; for (let k = i; k >= 0 && !fn; k--) { const m = /^(?:async )?function ([A-Za-z_$][\w$]*)/.exec(zeilen[k]); if (m) fn = m[1]; }
+    if (/^  diagonalAugeSchluss: 0,$/.test(z)) orte.push('PARAMS');
+    else if (/^\s*\{key:'diagonalAugeSchluss',/.test(z)) orte.push('Dashboard');
+    else if (fn === 'resolveLifeAndDeath' && /toteSteineAmEnde\(state\.board, undefined, undefined, PARAMS\.diagonalAugeEnde >= 1 \|\| PARAMS\.diagonalAugeSchluss >= 1\)/.test(z)) orte.push('resolveLifeAndDeath');
+    else orte.push(`unerwartet Zeile ${i + 1} (in ${fn}): ${z.trim().slice(0, 80)}`);
+  });
+  pruefeGleich(orte.join(','), 'PARAMS,resolveLifeAndDeath,Dashboard', 'Fundstellen');
+});
+
+test('Nur Schlusszählung: der Worker-Pfad bleibt bei diagonalAugeSchluss = 1 ohne Diagonalprüfung', () => {
+  const alt = globalThis.zaehlVorschau, gesehen = [], P = E.PARAMS, vorher = {p: P.passNachGegnerpass, d: P.diagonalAugeEnde, s: P.diagonalAugeSchluss};
+  globalThis.zaehlVorschau = function (b, k, opt) { gesehen.push(!!(opt && opt.diagonalAuge)); return alt.apply(this, arguments); };
+  try {
+    const b = B.brettAusText(REF.entwicklung[3].brett);
+    P.passNachGegnerpass = 1; P.diagonalAugeEnde = 0;
+    for (const w of [0, 1]) { P.diagonalAugeSchluss = w; E.passNachGegnerpassPruefung(b, 1, {1: 0, 2: 0}, {gegnerPasste: true, wertung: 'flaeche', komi: 7.5}); }
+    pruefeGleich(gesehen.join(','), 'false,false', 'opt.diagonalAuge bleibt aus');
+  } finally { globalThis.zaehlVorschau = alt; P.passNachGegnerpass = vorher.p; P.diagonalAugeEnde = vorher.d; P.diagonalAugeSchluss = vorher.s; }
 });
 
 laufeTests('diagonalauge.js').then(ok => { process.exitCode = ok ? 0 : 1; });
