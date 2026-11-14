@@ -60,6 +60,8 @@ In der Schlusszählung zeigt Schicht A (Übereinstimmung mit GNU Go, alt §17.6;
 
 Die 19 behobenen Ketten stammen aus 19 verschiedenen Partien (GNU Go ohne Vorgabe 14, Fuego 50 Spiele 3, Fuego 100 Spiele 2). Die Kennungen und ihre Reihenfolge sind dieselben wie im Gesamtpaket; das Werkzeug filtert nur.
 
+**Zwei der 23 Ketten waren schon Probestücke:** Die erste Probe (alt §18.5) enthielt drei Unterlagen, davon zwei Endstellungen (S); welche zwei der drei Kennungen U-6d01cf, U-f56b4d, U-8300dc das sind, ist hier nicht nachgesehen. Drei Sitzungen haben sie damals beurteilt, mit auseinandergehenden Ko-Einträgen. Diese Urteile werden nicht verwendet, und die Sitzungen sind ausgeschlossen (§4.3 Nr. 3). Die Kennungen sind dieselben wie damals; der Beurteiler bekommt nur das Paket.
+
 **Werkzeug:** `diagonal-pruefung-stufe3.js unterlagen … --art S` schreibt `beurteiler-paket-S/` und `geheim/aufdeckung-S.json`; der Workflow `diagonal-pruefung-stufe3.yml` hat dafür die Eingabe `art` (alle oder S) und eigene Artefakte `beurteiler-paket-S` und `stufe3-geheim-S`. `probe` zusammen mit `art` S ist abgelehnt: Es gibt keine weitere Probe, weil jede Probe Stücke verbrauchen würde.
 
 ### 4.2 Anleitung Fassung 2 (Setzung)
@@ -69,13 +71,13 @@ Das S-Paket hat Manifest-Version 2 und die Anleitung Fassung 2. Fassung 1 bleibt
 Was Fassung 2 anders macht:
 
 1. **Gelesene Zugfolgen sind Pflicht** (Feld `varianten`): mindestens **eine** Zugfolge, in der Schwarz zuerst zieht, und **eine**, in der Weiß zuerst zieht; bei `nicht_entscheidbar` oder Sicherheit `unsicher` mindestens **drei** je Zugrecht. Jede Zugfolge hat `beginnt`, `zuege` (Koordinaten wie im Diagramm oder `pass`) und `ergebnis` (mindestens 10 Zeichen).
-2. **Jede Zugfolge wird mechanisch nachgespielt** (`pruefen`, `zusammenfuegen` und `auswerten`): kein besetzter Punkt, kein Selbstmord, einfaches Ko durchgesetzt (am Anfang nur für die Seite, die laut Unterlage am Zug ist), Superko nicht. Die Stellung kommt aus der SGF der Unterlage, deren Prüfsumme gegen das Manifest geprüft wird.
+2. **Jede Zugfolge wird mechanisch nachgespielt und muss etwas lesen:** Eine Zugfolge nur aus Pässen wird abgelehnt, und dieselbe Zugfolge zählt nicht zweimal. Nachgespielt wird in `pruefen`, `zusammenfuegen` und `auswerten`: kein besetzter Punkt, kein Selbstmord, einfaches Ko durchgesetzt (am Anfang nur für die Seite, die laut Unterlage am Zug ist), Superko nicht. Die Stellung kommt aus der SGF der Unterlage, deren Prüfsumme gegen das Manifest geprüft wird.
 3. **`nicht_entscheidbar` ist keine Abkürzung mehr:** Der Satz „besser als Raten“ ist gestrichen; die Antwort verlangt mehr Zugfolgen als jede andere.
 4. **Zeit ist Pflicht** (`dauerSekunden`, gemessen, ohne Wartezeit auf Rückfragen). Sie wird berichtet, aber **nicht** als Schwelle benutzt: Sie ist eine Selbstangabe und nicht nachprüfbar.
 
-**Grenzen, offen benannt:** Das Werkzeug prüft, ob eine Zugfolge möglich ist, nicht, ob sie gut gewählt ist. Eine Zugfolge aus lauter Pässen besteht die Prüfung. Die Pflicht macht das Weglassen sichtbar und die Lesung nachlesbar; erzwingen kann sie gründliches Lesen nicht. Dass eine Sitzung mit Fassung 2 so liest wie GLM 5.3 auf Max in der zweiten Probe, ist eine Hypothese; sie ist nicht in einer Probe geprüft.
+**Grenzen, offen benannt:** Das Werkzeug prüft, ob eine Zugfolge möglich ist, nicht, ob sie gut gewählt ist. Ein beliebiger möglicher Zug mit anschließendem Pass besteht die Prüfung. Die Pflicht macht das Weglassen sichtbar und die Lesung nachlesbar; erzwingen kann sie gründliches Lesen nicht. Dass eine Sitzung mit Fassung 2 so liest wie GLM 5.3 auf Max in der zweiten Probe, ist eine Hypothese; sie ist nicht in einer Probe geprüft.
 
-Tests: `tests/diagonal-pruefung-stufe3.js` (33 Fälle, acht davon neu für Fassung 2 und S), unter anderem Rundweg der SGF, Ko-Verbot am Anfang und im Verlauf, besetzter Punkt, Selbstmord, ungültige Koordinaten, Mindestzahlen 1 und 3, veränderte SGF wird erkannt, Teilbögen werden mit Zugfolgen geprüft. Mutationsprobe bestanden für: Ko nicht durchgesetzt, drei Zugfolgen bei offen fehlen, kein S-Filter, mehrere Bögen erlaubt, Mindestumfang verlangt V auch bei S, SGF-Prüfsumme ungeprüft.
+Tests: `tests/diagonal-pruefung-stufe3.js` (33 Fälle, acht davon neu für Fassung 2 und S), unter anderem Rundweg der SGF, Ko-Verbot am Anfang und im Verlauf, besetzter Punkt, Selbstmord, ungültige Koordinaten, Mindestzahlen 1 und 3, nur Pässe, doppelte Zugfolgen, veränderte SGF wird erkannt, Teilbögen werden mit Zugfolgen geprüft. Mutationsprobe bestanden für: Ko nicht durchgesetzt, drei Zugfolgen bei offen fehlen, Pass-Folgen erlaubt, Doppelte zählen mehrfach, kein S-Filter, mehrere Bögen erlaubt, Mindestumfang verlangt V auch bei S, SGF-Prüfsumme ungeprüft.
 
 ### 4.3 Beurteiler (Setzungen und offene Entscheidungen)
 
@@ -98,6 +100,12 @@ Ein Befund „positive Kandidatur“ verlangt alle Bedingungen:
 **Mindestumfang** (alt §7 Nr. 7): 30 betroffene Stellungen nur in S (658, erreicht). Ungeklärte B2-Fälle verhindern die Kandidatur nicht (wie alt §18, Auslegung von alt §8 Nr. 4), sie werden einzeln berichtet. R+, R− und ungeklärt sind wie in alt §6.4 definiert; mit genau einem Bogen gibt es keinen Widerspruch zwischen Beurteilern.
 
 Die Zahlen 5, 3 und 30 sind Setzungen ohne Sicherheitswert. Eine positive Kandidatur heißt nur: In dieser Prüfmenge wurde nichts Gegenteiliges gefunden. Sie ist kein Go.
+
+### 4.4a Schwäche der Regel: Schieflage der 23 Ketten (Entscheidung offen, E-S5)
+
+Die Regel prüft den Beurteiler fast nur in eine Richtung. Von den 21 Ketten, bei denen der Schalter etwas ändert, ist bei 20 „tot“ die Antwort zugunsten des Schalters: 18 behobene Ketten (GNU Go: tot) und die beiden B1-Ketten (alt §17.6: alle sieben neu abweichenden S-Steine sind „zusätzlich tot“). Nur bei einer Kette (behoben, GNU Go: lebend) führt „tot“ zu R−. Ein Beurteiler, der zu „tot“ neigt, erfüllt Bedingung 2 und 3 also fast von selbst, und ob er auch lebende Ketten als lebend erkennt, zeigt das Paket nur an dieser einen Kette und an den zwei unveränderten. Das ist keine Aussage über die Urteile, die noch niemand abgegeben hat, sondern über die Trennschärfe der Regel.
+
+**Vorschlag (nicht umgesetzt):** Kontrollketten beimischen, bei denen App (aus und an gleich) und GNU Go übereinstimmen, überwiegend „lebend“, gezogen per Hash aus den 200 S-Kontrollstellungen der Stufe 2, für den Beurteiler nicht erkennbar. Vorab festgelegte Folge: Weicht der Bogen bei mehr als einer vorab festgelegten Zahl von Kontrollketten mit einem entschiedenen, nicht unsicheren Urteil von der gemeinsamen Referenz ab, heißt das Ergebnis „kein Urteil“. Die gemeinsame Referenz ist keine Ground Truth; einzelne Abweichungen werden deshalb berichtet und nicht als Fehler gewertet. Kosten: mehr Unterlagen (bei 16 Kontrollketten 39 statt 23, also grob 10 bis 13 statt 6 bis 8 Stunden, Hypothese), neue Auswahl im Werkzeug mit Tests. **Ohne diese Entscheidung sollte das Paket nicht gebaut werden**, weil sie seine Zusammensetzung ändert.
 
 ### 4.5 Auftragstext für den Beurteiler (Setzung)
 
@@ -138,6 +146,7 @@ Ein Wechsel von `diagonalAugeSchluss` auf Standard 1 kommt nur in Frage, wenn **
 | E-S1 | Wer beurteilt? | frische Sitzung GLM 5.3 auf Max, nicht Astra (§4.3) |
 | E-S2 | Mindestzahlen der Zugfolgen | 1 je Zugrecht, 3 bei `nicht_entscheidbar` oder `unsicher` (§4.2) |
 | E-S3 | Entscheidungsregel für S | wie §4.4 (alt §8 auf S beschränkt, sonst unverändert) |
+| E-S5 | Kontrollketten gegen die Schieflage (§4.4a) | ja, 16 Kontrollketten (12 lebend, 4 tot), höchstens 1 Abweichung; **vor dem Paket zu entscheiden** |
 | E-S4 | Unterschied Vorschau und Schlusszählung bei einem späteren Wechsel | vor dem Wechsel entscheiden (§6 Nr. 4) |
 
 **Freigaben:** Der Merge dieses PR erteilt kein Go für einen Lauf. Reihenfolge: Merge → Go zum Paket (§5 Nr. 2) → Beurteilung → Ablage → Go zur Auswertung → Nachtrag → gegebenenfalls eigene Festlegung und Go zum Standardwechsel (§6). `diagonalAugeEnde` und `diagonalAugeSchluss` bleiben standardmäßig 0.

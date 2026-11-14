@@ -276,10 +276,10 @@ Jede Antwort enthält im Feld \`varianten\` die Zugfolgen, auf die sich dein Urt
 Jede Zugfolge hat drei Felder:
 
 - \`beginnt\`: \`"Schwarz"\` oder \`"Weiß"\`;
-- \`zuege\`: die Züge abwechselnd, beginnend mit dieser Farbe, in Koordinaten wie im Diagramm (Spalten A bis T ohne I, Zeilen 1 bis 19, zum Beispiel \`"Q19"\`), \`"pass"\` für einen Pass; mindestens ein Zug;
+- \`zuege\`: die Züge abwechselnd, beginnend mit dieser Farbe, in Koordinaten wie im Diagramm (Spalten A bis T ohne I, Zeilen 1 bis 19, zum Beispiel \`"Q19"\`), \`"pass"\` für einen Pass; mindestens ein Zug, der kein Pass ist;
 - \`ergebnis\`: was nach dieser Zugfolge mit der markierten Kette ist, in mindestens einem Satz.
 
-Wähle die Zugfolgen, die das Ergebnis entscheiden: den stärksten Angriff und die beste Verteidigung, keine beliebigen Züge.
+Wähle die Zugfolgen, die das Ergebnis entscheiden: den stärksten Angriff und die beste Verteidigung, keine beliebigen Züge. Jede Zugfolge muss sich von den anderen unterscheiden; eine Zugfolge nur aus Pässen zählt nicht.
 
 **Jede Zugfolge wird mechanisch nachgespielt.** Sie muss nach den Regeln möglich sein: kein besetzter Punkt, kein Selbstmord, kein sofortiges Zurückschlagen im Ko. Am Anfang ist der Ko-Punkt der Unterlage nur für die Seite gesperrt, die laut Unterlage am Zug ist. Ist eine Zugfolge nicht möglich, ist der Bogen ungültig; du bekommst die Fehlermeldung und darfst die betroffene Zugfolge berichtigen. Ob eine Zugfolge gut gewählt ist, prüft das Werkzeug nicht.
 
@@ -387,7 +387,7 @@ function pruefeVarianten(a, id, st, E, f) {
   const v = a.varianten;
   if (!(typeof a.dauerSekunden === 'number')) f.push(`${id}: dauerSekunden fehlt (Pflicht in Fassung 2)`);
   if (!Array.isArray(v)) { f.push(`${id}: varianten fehlt oder ist keine Liste (Pflicht in Fassung 2)`); return; }
-  const offen = a.kategorie === 'nicht_entscheidbar' || a.sicherheit === 'unsicher', min = offen ? VARIANTEN_MIN_OFFEN : VARIANTEN_MIN, je = {1: 0, 2: 0};
+  const offen = a.kategorie === 'nicht_entscheidbar' || a.sicherheit === 'unsicher', min = offen ? VARIANTEN_MIN_OFFEN : VARIANTEN_MIN, je = {1: 0, 2: 0}, gesehen = new Set();
   v.forEach((x, k) => {
     const n = `${id}: Zugfolge ${k + 1}`;
     if (!x || typeof x !== 'object') { f.push(`${n}: kein Objekt`); return; }
@@ -399,6 +399,11 @@ function pruefeVarianten(a, id, st, E, f) {
     if (st.fehler) { f.push(`${n}: Stellung der Unterlage nicht nachspielbar (${st.fehler})`); return; }
     const grund = spieleVariante(E, st, beginnt, x.zuege);
     if (grund) { f.push(`${n} (${x.beginnt} beginnt): ${grund}`); return; }
+    /* Setzung: eine Zugfolge nur aus Pässen liest nichts, und dieselbe Zugfolge zählt nicht zweimal */
+    if (x.zuege.every(z => z === 'pass')) { f.push(`${n}: besteht nur aus Pässen`); return; }
+    const schluessel = beginnt + '|' + x.zuege.join(',');
+    if (gesehen.has(schluessel)) { f.push(`${n}: doppelt (gleiche Zugfolge wie eine frühere)`); return; }
+    gesehen.add(schluessel);
     je[beginnt]++;
   });
   if (je[1] < min || je[2] < min) f.push(`${id}: zu wenige mögliche Zugfolgen (Schwarz beginnt ${je[1]}, Weiß beginnt ${je[2]}; verlangt je ${min}${offen ? ', weil nicht_entscheidbar oder unsicher' : ''})`);

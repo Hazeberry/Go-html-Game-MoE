@@ -385,8 +385,10 @@ test('Probe: Ziehung 0 ist die bisherige Ziehung, eine andere Ziehung wählt det
 /* ── 5c S-Paket, Anleitung Fassung 2, gelesene Zugfolgen (docs/diagonal-schluss-vorabfestlegung.md) ── */
 const folgeVon = zuege => zuege.map((z, i) => ({farbe: i % 2 ? 2 : 1, punkt: z === 'pass' ? -1 : L.vonGtp(z)}));
 const KO_FOLGE = ['C4', 'E5', 'D5', 'E3', 'D3', 'F4', 'pass', 'D4', 'E4'];   /* Schwarz E4 schlägt D4: Ko auf D4, Weiß am Zug */
-const pass2 = () => [{beginnt: 'Schwarz', zuege: ['pass'], ergebnis: 'Nichts ändert sich an der Kette.'}, {beginnt: 'Weiß', zuege: ['pass'], ergebnis: 'Nichts ändert sich an der Kette.'}];
-const antwortV2 = (id, kat = 'tot', extra = {}) => antwort(id, kat, {dauerSekunden: 300, varianten: pass2(), ...extra});
+const legal = (st, farbe, n) => { const r = []; for (let i = 0; i < 361 && r.length < n; i++) if (!st.brett[i] && S3.spieleVariante(E, st, farbe, [L.zuGtp(i)]) === null) r.push(L.zuGtp(i)); return r; };
+/* n verschiedene mögliche Zugfolgen je Zugrecht (ein Zug, dann Pass); bei n = 1: [0] Schwarz beginnt, [1] Weiß beginnt */
+const zf = (st, n = 1) => [...legal(st, 1, n).map(z => ({beginnt: 'Schwarz', zuege: [z, 'pass'], ergebnis: 'Nichts ändert sich an der Kette.'})), ...legal(st, 2, n).map(z => ({beginnt: 'Weiß', zuege: [z, 'pass'], ergebnis: 'Nichts ändert sich an der Kette.'}))];
+const antwortV2 = (id, st, kat = 'tot', extra = {}) => antwort(id, kat, {dauerSekunden: 300, varianten: zf(st), ...extra});
 test('SGF der Unterlage: folgeAusSgf liest zurück, was sgfVon schreibt (mit Pässen)', () => {
   const f = folgeVon(['D4', 'Q16', 'pass', 'C3', 'T19', 'A1', 'pass', 'pass']);
   pruefeGleich(JSON.stringify(S3.folgeAusSgf(S3.sgfVon(f))), JSON.stringify(f), 'Rundweg');
@@ -421,7 +423,7 @@ test('S-Paket: nur S-Ketten, Fassung 2, dieselben Kennungen in derselben Reihenf
 test('Anleitung Fassung 2: Zugfolgen Pflicht, nicht_entscheidbar ist keine Abkürzung, Zeit Pflicht; Fassung 1 unverändert', () => {
   const a = S3.ANLEITUNG_V2;
   pruefe(a.includes('\n## Gelesene Zugfolgen (Pflicht)\n'), 'Abschnitt Zugfolgen'); pruefe(/mindestens \*\*drei\*\* je Zugrecht/.test(a), 'drei je Zugrecht bei offen');
-  pruefe(/Jede Zugfolge wird mechanisch nachgespielt/.test(a), 'Nachspielen angekündigt'); pruefe(!/besser als Raten/.test(a), 'kein „besser als Raten“');
+  pruefe(/Jede Zugfolge wird mechanisch nachgespielt/.test(a), 'Nachspielen angekündigt'); pruefe(/eine Zugfolge nur aus Pässen zählt nicht/.test(a) && /muss sich von den anderen unterscheiden/.test(a), 'Pässe und Doppelte genannt'); pruefe(!/besser als Raten/.test(a), 'kein „besser als Raten“');
   pruefe(/trage sie als \\`?dauerSekunden\\`? ein \(Pflicht\)|dauerSekunden` ein \(Pflicht\)/.test(a), 'Zeit Pflicht');
   pruefe(/sie ersetzt das Lesen nicht/.test(a), 'Unsicherheit ersetzt das Lesen nicht'); pruefe(/besser als Raten/.test(S3.ANLEITUNG), 'Fassung 1 unverändert');
   for (const kopf of ['## Zugrecht', '## Ko', '## Lesetiefe', '## Hilfsmittel', '## Arbeiten in Etappen']) pruefe(a.includes('\n' + kopf + '\n'), 'Abschnitt ' + kopf);
@@ -429,31 +431,34 @@ test('Anleitung Fassung 2: Zugfolgen Pflicht, nicht_entscheidbar ist keine Abkü
 });
 test('Fassung 2 prüfen: Zugfolgen je Zugrecht, mögliche Züge, mehr Zugfolgen bei nicht_entscheidbar und unsicher, Zeit Pflicht', () => {
   const {p} = paket(grund(), {art: 'S'}), m = p.manifest, ids = m.reihenfolge, stellungen = S3.stellungenAusDateien(E, p.dateien, ids), opt = {stellungen, E};
-  const bogen = aend => { const b = ALT(p, ids.map(id => antwortV2(id))); if (aend) aend(b.antworten[0], b); return S3.pruefeBogen(b, m, opt); };
+  const bogen = aend => { const b = ALT(p, ids.map(id => antwortV2(id, stellungen[id]))); if (aend) aend(b.antworten[0], b); return S3.pruefeBogen(b, m, opt); };
   pruefeGleich(bogen().join(' | '), '', 'gültig mit je einer Zugfolge');
   const st = stellungen[ids[0]], besetzt = L.zuGtp([...st.brett.keys()].find(i => st.brett[i])), frei = L.zuGtp([...st.brett.keys()].find(i => !st.brett[i] && S3.spieleVariante(E, st, 1, [L.zuGtp(i)]) === null));
   const hat = (f, re, n) => pruefe(f.some(x => re.test(x)), `${n}: ${f.slice(0, 2).join(' | ') || 'keine Fehler'}`);
   hat(bogen(a => { delete a.varianten; }), /varianten fehlt/, 'ohne varianten'); hat(bogen(a => { delete a.dauerSekunden; }), /dauerSekunden fehlt/, 'ohne Zeit');
   hat(bogen(a => { a.varianten = a.varianten.slice(0, 1); }), /zu wenige mögliche Zugfolgen \(Schwarz beginnt 1, Weiß beginnt 0/, 'nur ein Zugrecht');
   hat(bogen(a => { a.varianten[0].zuege = [besetzt]; }), /Punkt besetzt/, 'besetzter Punkt');
-  pruefeGleich(bogen(a => { a.varianten[0].zuege = [frei, 'pass']; }).join(' | '), '', 'echter Zug möglich');
+  pruefeGleich(bogen(a => { a.varianten[0].zuege = [frei, 'pass', 'pass']; }).join(' | '), '', 'echter Zug möglich');
+  hat(bogen(a => { a.varianten[0].zuege = ['pass', 'pass']; }), /besteht nur aus Pässen/, 'nur Pässe');
+  hat(bogen(a => { a.varianten.push({...a.varianten[0]}); a.varianten = [a.varianten[2], a.varianten[1], a.varianten[0]]; }), /doppelt/, 'gleiche Zugfolge zweimal');
+  hat(bogen(a => { a.kategorie = 'nicht_entscheidbar'; a.sicherheit = 'unsicher'; a.offen = 'Der Randkampf ist nicht zu Ende gelesen.'; a.varianten = [...a.varianten, ...a.varianten, ...a.varianten].map(x => ({...x})); }), /verlangt je 3/, 'dreimal dieselbe Zugfolge zählt einmal');
   hat(bogen(a => { a.varianten[1].ergebnis = 'kurz'; }), /ergebnis fehlt oder ist kürzer/, 'Ergebnis zu kurz'); hat(bogen(a => { a.varianten[1].beginnt = 'W'; }), /beginnt ist nicht/, 'beginnt falsch');
   hat(bogen(a => { a.kategorie = 'nicht_entscheidbar'; a.sicherheit = 'unsicher'; a.offen = 'Der Randkampf ist nicht zu Ende gelesen.'; }), /verlangt je 3, weil nicht_entscheidbar/, 'nicht_entscheidbar mit einer je Seite');
   hat(bogen(a => { a.sicherheit = 'unsicher'; a.offen = 'Der Randkampf ist nicht zu Ende gelesen.'; }), /verlangt je 3/, 'unsicher mit einer je Seite');
-  pruefeGleich(bogen(a => { a.kategorie = 'nicht_entscheidbar'; a.sicherheit = 'unsicher'; a.offen = 'Der Randkampf ist nicht zu Ende gelesen.'; a.varianten = [...pass2(), ...pass2(), ...pass2()]; }).join(' | '), '', 'nicht_entscheidbar mit drei je Seite');
-  hat(S3.pruefeBogen(ALT(p, ids.map(id => antwortV2(id))), m, {}), /nicht verfügbar/, 'ohne Stellungen nicht prüfbar');
+  pruefeGleich(bogen(a => { a.kategorie = 'nicht_entscheidbar'; a.sicherheit = 'unsicher'; a.offen = 'Der Randkampf ist nicht zu Ende gelesen.'; a.varianten = zf(stellungen[ids[0]], 3); }).join(' | '), '', 'nicht_entscheidbar mit drei verschiedenen je Seite');
+  hat(S3.pruefeBogen(ALT(p, ids.map(id => antwortV2(id, stellungen[id]))), m, {}), /nicht verfügbar/, 'ohne Stellungen nicht prüfbar');
   const alt = paket().p; pruefeGleich(S3.pruefeBogen(ALT(alt, alt.manifest.reihenfolge.map(id => antwort(id))), alt.manifest).length, 0, 'Fassung 1 verlangt keine Zugfolgen');
-  const h = Math.ceil(ids.length / 2), t1 = ALT(p, ids.slice(0, h).map(id => antwortV2(id))), t2 = ALT(p, ids.slice(h).map(id => antwortV2(id)));
+  const h = Math.ceil(ids.length / 2), t1 = ALT(p, ids.slice(0, h).map(id => antwortV2(id, stellungen[id]))), t2 = ALT(p, ids.slice(h).map(id => antwortV2(id, stellungen[id])));
   const r = S3.fuegeZusammen([{name: 'a', bogen: t1}, {name: 'b', bogen: t2}], m, opt); pruefeGleich(r.fehler.length + r.fehlend.length, 0, 'Teilbögen der Fassung 2 vereinbar');
-  if (ids.length > 1) { const t3 = ALT(p, ids.slice(h).map(id => antwortV2(id, 'tot', {varianten: [pass2()[0]]}))); pruefe(S3.fuegeZusammen([{name: 'a', bogen: t1}, {name: 'b', bogen: t3}], m, opt).fehler.some(x => /zu wenige/.test(x)), 'Teilbogen wird mit Zugfolgen geprüft'); }
+  if (ids.length > 1) { const t3 = ALT(p, ids.slice(h).map(id => antwortV2(id, stellungen[id], 'tot', {varianten: [zf(stellungen[id])[0]]}))); pruefe(S3.fuegeZusammen([{name: 'a', bogen: t1}, {name: 'b', bogen: t3}], m, opt).fehler.some(x => /zu wenige/.test(x)), 'Teilbogen wird mit Zugfolgen geprüft'); }
 });
 test('Ablauf S: Paket „beurteiler-paket-S“ und „aufdeckung-S.json“; pruefen spielt die Zugfolgen aus den SGF nach; auswerten nimmt genau einen Bogen', () => {
   const g = grund(), aus = fs.mkdtempSync(path.join(tmp, 's-')), r = lauf(['unterlagen', '--stufe1', g.s1, '--stufe2', g.s2, '--archiv', g.daten, '--aus', aus, '--art', 'S']);
   pruefeGleich(r.status, 0, 'unterlagen --art S: ' + r.stderr); pruefe(/Paket S: /.test(r.stdout), 'Meldung');
   const pv = path.join(aus, 'beurteiler-paket-S'), mp = path.join(pv, 'manifest.json'), m = liesJson(mp), aufd = liesJson(path.join(aus, 'geheim', 'aufdeckung-S.json'));
   pruefe(!fs.existsSync(path.join(aus, 'beurteiler-paket')), 'kein Gesamtpaket geschrieben'); pruefeGleich(Object.keys(aufd).join(), m.reihenfolge.join(), 'Aufdeckung passt zum Paket');
-  const st = S3.stellungAusSgf(E, fs.readFileSync(path.join(pv, 'unterlagen', m.reihenfolge[0] + '.sgf'), 'utf8')), besetzt = L.zuGtp([...st.brett.keys()].find(i => st.brett[i]));
-  const gut = schreibeBogen(aus, 'gut.json', m, m.reihenfolge.map(id => antwortV2(id))), schlecht = schreibeBogen(aus, 'schlecht.json', m, m.reihenfolge.map((id, k) => antwortV2(id, 'tot', k ? {} : {varianten: [{beginnt: 'Schwarz', zuege: [besetzt], ergebnis: 'Der Zug ist nicht möglich.'}, pass2()[1]]})));
+  const sts = Object.fromEntries(m.reihenfolge.map(id => [id, S3.stellungAusSgf(E, fs.readFileSync(path.join(pv, 'unterlagen', id + '.sgf'), 'utf8'))])), st = sts[m.reihenfolge[0]], besetzt = L.zuGtp([...st.brett.keys()].find(i => st.brett[i]));
+  const gut = schreibeBogen(aus, 'gut.json', m, m.reihenfolge.map(id => antwortV2(id, sts[id]))), schlecht = schreibeBogen(aus, 'schlecht.json', m, m.reihenfolge.map((id, k) => antwortV2(id, sts[id], 'tot', k ? {} : {varianten: [{beginnt: 'Schwarz', zuege: [besetzt], ergebnis: 'Der Zug ist nicht möglich.'}, zf(sts[id])[1]]})));
   pruefeGleich(lauf(['pruefen', '--bogen', gut, '--manifest', mp]).status, 0, 'gültiger Bogen');
   const rs = lauf(['pruefen', '--bogen', schlecht, '--manifest', mp]); pruefeGleich(rs.status, 1, 'unmöglicher Zug: Exit 1'); pruefe(/Punkt besetzt/.test(rs.stderr + rs.stdout), 'Grund genannt');
   const sgf = path.join(pv, 'unterlagen', m.reihenfolge[0] + '.sgf'), orig = fs.readFileSync(sgf, 'utf8');
