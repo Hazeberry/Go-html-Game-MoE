@@ -1,0 +1,56 @@
+{
+ "manifestSha256": "a6a4c945de8800744423ed9733c9aa2b1d77332e306e5d9fd61b2fe102849fce",
+ "beurteiler": "KI",
+ "hilfsmittel": "Eigenes mechanisches Python-Skript zum Nachspielen der SGF-Zuggeschichten, Anzeigen des Bretts, Zählen von Freiheiten und Prüfen selbst gewählter Zugfolgen einschließlich einfacher Ko-Verbote; keine automatische Suche, keine fremde Go-Software, keine externen Quellen und keine weiteren Beurteiler. UTC-Uhr zur Messung der verstrichenen Bearbeitungszeit je Unterlage (einschließlich mechanischer Prüfungen und Zwischenmeldungen).",
+ "antworten": [
+  {
+   "id": "U-2173a8",
+   "kategorie": "nicht_entscheidbar",
+   "begruendung": "A5 hat zunächst die drei Freiheiten A4, A6 und B5, aber keine gesicherten Augen. Weiß kann mit A4 den Stein A3 schlagen; das entstehende Ko um A3 entscheidet allein nicht über A5. Die geprüfte Folge W A4, S A6, W B5, S B7, W C7, S B8 verbindet A5 mit B6 und C8 und lässt die Freiheiten A7, A8, B9, C6 und C9. C7 steht dann auf C6 in Atari. Damit ist weder der Fang noch ein Leben mit zwei Augen bewiesen: Die Augenbildung am linken Rand und der Kampf um C6/D5 müssen zusammen gelesen werden. Auch mit Schwarz am Zug habe ich keinen abschließenden Nachweis.",
+   "sicherheit": "unsicher",
+   "offen": "Für beide Zugrechte bleibt offen, ob Schwarz gegen die stärkste weiße Fortsetzung zwei echte Augen im linken Bereich erzwingen kann; insbesondere sind die Abspiele um A7/A8, B9/C9 und C6/D5 nicht abschließend gelesen.",
+   "dauerSekunden": 131
+  },
+  {
+   "id": "U-15d04c",
+   "kategorie": "lebendig",
+   "begruendung": "Die markierte weiße Kette hat M4, N5, O5 und P6 als Freiheiten. M4 und N5 bieten alternative Verbindungen zu M5; P6 verbindet unmittelbar mit der weißen Kette Q6–Q8/N8. Zwischen diesen Ketten liegt ausgedehnter Augenraum. Auch ein schwarzer Einbruch bei P7 widerlegt das Leben nicht: Die geprüfte Variante S P7, W P6, S O7, W N7, S O6, W N6, S O5, W N5 fängt die vier eingedrungenen Steine. Auf erneutes S O6 kann W O7 und anschließend W O5 zwei echte Augen auf O6 und P7 sichern. Für beide Zugrechte halte ich die weißen Verbindungs- und Augenmöglichkeiten für ausreichend; die Beispielvariante ist kein vollständiger Variantenbeweis.",
+   "sicherheit": "eher_sicher",
+   "offen": "Nicht vollständig gelesen sind alle schwarzen Abweichungen beim Eindringen, insbesondere das Ausweichen von O6 nach N6 sowie Angriffe auf die Verbindungen über M4/N5. Das Urteil für beide Zugrechte beruht auch auf der Größe des verfügbaren Augenraums.",
+   "dauerSekunden": 80
+  },
+  {
+   "id": "U-351c82",
+   "kategorie": "ko_zugabhaengig",
+   "urteilSchwarzAmZug": "tot",
+   "urteilWeissAmZug": "lebendig",
+   "begruendung": "Mit Schwarz am Zug verbindet S Q19 den Stein R19 mit der schwarzen Außenkette. Weiß bleibt auf S18 und T19 beschränkt: W S18 verbindet die weißen Steine, lässt aber nur T19 als Freiheit; S T19 schlägt die gesamte Gruppe einschließlich S19. W T19 wird entsprechend durch S S18 beantwortet. Mit Weiß am Zug schlägt W Q19 den schwarzen Stein R19 im Ko. Schwarz darf R19 nicht sofort zurückschlagen; S18 und T19 sind jetzt Selbstmordzüge, weil das Schlagen von R19 auch der weißen Kette R18 eine zusätzliche Freiheit gegeben hat. Ohne äußere Ko-Drohungen kann Weiß anschließend R19 verbinden. Die Kette um S19 und der Stein T18 besitzen dann gemeinsam die beiden geschützten Augenpunkte S18 und T19; Schwarz kann keinen davon legal besetzen. Weiß beendet das Ko durch R19, Schwarz könnte es durch Q19 schließen.",
+   "sicherheit": "sicher",
+   "dauerSekunden": 112
+  },
+  {
+   "id": "U-49f79f",
+   "kategorie": "lebendig",
+   "begruendung": "P2 und P3 verbinden die markierte Kette alternativ mit Q2/Q3/P4. Ohne schwarzen Einbruch schafft W P2 auf P3 einen vollständig von dieser verbundenen weißen Kette umgebenen Augenpunkt. Auch S P2 lässt sich angreifen: Die geprüfte Folge S P2, W P3, S P1, W Q1, S O1, W N1 schlägt P2/P1/O1. Auf S P1 hält W O1 die eingedrungene Kette auf P2 in Atari; W P2 fängt sie und sichert das Auge P1. Ein zweiter Augenbereich liegt auf R3/R4: Nach S R4 verbindet W S4 die weißen Steine rechts, setzt R4 auf R3 in Atari und ermöglicht W R3 mit einem echten Auge auf R4. Beide Augen wurden in einer zusammenhängenden Beispielvariante nachgespielt. Ich halte die örtlichen Verbindungs- und Fangmöglichkeiten bei beiden Zugrechten für ausreichend.",
+   "sicherheit": "eher_sicher",
+   "offen": "Die unabhängigen Augenbereiche sind gelesen, aber nicht jede zeitliche Kombination schwarzer Angriffe auf P2/P3 und R3/R4 sowie alle Abweichungen am unteren Rand. Ein vollständiger Variantenbeweis für beide Zugrechte fehlt.",
+   "dauerSekunden": 117
+  },
+  {
+   "id": "U-dea5f6",
+   "kategorie": "nicht_entscheidbar",
+   "begruendung": "Die schwarze Kette B2–B4 hat die sechs Freiheiten A2, A3, A4, B1, B5 und C4, aber noch kein gesichertes Auge. Leben ist in konkreten Varianten möglich: W B5, S A4, W A5, S B1, W C1, S A2 ergibt zwei echte Augen auf A1 und A3. Diese Folge beweist jedoch nicht die beste Verteidigung gegen andere weiße Angriffe. Insbesondere verändern ein früher weißer Einbruch auf A3 oder A2 und Sperrzüge auf B5/C5 die Augenform; zugleich sind die Auswege über C4 und die erste Linie sowie mögliche Gegenfänge zu berücksichtigen. Für keines der beiden Zugrechte habe ich den gesamten Kampf bis zu einem erzwungenen Ergebnis gelesen.",
+   "sicherheit": "unsicher",
+   "offen": "Offen bleibt für beide Zugrechte, ob Schwarz die Randaugen gegen die stärkste weiße Zugfolge sichern oder rechtzeitig über B5/C4 beziehungsweise B1/C1 ausweichen kann. Die gezeigte Lebensvariante schließt eine stärkere weiße Abweichung nicht aus.",
+   "dauerSekunden": 136
+  },
+  {
+   "id": "U-f4bb91",
+   "kategorie": "nicht_entscheidbar",
+   "begruendung": "Die markierte Kette hat zunächst nur Q13, S11 und T12 als Freiheiten. Q13 und P14 sind wichtige Verbindungsstellen zu P13/Q14 und den schwarzen Ketten um O14/P15; Weiß kann anfangs auf keinem dieser beiden Punkte legal spielen, da keine angrenzende schwarze Kette dadurch gefangen würde. Rechts steht der weiße Stein S13 auf T13 in Atari, T16 auf T15. Die geprüfte Folge W T13, S T12, W T14, S T15 schlägt S13/T13/T14 und T16 und eröffnet schwarze Augenmöglichkeiten. Eine andere geprüfte Folge, W T12, S T13, W T15, S S13, W R16, S T14, verbindet die markierte Kette mit der oberen schwarzen Kette und schlägt T15/T16, ergibt dort aber zunächst nur einen zusammenhängenden Augenraum auf T15/T16. Ob zusätzlich ein zweites Auge über Q13/P14 und O15/O16 oder durch anderes Spiel am rechten Rand erzwungen werden kann, habe ich für beide Zugrechte nicht abschließend geklärt.",
+   "sicherheit": "unsicher",
+   "offen": "Es fehlt die vollständige gemeinsame Lesung der Randabspiele ab T12/T13 und der Verbindungen über Q13/P14 einschließlich der Augenbildung um O15/O16. Weder ein erzwungenes Leben noch ein erzwungener Fang oder ein zugabhängiger Unterschied ist für beide Startfälle nachgewiesen.",
+   "dauerSekunden": 224
+  }
+ ]
+}
