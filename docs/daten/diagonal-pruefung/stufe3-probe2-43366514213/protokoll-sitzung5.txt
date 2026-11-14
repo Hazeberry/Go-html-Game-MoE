@@ -1,0 +1,37 @@
+Begleittext der Sitzung 5 (Claude Sonnet 5.5, Einstellung Mittel), von Hazeberry zusammen mit dem Bogen in den Chat kopiert. Der Verlauf der Sitzung selbst liegt nicht vor.
+
+Der Nutzer hat ausdrücklich darum gebeten, das Paket zu lesen; ich lese zuerst die Anleitung.
+
+Zwei von sechs Unterlagen sind beurteilt (U-2173a8 und U-15d04c); ich lese jetzt die dritte, U-351c82, und stoppe die Zeit je Unterlage mit der Uhr im Container.
+
+Ich bin bei der fünften Unterlage, U-dea5f6, einer schwarzen Dreierkette am linken Rand (B2–B4); ich prüfe gerade Freiheiten und Nachbarketten mit dem Nachspiel-Skript und lese dann den Kampf.
+
+Der Antwortbogen `antwortbogen.json` ist fertig und enthält alle sechs Unterlagen in der Reihenfolge der Vorlage. Bei zwei Unterlagen (U-dea5f6 und U-2173a8) bin ich bei der Antwort nicht sicher.
+
+| Unterlage | Urteil | Sicherheit |
+|---|---|---|
+| U-2173a8 | lebendig | eher_sicher |
+| U-15d04c | lebendig | eher_sicher |
+| U-351c82 | ko_zugabhaengig (Schwarz am Zug: tot, Weiß am Zug: lebendig) | sicher |
+| U-49f79f | lebendig | eher_sicher |
+| U-dea5f6 | tot | unsicher |
+| U-f4bb91 | lebendig | sicher |
+
+- U-351c82: Das Skript hat beide Zugrechte bestätigt. Schwarz fängt mit S18, Weiß rettet sich mit Q19xR19 und R19 auf Ko-Weise.
+- U-dea5f6: Mit Weiß am Zug sehe ich keine zwei Augen für Schwarz. Mit Schwarz am Zug habe ich nicht alles ausgelesen. Falls Schwarz dort zuerst leben kann, wäre `ko_zugabhaengig` richtig. Das steht unter `offen`.
+- U-2173a8: Eine Variante des Weiß-Einbruchs oben links ist nicht zu Ende gelesen.
+
+Hilfsmittel: Ich habe nur ein eigenes Skript zum Nachspielen und Freiheitenzählen benutzt, um meine Zugfolgen zu prüfen. Es gab keine Go-Software, keine Suche und kein Internet.
+
+Zeitmessung: Die Zeit je Unterlage habe ich mit der Uhr im Container gemessen und als `dauerSekunden` eingetragen. Das ist Wanduhrzeit, also einschließlich meines Nachdenkens. U-2173a8 brauchte etwa 513 s, U-dea5f6 etwa 319 s. Bei U-f4bb91 habe ich die Zeit weggelassen, weil die Messung eine lange Pause einschloss und nicht brauchbar war.
+
+Gemessen habe ich für fünf der sechs Unterlagen zusammen etwa 1049 Sekunden, also rund 17,5 Minuten:
+- U-2173a8: 513 s
+- U-15d04c: 68 s
+- U-351c82: 55 s
+- U-49f79f: 93 s
+- U-dea5f6: 319 s
+
+Für U-f4bb91 habe ich keine brauchbare Zeit. Die Uhr zeigte dort rund 16.800 s, weil die Messung eine lange Pause einschloss, in der ich auf deine Rückmeldung wartete. Ich habe den Wert deshalb nicht in den Bogen eingetragen. Die Lesezeit für diese Unterlage lag ungefähr im Bereich der kürzeren anderen, ich kann sie aber nicht genau beziffern.
+
+Die Werte sind Wanduhrzeit zwischen dem Öffnen und dem Abschluss einer Unterlage, also einschließlich meines Nachdenkens. Auch bei U-dea5f6 könnte ein kleiner Teil Wartezeit enthalten sein, weil dort ebenfalls eine Rückfrage dazwischenkam. Eine genaue Gesamtdauer für das ganze Paket kann ich dir deshalb nicht nennen.
