@@ -2918,6 +2918,9 @@ globalThis.PARAMS = {
      AUS (0): das Verhalten ist dann bit-gleich zu vorher. Bei 1 zählt in der Schlusszählung und in der Zählvorschau ein
      Ein-Punkt-Auge nur, wenn _diagIsTrueEye es bestätigt. Versuchsschalter, kein Nachweis, dass 1 besser ist. */
   diagonalAugeEnde: 0,
+  /* Dieselbe Diagonalprüfung NUR in der Schlusszählung (resolveLifeAndDeath, docs/diagonal-schluss-vorabfestlegung.md): nicht in der
+     Zählvorschau, nicht im Worker, nicht in der KI. AUS (0): bit-gleich zu vorher. diagonalAugeEnde = 1 schaltet weiterhin beides. */
+  diagonalAugeSchluss: 0,
   resignMinMoves: 60,
   /* Strukturelle Aufgabe: so viele Züge in Folge, in denen JEDER legale Zug
      todgeboren wäre. Anders als resignQ ist das bewiesen, nicht geschätzt —
@@ -5792,7 +5795,7 @@ function resolveLifeAndDeath() {
      lebende Randsteine und zählte jeden Punkt eines Zwei-Punkte-Auges als
      eigenes Auge (docs/zaehlung.md). */
   state.deadStones = new Set();
-  const tot = toteSteineAmEnde(state.board, undefined, undefined, PARAMS.diagonalAugeEnde >= 1);
+  const tot = toteSteineAmEnde(state.board, undefined, undefined, PARAMS.diagonalAugeEnde >= 1 || PARAMS.diagonalAugeSchluss >= 1);
   for (let i = 0; i < BOARD_SIZE; i++) if (tot[i]) state.deadStones.add(i);
   for (const i of state.deadStones) {
     const color = state.board[i];
@@ -7613,6 +7616,8 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
          tip:'Nur für den Versuch Pass nach Gegnerpass: Vorsprung in Punkten, den auch der ungünstigere der beiden Stände der Zählvorschau erreichen muss.'},
         {key:'diagonalAugeEnde', label:'Diagonalprüfung (Zählung)', step:1, min:0, max:1,
          tip:'VERSUCH, Standard 0 = aus (Verhalten bit-gleich zu vorher). 1 = in der Schlusszählung und in der Zählvorschau zählt ein Ein-Punkt-Auge nur, wenn die Diagonalregel es bestätigt (falsche Augen zählen nicht). Kein Nachweis, dass 1 besser ist (docs/diagonalpruefung-vorabfestlegung.md).'},
+        {key:'diagonalAugeSchluss', label:'Diagonalprüfung (nur Schlusszählung)', step:1, min:0, max:1,
+         tip:'VERSUCH, Standard 0 = aus (Verhalten bit-gleich zu vorher). 1 = nur in der Schlusszählung am Spielende zählt ein Ein-Punkt-Auge nur, wenn die Diagonalregel es bestätigt. Die Zählvorschau und die KI bleiben unverändert. Kein Nachweis, dass 1 besser ist (docs/diagonal-schluss-vorabfestlegung.md).'},
         {key:'adaptiveBudgetTargetMinSims', label:'Ziel-Min-Sims', step:10, min:20, max:300, main:true,
          tip:'⭐ HAUPTHEBEL. Direkte Messkorrektur — wenn letzter Zug weniger Sims schaffte, wird automatisch mehr Zeit gegeben, unabhängig von der Ursache (Randkampf, große Gruppen etc.)'},
         {key:'rolloutSample',     label:'Rollout-Sample',   step:8,   min:0,   max:200,
