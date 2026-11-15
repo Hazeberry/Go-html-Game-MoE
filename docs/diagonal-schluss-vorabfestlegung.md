@@ -92,7 +92,7 @@ Tests: `tests/diagonal-pruefung-stufe3.js` (34 Fälle, neun davon neu für Fassu
 Ein Befund „positive Kandidatur“ verlangt alle Bedingungen:
 
 1. Pflichtprüfungen bestanden (Eingaben gegen ihre Prüfsummen, Bogen gültig nach Fassung 2, genau ein Bogen, Kontrollketten wie festgelegt: 12 lebend und 4 tot, und nach §4.4a gültig).
-2. **Bestätigter Nutzen:** mindestens 5 R+ aus mindestens 3 verschiedenen Partien (alt §10.5, unverändert). Möglich sind höchstens 19 R+ aus 19 Partien (die behobenen Ketten).
+2. **Bestätigter Nutzen:** mindestens 5 R+ aus mindestens 3 verschiedenen Partien (alt §10.5, unverändert). Möglich sind höchstens 21 R+ aus 20 Partien: die 19 behobenen Ketten (je eine Partie) und die beiden B1-Ketten (eine weitere Partie), bei denen ein Urteil wie „an“ ebenfalls R+ ist. (Berichtigt am 15.11.2026: Die erste Fassung nannte 19 aus 19 und übersah die B1-Ketten.)
 3. **R− = 0 in der Schlusszählung**, konservativ gezählt (ein entschiedenes, nicht unsicheres Urteil gleich „aus“ genügt).
 4. **Beide B1-Fälle entschieden** (kein ungeklärter B1-Fall) und keine Ausfälle in betroffenen Stellungen (Stufe 2: 0).
 5. Wirkung auf den Endstand berichtet, einschließlich Siegerwechsel (aus dem Bericht der Stufe 1).
