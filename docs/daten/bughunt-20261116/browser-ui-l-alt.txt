@@ -1,0 +1,33 @@
+
+Review-Korrekturen im echten Browser
+────────────────────────────────────
+  ✓  Undo nach 60 Zügen: die Superko-Prüfung kennt alle Stellungen (5 Prüfungen, 706 ms)
+  ✓  PolicyNet-Puffer: erst nach gelungenem Zug, Undo nimmt ihn heraus (4 Prüfungen, 314 ms)
+  ✓  Aufgabe der KI: Training mit -1, nach Undo kein „+R“ mehr (6 Prüfungen, 326 ms)
+  ✓  Notzug: kein eigenes Auge füllen (2 Prüfungen, 360 ms)
+  ✓  Dashboard: nur Abweichungen speichern, altes Format verwerfen (8 Prüfungen, 699 ms)
+  ✓  data:-Worker asynchron abgelehnt: KI wechselt auf blob:, nicht auf den Hauptthread (5 Prüfungen, 441 ms)
+  ✓  T-D1: Dashboard übernimmt gebrochene Werte, ganzzahlige Felder bleiben ganzzahlig (7 Prüfungen, 294 ms)
+  ✓  T-W1: 20-mal KI aus und an während der Rechnung: Neustart statt Watchdog (7 Prüfungen, 1568 ms)
+  ✓  T-W2: gleiche Stufe und Farbe während der Rechnung lösen keine Anfrage aus (6 Prüfungen, 871 ms)
+  ✓  T-W3: zwei Züge auf Schwer ohne Klick: derselbe Worker, kein Neustart (5 Prüfungen, 1253 ms)
+  ✓  T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob: (7 Prüfungen, 826 ms)
+  ✓  T-P1: ein Preset ergibt dieselben Werte, egal welches vorher gewählt war (2 Prüfungen, 368 ms)
+  ✓  T-P2: Werte außerhalb der Presets bleiben beim Presetwechsel erhalten (2 Prüfungen, 346 ms)
+  ✓  T-P3: nach Presetwechseln zeigen die Felder die Werte aus PARAMS (3 Prüfungen, 359 ms)
+  ✓  T-K1: ohne Zwischenablage-Schnittstelle kopieren 📋, 🐞 und Export über den Rückfall (7 Prüfungen, 776 ms)
+  ✓  T-K2: scheitert das Kopieren ganz, zeigen die Knöpfe ✗ (3 Prüfungen, 757 ms)
+  ✓  T-K3: Export meldet auf dem Export-Knopf, Beschriftungen bleiben nicht hängen (4 Prüfungen, 6143 ms)
+  ✓  T-K4: mit Zwischenablage-Schnittstelle kein Rückfall (Kontrolle) (4 Prüfungen, 691 ms)
+  ✗  T-L1: nach dem Verkleinern hat das Brett die Soll-Größe, die Seite scrollt nicht waagerecht
+     Canvas-Breite = computeLayout().S: erwartet 376, bekommen 634
+         at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
+  ✗  T-L2: nach dem Verkleinern bleiben Stein und Zählvorschau, Klicks treffen
+     schwarzer Stein an der neuen Lage (RGB 200/160/90)
+         at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
+  ✗  T-L3: mit Fokus in einem Eingabefeld passt sich das Brett erst nach dem Verlassen an
+     nach dem Verlassen Soll-Größe: erwartet 376, bekommen 634
+         at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
+  ✓  T-L4: resize ohne Größenänderung zeichnet nicht neu (Kontrolle) (2 Prüfungen, 699 ms)
+
+  19 bestanden · 3 fehlgeschlagen

@@ -6581,6 +6581,28 @@ resizeCanvas();
 
 function render() { ctx.drawImage(stateCache, 0, 0); }
 
+/* Fenstergröße geändert (L-1, docs/korrektur-l1-vorabfestlegung.md): Brett in
+   der neuen Größe aus state neu zeichnen. Gebündelt (150 ms nach dem letzten
+   resize), nur wenn sich die Brettgröße wirklich ändert, und nicht, solange ein
+   Eingabefeld den Fokus hat: Auf manchen Handys verkleinert die
+   Bildschirmtastatur das Fenster, das Brett würde sonst beim Tippen springen.
+   Dann wird beim Verlassen des Feldes nachgeholt. */
+let _groesseUhr = 0, _groesseNachFokus = false;
+function brettGroesseAnpassen() {
+  const el = document.activeElement;
+  if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) {
+    if (!_groesseNachFokus) {
+      _groesseNachFokus = true;
+      document.addEventListener('focusout', () => { _groesseNachFokus = false; setTimeout(brettGroesseAnpassen, 0); }, {once: true});
+    }
+    return;
+  }
+  if (computeLayout().S === layout.S) return;
+  resizeCanvas(); render();
+  if (pendingTouch) drawGhost(pendingTouch.col, pendingTouch.row);
+}
+addEventListener('resize', () => { clearTimeout(_groesseUhr); _groesseUhr = setTimeout(brettGroesseAnpassen, 150); });
+
 function drawGhost(col, row) {
   const {MARGIN:M, CELL:C} = layout;
   ctx.beginPath(); ctx.arc(M+col*C, M+row*C, C*0.44, 0, Math.PI*2);
