@@ -13,9 +13,15 @@ Die Änderung betrifft nur den Dashboard-Block am Ende von `index.html`. Die Bl�
 haben die drei Blöcke dieselben Prüfsummen wie in `docs/korrektur-d1-w1-vorabfestlegung.md` §1:
 `54dfef2d…`, `f847c124…` und `56a5d6c0…`.
 
-Deshalb gibt es **keinen Schalter** und **keinen Messlauf**. Andere Werte bekommt die Engine nur, wenn man nacheinander
-verschiedene Presets wählt: dann die Werte des zuletzt gewählten Presets, ohne Reste der vorigen. Die Presets selbst
-sind nie gemessen worden. Eine Wirkung auf die Spielstärke ist weder heute noch nach der Korrektur belegt.
+Deshalb gibt es **keinen Schalter** und **keinen Messlauf**. Andere Werte bekommt die Engine nur beim Wählen eines
+Presets, und zwar in zwei Fällen:
+- **Wechsel zwischen Presets:** Es gelten die Werte des zuletzt gewählten Presets, ohne Reste der vorigen.
+- **Von Hand geänderter Preset-Schlüssel:** Wer einen der 13 Schlüssel aus §2 von Hand geändert hat und danach ein
+  Preset wählt, das diesen Schlüssel nicht selbst setzt, bekommt den Standardwert. Heute bliebe der eigene Wert stehen
+  (§3, „Folge, bewusst so“).
+
+Ohne Klick auf ein Preset ändert sich nichts. Die Presets selbst sind nie gemessen worden. Eine Wirkung auf die
+Spielstärke ist weder heute noch nach der Korrektur belegt.
 
 ## 2. Befund
 
