@@ -7887,6 +7887,12 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     }
   };
 
+  /* Alle Schlüssel, die irgendein Preset setzt. Vor jedem Preset gehen sie auf
+     den Standard, damit nichts vom vorher gewählten Preset stehen bleibt
+     (docs/korrektur-d2-vorabfestlegung.md). Aus PRESETS abgeleitet, nicht von
+     Hand gepflegt. */
+  const PRESET_SCHLUESSEL = [...new Set(Object.values(PRESETS).flatMap(p => p.values ? Object.keys(p.values) : []))];
+
   window.dashApplyPreset = function(name) {
     const preset = PRESETS[name];
     if (!preset) return;
@@ -7894,8 +7900,11 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
       dashReset();
     } else {
       const diagVorher = PARAMS.diagonalAugeEnde;
-      Object.assign(PARAMS, preset.values);
-      for (const [k,v] of Object.entries(preset.values)) {
+      const werte = {};
+      for (const k of PRESET_SCHLUESSEL) werte[k] = PARAMS_DEFAULT[k];
+      Object.assign(werte, preset.values);
+      Object.assign(PARAMS, werte);
+      for (const [k,v] of Object.entries(werte)) {
         const inp = document.getElementById('pd-' + k);
         if (inp) {
           inp.value = v;

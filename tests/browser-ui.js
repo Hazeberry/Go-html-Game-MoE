@@ -29,6 +29,11 @@
     10. T-W3: Zwei Züge ohne Klick: derselbe Worker, kein Neustart.
     11. T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob:.
 
+   Korrektur D-2 (docs/korrektur-d2-vorabfestlegung.md, Tests T-P1 bis T-P3):
+    12. T-P1: Ein Preset ergibt dieselben Werte, egal welches vorher gewählt war.
+    13. T-P2: Werte außerhalb der Presets (aiTimeBudget) bleiben erhalten.
+    14. T-P3: Die Felder zeigen nach Presetwechseln die Werte aus PARAMS.
+
    Aufruf:  node tests/browser-ui.js [pfad/zur/index.html] */
 'use strict';
 const {test, pruefe, pruefeGleich, laufeTests, STANDARD_HTML} = require('./rahmen');
@@ -390,6 +395,74 @@ test('T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob:', async () =
   pruefeGleich(r.neustarts, 5, 'fünf Neustarts gezählt');
   pruefe(!r.watchdog && r.tot !== true, `kein Watchdog, Worker lebt (${r.grund})`);
   pruefeGleich(r.zuege, 1, 'ein KI-Zug');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+/* ── Korrektur D-2 (docs/korrektur-d2-vorabfestlegung.md §4) ── */
+
+test('T-P1: ein Preset ergibt dieselben Werte, egal welches vorher gewählt war', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const abweichungen = await s.evaluate(() => {
+    const presets = ['ausgeglichen', 'aggressiv', 'defensiv'], bild = () => JSON.stringify(PARAMS), aus = [];
+    for (const x of presets) {
+      dashApplyPreset('standard'); dashApplyPreset(x);
+      const soll = bild();
+      for (const y of presets) {
+        if (y === x) continue;
+        dashApplyPreset('standard'); dashApplyPreset(y); dashApplyPreset(x);
+        if (bild() !== soll) {
+          const d = [];
+          for (const k of Object.keys(PARAMS_DEFAULT)) if (PARAMS[k] !== JSON.parse(soll)[k]) d.push(`${k}=${PARAMS[k]}`);
+          aus.push(`${y} → ${x}: ${d.join(', ')}`);
+        }
+      }
+    }
+    dashApplyPreset('standard');
+    return aus;
+  });
+  await ctx.close();
+  pruefeGleich(abweichungen.join(' | '), '', 'keine Reste des vorigen Presets (sechs Folgen)');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-P2: Werte außerhalb der Presets bleiben beim Presetwechsel erhalten', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const wert = await s.evaluate(() => {
+    dashApplyPreset('standard');
+    const e = document.getElementById('pd-aiTimeBudget');
+    e.value = '2500'; e.dispatchEvent(new Event('input'));
+    dashApplyPreset('aggressiv'); dashApplyPreset('defensiv');
+    const w = PARAMS.aiTimeBudget;
+    dashApplyPreset('standard');
+    return w;
+  });
+  await ctx.close();
+  pruefeGleich(wert, 2500, 'aiTimeBudget bleibt 2500');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-P3: nach Presetwechseln zeigen die Felder die Werte aus PARAMS', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const r = await s.evaluate(() => {
+    dashApplyPreset('standard'); dashApplyPreset('aggressiv'); dashApplyPreset('defensiv');
+    const falsch = []; let felder = 0;
+    for (const k of Object.keys(PARAMS_DEFAULT)) {
+      const e = document.getElementById('pd-' + k);
+      if (!e) continue;
+      felder++;
+      const markiert = Math.abs(PARAMS[k] - PARAMS_DEFAULT[k]) > 1e-9;
+      if (e.value !== String(PARAMS[k]) || e.classList.contains('changed') !== markiert)
+        falsch.push(`${k}: Feld ${e.value}, PARAMS ${PARAMS[k]}`);
+    }
+    dashApplyPreset('standard');
+    return {falsch, felder};
+  });
+  await ctx.close();
+  pruefe(r.felder > 50, `Felder gefunden (${r.felder})`);
+  pruefeGleich(r.falsch.join('; '), '', 'Felder und Markierung folgen PARAMS');
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 

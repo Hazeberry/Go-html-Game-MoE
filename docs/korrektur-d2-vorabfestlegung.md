@@ -1,6 +1,6 @@
 # Korrektur D-2: Vorabfestlegung
 
-**Stand: 16.11.2026. Status: Vorabfestlegung, noch keine Codeänderung.** Befund aus `docs/bughunt-20261116.md` (D-2).
+**Stand: 16.11.2026. Status: umgesetzt (§8), Abnahme gültig.** Befund aus `docs/bughunt-20261116.md` (D-2).
 Go von Hazeberry am 16.11.2026: „Go für D-2, Vorabfestlegung schreiben“.
 
 Dieses Doc enthält Vorgaben für die Umsetzung. Hazeberry liest es vor dem Merge. Die Umsetzung folgt danach in einem
@@ -125,3 +125,26 @@ geprüft (Chromium 153 headless). Der Prototyp ist nicht die Umsetzung.
 2. Umsetzung in einem eigenen PR: Code, Tests, `tests/README.md`, Nachtrag hier mit den Ergebnissen aus §5 und eine
    Zeile in `docs/bughunt-20261116.md`.
 3. CI grün, Merge, kurzer Bericht.
+
+## 8. Nachtrag: Umsetzung und Abnahme (16.11.2026)
+
+Hazeberry: „#328 freigegeben, du kannst schon mal PRen.“ Die Umsetzung folgt §3 und §4 ohne Abweichung. Geändert sind
+`index.html` (nur `dashApplyPreset` und die Liste `PRESET_SCHLUESSEL`), `tests/browser-ui.js` (T-P1 bis T-P3) und
+`tests/README.md`.
+
+**Abnahme nach §5:**
+
+1. **Prüfsummen:** Die Engine-Blöcke haben die Prüfsummen aus §1. `PARAMS_DEFAULT` und die Tabelle `PRESETS` sind
+   unverändert. Erfüllt.
+2. **Tests:** Am alten Code (`index.html` SHA-256 `4981f5f7…`, Stand `72c05cb`) schlägt T-P1 fehl, an allen sechs
+   Folgen. Beispiele: Aggressiv → Ausgewogen behält `tsumegoAtariSet` 650; Ausgewogen → Aggressiv behält `endCapBonus` 12,
+   `passMinMc120` 6 und `passMinMc150` 8. T-P2 und T-P3 bestehen dort. Am neuen Code bestehen alle 14 Tests der Datei.
+   Ausgaben: `docs/daten/bughunt-20261116/browser-ui-d2-alt.txt` und `browser-ui-d2-neu.txt`. Erfüllt.
+3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: siehe unten. Die CI steht im PR.
+4. **Prüfskript:** `pruefung.js` am neuen Code ergibt genau das Soll: D-2 „nicht reproduziert“, D-1 und W-1a bis W-1c
+   sowie W-1k weiter „nicht reproduziert“, K-1, K-2, L-1, R-1 und B-1 bis B-3 „reproduziert“ (7 von 13).
+   Daten: `docs/daten/bughunt-20261116/nach-d2.json`, Konsole `nach-d2-konsole.txt`. Erfüllt.
+
+Neue `index.html`: SHA-256 `fa58790fefc0b44510f20d227b0712e49206bb1b4307069d9fe9de3fb65b2931`.
+
+**Grenzen:** Nur Chromium 153 headless am Desktop. Eine Wirkung auf die Spielstärke ist nicht gemessen (§1).
