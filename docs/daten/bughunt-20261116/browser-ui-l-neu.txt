@@ -1,0 +1,27 @@
+
+Review-Korrekturen im echten Browser
+────────────────────────────────────
+  ✓  Undo nach 60 Zügen: die Superko-Prüfung kennt alle Stellungen (5 Prüfungen, 597 ms)
+  ✓  PolicyNet-Puffer: erst nach gelungenem Zug, Undo nimmt ihn heraus (4 Prüfungen, 335 ms)
+  ✓  Aufgabe der KI: Training mit -1, nach Undo kein „+R“ mehr (6 Prüfungen, 343 ms)
+  ✓  Notzug: kein eigenes Auge füllen (2 Prüfungen, 337 ms)
+  ✓  Dashboard: nur Abweichungen speichern, altes Format verwerfen (8 Prüfungen, 710 ms)
+  ✓  data:-Worker asynchron abgelehnt: KI wechselt auf blob:, nicht auf den Hauptthread (5 Prüfungen, 506 ms)
+  ✓  T-D1: Dashboard übernimmt gebrochene Werte, ganzzahlige Felder bleiben ganzzahlig (7 Prüfungen, 325 ms)
+  ✓  T-W1: 20-mal KI aus und an während der Rechnung: Neustart statt Watchdog (7 Prüfungen, 1651 ms)
+  ✓  T-W2: gleiche Stufe und Farbe während der Rechnung lösen keine Anfrage aus (6 Prüfungen, 796 ms)
+  ✓  T-W3: zwei Züge auf Schwer ohne Klick: derselbe Worker, kein Neustart (5 Prüfungen, 1136 ms)
+  ✓  T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob: (7 Prüfungen, 784 ms)
+  ✓  T-P1: ein Preset ergibt dieselben Werte, egal welches vorher gewählt war (2 Prüfungen, 350 ms)
+  ✓  T-P2: Werte außerhalb der Presets bleiben beim Presetwechsel erhalten (2 Prüfungen, 309 ms)
+  ✓  T-P3: nach Presetwechseln zeigen die Felder die Werte aus PARAMS (3 Prüfungen, 308 ms)
+  ✓  T-K1: ohne Zwischenablage-Schnittstelle kopieren 📋, 🐞 und Export über den Rückfall (7 Prüfungen, 741 ms)
+  ✓  T-K2: scheitert das Kopieren ganz, zeigen die Knöpfe ✗ (3 Prüfungen, 738 ms)
+  ✓  T-K3: Export meldet auf dem Export-Knopf, Beschriftungen bleiben nicht hängen (4 Prüfungen, 6089 ms)
+  ✓  T-K4: mit Zwischenablage-Schnittstelle kein Rückfall (Kontrolle) (4 Prüfungen, 672 ms)
+  ✓  T-L1: nach dem Verkleinern hat das Brett die Soll-Größe, die Seite scrollt nicht waagerecht (4 Prüfungen, 760 ms)
+  ✓  T-L2: nach dem Verkleinern bleiben Stein und Zählvorschau, Klicks treffen (4 Prüfungen, 894 ms)
+  ✓  T-L3: mit Fokus in einem Eingabefeld passt sich das Brett erst nach dem Verlassen an (3 Prüfungen, 1176 ms)
+  ✓  T-L4: resize ohne Größenänderung zeichnet nicht neu (Kontrolle) (2 Prüfungen, 740 ms)
+
+  22 bestanden · 0 fehlgeschlagen

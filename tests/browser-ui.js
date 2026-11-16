@@ -40,6 +40,12 @@
     17. T-K3: Export meldet auf dem Export-Knopf; keine hängenden Beschriftungen.
     18. T-K4: Mit Zwischenablage-Schnittstelle kein Rückfall (Kontrolle).
 
+   Korrektur L-1 (docs/korrektur-l1-vorabfestlegung.md, T-L1 bis T-L4):
+    19. T-L1: Nach dem Verkleinern hat das Brett die Soll-Größe, kein waagerechtes Scrollen.
+    20. T-L2: Stein und Zählvorschau bleiben, Klicks treffen.
+    21. T-L3: Mit Fokus in einem Eingabefeld erst nach dem Verlassen anpassen.
+    22. T-L4: resize ohne Größenänderung zeichnet nicht neu (Kontrolle).
+
    Aufruf:  node tests/browser-ui.js [pfad/zur/index.html] */
 'use strict';
 const {test, pruefe, pruefeGleich, laufeTests, STANDARD_HTML} = require('./rahmen');
@@ -568,6 +574,83 @@ test('T-K4: mit Zwischenablage-Schnittstelle kein Rückfall (Kontrolle)', async 
   pruefeGleich(r.inhalt, r.log, 'Protokoll steht in der Zwischenablage');
   pruefeGleich(r.exec, 0, 'kein Rückfall über execCommand');
   pruefeGleich(r.knopf, '✓', 'Rückmeldung ✓');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+/* ── Korrektur L-1 (docs/korrektur-l1-vorabfestlegung.md §4) ── */
+
+const GROSS = {viewport: {width: 1200, height: 900}};
+const KLEIN = {width: 400, height: 800};
+
+test('T-L1: nach dem Verkleinern hat das Brett die Soll-Größe, die Seite scrollt nicht waagerecht', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(null, undefined, GROSS);
+  const vorher = await s.evaluate(() => document.getElementById('board').width);
+  await s.setViewportSize(KLEIN);
+  await s.waitForTimeout(400);
+  const r = await s.evaluate(() => ({breite: document.getElementById('board').width, soll: computeLayout().S,
+    scroll: document.documentElement.scrollWidth, fenster: innerWidth}));
+  await ctx.close();
+  pruefe(vorher > r.soll, `Ausgangsbrett größer als das Soll (${vorher} > ${r.soll})`);
+  pruefeGleich(r.breite, r.soll, 'Canvas-Breite = computeLayout().S');
+  pruefe(r.scroll <= r.fenster, `kein waagerechtes Scrollen (${r.scroll} ≤ ${r.fenster})`);
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-L2: nach dem Verkleinern bleiben Stein und Zählvorschau, Klicks treffen', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(null, undefined, GROSS);
+  await s.evaluate(() => { placeStone(3, 3); drawStateToCache(); render(); vorschauOeffnen(); });
+  await s.setViewportSize(KLEIN);
+  await s.waitForTimeout(400);
+  /* Pixel an der SOLL-Lage nach computeLayout(), nicht nach der gespeicherten
+     Variable layout: die bliebe am alten Code die alte Lage (§6). */
+  const pixel = await s.evaluate(() => {
+    const L = computeLayout();
+    const d = document.getElementById('board').getContext('2d').getImageData(L.MARGIN + 3 * L.CELL, L.MARGIN + 3 * L.CELL, 1, 1).data;
+    return [d[0], d[1], d[2]];
+  });
+  const vorschau = await s.evaluate(() => !!state.vorschau);
+  await s.evaluate(() => vorschauSchliessen());
+  const box = await s.locator('#board').boundingBox();
+  const L = await s.evaluate(() => computeLayout());
+  const f = box.width / L.S;
+  await s.mouse.click(box.x + (L.MARGIN + 15 * L.CELL) * f, box.y + (L.MARGIN + 15 * L.CELL) * f);
+  await s.waitForTimeout(100);
+  const klick = await s.evaluate(() => state.board[idx(15, 15)]);
+  await ctx.close();
+  pruefe(Math.max(...pixel) < 80, `schwarzer Stein an der neuen Lage (RGB ${pixel.join('/')})`);
+  pruefe(vorschau, 'Zählvorschau bleibt offen');
+  pruefeGleich(klick, 2, 'Klick setzt auf 15/15 (Weiß am Zug)');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-L3: mit Fokus in einem Eingabefeld passt sich das Brett erst nach dem Verlassen an', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(null, undefined, GROSS);
+  await s.evaluate(() => { dashToggle(); dashSecToggle('search'); });
+  await s.focus('#pd-aiTimeBudget');
+  const vorher = await s.evaluate(() => document.getElementById('board').width);
+  await s.setViewportSize(KLEIN);
+  await s.waitForTimeout(400);
+  const waehrend = await s.evaluate(() => document.getElementById('board').width);
+  await s.evaluate(() => document.activeElement.blur());
+  await s.waitForTimeout(300);
+  const danach = await s.evaluate(() => ({breite: document.getElementById('board').width, soll: computeLayout().S}));
+  await ctx.close();
+  pruefeGleich(waehrend, vorher, 'mit Fokus unverändert');
+  pruefeGleich(danach.breite, danach.soll, 'nach dem Verlassen Soll-Größe');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-L4: resize ohne Größenänderung zeichnet nicht neu (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(null, undefined, GROSS);
+  await s.evaluate(() => { window.__maserung = grainCanvas; dispatchEvent(new Event('resize')); });
+  await s.waitForTimeout(400);
+  const gleich = await s.evaluate(() => window.__maserung === grainCanvas);
+  await ctx.close();
+  pruefe(gleich, 'dieselbe Maserung');
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 

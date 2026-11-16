@@ -1,6 +1,6 @@
 # Korrektur L-1: Vorabfestlegung
 
-**Stand: 16.11.2026. Status: Vorabfestlegung, noch keine Codeänderung.** Befund aus `docs/bughunt-20261116.md` (L-1).
+**Stand: 16.11.2026. Status: umgesetzt (§8), Abnahme gültig.** Befund aus `docs/bughunt-20261116.md` (L-1).
 Go von Hazeberry am 16.11.2026: „Go für L-1, Vorabfestlegung schreiben“.
 
 Dieses Doc enthält Vorgaben für die Umsetzung. Hazeberry liest es vor dem Merge. Die Umsetzung folgt danach in einem
@@ -130,3 +130,30 @@ geprüft (Chromium 153 headless). Der Prototyp ist nicht die Umsetzung.
 2. Umsetzung in einem eigenen PR: Code, Tests, `tests/README.md`, Nachtrag hier mit den Ergebnissen aus §5 und eine
    Zeile in `docs/bughunt-20261116.md`.
 3. CI grün, Merge, kurzer Bericht.
+
+## 8. Nachtrag: Umsetzung und Abnahme (16.11.2026)
+
+Hazeberry: „#331 freigegeben, du kannst schon mal PRen.“ Die Umsetzung folgt §3 und §4 ohne Abweichung. Geändert sind
+`index.html` (`brettGroesseAnpassen` und der `resize`-Handler nach `render`), `tests/browser-ui.js` (T-L1 bis T-L4) und
+`tests/README.md`. Die Umsetzung setzt auf dem Stand mit der Korrektur K-1/K-2 auf (PR #332).
+
+**Abnahme nach §5:**
+
+1. **Prüfsummen:** Die Engine-Blöcke haben die Prüfsummen aus §1. Erfüllt.
+2. **Tests:** Am alten Code (`index.html` SHA-256 `425a1c8f…`, Stand mit K-1/K-2) schlagen T-L1 bis T-L3 fehl:
+   - T-L1: Breite 634 statt 376.
+   - T-L2: Holz an der Soll-Lage (RGB 200/160/90) statt des Steins; Vorschau und Klick bestehen dort, wie in §4
+     angekündigt.
+   - T-L3: auch nach dem Verlassen des Feldes 634 statt 376.
+
+   T-L4 besteht dort. Am neuen Code bestehen alle 22 Tests der Datei. Ausgaben:
+   `docs/daten/bughunt-20261116/browser-ui-l-alt.txt` und `browser-ui-l-neu.txt`. Erfüllt.
+3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: siehe Nachtrag im PR. Die CI steht im PR.
+4. **Prüfskript:** `pruefung.js` am neuen Code ergibt genau das Soll: L-1 „nicht reproduziert“; D-1, D-2, W-1, K-1 und K-2
+   weiter „nicht reproduziert“; R-1 und B-1 bis B-3 „reproduziert“ (4 von 13).
+   Daten: `docs/daten/bughunt-20261116/nach-l1.json`, Konsole `nach-l1-konsole.txt`. Erfüllt.
+
+Neue `index.html`: SHA-256 `7466f87602c1af7446fb4bbe11c23af142f18d402cd770efc884b70544cf2621`.
+
+**Grenzen:** Nur Chromium 153 headless am Desktop, Fenstergröße per Playwright geändert. Drehen auf einem echten
+Handy und das Verhalten von Bildschirmtastaturen sind nicht geprüft.
