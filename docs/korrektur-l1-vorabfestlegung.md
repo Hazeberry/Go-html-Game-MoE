@@ -148,7 +148,8 @@ Hazeberry: „#331 freigegeben, du kannst schon mal PRen.“ Die Umsetzung folgt
 
    T-L4 besteht dort. Am neuen Code bestehen alle 22 Tests der Datei. Ausgaben:
    `docs/daten/bughunt-20261116/browser-ui-l-alt.txt` und `browser-ui-l-neu.txt`. Erfüllt.
-3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: siehe Nachtrag im PR. Die CI steht im PR.
+3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: alle 60 Testdateien bestanden. Eine Prüfung übersprang
+   sich, weil GNU Go lokal fehlt. Die CI steht im PR. Erfüllt, sobald die CI grün ist.
 4. **Prüfskript:** `pruefung.js` am neuen Code ergibt genau das Soll: L-1 „nicht reproduziert“; D-1, D-2, W-1, K-1 und K-2
    weiter „nicht reproduziert“; R-1 und B-1 bis B-3 „reproduziert“ (4 von 13).
    Daten: `docs/daten/bughunt-20261116/nach-l1.json`, Konsole `nach-l1-konsole.txt`. Erfüllt.
