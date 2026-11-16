@@ -19,9 +19,12 @@ SHA-256 des Inhalts der drei Blöcke am Stand `0f11058` (Prüfung in §5):
 | `worker-ai` | `f847c1247188d8a0c94d269581ae465b7428d601c13afb65dced683d69a366e9` |
 | `policy-net` | `56a5d6c0eb3f122425560fc55ebfb44ee70eda8fb47406a4f354928d5d93a475` |
 
-Deshalb gibt es **keinen Schalter** und **keinen Messlauf**: Eine Spielstärkefrage entsteht nicht, weil die Suche
-dieselben Eingaben bekommt wie vorher. Abweichend ist nur, welche Eingaben ankommen: Bei D-1 die Werte, die man im
-Dashboard tatsächlich eingegeben hat. Bei W-1 eine Anfrage, die ein Klick während der Rechnung ausgelöst hat.
+Deshalb gibt es **keinen Schalter** und **keinen Messlauf**. Im normalen Spielverlauf bekommt die Suche dieselben
+Anfragen wie vorher. Abweichungen gibt es nur in zwei Fällen:
+- **D-1:** Die Engine bekommt den Wert, der im Dashboard tatsächlich eingegeben wurde.
+- **W-1:** Klickt man während einer Rechnung, startet der Worker neu und verliert seinen Zustand (§3). Das ist
+  derselbe Zustand, den heute schon „Neues Spiel“ und jeder Watchdog verwerfen. Eine Wirkung auf die Spielstärke ist
+  für diesen Fall nicht gemessen. Er tritt nur bei Klicks während der Rechnung auf.
 
 ## 2. D-1: Gebrochene Werte im Dashboard
 
@@ -53,14 +56,25 @@ und läuft deshalb ab, bevor sie an der Reihe war. Folge: Der Worker gilt bis �
 **Änderung, zwei Teile:**
 
 1. **Laufende Anfrage ersetzen statt anhängen.** Die Worker-Anbindung merkt sich, ob eine Anfrage beim Worker liegt:
-   `state.aiWorkerCtx.laeuft` wird beim `postMessage` auf die reqId gesetzt und bei jeder Antwort des Workers
-   (`onmessage`) auf `null`. Liegt beim Auslösen eines Zuges auf Schwer noch eine Anfrage beim Worker, beendet
-   `triggerAIMove` ihn (`cleanupWorker()`) und baut einen neuen auf dem üblichen Weg, zuerst `data:`, dann `blob:`.
-   Ins Zugprotokoll kommt dabei die Zeile `! Neue Anfrage während der Rechnung → Worker neu gestartet`; so sieht man
-   den Neustart im Fehlerbericht.
+   - `state.aiWorkerCtx.laeuft` ist beim Erzeugen `null`.
+   - Es wird an **jeder** Stelle, die eine Anfrage an den Worker schickt, auf die reqId gesetzt. Das ist
+     `triggerAIMove` und der Wechsel von `data:` auf `blob:` in `onerror`.
+   - Es wird zu **Beginn** von `onmessage` auf `null` gesetzt, vor `applyAIResult`. Sonst sähe ein
+     `triggerAIMove`, das `applyAIResult` am Ende selbst aufruft, die eben beantwortete Anfrage noch als laufend und
+     startete den Worker ohne Grund neu.
+
+   Liegt beim Auslösen eines Zuges auf Schwer noch eine Anfrage beim Worker, beendet `triggerAIMove` ihn
+   (`cleanupWorker()`). Dann baut es einen neuen Worker **derselben Art** (`data:` oder `blob:`) wie der beendete,
+   mit `blob:` als Rückfall. Ein neuer Versuch mit `data:` würde in einer Umgebung, die `data:` erst asynchron
+   ablehnt, bei jedem Neustart dieselbe Ablehnung wiederholen.
+
+   Die Neustarts zählt `state.workerNeustarts`. „Neues Spiel“ setzt den Zähler auf 0, und er steht im Fehlerbericht
+   unter `meta`. Ins Zugprotokoll kommt dafür **keine** Zeile: Im Prototyp ergaben 20 Klicks 20 gleiche Zeilen, die
+   die Züge aus dem sichtbaren Teil des Protokolls drängen.
 2. **Gleiche Wahl ohne Wirkung, solange die KI rechnet.** Ein Klick auf die bereits gewählte Stufe oder Farbe löst
    keine neue Anfrage aus, solange `state.aiThinking` gilt. Rechnet die KI gerade nicht, bleibt alles wie bisher:
-   Der Klick stößt sie an, wenn sie am Zug ist. Das bleibt neben KI aus und an ein Weg aus einem Hänger.
+   Der Klick stößt sie an, wenn sie am Zug ist. Bleibt `aiThinking` einmal hängen (etwa R-1), hilft dieser Klick
+   nicht mehr. KI aus und wieder an bleibt aber ein Weg heraus, denn der KI-Knopf bekommt keine Sperre.
 
 **Unverändert:** Liegt beim Auslösen keine Anfrage beim Worker, und das ist der normale Spielverlauf, läuft der Code
 wie heute: derselbe Worker, dieselbe Nachricht, derselbe Watchdog. Der Weg über den Hauptthread
@@ -97,12 +111,19 @@ Test muss mit dem Code **vor** der Korrektur fehlschlagen. Das wird im Umsetzung
 | Test | Prüft | vor der Korrektur |
 |---|---|---|
 | T-D1 | Jedes Dashboard-Feld mit gebrochenem Schritt übernimmt einen gebrochenen Wert im Bereich genau in `PARAMS`. Ein Feld mit ganzzahligem Schritt (`resignStreak`) liest „7.6“ weiter als 7 | scheitert an vier Feldern |
-| T-W1 | KI Schwarz auf Schwer, `aiTimeBudget` 300, `adaptiveBudgetEnabled` 0 (Watchdog 3900 ms). Während der ersten Rechnung 15-mal KI aus und an. Danach: genau ein KI-Zug, `workerDead` false, keine Watchdog-Zeile | Watchdog, `workerDead` true |
-| T-W2 | Während der Rechnung 5 Klicks auf die gewählte Stufe und 5 auf die gewählte Farbe: `aiRequestId` steigt nicht, der Worker bleibt derselbe | `aiRequestId` steigt um 20 |
-| T-W3 | Zwei KI-Züge auf Schwer ohne Klick dazwischen: derselbe Worker (Objektgleichheit), keine Neustartzeile im Protokoll | besteht auch vorher (Kontrolle des normalen Wegs) |
+| T-W1 | KI Schwarz auf Schwer, `aiTimeBudget` 300, `adaptiveBudgetEnabled` 0 (Watchdog 3900 ms). Während der ersten Rechnung 20-mal KI aus und an, **in einem einzigen `page.evaluate`**. Danach: genau ein KI-Zug, `workerDead` false, keine Watchdog-Zeile, `workerNeustarts` 20 | Watchdog, `workerDead` true |
+| T-W2 | Einstellungen wie T-W1. Während der Rechnung 5 Klicks auf die gewählte Stufe und 5 auf die gewählte Farbe: `aiRequestId` steigt nicht, der Worker bleibt derselbe, `workerNeustarts` 0 | `aiRequestId` steigt um 20 |
+| T-W3 | Zwei KI-Züge auf Schwer ohne Klick dazwischen: derselbe Worker (Objektgleichheit), `workerNeustarts` 0 | besteht auch vorher (Kontrolle des normalen Wegs) |
 
-Rechnung zu T-W1: Ohne Korrektur stehen 16 Anfragen zu je rund 0,3 s an, zusammen etwa 4,8 s. Das liegt über dem
-Watchdog von 3,9 s. Die Ausführungsdauer der Datei steigt dadurch um wenige Sekunden.
+Zu T-W1:
+- **Warum in einem Aufruf:** Einzelne Playwright-Klicks verteilen die Anfragen über rund 2 s. Der Worker arbeitet die
+  Warteschlange in dieser Zeit schon teilweise ab, und der Watchdog läuft am alten Code **nicht** ab. So wurde es im
+  Prototyp mit 15 Zyklen gemessen (§7).
+- **Warum 20 Zyklen:** Jede Anfrage dauert mindestens das Budget von 300 ms, weil die Suche bis zu ihrer Frist läuft.
+  21 Anfragen brauchen damit mindestens 6,3 s, auf jedem Rechner mehr als der Watchdog von 3,9 s. Gemessen dauerten
+  sie je rund 0,32 s.
+
+Die Ausführungsdauer von `tests/browser-ui.js` steigt um einige Sekunden.
 
 ## 5. Abnahme
 
@@ -110,10 +131,11 @@ Zwei Zustände, gültig oder ungültig. **Gültig** nur, wenn alles zutrifft:
 
 1. Die drei Engine-Blöcke haben die Prüfsummen aus §1, und `PARAMS_DEFAULT` ist unverändert.
 2. T-D1, T-W1 und T-W2 schlagen am alten Code fehl und bestehen am neuen. T-W3 besteht an beiden.
-3. `node tests/run.js` lokal grün, CI grün.
+3. `node tests/run.js` lokal grün, CI grün. Die bestehenden Browser-Tests bleiben unverändert.
 4. `auswertung/bughunt-20261116/pruefung.js` am neuen Code: D-1, W-1a, W-1b und W-1c „nicht reproduziert“, W-1k
    weiter „nicht reproduziert“. Die übrigen Fälle (D-2, K-1, K-2, L-1, R-1, B-1 bis B-3) unverändert „reproduziert“.
-   Die Ausgabe wird als `docs/daten/bughunt-20261116/nach-d1-w1.json` abgelegt.
+   Die Ausgabe wird als `docs/daten/bughunt-20261116/nach-d1-w1.json` abgelegt. W-1a und W-1b klicken auf die schon
+   gewählte Stufe bzw. Farbe und prüfen damit Teil 2. Den Neustart (Teil 1) prüft W-1c, und gründlicher T-W1.
 
 **Ungültig** heißt: kein Merge, der Grund steht als Nachtrag in diesem Doc.
 
@@ -123,3 +145,45 @@ Zwei Zustände, gültig oder ungültig. **Gültig** nur, wenn alles zutrifft:
 2. Umsetzung in einem eigenen PR: Code, Tests, `tests/README.md`, Nachtrag hier mit den Ergebnissen aus §5.
    Dazu eine Zeile in `docs/bughunt-20261116.md`, dass D-1 und W-1 behoben sind.
 3. CI grün, Merge, kurzer Bericht.
+
+## 7. Nachprüfung vor dem Merge (16.11.2026)
+
+Auf Bitte von Hazeberry wurde die Vorabfestlegung nicht nur gelesen, sondern als **Prototyp** geprüft: die Änderungen
+aus §2 und §3 in einer Kopie der `index.html` außerhalb des Repos, lokal, Chromium 153 headless. Der Prototyp ist nicht
+die Umsetzung; er dient nur der Prüfung des Entwurfs.
+
+**Ergebnisse:**
+- Die Engine-Blöcke des Prototyps haben die Prüfsummen aus §1.
+- **T-D1:** Am alten Code scheitern genau die vier Felder (`atariSizeWeight` 0,05 → 0, `raumZug` und `raumGewicht`
+  0,5 → 0, `endTieBreak` 0,5 → 0). Am Prototyp scheitert keines, auch nicht die Felder des Policy-Netzes.
+  `resignStreak` liest „7.6“ an beiden als 7.
+- **T-W1** (je ein Lauf):
+
+  | Zyklen | alter Code | Prototyp |
+  |---:|---|---|
+  | 10 | kein Watchdog, Zug nach 3,6 s | kein Watchdog, Zug nach 0,5 s |
+  | 15 | Watchdog, `workerDead` | kein Watchdog |
+  | 20 | Watchdog, `workerDead` | kein Watchdog, 20 Neustarts |
+
+  Die Neustarts waren im Prototyp noch Protokollzeilen und sind daran gezählt. Den Zähler `workerNeustarts` gab es
+  dort noch nicht.
+
+  Mit einzelnen Playwright-Klicks (15 Zyklen) lief der Watchdog am alten Code nicht ab. Der Test hätte in der ersten
+  Fassung also nichts bewiesen; jetzt steht er in §4 in einem Aufruf mit 20 Zyklen.
+- **T-W2:** Am alten Code steigt `aiRequestId` um 20, am Prototyp gar nicht. Der Worker bleibt derselbe.
+- **T-W3:** Besteht an beiden.
+- **Bestehende Browser-Tests:** `browser-ui`, `browser-nan`, `browser-zaehlvorschau`, `browser-passregel`,
+  `browser-zeiten` und `browser-diagonalauge` bestehen am Prototyp, 29 Prüfungen.
+- **Prüfskript:** `pruefung.js` am Prototyp ergibt genau das Soll aus §5 Punkt 4 (8 von 13 Fällen reproduziert).
+- **Zusatzfälle:** Schwer → Mittel → Schwer während der Rechnung: ein Neustart, kein Watchdog, ein Zug. Sechsmal die
+  Farbe hin und zurück: sechs Neustarts, kein Watchdog, ein Zug.
+
+**Danach am Entwurf geändert** (gegenüber der ersten Fassung dieses PRs):
+1. **T-W1:** Anfragen in einem Aufruf statt über einzelne Klicks, 20 statt 15 Zyklen. Die Rechnung steht jetzt mit der
+   Untergrenze aus dem Budget (§4).
+2. **Art des neuen Workers:** dieselbe wie die des beendeten, statt immer zuerst `data:`.
+3. **`laeuft`:** an jeder Sendestelle setzen (auch beim Wechsel auf `blob:`) und zu Beginn von `onmessage`
+   zurücksetzen, vor `applyAIResult`.
+4. **Neustarts:** zählen statt protokollieren (20 Klicks gaben 20 Protokollzeilen).
+5. **Wortlaut:** §1 sagt nicht mehr pauschal, es entstehe keine Spielstärkefrage, sondern nennt den Klickfall.
+   Die Dauer je Anfrage ist gemessen (0,32 s) statt geschätzt (0,3 s).
