@@ -140,7 +140,8 @@ Hazeberry: „#328 freigegeben, du kannst schon mal PRen.“ Die Umsetzung folgt
    Folgen. Beispiele: Aggressiv → Ausgewogen behält `tsumegoAtariSet` 650; Ausgewogen → Aggressiv behält `endCapBonus` 12,
    `passMinMc120` 6 und `passMinMc150` 8. T-P2 und T-P3 bestehen dort. Am neuen Code bestehen alle 14 Tests der Datei.
    Ausgaben: `docs/daten/bughunt-20261116/browser-ui-d2-alt.txt` und `browser-ui-d2-neu.txt`. Erfüllt.
-3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: siehe unten. Die CI steht im PR.
+3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: alle 60 Testdateien bestanden. Eine Prüfung übersprang
+   sich, weil GNU Go lokal fehlt. Die CI steht im PR. Erfüllt, sobald die CI grün ist.
 4. **Prüfskript:** `pruefung.js` am neuen Code ergibt genau das Soll: D-2 „nicht reproduziert“, D-1 und W-1a bis W-1c
    sowie W-1k weiter „nicht reproduziert“, K-1, K-2, L-1, R-1 und B-1 bis B-3 „reproduziert“ (7 von 13).
    Daten: `docs/daten/bughunt-20261116/nach-d2.json`, Konsole `nach-d2-konsole.txt`. Erfüllt.
