@@ -1,0 +1,19 @@
+
+Review-Korrekturen im echten Browser
+────────────────────────────────────
+  ✓  Undo nach 60 Zügen: die Superko-Prüfung kennt alle Stellungen (5 Prüfungen, 1439 ms)
+  ✓  PolicyNet-Puffer: erst nach gelungenem Zug, Undo nimmt ihn heraus (4 Prüfungen, 352 ms)
+  ✓  Aufgabe der KI: Training mit -1, nach Undo kein „+R“ mehr (6 Prüfungen, 293 ms)
+  ✓  Notzug: kein eigenes Auge füllen (2 Prüfungen, 330 ms)
+  ✓  Dashboard: nur Abweichungen speichern, altes Format verwerfen (8 Prüfungen, 669 ms)
+  ✓  data:-Worker asynchron abgelehnt: KI wechselt auf blob:, nicht auf den Hauptthread (5 Prüfungen, 477 ms)
+  ✓  T-D1: Dashboard übernimmt gebrochene Werte, ganzzahlige Felder bleiben ganzzahlig (7 Prüfungen, 361 ms)
+  ✓  T-W1: 20-mal KI aus und an während der Rechnung: Neustart statt Watchdog (7 Prüfungen, 1769 ms)
+  ✓  T-W2: gleiche Stufe und Farbe während der Rechnung lösen keine Anfrage aus (6 Prüfungen, 818 ms)
+  ✓  T-W3: zwei Züge auf Schwer ohne Klick: derselbe Worker, kein Neustart (5 Prüfungen, 1183 ms)
+  ✓  T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob: (7 Prüfungen, 800 ms)
+  ✓  T-P1: ein Preset ergibt dieselben Werte, egal welches vorher gewählt war (2 Prüfungen, 323 ms)
+  ✓  T-P2: Werte außerhalb der Presets bleiben beim Presetwechsel erhalten (2 Prüfungen, 335 ms)
+  ✓  T-P3: nach Presetwechseln zeigen die Felder die Werte aus PARAMS (3 Prüfungen, 317 ms)
+
+  14 bestanden · 0 fehlgeschlagen

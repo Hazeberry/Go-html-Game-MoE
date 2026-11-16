@@ -1,0 +1,21 @@
+
+Review-Korrekturen im echten Browser
+────────────────────────────────────
+  ✓  Undo nach 60 Zügen: die Superko-Prüfung kennt alle Stellungen (5 Prüfungen, 669 ms)
+  ✓  PolicyNet-Puffer: erst nach gelungenem Zug, Undo nimmt ihn heraus (4 Prüfungen, 313 ms)
+  ✓  Aufgabe der KI: Training mit -1, nach Undo kein „+R“ mehr (6 Prüfungen, 320 ms)
+  ✓  Notzug: kein eigenes Auge füllen (2 Prüfungen, 313 ms)
+  ✓  Dashboard: nur Abweichungen speichern, altes Format verwerfen (8 Prüfungen, 678 ms)
+  ✓  data:-Worker asynchron abgelehnt: KI wechselt auf blob:, nicht auf den Hauptthread (5 Prüfungen, 476 ms)
+  ✓  T-D1: Dashboard übernimmt gebrochene Werte, ganzzahlige Felder bleiben ganzzahlig (7 Prüfungen, 335 ms)
+  ✓  T-W1: 20-mal KI aus und an während der Rechnung: Neustart statt Watchdog (7 Prüfungen, 1683 ms)
+  ✓  T-W2: gleiche Stufe und Farbe während der Rechnung lösen keine Anfrage aus (6 Prüfungen, 803 ms)
+  ✓  T-W3: zwei Züge auf Schwer ohne Klick: derselbe Worker, kein Neustart (5 Prüfungen, 1183 ms)
+  ✓  T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob: (7 Prüfungen, 812 ms)
+  ✗  T-P1: ein Preset ergibt dieselben Werte, egal welches vorher gewählt war
+     keine Reste des vorigen Presets (sechs Folgen): erwartet , bekommen aggressiv → ausgeglichen: tsumegoAtariSet=650 | defensiv → ausgeglichen: midRescueAtari=500, tsumegoRescue3=900 | ausgeglichen → aggressiv: endCapBonus=12, passMinMc120=6, passMinMc150=8 | defensiv → aggressiv: midRescueAtari=500, tsumegoRescue3=900 | ausgeglichen → defensiv: endCapBonus=12, passMinMc120=6, passMinMc150=8 | aggressiv → defensiv: tsumegoAtariSet=650
+         at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
+  ✓  T-P2: Werte außerhalb der Presets bleiben beim Presetwechsel erhalten (2 Prüfungen, 304 ms)
+  ✓  T-P3: nach Presetwechseln zeigen die Felder die Werte aus PARAMS (3 Prüfungen, 341 ms)
+
+  13 bestanden · 1 fehlgeschlagen
