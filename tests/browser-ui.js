@@ -244,15 +244,20 @@ test('T-D1: Dashboard übernimmt gebrochene Werte, ganzzahlige Felder bleiben ga
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 
-/* KI Schwarz auf Schwer mit kurzem, festem Budget: Watchdog 3 × 300 + 3000 = 3900 ms. */
-async function schwerStart(s) {
+/* KI Schwarz auf Schwer mit kurzem, festem Budget: Watchdog 3 × 300 + 3000 = 3900 ms.
+   Legt nur window.__schwerStart in der Seite an; GESTARTET wird im selben
+   page.evaluate wie die Klicks danach. Zwischen zwei Aufrufen aus dem
+   Testprozess kann ein langsamer Runner die 300-ms-Rechnung schon beendet
+   haben, dann gingen die Klicks ins Leere (Hinweis von Luna). */
+async function schwerVorbereiten(s) {
   await s.evaluate(() => {
-    PARAMS.aiTimeBudget = 300; PARAMS.adaptiveBudgetEnabled = 0;
-    document.querySelector('.diff-btn[data-diff="hard"]').click();
-    document.querySelector('.color-btn[data-color="1"]').click();
-    document.getElementById('btn-ai-toggle').click();
+    window.__schwerStart = () => {
+      PARAMS.aiTimeBudget = 300; PARAMS.adaptiveBudgetEnabled = 0;
+      document.querySelector('.diff-btn[data-diff="hard"]').click();
+      document.querySelector('.color-btn[data-color="1"]').click();
+      document.getElementById('btn-ai-toggle').click();
+    };
   });
-  await s.waitForTimeout(50);
 }
 const zugFertig = (s, n) => s.waitForFunction(n => !state.aiThinking && state.moveCount >= n, n, {timeout: 30000})
   .catch(() => { /* unten geprüft */ });
@@ -266,10 +271,18 @@ const lage = s => s.evaluate(() => {
 test('T-W1: 20-mal KI aus und an während der Rechnung: Neustart statt Watchdog', async () => {
   if (!(await vorbereiten())) return 'skip';
   const {s, ctx, fehler} = await seite();
-  await schwerStart(s);
-  /* In EINEM Aufruf: über einzelne Klicks verteilt arbeitet der Worker die
-     Anfragen schon ab, und der alte Code bliebe ohne Watchdog (§7). */
-  await s.evaluate(() => { const k = document.getElementById('btn-ai-toggle'); for (let i = 0; i < 20; i++) { k.click(); k.click(); } });
+  await schwerVorbereiten(s);
+  /* Start und Klickfolge in EINEM Aufruf: über einzelne Klicks verteilt
+     arbeitet der Worker die Anfragen schon ab, und der alte Code bliebe ohne
+     Watchdog (§7); nach einem eigenen Startaufruf könnte die Rechnung schon
+     vorbei sein. */
+  const rechnet = await s.evaluate(() => {
+    __schwerStart();
+    const vorher = state.aiThinking;
+    const k = document.getElementById('btn-ai-toggle');
+    for (let i = 0; i < 20; i++) { k.click(); k.click(); }
+    return vorher;
+  });
   await zugFertig(s, 1);
   await s.waitForTimeout(300);
   const r = await lage(s);
@@ -277,6 +290,7 @@ test('T-W1: 20-mal KI aus und an während der Rechnung: Neustart statt Watchdog'
   /* Vorbedingung: Die Suche endete an der Frist von 300 ms, nicht am Limit von
      20 000 Simulationen. Nur dann dauert jede Anfrage mindestens 300 ms, und
      nur dann löst der alte Code hier zuverlässig den Watchdog aus (§4). */
+  pruefe(rechnet, 'Vorbedingung: die KI rechnete beim ersten Klick');
   pruefe(r.sims !== null && r.sims < 20000, `Suche endete an der Frist (${r.sims} Simulationen)`);
   pruefeGleich(r.zuege, 1, 'genau ein KI-Zug');
   pruefe(r.tot !== true, `der Worker gilt nicht als tot (${r.grund})`);
@@ -288,8 +302,9 @@ test('T-W1: 20-mal KI aus und an während der Rechnung: Neustart statt Watchdog'
 test('T-W2: gleiche Stufe und Farbe während der Rechnung lösen keine Anfrage aus', async () => {
   if (!(await vorbereiten())) return 'skip';
   const {s, ctx, fehler} = await seite();
-  await schwerStart(s);
+  await schwerVorbereiten(s);
   const r0 = await s.evaluate(() => {
+    __schwerStart();
     window.__worker = state.aiWorker;
     const vor = state.aiRequestId;
     for (let i = 0; i < 5; i++) {
@@ -301,7 +316,7 @@ test('T-W2: gleiche Stufe und Farbe während der Rechnung lösen keine Anfrage a
   await zugFertig(s, 1);
   const r = await lage(s);
   await ctx.close();
-  pruefe(r0.rechnet, 'die KI rechnete während der Klicks');
+  pruefe(r0.rechnet, 'Vorbedingung: die KI rechnete während der Klicks');
   pruefeGleich(r0.nach, r0.vor, 'aiRequestId unverändert');
   pruefe(r0.gleich, 'derselbe Worker');
   pruefeGleich(r.neustarts, 0, 'kein Neustart');
@@ -312,7 +327,8 @@ test('T-W2: gleiche Stufe und Farbe während der Rechnung lösen keine Anfrage a
 test('T-W3: zwei Züge auf Schwer ohne Klick: derselbe Worker, kein Neustart', async () => {
   if (!(await vorbereiten())) return 'skip';
   const {s, ctx, fehler} = await seite();
-  await schwerStart(s);
+  await schwerVorbereiten(s);
+  await s.evaluate(() => __schwerStart());
   await zugFertig(s, 1);
   await s.evaluate(() => {
     window.__worker = state.aiWorker;
@@ -346,15 +362,29 @@ test('T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob:', async () =
       return new Echt(url, opt);
     };
   });
-  await schwerStart(s);
-  await s.waitForFunction(() => state.aiWorkerCtx && state.aiWorkerCtx.art === 'blob' && state.aiThinking, null, {timeout: 10000})
-    .catch(() => { /* unten geprüft */ });
-  await s.evaluate(() => { const k = document.getElementById('btn-ai-toggle'); for (let i = 0; i < 5; i++) { k.click(); k.click(); } });
+  await schwerVorbereiten(s);
+  /* Warten auf den blob:-Worker und Klicken in EINEM Aufruf, ohne Umweg über
+     den Testprozess: Sobald die Seite den Wechsel sieht, wird im selben Takt
+     geklickt. */
+  const bereit = await s.evaluate(() => new Promise(fertig => {
+    __schwerStart();
+    const t0 = Date.now();
+    const pruefen = () => {
+      if (state.aiWorkerCtx && state.aiWorkerCtx.art === 'blob' && state.aiThinking) {
+        const k = document.getElementById('btn-ai-toggle');
+        for (let i = 0; i < 5; i++) { k.click(); k.click(); }
+        fertig(true);
+      } else if (Date.now() - t0 > 10000) fertig(false);
+      else setTimeout(pruefen, 2);
+    };
+    pruefen();
+  }));
   await zugFertig(s, 1);
   const r = await lage(s);
   const w = await s.evaluate(() => ({art: state.aiWorkerCtx ? state.aiWorkerCtx.art : null,
     ablehnungen: state.log.filter(l => l.includes('data:-Worker abgelehnt')).length}));
   await ctx.close();
+  pruefe(bereit, 'Vorbedingung: blob:-Worker rechnete beim ersten Klick');
   pruefeGleich(w.art, 'blob', 'nach den Neustarts weiter blob:');
   pruefeGleich(w.ablehnungen, 1, 'data: nur einmal abgelehnt, nicht bei jedem Neustart');
   pruefeGleich(r.neustarts, 5, 'fünf Neustarts gezählt');
