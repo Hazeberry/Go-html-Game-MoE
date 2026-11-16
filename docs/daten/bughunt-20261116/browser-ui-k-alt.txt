@@ -1,0 +1,29 @@
+
+Review-Korrekturen im echten Browser
+────────────────────────────────────
+  ✓  Undo nach 60 Zügen: die Superko-Prüfung kennt alle Stellungen (5 Prüfungen, 675 ms)
+  ✓  PolicyNet-Puffer: erst nach gelungenem Zug, Undo nimmt ihn heraus (4 Prüfungen, 323 ms)
+  ✓  Aufgabe der KI: Training mit -1, nach Undo kein „+R“ mehr (6 Prüfungen, 317 ms)
+  ✓  Notzug: kein eigenes Auge füllen (2 Prüfungen, 300 ms)
+  ✓  Dashboard: nur Abweichungen speichern, altes Format verwerfen (8 Prüfungen, 633 ms)
+  ✓  data:-Worker asynchron abgelehnt: KI wechselt auf blob:, nicht auf den Hauptthread (5 Prüfungen, 475 ms)
+  ✓  T-D1: Dashboard übernimmt gebrochene Werte, ganzzahlige Felder bleiben ganzzahlig (7 Prüfungen, 357 ms)
+  ✓  T-W1: 20-mal KI aus und an während der Rechnung: Neustart statt Watchdog (7 Prüfungen, 1716 ms)
+  ✓  T-W2: gleiche Stufe und Farbe während der Rechnung lösen keine Anfrage aus (6 Prüfungen, 805 ms)
+  ✓  T-W3: zwei Züge auf Schwer ohne Klick: derselbe Worker, kein Neustart (5 Prüfungen, 1160 ms)
+  ✓  T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob: (7 Prüfungen, 845 ms)
+  ✓  T-P1: ein Preset ergibt dieselben Werte, egal welches vorher gewählt war (2 Prüfungen, 315 ms)
+  ✓  T-P2: Werte außerhalb der Presets bleiben beim Presetwechsel erhalten (2 Prüfungen, 325 ms)
+  ✓  T-P3: nach Presetwechseln zeigen die Felder die Werte aus PARAMS (3 Prüfungen, 297 ms)
+  ✗  T-K1: ohne Zwischenablage-Schnittstelle kopieren 📋, 🐞 und Export über den Rückfall
+     Export wirft nicht: erwartet null, bekommen Cannot read properties of undefined (reading 'writeText')
+         at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
+  ✗  T-K2: scheitert das Kopieren ganz, zeigen die Knöpfe ✗
+     Misserfolg sichtbar, auf den richtigen Knöpfen: erwartet ✗ ✗ | 💾 Speichern | ✗ Fehler, bekommen ✓ ✓ | ✓ Kopiert | ⬇ Export
+         at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
+  ✗  T-K3: Export meldet auf dem Export-Knopf, Beschriftungen bleiben nicht hängen
+     Export meldet auf dem eigenen Knopf: erwartet 💾 Speichern | ✓ Kopiert, bekommen ✓ Kopiert | ⬇ Export
+         at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
+  ✓  T-K4: mit Zwischenablage-Schnittstelle kein Rückfall (Kontrolle) (4 Prüfungen, 683 ms)
+
+  15 bestanden · 3 fehlgeschlagen

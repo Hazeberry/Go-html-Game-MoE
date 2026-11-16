@@ -34,6 +34,12 @@
     13. T-P2: Werte außerhalb der Presets (aiTimeBudget) bleiben erhalten.
     14. T-P3: Die Felder zeigen nach Presetwechseln die Werte aus PARAMS.
 
+   Korrektur K-1 und K-2 (docs/korrektur-k1-k2-vorabfestlegung.md, T-K1 bis T-K4):
+    15. T-K1: Ohne navigator.clipboard kopieren 📋, 🐞 und Export über den Rückfall.
+    16. T-K2: Scheitert das Kopieren ganz, zeigen die Knöpfe ✗ statt ✓.
+    17. T-K3: Export meldet auf dem Export-Knopf; keine hängenden Beschriftungen.
+    18. T-K4: Mit Zwischenablage-Schnittstelle kein Rückfall (Kontrolle).
+
    Aufruf:  node tests/browser-ui.js [pfad/zur/index.html] */
 'use strict';
 const {test, pruefe, pruefeGleich, laufeTests, STANDARD_HTML} = require('./rahmen');
@@ -56,9 +62,10 @@ async function vorbereiten() {
   return true;
 }
 
-/* Neue Seite; init läuft vor allen Skripten der Seite. */
-async function seite(init, initArg) {
-  const ctx = await browser.newContext();
+/* Neue Seite; init läuft vor allen Skripten der Seite. kontext: Optionen für
+   newContext, etwa Berechtigungen für die Zwischenablage. */
+async function seite(init, initArg, kontext) {
+  const ctx = await browser.newContext(kontext);
   const s = await ctx.newPage();
   const fehler = [];
   s.on('pageerror', e => fehler.push(e.message));
@@ -463,6 +470,104 @@ test('T-P3: nach Presetwechseln zeigen die Felder die Werte aus PARAMS', async (
   await ctx.close();
   pruefe(r.felder > 50, `Felder gefunden (${r.felder})`);
   pruefeGleich(r.falsch.join('; '), '', 'Felder und Markierung folgen PARAMS');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+/* ── Korrektur K-1 und K-2 (docs/korrektur-k1-k2-vorabfestlegung.md §4) ── */
+
+/* Attrappe vor dem Laden: optional ohne navigator.clipboard oder mit
+   ablehnendem writeText; execCommand('copy') gibt einen festen Wert, und ein
+   Wrapper um select() hält den Text fest, der kopiert werden sollte. */
+function kopierAttrappe({ohneApi, writeTextLehntAb, execOk}) {
+  if (ohneApi) Object.defineProperty(navigator, 'clipboard', {value: undefined, configurable: true});
+  if (writeTextLehntAb) navigator.clipboard.writeText = () => Promise.reject(new Error('Attrappe: abgelehnt'));
+  window.__kopien = [];
+  const sel = HTMLTextAreaElement.prototype.select;
+  HTMLTextAreaElement.prototype.select = function () { window.__letzterText = this.value; return sel.call(this); };
+  document.execCommand = function (befehl) {
+    if (befehl === 'copy') window.__kopien.push(window.__letzterText);
+    return execOk;
+  };
+}
+const kopierKnoepfe = s => s.evaluate(() => ({log: document.getElementById('btn-copy-log').textContent,
+  bug: document.getElementById('btn-bug-report').textContent,
+  dash: [...document.querySelectorAll('.pd-export-btn')].map(b => b.textContent)}));
+/* Export über die Funktion; am alten Code wirft sie ohne Schnittstelle. */
+const exportiere = s => s.evaluate(() => { dashToggle(); try { dashExport(); return null; } catch (e) { return e.message; } });
+
+test('T-K1: ohne Zwischenablage-Schnittstelle kopieren 📋, 🐞 und Export über den Rückfall', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(kopierAttrappe, {ohneApi: true, execOk: true});
+  await s.evaluate(() => { state.log.push('Testzeile K1'); updateUI(); });
+  await s.click('#btn-copy-log');
+  await s.click('#btn-bug-report');
+  const wurf = await exportiere(s);
+  await s.waitForTimeout(300);
+  const kopien = await s.evaluate(() => window.__kopien.map(t => String(t || '')));
+  const k = await kopierKnoepfe(s);
+  await ctx.close();
+  pruefeGleich(wurf, null, 'Export wirft nicht');
+  pruefeGleich(kopien.length, 3, 'dreimal über den Rückfall kopiert');
+  pruefe((kopien[0] || '').includes('Testzeile K1'), 'Protokoll kopiert');
+  pruefe((kopien[1] || '').includes('"meta"'), 'Fehlerbericht kopiert');
+  pruefe((kopien[2] || '').includes('globalThis.PARAMS'), 'Parameter-Export kopiert');
+  pruefeGleich(`${k.log} ${k.bug} | ${k.dash.join(' | ')}`, '✓ ✓ | 💾 Speichern | ✓ Kopiert', 'Rückmeldungen auf den richtigen Knöpfen');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-K2: scheitert das Kopieren ganz, zeigen die Knöpfe ✗', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(kopierAttrappe, {writeTextLehntAb: true, execOk: false});
+  await s.click('#btn-copy-log');
+  await s.click('#btn-bug-report');
+  const wurf = await exportiere(s);
+  await s.waitForTimeout(300);
+  const k = await kopierKnoepfe(s);
+  await ctx.close();
+  pruefeGleich(wurf, null, 'Export wirft nicht');
+  pruefeGleich(`${k.log} ${k.bug} | ${k.dash.join(' | ')}`, '✗ ✗ | 💾 Speichern | ✗ Fehler', 'Misserfolg sichtbar, auf den richtigen Knöpfen');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-K3: Export meldet auf dem Export-Knopf, Beschriftungen bleiben nicht hängen', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(null, undefined, {permissions: ['clipboard-read', 'clipboard-write']});
+  await s.evaluate(() => dashToggle());
+  await s.evaluate(() => dashExport());
+  await s.waitForTimeout(150);
+  const direkt = (await kopierKnoepfe(s)).dash.join(' | ');
+  await s.waitForTimeout(1700);
+  await s.evaluate(() => { dashSave(); dashExport(); });
+  await s.waitForTimeout(1800);
+  const nachBeiden = (await kopierKnoepfe(s)).dash.join(' | ');
+  await s.evaluate(() => dashSave());
+  await s.waitForTimeout(300);
+  await s.evaluate(() => dashSave());
+  await s.waitForTimeout(1800);
+  const nachZweimal = (await kopierKnoepfe(s)).dash.join(' | ');
+  await ctx.close();
+  pruefeGleich(direkt, '💾 Speichern | ✓ Kopiert', 'Export meldet auf dem eigenen Knopf');
+  pruefeGleich(nachBeiden, '💾 Speichern | ⬇ Export', 'nach Speichern und Export wieder in Ruhe');
+  pruefeGleich(nachZweimal, '💾 Speichern | ⬇ Export', 'nach zweimal Speichern wieder in Ruhe');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-K4: mit Zwischenablage-Schnittstelle kein Rückfall (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(() => {
+    window.__exec = 0;
+    const echt = document.execCommand.bind(document);
+    document.execCommand = function (c) { window.__exec++; return echt(c); };
+  }, undefined, {permissions: ['clipboard-read', 'clipboard-write']});
+  await s.evaluate(() => { state.log.push('Kontrolle K4'); updateUI(); });
+  await s.click('#btn-copy-log');
+  await s.waitForTimeout(300);
+  const r = await s.evaluate(async () => ({inhalt: await navigator.clipboard.readText(), exec: window.__exec,
+    knopf: document.getElementById('btn-copy-log').textContent, log: state.log.join('\n')}));
+  await ctx.close();
+  pruefeGleich(r.inhalt, r.log, 'Protokoll steht in der Zwischenablage');
+  pruefeGleich(r.exec, 0, 'kein Rückfall über execCommand');
+  pruefeGleich(r.knopf, '✓', 'Rückmeldung ✓');
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 

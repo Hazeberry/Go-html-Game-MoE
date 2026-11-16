@@ -6736,20 +6736,42 @@ document.getElementById('btn-reset').addEventListener('click',()=>{
   if(state.aiEnabled&&!humanTurn())triggerAIMove();
 });
 
-function copyWithFeedback(text, btnId, idleLabel) {
-  const done = () => {
-    const btn = document.getElementById(btnId);
-    btn.textContent = '✓'; btn.style.color = 'var(--green)';
-    setTimeout(() => { btn.textContent = idleLabel; btn.style.color = ''; }, 1500);
+/* In die Zwischenablage kopieren, mit Rückfall (K-1, docs/korrektur-k1-k2-vorabfestlegung.md).
+   writeText läuft INNERHALB des Promise: Fehlt navigator.clipboard (kein
+   sicherer Kontext, etwa http:// im LAN) oder wirft der Aufruf, landet das im
+   Rückfall statt als Seitenfehler. Ergebnis: true nur, wenn wirklich kopiert
+   wurde; execCommand('copy') zählt nur bei Rückgabe true. */
+function inZwischenablage(text) {
+  const rueckfall = () => {
+    let ta = null;
+    try {
+      ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      return document.execCommand('copy') === true;
+    } catch (e) { return false; }
+    finally { if (ta && ta.parentNode) ta.parentNode.removeChild(ta); }
   };
-  navigator.clipboard.writeText(text).then(done).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    done();
-  });
+  return Promise.resolve()
+    .then(() => navigator.clipboard.writeText(text))
+    .then(() => true, rueckfall);
+}
+
+/* Rückmeldung auf genau diesem Knopf (K-2): Erfolg grün, Misserfolg rot, nach
+   1,5 s zurück zur FESTEN Ruhebeschriftung. Vorher merkten sich die Knöpfe die
+   gerade angezeigte Beschriftung als Original; zwei schnelle Klicks ließen so
+   „✓ Gespeichert“ dauerhaft stehen. Ein neuer Aufruf hebt den alten Zeitgeber auf. */
+const _rueckmeldungUhr = new Map();
+function zeigeRueckmeldung(btn, ok, okText, ruheText, fehlerText) {
+  if (!btn) return;
+  clearTimeout(_rueckmeldungUhr.get(btn));
+  btn.textContent = ok ? okText : fehlerText;
+  btn.style.color = ok ? 'var(--green)' : 'var(--red)';
+  _rueckmeldungUhr.set(btn, setTimeout(() => { btn.textContent = ruheText; btn.style.color = ''; }, 1500));
+}
+
+function copyWithFeedback(text, btnId, idleLabel) {
+  return inZwischenablage(text).then(ok => zeigeRueckmeldung(document.getElementById(btnId), ok, '✓', idleLabel, '✗'));
 }
 
 document.getElementById('btn-sgf').addEventListener('click', downloadSGF);
@@ -7826,8 +7848,8 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
   html += `
       <div class="pd-reset-row">
         <button class="pd-reset-btn" onclick="dashReset()">↺ Reset</button>
-        <button class="pd-export-btn" onclick="dashSave()">💾 Speichern</button>
-        <button class="pd-export-btn" onclick="dashExport()">⬇ Export</button>
+        <button class="pd-export-btn" id="pd-btn-speichern" onclick="dashSave()">💾 Speichern</button>
+        <button class="pd-export-btn" id="pd-btn-export" onclick="dashExport()">⬇ Export</button>
       </div>
     </div>`;
 
@@ -8017,11 +8039,7 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     let ok = true;
     try { localStorage.setItem(PD_STORE, JSON.stringify({version: PD_VERSION, abweichungen: dashAbweichungen()})); }
     catch (e) { console.warn('[Dashboard] Speichern fehlgeschlagen:', e); ok = false; }
-    const btn = document.querySelectorAll('.pd-export-btn')[0];
-    const orig = btn.textContent;
-    btn.textContent = ok ? '✓ Gespeichert' : '✗ Fehler';
-    btn.style.color = ok ? 'var(--green)' : 'var(--red)';
-    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+    zeigeRueckmeldung(document.getElementById('pd-btn-speichern'), ok, '✓ Gespeichert', '💾 Speichern', '✗ Fehler');
   };
 
   /* Beim Seitenaufbau einspielen. Nur Schlüssel, die es wirklich gibt, und
@@ -8082,11 +8100,9 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     for (const [k,v] of Object.entries(PARAMS)) lines.push(`  ${k}: ${v},`);
     lines.push('};');
     const txt = lines.join('\n');
-    navigator.clipboard.writeText(txt).catch(()=>{});
-    const btn = document.querySelector('.pd-export-btn');
-    const orig = btn.textContent;
-    btn.textContent = '✓ Kopiert'; btn.style.color='var(--green)';
-    setTimeout(()=>{ btn.textContent=orig; btn.style.color=''; },1500);
+    /* Kopieren mit Rückfall, Rückmeldung auf dem Export-Knopf selbst (K-1, K-2) */
+    return inZwischenablage(txt).then(ok =>
+      zeigeRueckmeldung(document.getElementById('pd-btn-export'), ok, '✓ Kopiert', '⬇ Export', '✗ Fehler'));
   };
 
   const origUpdateUI = window.updateUI;
