@@ -5653,6 +5653,7 @@ const state = {
      reicht nicht (Ko, Gefangene, Superko-Historie gehen verloren). */
   aiDiag: [], lastAIRequest: null, aiReqT0: 0, aiReqBudget: 0,
   workerDeadReason: null,
+  workerNeustarts: 0,   /* Worker neu gestartet, weil während der Rechnung eine neue Anfrage kam (W-1) */
   aiEnabled: false, aiColor: 2, aiDifficulty: 'easy',
   aiThinking: false, aiRequestId: 0, aiWorker: null, aiWorkerCtx: null, deadStones: new Set(), undoStack: [],
   vorschau: null   /* Zählvorschau: {schluessel, v}; nur Anzeige, nie Teil des Spiels */
@@ -5767,6 +5768,7 @@ function resetGame() {
   cleanupWorker();
   state.workerDead = false;   /* Neues Spiel = neuer Versuch */
   state.workerDeadReason = null;
+  state.workerNeustarts = 0;
   state.vorschau = null; vorschauPanelAktualisieren();
   if (globalThis.policyNet) { policyNet._trained=false; policyNet._gameBuffer=[]; }
   state.aiRequestId++;
@@ -6080,14 +6082,17 @@ function erzeugeWorker(art) {
     url = URL.createObjectURL(new Blob([workerSrc], {type: 'application/javascript'}));
   }
   state.aiWorker = new Worker(url);
-  state.aiWorkerCtx = {url, art, antwort: false, letzteAnfrage: null, netInp: null, netPriors: null, netHidden: null};
+  state.aiWorkerCtx = {url, art, antwort: false, laeuft: null, letzteAnfrage: null, netInp: null, netPriors: null, netHidden: null};
   attachWorkerHandlers();
 }
 
 function attachWorkerHandlers() {
   state.aiWorker.onmessage = function(e) {
     const ctx = state.aiWorkerCtx;
-    if (ctx) ctx.antwort = true;   /* der Worker läuft; ein späterer Fehler ist ein echter Absturz */
+    /* laeuft zuerst zurücksetzen: applyAIResult kann selbst triggerAIMove
+       rufen, und das soll die eben beantwortete Anfrage nicht für laufend
+       halten (docs/korrektur-d1-w1-vorabfestlegung.md §3). */
+    if (ctx) { ctx.antwort = true; ctx.laeuft = null; }   /* der Worker läuft; ein späterer Fehler ist ein echter Absturz */
     /* Messwert des Workers in die Hauptthread-Kopie übernehmen — der
        Watchdog in triggerAIMove nutzt getAdaptiveTimeBudget und rechnete
        sonst für immer mit _lastMsPerSim === null (worker-ai läuft in
@@ -6128,6 +6133,7 @@ function attachWorkerHandlers() {
         Object.assign(state.aiWorkerCtx, netz, {letzteAnfrage: anfrage});
         state.log.push('! data:-Worker abgelehnt → blob:-Worker');
         state.aiWorker.postMessage(anfrage);
+        state.aiWorkerCtx.laeuft = anfrage.reqId;
         return;
       } catch (e2) {
         console.warn('[Worker] blob:-URL ebenfalls fehlgeschlagen:', e2.message || e2);
@@ -6207,6 +6213,17 @@ function triggerAIMove() {
     };
     if (state.workerDead) { fallbackToMainThread(reqId, _netInp, _netPriors, _netHidden); return; }
     try {
+      /* Liegt noch eine Anfrage beim Worker, nicht dahinter anstellen: Der
+         Worker arbeitet nacheinander ab, der Watchdog dieser Anfrage zählt
+         aber ab jetzt und lief ab, bevor sie dran war (W-1,
+         docs/korrektur-d1-w1-vorabfestlegung.md). Stattdessen neu starten,
+         mit derselben Art wie bisher. */
+      if (state.aiWorker && state.aiWorkerCtx && state.aiWorkerCtx.laeuft != null) {
+        const art = state.aiWorkerCtx.art;
+        cleanupWorker();
+        state.workerNeustarts++;
+        try { erzeugeWorker(art); } catch (e) { erzeugeWorker('blob'); }
+      }
       if (!state.aiWorker) {
         try { erzeugeWorker('data'); }
         catch (e1) {
@@ -6236,6 +6253,7 @@ function triggerAIMove() {
       state.aiWorkerCtx.letzteAnfrage = anfrage;   /* für den Wechsel data: → blob: in onerror */
       state.aiReqSend = Date.now();
       state.aiWorker.postMessage(anfrage);
+      state.aiWorkerCtx.laeuft = reqId;
 
       /* Watchdog: falls der Worker durch eine echte Endlosschleife hängt
          (kein try/catch der Welt hilft dagegen), erzwinge nach großzügiger
@@ -6677,12 +6695,15 @@ document.getElementById('btn-ai-toggle').addEventListener('click',function(){
 });
 
 document.querySelectorAll('.diff-btn').forEach(btn=>btn.addEventListener('click',function(){
+  /* Gleiche Wahl während der Rechnung: keine weitere Anfrage (W-1) */
+  if(this.dataset.diff===state.aiDifficulty&&state.aiThinking)return;
   document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
   this.classList.add('active');state.aiDifficulty=this.dataset.diff;updateAIStatus();
   if(state.aiEnabled&&!state.gameOver&&!humanTurn()){state.aiRequestId++;triggerAIMove();}
 }));
 
 document.querySelectorAll('.color-btn').forEach(btn=>btn.addEventListener('click',function(){
+  if(parseInt(this.dataset.color)===state.aiColor&&state.aiThinking)return;
   document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));
   this.classList.add('active');state.aiColor=parseInt(this.dataset.color);updateAIStatus();
   if(state.aiEnabled&&!state.gameOver&&!humanTurn()){state.aiRequestId++;triggerAIMove();}
@@ -6764,6 +6785,7 @@ function buildBugReport() {
       kiDenkt:    state.aiThinking,
       workerDead: state.workerDead,
       workerDeadReason: state.workerDeadReason || null,
+      workerNeustarts: state.workerNeustarts,
       spielVorbei: state.gameOver,
       koPoint:    state.koPoint,
       gefangene:  {...state.captures},
@@ -7780,6 +7802,10 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     } else {
       for (const p of sec.params) {
         const cls = p.main ? 'pd-row pd-haupthebel' : p.warn ? 'pd-row pd-warn' : 'pd-row';
+        /* Gebrochen liest, wer float trägt ODER einen gebrochenen Schritt hat.
+           Vorher fehlte bei vier Feldern das Kennzeichen, und parseInt machte
+           aus 0,5 eine 0 (docs/bughunt-20261116.md, D-1). */
+        const gebrochen = !!p.float || !Number.isInteger(p.step);
         const tipId = 'pdtip-' + p.key;
         html += `
           <div class="${cls}">
@@ -7788,8 +7814,8 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
             <input class="pd-input" type="number" id="pd-${p.key}"
               step="${p.step}" min="${p.min}" max="${p.max}"
               value="${PARAMS[p.key]}"
-              onchange="dashUpdate('${p.key}', this, ${!!p.float})"
-              oninput="dashUpdate('${p.key}', this, ${!!p.float})">
+              onchange="dashUpdate('${p.key}', this, ${gebrochen})"
+              oninput="dashUpdate('${p.key}', this, ${gebrochen})">
           </div>
           ${p.tip ? `<div class="pd-tip-text" id="${tipId}">${p.tip}</div>` : ''}`;
       }
