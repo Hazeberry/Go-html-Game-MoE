@@ -105,8 +105,10 @@ wie heute: derselbe Worker, dieselbe Nachricht, derselbe Watchdog. Der Weg über
 ## 4. Tests (in der Umsetzung)
 
 Alle neuen Tests kommen in `tests/browser-ui.js`. Dort laufen sie im Job „Browser“ der CI mit; `tests/run.js` und
-`.github/workflows/tests.yml` führen die Datei bereits auf. Die Zeile in `tests/README.md` wird ergänzt. Jeder neue
-Test muss mit dem Code **vor** der Korrektur fehlschlagen. Das wird im Umsetzungs-PR mit der Ausgabe gezeigt.
+`.github/workflows/tests.yml` führen die Datei bereits auf. Die Zeile in `tests/README.md` wird ergänzt.
+T-D1, T-W1 und T-W2 müssen mit dem Code **vor** der Korrektur fehlschlagen. T-W3 ist die Kontrolle des normalen Wegs
+und besteht an beiden. T-W4 prüft den Neustartweg selbst; am alten Code scheitert er nur daran, dass es keinen
+Neustart und keinen Zähler gibt. Das Verhalten an beiden Ständen wird im Umsetzungs-PR mit der Ausgabe gezeigt.
 
 | Test | Prüft | vor der Korrektur |
 |---|---|---|
@@ -114,14 +116,19 @@ Test muss mit dem Code **vor** der Korrektur fehlschlagen. Das wird im Umsetzung
 | T-W1 | KI Schwarz auf Schwer, `aiTimeBudget` 300, `adaptiveBudgetEnabled` 0 (Watchdog 3900 ms). Während der ersten Rechnung 20-mal KI aus und an, **in einem einzigen `page.evaluate`**. Danach: genau ein KI-Zug, `workerDead` false, keine Watchdog-Zeile, `workerNeustarts` 20 | Watchdog, `workerDead` true |
 | T-W2 | Einstellungen wie T-W1. Während der Rechnung 5 Klicks auf die gewählte Stufe und 5 auf die gewählte Farbe: `aiRequestId` steigt nicht, der Worker bleibt derselbe, `workerNeustarts` 0 | `aiRequestId` steigt um 20 |
 | T-W3 | Zwei KI-Züge auf Schwer ohne Klick dazwischen: derselbe Worker (Objektgleichheit), `workerNeustarts` 0 | besteht auch vorher (Kontrolle des normalen Wegs) |
+| T-W4 | `data:` wird asynchron abgelehnt (Attrappe wie im bestehenden Test 6), die KI rechnet im `blob:`-Worker. Während der Rechnung 5-mal KI aus und an in einem Aufruf: Der neue Worker ist wieder `blob:`, die Ablehnung von `data:` steht genau einmal im Protokoll, `workerNeustarts` 5, kein Watchdog, ein Zug | scheitert nur am fehlenden Zähler |
 
 Zu T-W1:
 - **Warum in einem Aufruf:** Einzelne Playwright-Klicks verteilen die Anfragen über rund 2 s. Der Worker arbeitet die
   Warteschlange in dieser Zeit schon teilweise ab, und der Watchdog läuft am alten Code **nicht** ab. So wurde es im
   Prototyp mit 15 Zyklen gemessen (§7).
-- **Warum 20 Zyklen:** Jede Anfrage dauert mindestens das Budget von 300 ms, weil die Suche bis zu ihrer Frist läuft.
-  21 Anfragen brauchen damit mindestens 6,3 s, auf jedem Rechner mehr als der Watchdog von 3,9 s. Gemessen dauerten
-  sie je rund 0,32 s.
+- **Warum 20 Zyklen:** Die Suche endet an ihrer Frist von 300 ms **oder** bei 20 000 Simulationen
+  (`mctsPUCT`, `simLimit`), je nachdem, was zuerst eintritt. Gemessen wurden rund 1 900 Simulationen je Sekunde
+  (3 491 in 1,8 s), in 300 ms also rund 580. Die Grenze von 20 000 erreicht erst ein etwa 35-mal schnellerer Rechner.
+  Solange die Frist greift, brauchen 21 Anfragen mindestens 6,3 s, mehr als der Watchdog von 3,9 s. Gemessen dauerten
+  sie je rund 0,32 s. Eine Garantie für jeden Rechner ist das **nicht**. Deshalb prüft T-W1 die Vorbedingung selbst:
+  Der ausgeführte Zug meldet weniger als 20 000 Simulationen. Endet die Suche einmal an der Grenze, schlägt T-W1 fehl
+  und verdeckt die Lage nicht. Den Fehlernachweis am alten Code liefert die abgelegte Ausgabe.
 
 Die Ausführungsdauer von `tests/browser-ui.js` steigt um einige Sekunden.
 
@@ -130,7 +137,8 @@ Die Ausführungsdauer von `tests/browser-ui.js` steigt um einige Sekunden.
 Zwei Zustände, gültig oder ungültig. **Gültig** nur, wenn alles zutrifft:
 
 1. Die drei Engine-Blöcke haben die Prüfsummen aus §1, und `PARAMS_DEFAULT` ist unverändert.
-2. T-D1, T-W1 und T-W2 schlagen am alten Code fehl und bestehen am neuen. T-W3 besteht an beiden.
+2. T-D1, T-W1 und T-W2 schlagen am alten Code fehl und bestehen am neuen. T-W3 besteht an beiden. T-W4 besteht am
+   neuen Code.
 3. `node tests/run.js` lokal grün, CI grün. Die bestehenden Browser-Tests bleiben unverändert.
 4. `auswertung/bughunt-20261116/pruefung.js` am neuen Code: D-1, W-1a, W-1b und W-1c „nicht reproduziert“, W-1k
    weiter „nicht reproduziert“. Die übrigen Fälle (D-2, K-1, K-2, L-1, R-1, B-1 bis B-3) unverändert „reproduziert“.
@@ -187,3 +195,10 @@ die Umsetzung; er dient nur der Prüfung des Entwurfs.
 4. **Neustarts:** zählen statt protokollieren (20 Klicks gaben 20 Protokollzeilen).
 5. **Wortlaut:** §1 sagt nicht mehr pauschal, es entstehe keine Spielstärkefrage, sondern nennt den Klickfall.
    Die Dauer je Anfrage ist gemessen (0,32 s) statt geschätzt (0,3 s).
+
+**Hinweise von Luna zu dieser Fassung (16.11.2026), eingearbeitet:**
+- T-W1 behandelte das Zeitbudget als garantierte Mindestdauer. Die Suche kann auch an der Grenze von 20 000
+  Simulationen enden. Die Garantie ist gestrichen, T-W1 prüft die Vorbedingung selbst (§4).
+- §4 verlangte, dass jeder neue Test vorher fehlschlägt. Das widersprach T-W3. §4 ist an §5 angeglichen.
+- Dass ein Neustart die Art `data:` oder `blob:` beibehält, war festgelegt, aber durch keinen Test geprüft. Dafür gibt
+  es jetzt T-W4.
