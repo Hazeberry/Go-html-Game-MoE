@@ -1,0 +1,288 @@
+{
+ "umgebung": {
+  "datum": "2026-11-16T14:44:31.036Z",
+  "commit": "e0727310cb1370570ffcb20de6e7b513f949dcbf",
+  "indexHtmlSha256": "8f2c56e68dc29cf5f0aa79c9c062ce55ba43285fddfce67ea3560a3eb3da8a05",
+  "node": "v22.23.4",
+  "chromium": "153.0.8010.12"
+ },
+ "faelle": [
+  {
+   "id": "D-1",
+   "titel": "Dashboard: gebrochene Eingaben werden abgeschnitten (parseInt)",
+   "status": "reproduziert",
+   "daten": {
+    "abgeschnitten": [
+     "endTieBreak=0.5",
+     "endTieBreak=1.5",
+     "atariSizeWeight=0.25",
+     "raumZug=0.5",
+     "raumGewicht=1.5"
+    ],
+    "werte": {
+     "endTieBreak=0.5": {
+      "params": 0,
+      "feld": "0.5",
+      "standard": 1,
+      "markiert": true
+     },
+     "endTieBreak=1.5": {
+      "params": 1,
+      "feld": "1.5",
+      "standard": 1,
+      "markiert": false
+     },
+     "atariSizeWeight=0.25": {
+      "params": 0,
+      "feld": "0.25",
+      "standard": 0,
+      "markiert": false
+     },
+     "raumZug=0.5": {
+      "params": 0,
+      "feld": "0.5",
+      "standard": 0,
+      "markiert": false
+     },
+     "raumGewicht=1.5": {
+      "params": 1,
+      "feld": "1.5",
+      "standard": 0,
+      "markiert": true
+     },
+     "tsumegoNakade=0.75": {
+      "params": 0.75,
+      "feld": "0.75",
+      "standard": 0.5,
+      "markiert": true
+     }
+    },
+    "betroffeneFelder": [
+     "atariSizeWeight (step 0.05)",
+     "raumZug (step 0.5)",
+     "raumGewicht (step 0.5)",
+     "endTieBreak (step 0.5)"
+    ]
+   }
+  },
+  {
+   "id": "D-2",
+   "titel": "Presets: Werte des vorigen Presets bleiben stehen ([direkt, nach anderem Preset])",
+   "status": "reproduziert",
+   "daten": {
+    "defensivNachAggressiv": {
+     "tsumegoAtariSet": [
+      "Standard",
+      650
+     ]
+    },
+    "aggressivNachAusgewogen": {
+     "endCapBonus": [
+      "Standard",
+      12
+     ],
+     "passMinMc120": [
+      "Standard",
+      6
+     ],
+     "passMinMc150": [
+      "Standard",
+      8
+     ]
+    }
+   }
+  },
+  {
+   "id": "W-1a",
+   "titel": "Schwer: 5 Klicks auf die Stufe während der Rechnung",
+   "status": "reproduziert",
+   "daten": {
+    "zusatzKlicks": 5,
+    "anfragen": 11,
+    "msBisZug": 10887,
+    "workerDead": true,
+    "grund": "Watchdog: keine Antwort nach 8400 ms",
+    "zug": 1,
+    "warnungen": [
+     "! Worker-Watchdog (8400 ms) → synchroner Modus"
+    ],
+    "dauerMs": [
+     10250
+    ],
+    "budgetMs": [
+     1800
+    ],
+    "seitenfehler": []
+   }
+  },
+  {
+   "id": "W-1b",
+   "titel": "Schwer: 5 Klicks auf die Farbe während der Rechnung",
+   "status": "reproduziert",
+   "daten": {
+    "zusatzKlicks": 5,
+    "anfragen": 11,
+    "msBisZug": 10893,
+    "workerDead": true,
+    "grund": "Watchdog: keine Antwort nach 8400 ms",
+    "zug": 1,
+    "warnungen": [
+     "! Worker-Watchdog (8400 ms) → synchroner Modus"
+    ],
+    "dauerMs": [
+     10265
+    ],
+    "budgetMs": [
+     1800
+    ],
+    "seitenfehler": []
+   }
+  },
+  {
+   "id": "W-1c",
+   "titel": "Schwer: 5-mal KI aus und an während der Rechnung",
+   "status": "reproduziert",
+   "daten": {
+    "zusatzKlicks": 5,
+    "anfragen": 6,
+    "msBisZug": 11128,
+    "workerDead": true,
+    "grund": "Watchdog: keine Antwort nach 8400 ms",
+    "zug": 1,
+    "warnungen": [
+     "! Worker-Watchdog (8400 ms) → synchroner Modus"
+    ],
+    "dauerMs": [
+     10256
+    ],
+    "budgetMs": [
+     1800
+    ],
+    "seitenfehler": []
+   }
+  },
+  {
+   "id": "W-1k",
+   "titel": "Kontrolle: 2 Klicks auf die Stufe (Erwartung: kein Watchdog)",
+   "status": "nicht reproduziert",
+   "daten": {
+    "zusatzKlicks": 2,
+    "anfragen": 5,
+    "msBisZug": 5395,
+    "workerDead": false,
+    "grund": null,
+    "zug": 1,
+    "warnungen": [],
+    "dauerMs": [
+     5182
+    ],
+    "budgetMs": [
+     1800
+    ],
+    "seitenfehler": []
+   }
+  },
+  {
+   "id": "K-1",
+   "titel": "Kopieren ohne navigator.clipboard wirft, Rückfall wird nie erreicht",
+   "status": "reproduziert",
+   "daten": {
+    "btn-copy-log": {
+     "beschriftung": "📋",
+     "seitenfehler": [
+      "Cannot read properties of undefined (reading 'writeText')"
+     ]
+    },
+    "btn-bug-report": {
+     "beschriftung": "🐞",
+     "seitenfehler": [
+      "Cannot read properties of undefined (reading 'writeText')"
+     ]
+    },
+    "dashExport": "Cannot read properties of undefined (reading 'writeText')"
+   }
+  },
+  {
+   "id": "K-2",
+   "titel": "Export: Rückmeldung auf dem falschen Knopf, Beschriftung kann hängen bleiben",
+   "status": "reproduziert",
+   "daten": {
+    "vorher": [
+     "💾 Speichern",
+     "⬇ Export"
+    ],
+    "direktNachExport": [
+     "✓ Kopiert",
+     "⬇ Export"
+    ],
+    "nachSpeichernUndExport": [
+     "✓ Gespeichert",
+     "⬇ Export"
+    ]
+   }
+  },
+  {
+   "id": "L-1",
+   "titel": "Brett passt sich der Fenstergröße nicht an",
+   "status": "reproduziert",
+   "daten": {
+    "vorher": {
+     "canvas": 634,
+     "layout": 634
+    },
+    "nachher": {
+     "canvas": 634,
+     "layout": 376,
+     "scrollWidth": 517,
+     "innerWidth": 400
+    }
+   }
+  },
+  {
+   "id": "R-1",
+   "titel": "Leicht: wirft getAIMove, bleibt „KI denkt...“ stehen",
+   "status": "reproduziert",
+   "daten": {
+    "aiThinking": true,
+    "rueckgaengigGesperrt": true,
+    "status": "KI denkt...",
+    "zug": 1,
+    "seitenfehler": [
+     "Attrappe"
+    ]
+   }
+  },
+  {
+   "id": "B-1",
+   "titel": "Dashboard: Feld zeigt den ungeklemmten Wert",
+   "status": "reproduziert",
+   "daten": {
+    "params": 5000,
+    "feld": "99999"
+   }
+  },
+  {
+   "id": "B-2",
+   "titel": "Spielende: toter Stein verschwindet, rotes Kreuz wird nie gezeichnet",
+   "status": "reproduziert",
+   "daten": {
+    "spielende": true,
+    "tote": [
+     5
+    ],
+    "steinAufF19": 0,
+    "log": [
+     "! 1 tote Steine entfernt"
+    ]
+   }
+  },
+  {
+   "id": "B-3",
+   "titel": "Statuszeile zeigt „Beide gepasst.“ nie",
+   "status": "reproduziert",
+   "daten": {
+    "statuszeile": "Spiel beendet"
+   }
+  }
+ ]
+}
