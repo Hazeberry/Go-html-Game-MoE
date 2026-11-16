@@ -114,7 +114,8 @@ geprüft (Chromium 153 headless). Der Prototyp ist nicht die Umsetzung.
 - **T-L4:** An beiden bleibt die Maserung dieselbe.
 - **Eigener Fehler beim Prüfen:** Die erste Fassung von T-L2 las den Pixel an der Lage nach der **gespeicherten**
   Variable `layout`. Am alten Code ist das die alte Lage, und der Test bestand fälschlich. In §4 steht deshalb die
-  Soll-Lage nach `computeLayout()`.
+  Soll-Lage nach `computeLayout()`. Nachgeprüft: Dort liegt am alten Code Holz (RGB 200/160/90), der Test schlägt also
+  fehl. Am Prototyp liegt dort der Stein (RGB 40/40/40).
 
 ## 7. Ablauf
 
