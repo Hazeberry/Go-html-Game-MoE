@@ -1,6 +1,6 @@
 # Korrektur D-1 und W-1: Vorabfestlegung
 
-**Stand: 16.11.2026. Status: Vorabfestlegung, noch keine Codeänderung.** Befunde aus `docs/bughunt-20261116.md`.
+**Stand: 16.11.2026. Status: umgesetzt (§8), Abnahme gültig.** Befunde aus `docs/bughunt-20261116.md`.
 Go von Hazeberry am 16.11.2026: „Go für D-1 und W-1, Vorabfestlegung schreiben“.
 
 Dieses Doc legt fest, was geändert wird, was unverändert bleiben muss und woran die Korrektur gemessen wird. Es
@@ -187,3 +187,35 @@ die Umsetzung; er dient nur der Prüfung des Entwurfs.
 4. **Neustarts:** zählen statt protokollieren (20 Klicks gaben 20 Protokollzeilen).
 5. **Wortlaut:** §1 sagt nicht mehr pauschal, es entstehe keine Spielstärkefrage, sondern nennt den Klickfall.
    Die Dauer je Anfrage ist gemessen (0,32 s) statt geschätzt (0,3 s).
+
+## 8. Nachtrag: Umsetzung und Abnahme (16.11.2026)
+
+Hazeberry: „Du kannst schon mal PRen.“ Die Umsetzung folgt §2 bis §4 ohne Abweichung, im eigenen PR auf Grundlage
+dieses Docs. Geändert sind `index.html` (Dashboard, Worker-Anbindung, Stufen- und Farbknöpfe, Fehlerbericht),
+`tests/browser-ui.js` (T-D1 bis T-W3) und `tests/README.md`.
+
+**Abnahme nach §5:**
+
+1. **Prüfsummen:** Die Engine-Blöcke haben am neuen Stand genau die Prüfsummen aus §1. `PARAMS_DEFAULT` liegt im
+   Block `worker-ai` und ist damit ebenfalls unverändert. Erfüllt.
+2. **Tests:** Am alten Code (`index.html` SHA-256 `8f2c56e6…`, Stand `0f11058`) schlagen T-D1, T-W1 und T-W2 fehl,
+   T-W3 besteht. Gründe:
+   - T-D1: vier Felder abgeschnitten.
+   - T-W1: „der Worker gilt nicht als tot (Watchdog: keine Antwort nach 3900 ms)“.
+   - T-W2: `aiRequestId` 21 statt 1.
+
+   Am neuen Code bestehen alle zehn Tests der Datei. Ausgaben: `docs/daten/bughunt-20261116/browser-ui-alt.txt` und
+   `browser-ui-neu.txt`. Erfüllt.
+3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: alle 60 Testdateien bestanden. Eine Prüfung übersprang
+   sich, weil GNU Go lokal fehlt. Die CI steht im PR. Erfüllt, sobald die CI grün ist.
+4. **Prüfskript:** `pruefung.js` am neuen Code ergibt genau das Soll: D-1 und W-1a bis W-1c „nicht reproduziert“,
+   W-1k „nicht reproduziert“, D-2, K-1, K-2, L-1, R-1 und B-1 bis B-3 „reproduziert“ (8 von 13).
+   Daten: `docs/daten/bughunt-20261116/nach-d1-w1.json`, Konsole `nach-d1-w1-konsole.txt`. Erfüllt.
+
+**Ergebnis:** gültig, vorbehaltlich grüner CI. Neue `index.html`:
+SHA-256 `4981f5f7a0a030ec7595c199c14ae6ad2d2b8f5fd05bf1a3c9c1231da93666a3`.
+
+**Grenzen:**
+- Nur Chromium 153 headless am Desktop, je Test ein Lauf.
+- Auf dem Handy nicht geprüft, auch nicht die Kosten eines Neustarts dort.
+- Eine Wirkung auf die Spielstärke ist nicht gemessen und nach §1 nicht zu erwarten, außer im Klickfall.
