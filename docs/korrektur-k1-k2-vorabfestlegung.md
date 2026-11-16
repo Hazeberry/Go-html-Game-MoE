@@ -152,7 +152,8 @@ Die Umsetzung setzt auf dem Stand mit der Korrektur D-2 auf (PR #330).
 
    T-K4 besteht dort. Am neuen Code bestehen alle 18 Tests der Datei. Ausgaben:
    `docs/daten/bughunt-20261116/browser-ui-k-alt.txt` und `browser-ui-k-neu.txt`. Erfüllt.
-3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: siehe Nachtrag im PR. Die CI steht im PR.
+3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: alle 60 Testdateien bestanden. Eine Prüfung übersprang
+   sich, weil GNU Go lokal fehlt. Die CI steht im PR. Erfüllt, sobald die CI grün ist.
 4. **Prüfskript:** `pruefung.js` am neuen Code ergibt genau das Soll: K-1 und K-2 „nicht reproduziert“; D-1, D-2 und W-1
    weiter „nicht reproduziert“; L-1, R-1 und B-1 bis B-3 „reproduziert“ (5 von 13).
    Daten: `docs/daten/bughunt-20261116/nach-k1-k2.json`, Konsole `nach-k1-k2-konsole.txt`. Erfüllt.
