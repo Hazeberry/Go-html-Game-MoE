@@ -27,6 +27,7 @@
      9. T-W2: Klicks auf die schon gewählte Stufe oder Farbe während der
         Rechnung lösen keine Anfrage aus.
     10. T-W3: Zwei Züge ohne Klick: derselbe Worker, kein Neustart.
+    11. T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob:.
 
    Aufruf:  node tests/browser-ui.js [pfad/zur/index.html] */
 'use strict';
@@ -255,8 +256,12 @@ async function schwerStart(s) {
 }
 const zugFertig = (s, n) => s.waitForFunction(n => !state.aiThinking && state.moveCount >= n, n, {timeout: 30000})
   .catch(() => { /* unten geprüft */ });
-const lage = s => s.evaluate(() => ({zuege: state.moveCount, tot: !!state.workerDead, grund: state.workerDeadReason,
-  watchdog: state.log.some(l => l.includes('Watchdog')), neustarts: state.workerNeustarts}));
+const lage = s => s.evaluate(() => {
+  const info = (state.aiDiag.at(-1) || {}).info || '', m = /MCTS (\d+) Sims/.exec(info);
+  return {zuege: state.moveCount, tot: !!state.workerDead, grund: state.workerDeadReason,
+    watchdog: state.log.some(l => l.includes('Watchdog')), neustarts: state.workerNeustarts,
+    sims: m ? +m[1] : null};
+});
 
 test('T-W1: 20-mal KI aus und an während der Rechnung: Neustart statt Watchdog', async () => {
   if (!(await vorbereiten())) return 'skip';
@@ -269,6 +274,10 @@ test('T-W1: 20-mal KI aus und an während der Rechnung: Neustart statt Watchdog'
   await s.waitForTimeout(300);
   const r = await lage(s);
   await ctx.close();
+  /* Vorbedingung: Die Suche endete an der Frist von 300 ms, nicht am Limit von
+     20 000 Simulationen. Nur dann dauert jede Anfrage mindestens 300 ms, und
+     nur dann löst der alte Code hier zuverlässig den Watchdog aus (§4). */
+  pruefe(r.sims !== null && r.sims < 20000, `Suche endete an der Frist (${r.sims} Simulationen)`);
   pruefeGleich(r.zuege, 1, 'genau ein KI-Zug');
   pruefe(r.tot !== true, `der Worker gilt nicht als tot (${r.grund})`);
   pruefe(!r.watchdog, 'kein Watchdog');
@@ -320,6 +329,37 @@ test('T-W3: zwei Züge auf Schwer ohne Klick: derselbe Worker, kein Neustart', a
   pruefe(gleich, 'derselbe Worker');
   pruefe(!r.neustarts, 'kein Neustart');
   pruefe(!r.watchdog && r.tot !== true, 'kein Watchdog, Worker lebt');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob:', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  /* Dieselbe Attrappe wie im Test zum asynchron abgelehnten data:-Worker */
+  const {s, ctx, fehler} = await seite(() => {
+    const Echt = window.Worker;
+    window.Worker = function (url, opt) {
+      if (String(url).startsWith('data:')) {
+        const falsch = {onmessage: null, onerror: null, terminate() {},
+          postMessage() { setTimeout(() => { if (falsch.onerror) falsch.onerror({message: 'simuliert: data: abgelehnt'}); }, 20); }};
+        return falsch;
+      }
+      return new Echt(url, opt);
+    };
+  });
+  await schwerStart(s);
+  await s.waitForFunction(() => state.aiWorkerCtx && state.aiWorkerCtx.art === 'blob' && state.aiThinking, null, {timeout: 10000})
+    .catch(() => { /* unten geprüft */ });
+  await s.evaluate(() => { const k = document.getElementById('btn-ai-toggle'); for (let i = 0; i < 5; i++) { k.click(); k.click(); } });
+  await zugFertig(s, 1);
+  const r = await lage(s);
+  const w = await s.evaluate(() => ({art: state.aiWorkerCtx ? state.aiWorkerCtx.art : null,
+    ablehnungen: state.log.filter(l => l.includes('data:-Worker abgelehnt')).length}));
+  await ctx.close();
+  pruefeGleich(w.art, 'blob', 'nach den Neustarts weiter blob:');
+  pruefeGleich(w.ablehnungen, 1, 'data: nur einmal abgelehnt, nicht bei jedem Neustart');
+  pruefeGleich(r.neustarts, 5, 'fünf Neustarts gezählt');
+  pruefe(!r.watchdog && r.tot !== true, `kein Watchdog, Worker lebt (${r.grund})`);
+  pruefeGleich(r.zuege, 1, 'ein KI-Zug');
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 

@@ -1,12 +1,12 @@
 
 Review-Korrekturen im echten Browser
 ────────────────────────────────────
-  ✓  Undo nach 60 Zügen: die Superko-Prüfung kennt alle Stellungen (5 Prüfungen, 930 ms)
-  ✓  PolicyNet-Puffer: erst nach gelungenem Zug, Undo nimmt ihn heraus (4 Prüfungen, 427 ms)
-  ✓  Aufgabe der KI: Training mit -1, nach Undo kein „+R“ mehr (6 Prüfungen, 461 ms)
-  ✓  Notzug: kein eigenes Auge füllen (2 Prüfungen, 411 ms)
-  ✓  Dashboard: nur Abweichungen speichern, altes Format verwerfen (8 Prüfungen, 901 ms)
-  ✓  data:-Worker asynchron abgelehnt: KI wechselt auf blob:, nicht auf den Hauptthread (5 Prüfungen, 601 ms)
+  ✓  Undo nach 60 Zügen: die Superko-Prüfung kennt alle Stellungen (5 Prüfungen, 690 ms)
+  ✓  PolicyNet-Puffer: erst nach gelungenem Zug, Undo nimmt ihn heraus (4 Prüfungen, 327 ms)
+  ✓  Aufgabe der KI: Training mit -1, nach Undo kein „+R“ mehr (6 Prüfungen, 370 ms)
+  ✓  Notzug: kein eigenes Auge füllen (2 Prüfungen, 353 ms)
+  ✓  Dashboard: nur Abweichungen speichern, altes Format verwerfen (8 Prüfungen, 783 ms)
+  ✓  data:-Worker asynchron abgelehnt: KI wechselt auf blob:, nicht auf den Hauptthread (5 Prüfungen, 563 ms)
   ✗  T-D1: Dashboard übernimmt gebrochene Werte, ganzzahlige Felder bleiben ganzzahlig
      jedes Feld mit gebrochenem Schritt übernimmt den Wert: erwartet , bekommen atariSizeWeight: 0.05 → 0; raumZug: 0.5 → 0; raumGewicht: 0.5 → 0; endTieBreak: 0.5 → 0
          at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
@@ -16,6 +16,9 @@ Review-Korrekturen im echten Browser
   ✗  T-W2: gleiche Stufe und Farbe während der Rechnung lösen keine Anfrage aus
      aiRequestId unverändert: erwartet 1, bekommen 21
          at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
-  ✓  T-W3: zwei Züge auf Schwer ohne Klick: derselbe Worker, kein Neustart (5 Prüfungen, 1308 ms)
+  ✓  T-W3: zwei Züge auf Schwer ohne Klick: derselbe Worker, kein Neustart (5 Prüfungen, 1363 ms)
+  ✗  T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob:
+     fünf Neustarts gezählt: erwartet 5, bekommen undefined
+         at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
 
-  7 bestanden · 3 fehlgeschlagen
+  7 bestanden · 4 fehlgeschlagen
