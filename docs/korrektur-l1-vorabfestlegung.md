@@ -13,9 +13,15 @@ Betroffen ist nur die Darstellung im Hauptskript. Die Blöcke `shared-go-logic`,
 `56a5d6c0…`). `state`, `PARAMS` und das Spielgeschehen werden nicht berührt.
 
 Kein Schalter, kein Messlauf. Was sich ändert: Nach einer Änderung der Fenstergröße wird das Brett in der passenden
-Größe neu gezeichnet. Dabei entsteht wie beim Laden eine neue Holzmaserung (`generateGrain` nutzt `Math.random`). Der
-Hauptthread-Zufall ist nicht gesät; Leicht und Mittel, die im Hauptthread rechnen, waren schon bisher nicht
-reproduzierbar. Ein Unterschied zum heutigen Verhalten ist das nicht.
+Größe neu gezeichnet. Dabei entsteht wie beim Laden eine neue Holzmaserung.
+
+**Zusätzliche Zufallsaufrufe:** `generateGrain` ruft `Math.random()` auf, 90-mal je Neuzeichnen. Leicht und Mittel
+rechnen im Hauptthread und wählen ihre Züge mit demselben, nicht gesäten Zufallsgenerator. Nach einer Größenänderung
+kann eine Partie auf diesen Stufen deshalb andere Züge bekommen, als sie ohne die Änderung bekommen hätte. Dass Leicht
+und Mittel schon heute nicht reproduzierbar sind, beweist nicht, dass sich die Zugfolge nicht ändert. Es heißt nur,
+dass es keine feste Zugfolge gab, die man vergleichen könnte. Die Stufe Schwer rechnet im Worker mit eigenem
+Zufallsgenerator und ist davon nicht berührt; das ist gelesen, nicht gemessen. Eine Auswirkung auf die Spielstärke ist
+nicht gemessen.
 
 ## 2. Befund
 
