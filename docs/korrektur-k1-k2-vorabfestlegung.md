@@ -1,6 +1,6 @@
 # Korrektur K-1 und K-2: Vorabfestlegung
 
-**Stand: 16.11.2026. Status: Vorabfestlegung, noch keine Codeänderung.** Befunde aus `docs/bughunt-20261116.md`
+**Stand: 16.11.2026. Status: umgesetzt (§8), Abnahme gültig.** Befunde aus `docs/bughunt-20261116.md`
 (K-1, K-2). Go von Hazeberry am 16.11.2026: „Go für K-1 und K-2, Vorabfestlegung schreiben“.
 
 Dieses Doc enthält Vorgaben für die Umsetzung. Hazeberry liest es vor dem Merge. Die Umsetzung folgt danach in einem
@@ -130,3 +130,34 @@ geprüft (Chromium 153 headless). Der Prototyp ist nicht die Umsetzung.
 2. Umsetzung in einem eigenen PR: Code, Tests, `tests/README.md`, Nachtrag hier mit den Ergebnissen aus §5 und eine
    Zeile in `docs/bughunt-20261116.md`.
 3. CI grün, Merge, kurzer Bericht.
+
+## 8. Nachtrag: Umsetzung und Abnahme (16.11.2026)
+
+Hazeberry: „#329 freigegeben, du kannst schon mal PRen.“ Die Umsetzung folgt §3 und §4 ohne Abweichung. Geändert sind:
+- `index.html`: `inZwischenablage`, `zeigeRueckmeldung`, `copyWithFeedback`, `dashSave` und `dashExport`, dazu die ids
+  `pd-btn-speichern` und `pd-btn-export`;
+- `tests/browser-ui.js`: T-K1 bis T-K4. Die Hilfsfunktion `seite` nimmt dafür optional Kontext-Optionen
+  (Berechtigungen für die Zwischenablage); die bestehenden Aufrufe bleiben unverändert;
+- `tests/README.md`.
+
+Die Umsetzung setzt auf dem Stand mit der Korrektur D-2 auf (PR #330).
+
+**Abnahme nach §5:**
+
+1. **Prüfsummen:** Die Engine-Blöcke haben die Prüfsummen aus §1. Erfüllt.
+2. **Tests:** Am alten Code (`index.html` SHA-256 `fa58790f…`, Stand mit D-2) schlagen T-K1 bis T-K3 fehl:
+   - T-K1: „Export wirft nicht: … Cannot read properties of undefined (reading 'writeText')“.
+   - T-K2: „✓ ✓ | ✓ Kopiert | ⬇ Export“ statt „✗ ✗ | 💾 Speichern | ✗ Fehler“.
+   - T-K3: „✓ Kopiert | ⬇ Export“ statt „💾 Speichern | ✓ Kopiert“.
+
+   T-K4 besteht dort. Am neuen Code bestehen alle 18 Tests der Datei. Ausgaben:
+   `docs/daten/bughunt-20261116/browser-ui-k-alt.txt` und `browser-ui-k-neu.txt`. Erfüllt.
+3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: siehe Nachtrag im PR. Die CI steht im PR.
+4. **Prüfskript:** `pruefung.js` am neuen Code ergibt genau das Soll: K-1 und K-2 „nicht reproduziert“; D-1, D-2 und W-1
+   weiter „nicht reproduziert“; L-1, R-1 und B-1 bis B-3 „reproduziert“ (5 von 13).
+   Daten: `docs/daten/bughunt-20261116/nach-k1-k2.json`, Konsole `nach-k1-k2-konsole.txt`. Erfüllt.
+
+Neue `index.html`: SHA-256 `425a1c8f7ac9ccff3ac8cc8fb2222db4ce50cd7a569238adf755918e69868821`.
+
+**Grenzen:** Nur Chromium 153 headless. Die fehlende Schnittstelle ist im Test nachgestellt, nicht über einen echten
+Aufruf per `http://` im LAN oder auf dem Handy geprüft.
