@@ -20,7 +20,8 @@ rechnen im Hauptthread und wählen ihre Züge mit demselben, nicht gesäten Zufa
 kann eine Partie auf diesen Stufen deshalb andere Züge bekommen, als sie ohne die Änderung bekommen hätte. Dass Leicht
 und Mittel schon heute nicht reproduzierbar sind, beweist nicht, dass sich die Zugfolge nicht ändert. Es heißt nur,
 dass es keine feste Zugfolge gab, die man vergleichen könnte. Die Stufe Schwer rechnet im Worker mit eigenem
-Zufallsgenerator und ist davon nicht berührt; das ist gelesen, nicht gemessen. Eine Auswirkung auf die Spielstärke ist
+Zufallsgenerator und ist davon nicht berührt, solange der Worker läuft. Im Rückfall auf den Hauptthread
+(`workerDead`) teilt sie sich den Generator ebenfalls. Beides ist gelesen, nicht gemessen. Eine Auswirkung auf die Spielstärke ist
 nicht gemessen.
 
 ## 2. Befund
