@@ -1,0 +1,37 @@
+
+Review-Korrekturen im echten Browser
+────────────────────────────────────
+  ✓  Undo nach 60 Zügen: die Superko-Prüfung kennt alle Stellungen (5 Prüfungen, 491 ms)
+  ✓  PolicyNet-Puffer: erst nach gelungenem Zug, Undo nimmt ihn heraus (4 Prüfungen, 259 ms)
+  ✓  Aufgabe der KI: Training mit -1, nach Undo kein „+R“ mehr (6 Prüfungen, 260 ms)
+  ✓  Notzug: kein eigenes Auge füllen (2 Prüfungen, 259 ms)
+  ✓  Dashboard: nur Abweichungen speichern, altes Format verwerfen (8 Prüfungen, 513 ms)
+  ✓  data:-Worker asynchron abgelehnt: KI wechselt auf blob:, nicht auf den Hauptthread (5 Prüfungen, 393 ms)
+  ✓  T-D1: Dashboard übernimmt gebrochene Werte, ganzzahlige Felder bleiben ganzzahlig (7 Prüfungen, 255 ms)
+  ✓  T-W1: 20-mal KI aus und an während der Rechnung: Neustart statt Watchdog (7 Prüfungen, 1448 ms)
+  ✓  T-W2: gleiche Stufe und Farbe während der Rechnung lösen keine Anfrage aus (6 Prüfungen, 726 ms)
+  ✓  T-W3: zwei Züge auf Schwer ohne Klick: derselbe Worker, kein Neustart (5 Prüfungen, 1038 ms)
+  ✓  T-W4: Neustart nach abgelehntem data:-Worker bleibt bei blob: (7 Prüfungen, 719 ms)
+  ✓  T-P1: ein Preset ergibt dieselben Werte, egal welches vorher gewählt war (2 Prüfungen, 243 ms)
+  ✓  T-P2: Werte außerhalb der Presets bleiben beim Presetwechsel erhalten (2 Prüfungen, 254 ms)
+  ✓  T-P3: nach Presetwechseln zeigen die Felder die Werte aus PARAMS (3 Prüfungen, 261 ms)
+  ✓  T-K1: ohne Zwischenablage-Schnittstelle kopieren 📋, 🐞 und Export über den Rückfall (7 Prüfungen, 693 ms)
+  ✓  T-K2: scheitert das Kopieren ganz, zeigen die Knöpfe ✗ (3 Prüfungen, 679 ms)
+  ✓  T-K3: Export meldet auf dem Export-Knopf, Beschriftungen bleiben nicht hängen (4 Prüfungen, 6075 ms)
+  ✓  T-K4: mit Zwischenablage-Schnittstelle kein Rückfall (Kontrolle) (4 Prüfungen, 615 ms)
+  ✓  T-L1: nach dem Verkleinern hat das Brett die Soll-Größe, die Seite scrollt nicht waagerecht (4 Prüfungen, 685 ms)
+  ✓  T-L2: nach dem Verkleinern bleiben Stein und Zählvorschau, Klicks treffen (4 Prüfungen, 803 ms)
+  ✓  T-L3: mit Fokus in einem Eingabefeld passt sich das Brett erst nach dem Verlassen an (3 Prüfungen, 994 ms)
+  ✓  T-L4: resize ohne Größenänderung zeichnet nicht neu (Kontrolle) (2 Prüfungen, 681 ms)
+  ✗  T-R1: Leicht, getAIMove wirft: Protokollzeile und Notzug statt Hängepartie
+     die KI rechnet nicht mehr (KI denkt...)
+         at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
+  ✗  T-R2: Mittel, getAIMove wirft: Protokollzeile und Notzug statt Hängepartie
+     die KI rechnet nicht mehr (KI denkt...)
+         at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
+  ✗  T-R3: ohne legalen Zug passt die KI nach dem Fehler
+     die KI rechnet nicht mehr (KI denkt...)
+         at pruefe (/home/user/Go-html-Game-MoE/tests/rahmen.js:95:25)
+  ✓  T-R4: ohne Fehler zieht die KI auf Leicht normal (Kontrolle) (4 Prüfungen, 1087 ms)
+
+  23 bestanden · 3 fehlgeschlagen
