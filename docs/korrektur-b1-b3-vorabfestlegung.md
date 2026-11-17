@@ -1,6 +1,6 @@
 # Korrektur B-1 bis B-3: Vorabfestlegung
 
-**Stand: 17.11.2026. Status: Vorabfestlegung, noch keine Codeänderung.** Befunde aus `docs/bughunt-20261116.md`
+**Stand: 17.11.2026. Status: umgesetzt (§8), Abnahme gültig.** Befunde aus `docs/bughunt-20261116.md`
 (B-1 bis B-3). Go von Hazeberry am 17.11.2026, nach „Übrig sind nur B-1 bis B-3“: „Go“.
 
 Dieses Doc enthält Vorgaben für die Umsetzung. Hazeberry liest es vor dem Merge. **Bei B-2 ist eine Gestaltungsfrage
@@ -169,3 +169,34 @@ eingesetzt und lokal geprüft (Chromium 153 headless). Der Prototyp ist nicht di
 **Hinweis aus der Lesung (17.11.2026), eingearbeitet:** §4 ließ bei Variante B die Tests T-B2 bis T-B4 entfallen, §5
 verlangte sie aber uneingeschränkt. Variante B wäre damit nach dem Wortlaut nicht abnahmefähig gewesen. §5 Punkt 2
 unterscheidet jetzt nach Variante A und B.
+
+## 8. Nachtrag: Umsetzung und Abnahme (17.11.2026)
+
+Hazeberry, nach grüner CI von #336: „Go“. Die Umsetzung folgt §3 und §4 mit **Variante A** für B-2, ohne Abweichung.
+Geändert sind:
+- `index.html`: `change`-Listener am Dashboard-Panel; `state.deadFarben` in Zustand, Rückgängig, „Neues Spiel“,
+  `resolveLifeAndDeath` und Aufgabe-Pfad; Zeichnen in `drawStateToCache` mit Deckkraft 0,45; `drawStoneTo` mit
+  optionalem `nurKreuz`; `updateUI`;
+- `tests/browser-ui.js`: T-B1 bis T-B5;
+- `tests/README.md`.
+
+**Abnahme nach §5 (Variante A):**
+
+1. **Prüfsummen:** Die Engine-Blöcke haben die Prüfsummen aus §1. Erfüllt.
+2. **Tests:** Am alten Code (`index.html` SHA-256 `7a0353b1…`, Stand `9c628c9`) schlagen T-B1, T-B2 und T-B5 fehl:
+   - T-B1: nach `change` 99999 statt 5000.
+   - T-B2: Holz an F19 (RGB 200/160/90). Die Prüfungen davor (F19 leer, `deadStones`, „Weiß +235.5“, Gefangene 1/0)
+     bestehen dort schon: Die Wertung ist an beiden Ständen gleich.
+   - T-B5: „Spiel beendet“ statt „Beide gepasst.“.
+
+   T-B3 und T-B4 bestehen dort. Am neuen Code bestehen alle 31 Tests der Datei. Ausgaben:
+   `docs/daten/bughunt-20261116/browser-ui-b-alt.txt` und `browser-ui-b-neu.txt`. Erfüllt.
+3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: siehe Nachtrag im PR. Die CI steht im PR.
+4. **Prüfskript:** `pruefung.js` am neuen Code: B-1 und B-3 „nicht reproduziert“, alle früher behobenen Fälle weiter
+   „nicht reproduziert“, B-2 wie in §5 angekündigt „reproduziert“ (1 von 13).
+   Daten: `docs/daten/bughunt-20261116/nach-b1-b3.json`, Konsole `nach-b1-b3-konsole.txt`. Erfüllt.
+
+Neue `index.html`: SHA-256 `e9f99467d05032bc5aa0dfe95b98849f2a6d03258490774a9d905fe7a911be14`.
+
+**Grenzen:** Nur Chromium 153 headless. Die Darstellung der toten Steine ist an einem Pixel geprüft, nicht mit dem Auge
+an echten Partien.
