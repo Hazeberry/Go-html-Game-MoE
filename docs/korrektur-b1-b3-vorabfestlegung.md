@@ -191,7 +191,8 @@ Geändert sind:
 
    T-B3 und T-B4 bestehen dort. Am neuen Code bestehen alle 31 Tests der Datei. Ausgaben:
    `docs/daten/bughunt-20261116/browser-ui-b-alt.txt` und `browser-ui-b-neu.txt`. Erfüllt.
-3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: siehe Nachtrag im PR. Die CI steht im PR.
+3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: alle 60 Testdateien bestanden. Eine Prüfung übersprang
+   sich, weil GNU Go lokal fehlt. Die CI steht im PR. Erfüllt, sobald die CI grün ist.
 4. **Prüfskript:** `pruefung.js` am neuen Code: B-1 und B-3 „nicht reproduziert“, alle früher behobenen Fälle weiter
    „nicht reproduziert“, B-2 wie in §5 angekündigt „reproduziert“ (1 von 13).
    Daten: `docs/daten/bughunt-20261116/nach-b1-b3.json`, Konsole `nach-b1-b3-konsole.txt`. Erfüllt.
