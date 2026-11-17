@@ -1,7 +1,7 @@
 # Korrektur R-1: Vorabfestlegung
 
 **Stand: 17.11.2026. Status: Vorabfestlegung, noch keine Codeänderung.** Befund aus `docs/bughunt-20261116.md` (R-1).
-Go von Hazeberry am 16.11.2026 (Ortszeit): „Go für R-1, Vorabfestlegung schreiben“.
+Go von Hazeberry am 17.11.2026: „Go für R-1, Vorabfestlegung schreiben“.
 
 Dieses Doc enthält Vorgaben für die Umsetzung. Hazeberry liest es vor dem Merge. Die Umsetzung folgt danach in einem
 eigenen PR, nach dem Muster der bisherigen Korrekturen.
