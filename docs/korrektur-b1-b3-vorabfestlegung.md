@@ -23,7 +23,7 @@ Zeilen am Stand `f75dc43` (`main`).
   `PARAMS` begrenzt, das Feld zeigt aber weiter die Eingabe. Gemessen: `aiTimeBudget` Eingabe 99999, in `PARAMS` 5000,
   im Feld 99999. Dasselbe gilt für ganzzahlige Felder mit gebrochener Eingabe: „7.6“ bei `resignStreak` gilt als 7,
   das Feld zeigt 7.6.
-- **B-2, tote Steine am Spielende** (`resolveLifeAndDeath` Z. 5795, `drawStateToCache` Z. 6497):
+- **B-2, tote Steine am Spielende** (`resolveLifeAndDeath` Z. 5794, `drawStateToCache` Z. 6498):
   - Tote Steine werden vom Brett genommen. Dabei entsteht nur die Zeile „! n tote Steine entfernt“; auf dem Brett
     sieht man nicht, **welche** Steine es waren.
   - Der Zeichenweg mit rotem Kreuz (`drawStoneTo` mit `isDead`) wird nie erreicht, weil der Stein beim Zeichnen schon
