@@ -53,7 +53,8 @@ nicht auf ihr Maximum; der Listener zeigt dort nur, was in `PARAMS` steht.
 **Variante A (empfohlen, am Prototyp geprüft): markieren.**
 - `resolveLifeAndDeath` merkt sich zusätzlich die Farbe jedes entfernten Steins (`state.deadFarben`, eine Map von
   Punkt zu Farbe).
-- `drawStateToCache` zeichnet diese Steine an ihrem Punkt halb durchsichtig, darüber das rote Kreuz.
+- `drawStateToCache` zeichnet diese Steine an ihrem Punkt halb durchsichtig (Deckkraft 0,45 wie in der PWA), darüber
+  das rote Kreuz.
 - Das Brett selbst bleibt wie heute **leer** an diesen Punkten. Wertung, Gefangene, Protokoll und SGF bleiben
   unverändert.
 - `deadFarben` wird wie `deadStones` behandelt:
@@ -66,6 +67,19 @@ nicht auf ihr Maximum; der Listener zeigt dort nur, was in `PARAMS` steht.
 Begründung: Wer am Ende nachrechnet, sieht, welche Steine als tot gezählt wurden. Bisher stand nur eine Zahl im
 Protokoll. Die Zählvorschau markiert vorher genauso, und der Kommentar dort wird richtig.
 
+**Herkunft des Zeichenwegs (Hinweis von Hazeberry, nachgelesen):** Das rote Kreuz stammt aus der PWA
+(`vergleich/pwa-index.html`, aus Hazeberry/Go-PWA). Dort war es eine vollständige Funktion:
+- Tote Steine **bleiben auf dem Brett**, halb durchsichtig (Deckkraft 0,45) und mit rotem Kreuz (`drawStoneTo`,
+  Z. 3087 bis 3110 dort).
+- Eine Gruppe lässt sich durch **Antippen** zwischen tot und lebend umschalten (Z. 2664 f. dort; Protokoll „Steine als
+  tot markiert (antippen zum Ändern)“).
+- Gezählt wird auf einer Kopie des Bretts (`endBrett`).
+
+In diesem Repo werden die toten Steine dagegen vom Brett genommen. Übrig blieb nur der Zeichenweg, der deshalb
+unerreichbar ist. Variante A übernimmt die **Darstellung** der PWA, nicht das Umschalten. Das Umschalten per Antippen
+wäre ein eigener, größerer Schritt: Es betrifft Zählung, Gefangene, Rückgängig und SGF. Es ist **nicht** Teil dieser
+Korrektur.
+
 **Variante B: so lassen und nur den Kommentar berichtigen.** Der ungenutzte Zweig in `drawStoneTo` bliebe oder fiele
 weg. Kein Risiko, aber am Ende bleibt unsichtbar, welche Steine als tot galten.
 
@@ -74,7 +88,9 @@ ob tote Steine markiert werden. Nimm das, was du für sinnvoll hältst.“). Gew
 - Am Ende ist sichtbar, welche Steine als tot gezählt wurden.
 - Wertung, Gefangene, Protokoll und SGF bleiben unverändert.
 - Der Prototyp zeigte keine Nebenwirkung auf Rückgängig und Aufgabe (§6).
-- Der vorhandene, bisher unerreichbare Zeichenweg mit rotem Kreuz zeigt, dass es so gedacht war.
+- Die Darstellung entspricht der PWA, aus der der unerreichbare Zeichenweg stammt (siehe „Herkunft“ oben).
+  Meine erste Begründung („zeigt, dass es so gedacht war“) war zu weit gefasst: Der Zeichenweg ist übernommen und belegt
+  keine Absicht für dieses Repo.
 
 ### 3.3 B-3: Übergebene Meldung auch nach Spielende
 
@@ -133,7 +149,8 @@ eingesetzt und lokal geprüft (Chromium 153 headless). Der Prototyp ist nicht di
   - Alter Code: nach `change` 99999 im Feld bei 5000 in `PARAMS`; „7.6“ bleibt stehen.
   - Prototyp: während der Eingabe 99999, nach `change` 5000. Die Eingabe „5“, „50“, „500“ bleibt ungestört, danach
     500. „7.6“ wird nach `change` zu „7“.
-- **T-B2:**
+- **T-B2** (Prototyp noch mit Deckkraft 0,5, die Umsetzung nimmt 0,45; der geprüfte Pixel liegt auf dem Kreuzarm,
+  der voll deckend gezeichnet wird):
   - Alter Code: an F19 Holz (RGB 200/160/90).
   - Prototyp: am Kreuzarm RGB 192/57/43 (das Rot des Kreuzes). An beiden: F19 leer, `deadStones` = {F19},
     „Weiß +235.5“, Gefangene Schwarz 1, Weiß 0.
