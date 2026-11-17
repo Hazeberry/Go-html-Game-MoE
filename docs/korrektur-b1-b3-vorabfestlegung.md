@@ -69,7 +69,12 @@ Protokoll. Die Zählvorschau markiert vorher genauso, und der Kommentar dort wir
 **Variante B: so lassen und nur den Kommentar berichtigen.** Der ungenutzte Zweig in `drawStoneTo` bliebe oder fiele
 weg. Kein Risiko, aber am Ende bleibt unsichtbar, welche Steine als tot galten.
 
-Ohne andere Entscheidung beim Lesen gilt **Variante A**.
+**Entscheidung (17.11.2026): Variante A.** Hazeberry hat die Wahl Claude überlassen („Ich überlasse die Entscheidung,
+ob tote Steine markiert werden. Nimm das, was du für sinnvoll hältst.“). Gewählt ist A:
+- Am Ende ist sichtbar, welche Steine als tot gezählt wurden.
+- Wertung, Gefangene, Protokoll und SGF bleiben unverändert.
+- Der Prototyp zeigte keine Nebenwirkung auf Rückgängig und Aufgabe (§6).
+- Der vorhandene, bisher unerreichbare Zeichenweg mit rotem Kreuz zeigt, dass es so gedacht war.
 
 ### 3.3 B-3: Übergebene Meldung auch nach Spielende
 
@@ -104,7 +109,11 @@ Variante B entfallen T-B2 bis T-B4. Dann wird nur der Kommentar geändert, und d
 Zwei Zustände, gültig oder ungültig. **Gültig** nur, wenn alles zutrifft:
 
 1. Die drei Engine-Blöcke haben die Prüfsummen aus §1.
-2. T-B1, T-B2 und T-B5 schlagen am alten Code fehl und bestehen am neuen; T-B3 und T-B4 bestehen an beiden.
+2. Tests, je nach Variante für B-2:
+   - **Variante A (gewählt):** T-B1, T-B2 und T-B5 schlagen am alten Code fehl und bestehen am neuen; T-B3 und T-B4
+     bestehen an beiden.
+   - **Variante B:** T-B1 und T-B5 schlagen am alten Code fehl und bestehen am neuen; T-B2 bis T-B4 entfallen. Statt
+     ihrer wird geprüft, dass sich an B-2 nur der Kommentar ändert (Diff).
 3. `node tests/run.js` lokal grün, CI grün. Die bestehenden Browser-Tests bleiben unverändert.
 4. `auswertung/bughunt-20261116/pruefung.js` am neuen Code: B-1 und B-3 „nicht reproduziert“, alle früher behobenen
    Fälle weiter „nicht reproduziert“. **B-2 bleibt dort „reproduziert“.** Der Fall prüft, ob der Stein vom Brett
@@ -139,3 +148,7 @@ eingesetzt und lokal geprüft (Chromium 153 headless). Der Prototyp ist nicht di
 2. Umsetzung in einem eigenen PR: Code, Tests, `tests/README.md`, Nachtrag hier mit den Ergebnissen aus §5 und eine
    Zeile in `docs/bughunt-20261116.md`.
 3. CI grün, Merge, kurzer Bericht.
+
+**Hinweis aus der Lesung (17.11.2026), eingearbeitet:** §4 ließ bei Variante B die Tests T-B2 bis T-B4 entfallen, §5
+verlangte sie aber uneingeschränkt. Variante B wäre damit nach dem Wortlaut nicht abnahmefähig gewesen. §5 Punkt 2
+unterscheidet jetzt nach Variante A und B.
