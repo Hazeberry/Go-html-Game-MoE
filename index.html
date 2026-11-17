@@ -6312,11 +6312,23 @@ function triggerAIMove() {
         netBlend:   0,
         lastMsPerSim: _lastMsPerSim
       };
-      const r = getAIMove(state.board, state.aiColor,
-        Array.from(state.boardHistory), {...state.captures},
-        state.moveCount, state.aiDifficulty, reqId,
-        state.koPoint, state.lastMove, passExtra());      /* Fix 7 + Lokalitätsterm + Versuchsregel */
-      r.zeiten = zeitenLesen();
+      /* Derselbe Schutz wie in fallbackToMainThread (R-1,
+         docs/korrektur-r1-vorabfestlegung.md): wirft getAIMove oder liefert es
+         kein Objekt, blieb aiThinking hier für immer true und die KI hing. Jetzt
+         Protokollzeile, Notzug oder Pass, und weiter über applyAIResult. */
+      let r;
+      try {
+        r = getAIMove(state.board, state.aiColor,
+          Array.from(state.boardHistory), {...state.captures},
+          state.moveCount, state.aiDifficulty, reqId,
+          state.koPoint, state.lastMove, passExtra());      /* Fix 7 + Lokalitätsterm + Versuchsregel */
+        r.zeiten = zeitenLesen();
+      } catch (e) {
+        console.error('[Leicht/Mittel] getAIMove gescheitert:', e);
+        state.log.push(`! KI-Fehler (${{easy: 'Leicht', medium: 'Mittel'}[state.aiDifficulty]}): ${(e && e.message) || e} → Notzug`);
+        const fb = findAnyLegalMove(state.aiColor);
+        r = fb ? {type: 'stone', x: fb.x, y: fb.y, requestId: reqId} : {type: 'pass', requestId: reqId};
+      }
       applyAIResult(r, reqId, null, null, null);
     }, 50);
   }

@@ -1,6 +1,6 @@
 # Korrektur R-1: Vorabfestlegung
 
-**Stand: 17.11.2026. Status: Vorabfestlegung, noch keine Codeänderung.** Befund aus `docs/bughunt-20261116.md` (R-1).
+**Stand: 17.11.2026. Status: umgesetzt (§8), Abnahme gültig.** Befund aus `docs/bughunt-20261116.md` (R-1).
 Go von Hazeberry am 17.11.2026: „Go für R-1, Vorabfestlegung schreiben“.
 
 Dieses Doc enthält Vorgaben für die Umsetzung. Hazeberry liest es vor dem Merge. Die Umsetzung folgt danach in einem
@@ -125,3 +125,25 @@ internen Namen `easy`/`medium`; §3 legt die Anzeigenamen fest.
 2. Umsetzung in einem eigenen PR: Code, Tests, `tests/README.md`, Nachtrag hier mit den Ergebnissen aus §5 und eine
    Zeile in `docs/bughunt-20261116.md`.
 3. CI grün, Merge, kurzer Bericht.
+
+## 8. Nachtrag: Umsetzung und Abnahme (17.11.2026)
+
+Hazeberry, nach grüner CI von #334: „Go“. Die Umsetzung folgt §3 und §4 ohne Abweichung. Geändert sind `index.html`
+(Zweig für Leicht und Mittel in `triggerAIMove`), `tests/browser-ui.js` (T-R1 bis T-R4) und `tests/README.md`.
+
+**Abnahme nach §5:**
+
+1. **Prüfsummen:** Die Engine-Blöcke haben die Prüfsummen aus §1. Erfüllt.
+2. **Tests:** Am alten Code (`index.html` SHA-256 `7466f876…`, Stand `2b5b077`) schlagen T-R1 bis T-R3 fehl, jeweils
+   mit „die KI rechnet nicht mehr (KI denkt...)“. T-R4 besteht dort. Am neuen Code bestehen alle 26 Tests der Datei.
+   Ausgaben: `docs/daten/bughunt-20261116/browser-ui-r-alt.txt` und `browser-ui-r-neu.txt`. Erfüllt.
+3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: alle 60 Testdateien bestanden. Eine Prüfung übersprang
+   sich, weil GNU Go lokal fehlt. Die CI steht im PR. Erfüllt, sobald die CI grün ist.
+4. **Prüfskript:** `pruefung.js` am neuen Code ergibt genau das Soll: R-1 „nicht reproduziert“; D-1, D-2, W-1, K-1, K-2
+   und L-1 weiter „nicht reproduziert“; B-1 bis B-3 „reproduziert“ (3 von 13).
+   Daten: `docs/daten/bughunt-20261116/nach-r1.json`, Konsole `nach-r1-konsole.txt`. Erfüllt.
+
+Neue `index.html`: SHA-256 `7a0353b1f4c5d899d92c001f1ddc79d00651db32197cc2084e81e5a6f8a38535`.
+
+**Grenzen:** Nur Chromium 153 headless. Der Fehler ist mit einer Attrappe ausgelöst; ein echter Auslöser auf Leicht
+oder Mittel ist weiterhin nicht bekannt.

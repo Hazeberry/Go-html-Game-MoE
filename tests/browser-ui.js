@@ -46,6 +46,12 @@
     21. T-L3: Mit Fokus in einem Eingabefeld erst nach dem Verlassen anpassen.
     22. T-L4: resize ohne Größenänderung zeichnet nicht neu (Kontrolle).
 
+   Korrektur R-1 (docs/korrektur-r1-vorabfestlegung.md, T-R1 bis T-R4):
+    23. T-R1: Leicht, getAIMove wirft: Protokollzeile, Notzug, keine Hängepartie.
+    24. T-R2: dasselbe auf Mittel.
+    25. T-R3: ohne legalen Zug passt die KI.
+    26. T-R4: ohne Fehler zieht die KI normal (Kontrolle).
+
    Aufruf:  node tests/browser-ui.js [pfad/zur/index.html] */
 'use strict';
 const {test, pruefe, pruefeGleich, laufeTests, STANDARD_HTML} = require('./rahmen');
@@ -651,6 +657,69 @@ test('T-L4: resize ohne Größenänderung zeichnet nicht neu (Kontrolle)', async
   const gleich = await s.evaluate(() => window.__maserung === grainCanvas);
   await ctx.close();
   pruefe(gleich, 'dieselbe Maserung');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+/* ── Korrektur R-1 (docs/korrektur-r1-vorabfestlegung.md §4) ── */
+
+const kiLage = s => s.evaluate(() => ({denkt: state.aiThinking, undoGesperrt: document.getElementById('btn-undo').disabled,
+  zuege: state.moveCount, amZug: state.currentPlayer, status: document.getElementById('ai-status').textContent,
+  fehlerZeilen: state.log.filter(l => l.includes('KI-Fehler')), letzte: state.log[state.log.length - 1] || ''}));
+
+for (const [nr, stufe, name] of [['T-R1', 'easy', 'Leicht'], ['T-R2', 'medium', 'Mittel']]) {
+  test(`${nr}: ${name}, getAIMove wirft: Protokollzeile und Notzug statt Hängepartie`, async () => {
+    if (!(await vorbereiten())) return 'skip';
+    const {s, ctx, fehler} = await seite();
+    await s.evaluate(st => {
+      getAIMove = () => { throw new Error('Attrappe'); };
+      document.querySelector(`.diff-btn[data-diff="${st}"]`).click();
+      document.getElementById('btn-ai-toggle').click();
+      placeStone(3, 3); render(); updateUI(); triggerAIMove();
+    }, stufe);
+    await s.waitForTimeout(600);
+    const r = await kiLage(s);
+    await ctx.close();
+    pruefe(!r.denkt, `die KI rechnet nicht mehr (${r.status})`);
+    pruefe(!r.undoGesperrt, 'Rückgängig ist frei');
+    pruefeGleich(`${r.zuege}/${r.amZug}`, '2/1', 'Notzug von Weiß, Schwarz am Zug');
+    pruefeGleich(r.fehlerZeilen.join(' | '), `! KI-Fehler (${name}): Attrappe → Notzug`, 'Protokollzeile mit Anzeigenamen');
+    pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+  });
+}
+
+test('T-R3: ohne legalen Zug passt die KI nach dem Fehler', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  await s.evaluate(() => {
+    getAIMove = () => { throw new Error('Attrappe'); };
+    /* Ganzes Brett schwarz bis auf zwei Augen A19 und C19: jeder weiße Zug wäre Selbstmord */
+    const b = createBoard();
+    for (let i = 0; i < BOARD_SIZE; i++) b[i] = 1;
+    b[idx(0, 0)] = 0; b[idx(2, 0)] = 0;
+    state.board = b; state.currentHash = computeZobrist(b);
+    state.boardHistory = new Set([state.currentHash]); state.hashListe = [state.currentHash];
+    state.currentPlayer = 2; state.aiColor = 2; state.aiDifficulty = 'easy'; state.aiEnabled = true;
+    triggerAIMove();
+  });
+  await s.waitForTimeout(600);
+  const r = await kiLage(s);
+  await ctx.close();
+  pruefe(!r.denkt, `die KI rechnet nicht mehr (${r.status})`);
+  pruefeGleich(r.letzte, '1. ○ Weiß passt', 'Weiß passt');
+  pruefeGleich(r.amZug, 1, 'Schwarz am Zug');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-R4: ohne Fehler zieht die KI auf Leicht normal (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  await s.evaluate(() => { document.getElementById('btn-ai-toggle').click(); placeStone(3, 3); render(); updateUI(); triggerAIMove(); });
+  await s.waitForTimeout(800);
+  const r = await kiLage(s);
+  await ctx.close();
+  pruefe(!r.denkt, 'die KI hat geantwortet');
+  pruefeGleich(`${r.zuege}/${r.amZug}`, '2/1', 'Zug von Weiß, Schwarz am Zug');
+  pruefeGleich(r.fehlerZeilen.length, 0, 'keine Fehlerzeile');
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 
