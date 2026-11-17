@@ -52,6 +52,13 @@
     25. T-R3: ohne legalen Zug passt die KI.
     26. T-R4: ohne Fehler zieht die KI normal (Kontrolle).
 
+   Korrektur B-1 bis B-3 (docs/korrektur-b1-b3-vorabfestlegung.md, T-B1 bis T-B5):
+    27. T-B1: Dashboard-Feld zeigt nach der Eingabe den gültigen Wert.
+    28. T-B2: tote Steine am Ende blass mit rotem Kreuz, Wertung unverändert.
+    29. T-B3: nach Rückgängig kein Kreuz (Kontrolle).
+    30. T-B4: nach Aufgabe der KI kein Kreuz (Kontrolle).
+    31. T-B5: „Beide gepasst.“ nach zwei Pässen.
+
    Aufruf:  node tests/browser-ui.js [pfad/zur/index.html] */
 'use strict';
 const {test, pruefe, pruefeGleich, laufeTests, STANDARD_HTML} = require('./rahmen');
@@ -720,6 +727,116 @@ test('T-R4: ohne Fehler zieht die KI auf Leicht normal (Kontrolle)', async () =>
   pruefe(!r.denkt, 'die KI hat geantwortet');
   pruefeGleich(`${r.zuege}/${r.amZug}`, '2/1', 'Zug von Weiß, Schwarz am Zug');
   pruefeGleich(r.fehlerZeilen.length, 0, 'keine Fehlerzeile');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+/* ── Korrektur B-1 bis B-3 (docs/korrektur-b1-b3-vorabfestlegung.md §4) ── */
+
+test('T-B1: nach der Eingabe zeigt ein Dashboard-Feld den gültigen Wert, beim Tippen greift nichts ein', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const r = await s.evaluate(() => {
+    dashToggle(); dashSecToggle('search');
+    const e = document.getElementById('pd-aiTimeBudget'), aus = {};
+    const tippe = v => { e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); return e.value; };
+    const fertig = () => { e.dispatchEvent(new Event('change', {bubbles: true})); return e.value; };
+    aus.waehrend = tippe('99999');
+    aus.danach = fertig();
+    aus.params = PARAMS.aiTimeBudget;
+    aus.schritte = ['5', '50', '500'].map(tippe);
+    aus.ende = fertig();
+    aus.params2 = PARAMS.aiTimeBudget;
+    const g = document.getElementById('pd-resignStreak');
+    g.value = '7.6'; g.dispatchEvent(new Event('input', {bubbles: true})); g.dispatchEvent(new Event('change', {bubbles: true}));
+    aus.ganz = g.value;
+    Object.assign(PARAMS, PARAMS_DEFAULT);
+    return aus;
+  });
+  await ctx.close();
+  pruefeGleich(r.waehrend, '99999', 'beim Tippen bleibt die Eingabe');
+  pruefeGleich(r.danach, String(r.params), 'nach change zeigt das Feld PARAMS');
+  pruefeGleich(r.params, 5000, 'PARAMS auf das Maximum begrenzt');
+  pruefeGleich(r.schritte.join(','), '5,50,500', '5, 50, 500 ungestört eintippbar');
+  pruefeGleich(`${r.ende}/${r.params2}`, '500/500', 'danach 500');
+  pruefeGleich(r.ganz, '7', 'ganzzahliges Feld zeigt nach change 7');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+/* Schwarze Mauer auf Reihe 17, weiße auf Reihe 15, ein weißer Stein auf F19
+   im schwarzen Gebiet (wie im Bug Hunt, B-2). */
+function stellungB2() {
+  const b = createBoard();
+  for (let x = 0; x < 19; x++) { b[idx(x, 2)] = 1; b[idx(x, 4)] = 2; }
+  b[idx(5, 0)] = 2;
+  state.board = b; state.currentHash = computeZobrist(b);
+  state.boardHistory = new Set([state.currentHash]); state.hashListe = [state.currentHash];
+  drawStateToCache(); render();
+}
+/* Pixel auf dem Kreuzarm von F19 (ein Fünftel einer Zelle nach rechts unten) */
+const pixelF19 = s => s.evaluate(() => {
+  const L = layout, d = document.getElementById('board').getContext('2d')
+    .getImageData(L.MARGIN + 5 * L.CELL + Math.round(L.CELL * 0.2), L.MARGIN + Math.round(L.CELL * 0.2), 1, 1).data;
+  return [d[0], d[1], d[2]];
+});
+const rot = p => p[0] > 150 && p[1] < 100 && p[2] < 100;
+
+test('T-B2: am Spielende tote Steine blass mit rotem Kreuz, Wertung unverändert', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  await s.evaluate(stellungB2);
+  await s.click('#btn-pass'); await s.click('#btn-pass');
+  await s.waitForTimeout(100);
+  const r = await s.evaluate(() => ({brett: state.board[idx(5, 0)], tote: [...state.deadStones],
+    anzeige: document.getElementById('final-score').textContent, gefangen: `${state.captures[1]}/${state.captures[2]}`}));
+  const p = await pixelF19(s);
+  await ctx.close();
+  pruefeGleich(r.brett, 0, 'F19 bleibt auf dem Brett leer');
+  pruefeGleich(r.tote.join(','), String(5), 'F19 in deadStones');
+  pruefeGleich(r.anzeige, 'Weiß +235.5', 'Wertung wie am alten Code');
+  pruefeGleich(r.gefangen, '1/0', 'Gefangene wie am alten Code');
+  pruefe(rot(p), `rotes Kreuz an F19 (RGB ${p.join('/')})`);
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-B3: nach Rückgängig am Spielende kein Kreuz (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  await s.evaluate(stellungB2);
+  await s.click('#btn-pass'); await s.click('#btn-pass');
+  await s.evaluate(() => { undo(); render(); });
+  const r = await s.evaluate(() => ({brett: state.board[idx(5, 0)], farben: state.deadFarben ? state.deadFarben.size : 0}));
+  const p = await pixelF19(s);
+  await ctx.close();
+  pruefeGleich(r.brett, 2, 'weißer Stein zurück');
+  pruefeGleich(r.farben, 0, 'keine gemerkten toten Steine');
+  pruefe(!rot(p), `kein rotes Kreuz an F19 (RGB ${p.join('/')})`);
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-B4: nach Aufgabe der KI kein Kreuz (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  await s.evaluate(stellungB2);
+  await s.evaluate(() => {
+    state.aiEnabled = true; state.aiColor = 2; state.currentPlayer = 2;
+    applyAIResult({type: 'resign'}, state.aiRequestId); render();
+  });
+  const r = await s.evaluate(() => ({brett: state.board[idx(5, 0)], status: document.getElementById('message').textContent}));
+  const p = await pixelF19(s);
+  await ctx.close();
+  pruefeGleich(r.brett, 2, 'F19 bleibt weiß');
+  pruefe(!rot(p), `kein rotes Kreuz an F19 (RGB ${p.join('/')})`);
+  pruefeGleich(r.status, 'Spiel beendet', 'Statuszeile nach Aufgabe');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-B5: nach zwei Pässen über den Knopf steht „Beide gepasst.“', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  await s.click('#btn-pass'); await s.click('#btn-pass');
+  const text = await s.evaluate(() => document.getElementById('message').textContent);
+  await ctx.close();
+  pruefeGleich(text, 'Beide gepasst.', 'Statuszeile');
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 
