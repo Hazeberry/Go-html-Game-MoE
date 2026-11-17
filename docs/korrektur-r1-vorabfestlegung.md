@@ -137,7 +137,8 @@ Hazeberry, nach grüner CI von #334: „Go“. Die Umsetzung folgt §3 und §4 o
 2. **Tests:** Am alten Code (`index.html` SHA-256 `7466f876…`, Stand `2b5b077`) schlagen T-R1 bis T-R3 fehl, jeweils
    mit „die KI rechnet nicht mehr (KI denkt...)“. T-R4 besteht dort. Am neuen Code bestehen alle 26 Tests der Datei.
    Ausgaben: `docs/daten/bughunt-20261116/browser-ui-r-alt.txt` und `browser-ui-r-neu.txt`. Erfüllt.
-3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: siehe Nachtrag im PR. Die CI steht im PR.
+3. **Testsuite:** `node tests/run.js` lokal mit Browser-Tests: alle 60 Testdateien bestanden. Eine Prüfung übersprang
+   sich, weil GNU Go lokal fehlt. Die CI steht im PR. Erfüllt, sobald die CI grün ist.
 4. **Prüfskript:** `pruefung.js` am neuen Code ergibt genau das Soll: R-1 „nicht reproduziert“; D-1, D-2, W-1, K-1, K-2
    und L-1 weiter „nicht reproduziert“; B-1 bis B-3 „reproduziert“ (3 von 13).
    Daten: `docs/daten/bughunt-20261116/nach-r1.json`, Konsole `nach-r1-konsole.txt`. Erfüllt.
