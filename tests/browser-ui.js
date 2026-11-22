@@ -65,6 +65,12 @@
     34. T-U3: aus und wieder an: genau ein Zug, kein Watchdog (Kontrolle).
     35. T-U4: ohne Klick zieht die KI normal (Kontrolle).
 
+   Korrektur H-1 (docs/korrektur-h1-vorabfestlegung.md, T-H1 bis T-H3):
+    36. T-H1: Der Hinweis des Policy-Netz-Abschnitts nennt Formel und Default,
+        nicht mehr „nach 5 Spielen ~30%".
+    37. T-H2: blendWeight folgt netMaxBlend × min(1, Spiele/netWarmup).
+    38. T-H3: mit den Standardwerten ist blendWeight immer 0.
+
    Aufruf:  node tests/browser-ui.js [pfad/zur/index.html] */
 'use strict';
 const {test, pruefe, pruefeGleich, laufeTests, STANDARD_HTML} = require('./rahmen');
@@ -966,6 +972,81 @@ test('T-U4: ohne Klick zieht die KI normal (Kontrolle)', async () => {
   pruefeGleich(r.weiss, 1, 'ein weißer Stein');
   pruefeGleich(r.status, 'KI aktiv · Weiß · Schwer', 'Statuszeile');
   pruefe(!r.undoGesperrt, 'Rückgängig ist frei');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+/* H-1: Der Abschnittshinweis wird als Inhalt von #pdhint-polnet gerendert
+   (index.html, dashRender). T-H2 und T-H3 binden ihn an das Verhalten: Sie
+   schlagen an, wenn jemand Formel oder Default ändert, ohne den Text
+   nachzuziehen — genau der Weg, auf dem H-1 entstanden ist. */
+test('T-H1: der Policy-Netz-Hinweis nennt Formel und Default statt einer Blend-Zahl', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const t = await s.evaluate(() => {
+    const el = document.getElementById('pdhint-polnet');
+    return el ? el.textContent : null;
+  });
+  await ctx.close();
+  pruefe(t !== null, 'der Hinweis des Abschnitts polnet ist im DOM');
+  pruefe(/netMaxBlend 0/.test(t), 'nennt netMaxBlend 0');
+  pruefe(/steuert nie/.test(t), 'nennt die Folge: steuert nie');
+  pruefe(/netWarmup/.test(t), 'nennt netWarmup in der Formel');
+  pruefe(!/nach 5 Spielen/.test(t), 'keine Behauptung „nach 5 Spielen"');
+  pruefe(!/[<&]/.test(t), 'keine spitzen Klammern und kein kaufmännisches Und');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-H2: blendWeight folgt netMaxBlend × min(1, Spiele/netWarmup)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const r = await s.evaluate(() => {
+    const alt = {g: policyNet.gamesPlayed, mb: PARAMS.netMaxBlend, w: PARAMS.netWarmup, h: policyNet._healthy};
+    const falsch = []; let geprueft = 0;
+    policyNet._healthy = true;
+    for (const [mb, w] of [[0, 10], [0.3, 5], [0.5, 1], [0.6, 10], [1, 10]]) {
+      PARAMS.netMaxBlend = mb; PARAMS.netWarmup = w;
+      for (const g of [0, 1, 2, 3, 5, 9, 10, 11, 25]) {
+        policyNet.gamesPlayed = g;
+        const ist = policyNet.blendWeight;
+        const soll = g < 2 ? 0 : mb * Math.min(1, g / w);
+        geprueft++;
+        if (Math.abs(ist - soll) > 1e-12) falsch.push(`mb ${mb}, w ${w}, g ${g}: ${ist} statt ${soll}`);
+      }
+    }
+    /* Ein krankes Netz steuert nie, auch mit grossem netMaxBlend */
+    PARAMS.netMaxBlend = 0.6; PARAMS.netWarmup = 10;
+    policyNet.gamesPlayed = 5; policyNet._healthy = false;
+    const krank = policyNet.blendWeight;
+    Object.assign(policyNet, {gamesPlayed: alt.g, _healthy: alt.h});
+    PARAMS.netMaxBlend = alt.mb; PARAMS.netWarmup = alt.w;
+    return {falsch, geprueft, krank, altMb: alt.mb, altW: alt.w,
+      wiederMb: PARAMS.netMaxBlend, wiederW: PARAMS.netWarmup};
+  });
+  await ctx.close();
+  pruefeGleich(r.geprueft, 45, '45 Kombinationen geprüft');
+  pruefeGleich(r.falsch.join('; '), '', 'blendWeight folgt der Formel');
+  pruefeGleich(r.krank, 0, 'krankes Netz steuert nicht');
+  pruefeGleich(r.wiederMb, r.altMb, 'netMaxBlend wiederhergestellt');
+  pruefeGleich(r.wiederW, r.altW, 'netWarmup wiederhergestellt');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-H3: mit den Standardwerten steuert das Netz nie (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const r = await s.evaluate(() => {
+    const alt = {g: policyNet.gamesPlayed, h: policyNet._healthy};
+    policyNet._healthy = true;
+    const werte = [];
+    for (const g of [0, 1, 2, 5, 10, 25, 100]) { policyNet.gamesPlayed = g; werte.push(policyNet.blendWeight); }
+    Object.assign(policyNet, {gamesPlayed: alt.g, _healthy: alt.h});
+    return {werte, mb: PARAMS.netMaxBlend, mbDefault: PARAMS_DEFAULT.netMaxBlend, wDefault: PARAMS_DEFAULT.netWarmup};
+  });
+  await ctx.close();
+  pruefeGleich(r.mbDefault, 0, 'netMaxBlend hat den Default 0');
+  pruefeGleich(r.wDefault, 10, 'netWarmup hat den Default 10');
+  pruefeGleich(r.mb, 0, 'die Seite läuft mit netMaxBlend 0');
+  pruefeGleich(r.werte.join(','), '0,0,0,0,0,0,0', 'blendWeight ist für jede Spielzahl 0');
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 

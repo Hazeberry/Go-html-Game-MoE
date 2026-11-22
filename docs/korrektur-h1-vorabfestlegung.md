@@ -1,6 +1,6 @@
 # Korrektur H-1: Vorabfestlegung
 
-**Stand: 22.11.2026. Status: Entwurf, nicht umgesetzt.** Befund aus `docs/bughunt-20261116.md` §7 (H-1). Go von
+**Stand: 22.11.2026. Status: umgesetzt (§8), Abnahme gültig.** Befund aus `docs/bughunt-20261116.md` §7 (H-1). Go von
 Hazeberry am 22.11.2026: „H-1 Vorabfestlegung".
 
 Dieses Doc enthält Vorgaben für die Umsetzung. Hazeberry liest es vor dem Merge. Die Umsetzung folgt danach in einem
@@ -185,3 +185,41 @@ Trainingsverfahren („REINFORCE") ist keine eigene Prüfung gemacht. Keine Mess
 2. Umsetzung in einem eigenen PR nach eigenem Go: Text nach §3, Tests nach §4, `tests/README.md`, Nachtrag hier mit
    den Ergebnissen aus §5 und eine Zeile in `docs/bughunt-20261116.md` §7.
 3. CI grün, Merge, kurzer Bericht mit den löschbaren Branches.
+
+## 8. Nachtrag: Umsetzung und Abnahme (22.11.2026)
+
+Hazeberry, nach grüner CI von #343: „Go". Die Umsetzung folgt §3 und §4 ohne Abweichung. Geändert sind `index.html`
+(eine Zeile: die Zeichenkette des Hinweises), `tests/browser-ui.js` (T-H1 bis T-H3 und der Kommentarkopf) und
+`tests/README.md`.
+
+**Abnahme nach §5:**
+
+1. **Prüfsummen und Standardwerte:** Die drei Engine-Blöcke haben die Prüfsummen aus §1, nach der Änderung
+   nachgerechnet. Der Diff berührt keinen Parameter; `PARAMS_DEFAULT` ist unverändert. Erfüllt.
+2. **Umfang:** `git diff --numstat index.html` ergibt `1  1  index.html` — genau eine Zeile ersetzt. Erfüllt.
+3. **Neue Tests:** Am alten Code (`index.html` SHA-256 `1df02491…`, Stand `39e7f39`) schlägt T-H1 fehl, und zwar an
+   der Prüfung „nennt netMaxBlend 0"; T-H2 und T-H3 bestehen dort (37 bestanden, 1 fehlgeschlagen). Am neuen Code
+   bestehen alle 38 Tests der Datei. Erfüllt.
+4. **Bestehende Tests:** unverändert übernommen; die 35 bestehen am neuen Code. Erfüllt.
+5. **Testsuite:** `node tests/run.js` mit Browser-Tests: **alle 60 Testdateien bestanden**, Exit 0. Eine Prüfung
+   übersprang sich, weil GNU Go lokal fehlt (wie bei R-1 und UI-1). Die CI steht im PR. Erfüllt, sobald die CI grün
+   ist.
+6. **Prüfskript:** `auswertung/bughunt-20261116/pruefung.js` am neuen Code: 1 von 13 reproduziert, nämlich B-2 — das
+   Soll. Daten: `docs/daten/bughunt-20261116/nach-h1.json`, Konsole `nach-h1-konsole.txt`. Erfüllt.
+
+**Der Hinweis lautet jetzt** (eine Zeile im Code, hier umgebrochen):
+
+```
+3971→128→361 Netz, REINFORCE. Score = (1−blend)·MoE + blend·Prior·scale, mit
+blend = netMaxBlend × min(1, Spiele/netWarmup), erst ab 2 Spielen und nur bei gesundem Netz.
+Mit netMaxBlend 0 (Default) lernt das Netz nur mit und steuert nie. Gewichte in localStorage.
+Gradienten-Deckel 0 = aus — dann divergiert das Training (siehe Kommentar bei netGradClip).
+```
+
+355 Zeichen, ohne spitze Klammern, kaufmännisches Und oder Anführungszeichen (im Test geprüft, T-H1).
+
+Neue `index.html`: SHA-256 `334166b01e86126b6d96c3b044ac58c0473c80ae6270f9889aa7f6895de7a4e7`.
+
+**Grenzen:** Nur Chromium 153 headless. Die Spielzahlen und Parameter in T-H2 und T-H3 sind gesetzt, nicht erspielt.
+Das Spiel ist unverändert, es gibt also nichts zu messen. Zum Trainingsverfahren („REINFORCE") ist weiterhin keine
+eigene Prüfung gemacht; der Kommentar bei `netGradClip` nennt es so.

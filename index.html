@@ -7764,7 +7764,7 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     },
     {
       id:'polnet', label:'🧠 Policy-Netz',
-      hint:'3971→128→361 Netz, REINFORCE. Score = (1−blend)·MoE + blend·Prior·scale. Blend wächst automatisch: nach 5 Spielen ~30% Einfluss. Gewichte in localStorage. Gradienten-Deckel 0 = aus — dann divergiert das Training (siehe Kommentar bei netGradClip).',
+      hint:'3971→128→361 Netz, REINFORCE. Score = (1−blend)·MoE + blend·Prior·scale, mit blend = netMaxBlend × min(1, Spiele/netWarmup), erst ab 2 Spielen und nur bei gesundem Netz. Mit netMaxBlend 0 (Default) lernt das Netz nur mit und steuert nie. Gewichte in localStorage. Gradienten-Deckel 0 = aus — dann divergiert das Training (siehe Kommentar bei netGradClip).',
       custom:'pnet'
     },
   ];
