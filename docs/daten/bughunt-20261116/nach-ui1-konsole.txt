@@ -3,13 +3,13 @@
 [D-2] nicht reproduziert: Presets: Werte des vorigen Presets bleiben stehen ([direkt, nach anderem Preset])
     {"defensivNachAggressiv":{},"aggressivNachAusgewogen":{}}
 [W-1a] nicht reproduziert: Schwer: 5 Klicks auf die Stufe während der Rechnung
-    {"zusatzKlicks":5,"anfragen":1,"msBisZug":1709,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[1950],"budgetMs":[1800],"seitenfehler":[]}
+    {"zusatzKlicks":5,"anfragen":1,"msBisZug":1738,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[1979],"budgetMs":[1800],"seitenfehler":[]}
 [W-1b] nicht reproduziert: Schwer: 5 Klicks auf die Farbe während der Rechnung
-    {"zusatzKlicks":5,"anfragen":1,"msBisZug":1712,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[1952],"budgetMs":[1800],"seitenfehler":[]}
+    {"zusatzKlicks":5,"anfragen":1,"msBisZug":1732,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[1983],"budgetMs":[1800],"seitenfehler":[]}
 [W-1c] nicht reproduziert: Schwer: 5-mal KI aus und an während der Rechnung
-    {"zusatzKlicks":5,"anfragen":11,"msBisZug":3417,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[2090],"budgetMs":[1800],"seitenfehler":[]}
+    {"zusatzKlicks":5,"anfragen":11,"msBisZug":3570,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[2224],"budgetMs":[1800],"seitenfehler":[]}
 [W-1k] nicht reproduziert: Kontrolle: 2 Klicks auf die Stufe (Erwartung: kein Watchdog)
-    {"zusatzKlicks":2,"anfragen":1,"msBisZug":1733,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[1969],"budgetMs":[1800],"seitenfehler":[]}
+    {"zusatzKlicks":2,"anfragen":1,"msBisZug":1723,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[1965],"budgetMs":[1800],"seitenfehler":[]}
 [K-1] nicht reproduziert: Kopieren ohne navigator.clipboard wirft, Rückfall wird nie erreicht
     {"btn-copy-log":{"beschriftung":"✓","seitenfehler":[]},"btn-bug-report":{"beschriftung":"✓","seitenfehler":[]},"dashExport":"kein Fehler"}
 [K-2] nicht reproduziert: Export: Rückmeldung auf dem falschen Knopf, Beschriftung kann hängen bleiben

@@ -846,8 +846,8 @@ test('T-B5: nach zwei Pässen über den Knopf steht „Beide gepasst.“', async
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 
-/* UI-1: KI Weiss, damit ein Menschenzug im Rueckgaengig-Stapel liegt und der
-   Knopf pruefbar ist (bei KI Schwarz im ersten Zug ist der Stapel leer und der
+/* UI-1: KI Weiß, damit ein Menschenzug im Rückgängig-Stapel liegt und der
+   Knopf prüfbar ist (bei KI Schwarz im ersten Zug ist der Stapel leer und der
    Knopf ohnehin gesperrt). Start, Menschenzug und Klick in EINEM Aufruf: sonst
    kann die 300-ms-Rechnung schon vorbei sein (wie bei T-W1). */
 async function ui1Vorbereiten(s) {
@@ -855,7 +855,7 @@ async function ui1Vorbereiten(s) {
     window.__ui1Start = () => {
       PARAMS.aiTimeBudget = 300; PARAMS.adaptiveBudgetEnabled = 0;
       document.querySelector('.diff-btn[data-diff="hard"]').click();
-      document.querySelector('.color-btn[data-color="2"]').click();   /* KI = Weiss */
+      document.querySelector('.color-btn[data-color="2"]').click();   /* KI = Weiß */
       document.getElementById('btn-ai-toggle').click();               /* KI an */
       placeStone(3, 3); render(); updateUI('');                       /* Mensch Schwarz */
       if (!state.aiThinking) triggerAIMove();
@@ -886,7 +886,7 @@ test('T-U1: Abschalten während der Rechnung: kein Zug mehr, Rückgängig frei',
   /* Warten, bis der Worker geantwortet hat: dann hat der alte Code den Stein
      gesetzt, der neue die Antwort verworfen. Robuster als eine feste Frist. */
   await s.waitForFunction(() => state.aiWorkerCtx && state.aiWorkerCtx.antwort === true, null, {timeout: 20000})
-    .catch(() => { /* unten geprueft */ });
+    .catch(() => { /* unten geprüft */ });
   await s.waitForTimeout(300);
   const r = await ui1Lage(s);
   await ctx.close();
@@ -908,17 +908,17 @@ test('T-U2: Worker-Absturz nach dem Abschalten setzt keinen Zug', async () => {
     __ui1Start();
     const rechnete = state.aiThinking;
     document.getElementById('btn-ai-toggle').click();                 /* KI aus */
-    /* Genau der Weg aus index.html Z. 6152: onerror ruft
+    /* Genau der Weg aus attachWorkerHandlers.onerror: dort ruft
        fallbackToMainThread(state.aiRequestId, ...) mit der AKTUELLEN Kennung,
-       die Kennungspruefung kann dort nie greifen (UI-1 §2). */
+       die Kennungsprüfung kann dort nie greifen (UI-1 §2). */
     const onerror = state.aiWorker && state.aiWorker.onerror;
     if (onerror) onerror.call(state.aiWorker, {message: 'Testabsturz'});
     return {rechnete, onerrorVorhanden: !!onerror};
   });
   /* Am alten Code steht der Stein nach rund 400 ms; am neuen kommt er nie,
-     deshalb laeuft die Frist dort ab. */
+     deshalb läuft die Frist dort ab. */
   await s.waitForFunction(() => state.moveCount >= 2, null, {timeout: 4000})
-    .catch(() => { /* unten geprueft */ });
+    .catch(() => { /* unten geprüft */ });
   const r = await ui1Lage(s);
   await ctx.close();
   pruefe(sofort.rechnete, 'Vorbedingung: die KI rechnete beim Klick');

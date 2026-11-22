@@ -240,11 +240,22 @@ Kommentarkopf) und `tests/README.md`.
    - T-U2 scheitert am alten Code an „kein weißer Stein auf dem Brett: erwartet 0, bekommen 1".
 3. **Bestehende Tests:** unverändert übernommen; die 31 bestehen am neuen Code, die beiden PolicyNet-Tests und T-W1
    bis T-W4 eingeschlossen. Erfüllt.
-4. **Testsuite:** `node tests/run.js` mit Browser-Tests, Ergebnis siehe unten. CI im PR.
+4. **Testsuite:** `node tests/run.js` mit Browser-Tests: **alle 60 Testdateien bestanden**, Exit 0. Eine Prüfung
+   übersprang sich, weil GNU Go lokal fehlt (wie bei R-1). Die CI steht im PR. Erfüllt, sobald die CI grün ist.
 5. **Prüfskript:** `auswertung/bughunt-20261116/pruefung.js` am neuen Code: 1 von 13 reproduziert, nämlich B-2 — das
    Soll. Daten: `docs/daten/bughunt-20261116/nach-ui1.json`, Konsole `nach-ui1-konsole.txt`. Erfüllt.
 
-Neue `index.html`: SHA-256 `c5ba06077f6ad6452068743453cc53b9eff9cfbee2dee2deed4c7af9f0ed542d`.
+Neue `index.html`: SHA-256 `1df02491840ca2d099366874a34c2928e40fb857fa35fd0d3d84c54b6a285227`.
+
+**Zwei Hinweise zur Genauigkeit der Belege:**
+- Die neuen Kommentare standen zuerst in ASCII-Umschrift („ueber", „Rueckgaengig") und wurden auf Umlaute gebracht,
+  wie der umgebende Code sie schreibt. Dabei verschob sich die Zeile der `onerror`-Stelle, weshalb der Kommentar in
+  T-U2 die Funktion nennt statt einer Zeilennummer. Beide Testläufe aus Punkt 2 wurden nach dieser Korrektur
+  **wiederholt** und ergaben dasselbe: am alten Code 33 bestanden und 2 fehlgeschlagen, am neuen 35 und 0. Die hier
+  genannten Zahlen sind die der wiederholten Läufe.
+- `nach-ui1.json` nennt als `commit` `522301a`, weil das Prüfskript nach diesem Commit und vor dem Commit der
+  Kommentarkorrektur lief. Maßgeblich ist die darin genannte `index.html`-Prüfsumme `1df02491…`; sie stimmt mit dem
+  Stand überein, der hier abgenommen wird.
 
 **Grenzen:** Nur Chromium 153 headless. Der Absturzfall in T-U2 ruft `onerror` von Hand; ein echter Worker-Absturz
 nach dem Abschalten ist nicht erzeugt. Der Fall „Mensch zieht nach dem Abschalten weiter" bleibt ungeprüft (§2). Kein

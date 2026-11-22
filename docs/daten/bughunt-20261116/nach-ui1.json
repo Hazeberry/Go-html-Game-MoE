@@ -1,8 +1,8 @@
 {
  "umgebung": {
-  "datum": "2026-11-22T20:13:39.737Z",
-  "commit": "1320f055098953579ee23a74d0d63095655ca7f0",
-  "indexHtmlSha256": "c5ba06077f6ad6452068743453cc53b9eff9cfbee2dee2deed4c7af9f0ed542d",
+  "datum": "2026-11-22T20:23:26.001Z",
+  "commit": "522301af4431393ec924d9158b9824f7a4dd3219",
+  "indexHtmlSha256": "1df02491840ca2d099366874a34c2928e40fb857fa35fd0d3d84c54b6a285227",
   "node": "v22.23.5",
   "chromium": "153.0.8010.12"
  },
@@ -70,13 +70,13 @@
    "daten": {
     "zusatzKlicks": 5,
     "anfragen": 1,
-    "msBisZug": 1709,
+    "msBisZug": 1738,
     "workerDead": false,
     "grund": null,
     "zug": 1,
     "warnungen": [],
     "dauerMs": [
-     1950
+     1979
     ],
     "budgetMs": [
      1800
@@ -91,13 +91,13 @@
    "daten": {
     "zusatzKlicks": 5,
     "anfragen": 1,
-    "msBisZug": 1712,
+    "msBisZug": 1732,
     "workerDead": false,
     "grund": null,
     "zug": 1,
     "warnungen": [],
     "dauerMs": [
-     1952
+     1983
     ],
     "budgetMs": [
      1800
@@ -112,13 +112,13 @@
    "daten": {
     "zusatzKlicks": 5,
     "anfragen": 11,
-    "msBisZug": 3417,
+    "msBisZug": 3570,
     "workerDead": false,
     "grund": null,
     "zug": 1,
     "warnungen": [],
     "dauerMs": [
-     2090
+     2224
     ],
     "budgetMs": [
      1800
@@ -133,13 +133,13 @@
    "daten": {
     "zusatzKlicks": 2,
     "anfragen": 1,
-    "msBisZug": 1733,
+    "msBisZug": 1723,
     "workerDead": false,
     "grund": null,
     "zug": 1,
     "warnungen": [],
     "dauerMs": [
-     1969
+     1965
     ],
     "budgetMs": [
      1800
