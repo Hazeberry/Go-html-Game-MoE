@@ -183,5 +183,72 @@ test('trainGame(): ein divergierter Stand wird zurückgerollt statt gespeichert'
   pruefeGleich(netz._gameBuffer.length, 0, 'der Buffer wurde geleert');
 });
 
+/* ══ NET-1: gesperrtes localStorage bricht den Aufrufer nicht ab ════
+   docs/korrektur-net1-vorabfestlegung.md. reset() begann mit einem
+   ungeschuetzten localStorage.removeItem; weil das die erste Anweisung ist,
+   passierte bei gesperrtem Storage NICHTS danach — keine neuen Gewichte,
+   keine Zaehler auf 0 — und der Wurf brach den Aufrufer ab. trainGame ruft
+   reset() im Divergenzpfad, und das steckt mitten im Spielende. */
+function mitGesperrtemRemoveItem(fn) {
+  const echt = globalThis.localStorage.removeItem;
+  globalThis.localStorage.removeItem = () => { throw new Error('gesperrt'); };
+  const sE = console.error, sW = console.warn, sL = console.log;
+  console.error = console.warn = console.log = () => {};
+  try { return fn(); }
+  finally {
+    globalThis.localStorage.removeItem = echt;
+    console.error = sE; console.warn = sW; console.log = sL;
+  }
+}
+
+test('T-N1: reset() bei gesperrtem localStorage wirft nicht und setzt trotzdem zurück', () => {
+  netz.reset();
+  netz.gamesPlayed = 17; netz.wins = 9; netz._trained = true; netz.W1[0] = NaN;
+
+  let wurf = null;
+  mitGesperrtemRemoveItem(() => { try { netz.reset(); } catch (e) { wurf = e; } });
+
+  pruefeGleich(wurf, null, 'reset() wirft nicht');
+  pruefeFinit(netz.W1, 'W1 nach dem Reset finit');
+  pruefeGleich(netz.gamesPlayed, 0, 'gamesPlayed zurückgesetzt');
+  pruefeGleich(netz.wins, 0, 'wins zurückgesetzt');
+  pruefeGleich(netz._trained, false, '_trained zurückgesetzt');
+  pruefeGleich(netz._healthy, true, 'das Netz gilt wieder als gesund');
+});
+
+test('T-N2: Divergenzpfad bei gesperrtem localStorage wirft nicht', () => {
+  netz.reset();
+  KI.ablage.delete('go_pnet');          /* ohne gespeicherten Stand nimmt trainGame den reset()-Zweig */
+  netz.gamesPlayed = 5; netz.wins = 3; netz._divergences = 0;
+
+  const inp    = netz.boardToInput(new Uint8Array(361), 1, null, null);
+  const hidden = new Float32Array(netz.HID).fill(0.5);
+  const probs  = new Float32Array(netz.OUT).fill(1 / netz.OUT);
+  netz._gameBuffer = [{inp, probs, hidden, moveIdx: 5}];
+  netz.W1[0] = NaN;                     /* Divergenz erzwingen */
+
+  let wurf = null;
+  mitGesperrtemRemoveItem(() => { try { netz.trainGame(1); } catch (e) { wurf = e; } });
+
+  pruefeGleich(wurf, null, 'trainGame() wirft nicht');
+  pruefeFinit(netz.W1, 'W1 nach dem Rollback finit');
+  pruefeGleich(netz._gameBuffer.length, 0, 'der Buffer wurde geleert');
+  pruefeGleich(netz.gamesPlayed, 0, 'der Reset hat gegriffen');
+});
+
+test('T-N5: ohne Sperre setzt reset() wie bisher zurück (Kontrolle)', () => {
+  netz.reset();
+  netz.gamesPlayed = 7; netz.wins = 4; netz.W1[0] = NaN;
+  KI.ablage.set('go_pnet', 'alter Stand');
+
+  const sL = console.log; console.log = () => {};
+  netz.reset();
+  console.log = sL;
+
+  pruefeFinit(netz.W1, 'W1 finit');
+  pruefeGleich(netz.gamesPlayed, 0, 'gamesPlayed zurückgesetzt');
+  pruefe(KI.ablage.get('go_pnet') !== 'alter Stand', 'der alte Eintrag ist weg (save() schreibt den neuen)');
+});
+
 laufeTests('NaN-Schutz in MCTS/PUCT und Policy-Netz')
   .then(ok => process.exit(ok ? 0 : 1));

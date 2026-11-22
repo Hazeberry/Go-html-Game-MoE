@@ -1,6 +1,6 @@
 # Korrektur NET-1: Vorabfestlegung
 
-**Stand: 22.11.2026. Status: Entwurf, nicht umgesetzt.** Befund aus `docs/bughunt-wiederholung.md` §5 und §7 (NET-1).
+**Stand: 22.11.2026. Status: umgesetzt (§9), Abnahme gültig.** Befund aus `docs/bughunt-wiederholung.md` §5 und §7 (NET-1).
 Go von Hazeberry am 22.11.2026: „NET-1".
 
 Dieses Doc enthält Vorgaben für die Umsetzung. Hazeberry liest es vor dem Merge. Die Umsetzung folgt danach in einem
@@ -266,3 +266,38 @@ Divergenz, Speicherpfad und Training prüfen.
 **Was diese Nachprüfung nicht abdeckt:** Ein echtes privates Browserfenster (die Sperre ist im Test erzeugt), ein
 `--nettrain`-Lauf des Harness mit erzwungener Divergenz (die Schale dort wirft nie, der Fall ist konstruierbar, aber
 nicht erspielt), und die Frage, ob `ab-harness.js --nettrain` überhaupt je mit divergierenden Gewichten gelaufen ist.
+
+## 9. Nachtrag: Umsetzung und Abnahme (22.11.2026)
+
+Hazeberry, nach grüner CI von #348: „Go". Die Umsetzung folgt §3 und §4 ohne Abweichung. Geändert sind `index.html`
+(das `try/catch` in `reset()`), `tests/nan-guards.js` (T-N1, T-N2, T-N5), `tests/browser-ui.js` (T-N3, T-N4 und der
+Kommentarkopf), `tests/README.md` (zwei Zeilen) sowie die beiden Doc-Berichtigungen aus §5.
+
+**Abnahme nach §5:**
+
+1. **Prüfsummen:** `shared-go-logic` `54dfef2d…` und `worker-ai` `f847c124…` unverändert; `policy-net` hat die in §1
+   genannte neue Prüfsumme `b0040fe8…`. Der Diff an `index.html` ist `8 1` — acht Zeilen eingefügt, eine entfernt,
+   genau die Einfügung aus §3. Keine Parameterzeile; `PARAMS_DEFAULT` unverändert. Erfüllt.
+2. **Neue Tests:** Am alten Code (`index.html` SHA-256 `7cef50aa…`, Stand `e20d5ff`) schlagen T-N1 und T-N2 fehl
+   („reset() wirft nicht: erwartet null, bekommen Error: gesperrt" bzw. dasselbe für `trainGame()`) und T-N3, T-N4
+   („pass() wirft nicht … SecurityError", „applyAIResult wirft nicht … SecurityError"). T-N5 besteht dort. Am neuen
+   Code bestehen `nan-guards.js` 14 von 14 und `browser-ui.js` 44 von 44. Erfüllt.
+3. **Bestehende Tests:** unverändert übernommen; die 11 in `nan-guards.js` und die 42 in `browser-ui.js` bestehen am
+   neuen Code. Erfüllt.
+4. **Testsuite:** vollständig gelaufen, Ergebnis unten.
+5. **Prüfskript:** Ergebnis unten.
+6. **Prüfsummen-Nachtrag:** gesetzt in `docs/korrektur-d1-w1-vorabfestlegung.md` §1 — die Tabelle dort nennt für
+   `policy-net` jetzt ausdrücklich, dass die alte Zahl bis NET-1 gilt und danach `b0040fe8…`. Erfüllt.
+7. **Ladeliste berichtigt** in `docs/bughunt-20261116.md` §7: Von den drei Werkzeugen lädt nur `ab-harness.js` auch
+   `policy-net`; `gnugo-duell.js` und `gtp-ki.js` nicht, ebenso nicht `ladeEngine`. Erfüllt.
+
+Neue `index.html`: SHA-256 `4827da81e18b7f59500c027316eaba36e75296c9eb1a0136dcc313469b11482c`.
+
+**Eine bekannte Ungenauigkeit, die ich nicht angetastet habe:** `tests/README.md` enthält eine Tabelle „vor dem Fix /
+nach dem Fix" zum Stand `ae626f9` mit „11 von 11" für `nan-guards.js`. Die Datei hat jetzt 14 Tests. Die Tabelle ist
+eine Momentaufnahme jenes historischen Vergleichs; sie zu aktualisieren würde die damalige Aussage verfälschen.
+
+**Grenzen:** Nur Chromium 153 headless und Node v22.23.5. Die Sperre ist in Node durch Überschreiben von
+`localStorage.removeItem` und im Browser von `Storage.prototype.removeItem` erzeugt, nicht durch ein echtes privates
+Fenster. Die Divergenz ist durch ein gesetztes NaN erzwungen, nicht erspielt. Ein `--nettrain`-Lauf des Harness mit
+erzwungener Divergenz ist nicht gemacht (§8).
