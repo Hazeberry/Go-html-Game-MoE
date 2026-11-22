@@ -1,0 +1,247 @@
+{
+ "umgebung": {
+  "datum": "2026-11-22T20:23:26.001Z",
+  "commit": "522301af4431393ec924d9158b9824f7a4dd3219",
+  "indexHtmlSha256": "1df02491840ca2d099366874a34c2928e40fb857fa35fd0d3d84c54b6a285227",
+  "node": "v22.23.5",
+  "chromium": "153.0.8010.12"
+ },
+ "faelle": [
+  {
+   "id": "D-1",
+   "titel": "Dashboard: gebrochene Eingaben werden abgeschnitten (parseInt)",
+   "status": "nicht reproduziert",
+   "daten": {
+    "abgeschnitten": [],
+    "werte": {
+     "endTieBreak=0.5": {
+      "params": 0.5,
+      "feld": "0.5",
+      "standard": 1,
+      "markiert": true
+     },
+     "endTieBreak=1.5": {
+      "params": 1.5,
+      "feld": "1.5",
+      "standard": 1,
+      "markiert": true
+     },
+     "atariSizeWeight=0.25": {
+      "params": 0.25,
+      "feld": "0.25",
+      "standard": 0,
+      "markiert": true
+     },
+     "raumZug=0.5": {
+      "params": 0.5,
+      "feld": "0.5",
+      "standard": 0,
+      "markiert": true
+     },
+     "raumGewicht=1.5": {
+      "params": 1.5,
+      "feld": "1.5",
+      "standard": 0,
+      "markiert": true
+     },
+     "tsumegoNakade=0.75": {
+      "params": 0.75,
+      "feld": "0.75",
+      "standard": 0.5,
+      "markiert": true
+     }
+    },
+    "betroffeneFelder": []
+   }
+  },
+  {
+   "id": "D-2",
+   "titel": "Presets: Werte des vorigen Presets bleiben stehen ([direkt, nach anderem Preset])",
+   "status": "nicht reproduziert",
+   "daten": {
+    "defensivNachAggressiv": {},
+    "aggressivNachAusgewogen": {}
+   }
+  },
+  {
+   "id": "W-1a",
+   "titel": "Schwer: 5 Klicks auf die Stufe während der Rechnung",
+   "status": "nicht reproduziert",
+   "daten": {
+    "zusatzKlicks": 5,
+    "anfragen": 1,
+    "msBisZug": 1738,
+    "workerDead": false,
+    "grund": null,
+    "zug": 1,
+    "warnungen": [],
+    "dauerMs": [
+     1979
+    ],
+    "budgetMs": [
+     1800
+    ],
+    "seitenfehler": []
+   }
+  },
+  {
+   "id": "W-1b",
+   "titel": "Schwer: 5 Klicks auf die Farbe während der Rechnung",
+   "status": "nicht reproduziert",
+   "daten": {
+    "zusatzKlicks": 5,
+    "anfragen": 1,
+    "msBisZug": 1732,
+    "workerDead": false,
+    "grund": null,
+    "zug": 1,
+    "warnungen": [],
+    "dauerMs": [
+     1983
+    ],
+    "budgetMs": [
+     1800
+    ],
+    "seitenfehler": []
+   }
+  },
+  {
+   "id": "W-1c",
+   "titel": "Schwer: 5-mal KI aus und an während der Rechnung",
+   "status": "nicht reproduziert",
+   "daten": {
+    "zusatzKlicks": 5,
+    "anfragen": 11,
+    "msBisZug": 3570,
+    "workerDead": false,
+    "grund": null,
+    "zug": 1,
+    "warnungen": [],
+    "dauerMs": [
+     2224
+    ],
+    "budgetMs": [
+     1800
+    ],
+    "seitenfehler": []
+   }
+  },
+  {
+   "id": "W-1k",
+   "titel": "Kontrolle: 2 Klicks auf die Stufe (Erwartung: kein Watchdog)",
+   "status": "nicht reproduziert",
+   "daten": {
+    "zusatzKlicks": 2,
+    "anfragen": 1,
+    "msBisZug": 1723,
+    "workerDead": false,
+    "grund": null,
+    "zug": 1,
+    "warnungen": [],
+    "dauerMs": [
+     1965
+    ],
+    "budgetMs": [
+     1800
+    ],
+    "seitenfehler": []
+   }
+  },
+  {
+   "id": "K-1",
+   "titel": "Kopieren ohne navigator.clipboard wirft, Rückfall wird nie erreicht",
+   "status": "nicht reproduziert",
+   "daten": {
+    "btn-copy-log": {
+     "beschriftung": "✓",
+     "seitenfehler": []
+    },
+    "btn-bug-report": {
+     "beschriftung": "✓",
+     "seitenfehler": []
+    },
+    "dashExport": "kein Fehler"
+   }
+  },
+  {
+   "id": "K-2",
+   "titel": "Export: Rückmeldung auf dem falschen Knopf, Beschriftung kann hängen bleiben",
+   "status": "nicht reproduziert",
+   "daten": {
+    "vorher": [
+     "💾 Speichern",
+     "⬇ Export"
+    ],
+    "direktNachExport": [
+     "💾 Speichern",
+     "✓ Kopiert"
+    ],
+    "nachSpeichernUndExport": [
+     "💾 Speichern",
+     "⬇ Export"
+    ]
+   }
+  },
+  {
+   "id": "L-1",
+   "titel": "Brett passt sich der Fenstergröße nicht an",
+   "status": "nicht reproduziert",
+   "daten": {
+    "vorher": {
+     "canvas": 634,
+     "layout": 634
+    },
+    "nachher": {
+     "canvas": 376,
+     "layout": 376,
+     "scrollWidth": 400,
+     "innerWidth": 400
+    }
+   }
+  },
+  {
+   "id": "R-1",
+   "titel": "Leicht: wirft getAIMove, bleibt „KI denkt...“ stehen",
+   "status": "nicht reproduziert",
+   "daten": {
+    "aiThinking": false,
+    "rueckgaengigGesperrt": false,
+    "status": "KI aktiv · Weiß · Leicht",
+    "zug": 2,
+    "seitenfehler": []
+   }
+  },
+  {
+   "id": "B-1",
+   "titel": "Dashboard: Feld zeigt den ungeklemmten Wert",
+   "status": "nicht reproduziert",
+   "daten": {
+    "params": 5000,
+    "feld": "5000"
+   }
+  },
+  {
+   "id": "B-2",
+   "titel": "Spielende: toter Stein verschwindet, rotes Kreuz wird nie gezeichnet",
+   "status": "reproduziert",
+   "daten": {
+    "spielende": true,
+    "tote": [
+     5
+    ],
+    "steinAufF19": 0,
+    "log": [
+     "! 1 tote Steine entfernt"
+    ]
+   }
+  },
+  {
+   "id": "B-3",
+   "titel": "Statuszeile zeigt „Beide gepasst.“ nie",
+   "status": "nicht reproduziert",
+   "daten": {
+    "statuszeile": "Beide gepasst."
+   }
+  }
+ ]
+}

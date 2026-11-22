@@ -1,6 +1,6 @@
 # Korrektur UI-1: Vorabfestlegung
 
-**Stand: 22.11.2026. Status: Entwurf, nicht umgesetzt.** Befund aus `docs/bughunt-wiederholung.md` §5 (UI-1), Stand
+**Stand: 22.11.2026. Status: umgesetzt (§8), Abnahme gültig.** Befund aus `docs/bughunt-wiederholung.md` §5 (UI-1), Stand
 am heutigen Code bestätigt in `docs/bughunt-20261116.md` §3 und §8. Go von Hazeberry am 22.11.2026:
 „UI-1 Vorabfestlegung".
 
@@ -221,3 +221,42 @@ geprüft, nicht mit einem echten Worker-Absturz. Der Fall „Mensch zieht nach d
 2. Umsetzung in einem eigenen PR nach eigenem Go: Code nach §3, Tests nach §4, `tests/README.md`, Nachtrag hier mit
    den Ergebnissen aus §5 und eine Zeile in `docs/bughunt-20261116.md`.
 3. CI grün, Merge, kurzer Bericht mit den löschbaren Branches.
+
+## 8. Nachtrag: Umsetzung und Abnahme (22.11.2026)
+
+Hazeberry, nach grüner CI von #341: „Go". Die Umsetzung folgt §3 und §4 ohne Abweichung. Geändert sind `index.html`
+(Handler des KI-Knopfs, Eingang von `fallbackToMainThread`), `tests/browser-ui.js` (T-U1 bis T-U4 und der
+Kommentarkopf) und `tests/README.md`.
+
+**Abnahme nach §5:**
+
+1. **Prüfsummen:** Die drei Engine-Blöcke haben die Prüfsummen aus §1, nach der Änderung nachgerechnet. Erfüllt.
+2. **Neue Tests:** Am alten Code (`index.html` SHA-256 `e9f99467…`, Stand `1320f05`) schlagen T-U1 und T-U2 fehl, T-U3
+   und T-U4 bestehen dort (33 bestanden, 2 fehlgeschlagen). Am neuen Code bestehen alle 35 Tests der Datei
+   (0 fehlgeschlagen). Erfüllt.
+   - T-U1 scheitert am alten Code an der ersten Prüfung nach dem Klick: „sofort nach dem Klick rechnet die KI nicht
+     mehr". Der Rahmen bricht beim ersten Fehler ab, deshalb kommt der Test dort nicht mehr bis zur Steinprüfung; dass
+     der Stein gesetzt wird, ist in §6 gemessen und in T-U2 auch am alten Code sichtbar.
+   - T-U2 scheitert am alten Code an „kein weißer Stein auf dem Brett: erwartet 0, bekommen 1".
+3. **Bestehende Tests:** unverändert übernommen; die 31 bestehen am neuen Code, die beiden PolicyNet-Tests und T-W1
+   bis T-W4 eingeschlossen. Erfüllt.
+4. **Testsuite:** `node tests/run.js` mit Browser-Tests: **alle 60 Testdateien bestanden**, Exit 0. Eine Prüfung
+   übersprang sich, weil GNU Go lokal fehlt (wie bei R-1). Die CI steht im PR. Erfüllt, sobald die CI grün ist.
+5. **Prüfskript:** `auswertung/bughunt-20261116/pruefung.js` am neuen Code: 1 von 13 reproduziert, nämlich B-2 — das
+   Soll. Daten: `docs/daten/bughunt-20261116/nach-ui1.json`, Konsole `nach-ui1-konsole.txt`. Erfüllt.
+
+Neue `index.html`: SHA-256 `1df02491840ca2d099366874a34c2928e40fb857fa35fd0d3d84c54b6a285227`.
+
+**Zwei Hinweise zur Genauigkeit der Belege:**
+- Die neuen Kommentare standen zuerst in ASCII-Umschrift („ueber", „Rueckgaengig") und wurden auf Umlaute gebracht,
+  wie der umgebende Code sie schreibt. Dabei verschob sich die Zeile der `onerror`-Stelle, weshalb der Kommentar in
+  T-U2 die Funktion nennt statt einer Zeilennummer. Beide Testläufe aus Punkt 2 wurden nach dieser Korrektur
+  **wiederholt** und ergaben dasselbe: am alten Code 33 bestanden und 2 fehlgeschlagen, am neuen 35 und 0. Die hier
+  genannten Zahlen sind die der wiederholten Läufe.
+- `nach-ui1.json` nennt als `commit` `522301a`, weil das Prüfskript nach diesem Commit und vor dem Commit der
+  Kommentarkorrektur lief. Maßgeblich ist die darin genannte `index.html`-Prüfsumme `1df02491…`; sie stimmt mit dem
+  Stand überein, der hier abgenommen wird.
+
+**Grenzen:** Nur Chromium 153 headless. Der Absturzfall in T-U2 ruft `onerror` von Hand; ein echter Worker-Absturz
+nach dem Abschalten ist nicht erzeugt. Der Fall „Mensch zieht nach dem Abschalten weiter" bleibt ungeprüft (§2). Kein
+Handy, kein Firefox, keine Partie, keine Spielstärkemessung.

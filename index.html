@@ -6053,6 +6053,11 @@ function passExtra() {
 function fallbackToMainThread(reqId, netInp, netPriors, netHidden) {
   setTimeout(() => {
     if (reqId !== state.aiRequestId) return;
+    /* Der Weg über onerror übergibt die AKTUELLE Kennung, die Prüfung
+       darüber kann dort nie greifen. Ohne das hier rechnet der Hauptthread
+       für eine abgeschaltete KI und setzt ihren Zug (UI-1,
+       docs/korrektur-ui1-vorabfestlegung.md §2). */
+    if (!state.aiEnabled) { state.aiThinking = false; updateAIStatus(); updateUndoButton(); return; }
     let r;
     try {
       r = getAIMove(state.board, state.aiColor,
@@ -6745,6 +6750,12 @@ document.getElementById('btn-ai-toggle').addEventListener('click',function(){
   state.aiEnabled=!state.aiEnabled;
   this.textContent=state.aiEnabled?'KI deaktivieren':'KI aktivieren';
   this.classList.toggle('active-mode',state.aiEnabled);
+  /* Abschalten verwirft die laufende Anfrage: ohne das erhöhte aiRequestId
+     gilt ihre Antwort als aktuell und setzt noch einen Stein, und ohne
+     aiThinking=false bleibt Rückgängig gesperrt, während die Anzeige
+     schon "KI ist deaktiviert" sagt (UI-1,
+     docs/korrektur-ui1-vorabfestlegung.md). */
+  if(!state.aiEnabled){state.aiRequestId++;state.aiThinking=false;updateUndoButton();}
   updateAIStatus();
   if(state.aiEnabled&&!state.gameOver&&!humanTurn())triggerAIMove();
 });

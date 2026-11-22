@@ -59,6 +59,12 @@
     30. T-B4: nach Aufgabe der KI kein Kreuz (Kontrolle).
     31. T-B5: „Beide gepasst.“ nach zwei Pässen.
 
+   Korrektur UI-1 (docs/korrektur-ui1-vorabfestlegung.md, T-U1 bis T-U4):
+    32. T-U1: Abschalten während der Rechnung: kein Zug mehr, Rückgängig frei.
+    33. T-U2: dasselbe, wenn der Worker danach abstürzt (onerror).
+    34. T-U3: aus und wieder an: genau ein Zug, kein Watchdog (Kontrolle).
+    35. T-U4: ohne Klick zieht die KI normal (Kontrolle).
+
    Aufruf:  node tests/browser-ui.js [pfad/zur/index.html] */
 'use strict';
 const {test, pruefe, pruefeGleich, laufeTests, STANDARD_HTML} = require('./rahmen');
@@ -837,6 +843,129 @@ test('T-B5: nach zwei Pässen über den Knopf steht „Beide gepasst.“', async
   const text = await s.evaluate(() => document.getElementById('message').textContent);
   await ctx.close();
   pruefeGleich(text, 'Beide gepasst.', 'Statuszeile');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+/* UI-1: KI Weiß, damit ein Menschenzug im Rückgängig-Stapel liegt und der
+   Knopf prüfbar ist (bei KI Schwarz im ersten Zug ist der Stapel leer und der
+   Knopf ohnehin gesperrt). Start, Menschenzug und Klick in EINEM Aufruf: sonst
+   kann die 300-ms-Rechnung schon vorbei sein (wie bei T-W1). */
+async function ui1Vorbereiten(s) {
+  await s.evaluate(() => {
+    window.__ui1Start = () => {
+      PARAMS.aiTimeBudget = 300; PARAMS.adaptiveBudgetEnabled = 0;
+      document.querySelector('.diff-btn[data-diff="hard"]').click();
+      document.querySelector('.color-btn[data-color="2"]').click();   /* KI = Weiß */
+      document.getElementById('btn-ai-toggle').click();               /* KI an */
+      placeStone(3, 3); render(); updateUI('');                       /* Mensch Schwarz */
+      if (!state.aiThinking) triggerAIMove();
+    };
+  });
+}
+const ui1Lage = s => s.evaluate(() => {
+  let weiss = 0;
+  for (let i = 0; i < state.board.length; i++) if (state.board[i] === 2) weiss++;
+  return {zuege: state.moveCount, weiss, rechnet: state.aiThinking,
+    undoGesperrt: document.getElementById('btn-undo').disabled,
+    status: document.getElementById('ai-status').textContent, aiEnabled: state.aiEnabled,
+    tot: !!state.workerDead, grund: state.workerDeadReason,
+    watchdog: state.log.some(l => l.includes('Watchdog')), neustarts: state.workerNeustarts};
+});
+
+test('T-U1: Abschalten während der Rechnung: kein Zug mehr, Rückgängig frei', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  await ui1Vorbereiten(s);
+  const sofort = await s.evaluate(() => {
+    __ui1Start();
+    const rechnete = state.aiThinking, stapel = state.undoStack.length;
+    document.getElementById('btn-ai-toggle').click();                 /* KI aus */
+    return {rechnete, stapel, rechnet: state.aiThinking,
+      undoGesperrt: document.getElementById('btn-undo').disabled, aiEnabled: state.aiEnabled};
+  });
+  /* Warten, bis der Worker geantwortet hat: dann hat der alte Code den Stein
+     gesetzt, der neue die Antwort verworfen. Robuster als eine feste Frist. */
+  await s.waitForFunction(() => state.aiWorkerCtx && state.aiWorkerCtx.antwort === true, null, {timeout: 20000})
+    .catch(() => { /* unten geprüft */ });
+  await s.waitForTimeout(300);
+  const r = await ui1Lage(s);
+  await ctx.close();
+  pruefe(sofort.rechnete, 'Vorbedingung: die KI rechnete beim Klick');
+  pruefeGleich(sofort.stapel, 1, 'Vorbedingung: ein Menschenzug im Rückgängig-Stapel');
+  pruefe(!sofort.aiEnabled, 'die KI ist abgeschaltet');
+  pruefe(!sofort.rechnet, 'sofort nach dem Klick rechnet die KI nicht mehr');
+  pruefe(!sofort.undoGesperrt, 'sofort nach dem Klick ist Rückgängig frei');
+  pruefeGleich(r.weiss, 0, 'kein weißer Stein auf dem Brett');
+  pruefeGleich(r.zuege, 1, 'nur der Menschenzug');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-U2: Worker-Absturz nach dem Abschalten setzt keinen Zug', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  await ui1Vorbereiten(s);
+  const sofort = await s.evaluate(() => {
+    __ui1Start();
+    const rechnete = state.aiThinking;
+    document.getElementById('btn-ai-toggle').click();                 /* KI aus */
+    /* Genau der Weg aus attachWorkerHandlers.onerror: dort ruft
+       fallbackToMainThread(state.aiRequestId, ...) mit der AKTUELLEN Kennung,
+       die Kennungsprüfung kann dort nie greifen (UI-1 §2). */
+    const onerror = state.aiWorker && state.aiWorker.onerror;
+    if (onerror) onerror.call(state.aiWorker, {message: 'Testabsturz'});
+    return {rechnete, onerrorVorhanden: !!onerror};
+  });
+  /* Am alten Code steht der Stein nach rund 400 ms; am neuen kommt er nie,
+     deshalb läuft die Frist dort ab. */
+  await s.waitForFunction(() => state.moveCount >= 2, null, {timeout: 4000})
+    .catch(() => { /* unten geprüft */ });
+  const r = await ui1Lage(s);
+  await ctx.close();
+  pruefe(sofort.rechnete, 'Vorbedingung: die KI rechnete beim Klick');
+  pruefe(sofort.onerrorVorhanden, 'Vorbedingung: der Worker hatte einen onerror-Handler');
+  pruefeGleich(r.weiss, 0, 'kein weißer Stein auf dem Brett');
+  pruefeGleich(r.zuege, 1, 'nur der Menschenzug');
+  pruefe(!r.rechnet, 'die KI rechnet nicht mehr');
+  pruefe(!r.undoGesperrt, 'Rückgängig ist frei');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-U3: aus und wieder an während der Rechnung: genau ein Zug (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  await ui1Vorbereiten(s);
+  const sofort = await s.evaluate(() => {
+    __ui1Start();
+    const rechnete = state.aiThinking;
+    const k = document.getElementById('btn-ai-toggle');
+    k.click(); k.click();                                             /* aus, wieder an */
+    return {rechnete, aiEnabled: state.aiEnabled};
+  });
+  await zugFertig(s, 2);
+  const r = await ui1Lage(s);
+  await ctx.close();
+  pruefe(sofort.rechnete, 'Vorbedingung: die KI rechnete beim ersten Klick');
+  pruefe(sofort.aiEnabled, 'die KI ist wieder an');
+  pruefeGleich(r.zuege, 2, 'genau ein KI-Zug');
+  pruefeGleich(r.weiss, 1, 'ein weißer Stein');
+  pruefe(r.tot !== true, `der Worker gilt nicht als tot (${r.grund})`);
+  pruefe(!r.watchdog, 'kein Watchdog');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-U4: ohne Klick zieht die KI normal (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  await ui1Vorbereiten(s);
+  const rechnete = await s.evaluate(() => { __ui1Start(); return state.aiThinking; });
+  await zugFertig(s, 2);
+  const r = await ui1Lage(s);
+  await ctx.close();
+  pruefe(rechnete, 'Vorbedingung: die KI rechnete');
+  pruefeGleich(r.zuege, 2, 'die KI hat gezogen');
+  pruefeGleich(r.weiss, 1, 'ein weißer Stein');
+  pruefeGleich(r.status, 'KI aktiv · Weiß · Schwer', 'Statuszeile');
+  pruefe(!r.undoGesperrt, 'Rückgängig ist frei');
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 
