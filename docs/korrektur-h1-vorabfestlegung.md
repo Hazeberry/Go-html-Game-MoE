@@ -201,7 +201,9 @@ Hazeberry, nach grüner CI von #343: „Go". Die Umsetzung folgt §3 und §4 ohn
    der Prüfung „nennt netMaxBlend 0"; T-H2 und T-H3 bestehen dort (37 bestanden, 1 fehlgeschlagen). Am neuen Code
    bestehen alle 38 Tests der Datei. Erfüllt.
 4. **Bestehende Tests:** unverändert übernommen; die 35 bestehen am neuen Code. Erfüllt.
-5. **Testsuite:** `node tests/run.js` mit Browser-Tests, Ergebnis unten. Die CI steht im PR.
+5. **Testsuite:** `node tests/run.js` mit Browser-Tests: **alle 60 Testdateien bestanden**, Exit 0. Eine Prüfung
+   übersprang sich, weil GNU Go lokal fehlt (wie bei R-1 und UI-1). Die CI steht im PR. Erfüllt, sobald die CI grün
+   ist.
 6. **Prüfskript:** `auswertung/bughunt-20261116/pruefung.js` am neuen Code: 1 von 13 reproduziert, nämlich B-2 — das
    Soll. Daten: `docs/daten/bughunt-20261116/nach-h1.json`, Konsole `nach-h1-konsole.txt`. Erfüllt.
 
