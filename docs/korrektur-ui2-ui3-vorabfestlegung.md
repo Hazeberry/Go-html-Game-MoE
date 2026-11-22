@@ -223,7 +223,9 @@ Hazeberry, nach grüner CI von #345: „Go". Die Umsetzung folgt §4 und §5 ohn
    - T-S1 scheitert am alten Code an „Anzeige folgt der Wertung: erwartet Weiß +5.5, bekommen Schwarz +353.5".
    - T-V1 scheitert an „das Bild zeigt die Marken nicht mehr".
 3. **Bestehende Tests:** unverändert übernommen; die 38 bestehen am neuen Code. Erfüllt.
-4. **Testsuite:** `node tests/run.js` mit Browser-Tests, Ergebnis unten. Die CI steht im PR.
+4. **Testsuite:** `node tests/run.js` mit Browser-Tests: **alle 60 Testdateien bestanden**, Exit 0. Eine Prüfung
+   übersprang sich, weil GNU Go lokal fehlt (wie bei R-1, UI-1 und H-1). Die CI steht im PR. Erfüllt, sobald die CI
+   grün ist.
 5. **Prüfskript:** `auswertung/bughunt-20261116/pruefung.js` am neuen Code: 1 von 13 reproduziert, nämlich B-2 — das
    Soll. Daten: `docs/daten/bughunt-20261116/nach-ui2-ui3.json`, Konsole `nach-ui2-ui3-konsole.txt`. Erfüllt.
 
