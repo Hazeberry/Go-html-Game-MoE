@@ -36,9 +36,15 @@ steht im Block `policy-net`, und dort sitzt die Änderung.
 **Das Verhalten unterscheidet sich also ausschließlich in dem Fall, der heute abbricht.** Ein Messlauf oder ein
 Engine-Vergleich ist dafür nach meiner Einschätzung nicht nötig.
 
-**Offen für Hazeberrys Entscheidung:** `CLAUDE.md` sieht für Änderungen an einem Engine-Stand den Vergleich über
-`engine-vergleich.yml` in GitHub Actions vor. Wer das trotz der Argumente oben haben will, braucht dafür ein eigenes
-Go; die Umsetzung wartet dann darauf. Meine Empfehlung: verzichtbar, weil die Aufruferliste vollständig und kurz ist.
+**Zum Engine-Vergleich — nachgeprüft am 22.11. (§8), und das Ergebnis ist deutlicher als zuerst gedacht: Er wäre
+blind.** `engine-vergleich.yml` ruft `auswertung/engine-vergleich.js --dump`, das die Engine über `R.ladeEngine` holt
+(`auswertung/diagnose/wurzel-replay.js` Z. 44 bis 62). Diese Funktion lädt **nur** `shared-go-logic` und `worker-ai`;
+der Block `policy-net` kommt in der ganzen Datei nicht vor. Ein Vergleich alt gegen neu würde also „GLEICH" melden,
+ohne die geänderte Zeile geladen zu haben. Nach der Gültigkeitsregel des Projekts wäre dieses „GLEICH" kein Urteil
+über die Änderung, sondern eine Aussage über Code, der nicht dabei war.
+
+Ein Engine-Vergleich ist für NET-1 damit nicht „verzichtbar", sondern **ungeeignet**. Was die Änderung bewirkt,
+prüfen die Tests aus §4 und die Prototyp-Messung aus §6.
 
 ## 2. Befund
 
@@ -152,6 +158,13 @@ Zwei Zustände, gültig oder ungültig. **Gültig** nur, wenn alles zutrifft:
    machen, nicht nur die berührten Dateien.
 5. `auswertung/bughunt-20261116/pruefung.js` am neuen Code: weiter 1 von 13 reproduziert, nämlich B-2. Ausgabe als
    `docs/daten/bughunt-20261116/nach-net1.json`, mit Konsole.
+6. **Die veraltete Prüfsummen-Referenz ist nachgetragen.** Neun Docs nennen `56a5d6c0…` als Nachweis „Engine
+   unberührt", und alle neueren verweisen dafür auf `docs/korrektur-d1-w1-vorabfestlegung.md` §1. Die Umsetzung setzt
+   dort einen Nachtrag: dass für `policy-net` seit NET-1 `b0040fe8…` gilt und die Zahl in der Tabelle den Stand bis
+   dahin beschreibt. Ohne das zitiert die nächste Vorabfestlegung eine Zahl, die nicht mehr stimmt (§8).
+7. **Die falsche Aussage in `docs/bughunt-20261116.md` §7 ist berichtigt:** Dort steht, `gnugo-duell.js`, `gtp-ki.js`
+   und `ab-harness.js` würden „nur die Blöcke `shared-go-logic`, `worker-ai` und `policy-net`" laden. Für
+   `gnugo-duell.js` und `gtp-ki.js` trifft das nicht zu — beide laden `policy-net` nicht (§8).
 
 **Ungültig** heißt: kein Merge, der Grund steht als Nachtrag in diesem Doc.
 
@@ -190,8 +203,66 @@ NaN erzwungen, nicht erspielt. Keine Partie gegen einen Gegner, keine Spielstär
 
 ## 7. Ablauf
 
-1. Dieses Doc als PR, CI grün, **Hazeberry liest es** — und entscheidet dabei auch über den Engine-Vergleich (§1).
-   Merge.
+1. Dieses Doc als PR, CI grün, **Hazeberry liest es**, Merge. Die Frage nach dem Engine-Vergleich ist durch §8
+   beantwortet: Er wäre ungeeignet, nicht nur verzichtbar.
 2. Umsetzung in einem eigenen PR nach eigenem Go: Code nach §3, Tests nach §4, `tests/README.md`, Nachtrag hier mit
-   den Ergebnissen aus §5 und eine Zeile in `docs/bughunt-20261116.md` §3.
+   den Ergebnissen aus §5, eine Zeile in `docs/bughunt-20261116.md` §3 — **und die beiden Doc-Berichtigungen aus
+   Abnahmepunkt 6 und 7** (Prüfsummen-Nachtrag in `docs/korrektur-d1-w1-vorabfestlegung.md` §1, Berichtigung der
+   Ladeliste in `docs/bughunt-20261116.md` §7).
 3. CI grün, Merge, kurzer Bericht mit den löschbaren Branches.
+
+## 8. Pedantische Nachprüfung (22.11.2026, auf Bitte von Hazeberry)
+
+Anlass: ein Engine-Block ändert sich, und das soll keine Folgebaustelle aufmachen. Neun Punkte, zwei davon mit
+Befund.
+
+**1. Ist die alte Prüfsumme irgendwo fest kodiert?** `56a5d6c0…` kommt in **neun Docs** vor und in **keiner** Datei
+unter `tests/`, `auswertung/`, `distillation/`, `.github/workflows/` oder im Wurzelverzeichnis. Kein Test und kein
+Workflow bricht.
+
+**2. Befund: Die Docs veralten.** Alle Vorabfestlegungen ab D-2 verweisen für „Engine unberührt" auf
+`docs/korrektur-d1-w1-vorabfestlegung.md` §1. Nach NET-1 stimmt die dortige `policy-net`-Zahl nicht mehr für den
+aktuellen Stand. Das ist genau die Folgebaustelle, die zu vermeiden ist: Die nächste Korrektur würde die veraltete
+Zahl zitieren und als „unberührt" belegen, was gar nicht mehr geprüft wäre. **Abnahmepunkt 6** schreibt den Nachtrag
+dort fest.
+
+**3. Wer lädt den Block `policy-net`?** Vollständige Liste, durch Suche über alle `.js`-Dateien:
+
+| lädt `policy-net` | `localStorage`-Schale | ruft `reset()` / `trainGame()`? |
+|---|---|---|
+| `index.html` (Browser) | echtes `localStorage` | ja, das ist der Befund |
+| `ab-harness.js` (Z. 878) | Z. 856 `removeItem: k => speicher.delete(k)` | über `--nettrain` möglich |
+| `auswertung/weiterspielen.js` | Z. 63 `removeItem() {}` | nein |
+| `distillation/collect.js`, `dump_boards.js`, `export_check.js`, `lokalitaet_check.js`, `spanne_check.js` | je eine Schale mit `removeItem` | nein |
+| `tests/rahmen.js` (Z. 47, für alle Node-Tests mit Netz) | Z. 42 `removeItem: k => ablage.delete(k)` | ja, in `nan-guards.js` und `training-stability.js` |
+
+**In jeder dieser Schalen funktioniert `removeItem` und wirft nie.** Der `catch`-Zweig aus §3 wird dort nie betreten;
+der Code läuft Anweisung für Anweisung wie bisher. `auswertung/architektur.js` nennt den Blocknamen nur als Text für
+ein Diagramm.
+
+**4. Befund: `ladeEngine` lädt den Block nicht — der Engine-Vergleich wäre blind.** Siehe §1. Belegt durch 0 Treffer
+für `policy-net` in `auswertung/diagnose/wurzel-replay.js`.
+
+**5. Und `gnugo-duell.js`, `gtp-ki.js` und `auswertung/engine-vergleich.js` laden ihn auch nicht** — je 0 Treffer.
+Damit sind die Werkzeuge, die gegen GNU Go und Fuego spielen und die PWA-Vergleiche fahren, von dieser Änderung
+überhaupt nicht berührt: Der geänderte Code kommt dort nie vor. Das ist ein stärkeres Argument als die Aufruferliste
+allein — und es berichtigt eine Aussage in `docs/bughunt-20261116.md` §7 (**Abnahmepunkt 7**).
+
+**6. Zählt ein Test die neue `console.warn`-Zeile als Fehler?** Nein, zweifach abgesichert: `tests/browser-nan.js`
+bewertet nur `m.type() === 'error'` (Z. 62), und Meldungen, die mit `[PolicyNet]` beginnen, sortiert es ohnehin als
+Diagnose ein, nicht als Fehler (Z. 60). Die neue Zeile beginnt genau so.
+
+**7. Prüft ein Test Prüfsummen von Engine-Blöcken?** `tests/engine-vergleich.js` nicht — es startet
+`auswertung/engine-vergleich.js` zweimal mit **demselben** Stand und erwartet „gleich". Keine Datei im Repo vergleicht
+Blockprüfsummen gegen einen festen Wert.
+
+**8. Ist der Diff im Block wirklich nur die eine Stelle?** Zeilenweiser Vergleich des extrahierten Blocks: 498 Zeilen
+alt, 505 neu. Eine Zeile entfernt (`localStorage.removeItem('go_pnet');`), acht eingefügt (sechs Kommentar, zwei
+Code), erste Abweichung bei Blockzeile 462, danach wieder identisch. Keine andere Stelle berührt.
+
+**9. Volle Testsuite gegen den Prototyp:** alle 60 Testdateien bestanden (§6), darunter die vier Dateien, die
+Divergenz, Speicherpfad und Training prüfen.
+
+**Was diese Nachprüfung nicht abdeckt:** Ein echtes privates Browserfenster (die Sperre ist im Test erzeugt), ein
+`--nettrain`-Lauf des Harness mit erzwungener Divergenz (die Schale dort wirft nie, der Fall ist konstruierbar, aber
+nicht erspielt), und die Frage, ob `ab-harness.js --nettrain` überhaupt je mit divergierenden Gewichten gelaufen ist.
