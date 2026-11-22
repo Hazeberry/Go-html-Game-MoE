@@ -171,7 +171,10 @@ Keine Seitenfehler in beiden Läufen.
 Spalten). Der Prototyp beendet das Sammeln nach dem Abschluss und macht die Festlegung sichtbar; das Sammeln
 funktioniert nach „Neues Spiel" unverändert.
 
-**Bestehende Tests:** `node tests/browser-ui.js <prototyp>` ergibt **42 bestanden, 0 fehlgeschlagen**.
+**Bestehende Tests:** `node tests/browser-ui.js <prototyp>` ergibt **42 bestanden, 0 fehlgeschlagen**. Dazu
+`node tests/run.js <prototyp>`: **alle 60 Testdateien bestanden**, Exit 0 — darunter `tests/training-stability.js`
+mit dem Selbstspiel-Lauf über 30 Partien × 400 Züge (12 150 Prüfungen) und „Aufgabe der KI: Training mit -1, nach Undo
+kein +R". Das ist der Lauf, den die Nachprüfung unten nachgeholt hat.
 
 ### Nachprüfung auf Lücken (22.11.2026, auf Bitte von Hazeberry)
 
@@ -195,6 +198,9 @@ Bedingung.
 
 **Geprüft und in Ordnung: das Undo ohne Spielende.** `_trained` ist dort false, also keine Zeile, und der Puffer wird
 wie bisher auf `prev.netBufLen` gekürzt (1 → 0). An beiden Ständen gleich.
+
+**Nachgeholt: die volle Testsuite gegen den Prototyp.** Zuerst war nur `tests/browser-ui.js` gelaufen, obwohl
+`tests/training-stability.js` genau den Trainingspfad prüft. Nachgeholt: alle 60 Testdateien bestanden (oben).
 
 **Geprüft und in Ordnung: der Worker.** Der Worker baut sich ein eigenes `policyNet`-Objekt mit leerem `_gameBuffer`
 und ohne `_trained` (Z. 6018 bis 6023). Beide Änderungen aus §3 sitzen im Hauptskript (`applyAIResult`, `undo`) und
