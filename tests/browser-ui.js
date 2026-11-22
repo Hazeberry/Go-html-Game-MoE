@@ -71,6 +71,13 @@
     37. T-H2: blendWeight folgt netMaxBlend × min(1, Spiele/netWarmup).
     38. T-H3: mit den Standardwerten ist blendWeight immer 0.
 
+   Korrektur UI-2 und UI-3 (docs/korrektur-ui2-ui3-vorabfestlegung.md,
+   T-S1/T-S2 und T-V1/T-V2):
+    39. T-S1: Wertungswechsel nach Spielende rechnet die Anzeige neu.
+    40. T-S2: nach Aufgabe bleibt die Aufgabe-Anzeige stehen (Kontrolle).
+    41. T-V1: ein Pass räumt die Marken der Zählvorschau vom Brett.
+    42. T-V2: ein Zug räumt sie auch (Kontrolle).
+
    Aufruf:  node tests/browser-ui.js [pfad/zur/index.html] */
 'use strict';
 const {test, pruefe, pruefeGleich, laufeTests, STANDARD_HTML} = require('./rahmen');
@@ -1047,6 +1054,133 @@ test('T-H3: mit den Standardwerten steuert das Netz nie (Kontrolle)', async () =
   pruefeGleich(r.wDefault, 10, 'netWarmup hat den Default 10');
   pruefeGleich(r.mb, 0, 'die Seite läuft mit netMaxBlend 0');
   pruefeGleich(r.werte.join(','), '0,0,0,0,0,0,0', 'blendWeight ist für jede Spielzahl 0');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+/* UI-2 und UI-3. Die Stellung fuer T-S1: alles Schwarz ausser zwei Augen, also
+   Flaeche 361 zu 0 und Territory 2 zu 0 -- damit unterscheiden sich die beiden
+   Wertungen deutlich (353,5 gegen -5,5). */
+async function wertungsStellung(s) {
+  return s.evaluate(() => {
+    for (let i = 0; i < state.board.length; i++) state.board[i] = 1;
+    state.board[idx(0, 0)] = 0; state.board[idx(2, 0)] = 0;
+    state.currentPlayer = 1; state.consecutivePasses = 0;
+  });
+}
+
+test('T-S1: Wertungswechsel nach Spielende rechnet die Anzeige neu', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  await wertungsStellung(s);
+  const r = await s.evaluate(() => {
+    const re = t => { const m = /RE\[([^\]]*)\]/.exec(t); return m ? m[1] : '(kein RE)'; };
+    pass(); pass();                                        /* Spielende */
+    const vor = {anzeige: document.getElementById('final-score').textContent,
+      label: document.getElementById('final-label').textContent, sgf: re(buildSGF())};
+    document.querySelector('.scoring-btn[data-scoring="territory"]').click();
+    return {vor, nach: {anzeige: document.getElementById('final-score').textContent,
+      label: document.getElementById('final-label').textContent, sgf: re(buildSGF())},
+      ende: state.gameOver, resign: state.resignedBy};
+  });
+  await ctx.close();
+  pruefe(r.ende, 'Vorbedingung: das Spiel ist beendet');
+  pruefe(!r.resign, 'Vorbedingung: keine Aufgabe');
+  pruefeGleich(r.vor.anzeige, 'Schwarz +353.5', 'Area-Anzeige vor dem Wechsel');
+  pruefeGleich(r.vor.sgf, 'B+353.5', 'SGF vor dem Wechsel');
+  pruefeGleich(r.nach.anzeige, 'Weiß +5.5', 'Anzeige folgt der Wertung');
+  pruefeGleich(r.nach.label, 'Territory (Komi 7.5)', 'Label folgt der Wertung');
+  pruefeGleich(r.nach.sgf, 'W+5.5', 'SGF nach dem Wechsel');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-S2: nach Aufgabe bleibt die Aufgabe-Anzeige stehen (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const r = await s.evaluate(() => {
+    const re = t => { const m = /RE\[([^\]]*)\]/.exec(t); return m ? m[1] : '(kein RE)'; };
+    /* Aufgabe der KI auf dem Weg, den applyAIResult nimmt */
+    state.aiEnabled = false; state.aiColor = 2;
+    placeStone(0, 0);
+    state.currentPlayer = 2; state.aiRequestId = 3;
+    applyAIResult({type: 'resign', info: 'Test'}, 3, null, null, null);
+    const vor = {anzeige: document.getElementById('final-score').textContent,
+      label: document.getElementById('final-label').textContent, sgf: re(buildSGF())};
+    document.querySelector('.scoring-btn[data-scoring="territory"]').click();
+    return {vor, nach: {anzeige: document.getElementById('final-score').textContent,
+      label: document.getElementById('final-label').textContent, sgf: re(buildSGF())},
+      resign: state.resignedBy};
+  });
+  await ctx.close();
+  pruefeGleich(r.resign, 2, 'Vorbedingung: Weiß hat aufgegeben');
+  pruefeGleich(r.vor.label, 'Aufgabe', 'Label vor dem Wechsel');
+  pruefeGleich(r.nach.label, 'Aufgabe', 'Label bleibt Aufgabe');
+  pruefeGleich(r.nach.anzeige, r.vor.anzeige, 'Anzeige unverändert');
+  pruefeGleich(r.nach.sgf, 'B+R', 'SGF bleibt RE[B+R]');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+/* T-V1/T-V2: Die Marken der Vorschau zeigen TOTE Steine, nicht Gebiet. Ohne
+   toten Klumpen malt sie nichts, und der Test waere gruen, ohne etwas zu
+   pruefen (Vorabfestlegung §3). Deshalb drei weisse Steine in der Mitte und
+   eine ausdrueckliche Pruefung der Markenzahl. */
+async function vorschauStellung(s) {
+  return s.evaluate(() => {
+    for (let i = 0; i < state.board.length; i++) state.board[i] = 1;
+    state.board[idx(0, 0)] = 0; state.board[idx(2, 0)] = 0;
+    for (const [x, y] of [[9, 9], [9, 10], [10, 9]]) state.board[idx(x, y)] = 2;
+    state.currentPlayer = 1; state.consecutivePasses = 0;
+    drawStateToCache(); render();
+    vorschauOeffnen();
+    let marken = 0;
+    if (state.vorschau) for (let i = 0; i < 361; i++)
+      if (state.vorschau.v.bewiesenTot[i] || state.vorschau.v.geschaetztTot[i]) marken++;
+    return {offen: !!state.vorschau, marken, mitVorschau: canvas.toDataURL()};
+  });
+}
+
+test('T-V1: ein Pass räumt die Marken der Zählvorschau vom Brett', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const v = await vorschauStellung(s);
+  const r = await s.evaluate(mitVorschau => {
+    document.getElementById('btn-pass').click();
+    const nachPass = canvas.toDataURL();
+    drawStateToCache(); render();
+    return {gleichVorschau: nachPass === mitVorschau, gleichNeuaufbau: nachPass === canvas.toDataURL(),
+      vorschauWeg: !state.vorschau, zuege: state.moveCount};
+  }, v.mitVorschau);
+  await ctx.close();
+  pruefe(v.offen, 'Vorbedingung: die Vorschau war offen');
+  pruefeGleich(v.marken, 3, 'Vorbedingung: drei Marken auf dem Brett');
+  pruefeGleich(r.zuege, 1, 'ein Pass gezählt');
+  pruefe(r.vorschauWeg, 'die Vorschau ist verworfen');
+  pruefe(!r.gleichVorschau, 'das Bild zeigt die Marken nicht mehr');
+  pruefe(r.gleichNeuaufbau, 'das Bild gleicht dem sauberen Neuaufbau');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-V2: ein Zug räumt die Marken auch (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const v = await vorschauStellung(s);
+  const r = await s.evaluate(mitVorschau => {
+    /* Denselben Weg wie der Canvas-Klick nehmen (index.html Z. 6721):
+       placeStone aktualisiert den Cache, erst render() malt ihn aufs Canvas.
+       Ohne render() prueft der Test ein veraltetes Bild. */
+    const gesetzt = placeStone(0, 0);                      /* freier Punkt (Auge) */
+    render();
+    const nachZug = canvas.toDataURL();
+    drawStateToCache(); render();
+    return {ok: gesetzt.ok, gleichVorschau: nachZug === mitVorschau,
+      gleichNeuaufbau: nachZug === canvas.toDataURL(), vorschauWeg: !state.vorschau};
+  }, v.mitVorschau);
+  await ctx.close();
+  pruefe(v.offen, 'Vorbedingung: die Vorschau war offen');
+  pruefeGleich(v.marken, 3, 'Vorbedingung: drei Marken auf dem Brett');
+  pruefe(r.ok, 'der Zug wurde gesetzt');
+  pruefe(r.vorschauWeg, 'die Vorschau ist verworfen');
+  pruefe(!r.gleichVorschau, 'das Bild zeigt die Marken nicht mehr');
+  pruefe(r.gleichNeuaufbau, 'das Bild gleicht dem sauberen Neuaufbau');
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 
