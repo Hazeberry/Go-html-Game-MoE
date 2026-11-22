@@ -179,6 +179,11 @@ Divergenzpfad false liefert und `reset()` an die Reihe kommt), ein KI-Zug mit ec
 Keine Seitenfehler in beiden Läufen. Prüfsummen: `shared-go-logic` und `worker-ai` byteidentisch, `policy-net` wie in
 §1 angegeben.
 
+**Bestehende Tests, wegen des geänderten Engine-Blocks vollständig:** `node tests/run.js <prototyp>` ergibt **alle 60
+Testdateien bestanden**, Exit 0 — darunter `tests/nan-guards.js` („NaN-Schutz in MCTS/PUCT und Policy-Netz", 11 Tests)
+und `tests/browser-nan.js` („NaN-Schutz im echten Browser"), also genau die Dateien, die den Divergenz- und
+Speicherpfad prüfen, sowie `tests/training-stability.js` und `tests/browser-ui.js` (42 Tests).
+
 **Grenzen:** Nur Chromium 153 headless. Die Sperre ist durch Überschreiben von `Storage.prototype.removeItem`
 erzeugt, nicht durch ein echtes privates Fenster oder blockierte Site-Daten. Die Divergenz ist durch ein gesetztes
 NaN erzwungen, nicht erspielt. Keine Partie gegen einen Gegner, keine Spielstärkemessung.
