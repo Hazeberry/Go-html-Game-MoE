@@ -64,18 +64,22 @@ Zwei Einfügungen, nichts wird entfernt.
     if (r.ok && netPriors && globalThis.policyNet && !policyNet._trained) {
 ```
 
-**(b) Das Undo am Spielende sagt es** (`undo`): `warEnde` zu Beginn merken, weil Z. 5691 `state.gameOver` aus `prev`
-überschreibt, und die Zeile **nach** `state.log.splice` (Z. 5695) schreiben, sonst wird sie weggeschnitten:
+**(b) Jedes Undo einer gelernten Partie sagt es** (`undo`), geschrieben **nach** `state.log.splice` (Z. 5695), sonst
+wird die Zeile weggeschnitten:
 
 ```js
-  const warEnde = state.gameOver;
-  …
   /* Die Partie ist beim ersten Abschluss gelernt und bleibt es; was jetzt
-     folgt, geht nicht mehr ins Training (TRAIN-1, Variante a). Das steht im
-     Protokoll, damit es keine stille Festlegung ist. */
-  if (warEnde && !state.gameOver && globalThis.policyNet && policyNet._trained)
+     folgt, geht nicht mehr ins Training (TRAIN-1, Variante a). Die Zeile steht
+     nach JEDEM Undo einer gelernten Partie: undo kürzt das Protokoll auf
+     prev.logLength, und ein nur einmal geschriebener Hinweis wäre beim nächsten
+     Undo wieder weg, obwohl die Festlegung weiter gilt. */
+  if (globalThis.policyNet && policyNet._trained)
     state.log.push('! Partie ist bereits gelernt — die Fortsetzung geht nicht ins Training.');
 ```
+
+Keine Prüfung auf „war das Spiel beendet": `saveUndoState` läuft nur in `placeStone` und `pass`, und dort war das
+Spiel noch offen — nach einem Undo ist `state.gameOver` deshalb immer false. Die Bedingung `policyNet._trained`
+allein trifft genau die Partien, für die die Aussage gilt.
 
 **Unverändert:** `showFinalScore`, der Aufgabe-Pfad, `trainGame`, `resetGame`, `_trained` selbst. Die Engine ohnehin
 (§1).
@@ -85,8 +89,10 @@ Zwei Einfügungen, nichts wird entfernt.
   Spielfluss nicht.
 - **Der Puffer wird beim Undo nicht eigens geleert.** Er ist nach `trainGame` leer, und mit (a) füllt er sich nicht
   mehr. Ein zusätzliches Leeren wäre eine Zeile ohne Wirkung.
-- **Mehrfaches Undo im Spielende-Zustand schreibt die Zeile nur einmal**, weil sie an `warEnde && !state.gameOver`
-  hängt: Beim zweiten Undo ist `state.gameOver` schon false.
+- **Die Zeile wird bei jedem Undo neu geschrieben**, nicht nur beim ersten. Das ist nicht Redundanz, sondern nötig:
+  `undo` kürzt das Protokoll auf `prev.logLength` (Z. 5695), und ein nur beim ersten Mal geschriebener Hinweis
+  verschwindet beim nächsten Undo wieder — gemessen (§6). Weil jedes Undo zuerst kürzt und dann schreibt, steht am
+  Ende immer genau eine Zeile.
 
 **Erwogen und verworfen:**
 - *`_trained` beim Undo zurücksetzen.* Das wäre Variante (b) oder eine halbe Fassung davon: Die Gewichtsänderung des
@@ -113,11 +119,16 @@ Der erste Entwurf dieses Prüfskripts hatte genau diesen Fehler (§6).
 |---|---|---|
 | T-T1 | Zwei KI-Züge mit echten Eingaben, Spielende durch zwei Pässe, Undo, dann ein weiterer KI-Zug: Der Puffer bleibt **leer**; `_trained` bleibt true, `gamesPlayed` 1, keine Divergenz | scheitert: Puffer 1 |
 | T-T2 | Derselbe Ablauf, danach ein zweites Spielende: weiter **ein** Trainingsaufruf und `gamesPlayed` 1, Puffer leer | scheitert am Puffer (1 statt 0); die Trainingszahlen stimmen dort schon |
-| T-T3 | Nach dem Undo am Spielende steht „Partie ist bereits gelernt" im Protokoll; ein zweites Undo schreibt sie nicht erneut | scheitert: keine Zeile |
-| T-T4 | Nach „Neues Spiel" ist `_trained` false, und ein KI-Zug landet wieder im Puffer | besteht (Kontrolle: das Sammeln ist nicht dauerhaft abgeschaltet) |
-| T-T5 | Ein Undo **ohne** vorheriges Spielende schreibt die Zeile nicht | besteht (Kontrolle) |
+| T-T3 | Nach dem Undo am Spielende steht „Partie ist bereits gelernt" im Protokoll — und **nach einem zweiten Undo steht sie noch da** (genau einmal) | scheitert: keine Zeile |
+| T-T4 | Nach Aufgabe der KI und einem Undo steht die Zeile ebenfalls, und `_trained` bleibt true | scheitert: keine Zeile |
+| T-T5 | Nach „Neues Spiel" ist `_trained` false, und ein KI-Zug landet wieder im Puffer | besteht (Kontrolle: das Sammeln ist nicht dauerhaft abgeschaltet) |
+| T-T6 | Ein Undo **ohne** vorheriges Spielende schreibt keine Zeile und kürzt den Puffer wie bisher | besteht (Kontrolle) |
 
-T-T1 bis T-T3 müssen am alten Code fehlschlagen und am neuen bestehen. T-T4 und T-T5 bestehen an beiden.
+**Die Prüfung „nach einem zweiten Undo steht sie noch da" ist der Kern von T-T3.** Ein Test, der nur verlangt, dass
+die Zeile nicht doppelt erscheint, würde den Fehler aus §6 nicht finden — er bestand am ersten Entwurf, obwohl die
+Zeile dort beim zweiten Undo verschwand.
+
+T-T1 bis T-T4 müssen am alten Code fehlschlagen und am neuen bestehen. T-T5 und T-T6 bestehen an beiden.
 
 ## 5. Abnahme
 
@@ -161,6 +172,34 @@ Spalten). Der Prototyp beendet das Sammeln nach dem Abschluss und macht die Fest
 funktioniert nach „Neues Spiel" unverändert.
 
 **Bestehende Tests:** `node tests/browser-ui.js <prototyp>` ergibt **42 bestanden, 0 fehlgeschlagen**.
+
+### Nachprüfung auf Lücken (22.11.2026, auf Bitte von Hazeberry)
+
+Drei weitere Wege wurden geprüft, und einer davon hat den Entwurf geändert.
+
+**Gefunden und behoben: Die Protokollzeile verschwand beim zweiten Undo.** Der erste Entwurf schrieb sie nur, wenn das
+Undo ein Spielende aufhob (`warEnde && !state.gameOver`). Gemessen: Nach dem ersten Undo stand sie da, nach einem
+zweiten war sie **weg** — weil `undo` das Protokoll auf `prev.logLength` kürzt (Z. 5695) und der Hinweis beim zweiten
+Mal nicht neu geschrieben wurde. Der Zustand galt weiter (`_trained` true, keine Fortsetzung im Training), die
+Information war fort. §3 schreibt die Zeile deshalb jetzt bei **jedem** Undo einer gelernten Partie. Gemessen danach:
+eine Zeile nach dem ersten Undo, eine nach dem zweiten.
+
+**Bemerkenswert daran:** Der zuerst geplante Test T-T3 („ein zweites Undo schreibt sie nicht erneut") hätte am ersten
+Entwurf **bestanden** und den Fehler verdeckt. §4 verlangt jetzt das Gegenteil: dass die Zeile nach dem zweiten Undo
+noch da ist.
+
+**Geprüft und in Ordnung: der Aufgabe-Pfad.** Nach Aufgabe der KI (`applyAIResult`, Z. 5960) und einem Undo ist
+`_trained` true, `resignedBy` zurückgesetzt, das Spielende aufgehoben — und die Zeile steht (alter Code: keine Zeile).
+Die Aufgabe hat keinen eigenen Undo-Eintrag; das Undo nimmt den letzten Menschenzug zurück, und das genügt für die
+Bedingung.
+
+**Geprüft und in Ordnung: das Undo ohne Spielende.** `_trained` ist dort false, also keine Zeile, und der Puffer wird
+wie bisher auf `prev.netBufLen` gekürzt (1 → 0). An beiden Ständen gleich.
+
+**Geprüft und in Ordnung: der Worker.** Der Worker baut sich ein eigenes `policyNet`-Objekt mit leerem `_gameBuffer`
+und ohne `_trained` (Z. 6018 bis 6023). Beide Änderungen aus §3 sitzen im Hauptskript (`applyAIResult`, `undo`) und
+laufen nie im Worker; `getAIMove` selbst schiebt nichts in den Puffer (Kommentar Z. 5626 f.). `applyAIResult` bleibt
+damit die einzige Stelle, die füllt — alle `_gameBuffer`- und `_trained`-Vorkommen wurden dafür einzeln durchgesehen.
 
 **Ein Fehler im ersten Prüfskript, hier festgehalten, weil er das Ergebnis unbrauchbar gemacht hätte:** Der erste
 Aufbau übergab `new Float32Array(4)` als `inp`, `probs` und `hidden`. Damit divergierte das Training, `trainGame` lief
