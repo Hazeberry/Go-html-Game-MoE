@@ -5760,6 +5760,12 @@ function pass() {
     state.gameOver = true; state.log.push('— Spiel beendet (2× Pass) —');
     resolveLifeAndDeath(); showFinalScore();
   } else state.currentPlayer = opp;
+  /* Wie placeStone: der Cache muss den neuen Zustand zeigen, sonst bleiben die
+     Marken der Zählvorschau nach einem Pass sichtbar — drawStateToCache ruft
+     selbst vorschauAbgleichen und malt sie nur bei gültiger Vorschau (UI-3).
+     Bei zwei Pässen zeichnet resolveLifeAndDeath schon; der Aufruf hängt allein
+     am Zustand und liefert dasselbe Bild. */
+  drawStateToCache();
   updateUndoButton();
 }
 
@@ -5858,7 +5864,7 @@ function finalTerritoryScore() {
   return territory;
 }
 
-function showFinalScore() {
+function endstandAnzeigen() {
   let scoreB, scoreW, winner, diff, label;
   if (state.scoringMode === 'territory') {
     const t = finalTerritoryScore();
@@ -5877,6 +5883,13 @@ function showFinalScore() {
   document.getElementById('final-label').textContent = label;
   document.getElementById('final-score').textContent = state.finalMargin;
   document.getElementById('territory-panel').style.display = 'flex';
+}
+
+/* Spielende: zuerst die Anzeige, dann einmal je Partie das Training. Getrennt,
+   damit ein Wertungswechsel nur die Anzeige neu rechnet (UI-2,
+   docs/korrektur-ui2-ui3-vorabfestlegung.md §4). */
+function showFinalScore() {
+  endstandAnzeigen();
   /* PolicyNet-Training bleibt bewusst auf Area-Scoring — das Netz wurde
      durchgängig darauf kalibriert; ein Wechsel der Anzeige-Wertung soll
      die gelernte Skala nicht verschieben. */
@@ -6779,6 +6792,11 @@ document.querySelectorAll('.scoring-btn').forEach(btn=>btn.addEventListener('cli
   document.querySelectorAll('.scoring-btn').forEach(b=>b.classList.remove('active'));
   this.classList.add('active');state.scoringMode=this.dataset.scoring;
   vorschauSchliessen();   /* Zählvorschau gilt nur für die Wertung, mit der sie gerechnet wurde */
+  /* Nach Spielende die angezeigte Endpunktzahl in der neuen Wertung neu
+     rechnen; buildSGF tut das ohnehin bei jedem Aufruf (UI-2). Bei Aufgabe
+     nicht: dort steht im SGF RE[+R] ohne Wertungsrechnung, und der angezeigte
+     Stand gehört zu der Wertung, mit der er gerechnet wurde. */
+  if (state.gameOver && !state.resignedBy) endstandAnzeigen();
 }));
 
 document.getElementById('btn-pass').addEventListener('click',()=>{

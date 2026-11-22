@@ -1,6 +1,6 @@
 # Korrektur UI-2 und UI-3: Vorabfestlegung
 
-**Stand: 22.11.2026. Status: Entwurf, nicht umgesetzt.** Befunde aus `docs/bughunt-wiederholung.md` §5 (UI-2, UI-3),
+**Stand: 22.11.2026. Status: umgesetzt (§9), Abnahme gültig.** Befunde aus `docs/bughunt-wiederholung.md` §5 (UI-2, UI-3),
 am heutigen Code bestätigt. Go von Hazeberry am 22.11.2026: „UI-2, UI-3".
 
 Dieses Doc enthält Vorgaben für die Umsetzung. Hazeberry liest es vor dem Merge. Die Umsetzung folgt danach in einem
@@ -206,3 +206,35 @@ UI-2 ist im Prototyp nicht eigens geprüft; dafür ist T-S2 vorgesehen. Keine Pa
 2. Umsetzung in einem eigenen PR nach eigenem Go: Code nach §4, Tests nach §5, `tests/README.md`, Nachtrag hier mit
    den Ergebnissen aus §6 und eine Zeile in `docs/bughunt-20261116.md` §3.
 3. CI grün, Merge, kurzer Bericht mit den löschbaren Branches.
+
+## 9. Nachtrag: Umsetzung und Abnahme (22.11.2026)
+
+Hazeberry, nach grüner CI von #345: „Go". Die Umsetzung folgt §4 und §5 ohne Abweichung. Geändert sind `index.html`
+(Anzeigeteil als `endstandAnzeigen`, eine Zeile im Handler der Wertungsknöpfe, ein Aufruf in `pass`),
+`tests/browser-ui.js` (T-S1, T-S2, T-V1, T-V2 und der Kommentarkopf) und `tests/README.md`.
+
+**Abnahme nach §6:**
+
+1. **Prüfsummen und Standardwerte:** Die drei Engine-Blöcke haben die Prüfsummen aus §1, nach der Änderung
+   nachgerechnet. Der Diff enthält keine Parameterzeile; `PARAMS_DEFAULT` ist unverändert. Erfüllt.
+2. **Neue Tests:** Am alten Code (`index.html` SHA-256 `334166b0…`, Stand `3407ea8`) schlagen T-S1 und T-V1 fehl,
+   T-S2 und T-V2 bestehen dort (40 bestanden, 2 fehlgeschlagen). Am neuen Code bestehen alle 42 Tests der Datei.
+   Erfüllt.
+   - T-S1 scheitert am alten Code an „Anzeige folgt der Wertung: erwartet Weiß +5.5, bekommen Schwarz +353.5".
+   - T-V1 scheitert an „das Bild zeigt die Marken nicht mehr".
+3. **Bestehende Tests:** unverändert übernommen; die 38 bestehen am neuen Code. Erfüllt.
+4. **Testsuite:** `node tests/run.js` mit Browser-Tests, Ergebnis unten. Die CI steht im PR.
+5. **Prüfskript:** `auswertung/bughunt-20261116/pruefung.js` am neuen Code: 1 von 13 reproduziert, nämlich B-2 — das
+   Soll. Daten: `docs/daten/bughunt-20261116/nach-ui2-ui3.json`, Konsole `nach-ui2-ui3-konsole.txt`. Erfüllt.
+
+Neue `index.html`: SHA-256 `7cef50aa4c82825b9e102637d8c07e396cd904d2e93601b10a946b95e4af5c77`.
+
+**Ein Fehler im ersten Testentwurf, hier festgehalten, weil er eine Kontrolle rot gemacht hat:** T-V2 rief
+`placeStone` ohne `render()`. `placeStone` baut den Cache neu auf, aber erst `render()` malt ihn aufs Canvas — der
+Test verglich also ein veraltetes Bild und schlug am alten Code fehl, obwohl er dort bestehen sollte. Der echte
+Klickweg ist `placeStone(col,row); render();` (`index.html` Z. 6721); T-V2 nimmt jetzt denselben Weg. Der Befund UI-3
+war davon nicht berührt — T-V1 klickt den Pass-Knopf, der `render()` selbst ruft.
+
+**Grenzen:** Nur Chromium 153 headless. Die Stellungen sind synthetisch gesetzt, nicht erspielt. T-S2 löst die
+Aufgabe über `applyAIResult` aus, nicht über eine echte Suche. Die Zugwahl ist unverändert, es gibt also nichts zu
+messen.
