@@ -29,6 +29,14 @@ für `policy-net` die neuere Zahl.
 (`docs/korrektur-dash1-vorabfestlegung.md` §1 und §8). `shared-go-logic` und `worker-ai` sind weiter
 unverändert. **Diese Zahl ist die aktuelle.**
 
+**Nachtrag 23.11.2026, zweiter:** Für `worker-ai` endet die obige Zahl mit `evalStreuung`
+(`docs/eval-streuung-vorabfestlegung.md`). Seither lautet die Prüfsumme
+`3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9`. Das ist die **erste** Änderung an
+`worker-ai` seit diesem Dokument; `shared-go-logic` und `policy-net` sind unverändert. Die Änderung ist ein
+Parameter mit Default 1 und vier Multiplikationen mit ihm; bei 1 ist das Verhalten bitgleich, geprüft in
+`tests/eval-streuung.js` und durch den Engine-Vergleich in Actions. Wer hier nachschlägt, nimmt für `worker-ai`
+und für `policy-net` jeweils die neuere Zahl; für `shared-go-logic` gilt die aus der Tabelle.
+
 Deshalb gibt es **keinen Schalter** und **keinen Messlauf**. Im normalen Spielverlauf bekommt die Suche dieselben
 Anfragen wie vorher. Abweichungen gibt es nur in zwei Fällen:
 - **D-1:** Die Engine bekommt den Wert, der im Dashboard tatsächlich eingegeben wurde.
