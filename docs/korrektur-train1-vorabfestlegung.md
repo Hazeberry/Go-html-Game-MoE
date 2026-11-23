@@ -222,3 +222,65 @@ Suche. Keine Partie gegen einen Gegner, keine Spielstärkemessung — das Traini
 2. Umsetzung in einem eigenen PR nach eigenem Go: Code nach §3, Tests nach §4, `tests/README.md`, Nachtrag hier mit
    den Ergebnissen aus §5 und eine Zeile in `docs/bughunt-20261116.md` §3.
 3. CI grün, Merge, kurzer Bericht mit den löschbaren Branches.
+
+## 8. Nachtrag: Umsetzung und Abnahme (23.11.2026)
+
+Hazeberry: Go für die Liste, TRAIN-1 als erster Punkt. Die Umsetzung folgt §3 und §4 ohne Abweichung in der Sache.
+Node v22.23.5, Chromium headless, lokal; kein Messlauf.
+
+### 8.1 Die fünf Abnahmepunkte
+
+1. **Die drei Engine-Blöcke sind byteidentisch, `PARAMS_DEFAULT` ist unverändert.** Gemessen vor und nach der
+   Änderung: `shared-go-logic` `54dfef2d…`, `worker-ai` `f847c124…`, `policy-net` `b0040fe8…`. **Hinweis zur
+   Referenz:** §1 verweist auf `docs/korrektur-d1-w1-vorabfestlegung.md` §1 „am Stand `e2cd3c4` gültig". Dort nennt
+   der Nachtrag vom 22.11. für `policy-net` seit NET-1 die neuere Zahl `b0040fe8…`; die hier gemessene stimmt damit.
+   Der Diff an `index.html` besteht aus genau den zwei Einfügungen aus §3 (10 Zeilen dazu, eine ersetzt), keine
+   `PARAMS`-Zeile ist berührt.
+2. **T-T1 bis T-T4 schlagen am alten Code fehl und bestehen am neuen; T-T5 und T-T6 bestehen an beiden.** Gemessen
+   durch zwei Läufe von `tests/browser-ui.js`, einmal gegen den `index.html` am Stand `f26dd19`: **alt 46 von 50
+   bestanden**, neu **50 von 50**. Die vier Fehlschläge am alten Stand sind genau die vorhergesagten:
+
+   | Test | Meldung am alten Code | §4 hatte vorhergesagt |
+   |---|---|---|
+   | T-T1 | `der Puffer bleibt LEER: erwartet 0, bekommen 1` | „scheitert: Puffer 1" ✓ |
+   | T-T2 | `der Puffer ist leer: erwartet 0, bekommen 1` | „scheitert am Puffer (1 statt 0); die Trainingszahlen stimmen dort schon" ✓ — die Prüfungen auf einen Trainingsaufruf und `gamesPlayed` 1 liefen davor durch |
+   | T-T3 | `nach dem ersten Undo steht die Zeile einmal: erwartet 1, bekommen 0` | „scheitert: keine Zeile" ✓ |
+   | T-T4 | `nach dem Undo steht sie: erwartet 1, bekommen 0` | „scheitert: keine Zeile" ✓ |
+
+   **Berichtigung an §5 Nr. 2:** Dort steht „T-T1 bis T-T3 schlagen am alten Code fehl …; T-T4 und T-T5 bestehen an
+   beiden". Das widerspricht §4 („T-T1 bis T-T4 …; T-T5 und T-T6") und ist gemessen falsch: **T-T4 scheitert am
+   alten Code.** §4 ist die genauere Stelle; §5 Nr. 2 war beim Hinzufügen von T-T4 offenbar nicht mitgezogen.
+3. **Die bestehenden Tests in `tests/browser-ui.js` sind unverändert und bestehen**, darunter die beiden in §5
+   genannten. **Berichtigung an §5 Nr. 3:** Dort steht „heute sind das 42 ausgeführte Tests". Das galt am Stand
+   `e2cd3c4`; NET-1 hat T-N3 und T-N4 ergänzt, es sind also **44** bestehende. Mit den sechs neuen führt die Datei
+   jetzt **50** Tests aus.
+4. **`node tests/run.js` lokal: alle 60 Testdateien bestanden**, `tests/training-stability.js` darunter. CI: siehe PR.
+5. **`auswertung/bughunt-20261116/pruefung.js` am neuen Code: weiter 1 von 13 reproduziert, nämlich B-2.** Abgelegt
+   als `docs/daten/bughunt-20261116/nach-train1.json` mit `nach-train1-konsole.txt`; beide in `SHA256SUMS` ergänzt,
+   und `sha256sum -c` bestätigt alle 39 Einträge.
+
+### 8.2 Eine Vorgabe, die den Test tragfähig gemacht hat
+
+§4 verlangt echte Netzeingaben statt Attrappen, und das hat sich bewährt: Die Tests bauen ihre Puffer-Einträge mit
+`policyNet.boardToInput` und `policyNet.forward` wie der echte Aufrufer (`index.html` Z. 6221 f.). T-T1 prüft
+zusätzlich `_divergences` 0 und `_healthy` true — wäre der Divergenzpfad gelaufen, hätte `reset()` `gamesPlayed` auf
+0 und `_trained` auf false gesetzt, und der Test hätte die Divergenz-Mechanik geprüft statt TRAIN-1.
+
+**Ein eigener Fehler beim Schreiben, offen notiert:** T-T1 las zuerst `state.currentPlayer` **nach** dem
+Fortsetzungszug und verlangte 2. Richtig ist 1, weil der Zug den Spieler wechselt; gemessen war der Zustand nach dem
+Undo genau wie erwartet. Der Test liest die Größe jetzt vor dem Fortsetzungszug und prüft zusätzlich
+`state.board[idx(17, 17)] === 2`. Ohne diese Prüfung wäre der leere Puffer nichtssagend gewesen: ein nicht
+stattgefundener Zug füllt ihn auch nicht.
+
+### 8.3 Geändert
+
+`index.html` (die zwei Einfügungen aus §3), `tests/browser-ui.js` (T-T1 bis T-T6), `tests/README.md`, dieses Doc,
+`docs/bughunt-20261116.md` §3 (nach §7 Nr. 2) und die beiden Prüfdateien unter `docs/daten/bughunt-20261116/` samt
+`SHA256SUMS`.
+
+### 8.4 Was offen bleibt
+
+- **TRAIN-2** steht weiter im Code, ohne Vorabfestlegung.
+- Kein Messlauf, und keiner nötig: Das Training ändert sich nicht (§1), und bei `netMaxBlend` 0 wirkt das PolicyNet
+  nicht auf die Zugwahl. Eine Wirkung auf die Spielstärke ist weder behauptet noch geprüft.
+- Die Zeile im Protokoll ist deutsch und fest verdrahtet, wie der übrige Protokolltext.

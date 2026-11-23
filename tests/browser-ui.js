@@ -1263,6 +1263,185 @@ test('T-N4: Divergenz im Aufgabe-Pfad mit gesperrtem localStorage bricht nicht a
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 
+/* ══ TRAIN-1, Variante a ═════════════════════════════════════
+   docs/korrektur-train1-vorabfestlegung.md, Tests nach §4. Eine Partie wird
+   genau einmal gelernt; nach dem Abschluss wird nicht mehr gesammelt, und jedes
+   Undo einer gelernten Partie sagt es im Protokoll.
+
+   §4 gibt eine Vorgabe zum Aufbau, die den Test erst tragfaehig macht: Die
+   Puffer-Eintraege muessen ECHTE Netzeingaben tragen (boardToInput und forward).
+   Mit Attrappen rechnet _backward Unsinn, _badWeight schlaegt an, und trainGame
+   laeuft in den Divergenzpfad, der reset() aufruft — gamesPlayed 0 und _trained
+   false. Der Test pruefte dann die Divergenz-Mechanik statt TRAIN-1. */
+const t1Init = () => {
+  globalThis.t1KiZug = (x, y, reqId) => {
+    const lm = state.lastMove !== null ? {x: xOf(state.lastMove), y: yOf(state.lastMove)} : null;
+    const inp = policyNet.boardToInput(state.board, state.aiColor, lm, state.koPoint);
+    const {probs, hidden} = policyNet.forward(inp);
+    state.aiRequestId = reqId;
+    applyAIResult({type: 'stone', x, y}, reqId, inp, probs, hidden);
+  };
+  globalThis.t1Zeilen = () => state.log.filter(z => /bereits gelernt/.test(z)).length;
+};
+
+/* Zwei KI-Zuege mit echten Eingaben, dann Spielende durch zwei Paesse.
+   showFinalScore setzt _trained und ruft trainGame: der Puffer wird geleert,
+   gamesPlayed steht auf 1. Danach hebt ein Undo das Spielende auf. */
+const t1BisUndo = `
+  state.aiEnabled = false; state.aiColor = 2;
+  const aufrufe = [], echt = policyNet.trainGame.bind(policyNet);
+  policyNet.trainGame = x => { aufrufe.push(x); return echt(x); };
+  placeStone(3, 3);                       /* Mensch, Schwarz */
+  t1KiZug(15, 15, 1);                     /* KI, Weiss */
+  placeStone(4, 4);
+  t1KiZug(16, 16, 2);
+  const vorEnde = policyNet._gameBuffer.length;
+  pass();                                 /* Schwarz passt */
+  pass();                                 /* Weiss passt → Spielende, Training */
+  const nachEnde = {puffer: policyNet._gameBuffer.length, trained: policyNet._trained,
+                    spiele: policyNet.gamesPlayed, aufrufe: aufrufe.length};
+  undo();                                 /* hebt den zweiten Pass auf */
+`;
+
+test('T-T1: nach dem Abschluss sammelt die Fortsetzung nicht mehr', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(t1Init);
+  const r = await s.evaluate(`(() => {
+    ${t1BisUndo}
+    const nachUndo = {amZug: state.currentPlayer, beendet: state.gameOver};
+    t1KiZug(17, 17, 3);                   /* Fortsetzung nach dem Undo */
+    return {vorEnde, nachEnde, nachUndo, nachFortsetzung: policyNet._gameBuffer.length,
+            gesetzt: state.board[idx(17, 17)], trained: policyNet._trained,
+            spiele: policyNet.gamesPlayed, divergenzen: policyNet._divergences,
+            gesund: policyNet._healthy};
+  })()`);
+  await ctx.close();
+  pruefeGleich(r.vorEnde, 2, 'zwei KI-Zuege im Puffer');
+  pruefeGleich(r.nachEnde.puffer, 0, 'das Training hat den Puffer geleert');
+  pruefeGleich(r.nachEnde.spiele, 1, 'eine Partie gezaehlt');
+  pruefeGleich(r.nachUndo.beendet, false, 'das Undo hat das Spielende aufgehoben');
+  pruefeGleich(r.nachUndo.amZug, 2, 'nach dem Undo ist die KI am Zug');
+  /* Ohne diese Zeile waere der leere Puffer nichtssagend: ein nicht
+     stattgefundener Zug fuellt ihn auch nicht. */
+  pruefeGleich(r.gesetzt, 2, 'der Fortsetzungszug der KI liegt wirklich auf dem Brett');
+  pruefeGleich(r.nachFortsetzung, 0, 'der Puffer bleibt LEER — das ist der Befund');
+  pruefeGleich(r.trained, true, '_trained bleibt true');
+  pruefeGleich(r.spiele, 1, 'gamesPlayed bleibt 1');
+  pruefeGleich(r.divergenzen, 0, 'keine Divergenz (echte Netzeingaben, §4)');
+  pruefeGleich(r.gesund, true, 'das Netz gilt als gesund');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-T2: ein zweites Spielende lernt nicht erneut, und der Puffer bleibt leer', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(t1Init);
+  const r = await s.evaluate(`(() => {
+    ${t1BisUndo}
+    t1KiZug(17, 17, 3);
+    pass();                               /* Schwarz passt */
+    pass();                               /* Weiss passt → zweites Spielende */
+    return {aufrufe: aufrufe.slice(), puffer: policyNet._gameBuffer.length,
+            spiele: policyNet.gamesPlayed, trained: policyNet._trained,
+            beendet: state.gameOver};
+  })()`);
+  await ctx.close();
+  pruefeGleich(r.beendet, true, 'die Partie ist wieder beendet');
+  pruefeGleich(r.aufrufe.length, 1, 'genau EIN Trainingsaufruf fuer die ganze Partie');
+  pruefeGleich(r.spiele, 1, 'gamesPlayed bleibt 1');
+  pruefeGleich(r.puffer, 0, 'der Puffer ist leer — nichts wurde nutzlos gesammelt');
+  pruefeGleich(r.trained, true, '_trained bleibt true');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-T3: die Zeile steht nach JEDEM Undo einer gelernten Partie, genau einmal', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(t1Init);
+  const r = await s.evaluate(`(() => {
+    ${t1BisUndo}
+    const nachErstem = {zeilen: t1Zeilen(), letzte: state.log[state.log.length - 1]};
+    undo();                               /* zweites Undo: kuerzt das Protokoll erneut */
+    const nachZweitem = {zeilen: t1Zeilen(), letzte: state.log[state.log.length - 1]};
+    return {nachErstem, nachZweitem, trained: policyNet._trained};
+  })()`);
+  await ctx.close();
+  pruefeGleich(r.nachErstem.zeilen, 1, 'nach dem ersten Undo steht die Zeile einmal');
+  pruefe(/bereits gelernt/.test(r.nachErstem.letzte || ''), `als letzte Zeile: ${r.nachErstem.letzte}`);
+  /* Der Kern von T-T3: undo kuerzt auf prev.logLength, ein nur einmal
+     geschriebener Hinweis waere jetzt weg. */
+  pruefeGleich(r.nachZweitem.zeilen, 1, 'nach dem ZWEITEN Undo steht sie noch da, und nur einmal');
+  pruefe(/bereits gelernt/.test(r.nachZweitem.letzte || ''), `wieder als letzte Zeile: ${r.nachZweitem.letzte}`);
+  pruefeGleich(r.trained, true, '_trained bleibt true');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-T4: nach Aufgabe der KI und einem Undo steht die Zeile ebenfalls', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(t1Init);
+  const r = await s.evaluate(() => {
+    state.aiEnabled = false; state.aiColor = 2;
+    placeStone(3, 3);                     /* ein Undo-Eintrag; die Aufgabe hat keinen eigenen */
+    t1KiZug(15, 15, 1);
+    placeStone(4, 4);
+    /* Weiss (KI) gibt auf: der Aufgabe-Pfad in applyAIResult setzt _trained
+       und trainiert mit -1. */
+    state.currentPlayer = 2; state.aiRequestId = 2;
+    applyAIResult({type: 'resign', info: 'Test'}, 2, null, null, null);
+    const nachAufgabe = {trained: policyNet._trained, resignedBy: state.resignedBy, zeilen: t1Zeilen()};
+    undo();
+    return {nachAufgabe, zeilen: t1Zeilen(), letzte: state.log[state.log.length - 1],
+            trained: policyNet._trained, resignedBy: state.resignedBy};
+  });
+  await ctx.close();
+  pruefeGleich(r.nachAufgabe.resignedBy, 2, 'Weiss hat aufgegeben');
+  pruefeGleich(r.nachAufgabe.trained, true, 'der Aufgabe-Pfad hat gelernt');
+  pruefeGleich(r.nachAufgabe.zeilen, 0, 'vor dem Undo steht die Zeile nicht');
+  pruefeGleich(r.zeilen, 1, 'nach dem Undo steht sie');
+  pruefe(/bereits gelernt/.test(r.letzte || ''), `als letzte Zeile: ${r.letzte}`);
+  pruefeGleich(r.trained, true, '_trained bleibt true');
+  pruefeGleich(r.resignedBy, null, 'die Aufgabe gilt nicht mehr');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-T5: nach Neues Spiel wird wieder gesammelt (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(t1Init);
+  const r = await s.evaluate(`(() => {
+    ${t1BisUndo}
+    resetGame();
+    const nachReset = {trained: policyNet._trained, puffer: policyNet._gameBuffer.length};
+    state.aiEnabled = false; state.aiColor = 2;
+    placeStone(3, 3);
+    t1KiZug(15, 15, 4);
+    return {nachReset, puffer: policyNet._gameBuffer.length, zeilen: t1Zeilen()};
+  })()`);
+  await ctx.close();
+  pruefeGleich(r.nachReset.trained, false, 'Neues Spiel setzt _trained zurueck');
+  pruefeGleich(r.nachReset.puffer, 0, 'und leert den Puffer');
+  pruefeGleich(r.puffer, 1, 'der KI-Zug landet wieder im Puffer — nichts ist dauerhaft abgeschaltet');
+  pruefeGleich(r.zeilen, 0, 'im frischen Protokoll steht die Zeile nicht');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-T6: ein Undo ohne Spielende schreibt keine Zeile und kuerzt den Puffer (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(t1Init);
+  const r = await s.evaluate(() => {
+    state.aiEnabled = false; state.aiColor = 2;
+    placeStone(3, 3);
+    t1KiZug(15, 15, 1);
+    const vor = {puffer: policyNet._gameBuffer.length, trained: policyNet._trained};
+    undo();
+    return {vor, puffer: policyNet._gameBuffer.length, zeilen: t1Zeilen(), beendet: state.gameOver};
+  });
+  await ctx.close();
+  pruefeGleich(r.vor.trained, false, 'die Partie ist nicht gelernt');
+  pruefeGleich(r.vor.puffer, 1, 'der KI-Zug ist im Puffer');
+  pruefeGleich(r.puffer, 0, 'das Undo nimmt ihn heraus, wie bisher');
+  pruefeGleich(r.zeilen, 0, 'keine Zeile im Protokoll');
+  pruefeGleich(r.beendet, false, 'kein Spielende');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
 laufeTests('Review-Korrekturen im echten Browser').then(ok => {
   if (!playwright || !chromePfad)
     console.log(`\n  ${PFLICHT ? 'FEHLT' : 'Übersprungen'}: ${!playwright ? 'Playwright' : 'Chromium'} nicht gefunden.`);

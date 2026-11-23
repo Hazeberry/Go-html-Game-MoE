@@ -5693,6 +5693,13 @@ function undo() {
   state.koPoint = prev.koPoint;            // Fix 7
   state.sgfMoves.length = prev.sgfLen;     // SGF-Zugliste mit zurückrollen
   state.log.splice(prev.logLength);
+  /* Die Partie ist beim ersten Abschluss gelernt und bleibt es; was jetzt
+     folgt, geht nicht mehr ins Training (TRAIN-1, Variante a). Die Zeile steht
+     nach JEDEM Undo einer gelernten Partie: undo kürzt das Protokoll auf
+     prev.logLength, und ein nur einmal geschriebener Hinweis wäre beim nächsten
+     Undo wieder weg, obwohl die Festlegung weiter gilt. */
+  if (globalThis.policyNet && policyNet._trained)
+    state.log.push('! Partie ist bereits gelernt — die Fortsetzung geht nicht ins Training.');
   state.hashListe.length = prev.hashLen;
   state.boardHistory = new Set(state.hashListe);
   if (globalThis.policyNet && policyNet._gameBuffer && policyNet._gameBuffer.length > prev.netBufLen)
@@ -5923,7 +5930,9 @@ function applyAIResult(result, reqId, netInp, netPriors, netHidden) {
     /* Erst nach dem gelungenen Zug in den Trainingspuffer: placeStone hat
        dabei den Undo-Eintrag mit der Pufferlänge davor angelegt, und ein
        abgelehnter Zug gehört nicht ins Training. */
-    if (r.ok && netPriors && globalThis.policyNet) {
+    /* Nach dem ersten Abschluss dieser Partie wird nicht mehr gelernt
+       (TRAIN-1, Variante a) — dann auch nicht mehr gesammelt. */
+    if (r.ok && netPriors && globalThis.policyNet && !policyNet._trained) {
       policyNet._gameBuffer.push({
         inp: netInp, probs: netPriors, hidden: netHidden,
         moveIdx: idx(result.x, result.y)

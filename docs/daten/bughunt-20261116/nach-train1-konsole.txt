@@ -1,0 +1,28 @@
+[D-1] nicht reproduziert: Dashboard: gebrochene Eingaben werden abgeschnitten (parseInt)
+    {"abgeschnitten":[],"werte":{"endTieBreak=0.5":{"params":0.5,"feld":"0.5","standard":1,"markiert":true},"endTieBreak=1.5":{"params":1.5,"feld":"1.5","standard":1,"markiert":true},"atariSizeWeight=0.25":{"params":0.25,"feld":"0.25","standard":0,"markiert":true},"raumZug=0.5":{"params":0.5,"feld":"0.5","standard":0,"markiert":true},"raumGewicht=1.5":{"params":1.5,"feld":"1.5","standard":0,"markiert":true},"tsumegoNakade=0.75":{"params":0.75,"feld":"0.75","standard":0.5,"markiert":true}},"betroffeneFelder":[]}
+[D-2] nicht reproduziert: Presets: Werte des vorigen Presets bleiben stehen ([direkt, nach anderem Preset])
+    {"defensivNachAggressiv":{},"aggressivNachAusgewogen":{}}
+[W-1a] nicht reproduziert: Schwer: 5 Klicks auf die Stufe während der Rechnung
+    {"zusatzKlicks":5,"anfragen":1,"msBisZug":1726,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[1979],"budgetMs":[1800],"seitenfehler":[]}
+[W-1b] nicht reproduziert: Schwer: 5 Klicks auf die Farbe während der Rechnung
+    {"zusatzKlicks":5,"anfragen":1,"msBisZug":1727,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[1980],"budgetMs":[1800],"seitenfehler":[]}
+[W-1c] nicht reproduziert: Schwer: 5-mal KI aus und an während der Rechnung
+    {"zusatzKlicks":5,"anfragen":11,"msBisZug":3347,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[2102],"budgetMs":[1800],"seitenfehler":[]}
+[W-1k] nicht reproduziert: Kontrolle: 2 Klicks auf die Stufe (Erwartung: kein Watchdog)
+    {"zusatzKlicks":2,"anfragen":1,"msBisZug":1748,"workerDead":false,"grund":null,"zug":1,"warnungen":[],"dauerMs":[2007],"budgetMs":[1800],"seitenfehler":[]}
+[K-1] nicht reproduziert: Kopieren ohne navigator.clipboard wirft, Rückfall wird nie erreicht
+    {"btn-copy-log":{"beschriftung":"✓","seitenfehler":[]},"btn-bug-report":{"beschriftung":"✓","seitenfehler":[]},"dashExport":"kein Fehler"}
+[K-2] nicht reproduziert: Export: Rückmeldung auf dem falschen Knopf, Beschriftung kann hängen bleiben
+    {"vorher":["💾 Speichern","⬇ Export"],"direktNachExport":["💾 Speichern","✓ Kopiert"],"nachSpeichernUndExport":["💾 Speichern","⬇ Export"]}
+[L-1] nicht reproduziert: Brett passt sich der Fenstergröße nicht an
+    {"vorher":{"canvas":634,"layout":634},"nachher":{"canvas":376,"layout":376,"scrollWidth":400,"innerWidth":400}}
+[R-1] nicht reproduziert: Leicht: wirft getAIMove, bleibt „KI denkt...“ stehen
+    {"aiThinking":false,"rueckgaengigGesperrt":false,"status":"KI aktiv · Weiß · Leicht","zug":2,"seitenfehler":[]}
+[B-1] nicht reproduziert: Dashboard: Feld zeigt den ungeklemmten Wert
+    {"params":5000,"feld":"5000"}
+[B-2] reproduziert: Spielende: toter Stein verschwindet, rotes Kreuz wird nie gezeichnet
+    {"spielende":true,"tote":[5],"steinAufF19":0,"log":["! 1 tote Steine entfernt"]}
+[B-3] nicht reproduziert: Statuszeile zeigt „Beide gepasst.“ nie
+    {"statuszeile":"Beide gepasst."}
+
+1 von 13 Fällen reproduziert
