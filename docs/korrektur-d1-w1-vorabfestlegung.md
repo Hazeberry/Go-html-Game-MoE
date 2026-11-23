@@ -19,6 +19,11 @@ SHA-256 des Inhalts der drei Blöcke am Stand `0f11058` (Prüfung in §5):
 | `worker-ai` | `f847c1247188d8a0c94d269581ae465b7428d601c13afb65dced683d69a366e9` |
 | `policy-net` | `56a5d6c0eb3f122425560fc55ebfb44ee70eda8fb47406a4f354928d5d93a475` |
 
+**Nachtrag 22.11.2026:** Für `policy-net` gilt diese Zahl nur bis zur Korrektur NET-1. Seither lautet die Prüfsumme
+`b0040fe8c0a9eecead4c88b6d9f209846734d98d9a3b2050bffc420b5f2db4d2` (`docs/korrektur-net1-vorabfestlegung.md` §1 und
+§9). `shared-go-logic` und `worker-ai` sind unverändert. Wer hier nachschlägt, um „Engine unberührt" zu belegen, nimmt
+für `policy-net` die neuere Zahl.
+
 Deshalb gibt es **keinen Schalter** und **keinen Messlauf**. Im normalen Spielverlauf bekommt die Suche dieselben
 Anfragen wie vorher. Abweichungen gibt es nur in zwei Fällen:
 - **D-1:** Die Engine bekommt den Wert, der im Dashboard tatsächlich eingegeben wurde.

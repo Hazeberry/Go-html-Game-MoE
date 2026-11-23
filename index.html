@@ -7377,7 +7377,14 @@ class PolicyNet {
   }
 
   reset() {
-    localStorage.removeItem('go_pnet');
+    /* localStorage kann gesperrt sein (privates Fenster, blockierte
+       Site-Daten). Ungeschützt brach der Wurf hier den AUFRUFER ab:
+       trainGame ruft reset() im Divergenzpfad, und das steckt mitten im
+       Spielende — vor resolveLifeAndDeath und der Endstandsanzeige (NET-1).
+       Der Reset im Speicher läuft trotzdem; nur der gespeicherte Stand bleibt
+       dann liegen, und save() unten lehnt still ab. */
+    try { localStorage.removeItem('go_pnet'); }
+    catch (e) { console.warn('[PolicyNet] localStorage nicht löschbar:', (e && e.message) || e); }
     const he = n => Math.sqrt(2/n);
     this.W1=this._rand(this.HID*this.IN, he(this.IN));
     this.b1=new Float32Array(this.HID);
