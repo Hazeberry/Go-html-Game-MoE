@@ -327,3 +327,56 @@ dahinter. Bei 600 ist das Limit in keiner der vier Partien gebunden; die Längen
 `mctsFixedSims` gesetzt ist. Die Zeile ist kosmetisch: liefe die Suche wirklich nach Zeit, wären zwei Läufe mit
 gleichem Seed nicht byteidentisch — in §10.6 sind sie es. `mctsFixedSims` greift also, und die Kopfzeile ist nur
 irreführend.
+
+### 10.8 Drei Größen hat §6 „je Arm" verlangt, die der Aufbau nicht je Arm hergibt
+
+Beim Bauen der Auswertung, noch vor den Daten, fiel ein schwererer Fehler in §6 auf als die beiden in §10.1
+und §10.2. §6 verlangt drei Größen „je Arm". Zwei davon kann dieser Aufbau nicht liefern, und das liegt nicht am
+Werkzeug, sondern an der Versuchsanordnung.
+
+**Verschiedene Partien.** §6 nennt als Kostenseite „Wie viele **verschiedene** Partien je Arm? Gemessen als Zahl
+unterschiedlicher `final_board_hash` über die 360 Partien". Im Selbstspiel A gegen B spielen aber **beide Arme jede
+Partie** — einer Schwarz, einer Weiß; der Rohdump führt das in `armSchwarz` und `armWeiss` mit. Eine Partie gehört
+keinem Arm. „Je Arm" ist hier nicht definiert, und keine Rechnung auf diesen Daten macht es definiert.
+
+Ausgewiesen wird deshalb die Zahl verschiedener Endstellungen **über den ganzen Lauf**, dazu getrennt nach
+Farbzuordnung. Das ist weniger, als §6 wollte: sinkt die Zahl, ist die Vielfalt des Gemischs gesunken, und man kann
+sie nicht B zuschreiben. Wer die Vielfalt **je Arm** will, braucht zwei getrennte Läufe, A gegen A und B gegen B.
+Das ist ein eigener, billiger Folgeversuch — aber nicht dieser.
+
+**Anomalien.** Gültigkeitsregel Nr. 5 spricht von „der Anomaliezahl eines Arms". `ab-harness.js` zählt Anomalien
+jedoch nur global (`agg.anomalies`, Z. 1518) und schreibt eine Warnzeile nach stdout (Z. 1744); je Partie stehen sie
+weder in `--json` noch in `--roh`. Die Regel wird daher auf **Laufebene** geprüft: höchstens 2 % von 360, also
+höchstens 7 Anomalien. Fehlt das Konsolenlog eines Teillaufs, ist die Regel ungeprüft, und das Ergebnis lautet nach
+der Zwei-Zustände-Regel **KEIN URTEIL** — nicht „wahrscheinlich in Ordnung". Dass keine Warnzeile im Log steht,
+heißt null; nur eine fehlende Logdatei heißt unbekannt.
+
+**Aufgaben.** Mit `resignEnabled=0` sind sie 0, wie §10.3 festhält. Die Zahl wird ausgewiesen, nicht gestrichen.
+
+**Was daran mein Fehler ist.** Ich habe in §6 „je Arm" geschrieben, ohne zu prüfen, ob das Messgerät je Arm
+berichtet. Bei zwei von drei Größen tut es das nicht, und bei der Vielfalt kann es das in diesem Aufbau prinzipiell
+nicht. Das entwertet den primären Endpunkt nicht — die Siegrate von B ist je Partie wohldefiniert, weil jede Partie
+genau einen Sieger hat. Es verkleinert die Kostenseite, und die war in §1 das zweite Argument für die ganze
+Messung. Das steht hier, bevor eine Zahl vorliegt, und nicht in der Auswertung, wo es wie eine Ausrede klänge.
+
+### 10.9 Auflösung der Messung, die §6 nicht genannt hat
+
+§6 legt α und Umfang fest, sagt aber nicht, was damit überhaupt nachweisbar ist. Nachgerechnet mit dem exakten
+Test: bei 360 Partien wird 200 : 160 mit p = 0,0397 signifikant, 199 : 161 nicht mehr. Die Messung erkennt also
+Effekte ab einer Siegrate von rund **55,6 %**, das sind etwa **39 Elo**.
+
+Das gehört in die Lesart eines Nullergebnisses: „kein nachweisbarer Unterschied" heißt dann nicht „kein
+Unterschied", sondern „kleiner als rund 39 Elo, mit dem Clopper-Pearson-Intervall als genauer Auskunft". §6 sagt
+das im Grundsatz („das Clopper-Pearson-Intervall sagt, wie groß ein Effekt noch sein könnte"); hier steht die Zahl.
+
+### 10.10 Werkzeug und Test
+
+Die Auswertung läuft über `auswertung/eval-streuung-bericht.js`. Es rechnet nichts, solange die Gültigkeitsregel
+nicht hält, und endet dann mit Status 1, damit ein Lauf in Actions rot wird. Clopper-Pearson und der exakte Test
+sind nicht neu geschrieben, sondern aus `auswertung/kandidaten-orakel/haupt-bericht.js` und
+`auswertung/messung-zusatz.js` übernommen; `clopperPearson(2, 20)` ergibt `[0,0123; 0,3170]`, den Lehrbuchwert.
+
+`tests/eval-streuung-bericht.js` führt jede der fünf Regeln einzeln an der Prüfung vorbei und verlangt, dass sie
+anschlägt — ein Auswertungsskript ohne Test ist die Stelle, an der ein stiller Fehler zur falschen Zahl im Dokument
+wird. Geprüft werden außerdem die Statistik an von Hand nachrechenbaren Werten, die Lesart in allen drei
+Richtungen und dass der Bericht bei KEIN URTEIL jeden Grund nennt und keine Zahl ausgibt.
