@@ -170,8 +170,13 @@ for (const blend of BLENDS) {
       A: A.erg, B: B.erg, C: C.erg,
       wiederholbar: {A: A.wiederholbar, B: B.wiederholbar, C: C.wiederholbar},
       zugWechsel: A.erg.punkt !== B.erg.punkt || A.erg.typ !== B.erg.typ,
-      rangWechsel: JSON.stringify(A.erg.kandidaten.map(x => x.punkt))
-                !== JSON.stringify(B.erg.kandidaten.map(x => x.punkt)),
+      /* §5 Endpunkt (b) ist die Rangfolge der ersten ZWEI Kandidaten. Die
+         ersten drei werden getrennt gezaehlt, damit nichts verdeckt wird:
+         eine Aenderung auf Platz 3 ist kein Tausch der Spitze. */
+      rangWechsel: JSON.stringify(A.erg.kandidaten.slice(0, 2).map(x => x.punkt))
+                !== JSON.stringify(B.erg.kandidaten.slice(0, 2).map(x => x.punkt)),
+      rangWechselTop3: JSON.stringify(A.erg.kandidaten.map(x => x.punkt))
+                    !== JSON.stringify(B.erg.kandidaten.map(x => x.punkt)),
       cStelltHer: C.erg.punkt === A.erg.punkt && C.erg.typ === A.erg.typ,
       priorsGleichEingespeist: priorsEingespeist.every((x, i) => x === priorsA[i]),
       priorsTop2: k.length >= 2 ? {A: [priorsA[k[0].idx], priorsA[k[1].idx]],
@@ -200,17 +205,33 @@ const zaehl = {};
 for (const blend of BLENDS) {
   const g = ergebnisse.filter(e => e.blend === blend);
   zaehl[blend] = {stellungen: g.length, zugWechsel: g.filter(e => e.zugWechsel).length,
-                  rangWechsel: g.filter(e => e.rangWechsel).length,
-                  cStelltHer: g.filter(e => e.zugWechsel && e.cStelltHer).length};
+                  rangWechselTop2: g.filter(e => e.rangWechsel).length,
+                  rangWechselTop3: g.filter(e => e.rangWechselTop3).length,
+                  cStelltHer: g.filter(e => e.zugWechsel && e.cStelltHer).length,
+                  /* Wie oft der gewaehlte Zug ueberhaupt der Spitzenkandidat war.
+                     Ohne diese Zahl liest sich "kein Zugwechsel" wie Robustheit
+                     der Suche, obwohl der Zug gar nicht an der Spitze haengt. */
+                  zugIstSpitzenkandidat: g.filter(e => e.A.kandidaten.length
+                                           && e.A.punkt === e.A.kandidaten[0].punkt).length};
 }
 const urteil = !gueltig ? 'KEIN URTEIL'
   : Object.values(zaehl).some(z => z.cStelltHer > 0) ? 'Nachstellung bricht'
   : Object.values(zaehl).some(z => z.zugWechsel > 0) ? 'Zugwechsel, aber Arm C stellt nicht her'
-  : Object.values(zaehl).some(z => z.rangWechsel > 0) ? 'Nur Rangwechsel'
+  : Object.values(zaehl).some(z => z.rangWechselTop2 > 0) ? 'Nur Rangwechsel'
+  : Object.values(zaehl).some(z => z.rangWechselTop3 > 0) ? 'Nur Rangwechsel unterhalb der Spitze'
   : 'Kein Unterschied';
 
 const bericht = {kopf, gueltig, gruende, zaehl, urteil, ergebnisse};
-if (AUS) { fs.writeFileSync(AUS, JSON.stringify(bericht, null, 1)); console.log('geschrieben: ' + AUS); }
+if (AUS) {
+  /* Erst vollstaendig ins temporaere Verzeichnis, dann an den Zielort. Sonst
+     liegt waehrend des Laufs eine halbe Datei im Repo, und ein Abbruch
+     hinterliesse ein Artefakt, das spaeter wie ein gueltiger Lauf aussieht. */
+  const vorlaeufig = path.join(tmp, 'bericht.json');
+  fs.writeFileSync(vorlaeufig, JSON.stringify(bericht, null, 1));
+  fs.mkdirSync(path.dirname(path.resolve(AUS)), {recursive: true});
+  fs.copyFileSync(vorlaeufig, AUS);
+  console.log('geschrieben: ' + AUS);
+}
 console.log(JSON.stringify({kopf, gueltig, gruende: gruende.slice(0, 8), zaehl, urteil}, null, 2));
 fs.rmSync(tmp, {recursive: true, force: true});
 process.exit(gueltig ? 0 : 1);
