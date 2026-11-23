@@ -271,7 +271,8 @@ const BESTAND = {
   'distillation/collect.js':                      'feste-literale',
   /* Neu am 23.11.2026, und T-PR1 hat die Datei selbst gemeldet, als sie
      unverzeichnet dazukam (docs/prior-reproduktion-vorabfestlegung.md §8.5). */
-  'auswertung/diagnose/prior-reproduktion.js':    'feste-literale'
+  'auswertung/diagnose/prior-reproduktion.js':    'feste-literale',
+  'auswertung/diagnose/prior-seeds.js':           'feste-literale'
 };
 
 /* Dateien, die den Schalter nennen, ohne die Engine selbst zu rufen. */
@@ -300,7 +301,7 @@ test('T-PR1: der Bestand der Engine-Aufrufer ist geschlossen, jede Klasse haelt 
   pruefe(verschwunden.length === 0, verschwunden.length
     ? `verzeichnete Datei ruft die Engine nicht mehr an: ${verschwunden.join(', ')} -- BESTAND kuerzen`
     : 'keine verzeichnete Datei ist verschwunden');
-  pruefeGleich(ruft.length, 21, 'heute sind es 21 Dateien (§1.4)');
+  pruefeGleich(ruft.length, 22, 'heute sind es 22 Dateien (§1.4)');
 
   /* 2. Geschlossene Welt der Schalterstellen: auch eine Datei, die den
         Schalter anfasst, ohne die Engine zu rufen, soll auffallen. */
@@ -330,8 +331,8 @@ test('T-PR1: der Bestand der Engine-Aufrufer ist geschlossen, jede Klasse haelt 
              `${rel}: nennt den Schalter nicht (feste Literale, §1.4)`);
   }
   pruefeGleich(JSON.stringify(gezaehlt), JSON.stringify(
-    {versorgt: 2, 'versorgt-direkt': 2, waechter: 5, 'feste-literale': 12}),
-    'die vier Klassen sind 2 + 2 + 5 + 12 (§1.4)');
+    {versorgt: 2, 'versorgt-direkt': 2, waechter: 5, 'feste-literale': 13}),
+    'die vier Klassen sind 2 + 2 + 5 + 13 (§1.4)');
 });
 
 laufeTests('Versuchsregel Pass nach Gegnerpass').then(ok => process.exit(ok ? 0 : 1));
