@@ -446,7 +446,16 @@ async function partieSpielen(nr) {
           kandStat.abfrageMs += Date.now() - tq;
           extra = {kandidatenOrakel: {arm: opt.kandidatenOrakel, g: gi}};
         }
-        const r = E.getAIMove(board, f, Array.from(hist), {...caps}, mc, 'hard', 1, ko, last, extra);
+        /* Versuchsregel "Pass nach Gegnerpass": Die Engine kennt weder Komi noch
+           Wertung, sie bekommt beides ueber extra (GTP-2, nur hier von den
+           Node-Werkzeugen -- docs/passregel-wege-vorabfestlegung.md). paesse >= 1
+           ist hier richtig, weil der Zaehler ausschliesslich echte Paesse zaehlt:
+           Aufgabe bricht vorher ab, ein besetztes Feld wirft. extra selbst bleibt
+           unangetastet, damit der if-(extra)-Zweig des Kandidaten-Orakels unten
+           weiter nur bei Orakel greift. Wertung flaeche: GNU Go laeuft mit
+           --chinese-rules. */
+        const r = E.getAIMove(board, f, Array.from(hist), {...caps}, mc, 'hard', 1, ko, last,
+          {...extra, gegnerPasste: paesse >= 1, wertung: 'flaeche', komi: KOMI});
         if (r.type === 'resign') { aufgabe = f; break; }
         i = r.type === 'stone' ? r.y * 19 + r.x : -1;
         const m = /MCTS (\d+) Sims/.exec(r.info || ''); if (m) sims.push(+m[1]);

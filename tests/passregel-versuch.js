@@ -12,10 +12,15 @@
      4. Nur auf Stufe Schwer; auf Leicht/Mittel keine Wirkung.
      5. Verdrahtung: Hauptthread, Worker-Nachricht und Rückfall reichen
         gegnerPasste, Wertung und Komi weiter.
+     6. Die Node-Wege (T-PW…, docs/passregel-wege-vorabfestlegung.md):
+        gnugo-duell.js versorgt extra, vier andere Werkzeuge brechen ab statt
+        die Regel still ausfallen zu lassen, und mit Schalter 0 bleibt alles
+        bitgleich.
 
    Aufruf:  node tests/passregel-versuch.js [pfad/zur/index.html] */
 'use strict';
-const fs = require('fs'), path = require('path');
+const fs = require('fs'), path = require('path'), os = require('os');
+const {spawnSync, execFileSync} = require('child_process');
 const {ladeKI, test, pruefe, pruefeGleich, laufeTests} = require('./rahmen');
 const KI = ladeKI({htmlPfad: process.argv[2] || undefined, mitNetz: false});
 const {BOARD_SIZE, removeDeadGroups, PARAMS, getAIMove} = KI;
@@ -103,6 +108,112 @@ test('Verdrahtung: Hauptthread, Worker-Nachricht und Rückfall reichen gegnerPas
   pruefeGleich((html.match(/passExtra\(\)/g) || []).length, 4, 'Definition + Worker-Anfrage + zwei Aufrufe (Rückfall, Mittel/Leicht)');
   pruefe(/d\.extra \?\? null/.test(html), 'Worker reicht extra an getAIMove weiter');
   pruefe(/extra:\s+passExtra\(\)/.test(html), 'Anfrage an den Worker enthält extra');
+});
+
+/* ══ Die Node-Wege: T-PW1 bis T-PW5 ══════════════════════════════
+   docs/passregel-wege-vorabfestlegung.md. Von 20 Node-Aufrufstellen kann der
+   Schalter nur an sechs anliegen; gnugo-duell.js bekommt extra, vier andere
+   einen Waechter, die uebrigen bleiben unberuehrt.
+
+   Was hier AUSGEFUEHRT wird und was am Quelltext geprueft ist, steht je Test
+   dabei. Die drei Auswertungsskripte brauchen Archivdaten und brechen vor dem
+   Waechter ab (Exit 2, 2 und 1 ohne Argumente) -- ihr Waechter ist deshalb am
+   Quelltext geprueft, der von ab-harness.js ausgefuehrt. */
+const wurzelDuell = fs.readFileSync(path.join(wurzel, 'gnugo-duell.js'), 'utf8');
+
+test('T-PW1: gnugo-duell.js gibt extra mit gegnerPasste, Wertung und Komi weiter (Quelltext)', () => {
+  /* Dieselbe Pruefebene wie die Verdrahtungspruefung oben: der Aufruf ist eine
+     Zeile, und ein Lauf gegen GNU Go ist hier nicht moeglich. */
+  pruefe(/gegnerPasste: paesse >= 1/.test(wurzelDuell), 'gegnerPasste aus paesse');
+  pruefe(/wertung: 'flaeche'/.test(wurzelDuell), "Wertung 'flaeche'");
+  pruefe(/komi: KOMI/.test(wurzelDuell), 'Komi aus KOMI');
+  pruefe(/\{\.\.\.extra, gegnerPasste/.test(wurzelDuell), 'extra wird ergaenzt, nicht ersetzt');
+  /* extra selbst darf nicht ueberschrieben werden, sonst greift der
+     if-(extra)-Zweig des Kandidaten-Orakels auch ohne Orakel. */
+  pruefe(!/extra = \{\.\.\.extra/.test(wurzelDuell), 'extra selbst bleibt unangetastet');
+});
+
+test('T-PW2: in gnugo-duell.js zaehlt paesse nur echte Paesse (Quelltext)', () => {
+  /* Der Kern von §2 der Festlegung: in ab-harness.js, weiterspielen.js und
+     collect.js zaehlt der Zaehler auch Anomalien, Aufgaben oder besetzte
+     Felder mit -- dort waere paesse >= 1 falsch. Hier nicht, und das haengt an
+     diesen drei Zeilen. */
+  pruefe(/if \(i < 0\) \{ paesse\+\+;/.test(wurzelDuell), 'erhoeht wird nur im Pass-Zweig');
+  pruefe(/paesse = 0;/.test(wurzelDuell), 'und im Steinzug-Zweig zurueckgesetzt');
+  pruefe(/if \(r\.type === 'resign'\) \{ aufgabe = f; break; \}/.test(wurzelDuell),
+         'Aufgabe bricht vorher ab, zaehlt also nicht als Pass');
+  pruefe(/throw new Error\(`Zug \$\{mc \+ 1\} auf besetztes Feld/.test(wurzelDuell),
+         'ein besetztes Feld wirft, zaehlt also nicht als Pass');
+  /* Gegenprobe: in ab-harness.js ist es wirklich verunreinigt. */
+  const ab = fs.readFileSync(path.join(wurzel, 'ab-harness.js'), 'utf8');
+  pruefe(/anomalies\+\+; passes\+\+;/.test(ab), 'ab-harness: eine Anomalie erhoeht passes (deshalb dort kein extra)');
+});
+
+test('T-PW3: KOMI ist 0,5 mit Vorgabe und 7,5 ohne (ausgefuehrt)', () => {
+  pruefe(/const KOMI = opt\.vorgabe >= 2 \? 0\.5 : 7\.5;/.test(wurzelDuell), 'die Zeile steht so da');
+  /* Ausgefuehrt: dieselbe Rechnung, beide Zweige. */
+  const komi = vorgabe => (vorgabe >= 2 ? 0.5 : 7.5);
+  pruefeGleich(komi(0), 7.5, 'ohne Vorgabe 7,5');
+  pruefeGleich(komi(9), 0.5, 'mit neun Vorgabesteinen 0,5');
+});
+
+test('T-PW4: der Waechter von ab-harness.js bricht ab und nennt den Grund (ausgefuehrt)', () => {
+  const p = spawnSync(process.execPath, [path.join(wurzel, 'ab-harness.js'),
+    '--A', 'passNachGegnerpass=1', '--games', '1', '--budget', '10', '--maxmoves', '4'],
+    {encoding: 'utf8', timeout: 180000});
+  pruefeGleich(p.status, 1, 'Exitcode 1');
+  const aus = p.stdout + p.stderr;
+  pruefe(/passNachGegnerpass: dieses Werkzeug versorgt extra nicht/.test(aus), 'Meldung nennt die Ursache');
+  pruefe(/still ausfallen/.test(aus), 'und die Folge');
+  pruefe(/passregel-wege-vorabfestlegung\.md/.test(aus), 'und wo es nachzulesen ist');
+});
+
+test('T-PW4b: die drei Auswertungsskripte tragen denselben Waechter (Quelltext)', () => {
+  /* Sie brauchen Archivdaten und brechen ohne Argumente vor dem Waechter ab;
+     ausgefuehrt ist er deshalb nur bei ab-harness.js (T-PW4). */
+  for (const rel of ['auswertung/weiterspielen.js', 'auswertung/diagnose/wurzel-replay.js',
+                     'auswertung/lerner-pruefung.js']) {
+    const q = fs.readFileSync(path.join(wurzel, rel), 'utf8');
+    pruefe(/if \(E\.PARAMS\.passNachGegnerpass >= 1\)/.test(q), `${rel}: Waechter vorhanden`);
+    pruefe(/passregel-wege-vorabfestlegung\.md/.test(q), `${rel}: Meldung nennt das Doc`);
+  }
+  /* Und die Hilfe von ab-harness nennt ihn, damit die Zusage „komi-blind“
+     nachpruefbar bleibt (Abnahmepunkt 5). */
+  const ab = fs.readFileSync(path.join(wurzel, 'ab-harness.js'), 'utf8');
+  pruefe(/kein extra mit und bricht ab/.test(ab), 'ab-harness-Hilfe nennt den Waechter');
+});
+
+test('T-PW5: mit Schalter 0 spielt gnugo-duell.js dieselben Partien wie vorher (ausgefuehrt)', () => {
+  /* Bitgleich-Nachweis fuer den Standardfall: derselbe Seed gegen dieselbe
+     Attrappe, einmal mit dem Stand VOR dieser Korrektur und einmal mit dem
+     jetzigen. extra ist jetzt immer ein Objekt; bei passNachGegnerpass 0 gibt
+     passNachGegnerpassPruefung trotzdem null zurueck und _kandOrakel bleibt
+     null, die Zugwahl darf sich also nicht aendern. */
+  const ordner2 = fs.mkdtempSync(path.join(os.tmpdir(), 'pw-'));
+  try {
+    const attrappe = path.join(ordner2, 'gnugo');
+    fs.writeFileSync(attrappe, `#!/bin/sh\nexec "${process.execPath}" "${path.join(__dirname, 'gtp-attrappe.js')}" "$@"\n`, {mode: 0o755});
+    /* Der Stand vor der Korrektur: dieselbe Datei ohne die vier extra-Felder. */
+    const alt = wurzelDuell.replace(/\{\.\.\.extra, gegnerPasste: paesse >= 1, wertung: 'flaeche', komi: KOMI\}/, 'extra');
+    pruefe(alt !== wurzelDuell, 'der alte Stand liess sich herstellen');
+    const altDatei = path.join(wurzel, '.tmp-duell-alt.js');
+    fs.writeFileSync(altDatei, alt);
+    const fahre = skript => {
+      const roh = path.join(ordner2, `roh-${path.basename(skript)}.jsonl`);
+      const p = spawnSync(process.execPath, [skript, '--gnugo', attrappe, '--partien', '2', '--seed', '9',
+        '--stufe', '1', '--vorgabe', '0', '--maxzuege', '30', '--gnugo-aufgabe', '0',
+        '--ki', 'mctsFixedSims=20,resignEnabled=0', '--roh', roh],
+        {encoding: 'utf8', timeout: 300000});
+      pruefeGleich(p.status, 0, `${path.basename(skript)} laeuft: ${(p.stderr || '').slice(-200)}`);
+      return fs.readFileSync(roh, 'utf8').trim().split('\n').map(z => JSON.parse(z).zuege.join(' ')).join('|');
+    };
+    try {
+      const neu = fahre(path.join(wurzel, 'gnugo-duell.js'));
+      const vorher = fahre(altDatei);
+      pruefe(neu.length > 50, `Partien gespielt (${neu.length} Zeichen Zugfolge)`);
+      pruefeGleich(neu, vorher, 'Zug fuer Zug dieselben Partien wie vor der Korrektur');
+    } finally { fs.rmSync(altDatei, {force: true}); }
+  } finally { fs.rmSync(ordner2, {recursive: true, force: true}); }
 });
 
 laufeTests('Versuchsregel Pass nach Gegnerpass').then(ok => process.exit(ok ? 0 : 1));

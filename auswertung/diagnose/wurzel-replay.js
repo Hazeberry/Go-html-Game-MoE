@@ -83,6 +83,11 @@ function replay(E, p, opt = {}) {
     const f = mc % 2 === 0 ? 1 : 2, z = p.zuege[mc], archiv = z === 'pass' ? -1 : vonGtp(z);
     if (f === wir && !abweichung) {
       Object.assign(E.PARAMS, E.STANDARD, {adaptiveBudgetEnabled: 0, vorgabeSteine: 0}, p.ki);
+      /* Kein extra: hier wird eine Einzelstellung bewertet, gegnerPasste hat
+         keinen Wert, den die Daten tragen (docs/passregel-wege-vorabfestlegung.md §3). */
+      if (E.PARAMS.passNachGegnerpass >= 1)
+        throw new Error('passNachGegnerpass: dieses Werkzeug versorgt extra nicht, die Regel wuerde '
+          + 'still ausfallen (docs/passregel-wege-vorabfestlegung.md)');
       globalThis.__DIAG = null;
       const extra = typeof opt.extra === 'function' ? opt.extra(mc, {board, f}) : undefined;   /* nur für Tests (Kandidaten-Orakel) */
       const r = E.getAIMove(board, f, Array.from(hist), {...caps}, mc, 'hard', 1, ko, last, extra);

@@ -106,6 +106,8 @@ Argumenten. Nur der Browser versorgt die Regel (`passExtra()`, `index.html` Z. 6
 Testskripte, die `passNachGegnerpassPruefung` direkt aufrufen. Diese Korrektur heilt **einen von vier Wegen**; die
 anderen bleiben, wie sie sind. Das steht hier, damit später niemand „GTP-2 ist erledigt" daraus liest.
 
+**Nachtrag 23.11.2026:** Die anderen Wege sind jetzt behandelt, aber anders als dieser Satz es nahelegt — `docs/passregel-wege-vorabfestlegung.md`: Von 20 Node-Aufrufstellen kann der Schalter nur an sechs anliegen. `gnugo-duell.js` versorgt `extra` jetzt; vier Werkzeuge brechen stattdessen ab, weil ihr Pass-Zähler auch Anomalien zählt oder sie Einzelstellungen bewerten; elf Aufrufer bleiben unberührt. **„GTP-2 ist erledigt" stimmt damit für zwei von sechs Wegen und ist für vier als Abbruch statt als Versorgung gelöst.**
+
 ## 4. Befund GTP-3: Befehlsnummern werden nicht erkannt
 
 `antworte` nimmt das erste Wort als Befehl (Z. 98). Das GTP erlaubt jedem Befehl eine vorangestellte Nummer, und die
