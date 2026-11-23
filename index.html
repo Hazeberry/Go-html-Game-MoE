@@ -6791,9 +6791,24 @@ document.querySelectorAll('.diff-btn').forEach(btn=>btn.addEventListener('click'
 }));
 
 document.querySelectorAll('.color-btn').forEach(btn=>btn.addEventListener('click',function(){
-  if(parseInt(this.dataset.color)===state.aiColor&&state.aiThinking)return;
+  const neu=parseInt(this.dataset.color);
+  if(neu===state.aiColor&&state.aiThinking)return;
+  /* Farbwechsel mitten in der Partie: Die bisher gesammelten Beispiele sind
+     Züge der ALTEN Farbe, den Reward holt showFinalScore am Ende aber aus
+     state.aiColor — sie bekämen das Vorzeichen der NEUEN Farbe. Gemessen in
+     docs/korrektur-train2-vorabfestlegung.md §6: ein Zug der Siegerfarbe, mit
+     advantage -1 bestraft, obwohl seine Farbe gewonnen hatte. Darum werden sie
+     verworfen (TRAIN-2, Variante a); die Beispiele der neuen Farbe sammelt
+     applyAIResult danach normal weiter. Nur bei ECHTEM Wechsel: Der Handler
+     läuft auch beim Klick auf die schon aktive Farbe (die Rückkehr oben greift
+     nur zusammen mit aiThinking), und dann gibt es nichts zu verwerfen. */
+  if(neu!==state.aiColor&&globalThis.policyNet&&policyNet._gameBuffer&&policyNet._gameBuffer.length){
+    state.log.push(`! Farbwechsel — ${policyNet._gameBuffer.length} gesammelte KI-Züge der alten Farbe gehen nicht ins Training.`);
+    policyNet._gameBuffer=[];
+    updateUI();   /* zeichnet das Protokoll; sonst stünde die Zeile nur in state.log */
+  }
   document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));
-  this.classList.add('active');state.aiColor=parseInt(this.dataset.color);updateAIStatus();
+  this.classList.add('active');state.aiColor=neu;updateAIStatus();
   if(state.aiEnabled&&!state.gameOver&&!humanTurn()){state.aiRequestId++;triggerAIMove();}
 }));
 

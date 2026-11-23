@@ -1526,6 +1526,195 @@ test('T-DA4: fehlt pn-games, steigt dashUpdate wie bisher frueh aus (Kontrolle)'
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 
+
+/* ══ TRAIN-2: der Farbwechsel verwirft den Trainingspuffer ════════════
+   docs/korrektur-train2-vorabfestlegung.md, Tests nach §4. Der Farb-Handler
+   wechselte state.aiColor und liess die gesammelten Beispiele der ALTEN Farbe
+   im Puffer stehen; den Reward holt showFinalScore am Ende aus state.aiColor,
+   und trainGame gibt ihn jedem Eintrag. Gemessen in §6: ein Zug der
+   Siegerfarbe mit advantage -1.
+
+   Zwei Vorgaben aus §4, ohne die der Test nichts wert ist:
+     1. ECHTE Netzeingaben (boardToInput und forward). Mit Attrappen wie
+        new Float32Array(4) rechnet _backward Unsinn, _badWeight schlaegt an,
+        und trainGame laeuft in den Divergenzpfad, der reset() aufruft — der
+        Test pruefte dann die Divergenz-Mechanik statt TRAIN-2.
+     2. Der Wechsel laeuft ueber den ECHTEN Knopf. Eine Zuweisung an
+        state.aiColor wuerde den Handler umgehen und am alten wie am neuen
+        Code dasselbe tun. */
+const t2Init = () => {
+  /* Wie triggerAIMove (Z. 6218): state.lastMove ist ein INDEX, nicht ein
+     Objekt (Z. 5737). Mit {x: state.lastMove.x} blieben x und y undefined und
+     Ebene 8 (letzter Zug) leer. */
+  globalThis.t2KiZug = (x, y, reqId) => {
+    const lm = state.lastMove !== null ? {x: xOf(state.lastMove), y: yOf(state.lastMove)} : null;
+    const inp = policyNet.boardToInput(state.board, state.aiColor, lm, state.koPoint);
+    const {probs, hidden} = policyNet.forward(inp);
+    state.aiRequestId = reqId;
+    applyAIResult({type: 'stone', x, y}, reqId, inp, probs, hidden);
+  };
+  /* _backward protokollieren; das echte Training laeuft weiter, damit auch
+     Divergenz und Gewichtspruefung echt bleiben. */
+  globalThis.t2Horchen = () => {
+    globalThis.t2Rueckwaerts = [];
+    const echt = policyNet._backward.bind(policyNet);
+    policyNet._backward = (inp, hidden, probs, moveIdx, advantage) => {
+      globalThis.t2Rueckwaerts.push({moveIdx, advantage});
+      return echt(inp, hidden, probs, moveIdx, advantage);
+    };
+  };
+  globalThis.t2Klick = c => document.querySelector('.color-btn[data-color="' + c + '"]').click();
+  globalThis.t2Zeilen = () => state.log.filter(z => /Farbwechsel/.test(z));
+};
+
+/* KI ist Weiss und zieht einmal; dann der Klick auf Schwarz. Das Brett danach:
+   Schwarz 3/3, Weiss 15/3 — moveIdx 72 ist der Weiss-Zug (3·19+15). */
+const t2BisWechsel = `
+  state.aiEnabled = false; state.aiColor = 2;
+  t2Horchen();
+  placeStone(3, 3);                     /* Mensch, Schwarz */
+  t2KiZug(15, 3, 101);                  /* KI, Weiss */
+  const nachWeiss = {puffer: policyNet._gameBuffer.length,
+                     idx: policyNet._gameBuffer.map(b => b.moveIdx)};
+  t2Klick(1);                           /* KI spielt jetzt Schwarz */
+  const nachWechsel = {puffer: policyNet._gameBuffer.length, farbe: state.aiColor,
+                       zeilen: t2Zeilen()};
+`;
+
+test('T-F1: der Farbwechsel verwirft die Beispiele der alten Farbe, nur die neue Farbe wird gelernt', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(t2Init);
+  const r = await s.evaluate(`(() => {
+    ${t2BisWechsel}
+    t2KiZug(3, 15, 102);                /* KI, Schwarz — moveIdx 288 */
+    const nachSchwarz = policyNet._gameBuffer.length;
+    pass();                             /* Weiss (Mensch) passt */
+    pass();                             /* Schwarz passt → Spielende, Training */
+    const f = finalAreaScore();
+    return {nachWeiss, nachWechsel, nachSchwarz, rueck: globalThis.t2Rueckwaerts,
+            flaeche: {schwarz: f[1], weiss: f[2]}, spiele: policyNet.gamesPlayed,
+            div: policyNet._divergences, gesund: policyNet._healthy,
+            beendet: state.gameOver};
+  })()`);
+  await ctx.close();
+  /* Vorbedingung: ohne diese Zeile waere ein leerer Puffer nichtssagend. */
+  pruefeGleich(r.nachWeiss.puffer, 1, 'Vorbedingung: der Weiss-Zug liegt im Puffer');
+  pruefeGleich(r.nachWeiss.idx[0], 72, 'und zwar als moveIdx 72 (Zug auf 15/3)');
+  pruefeGleich(r.nachWechsel.farbe, 1, 'der Knopf hat die KI-Farbe auf Schwarz gestellt');
+  pruefeGleich(r.nachWechsel.puffer, 0, 'der Puffer ist nach dem Wechsel LEER — das ist der Befund');
+  pruefeGleich(r.nachWechsel.zeilen.length, 1, 'genau eine Protokollzeile zum Farbwechsel');
+  pruefe(/1 gesammelte/.test(r.nachWechsel.zeilen[0] || ''),
+         `die Zeile nennt die Zahl der verworfenen Zuege (${r.nachWechsel.zeilen[0] || '—'})`);
+  pruefeGleich(r.nachSchwarz, 1, 'die neue Farbe wird normal weiter gesammelt');
+  pruefeGleich(r.beendet, true, 'zwei Paesse haben die Partie beendet');
+  pruefeGleich(r.flaeche.schwarz, 2, 'Schlussflaeche Schwarz 2');
+  pruefeGleich(r.flaeche.weiss, 1, 'Schlussflaeche Weiss 1 — mit Komi 7,5 gewinnt Weiss');
+  pruefeGleich(r.rueck.length, 1, 'genau ein Beispiel gelernt — der Weiss-Zug ist nicht dabei');
+  pruefeGleich(r.rueck[0] && r.rueck[0].moveIdx, 288, 'und es ist der Schwarz-Zug (moveIdx 288)');
+  pruefeGleich(r.rueck[0] && r.rueck[0].advantage, -1, 'mit dem Reward seiner eigenen Farbe (Schwarz verliert)');
+  pruefeGleich(r.spiele, 1, 'eine Partie gezaehlt');
+  pruefeGleich(r.div, 0, 'keine Divergenz (echte Netzeingaben, §4)');
+  pruefeGleich(r.gesund, true, 'das Netz gilt als gesund');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-F2: endet die Partie direkt nach dem Wechsel, wird gar nicht gelernt', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(t2Init);
+  const r = await s.evaluate(`(() => {
+    ${t2BisWechsel}
+    pass();                             /* Schwarz (KI) passt — kein KI-Zug mehr */
+    pass();                             /* Weiss passt → Spielende */
+    return {nachWeiss, nachWechsel, rueck: globalThis.t2Rueckwaerts,
+            spiele: policyNet.gamesPlayed, wins: policyNet.wins,
+            trained: policyNet._trained, letztes: policyNet.lastResult,
+            beendet: state.gameOver, div: policyNet._divergences};
+  })()`);
+  await ctx.close();
+  pruefeGleich(r.nachWeiss.puffer, 1, 'Vorbedingung: der Weiss-Zug lag im Puffer');
+  pruefeGleich(r.nachWechsel.puffer, 0, 'der Wechsel hat ihn verworfen');
+  pruefeGleich(r.beendet, true, 'die Partie ist beendet');
+  pruefeGleich(r.rueck.length, 0, 'kein einziges Beispiel gelernt — es gibt keines mehr');
+  pruefeGleich(r.spiele, 0, 'und keine Partie gezaehlt (trainGame kehrt vor dem Zaehlen um)');
+  pruefeGleich(r.wins, 0, 'kein Sieg gezaehlt');
+  pruefeGleich(r.letztes, null, 'lastResult bleibt leer');
+  pruefeGleich(r.trained, true, '_trained ist gesetzt — die Partie gilt als abgeschlossen');
+  pruefeGleich(r.div, 0, 'keine Divergenz');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-F3: ein Klick auf die schon aktive Farbe verwirft nichts (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(t2Init);
+  const r = await s.evaluate(`(() => {
+    state.aiEnabled = false; state.aiColor = 2;
+    placeStone(3, 3);
+    t2KiZug(15, 3, 101);
+    const vor = policyNet._gameBuffer.length;
+    t2Klick(2);                         /* Weiss ist schon aktiv */
+    return {vor, nach: policyNet._gameBuffer.length, farbe: state.aiColor,
+            zeilen: t2Zeilen().length};
+  })()`);
+  await ctx.close();
+  pruefeGleich(r.vor, 1, 'Vorbedingung: ein Beispiel im Puffer');
+  pruefeGleich(r.nach, 1, 'der Puffer bleibt unangetastet');
+  pruefeGleich(r.farbe, 2, 'die Farbe bleibt Weiss');
+  pruefeGleich(r.zeilen, 0, 'keine Protokollzeile');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-F4: ohne Farbwechsel laeuft das Training unveraendert (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(t2Init);
+  const r = await s.evaluate(`(() => {
+    state.aiEnabled = false; state.aiColor = 2;
+    t2Horchen();
+    placeStone(3, 3);
+    t2KiZug(15, 3, 101);                /* moveIdx 72 */
+    placeStone(4, 4);
+    t2KiZug(16, 4, 102);                /* moveIdx 92 */
+    const vorEnde = policyNet._gameBuffer.length;
+    pass(); pass();
+    const f = finalAreaScore();
+    return {vorEnde, rueck: globalThis.t2Rueckwaerts, spiele: policyNet.gamesPlayed,
+            div: policyNet._divergences, zeilen: t2Zeilen().length,
+            flaeche: {schwarz: f[1], weiss: f[2]}};
+  })()`);
+  await ctx.close();
+  pruefeGleich(r.vorEnde, 2, 'zwei KI-Zuege im Puffer');
+  pruefeGleich(r.zeilen, 0, 'keine Farbwechsel-Zeile');
+  pruefeGleich(r.rueck.length, 2, 'beide Beispiele gelernt');
+  pruefeGleich(JSON.stringify(r.rueck.map(e => e.moveIdx)), '[72,92]', 'in der Reihenfolge des Puffers');
+  pruefeGleich(r.flaeche.weiss, 2, 'Schlussflaeche Weiss 2 — mit Komi 7,5 gewinnt Weiss');
+  pruefeGleich(r.rueck[0] && r.rueck[0].advantage, 1, 'Weiss hat gewonnen: advantage +1');
+  pruefeGleich(r.rueck[1] && r.rueck[1].advantage, 1, 'derselbe advantage fuer beide — hier richtig, beide sind Weiss');
+  pruefeGleich(r.spiele, 1, 'eine Partie gezaehlt');
+  pruefeGleich(r.div, 0, 'keine Divergenz');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-F5: ein Undo nach dem Verwerfen fuellt den Puffer nicht mit Luecken (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(t2Init);
+  const r = await s.evaluate(`(() => {
+    ${t2BisWechsel}
+    undo();                             /* nimmt den KI-Zug auf 15/3 zurueck */
+    const buf = policyNet._gameBuffer;
+    return {nachUndo: buf.length, loecher: Array.from(buf).filter(e => !e || !e.inp).length,
+            zuege: state.moveCount, stein: state.board[idx(15, 3)]};
+  })()`);
+  await ctx.close();
+  /* Absichtlich ohne Pruefung des Verwerfens selbst — das tut T-F1. Hier geht
+     es allein um den length-Zweig in undo (Z. 5705 f.): er kuerzt nur, wenn
+     der Puffer LAENGER ist als der gemerkte Stand, und darf ihn nie
+     verlaengern. Darum besteht dieser Test an beiden Staenden. */
+  pruefeGleich(r.stein, 0, 'Vorbedingung: das Undo hat den KI-Zug vom Brett genommen');
+  pruefeGleich(r.zuege, 1, 'ein Zug zurueckgenommen');
+  pruefeGleich(r.nachUndo, 0, 'der Puffer ist leer');
+  pruefeGleich(r.loecher, 0, 'kein Eintrag ist undefined — length hat nicht verlaengert');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
 laufeTests('Review-Korrekturen im echten Browser').then(ok => {
   if (!playwright || !chromePfad)
     console.log(`\n  ${PFLICHT ? 'FEHLT' : 'Übersprungen'}: ${!playwright ? 'Playwright' : 'Chromium'} nicht gefunden.`);

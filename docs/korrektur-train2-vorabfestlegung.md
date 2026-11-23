@@ -1,6 +1,6 @@
 # Korrektur TRAIN-2: Vorabfestlegung
 
-**Stand: 23.11.2026. Status: Entwurf, nicht umgesetzt.** Befund aus `docs/bughunt-wiederholung.md` §4 und §5
+**Stand: 23.11.2026. Status: umgesetzt, Abnahme gültig (§8).** Befund aus `docs/bughunt-wiederholung.md` §4 und §5
 (TRAIN-2); Stand der Reihe in `docs/bughunt-20261116.md` §3.
 
 **Berichtigung zur Übergabe:** Die Varianten (a) bis (d) in `docs/bughunt-20261116.md` §7 gehören zu **TRAIN-1**
@@ -87,15 +87,18 @@ document.querySelectorAll('.color-btn').forEach(btn=>btn.addEventListener('click
   const neu=parseInt(this.dataset.color);
   if(neu===state.aiColor&&state.aiThinking)return;
   /* Farbwechsel mitten in der Partie: Die bisher gesammelten Beispiele sind
-     Zuege der ALTEN Farbe, den Reward holt showFinalScore am Ende aber aus
-     state.aiColor. Sie bekaemen das Vorzeichen der NEUEN Farbe — gemessen in
-     docs/korrektur-train2-vorabfestlegung.md §6 ein Zug der Siegerfarbe, mit
-     -1 bestraft. Darum werden sie verworfen (TRAIN-2, Variante a). Die
-     Beispiele der neuen Farbe sammelt applyAIResult danach normal weiter. */
+     Züge der ALTEN Farbe, den Reward holt showFinalScore am Ende aber aus
+     state.aiColor — sie bekämen das Vorzeichen der NEUEN Farbe. Gemessen in
+     docs/korrektur-train2-vorabfestlegung.md §6: ein Zug der Siegerfarbe, mit
+     advantage -1 bestraft, obwohl seine Farbe gewonnen hatte. Darum werden sie
+     verworfen (TRAIN-2, Variante a); die Beispiele der neuen Farbe sammelt
+     applyAIResult danach normal weiter. Nur bei ECHTEM Wechsel: Der Handler
+     läuft auch beim Klick auf die schon aktive Farbe (die Rückkehr oben greift
+     nur zusammen mit aiThinking), und dann gibt es nichts zu verwerfen. */
   if(neu!==state.aiColor&&globalThis.policyNet&&policyNet._gameBuffer&&policyNet._gameBuffer.length){
-    state.log.push(`! Farbwechsel — ${policyNet._gameBuffer.length} gesammelte KI-Zuege der alten Farbe gehen nicht ins Training.`);
+    state.log.push(`! Farbwechsel — ${policyNet._gameBuffer.length} gesammelte KI-Züge der alten Farbe gehen nicht ins Training.`);
     policyNet._gameBuffer=[];
-    updateUI();
+    updateUI();   /* zeichnet das Protokoll; sonst stünde die Zeile nur in state.log */
   }
   document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));
   this.classList.add('active');state.aiColor=neu;updateAIStatus();
@@ -238,3 +241,105 @@ denselben Ablauf dauerhaft auf.
 2. Umsetzung in einem eigenen PR: Code nach §3, Tests nach §4, `tests/README.md`, Nachtrag hier mit den Ergebnissen
    aus §5 und eine Zeile in `docs/bughunt-20261116.md` §3.
 3. CI grün, Merge, `unsubscribe_pr_activity`, kurzer Bericht mit den löschbaren Branches.
+
+## 8. Nachtrag: Umsetzung und Abnahme (23.11.2026)
+
+Umgesetzt wie in §3 beschrieben, eine Stelle in `index.html` (Z. 6793 bis 6814): 17 Zeilen hinzu, 2 ersetzt, keine
+andere Datei am Spiel berührt.
+
+### 8.1 Die fünf Abnahmepunkte
+
+**1. Prüfsummen — erfüllt.** Nach der Änderung nachgerechnet, alle drei byteidentisch zu §1:
+
+| Block | SHA-256 nach der Änderung |
+|---|---|
+| `shared-go-logic` | `54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66` |
+| `worker-ai` | `f847c1247188d8a0c94d269581ae465b7428d601c13afb65dced683d69a366e9` |
+| `policy-net` | `14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190` |
+
+`PARAMS_DEFAULT` ist unberührt (der Diff an `index.html` enthält das Wort nicht). Ein Engine-Vergleich war damit
+nicht nötig und wurde nicht gefahren.
+
+**2. T-F1 bis T-F5 — erfüllt.** Beide Läufe im Container, Chromium über Playwright:
+
+| Lauf | Ergebnis | T-F1 | T-F2 | T-F3 | T-F4 | T-F5 |
+|---|---|---|---|---|---|---|
+| alter Stand (`ee8ce5d`) | 57 bestanden, **2 fehlgeschlagen** | **scheitert** | **scheitert** | besteht | besteht | besteht |
+| neuer Stand | **59 bestanden, 0 fehlgeschlagen** | besteht | besteht | besteht | besteht | besteht |
+
+Die Meldung am alten Stand ist bei beiden dieselbe Stelle: „der Puffer ist nach dem Wechsel LEER — das ist der
+Befund: erwartet 0, bekommen 1" (T-F1) und „der Wechsel hat ihn verworfen: erwartet 0, bekommen 1" (T-F2).
+Rohausgaben: `docs/daten/bughunt-20261116/browser-ui-f-alt.txt` und `browser-ui-f-neu.txt`.
+
+**3. Bestehende Tests — erfüllt.** `tests/browser-ui.js` ist nur ergänzt, keine bestehende Zeile geändert. Grün sind
+am neuen Stand insbesondere „T-W2: gleiche Stufe und Farbe während der Rechnung lösen keine Anfrage aus" — der Test
+fasst denselben Handler an und bestätigt, dass die Rückkehr bei `aiThinking` weiter greift — und die
+TRAIN-1-Tests T-T1 bis T-T6.
+
+**4. `node tests/run.js` — erfüllt.** Alle 61 Testdateien bestanden, darunter `tests/training-stability.js`. CI grün
+(Nachtrag 8.6).
+
+**5. `auswertung/bughunt-20261116/pruefung.js` — erfüllt.** Am neuen Stand weiter **1 von 13 Fällen reproduziert**,
+nämlich B-2 („Spielende: toter Stein verschwindet, rotes Kreuz wird nie gezeichnet"). Ausgabe in
+`docs/daten/bughunt-20261116/nach-train2.json`, Konsole in `nach-train2-konsole.txt`, Prüfsummen in `SHA256SUMS`
+ergänzt.
+
+**Urteil: gültig.**
+
+### 8.2 Was der Gegenlauf am alten Stand gemessen hat
+
+Beide Szenarien einzeln am alten Stand nachgefahren, mit protokolliertem `_backward`:
+
+| Szenario | alter Stand | neuer Stand |
+|---|---|---|
+| T-F1: Wechsel, dann ein KI-Zug als Schwarz, zwei Pässe | Puffer nach dem Wechsel **1**; **zwei** `_backward`-Aufrufe, `moveIdx` 288 **und 72**, beide `advantage` −1; `gamesPlayed` 1 | Puffer **0**; **ein** Aufruf, nur `moveIdx` 288, `advantage` −1; `gamesPlayed` 1 |
+| T-F2: Wechsel, dann sofort zwei Pässe | Puffer **1**; **ein** Aufruf für `moveIdx` **72** (den Weiß-Zug) mit `advantage` −1; `gamesPlayed` 0 → **1**, `lastResult` −1 | Puffer **0**; **kein** Aufruf; `gamesPlayed` bleibt **0**, `lastResult` bleibt leer |
+
+In beiden Fällen hatte **Weiß** die Stellung gewonnen (8,5 zu 2 bzw. 8,5 zu 1), und in beiden Fällen bekam der
+Weiß-Zug `advantage` −1. Das Vorzeichen war also nicht nur für beide Farben gleich, sondern für diesen Eintrag
+umgekehrt.
+
+**Meine Vorhersagen in §4 zum alten Stand sind bei beiden Kernprüfungen aufgegangen** — für T-F1 „Puffer 1 nach dem
+Wechsel, zwei `_backward`-Aufrufe, der Weiß-Zug mit demselben `advantage`", für T-F2 „ein Training mit dem Weiß-Zug,
+`gamesPlayed` 1". Auch die drei Kontrollen verhielten sich wie angekündigt. Das ist hier erwähnenswert, weil bei der
+Passregel-Korrektur drei von fünf Vorhersagen falsch waren.
+
+### 8.3 Eine Ungenauigkeit in §6, offen benannt
+
+Die Probe in §6 baute den letzten Zug falsch: `{x: state.lastMove.x, y: state.lastMove.y}` statt
+`{x: xOf(state.lastMove), y: yOf(state.lastMove)}`. `state.lastMove` ist ein **Index** (Z. 5737), kein Objekt; `x`
+und `y` waren damit `undefined`, `idx(undefined, undefined)` ergibt `NaN`, und eine Zuweisung auf `inp[NaN]` wird von
+einem `Float32Array` stillschweigend verworfen. **Ebene 8 (letzter Zug) war in der Probe also leer.**
+
+Das ändert am Befund nichts, und zwar nicht aus Nachsicht, sondern weil der `advantage` nicht von der Eingabe
+abhängt: Er kommt allein aus `reward` und `baseline` und wird in `trainGame` vor der Schleife gebildet. Die übrigen
+zehn Ebenen waren richtig, alle Werte endlich, `_backward` lief ohne Divergenz. Die Tests T-F1 bis T-F5 bauen die
+Eingabe in der Form, die `triggerAIMove` benutzt (Z. 6218), und sind an derselben Stelle ausdrücklich kommentiert.
+
+### 8.4 Geändert
+
+- `index.html`: der Farb-Handler (Z. 6793 bis 6814). Sonst nichts.
+- Der Codeblock in §3 ist an den tatsächlichen Wortlaut des Kommentars angeglichen (Umlaute, ein Satz zum Klick auf
+  die schon aktive Farbe); inhaltlich unverändert.
+- `tests/browser-ui.js`: `t2Init`, `t2BisWechsel` und die Tests T-F1 bis T-F5 angefügt; nichts geändert.
+- `tests/README.md`: die Zeile zu `browser-ui.js` um die fünf Tests ergänzt.
+- `docs/bughunt-20261116.md` §3: TRAIN-2 von „steht weiter im Code" auf „behoben".
+- `docs/daten/bughunt-20261116/`: `nach-train2.json`, `nach-train2-konsole.txt`, `browser-ui-f-alt.txt`,
+  `browser-ui-f-neu.txt`, vier Zeilen in `SHA256SUMS`.
+
+Die `README.md` des Repos bleibt unberührt: Das Verhalten der Oberfläche ändert sich nur in einem Randfall des
+Trainings, und das Netz steuert im Default nicht.
+
+### 8.5 Was offen bleibt
+
+- **Variante (b)** ist nicht umgesetzt. Wer die Beispiele der alten Farbe erhalten will, braucht die Farbe im
+  Puffereintrag, ein Vorzeichen je Eintrag und eine Antwort auf die Baseline-Frage aus §3. Das ist eine eigene
+  Vorabfestlegung.
+- **Wie oft ein Farbwechsel mitten in der Partie vorkommt, ist nicht erhoben.** Ohne diese Zahl lässt sich nicht
+  sagen, wie viel Training der Fehler bisher verdorben hat.
+- **Keine Spielstärkeaussage.** Bei `netMaxBlend` 0 steuert das Netz nicht; eine Folge für das Spielgefühl wäre eine
+  Hypothese und ist nicht gemessen.
+- **Eine Umgebung.** Chromium über Playwright im Container. Firefox, Safari und ein echtes Handy sind nicht geprüft;
+  der Handler hängt an keiner Browser-Eigenheit, das ist aber gelesen und nicht gemessen.
+- **Die Nebenwirkung von `updateUI()`** (Statuszeile auf „–") ist in §3 begründet, aber nicht eigens getestet. Sie
+  tritt nur in dem Zweig auf, der auch die Protokollzeile schreibt.
