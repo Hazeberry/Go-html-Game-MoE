@@ -107,9 +107,11 @@ Eine Einfügung in `reset()`:
 - **Nur eine Konsolenwarnung, keine Protokollzeile.** `save()` und das Dashboard machen es ebenso. Der Fall trifft
   Browser mit gesperrtem Storage; dort schlägt ohnehin jedes Speichern fehl, und eine Zeile je Reset im Zugprotokoll
   wäre Lärm an der falschen Stelle.
-- **Bei gesperrtem Storage ist der Reset nicht dauerhaft:** `save()` am Ende von `reset()` lehnt still ab, und beim
-  nächsten Laden kommt der alte Stand zurück. Das ist eine Eigenschaft der Umgebung, nicht dieser Korrektur, und wird
-  mit ihr nicht schlechter.
+- **Bei gesperrtem Storage ist der Reset nicht dauerhaft:** `save()` am Ende von `reset()` lehnt still ab.
+  **Berichtigt am 23.11.2026 (§10):** Hier stand „und beim nächsten Laden kommt der alte Stand zurück". Das gilt nur,
+  wenn der Storage lesbar, aber nicht schreibbar ist (Quota erschöpft). Sind die Site-Daten ganz blockiert, wirft auch
+  `getItem`, `load()` liefert `false`, und das Netz startet mit frischen Gewichten — es kommt gar kein Stand zurück.
+  Das ist eine Eigenschaft der Umgebung, nicht dieser Korrektur, und wird mit ihr nicht schlechter.
 
 **Unverändert:** `save()`, `load()`, `trainGame`, der Dashboard-Knopf, das Dashboard, die Zugwahl. Die Blöcke
 `shared-go-logic` und `worker-ai` bleiben byteidentisch (§1).
@@ -266,6 +268,8 @@ Divergenz, Speicherpfad und Training prüfen.
 **Was diese Nachprüfung nicht abdeckt:** Ein echtes privates Browserfenster (die Sperre ist im Test erzeugt), ein
 `--nettrain`-Lauf des Harness mit erzwungener Divergenz (die Schale dort wirft nie, der Fall ist konstruierbar, aber
 nicht erspielt), und die Frage, ob `ab-harness.js --nettrain` überhaupt je mit divergierenden Gewichten gelaufen ist.
+**Teilweise nachgeholt am 23.11.2026 (§10):** Der Fall „alle drei Storage-Operationen werfen" steht jetzt als T-N6
+und T-N7 in `tests/nan-guards.js`. Ein echtes privates Browserfenster bleibt ungeprüft.
 
 ## 9. Nachtrag: Umsetzung und Abnahme (22.11.2026)
 
@@ -303,3 +307,63 @@ eine Momentaufnahme jenes historischen Vergleichs; sie zu aktualisieren würde d
 `localStorage.removeItem` und im Browser von `Storage.prototype.removeItem` erzeugt, nicht durch ein echtes privates
 Fenster. Die Divergenz ist durch ein gesetztes NaN erzwungen, nicht erspielt. Ein `--nettrain`-Lauf des Harness mit
 erzwungener Divergenz ist nicht gemacht (§8).
+
+## 10. Nachtrag: Folgeprüfung bei vollständig blockiertem Storage (23.11.2026)
+
+Anlass: Hazeberry fragte nach einer Kettenreaktion dieser Korrektur. **Status: nur Dokumentation und zwei Tests.**
+`index.html` ist unverändert, keine Spieländerung, kein Messlauf. Lokal geprüft, Node v22.23.5.
+
+### 10.1 Was §8 nicht gefragt hatte
+
+§8 prüfte, wer den Block lädt und ob der Diff nur die eine Stelle berührt. Nicht gefragt war, wie sich der
+**Divergenzpfad** verhält, wenn der Storage nicht nur beim Löschen wirft, sondern bei **allen drei** Operationen —
+also in dem Fall, den §3 „blockierte Site-Daten" nennt. Die Tests sperren bisher weniger: T-N1 und T-N2 ersetzen genau
+`removeItem`, T-N3 und T-N4 lassen `removeItem` werfen und `getItem` `null` liefern, `setItem` bleibt unberührt.
+
+### 10.2 Befund: Bei blockiertem Storage ist der Rollback-Zweig unerreichbar
+
+`trainGame`, `index.html` Z. 7292:
+
+```js
+if (this._divergences < 3 && this.load()) { /* Rollback auf den letzten gültigen Stand */ } else { this.reset(); }
+```
+
+Wirft `getItem`, fängt `load()` den Wurf und gibt `false`. Die linke Bedingung ist dann nie erfüllbar, der
+`else`-Zweig greift ab der ersten Divergenz, und weil `reset()` selbst `this._divergences = 0` setzt, kann die
+Dreier-Schwelle nie hochzählen. Gemessen (T-N7), mit einem gültigen Stand in der Ablage und `gamesPlayed` 5:
+
+| Storage | Zweig | `_divergences` danach | `gamesPlayed` danach |
+|---|---|---|---|
+| frei (Kontrolle) | Rollback | 1 | 5 — erhalten |
+| blockiert, Lauf 1 bis 3 | `reset()` | 0 | 0 — weg |
+
+**Das ist kein Fehler dieser Korrektur und keine Verschlechterung.** Vorher brach dieser Pfad laut ab — das war der
+Befund. Jetzt läuft er durch: das Spielende funktioniert, und das Netz setzt sich bei jeder Divergenz still auf
+Zufallsgewichte zurück. Die Kette ist also, dass ein lautes Abbrechen zu einem stillen, wiederkehrenden Verlust des
+Trainingsstands wird. Sichtbar ist davon nur der Zähler im Dashboard, der auf 0 fällt, und eine `console.warn`.
+
+### 10.3 Befund: Der Fix trägt auch dort — gemessen, bisher nicht gezeigt
+
+Werfen alle drei Operationen, wirft `reset()` trotzdem nicht, die Gewichte sind endlich, die Zähler stehen auf 0, und
+`load()` gibt `false` (T-N6). Der Grund ist, dass `save()` (Z. 7316) und `load()` (Z. 7339) ihre Zugriffe schon vorher
+in `try` hatten; die Korrektur brauchte deshalb keine Begleitänderung. Gezählt: von 17 Nennungen von `localStorage`
+in `index.html` sind acht echte Aufrufe — drei für `go_pnet` (Z. 7330, 7341, 7386) und fünf im Dashboard (Z. 8141,
+8151, 8152, 8161, 8177). Alle acht stehen jetzt in einem `try`.
+
+### 10.4 Was offen bleibt
+
+- **`dashUpdate()` ist nicht durchgängig null-sicher.** Z. 7402 prüft `pn-games`, danach werden `pn-wins`, `pn-blend`
+  und `pn-result` ungeprüft dereferenziert, während `pn-health` und `pn-warmup-bar` geprüft sind. Bestehend, nicht von
+  dieser Korrektur eingeführt — aber `reset()` erreicht `save()` und `dashUpdate()` jetzt in genau der Umgebung, in der
+  es vorher abbrach, und es ist dieselbe Fehlerklasse: eine Ausnahme im Spielende-Pfad. Geringe Schwere, die Elemente
+  stehen im selben Markup. **Eine Änderung daran braucht eigene Vorabfestlegung und Go.**
+- Ein echtes privates Browserfenster bleibt ungeprüft; die Sperre ist in allen Tests erzeugt.
+- Der Knopf bei Z. 7887 nutzt einen Inline-Handler. Bestehend, von dieser Korrektur nicht berührt; nur vermerkt, falls
+  das Markup einmal angefasst wird.
+
+### 10.5 Geändert
+
+`tests/nan-guards.js` (T-N6 und T-N7, die Datei hat damit 16 Tests statt der in §9 genannten 14), `tests/README.md`
+(Zeile für die Datei; dazu die Laufzeitangabe, denn „< 1 s" stimmte schon vor dieser Änderung nicht — gemessen 2,1 s,
+mit den neuen Tests 4,2 s) und §3 sowie §8 dieses Docs. Die Tabelle „vor dem Fix / nach dem Fix" in `tests/README.md`
+bleibt wie in §9 begründet unangetastet.
