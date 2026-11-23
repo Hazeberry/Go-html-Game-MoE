@@ -105,7 +105,12 @@ test('Wertung zählt: Area gegen Territory (Partie vom 31.10.), mit Gefangenen',
 
 test('Verdrahtung: Hauptthread, Worker-Nachricht und Rückfall reichen gegnerPasste, Wertung und Komi weiter', () => {
   pruefe(/function passExtra\(\)\s*\{\s*return \{gegnerPasste: state\.consecutivePasses >= 1, wertung: state\.scoringMode, komi: KOMI\};/.test(html), 'passExtra');
-  pruefeGleich((html.match(/passExtra\(\)/g) || []).length, 4, 'Definition + Worker-Anfrage + zwei Aufrufe (Rückfall, Mittel/Leicht)');
+  /* 4 → 6 durch BR-1 (docs/passregel-wege-nachtrag-vorabfestlegung.md §3):
+     Die beiden Reproduktions-Schnappschuesse tragen jetzt ebenfalls
+     extra: passExtra(). Die Zahl bleibt eine Zahl und keine Mindestgrenze,
+     damit ein versehentlich weggefallener Aufruf weiter auffaellt. */
+  pruefeGleich((html.match(/passExtra\(\)/g) || []).length, 6,
+    'Definition + Worker-Anfrage + zwei Aufrufe (Rückfall, Mittel/Leicht) + zwei Schnappschuesse (BR-1)');
   pruefe(/d\.extra \?\? null/.test(html), 'Worker reicht extra an getAIMove weiter');
   pruefe(/extra:\s+passExtra\(\)/.test(html), 'Anfrage an den Worker enthält extra');
 });
@@ -214,6 +219,108 @@ test('T-PW5: mit Schalter 0 spielt gnugo-duell.js dieselben Partien wie vorher (
       pruefeGleich(neu, vorher, 'Zug fuer Zug dieselben Partien wie vor der Korrektur');
     } finally { fs.rmSync(altDatei, {force: true}); }
   } finally { fs.rmSync(ordner2, {recursive: true, force: true}); }
+});
+
+
+/* ══ T-PR1: Bestandspruefung der Engine-Aufrufer ═══════════════════════
+   docs/passregel-wege-nachtrag-vorabfestlegung.md §1.4 und §1.5.
+
+   Dieser Test behebt nichts. Er haelt den Bestand GESCHLOSSEN: Eine neue
+   Datei, die die Engine anfasst, macht ihn rot, bis jemand sie einordnet. Er
+   steht an der Stelle der dort verworfenen Warnung in der Engine und greift
+   frueher als sie -- in der CI, bevor ein Messlauf laeuft, statt mitten darin.
+
+   Vorbehalt, in §1.5 benannt: Geprueft wird TEXT, nicht Verhalten. Eine Datei,
+   die hier als `versorgt` steht und spaeter einen zweiten Codeweg bekommt, der
+   extra vergisst, faellt diesem Test NICHT auf. Das haette die Engine-Warnung
+   zur Laufzeit gefangen; sie ist aus den Gruenden in §1.3 und §1.5 nicht
+   gebaut. */
+const BESTAND = {
+  /* gibt extra an getAIMove weiter */
+  'gnugo-duell.js':                               'versorgt',
+  'gtp-ki.js':                                    'versorgt',
+  /* ruft passNachGegnerpassPruefung selbst mit extra auf, ohne getAIMove */
+  'auswertung/endspiel/passregel-stellungen.js':  'versorgt-direkt',
+  'auswertung/endspiel/passregel-vorsprung.js':   'versorgt-direkt',
+  /* bricht ab, wenn der Schalter an ist */
+  'ab-harness.js':                                'waechter',
+  'auswertung/weiterspielen.js':                  'waechter',
+  'auswertung/diagnose/wurzel-replay.js':         'waechter',
+  'auswertung/lerner-pruefung.js':                'waechter',
+  'auswertung/endspiel/passregel-fortsetzung.js': 'waechter',
+  /* setzt PARAMS nur aus DEFAULT plus festen Literalen und nennt den Schalter
+     nirgends -- allein deshalb sicher, weil der Standardwert 0 ist */
+  'auswertung/annaeherung.js':                    'feste-literale',
+  'auswertung/endspiel/netz-kosten.js':           'feste-literale',
+  'auswertung/endspiel/pass-stellungen.js':       'feste-literale',
+  'auswertung/kritisch-rang.js':                  'feste-literale',
+  'auswertung/lebensurteil-vergleich.js':         'feste-literale',
+  'auswertung/muster-endspiel-daten.js':          'feste-literale',
+  'auswertung/netz-zeit.js':                      'feste-literale',
+  'auswertung/zugwahl-grund.js':                  'feste-literale',
+  'auswertung/zugwert-rang.js':                   'feste-literale',
+  'auswertung/zugwert-suche.js':                  'feste-literale',
+  'distillation/collect.js':                      'feste-literale'
+};
+
+/* Dateien, die den Schalter nennen, ohne die Engine selbst zu rufen. */
+const SCHALTERSTELLEN = {
+  'auswertung/endspiel/passregel-lib.js':           'liest ihn nur fuer den Bericht',
+  'auswertung/endspiel/passregel-zaehldiagnose.js': 'setzt ihn auf 1 und geht ueber passregel-stellungen.js'
+};
+
+const jsDateien = () => execFileSync('git', ['ls-files', '*.js'], {cwd: wurzel, encoding: 'utf8'})
+  .split('\n').filter(f => f && !f.startsWith('tests/'));
+const quelle = rel => fs.readFileSync(path.join(wurzel, rel), 'utf8');
+
+test('T-PR1: der Bestand der Engine-Aufrufer ist geschlossen, jede Klasse haelt ihre Eigenschaft', () => {
+  const alle = jsDateien();
+  const gelistet = Object.keys(BESTAND);
+
+  /* 1. Geschlossene Welt der Aufrufer. */
+  const ruft = alle.filter(f => /getAIMove\(|passNachGegnerpassPruefung\(/.test(quelle(f)));
+  const unverzeichnet = ruft.filter(f => !gelistet.includes(f));
+  const verschwunden = gelistet.filter(f => !ruft.includes(f));
+  pruefe(unverzeichnet.length === 0, unverzeichnet.length
+    ? `NEUE Datei ruft die Engine an und ist nicht eingeordnet: ${unverzeichnet.join(', ')}`
+      + ' -- in BESTAND aufnehmen (docs/passregel-wege-nachtrag-vorabfestlegung.md §1.4):'
+      + ' versorgt, versorgt-direkt, waechter oder feste-literale'
+    : 'keine unverzeichnete Datei ruft die Engine an');
+  pruefe(verschwunden.length === 0, verschwunden.length
+    ? `verzeichnete Datei ruft die Engine nicht mehr an: ${verschwunden.join(', ')} -- BESTAND kuerzen`
+    : 'keine verzeichnete Datei ist verschwunden');
+  pruefeGleich(ruft.length, 20, 'heute sind es 20 Dateien (§1.4)');
+
+  /* 2. Geschlossene Welt der Schalterstellen: auch eine Datei, die den
+        Schalter anfasst, ohne die Engine zu rufen, soll auffallen. */
+  const nennt = alle.filter(f => /passNachGegnerpass/.test(quelle(f)));
+  const fremd = nennt.filter(f => !gelistet.includes(f) && !(f in SCHALTERSTELLEN));
+  pruefe(fremd.length === 0, fremd.length
+    ? `Datei nennt den Schalter und ist nirgends eingeordnet: ${fremd.join(', ')}`
+    : 'jede Datei, die den Schalter nennt, ist eingeordnet');
+
+  /* 3. Eigenschaft je Klasse. */
+  let gezaehlt = {versorgt: 0, 'versorgt-direkt': 0, waechter: 0, 'feste-literale': 0};
+  for (const [rel, klasse] of Object.entries(BESTAND)) {
+    const q = quelle(rel);
+    gezaehlt[klasse]++;
+    if (klasse === 'versorgt')
+      pruefe(/gegnerPasste/.test(q), `${rel}: gibt extra mit gegnerPasste weiter`);
+    else if (klasse === 'versorgt-direkt')
+      pruefe(/passNachGegnerpassPruefung\(/.test(q) && /gegnerPasste: true/.test(q),
+             `${rel}: ruft die Pruefung direkt mit einem extra auf`);
+    else if (klasse === 'waechter')
+      pruefe(/passNachGegnerpass (>= 1|!== 0)/.test(q), `${rel}: Waechter auf den Schalter`);
+    else
+      /* Das ist die Eigenschaft, auf der ihre Sicherheit beruht: Wer den
+         Schalter nicht nennt, kann ihn nicht einschalten -- der Rest kommt
+         aus DEFAULT, und dort steht 0. */
+      pruefe(!/passNachGegnerpass/.test(q),
+             `${rel}: nennt den Schalter nicht (feste Literale, §1.4)`);
+  }
+  pruefeGleich(JSON.stringify(gezaehlt), JSON.stringify(
+    {versorgt: 2, 'versorgt-direkt': 2, waechter: 5, 'feste-literale': 11}),
+    'die vier Klassen sind 2 + 2 + 5 + 11 (§1.4)');
 });
 
 laufeTests('Versuchsregel Pass nach Gegnerpass').then(ok => process.exit(ok ? 0 : 1));

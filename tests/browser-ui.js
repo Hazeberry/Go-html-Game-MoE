@@ -1715,6 +1715,177 @@ test('T-F5: ein Undo nach dem Verwerfen fuellt den Puffer nicht mit Luecken (Kon
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 
+
+/* ══ BR-1: der Reproduktions-Schnappschuss ist der Worker-Request ══════
+   docs/passregel-wege-nachtrag-vorabfestlegung.md, Tests nach §4.
+
+   state.lastAIRequest verspricht im Kommentar an buildBugReport, der letzte
+   Worker-Request zu sein, trug aber reqId und extra nicht. Ohne extra laeuft
+   eine Nachstellung OHNE die Versuchsregel: gemessen (§2.2) ueber einen
+   anderen Zweig, mit anderem info und ohne versuch-Feld.
+
+   Vorgabe aus §4: Der Schnappschuss muss ueber den ECHTEN Weg entstehen
+   (triggerAIMove mit workerDead, damit er gebaut wird), nicht von Hand
+   nachgebaut -- ein nachgebautes Objekt enthielte am alten wie am neuen Code
+   dasselbe und pruefte nichts. */
+const brInit = () => {
+  /* Zwei Aufrufe mit identischem Zufallsstrom, sonst sind zwei Suchen auf
+     derselben Stellung nicht vergleichbar. */
+  globalThis.brSaat = () => {
+    let s = 42;
+    Math.random = () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
+  };
+  globalThis.brRuf = (snap, extra) => {
+    brSaat();
+    return getAIMove(new Uint8Array(snap.board), snap.aiColor, new Set(snap.histHashes),
+      {...snap.captures}, snap.mc, snap.difficulty || 'hard', 1, snap.koPoint, snap.lastMove, extra);
+  };
+  /* Weiss besitzt das Brett mit zwei Augen, Schwarz hat gerade gepasst:
+     genau der Fall, in dem die Versuchsregel greift. Kuenstlich, aber die
+     Regel haengt nur an gegnerPasste und am Vorsprung. */
+  globalThis.brStellung = () => {
+    for (let i = 0; i < 361; i++) state.board[i] = 2;
+    state.board[idx(0, 0)] = 0; state.board[idx(18, 18)] = 0;
+    state.aiColor = 2; state.currentPlayer = 2;
+    state.consecutivePasses = 1; state.moveCount = 200;
+    PARAMS.mctsFixedSims = 20; PARAMS.adaptiveBudgetEnabled = 0;
+  };
+};
+
+test('T-BR1: der Schnappschuss des Schwer-Wegs traegt extra und reqId, die Nachstellung trifft den Zug', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(brInit);
+  const r = await s.evaluate(() => {
+    const echtesRandom = Math.random;
+    PARAMS.passNachGegnerpass = 1;
+    brStellung();
+    state.aiDifficulty = 'hard';
+    state.aiEnabled = true; state.workerDead = true;   /* erzwingt den Schnappschuss-Zweig */
+    triggerAIMove();
+    const snap = state.lastAIRequest;
+    const schluessel = Object.keys(snap);
+    const mitExtra = brRuf(snap, passExtra());
+    const ausSnap  = brRuf(snap, snap.extra);
+    Math.random = echtesRandom;
+    return {schluessel,
+            extra: snap.extra === undefined ? null : snap.extra,
+            reqIdTyp: typeof snap.reqId, reqId: snap.reqId,
+            mitExtra: {typ: mitExtra.type, info: mitExtra.info || null,
+                       versuch: mitExtra.versuch ? {pass: mitExtra.versuch.pass} : null},
+            ausSnap:  {typ: ausSnap.type, info: ausSnap.info || null,
+                       versuch: ausSnap.versuch ? {pass: ausSnap.versuch.pass} : null}};
+  });
+  await ctx.close();
+  /* Vorbedingung: die Regel greift in dieser Stellung ueberhaupt. */
+  pruefe(r.mitExtra.versuch !== null, 'Vorbedingung: der echte Aufruf wendet die Versuchsregel an');
+  pruefeGleich(r.mitExtra.typ, 'pass', 'und sie fuehrt zum Pass');
+  /* Der Befund. */
+  pruefe(r.extra !== null, 'der Schnappschuss traegt extra — das ist der Befund');
+  pruefeGleich(r.extra && r.extra.gegnerPasste, true, 'extra.gegnerPasste ist gesetzt');
+  pruefe(r.extra && typeof r.extra.wertung === 'string', 'extra.wertung ist dabei');
+  pruefeGleich(r.extra && r.extra.komi, 7.5, 'extra.komi ist dabei');
+  pruefeGleich(r.reqIdTyp, 'number', 'der Schnappschuss traegt reqId');
+  pruefe(r.reqId > 0, `reqId ist die echte Kennung (${r.reqId})`);
+  pruefe(r.schluessel.includes('extra') && r.schluessel.includes('reqId'),
+         `beide Felder in den Schluesseln (${r.schluessel.join(',')})`);
+  /* Und die Nachstellung trifft jetzt denselben Zweig. */
+  pruefeGleich(r.ausSnap.typ, r.mitExtra.typ, 'die Nachstellung liefert denselben Zugtyp');
+  pruefeGleich(r.ausSnap.info, r.mitExtra.info, 'dieselbe Begruendung — nicht mehr „eigene Augen“');
+  pruefe(r.ausSnap.versuch !== null, 'und das versuch-Feld ist da');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-BR2: der Schnappschuss des Leicht/Mittel-Wegs traegt extra und reqId', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(brInit);
+  const r = await s.evaluate(async () => {
+    state.aiEnabled = false; state.aiColor = 2; state.aiDifficulty = 'easy';
+    placeStone(3, 3);                      /* Mensch, Schwarz → Weiss am Zug */
+    state.aiEnabled = true;
+    /* Der Leicht/Mittel-Zweig steckt in einem setTimeout (Z. 6332): nach dem
+       synchronen Aufruf gibt es den Schnappschuss noch nicht. Darauf warten,
+       nicht raten. */
+    triggerAIMove();
+    for (let i = 0; i < 100 && !state.lastAIRequest; i++)
+      await new Promise(f => setTimeout(f, 50));
+    const snap = state.lastAIRequest;
+    if (!snap) return {fehlt: true};
+    return {schluessel: Object.keys(snap),
+            extra: snap.extra === undefined ? null : snap.extra,
+            reqIdTyp: typeof snap.reqId, stufe: snap.difficulty,
+            zuege: state.moveCount};
+  });
+  await ctx.close();
+  pruefe(!r.fehlt, 'der Schnappschuss ist innerhalb von 5 s entstanden');
+  pruefeGleich(r.stufe, 'easy', 'Vorbedingung: der Schnappschuss ist der des Leicht-Wegs');
+  pruefeGleich(r.zuege, 2, 'und die KI hat wirklich gezogen');
+  pruefe(r.extra !== null, 'er traegt extra');
+  pruefeGleich(r.extra && r.extra.gegnerPasste, false, 'gegnerPasste ist hier false (niemand hat gepasst)');
+  pruefeGleich(r.reqIdTyp, 'number', 'und reqId');
+  pruefe(r.schluessel.includes('extra') && r.schluessel.includes('reqId'),
+         `beide Felder in den Schluesseln (${r.schluessel.join(',')})`);
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-BR3: mit dem Default-Schalter aendert die Nachstellung nichts (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(brInit);
+  const r = await s.evaluate(() => {
+    const echtesRandom = Math.random;
+    brStellung();                          /* Schalter bleibt auf dem Default */
+    state.aiDifficulty = 'hard';
+    state.aiEnabled = true; state.workerDead = true;
+    triggerAIMove();
+    const snap = state.lastAIRequest;
+    const a = brRuf(snap, passExtra());
+    const b = brRuf(snap, snap.extra);
+    Math.random = echtesRandom;
+    return {schalter: PARAMS.passNachGegnerpass,
+            a: {typ: a.type, info: a.info || null, x: a.x ?? null, y: a.y ?? null, versuch: !!a.versuch},
+            b: {typ: b.type, info: b.info || null, x: b.x ?? null, y: b.y ?? null, versuch: !!b.versuch}};
+  });
+  await ctx.close();
+  pruefeGleich(r.schalter, 0, 'Vorbedingung: die Versuchsregel ist aus (Default)');
+  pruefeGleich(r.b.typ, r.a.typ, 'derselbe Zugtyp');
+  pruefeGleich(r.b.x, r.a.x, 'derselbe Punkt (x)');
+  pruefeGleich(r.b.y, r.a.y, 'derselbe Punkt (y)');
+  pruefeGleich(r.b.info, r.a.info, 'dieselbe Begruendung');
+  pruefeGleich(r.a.versuch, false, 'kein versuch-Feld, weil der Schalter aus ist');
+  pruefeGleich(r.b.versuch, false, 'auf beiden Wegen nicht');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-BR4: der Fehlerbericht bleibt gueltiges JSON und traegt bewusst kein netPriors (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(brInit);
+  const r = await s.evaluate(() => {
+    brStellung();
+    state.aiDifficulty = 'hard';
+    state.aiEnabled = true; state.workerDead = true;
+    triggerAIMove();
+    const roh = buildBugReport();
+    let b = null, fehler = null;
+    try { b = JSON.parse(roh); } catch (e) { fehler = (e && e.message) || String(e); }
+    const rep = (b && b.reproduktion) || {};
+    return {laenge: roh.length, parseFehler: fehler,
+            hatReproduktion: !!(b && b.reproduktion),
+            schalterImBericht: rep.params ? rep.params.passNachGegnerpass : 'fehlt',
+            hatNetPriors: Object.prototype.hasOwnProperty.call(rep, 'netPriors'),
+            hatBrett: Array.isArray(rep.board)};
+  });
+  await ctx.close();
+  pruefeGleich(r.parseFehler, null, 'der Bericht ist gueltiges JSON');
+  pruefeGleich(r.hatReproduktion, true, 'mit einem Reproduktions-Teil');
+  pruefeGleich(r.hatBrett, true, 'der das Brett enthaelt');
+  pruefeGleich(r.schalterImBericht, 0, 'PARAMS im Bericht nennt den Schalter (Default 0)');
+  /* Bewusste Entscheidung aus §3: die 361 Priors waeren 7775 Zeichen gegen
+     8106 des ganzen Berichts. Der Kommentar an buildBugReport nennt die
+     Grenze; dieser Test haelt sie fest, damit sie nicht unbemerkt kippt. */
+  pruefeGleich(r.hatNetPriors, false, 'und bewusst KEIN netPriors (§3)');
+  pruefe(r.laenge > 500 && r.laenge < 60000, `der Bericht bleibt handlich (${r.laenge} Zeichen)`);
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
 laufeTests('Review-Korrekturen im echten Browser').then(ok => {
   if (!playwright || !chromePfad)
     console.log(`\n  ${PFLICHT ? 'FEHLT' : 'Übersprungen'}: ${!playwright ? 'Playwright' : 'Chromium'} nicht gefunden.`);
