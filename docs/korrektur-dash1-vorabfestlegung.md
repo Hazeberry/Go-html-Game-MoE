@@ -109,8 +109,10 @@ Der Rest der Funktion bleibt unverändert, `pn-health` und `pn-warmup-bar` behal
   würde auch `pn-health` und `pn-warmup-bar` betreffen. Fehler sollen auffallen, nur nicht den Aufrufer mitnehmen.
 - *Den `try/catch` um die Aufrufe von `dashUpdate` legen.* Behandelt den Fehler dort, wo er nicht entsteht, und
   verdeckt jeden anderen Fehler in der Funktion gleich mit.
-- *Die Inline-Handler im Dashboard mitnehmen.* Z. 7896 hängt `policyNet.reset()` an ein `onclick`, was gegen die
-  Regel „neue Oberfläche ohne Inline-Handler" steht. Bestehender Code, ein eigener Punkt, nicht hier.
+- *Die Inline-Handler im Dashboard mitnehmen.* Das Dashboard ist durchgehend so geschrieben: 20 der 25
+  Inline-Handler in `index.html` stehen dort, `onclick` wie `onchange`. CLAUDE.md verlangt es fuer **neue**
+  Oberflaeche, bestehender Code verstoesst also nicht dagegen. Eine Umstellung waere ein eigenes Vorhaben mit
+  eigener Festlegung, kein Beiwerk dieser Korrektur.
 
 **Nicht Teil der Korrektur:** TRAIN-2. Die Frage, ob die Versuchsregel auch in `gnugo-duell.js`, `ab-harness.js` und
 den Auswertungsskripten versorgt werden soll (Punkt 4 der Liste). Die Inline-Handler im Dashboard.
@@ -179,3 +181,63 @@ Diese Vorgabe steht deshalb in §4.
 2. Umsetzung in einem eigenen PR: Code nach §3, Tests nach §4, `tests/README.md`, Nachtrag hier mit den Ergebnissen
    aus §5, der Eintrag nach Abnahmepunkt 6 und eine Zeile in `docs/bughunt-20261116.md` §3.
 3. CI grün, Merge, kurzer Bericht mit den löschbaren Branches.
+
+## 8. Nachtrag: Umsetzung und Abnahme (23.11.2026)
+
+Hazeberry: Go für die Liste und die PRs, autonom. Die Umsetzung folgt §3 und §4 ohne Abweichung in der Sache.
+Node v22.23.5, Chromium headless, lokal; kein Messlauf.
+
+### 8.1 Die sechs Abnahmepunkte
+
+1. **`shared-go-logic` und `worker-ai` sind byteidentisch** (`54dfef2d…`, `f847c124…`), **`policy-net` steht jetzt auf
+   `14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190`** (vorher `b0040fe8…`). `PARAMS_DEFAULT`
+   unverändert. Der Diff an `index.html` ist **ein einziger Block** bei Z. 7408, also ausschließlich `dashUpdate`.
+2. **T-DA1 schlägt am alten Code fehl und besteht am neuen; T-DA2 bis T-DA4 bestehen an beiden.** Zwei Läufe von
+   `tests/browser-ui.js`, einmal gegen den `index.html` am Stand `93156e9`: **alt 53 von 54**, neu **54 von 54**. Die
+   Meldung am alten Code: `ohneWins: kein Wurf: erwartet null, bekommen TypeError`.
+3. **Die bestehenden 50 Tests in `tests/browser-ui.js` sind unverändert und bestehen.** Dass T-DA2 auch am alten Code
+   besteht, ist der Nachweis für den Normalfall: dieselben vier Werte, `7`, `4 (57%)`, `0%`, `✓ Sieg`.
+4. **`node tests/run.js` lokal: alle 60 Testdateien bestanden.** CI: siehe PR.
+5. **`pruefung.js` am neuen Code: weiter 1 von 13 reproduziert, nämlich B-2.** Abgelegt als
+   `docs/daten/bughunt-20261116/nach-dash1.json` mit `nach-dash1-konsole.txt`, beide in `SHA256SUMS` ergänzt;
+   `sha256sum -c` bestätigt alle 41 Einträge.
+6. **Der Nachtrag in `docs/korrektur-d1-w1-vorabfestlegung.md` §1 nennt die neue `policy-net`-Prüfsumme** und
+   markiert sie ausdrücklich als die aktuelle.
+
+### 8.2 Eine Abweichung von §7, offen benannt
+
+§7 Nr. 2 verlangt „eine Zeile in `docs/bughunt-20261116.md` §3". **Die habe ich nicht geschrieben**, und zwar
+absichtlich: Jener §3 heißt „Stand der älteren Befunde" und führt die Befunde des Bug Hunts vom 16.11. und der
+Bughunt-Wiederholung — UI-1 bis UI-3, TRAIN-1, TRAIN-2, NET-1, GTP-1 bis GTP-3. **DASH-1 steht dort nicht**, der
+Befund stammt aus der Folgeprüfung zu NET-1. Eine Zeile dort hätte einen Befund vermerkt, den das Doc nie erhoben
+hat.
+
+Stattdessen steht der Zeiger da, wo der Befund herkommt: `docs/korrektur-net1-vorabfestlegung.md` §10.4 trug ihn als
+„braucht eigene Vorabfestlegung und Go" und hat jetzt einen Nachtrag, der auf dieses Doc verweist. Das ist dieselbe
+Pflege, nur an der richtigen Stelle. Ich hatte §7 nach dem Muster der vorigen Korrekturen geschrieben, ohne zu
+prüfen, ob der Befund in jenem §3 überhaupt vorkommt.
+
+### 8.3 Was die Messung bestätigt und was sie nicht zeigt
+
+Bestätigt: Der Normalfall bleibt bitgleich (T-DA2 an beiden Ständen), jeder Fehlfall wirft nicht mehr und schreibt
+nichts (T-DA1), die Optionalität von `pn-health` und `pn-warmup-bar` bleibt (T-DA3), und der frühe Ausstieg bei
+fehlendem `pn-games` arbeitet wie bisher (T-DA4).
+
+Nicht gezeigt, und in §2 schon so festgehalten: **ein Ausfall im Spiel.** Die fehlenden Elemente sind im Test aus dem
+DOM entfernt, nicht nie erzeugt; in der ausgelieferten `index.html` stehen alle sechs in einem Markup-Block. Die
+Korrektur beseitigt eine Unsymmetrie und eine Fehlerklasse, keinen beobachteten Vorfall.
+
+### 8.4 Geändert
+
+`index.html` (nur `dashUpdate`), `tests/browser-ui.js` (T-DA1 bis T-DA4), `tests/README.md`, dieses Doc,
+`docs/korrektur-d1-w1-vorabfestlegung.md` §1, `docs/korrektur-net1-vorabfestlegung.md` §10.4 und die beiden
+Prüfdateien unter `docs/daten/bughunt-20261116/` samt `SHA256SUMS`.
+
+### 8.5 Was offen bleibt
+
+- Die **Inline-Handler im Dashboard**: 20 der 25 in `index.html` stehen dort (ab Z. 7865), `onclick` wie
+  `onchange`. **Berichtigung meiner eigenen Notiz:** Ich hatte in einem frueheren Bericht von zwei Stellen
+  gesprochen und sie als Regelverstoss bezeichnet. Beides war falsch: es ist ein durchgehendes Muster, und die
+  Regel gilt fuer **neue** Oberflaeche, bestehender Code verstoesst also nicht. Eine Umstellung braeuchte eine
+  eigene Festlegung; von dieser Korrektur ist nichts davon beruehrt.
+- **TRAIN-2** steht weiter im Code, ohne Vorabfestlegung.

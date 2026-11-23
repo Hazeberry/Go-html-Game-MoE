@@ -24,6 +24,11 @@ SHA-256 des Inhalts der drei Blöcke am Stand `0f11058` (Prüfung in §5):
 §9). `shared-go-logic` und `worker-ai` sind unverändert. Wer hier nachschlägt, um „Engine unberührt" zu belegen, nimmt
 für `policy-net` die neuere Zahl.
 
+**Nachtrag 23.11.2026:** Und seit der Korrektur DASH-1 lautet sie
+`14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190`
+(`docs/korrektur-dash1-vorabfestlegung.md` §1 und §8). `shared-go-logic` und `worker-ai` sind weiter
+unverändert. **Diese Zahl ist die aktuelle.**
+
 Deshalb gibt es **keinen Schalter** und **keinen Messlauf**. Im normalen Spielverlauf bekommt die Suche dieselben
 Anfragen wie vorher. Abweichungen gibt es nur in zwei Fällen:
 - **D-1:** Die Engine bekommt den Wert, der im Dashboard tatsächlich eingegeben wurde.

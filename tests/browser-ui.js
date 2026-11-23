@@ -1442,6 +1442,90 @@ test('T-T6: ein Undo ohne Spielende schreibt keine Zeile und kuerzt den Puffer (
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 
+/* ══ DASH-1: dashUpdate ist null-sicher ════════════════════════════
+   docs/korrektur-dash1-vorabfestlegung.md, Tests nach §4. dashUpdate pruefte
+   von sechs Anzeigeelementen nur pn-games; ein fehlendes Geschwister warf einen
+   TypeError und liess die Anzeige halb aktualisiert zurueck.
+
+   §4 gibt eine Vorgabe zum Aufbau: Die vier Pflichtfelder werden vor JEDEM
+   Aufruf auf eine Markierung gesetzt. Sonst ist nicht unterscheidbar, ob ein
+   Feld geschrieben wurde oder noch einen Wert aus einem fruehen Schritt traegt
+   — die erste Fassung dieser Messung hatte genau den Fehler (§6). */
+const daInit = () => {
+  globalThis.daProbe = (weg) => {
+    const PFLICHT = ['pn-games', 'pn-wins', 'pn-blend', 'pn-result'];
+    const gemerkt = weg.map(id => {
+      const e = document.getElementById(id);
+      return {id, e, eltern: e && e.parentNode, next: e && e.nextSibling};
+    });
+    for (const g of gemerkt) if (g.e) g.e.remove();
+    for (const id of PFLICHT) { const e = document.getElementById(id); if (e) e.textContent = 'MARKE'; }
+    policyNet.gamesPlayed = 7; policyNet.wins = 4; policyNet.lastResult = 1;
+    let wurf = null;
+    try { policyNet.dashUpdate(); } catch (e) { wurf = e.constructor.name; }
+    const gelesen = {};
+    for (const id of PFLICHT) { const e = document.getElementById(id); gelesen[id] = e ? e.textContent : null; }
+    for (const g of gemerkt) if (g.e) g.eltern.insertBefore(g.e, g.next);   /* Markup zuruecklegen */
+    return {wurf, gelesen, geschrieben: PFLICHT.filter(id => gelesen[id] !== null && gelesen[id] !== 'MARKE')};
+  };
+};
+
+test('T-DA1: fehlt ein Pflichtfeld, wirft dashUpdate nicht und schreibt gar nichts', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(daInit);
+  const r = await s.evaluate(() => ({
+    ohneWins:   daProbe(['pn-wins']),
+    ohneBlend:  daProbe(['pn-blend']),
+    ohneResult: daProbe(['pn-result'])
+  }));
+  await ctx.close();
+  for (const [name, v] of Object.entries(r)) {
+    pruefeGleich(v.wurf, null, `${name}: kein Wurf`);
+    /* Der Kern: nicht nur kein Wurf, sondern auch keine halb aktualisierte
+       Anzeige. Am alten Code standen hier ein bis drei geschriebene Felder. */
+    pruefeGleich(v.geschrieben.length, 0, `${name}: kein Pflichtfeld geschrieben (${v.geschrieben})`);
+  }
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-DA2: sind alle sechs da, schreibt dashUpdate wie bisher (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(daInit);
+  const r = await s.evaluate(() => daProbe([]));
+  await ctx.close();
+  pruefeGleich(r.wurf, null, 'kein Wurf');
+  pruefeGleich(r.geschrieben.length, 4, 'alle vier Pflichtfelder geschrieben');
+  /* Die Werte sind am alten Code nachgefahren: 7 Spiele, 4 Siege = 57 %,
+     Netz-Einfluss 0 % bei netMaxBlend 0, letztes Spiel ein Sieg. */
+  pruefeGleich(r.gelesen['pn-games'], '7', 'Spiele');
+  pruefeGleich(r.gelesen['pn-wins'], '4 (57%)', 'Siege mit Rate');
+  pruefeGleich(r.gelesen['pn-blend'], '0%', 'Netz-Einfluss');
+  pruefeGleich(r.gelesen['pn-result'], '✓ Sieg', 'letztes Spiel');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-DA3: pn-health und pn-warmup-bar bleiben optional (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(daInit);
+  const r = await s.evaluate(() => daProbe(['pn-health', 'pn-warmup-bar']));
+  await ctx.close();
+  pruefeGleich(r.wurf, null, 'kein Wurf');
+  pruefeGleich(r.geschrieben.length, 4, 'die vier Pflichtfelder werden trotzdem gesetzt');
+  pruefeGleich(r.gelesen['pn-result'], '✓ Sieg', 'auch das letzte Feld');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-DA4: fehlt pn-games, steigt dashUpdate wie bisher frueh aus (Kontrolle)', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite(daInit);
+  const r = await s.evaluate(() => daProbe(['pn-games']));
+  await ctx.close();
+  pruefeGleich(r.wurf, null, 'kein Wurf');
+  pruefeGleich(r.geschrieben.length, 0, 'nichts geschrieben');
+  pruefeGleich(r.gelesen['pn-wins'], 'MARKE', 'die Markierung steht noch — der Ausstieg kam davor');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
 laufeTests('Review-Korrekturen im echten Browser').then(ok => {
   if (!playwright || !chromePfad)
     console.log(`\n  ${PFLICHT ? 'FEHLT' : 'Übersprungen'}: ${!playwright ? 'Playwright' : 'Chromium'} nicht gefunden.`);
