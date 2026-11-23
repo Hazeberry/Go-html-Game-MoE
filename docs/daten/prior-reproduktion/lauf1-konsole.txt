@@ -1,0 +1,43 @@
+gepusht: 90714b4
+      0.3
+    ],
+    "htmlSha256": "974268c3c30dd1d8adfce3da04093d2a5178dae2af118ca24771b079ba6bb88b",
+    "W0": {
+      "gamesPlayed": 2,
+      "wins": 1,
+      "beispiele": 12
+    },
+    "W1": {
+      "gamesPlayed": 8,
+      "wins": 4,
+      "beispiele": 48,
+      "trainGameAufrufe": 8
+    },
+    "gewichteVerschieden": true,
+    "divergenzen": 0,
+    "gesund": true
+  },
+  "gueltig": true,
+  "gruende": [],
+  "zaehl": {
+    "0.1": {
+      "stellungen": 56,
+      "zugWechsel": 0,
+      "rangWechselTop2": 0,
+      "rangWechselTop3": 0,
+      "cStelltHer": 0,
+      "zugIstSpitzenkandidat": 13
+    },
+    "0.3": {
+      "stellungen": 56,
+      "zugWechsel": 0,
+      "rangWechselTop2": 1,
+      "rangWechselTop3": 1,
+      "cStelltHer": 0,
+      "zugIstSpitzenkandidat": 13
+    }
+  },
+  "urteil": "Nur Rangwechsel"
+}
+
+[exited with code 0]

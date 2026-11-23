@@ -191,6 +191,15 @@ lastMsPerSim`. `extra` und `netPriors` fehlen, `buildBugReport().reproduktion` e
 Die Nachstellung läuft also über einen **anderen Zweig** und liefert ein anderes `info` und kein `versuch`-Feld. Die
 Zusage „1:1" und „exakt" trifft nicht zu.
 
+**Berichtigt am 23.11.2026, nach der Messung.** Der folgende Absatz schließt aus der GTP-Messung, eine
+Nachstellung würde „einen anderen Zug ergeben". Jene Messung betraf die **Versuchsregel** über `extra`, nicht die
+Priors. Für die Priors ist es inzwischen gemessen, und zwar gegen diesen Schluss:
+`docs/prior-reproduktion-vorabfestlegung.md` §8.2 — in 112 Fällen (56 Stellungen × 2 Blendwerte) **kein einziger
+Zugwechsel**, bei einem einzigen Rangwechsel der ersten zwei Kandidaten. Eine gemessene Erklärung steht dort in
+§8.3: In nur 13 von 56 Stellungen ist der gewählte Zug überhaupt der Spitzenkandidat der Wurzelliste. **Die
+praktische Reichweite des fehlenden `netPriors` ist damit kleiner, als der Absatz unten behauptet** — er bleibt im
+Wortlaut stehen, damit die Berichtigung nachvollziehbar ist.
+
 **Was die Messung nicht zeigt:** dass der **Zug selbst** abweichen kann. In dieser Stellung ist das Brett voll, beide
 Zweige passen. Dass die Regel den Zug ändert, ist aber an anderer Stelle gemessen:
 `docs/korrektur-gtp-vorabfestlegung.md` §11.2, Partie 427 — mit Schalter antwortet `genmove B` mit `pass`, ohne

@@ -221,3 +221,94 @@ irgendetwas davon zutrifft:
    kommt — gegen die 7 775 Zeichen aus BR-1 §3. Diese Messung entscheidet das **nicht** vor, sie liefert die
    Tatsache dazu.
 4. CI grün, Merge, `unsubscribe_pr_activity`, kurzer Bericht mit den löschbaren Branches.
+
+## 8. Nachtrag: Messung und Urteil (23.11.2026)
+
+**Urteil: „Nur Rangwechsel". Gültig.** Rohdaten `docs/daten/prior-reproduktion/lauf1.json`, Konsole
+`lauf1-konsole.txt`.
+
+### 8.1 Drei Fehler im Werkzeug, vor dem Ergebnis gefunden
+
+Die Messung hat zuerst das Werkzeug widerlegt, nicht die Frage beantwortet. Die Zahlen der ersten zwei Läufe sind
+Ergebnisse eines fehlerhaften Aufbaus und **nicht abgelegt**.
+
+1. **Falscher Endpunkt.** §5 legt die Rangfolge der ersten **zwei** Kandidaten fest; das Werkzeug verglich die
+   ersten **drei** und zählte fünf Rangwechsel statt einem. Jetzt werden `rangWechselTop2` (der Endpunkt) und
+   `rangWechselTop3` getrennt geführt.
+2. **`mctsTreeReuse` stand im Default auf 1.** Damit trägt `_mctsSavedRoot` den Suchbaum von Aufruf zu Aufruf
+   weiter: Arm B erbte den Baum, den Arm A gerade auf **demselben** Brett gebaut hatte. Die Arme waren nicht
+   unabhängig. Jedes andere Auswertungswerkzeug im Repo setzt es auf 0 (`annaeherung.js`, `kritisch-rang.js`,
+   `lebensurteil-vergleich.js`, `lerner-pruefung.js`, `muster-endspiel-daten.js`); ich hatte es übersehen.
+3. **Die Startgewichte des Netzes waren nicht geseedet.** Zwei Läufe mit identischen Argumenten wichen um 0,05 bis
+   0,6 Punkte ab. Ursache: Der PolicyNet-Konstruktor zieht die Startgewichte mit `_rand`, also `Math.random`, beim
+   Auswerten des `policy-net`-Blocks — **vor** jeder Zeile des Werkzeugs. Jeder Prozess hatte damit ein anderes W₀,
+   andere Priors und andere geblendete Punktwerte; die Abweichung passt genau auf `bw · Δp · netScoreScale`. Der
+   Generator wird jetzt **vor** `ladeKI` gesetzt. Nachgewiesen: zwei getrennte Prozesse liefern **bitgleiche**
+   Berichte.
+
+**Eine Lücke in dieser Festlegung selbst:** §5 Nr. 4 prüft zwei Aufrufe desselben Arms **innerhalb** eines
+Prozesses — die waren immer identisch, auch mit Fehler 3. Prozessübergreifende Wiederholbarkeit stand nicht in der
+Regel. Das war eine Lücke in meiner Vorgabe, nicht im Werkzeug, und wer die Regel künftig anwendet, sollte sie
+mitnehmen.
+
+**Allgemeine Folge für das Repo:** Jede Messung, in der ein frisches PolicyNet vorkommt, ist prozessübergreifend
+nicht wiederholbar, solange `Math.random` nicht **vor** dem Laden der Blöcke gesetzt ist. Bei `netMaxBlend` 0 fällt
+das nicht auf, weil das Netz dann nicht in die Zugwahl eingeht.
+
+### 8.2 Das Ergebnis
+
+Seed 7, `mctsFixedSims` 120, `netWarmup` 2, `mctsTreeReuse` 0. W₀: `gamesPlayed` 2 aus 12 Beispielen. W₁:
+`gamesPlayed` 8 aus 48 Beispielen, 8 `trainGame`-Aufrufe. Gewichte verschieden, null Divergenzen, Netz gesund.
+
+| Blend | Stellungen | **Zugwechsel** | Rangwechsel erste zwei | Rangwechsel erste drei | Arm C stellt her | Zug = Spitzenkandidat |
+|---|---|---|---|---|---|---|
+| 0,1 | 56 | **0** | 0 | 0 | 0 | 13 |
+| 0,3 | 56 | **0** | **1** | 1 | 0 | 13 |
+
+`blendWeight` war in **allen** Armen exakt 0,1 beziehungsweise 0,3; jeder Arm bei Wiederholung identisch; die in
+Arm C eingespeisten Priors bitgleich den in Arm A aufgezeichneten. Keiner der fünf Ungültigkeitsgründe traf zu.
+
+**Der eine Rangwechsel**, `hand-364.sgf` @110, Schwarz, Blend 0,3:
+
+| | Kandidaten | gewählter Zug |
+|---|---|---|
+| Arm A (W₀) | D5 = 3511,6565 · D6 = 3511,5704 · Q6 = 3510,7778 | **P14** |
+| Arm B (W₁) | **D6** = 3511,6826 · **D5** = 3511,6708 · Q6 = 3510,7958 | **P14** |
+
+Die Priors der beiden tauschten die Reihenfolge (A: 2,574·10⁻³ gegen 2,504·10⁻³; B: 2,583·10⁻³ gegen 2,584·10⁻³),
+die Lücke betrug 0,0861 Punkte — und der **Zug blieb derselbe**.
+
+Die Prior-Verschiebung von W₀ nach W₁ am jeweiligen Spitzenkandidaten lag zwischen **3,5·10⁻⁸ und 1,4·10⁻⁴**, also
+in derselben Größenordnung wie der Unterschied zwischen zwei Kandidaten überhaupt.
+
+### 8.3 Was das heißt, und was nicht
+
+**Die Frage aus §8.4 des BR-1-Docs ist nicht bestätigt.** In 112 Fällen hat der geänderte Trainingsstand **keinen
+einzigen Zug** verändert. Für diese 56 Stellungen bleibt die Aussage „eine Nachstellung kann einen anderen Zug
+ergeben" **geschlossen, nicht gemessen** — sie ist damit nicht widerlegt, sondern unbestätigt.
+
+**Arm C ist hier gegenstandslos.** Ohne Zugwechsel gibt es nichts herzustellen; `cStelltHer` 0 sagt nichts über
+seinen Wert. Dass die Einspeisung funktioniert, ist über die Prior-Gleichheit belegt — er hatte nur keine Arbeit.
+
+**Eine gemessene Erklärung, warum nichts passiert:** In nur **13 von 56** Stellungen war der gewählte Zug überhaupt
+der Spitzenkandidat der Wurzelliste. Die Suche nimmt nicht den Listenkopf; bei 120 Simulationen entscheidet sie
+selbst, und eine Umsortierung der Spitze erreicht den Zug meist nicht. Im einen Rangwechsel oben war der gewählte
+Zug P14 — keiner der drei getauschten Kandidaten.
+
+**Eine Berichtigung an `docs/passregel-wege-nachtrag-vorabfestlegung.md` §2.2.** Dort habe ich aus der
+GTP-Messung (Partie 427, `pass` gegen `R4`) geschlossen, eine Nachstellung aus dem Fehlerbericht würde „einen
+anderen Zug ergeben". Diese Messung betraf die **Versuchsregel** über `extra`, nicht die Priors. Für die Priors sagt
+die Messung hier: kein Zugwechsel in 56 Stellungen. **Die praktische Reichweite des fehlenden `netPriors` ist
+kleiner, als ich dort argumentiert habe.** Die Entscheidung in BR-1 §3, `netPriors` nicht aufzunehmen, steht damit
+besser da als zum Zeitpunkt ihrer Begründung — das war Glück, nicht Weitsicht.
+
+### 8.4 Was offen bleibt
+
+- **Ein Seed.** Die Rangfolge hängt am Rauschterm der Bewertung; ein anderer Seed gibt andere Kandidatenpaare und
+  möglicherweise eine andere Anzahl. Das ist die wichtigste offene Flanke.
+- **Wenig Training.** W₁ liegt nur sechs `trainGame`-Aufrufe hinter W₀, und die Prior-Verschiebung ist entsprechend
+  klein (maximal 1,4·10⁻⁴). Ein Netz nach hundert echten Partien könnte weiter auseinanderliegen.
+- **Die 13 Stellungen, in denen der Zug am Spitzenkandidaten hängt**, wären die interessantere Stichprobe. Eine
+  Messung, die sich auf sie beschränkt, hätte mehr Aussicht — und wäre eine eigene Festlegung.
+- **56 Stellungen aus sechs Handpartien**, keine Zufallsstichprobe. Node im Container, keine Browserprüfung.
+- **Kein Spielstärkeergebnis**, und alles nur unter `netMaxBlend` > 0, was nicht der ausgelieferte Standard ist.

@@ -1,0 +1,10690 @@
+{
+ "kopf": {
+  "seed": 7,
+  "sims": 120,
+  "netWarmup": 2,
+  "netScoreScale": 5000,
+  "blends": [
+   0.1,
+   0.3
+  ],
+  "htmlSha256": "974268c3c30dd1d8adfce3da04093d2a5178dae2af118ca24771b079ba6bb88b",
+  "W0": {
+   "gamesPlayed": 2,
+   "wins": 1,
+   "beispiele": 12
+  },
+  "W1": {
+   "gamesPlayed": 8,
+   "wins": 4,
+   "beispiele": 48,
+   "trainGameAufrufe": 8
+  },
+  "gewichteVerschieden": true,
+  "divergenzen": 0,
+  "gesund": true
+ },
+ "gueltig": true,
+ "gruende": [],
+ "zaehl": {
+  "0.1": {
+   "stellungen": 56,
+   "zugWechsel": 0,
+   "rangWechselTop2": 0,
+   "rangWechselTop3": 0,
+   "cStelltHer": 0,
+   "zugIstSpitzenkandidat": 13
+  },
+  "0.3": {
+   "stellungen": 56,
+   "zugWechsel": 0,
+   "rangWechselTop2": 1,
+   "rangWechselTop3": 1,
+   "cStelltHer": 0,
+   "zugIstSpitzenkandidat": 13
+  }
+ },
+ "urteil": "Nur Rangwechsel",
+ "ergebnisse": [
+  {
+   "datei": "hand-117.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "H7",
+    "info": "MCTS 120 Sims · 18% H7 · Q 0.86",
+    "kandidaten": [
+     {
+      "punkt": "H7",
+      "idx": 235,
+      "score": 7794.561
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7778.142
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7772.9244
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "H7",
+    "info": "MCTS 120 Sims · 18% H7 · Q 0.86",
+    "kandidaten": [
+     {
+      "punkt": "H7",
+      "idx": 235,
+      "score": 7794.5428
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7778.1561
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7772.9431
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "H7",
+    "info": "MCTS 120 Sims · 18% H7 · Q 0.86",
+    "kandidaten": [
+     {
+      "punkt": "H7",
+      "idx": 235,
+      "score": 7794.5688
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7778.1427
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7772.9197
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002507607452571392,
+     0.0022784885950386524
+    ],
+    "B": [
+     0.0024648532271385193,
+     0.0023050603922456503
+    ]
+   }
+  },
+  {
+   "datei": "hand-117.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "G10",
+    "info": "MCTS 120 Sims · 21% G10 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 7864.9958
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 7817.2446
+     },
+     {
+      "punkt": "E14",
+      "idx": 99,
+      "score": 7796.2136
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "G10",
+    "info": "MCTS 120 Sims · 21% G10 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 7865.0076
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 7817.2388
+     },
+     {
+      "punkt": "E14",
+      "idx": 99,
+      "score": 7796.1864
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "G10",
+    "info": "MCTS 120 Sims · 20% G10 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 7864.9965
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 7817.2355
+     },
+     {
+      "punkt": "E14",
+      "idx": 99,
+      "score": 7796.2229
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0025062942877411842,
+     0.0029231682419776917
+    ],
+    "B": [
+     0.0025290343910455704,
+     0.002920393133535981
+    ]
+   }
+  },
+  {
+   "datei": "hand-117.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "M18",
+    "info": "MCTS 120 Sims · 35% M18 · Q 0.87",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7621.0352
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7527.1969
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 7495.007
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "M18",
+    "info": "MCTS 120 Sims · 35% M18 · Q 0.87",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7621.049
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7527.1942
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 7495.0158
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "M18",
+    "info": "MCTS 120 Sims · 35% M18 · Q 0.87",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7621.0453
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7527.1956
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 7495.0101
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0022252362687140703,
+     0.002453221008181572
+    ],
+    "B": [
+     0.0022489072289317846,
+     0.002446659142151475
+    ]
+   }
+  },
+  {
+   "datei": "hand-117.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "H18",
+    "info": "MCTS 120 Sims · 53% H18 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7534.8355
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 7478.704
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7428.288
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "H18",
+    "info": "MCTS 120 Sims · 53% H18 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7534.8364
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 7478.7108
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7428.2872
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "H18",
+    "info": "MCTS 120 Sims · 53% H18 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7534.8357
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 7478.7057
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7428.299
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.00226760795339942,
+     0.0023199247661978006
+    ],
+    "B": [
+     0.002277111867442727,
+     0.0023320787586271763
+    ]
+   }
+  },
+  {
+   "datei": "hand-117.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "J15",
+    "info": "MCTS 120 Sims · 31% J15 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7390.8412
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7212.1099
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 7068.4657
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "J15",
+    "info": "MCTS 120 Sims · 31% J15 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7390.844
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7212.1171
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 7068.4583
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "J15",
+    "info": "MCTS 120 Sims · 31% J15 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7390.8415
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7212.1205
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 7068.473
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002197367139160633,
+     0.002494653221219778
+    ],
+    "B": [
+     0.002202229341492057,
+     0.002508534351363778
+    ]
+   }
+  },
+  {
+   "datei": "hand-117.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "S4",
+    "info": "MCTS 120 Sims · 28% S4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L19",
+      "idx": 10,
+      "score": 9754.2038
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7390.9997
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7211.9823
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "S4",
+    "info": "MCTS 120 Sims · 28% S4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L19",
+      "idx": 10,
+      "score": 9754.2303
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7391.0158
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7211.9929
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "S4",
+    "info": "MCTS 120 Sims · 28% S4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L19",
+      "idx": 10,
+      "score": 9754.1981
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 7391.0125
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 7211.9859
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0023005700204521418,
+     0.0022762049920856953
+    ],
+    "B": [
+     0.002351083094254136,
+     0.002306399866938591
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "D5",
+    "info": "MCTS 120 Sims · 22% D5 · Q 0.26",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 5072.7859
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4950.0215
+     },
+     {
+      "punkt": "D4",
+      "idx": 288,
+      "score": 4949.3214
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "D5",
+    "info": "MCTS 120 Sims · 22% D5 · Q 0.26",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 5072.7853
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4950.059
+     },
+     {
+      "punkt": "D4",
+      "idx": 288,
+      "score": 4949.349
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "D5",
+    "info": "MCTS 120 Sims · 22% D5 · Q 0.26",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 5072.7882
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4950.0216
+     },
+     {
+      "punkt": "D4",
+      "idx": 288,
+      "score": 4949.3208
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0030892856884747744,
+     0.002682372694835067
+    ],
+    "B": [
+     0.003100966801866889,
+     0.002755622146651149
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 29% Q6 · Q 0.27",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4971.7037
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4854.0573
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 4844.0854
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 29% Q6 · Q 0.27",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4971.709
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4854.0623
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 4844.0786
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 30% Q6 · Q 0.27",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4971.7083
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4854.0556
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 4844.0764
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002495663007721305,
+     0.0028017463628202677
+    ],
+    "B": [
+     0.00250809034332633,
+     0.002815005136653781
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "F14",
+    "info": "MCTS 120 Sims · 54% F14 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4884.3511
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 4731.7941
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4694.3365
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "F14",
+    "info": "MCTS 120 Sims · 54% F14 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4884.3525
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 4731.7725
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4694.3766
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "F14",
+    "info": "MCTS 120 Sims · 54% F14 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4884.3525
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 4731.7898
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4694.3285
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0024594080168753862,
+     0.002804897027090192
+    ],
+    "B": [
+     0.0024641393683850765,
+     0.0027557469438761473
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "C14",
+    "info": "MCTS 120 Sims · 38% C14 · Q 0.55",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4798.9848
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 4620.3476
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.3153
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C14",
+    "info": "MCTS 120 Sims · 38% C14 · Q 0.55",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4798.9866
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 4620.3293
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.3319
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C14",
+    "info": "MCTS 120 Sims · 38% C14 · Q 0.55",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4798.9871
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 4620.3497
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.3162
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002469588303938508,
+     0.002867667004466057
+    ],
+    "B": [
+     0.002464641584083438,
+     0.002828058088198304
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.56",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4654.8815
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4511.2105
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.1432
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.56",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4654.8813
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4511.241
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.1583
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.56",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4654.8897
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4511.1956
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.1603
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002192556858062744,
+     0.0026879115030169487
+    ],
+    "B": [
+     0.0021984404884278774,
+     0.0027561301831156015
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 43% P14 · Q 0.41",
+    "kandidaten": [
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4511.3489
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.2622
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4510.8237
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 43% P14 · Q 0.41",
+    "kandidaten": [
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4511.3863
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.2669
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4510.8297
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 43% P14 · Q 0.41",
+    "kandidaten": [
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4511.3665
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.2454
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4510.8221
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002504248870536685,
+     0.002573747653514147
+    ],
+    "B": [
+     0.002584360772743821,
+     0.0025832669343799353
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 120,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 73% P14 · Q 0.26",
+    "kandidaten": [
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4511.1763
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.0966
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4510.6851
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 73% P14 · Q 0.26",
+    "kandidaten": [
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4511.2092
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.1071
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4510.6878
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 73% P14 · Q 0.26",
+    "kandidaten": [
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 4511.1718
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.1068
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4510.6732
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002430599881336093,
+     0.002719514537602663
+    ],
+    "B": [
+     0.002500382252037525,
+     0.0027351866010576487
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 130,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 62% P14 · Q 0.22",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.3112
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4439.0031
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 4404.2359
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 62% P14 · Q 0.22",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.3165
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4439.0134
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 4404.2388
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 62% P14 · Q 0.22",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.3225
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4439.0061
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 4404.2245
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002775134751573205,
+     0.0020960138645023108
+    ],
+    "B": [
+     0.002792799612507224,
+     0.002115703886374831
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 140,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.09",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.3308
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4438.73
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 4404.4239
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.09",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.3285
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4438.7444
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 4404.4334
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.09",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 4511.3392
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 4438.7356
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 4404.4193
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002645827829837799,
+     0.002081502927467227
+    ],
+    "B": [
+     0.00263943150639534,
+     0.0021018306724727154
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 150,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "M10",
+    "info": "MCTS 120 Sims · 39% M10 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 9452.3964
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 9380.0864
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 9344.9782
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "M10",
+    "info": "MCTS 120 Sims · 39% M10 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 9452.3914
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 9380.1036
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 9344.9874
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "M10",
+    "info": "MCTS 120 Sims · 39% M10 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 9452.3928
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 9380.0775
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 9344.9781
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002598479390144348,
+     0.002067354042083025
+    ],
+    "B": [
+     0.0025886932853609324,
+     0.0021057953126728535
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 40% O16 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 6388.9619
+     },
+     {
+      "punkt": "P15",
+      "idx": 90,
+      "score": 6208.5653
+     },
+     {
+      "punkt": "Q14",
+      "idx": 110,
+      "score": 5907.7288
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 40% O16 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 6388.9342
+     },
+     {
+      "punkt": "P15",
+      "idx": 90,
+      "score": 6208.5901
+     },
+     {
+      "punkt": "Q14",
+      "idx": 110,
+      "score": 5907.6971
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 40% O16 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 6388.9649
+     },
+     {
+      "punkt": "P15",
+      "idx": 90,
+      "score": 6208.555
+     },
+     {
+      "punkt": "Q14",
+      "idx": 110,
+      "score": 5907.7341
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.003065032884478569,
+     0.0028289484325796366
+    ],
+    "B": [
+     0.0030063446611166,
+     0.002887637121602893
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 22% O16 · Q 0.10",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4876.9239
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4680.445
+     },
+     {
+      "punkt": "Q16",
+      "idx": 72,
+      "score": 4518.1111
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 21% O16 · Q 0.10",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4876.9026
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4680.4533
+     },
+     {
+      "punkt": "Q16",
+      "idx": 72,
+      "score": 4518.0984
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 22% O16 · Q 0.10",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4876.9252
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4680.448
+     },
+     {
+      "punkt": "Q16",
+      "idx": 72,
+      "score": 4518.1065
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002985556609928608,
+     0.002206226345151663
+    ],
+    "B": [
+     0.0029420393984764814,
+     0.0022224118001759052
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "M9",
+    "info": "MCTS 120 Sims · 38% M9 · Q 0.47",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 5055.1871
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4874.5102
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4665.4019
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "M9",
+    "info": "MCTS 120 Sims · 38% M9 · Q 0.47",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 5055.151
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4874.532
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4665.4119
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "M9",
+    "info": "MCTS 120 Sims · 38% M9 · Q 0.47",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 5055.1854
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4874.5068
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4665.4065
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002998017007485032,
+     0.002463329816237092
+    ],
+    "B": [
+     0.00292293936945498,
+     0.002510547172278166
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 39% E3 · Q 0.02",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4943.5308
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4764.2751
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4579.745
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 39% E3 · Q 0.02",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4943.4925
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4764.2992
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4579.748
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 39% E3 · Q 0.02",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4943.5447
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4764.2635
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4579.7363
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0030804243870079517,
+     0.0024225334636867046
+    ],
+    "B": [
+     0.0030035614036023617,
+     0.002463610377162695
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 53% E3 · Q -0.25",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4943.4656
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4692.2587
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4579.6869
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 53% E3 · Q -0.25",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4943.4477
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4692.2833
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4579.7067
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 53% E3 · Q -0.25",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4943.4514
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4692.2637
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 4579.6874
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0028937417082488537,
+     0.002423027530312538
+    ],
+    "B": [
+     0.002871232805773616,
+     0.0024731603916734457
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 31% S11 · Q -0.40",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4943.5303
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4692.2222
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4620.1304
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 31% S11 · Q -0.40",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4943.5062
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4692.2506
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4620.159
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 31% S11 · Q -0.40",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4943.5499
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4692.2215
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4620.1157
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.003090900368988514,
+     0.0023386136163026094
+    ],
+    "B": [
+     0.003024312434718013,
+     0.0023943993728607893
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 120,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 36% S11 · Q -0.38",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4727.5414
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4692.3192
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4548.1551
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 36% S11 · Q -0.38",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4727.5302
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4692.3367
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4548.1793
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 36% S11 · Q -0.38",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4727.5371
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4692.3347
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4548.1443
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.003065169556066394,
+     0.00256485678255558
+    ],
+    "B": [
+     0.0030453295912593603,
+     0.002599493134766817
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 130,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "O14",
+    "info": "MCTS 120 Sims · 52% O14 · Q -0.30",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4583.3749
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4548.3137
+     },
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 4485.5253
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O14",
+    "info": "MCTS 120 Sims · 52% O14 · Q -0.30",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4583.3711
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4548.3264
+     },
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 4485.5243
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O14",
+    "info": "MCTS 120 Sims · 52% O14 · Q -0.30",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4583.3785
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4548.306
+     },
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 4485.5316
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0031455710995942354,
+     0.0025701343547552824
+    ],
+    "B": [
+     0.003141250694170594,
+     0.0025982167571783066
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 140,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "N13",
+    "info": "MCTS 120 Sims · 25% N13 · Q 0.03",
+    "kandidaten": [
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 4485.6225
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4476.3155
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4404.1722
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "N13",
+    "info": "MCTS 120 Sims · 25% N13 · Q 0.03",
+    "kandidaten": [
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 4485.6436
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4476.3109
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4404.1758
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "N13",
+    "info": "MCTS 120 Sims · 25% N13 · Q 0.03",
+    "kandidaten": [
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 4485.6026
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4476.3059
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4404.1629
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0027174928691238165,
+     0.0027874629013240337
+    ],
+    "B": [
+     0.0027540409937500954,
+     0.0027789210435003042
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 150,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "S17",
+    "info": "MCTS 120 Sims · 51% S17 · Q 0.21",
+    "kandidaten": [
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4332.2843
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4260.0043
+     },
+     {
+      "punkt": "J15",
+      "idx": 84,
+      "score": 4167.3
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "S17",
+    "info": "MCTS 120 Sims · 51% S17 · Q 0.21",
+    "kandidaten": [
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4332.2869
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4259.9982
+     },
+     {
+      "punkt": "J15",
+      "idx": 84,
+      "score": 4167.2828
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "S17",
+    "info": "MCTS 120 Sims · 51% S17 · Q 0.21",
+    "kandidaten": [
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 4332.2849
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 4260.0009
+     },
+     {
+      "punkt": "J15",
+      "idx": 84,
+      "score": 4167.2847
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0027400515973567963,
+     0.0022974289022386074
+    ],
+    "B": [
+     0.0027451461646705866,
+     0.002282113768160343
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "K9",
+    "info": "MCTS 120 Sims · 28% K9 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4985.8629
+     },
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 4841.9484
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4791.7771
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "K9",
+    "info": "MCTS 120 Sims · 28% K9 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4985.7931
+     },
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 4841.9505
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4791.7898
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "K9",
+    "info": "MCTS 120 Sims · 28% K9 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4985.8662
+     },
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 4841.9494
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4791.7781
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.003385427873581648,
+     0.002895343815907836
+    ],
+    "B": [
+     0.00324544426985085,
+     0.002900071209296584
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "L7",
+    "info": "MCTS 120 Sims · 24% L7 · Q 0.63",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 4844.2171
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4820.4379
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4770.036
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "L7",
+    "info": "MCTS 120 Sims · 24% L7 · Q 0.63",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 4844.2371
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4820.4029
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4770.0614
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "L7",
+    "info": "MCTS 120 Sims · 25% L7 · Q 0.63",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 4844.2208
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4820.4164
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4770.0354
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0031020366586744785,
+     0.003387927310541272
+    ],
+    "B": [
+     0.0031445221975445747,
+     0.0033192001283168793
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "B5",
+    "info": "MCTS 120 Sims · 41% B5 · Q 0.37",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 4731.6549
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4721.072
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4659.0038
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "B5",
+    "info": "MCTS 120 Sims · 41% B5 · Q 0.37",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 4731.6612
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4721.0679
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4658.9707
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "B5",
+    "info": "MCTS 120 Sims · 41% B5 · Q 0.37",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 4731.6524
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4721.0835
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4659.014
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0032726130448281765,
+     0.00328950397670269
+    ],
+    "B": [
+     0.0032916851341724396,
+     0.0032847539987415075
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "O5",
+    "info": "MCTS 120 Sims · 23% O5 · Q 0.54",
+    "kandidaten": [
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4620.4848
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4620.3153
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4548.1317
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O5",
+    "info": "MCTS 120 Sims · 23% O5 · Q 0.54",
+    "kandidaten": [
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4620.4769
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4620.2857
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4548.1563
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O5",
+    "info": "MCTS 120 Sims · 23% O5 · Q 0.54",
+    "kandidaten": [
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4620.4615
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4620.3118
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4548.1312
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0030903329607099295,
+     0.003380748676136136
+    ],
+    "B": [
+     0.0030703539960086346,
+     0.0033157679717987776
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "M3",
+    "info": "MCTS 120 Sims · 35% M3 · Q 0.62",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4331.9863
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 4259.8767
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4116.6445
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "M3",
+    "info": "MCTS 120 Sims · 35% M3 · Q 0.62",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4332.0025
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 4259.8946
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4116.6218
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "M3",
+    "info": "MCTS 120 Sims · 35% M3 · Q 0.62",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4331.9944
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 4259.8626
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 4116.6515
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002103685401380062,
+     0.0025355382822453976
+    ],
+    "B": [
+     0.0021444386802613735,
+     0.002574183279648423
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 56% F15 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4548.5321
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4547.9922
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4547.6733
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 56% F15 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4548.4828
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4547.9922
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4547.6776
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 56% F15 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4548.5378
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4547.9749
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4547.6786
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0033625822979956865,
+     0.002450372092425823
+    ],
+    "B": [
+     0.003262328216806054,
+     0.002449078019708395
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 120,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 64% F15 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4547.6532
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4476.1148
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4404.6753
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 64% F15 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4547.669
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4476.1239
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4404.6328
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 64% F15 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4547.659
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4476.1208
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4404.6962
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0020564112346619368,
+     0.0027160504832863808
+    ],
+    "B": [
+     0.002087556291371584,
+     0.0027362024411559105
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 130,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "Q8",
+    "info": "MCTS 120 Sims · 32% Q8 · Q 0.81",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4044.008
+     },
+     {
+      "punkt": "F9",
+      "idx": 195,
+      "score": 3971.7932
+     },
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 3900.2024
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "Q8",
+    "info": "MCTS 120 Sims · 32% Q8 · Q 0.81",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4044.0267
+     },
+     {
+      "punkt": "F9",
+      "idx": 195,
+      "score": 3971.8003
+     },
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 3900.2059
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "Q8",
+    "info": "MCTS 120 Sims · 32% Q8 · Q 0.81",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4044.0002
+     },
+     {
+      "punkt": "F9",
+      "idx": 195,
+      "score": 3971.8005
+     },
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 3900.2039
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002019526669755578,
+     0.0022162043023854494
+    ],
+    "B": [
+     0.0020566550083458424,
+     0.0022304172161966562
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 140,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 32% O4 · Q 0.84",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4332.0019
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4260.0513
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 4188.0045
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 31% O4 · Q 0.84",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4332.0151
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4260.0677
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 4188.0101
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 32% O4 · Q 0.84",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4331.99
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4260.0322
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 4188.0026
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002088222187012434,
+     0.0024794673081487417
+    ],
+    "B": [
+     0.0021182631608098745,
+     0.002512752078473568
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 150,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 48% O4 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4475.9517
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4332.738
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4332.0716
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 48% O4 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4475.9547
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4332.6821
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4332.077
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 48% O4 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 4475.9661
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 4332.737
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 4332.085
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002198433503508568,
+     0.0033385753631591797
+    ],
+    "B": [
+     0.002198468428105116,
+     0.0032296977005898952
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 22% L9 · Q 0.78",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 5153.3894
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 5107.4317
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 5059.2173
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 22% L9 · Q 0.78",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 5153.4009
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 5107.4129
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 5059.2361
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 22% L9 · Q 0.78",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 5153.3846
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 5107.4277
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 5059.2312
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0029909301083534956,
+     0.0027062282897531986
+    ],
+    "B": [
+     0.0030122757889330387,
+     0.0026807005051523447
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 23% L9 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 4935.28
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 4913.0493
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 4892.9904
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 23% L9 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 4935.2919
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 4913.0663
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 4892.9807
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 23% L9 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 4935.2726
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 4913.0621
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 4892.9827
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002929276553913951,
+     0.002628196030855179
+    ],
+    "B": [
+     0.002953310264274478,
+     0.0026592547073960304
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 93% Q6 · Q 0.93",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 3751.0895
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3710.9758
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 3697.9033
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 93% Q6 · Q 0.93",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 3751.0547
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3710.9942
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 3697.9105
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 93% Q6 · Q 0.93",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 3751.0976
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3710.9837
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 3697.9077
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0031061044428497553,
+     0.0023138639517128468
+    ],
+    "B": [
+     0.0030388953164219856,
+     0.002349924761801958
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "S8",
+    "info": "MCTS 120 Sims · 44% S8 · Q 0.94",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3828.0476
+     },
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 3807.3052
+     },
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 3756.2503
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "S8",
+    "info": "MCTS 120 Sims · 44% S8 · Q 0.94",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3828.068
+     },
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 3807.2693
+     },
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 3756.2513
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "S8",
+    "info": "MCTS 120 Sims · 44% S8 · Q 0.94",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3828.0486
+     },
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 3807.3034
+     },
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 3756.2515
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002416925271973014,
+     0.003058166243135929
+    ],
+    "B": [
+     0.0024558629374951124,
+     0.0029855123721063137
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "M4",
+    "info": "MCTS 120 Sims · 35% M4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 3756.2668
+     },
+     {
+      "punkt": "L12",
+      "idx": 143,
+      "score": 3683.9788
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3612.2348
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "M4",
+    "info": "MCTS 120 Sims · 35% M4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 3756.2674
+     },
+     {
+      "punkt": "L12",
+      "idx": 143,
+      "score": 3684.0209
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3612.2473
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "M4",
+    "info": "MCTS 120 Sims · 35% M4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 3756.2717
+     },
+     {
+      "punkt": "L12",
+      "idx": 143,
+      "score": 3683.9737
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3612.2378
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.00275506847538054,
+     0.0021224699448794127
+    ],
+    "B": [
+     0.002755599096417427,
+     0.00220737443305552
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 53% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3900.2523
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3684.3826
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.4315
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 53% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3900.2582
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3684.3666
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.4194
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 53% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3900.2485
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3684.3771
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.4172
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0023657106794416904,
+     0.0036004388239234686
+    ],
+    "B": [
+     0.002381026977673173,
+     0.0035696602426469326
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 120,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 43% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3900.1377
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.4534
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3612.4509
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 43% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3900.1455
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.4455
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3612.438
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 43% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3900.1295
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3612.4655
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.4349
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0023566929157823324,
+     0.0030679279007017612
+    ],
+    "B": [
+     0.0023727312218397856,
+     0.0030518299899995327
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 130,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 56% C2 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3972.1138
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3612.5148
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.3213
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 56% C2 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3972.1245
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3612.4968
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.3158
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 56% C2 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3972.1242
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3612.5192
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.3405
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0022762620355933905,
+     0.0035653889644891024
+    ],
+    "B": [
+     0.002295156940817833,
+     0.0035259323194622993
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 140,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 67% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 3684.367
+     },
+     {
+      "punkt": "M12",
+      "idx": 144,
+      "score": 3540.5008
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3540.2138
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 67% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 3684.3649
+     },
+     {
+      "punkt": "M12",
+      "idx": 144,
+      "score": 3540.5046
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3540.2136
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 67% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 3684.3582
+     },
+     {
+      "punkt": "M12",
+      "idx": 144,
+      "score": 3540.4793
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3540.2017
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002701018238440156,
+     0.0028232792392373085
+    ],
+    "B": [
+     0.0027021029964089394,
+     0.002842135727405548
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 150,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 41% C2 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.4219
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3468.0986
+     },
+     {
+      "punkt": "K13",
+      "idx": 123,
+      "score": 3396.3595
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 41% C2 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.4229
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3468.0848
+     },
+     {
+      "punkt": "K13",
+      "idx": 123,
+      "score": 3396.3472
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 41% C2 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 3612.4018
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3468.0952
+     },
+     {
+      "punkt": "K13",
+      "idx": 123,
+      "score": 3396.3595
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002975746989250183,
+     0.002629654249176383
+    ],
+    "B": [
+     0.002984498394653201,
+     0.0025976079050451517
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 40% E16 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 3604.4128
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 3258.7392
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 3240.9062
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 40% E16 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 3604.4238
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 3258.6997
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 3240.8952
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 40% E16 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 3604.4162
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 3258.7387
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 3240.9099
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0022585513070225716,
+     0.002958892146125436
+    ],
+    "B": [
+     0.002280196873471141,
+     0.0028889221139252186
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 39% E16 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 3602.6923
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3402.1577
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 3258.6098
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 39% E16 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 3602.711
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3402.1621
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 3258.5731
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 39% E16 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 3602.7023
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3402.1626
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 3258.6059
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0023322736378759146,
+     0.0023006426636129618
+    ],
+    "B": [
+     0.0023725980427116156,
+     0.002310751937329769
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 62% N18 · Q 0.97",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 3373.5853
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 3154.5739
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3146.1865
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 62% N18 · Q 0.97",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 3373.6245
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 3154.5546
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3146.204
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 62% N18 · Q 0.97",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 3373.5751
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 3154.5556
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3146.1845
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002391072455793619,
+     0.002919252961874008
+    ],
+    "B": [
+     0.002464981283992529,
+     0.0028933717403560877
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "C16",
+    "info": "MCTS 120 Sims · 54% C16 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2964.1875
+     },
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2943.3191
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2820.5936
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C16",
+    "info": "MCTS 120 Sims · 54% C16 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2964.2119
+     },
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2943.3001
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2820.5854
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C16",
+    "info": "MCTS 120 Sims · 54% C16 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2964.1915
+     },
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2943.3185
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2820.5949
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0023959160316735506,
+     0.0033151195384562016
+    ],
+    "B": [
+     0.002444053767248988,
+     0.0032856559846550226
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "B14",
+    "info": "MCTS 120 Sims · 42% B14 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 3015.0138
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2964.1125
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2892.3042
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "B14",
+    "info": "MCTS 120 Sims · 42% B14 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 3014.9948
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2964.1279
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2892.2994
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "B14",
+    "info": "MCTS 120 Sims · 42% B14 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 3015.0126
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2964.1125
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2892.3261
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0032522454857826233,
+     0.0024279567878693342
+    ],
+    "B": [
+     0.0032127376180142164,
+     0.0024668164551258087
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 32% N18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 3015.4367
+     },
+     {
+      "punkt": "N18",
+      "idx": 31,
+      "score": 3014.551
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2892.5684
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 32% N18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 3015.4144
+     },
+     {
+      "punkt": "N18",
+      "idx": 31,
+      "score": 3014.5375
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2892.5637
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 32% N18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 3015.4163
+     },
+     {
+      "punkt": "N18",
+      "idx": 31,
+      "score": 3014.5515
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2892.5716
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0032234794925898314,
+     0.002806407632306218
+    ],
+    "B": [
+     0.003185158595442772,
+     0.0027782502584159374
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 120,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "R8",
+    "info": "MCTS 120 Sims · 46% R8 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2748.159
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2676.22
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 2604.2663
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "R8",
+    "info": "MCTS 120 Sims · 46% R8 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2748.1111
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2676.2314
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 2604.2785
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "R8",
+    "info": "MCTS 120 Sims · 46% R8 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2748.148
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2676.2109
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 2604.2675
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0029307715594768524,
+     0.0023326468653976917
+    ],
+    "B": [
+     0.0028316036332398653,
+     0.0023514169733971357
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 130,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 35% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1703.7795
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1628.0971
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1627.8648
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 35% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1703.7707
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1628.0246
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1627.8899
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 35% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1703.7749
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1628.1078
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1627.8581
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0033625513315200806,
+     0.0032224624883383512
+    ],
+    "B": [
+     0.003347960999235511,
+     0.003075738437473774
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 140,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "G18",
+    "info": "MCTS 120 Sims · 37% G18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1775.3812
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1628.2363
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1627.6537
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "G18",
+    "info": "MCTS 120 Sims · 37% G18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1775.3616
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1628.1525
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1627.687
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "G18",
+    "info": "MCTS 120 Sims · 37% G18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1775.3985
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1628.2281
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1627.6523
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0031299341935664415,
+     0.003360025817528367
+    ],
+    "B": [
+     0.0030902032740414143,
+     0.003190775867551565
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 150,
+   "amZug": "S",
+   "blend": 0.1,
+   "A": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 42% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "D14",
+      "idx": 98,
+      "score": 6811.8851
+     },
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1703.2828
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1628.0577
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 42% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "D14",
+      "idx": 98,
+      "score": 6811.9126
+     },
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1703.271
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1627.9836
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 42% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "D14",
+      "idx": 98,
+      "score": 6811.8892
+     },
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1703.2767
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1628.066
+     }
+    ],
+    "blendWeight": 0.1
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0022710824850946665,
+     0.0027819499373435974
+    ],
+    "B": [
+     0.0023247033823281527,
+     0.0027630480471998453
+    ]
+   }
+  },
+  {
+   "datei": "hand-117.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "H7",
+    "info": "MCTS 120 Sims · 18% H7 · Q 0.86",
+    "kandidaten": [
+     {
+      "punkt": "H7",
+      "idx": 235,
+      "score": 6065.2054
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 6052.1961
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 6048.325
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "H7",
+    "info": "MCTS 120 Sims · 18% H7 · Q 0.86",
+    "kandidaten": [
+     {
+      "punkt": "H7",
+      "idx": 235,
+      "score": 6065.1506
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 6052.2384
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 6048.3809
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "H7",
+    "info": "MCTS 120 Sims · 18% H7 · Q 0.86",
+    "kandidaten": [
+     {
+      "punkt": "H7",
+      "idx": 235,
+      "score": 6065.2286
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 6052.1982
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 6048.3109
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002507607452571392,
+     0.0022784885950386524
+    ],
+    "B": [
+     0.0024648532271385193,
+     0.0023050603922456503
+    ]
+   }
+  },
+  {
+   "datei": "hand-117.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "G10",
+    "info": "MCTS 120 Sims · 20% G10 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 6120.0022
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 6083.3472
+     },
+     {
+      "punkt": "E14",
+      "idx": 99,
+      "score": 6067.3006
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "G10",
+    "info": "MCTS 120 Sims · 20% G10 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 6120.0376
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 6083.3297
+     },
+     {
+      "punkt": "E14",
+      "idx": 99,
+      "score": 6067.2192
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "G10",
+    "info": "MCTS 120 Sims · 20% G10 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 6120.0043
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 6083.3201
+     },
+     {
+      "punkt": "E14",
+      "idx": 99,
+      "score": 6067.3285
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0025062942877411842,
+     0.0029231682419776917
+    ],
+    "B": [
+     0.0025290343910455704,
+     0.002920393133535981
+    ]
+   }
+  },
+  {
+   "datei": "hand-117.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "M18",
+    "info": "MCTS 120 Sims · 35% M18 · Q 0.87",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5929.922
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5857.2153
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 5832.1115
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "M18",
+    "info": "MCTS 120 Sims · 35% M18 · Q 0.87",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5929.9633
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5857.2071
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 5832.138
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "M18",
+    "info": "MCTS 120 Sims · 35% M18 · Q 0.87",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5929.9521
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5857.2113
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 5832.1208
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0022252362687140703,
+     0.002453221008181572
+    ],
+    "B": [
+     0.0022489072289317846,
+     0.002446659142151475
+    ]
+   }
+  },
+  {
+   "datei": "hand-117.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "H18",
+    "info": "MCTS 120 Sims · 53% H18 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5862.9468
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 5819.3438
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5780.4892
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "H18",
+    "info": "MCTS 120 Sims · 53% H18 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5862.9494
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 5819.364
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5780.4869
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "H18",
+    "info": "MCTS 120 Sims · 53% H18 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5862.9474
+     },
+     {
+      "punkt": "H8",
+      "idx": 216,
+      "score": 5819.3488
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5780.5223
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.00226760795339942,
+     0.0023199247661978006
+    ],
+    "B": [
+     0.002277111867442727,
+     0.0023320787586271763
+    ]
+   }
+  },
+  {
+   "datei": "hand-117.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "J15",
+    "info": "MCTS 120 Sims · 31% J15 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5750.8728
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5612.167
+     },
+     {
+      "punkt": "H7",
+      "idx": 235,
+      "score": 5500.9309
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "J15",
+    "info": "MCTS 120 Sims · 31% J15 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5750.8812
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5612.1886
+     },
+     {
+      "punkt": "H7",
+      "idx": 235,
+      "score": 5500.841
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "J15",
+    "info": "MCTS 120 Sims · 31% J15 · Q 0.88",
+    "kandidaten": [
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5750.8738
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5612.1989
+     },
+     {
+      "punkt": "H7",
+      "idx": 235,
+      "score": 5500.9583
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002197367139160633,
+     0.002494653221219778
+    ],
+    "B": [
+     0.002202229341492057,
+     0.002508534351363778
+    ]
+   }
+  },
+  {
+   "datei": "hand-117.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "S4",
+    "info": "MCTS 120 Sims · 28% S4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L19",
+      "idx": 10,
+      "score": 7589.1717
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5751.056
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5611.9787
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "S4",
+    "info": "MCTS 120 Sims · 28% S4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L19",
+      "idx": 10,
+      "score": 7589.2514
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5751.1044
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5612.0105
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "S4",
+    "info": "MCTS 120 Sims · 28% S4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L19",
+      "idx": 10,
+      "score": 7589.1547
+     },
+     {
+      "punkt": "F4",
+      "idx": 290,
+      "score": 5751.0944
+     },
+     {
+      "punkt": "J7",
+      "idx": 236,
+      "score": 5611.9894
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0023005700204521418,
+     0.0022762049920856953
+    ],
+    "B": [
+     0.002351083094254136,
+     0.002306399866938591
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "D5",
+    "info": "MCTS 120 Sims · 21% D5 · Q 0.25",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3948.9276
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3852.9968
+     },
+     {
+      "punkt": "D4",
+      "idx": 288,
+      "score": 3851.9538
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "D5",
+    "info": "MCTS 120 Sims · 21% D5 · Q 0.25",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3948.9258
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3853.1093
+     },
+     {
+      "punkt": "D4",
+      "idx": 288,
+      "score": 3852.0365
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "D5",
+    "info": "MCTS 120 Sims · 21% D5 · Q 0.25",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3948.9345
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3852.9972
+     },
+     {
+      "punkt": "D4",
+      "idx": 288,
+      "score": 3851.952
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0030892856884747744,
+     0.002682372694835067
+    ],
+    "B": [
+     0.003100966801866889,
+     0.002755622146651149
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 30% Q6 · Q 0.28",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3869.6435
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3778.4949
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 3770.826
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 29% Q6 · Q 0.27",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3869.6593
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3778.5098
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 3770.8057
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 30% Q6 · Q 0.28",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3869.6572
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3778.4896
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 3770.7993
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002495663007721305,
+     0.0028017463628202677
+    ],
+    "B": [
+     0.00250809034332633,
+     0.002815005136653781
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "F14",
+    "info": "MCTS 120 Sims · 54% F14 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3801.6693
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 3683.4104
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3654.0146
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "F14",
+    "info": "MCTS 120 Sims · 54% F14 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3801.6736
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 3683.3457
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3654.1347
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "F14",
+    "info": "MCTS 120 Sims · 54% F14 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3801.6735
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 3683.3975
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3653.9907
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0024594080168753862,
+     0.002804897027090192
+    ],
+    "B": [
+     0.0024641393683850765,
+     0.0027557469438761473
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "C14",
+    "info": "MCTS 120 Sims · 38% C14 · Q 0.55",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3735.2824
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 3596.7855
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.7736
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C14",
+    "info": "MCTS 120 Sims · 38% C14 · Q 0.55",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3735.2878
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 3596.7304
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.8234
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C14",
+    "info": "MCTS 120 Sims · 38% C14 · Q 0.55",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3735.2895
+     },
+     {
+      "punkt": "P5",
+      "idx": 280,
+      "score": 3596.7916
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.7764
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002469588303938508,
+     0.002867667004466057
+    ],
+    "B": [
+     0.002464641584083438,
+     0.002828058088198304
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.56",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3622.8812
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3511.7387
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.4682
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.56",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3622.8809
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3511.8303
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.5136
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.56",
+    "kandidaten": [
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3622.9059
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3511.6943
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.5195
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002192556858062744,
+     0.0026879115030169487
+    ],
+    "B": [
+     0.0021984404884278774,
+     0.0027561301831156015
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 43% P14 · Q 0.41",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.6565
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3511.5704
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3510.7778
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 43% P14 · Q 0.41",
+    "kandidaten": [
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3511.6826
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.6708
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3510.7958
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 43% P14 · Q 0.41",
+    "kandidaten": [
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3511.6231
+     },
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.6061
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3510.7729
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": true,
+   "rangWechselTop3": true,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002573747653514147,
+     0.002504248870536685
+    ],
+    "B": [
+     0.0025832669343799353,
+     0.002584360772743821
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 120,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 73% P14 · Q 0.26",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.6297
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3511.4034
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3510.6978
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 73% P14 · Q 0.26",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.6613
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3511.5019
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3510.7061
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 73% P14 · Q 0.26",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.6603
+     },
+     {
+      "punkt": "D6",
+      "idx": 250,
+      "score": 3511.3899
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3510.6621
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002719514537602663,
+     0.002430599881336093
+    ],
+    "B": [
+     0.0027351866010576487,
+     0.002500382252037525
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 130,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 62% P14 · Q 0.22",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.8558
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3454.8802
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 3428.5819
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 62% P14 · Q 0.22",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.8718
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3454.9111
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 3428.5907
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 62% P14 · Q 0.22",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.8899
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3454.8892
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 3428.5479
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002775134751573205,
+     0.0020960138645023108
+    ],
+    "B": [
+     0.002792799612507224,
+     0.002115703886374831
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 140,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.09",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.7339
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3454.646
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 3428.6816
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.09",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.7271
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3454.6891
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 3428.71
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "P14",
+    "info": "MCTS 120 Sims · 64% P14 · Q 0.09",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 3511.7592
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 3454.6627
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 3428.6678
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002645827829837799,
+     0.002081502927467227
+    ],
+    "B": [
+     0.00263943150639534,
+     0.0021018306724727154
+    ]
+   }
+  },
+  {
+   "datei": "hand-364.sgf",
+   "bis": 150,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "M10",
+    "info": "MCTS 120 Sims · 39% M10 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 7354.7592
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 7297.9396
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 7271.1955
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "M10",
+    "info": "MCTS 120 Sims · 39% M10 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 7354.7439
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 7297.9912
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 7271.223
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "M10",
+    "info": "MCTS 120 Sims · 39% M10 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "D5",
+      "idx": 269,
+      "score": 7354.7483
+     },
+     {
+      "punkt": "Q6",
+      "idx": 262,
+      "score": 7297.9129
+     },
+     {
+      "punkt": "E5",
+      "idx": 270,
+      "score": 7271.1952
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002598479390144348,
+     0.002067354042083025
+    ],
+    "B": [
+     0.0025886932853609324,
+     0.0021057953126728535
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 40% O16 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4972.5916
+     },
+     {
+      "punkt": "P15",
+      "idx": 90,
+      "score": 4832.0502
+     },
+     {
+      "punkt": "Q14",
+      "idx": 110,
+      "score": 4598.1416
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 39% O16 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4972.5084
+     },
+     {
+      "punkt": "P15",
+      "idx": 90,
+      "score": 4832.1247
+     },
+     {
+      "punkt": "Q14",
+      "idx": 110,
+      "score": 4598.0466
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 40% O16 · Q 0.07",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 4972.6005
+     },
+     {
+      "punkt": "P15",
+      "idx": 90,
+      "score": 4832.0194
+     },
+     {
+      "punkt": "Q14",
+      "idx": 110,
+      "score": 4598.1576
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.003065032884478569,
+     0.0028289484325796366
+    ],
+    "B": [
+     0.0030063446611166,
+     0.002887637121602893
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 23% O16 · Q 0.10",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3796.4775
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3642.7908
+     },
+     {
+      "punkt": "Q16",
+      "idx": 72,
+      "score": 3517.2591
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 23% O16 · Q 0.10",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3796.4137
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3642.8158
+     },
+     {
+      "punkt": "Q16",
+      "idx": 72,
+      "score": 3517.2211
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O16",
+    "info": "MCTS 120 Sims · 23% O16 · Q 0.10",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3796.4813
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3642.7998
+     },
+     {
+      "punkt": "Q16",
+      "idx": 72,
+      "score": 3517.2453
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002985556609928608,
+     0.002206226345151663
+    ],
+    "B": [
+     0.0029420393984764814,
+     0.0022224118001759052
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "M9",
+    "info": "MCTS 120 Sims · 38% M9 · Q 0.47",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3935.147
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3794.0304
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3631.0978
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "M9",
+    "info": "MCTS 120 Sims · 38% M9 · Q 0.47",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3935.0388
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3794.0957
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3631.1278
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "M9",
+    "info": "MCTS 120 Sims · 38% M9 · Q 0.47",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3935.142
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3794.0201
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3631.1116
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002998017007485032,
+     0.002463329816237092
+    ],
+    "B": [
+     0.00292293936945498,
+     0.002510547172278166
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 37% E3 · Q 0.03",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3848.3602
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3708.2647
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3564.7338
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 40% E3 · Q 0.02",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3848.2453
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3708.3371
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3564.7428
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 37% E3 · Q 0.03",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3848.4019
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3708.23
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3564.7075
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0030804243870079517,
+     0.0024225334636867046
+    ],
+    "B": [
+     0.0030035614036023617,
+     0.002463610377162695
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 53% E3 · Q -0.25",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3848.1647
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3652.2157
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3564.5593
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 53% E3 · Q -0.25",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3848.1109
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3652.2894
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3564.6187
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "E3",
+    "info": "MCTS 120 Sims · 53% E3 · Q -0.25",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3848.1219
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3652.2307
+     },
+     {
+      "punkt": "P17",
+      "idx": 52,
+      "score": 3564.5608
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0028937417082488537,
+     0.002423027530312538
+    ],
+    "B": [
+     0.002871232805773616,
+     0.0024731603916734457
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 31% S11 · Q -0.40",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3848.3586
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3652.1062
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3596.0526
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 31% S11 · Q -0.40",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3848.2864
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3652.1914
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3596.1384
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 31% S11 · Q -0.40",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3848.4176
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3652.1041
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3596.0086
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.003090900368988514,
+     0.0023386136163026094
+    ],
+    "B": [
+     0.003024312434718013,
+     0.0023943993728607893
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 120,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 34% S11 · Q -0.38",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3680.3921
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3652.397
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3540.1268
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 34% S11 · Q -0.38",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3680.3583
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3652.4495
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3540.1994
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "S11",
+    "info": "MCTS 120 Sims · 34% S11 · Q -0.38",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3680.379
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3652.4435
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3540.0943
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.003065169556066394,
+     0.00256485678255558
+    ],
+    "B": [
+     0.0030453295912593603,
+     0.002599493134766817
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 130,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "O14",
+    "info": "MCTS 120 Sims · 59% O14 · Q -0.25",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3568.3345
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3540.45
+     },
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 3491.7458
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O14",
+    "info": "MCTS 120 Sims · 59% O14 · Q -0.25",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3568.3231
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3540.4881
+     },
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 3491.7427
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O14",
+    "info": "MCTS 120 Sims · 59% O14 · Q -0.25",
+    "kandidaten": [
+     {
+      "punkt": "O16",
+      "idx": 70,
+      "score": 3568.345
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3540.4271
+     },
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 3491.7648
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0031455710995942354,
+     0.0025701343547552824
+    ],
+    "B": [
+     0.003141250694170594,
+     0.0025982167571783066
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 140,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "N13",
+    "info": "MCTS 120 Sims · 25% N13 · Q 0.03",
+    "kandidaten": [
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 3491.8812
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3484.6973
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3428.0934
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "N13",
+    "info": "MCTS 120 Sims · 25% N13 · Q 0.03",
+    "kandidaten": [
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 3491.9446
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3484.6835
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3428.1043
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "N13",
+    "info": "MCTS 120 Sims · 25% N13 · Q 0.03",
+    "kandidaten": [
+     {
+      "punkt": "N13",
+      "idx": 126,
+      "score": 3491.8214
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3484.6684
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3428.0655
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0027174928691238165,
+     0.0027874629013240337
+    ],
+    "B": [
+     0.0027540409937500954,
+     0.0027789210435003042
+    ]
+   }
+  },
+  {
+   "datei": "hand-392.sgf",
+   "bis": 150,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "S17",
+    "info": "MCTS 120 Sims · 51% S17 · Q 0.21",
+    "kandidaten": [
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3372.5975
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3315.8969
+     },
+     {
+      "punkt": "J15",
+      "idx": 84,
+      "score": 3244.6733
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "S17",
+    "info": "MCTS 120 Sims · 51% S17 · Q 0.21",
+    "kandidaten": [
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3372.6055
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3315.8784
+     },
+     {
+      "punkt": "J15",
+      "idx": 84,
+      "score": 3244.6218
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "S17",
+    "info": "MCTS 120 Sims · 51% S17 · Q 0.21",
+    "kandidaten": [
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 3372.5994
+     },
+     {
+      "punkt": "K14",
+      "idx": 104,
+      "score": 3315.8868
+     },
+     {
+      "punkt": "J15",
+      "idx": 84,
+      "score": 3244.6276
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0027400515973567963,
+     0.0022974289022386074
+    ],
+    "B": [
+     0.0027451461646705866,
+     0.002282113768160343
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "K9",
+    "info": "MCTS 120 Sims · 28% K9 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3881.6476
+     },
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 3769.1747
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3730.0339
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "K9",
+    "info": "MCTS 120 Sims · 28% K9 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3881.4382
+     },
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 3769.181
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3730.072
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "K9",
+    "info": "MCTS 120 Sims · 28% K9 · Q 0.64",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3881.6576
+     },
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 3769.1777
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3730.0371
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.003385427873581648,
+     0.002895343815907836
+    ],
+    "B": [
+     0.00324544426985085,
+     0.002900071209296584
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "L7",
+    "info": "MCTS 120 Sims · 24% L7 · Q 0.63",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 3771.1631
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3753.0415
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3713.1893
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "L7",
+    "info": "MCTS 120 Sims · 24% L7 · Q 0.63",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 3771.2229
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3752.9367
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3713.0358
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "L7",
+    "info": "MCTS 120 Sims · 24% L7 · Q 0.63",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 3771.174
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3752.9771
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3713.1789
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0031020366586744785,
+     0.003387927310541272
+    ],
+    "B": [
+     0.0031445221975445747,
+     0.0033192001283168793
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "B5",
+    "info": "MCTS 120 Sims · 38% B5 · Q 0.35",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 3683.8178
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3675.5743
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3627.3245
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "B5",
+    "info": "MCTS 120 Sims · 38% B5 · Q 0.35",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 3683.8367
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3675.5621
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3627.2254
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "B5",
+    "info": "MCTS 120 Sims · 38% B5 · Q 0.35",
+    "kandidaten": [
+     {
+      "punkt": "L7",
+      "idx": 238,
+      "score": 3683.8103
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3675.6089
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3627.3553
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0032726130448281765,
+     0.00328950397670269
+    ],
+    "B": [
+     0.0032916851341724396,
+     0.0032847539987415075
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "O5",
+    "info": "MCTS 120 Sims · 23% O5 · Q 0.54",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3597.3427
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3597.196
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3539.8087
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O5",
+    "info": "MCTS 120 Sims · 23% O5 · Q 0.54",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3597.2538
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3597.1723
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3539.8826
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O5",
+    "info": "MCTS 120 Sims · 23% O5 · Q 0.54",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3597.3322
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3597.126
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3539.8074
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.003380748676136136,
+     0.0030903329607099295
+    ],
+    "B": [
+     0.0033157679717987776,
+     0.0030703539960086346
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "M3",
+    "info": "MCTS 120 Sims · 35% M3 · Q 0.62",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3371.6419
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 3316.0862
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3205.52
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "M3",
+    "info": "MCTS 120 Sims · 35% M3 · Q 0.62",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3371.6908
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 3316.1398
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3205.452
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "M3",
+    "info": "MCTS 120 Sims · 35% M3 · Q 0.62",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3371.6664
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 3316.0437
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 3205.541
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002103685401380062,
+     0.0025355382822453976
+    ],
+    "B": [
+     0.0021444386802613735,
+     0.002574183279648423
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 56% F15 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3541.4706
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3540.0883
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3539.4056
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 56% F15 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3541.3228
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3540.0884
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3539.4184
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 56% F15 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3541.4878
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3540.0364
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3539.4213
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0033625822979956865,
+     0.002450372092425823
+    ],
+    "B": [
+     0.003262328216806054,
+     0.002449078019708395
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 120,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 64% F15 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3539.3354
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3484.4271
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3429.5719
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 64% F15 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3539.383
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3484.4543
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3429.4445
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "F15",
+    "info": "MCTS 120 Sims · 64% F15 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3539.353
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3484.4451
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3429.6346
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0020564112346619368,
+     0.0027160504832863808
+    ],
+    "B": [
+     0.002087556291371584,
+     0.0027362024411559105
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 130,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "Q8",
+    "info": "MCTS 120 Sims · 32% Q8 · Q 0.81",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3147.6008
+     },
+     {
+      "punkt": "F9",
+      "idx": 195,
+      "score": 3091.6188
+     },
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 3036.6432
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "Q8",
+    "info": "MCTS 120 Sims · 32% Q8 · Q 0.81",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3147.657
+     },
+     {
+      "punkt": "F9",
+      "idx": 195,
+      "score": 3091.6401
+     },
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 3036.6539
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "Q8",
+    "info": "MCTS 120 Sims · 32% Q8 · Q 0.81",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3147.5774
+     },
+     {
+      "punkt": "F9",
+      "idx": 195,
+      "score": 3091.6406
+     },
+     {
+      "punkt": "G10",
+      "idx": 177,
+      "score": 3036.6479
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002019526669755578,
+     0.0022162043023854494
+    ],
+    "B": [
+     0.0020566550083458424,
+     0.0022304172161966562
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 140,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 32% O4 · Q 0.84",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3371.6814
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3316.1705
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 3260.3677
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 32% O4 · Q 0.84",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3371.7211
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3316.2198
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 3260.3847
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 32% O4 · Q 0.84",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3371.6458
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3316.1134
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 3260.3622
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002088222187012434,
+     0.0024794673081487417
+    ],
+    "B": [
+     0.0021182631608098745,
+     0.002512752078473568
+    ]
+   }
+  },
+  {
+   "datei": "hand-427.sgf",
+   "bis": 150,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 48% O4 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3483.7066
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3373.6191
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3372.2865
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 48% O4 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3483.7154
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3373.4514
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3372.3028
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "O4",
+    "info": "MCTS 120 Sims · 48% O4 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3483.7496
+     },
+     {
+      "punkt": "K9",
+      "idx": 199,
+      "score": 3373.6161
+     },
+     {
+      "punkt": "H9",
+      "idx": 197,
+      "score": 3372.3267
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002198433503508568,
+     0.0033385753631591797
+    ],
+    "B": [
+     0.002198468428105116,
+     0.0032296977005898952
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 22% L9 · Q 0.78",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 4011.5258
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 3975.4627
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 3937.6654
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 22% L9 · Q 0.78",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 4011.5602
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 3975.4064
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 3937.7218
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 22% L9 · Q 0.78",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 4011.5113
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 3975.4506
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 3937.7071
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0029909301083534956,
+     0.0027062282897531986
+    ],
+    "B": [
+     0.0030122757889330387,
+     0.0026807005051523447
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 22% L9 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 3841.8224
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 3824.1524
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 3808.7564
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 22% L9 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 3841.8582
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 3824.2032
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 3808.7272
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "L9",
+    "info": "MCTS 120 Sims · 22% L9 · Q 0.83",
+    "kandidaten": [
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 3841.8001
+     },
+     {
+      "punkt": "M10",
+      "idx": 182,
+      "score": 3824.1908
+     },
+     {
+      "punkt": "M9",
+      "idx": 201,
+      "score": 3808.7332
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002929276553913951,
+     0.002628196030855179
+    ],
+    "B": [
+     0.002953310264274478,
+     0.0026592547073960304
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 93% Q6 · Q 0.93",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2920.9474
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2888.8681
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 2879.2563
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 93% Q6 · Q 0.93",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2920.8429
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2888.9232
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 2879.278
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "Q6",
+    "info": "MCTS 120 Sims · 93% Q6 · Q 0.93",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2920.9716
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2888.8916
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 2879.2696
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0031061044428497553,
+     0.0023138639517128468
+    ],
+    "B": [
+     0.0030388953164219856,
+     0.002349924761801958
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "S8",
+    "info": "MCTS 120 Sims · 44% S8 · Q 0.94",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2980.0536
+     },
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2964.6394
+     },
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 2924.9212
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "S8",
+    "info": "MCTS 120 Sims · 44% S8 · Q 0.94",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2980.1147
+     },
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2964.5316
+     },
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 2924.9241
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "S8",
+    "info": "MCTS 120 Sims · 44% S8 · Q 0.94",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2980.0566
+     },
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2964.634
+     },
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 2924.9248
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002416925271973014,
+     0.003058166243135929
+    ],
+    "B": [
+     0.0024558629374951124,
+     0.0029855123721063137
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "M4",
+    "info": "MCTS 120 Sims · 35% M4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 2924.5912
+     },
+     {
+      "punkt": "L12",
+      "idx": 143,
+      "score": 2867.6864
+     },
+     {
+      "punkt": "N12",
+      "idx": 145,
+      "score": 2812.1461
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "M4",
+    "info": "MCTS 120 Sims · 35% M4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 2924.5928
+     },
+     {
+      "punkt": "L12",
+      "idx": 143,
+      "score": 2867.8127
+     },
+     {
+      "punkt": "N12",
+      "idx": 145,
+      "score": 2812.1943
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "M4",
+    "info": "MCTS 120 Sims · 35% M4 · Q 0.96",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 2924.6059
+     },
+     {
+      "punkt": "L12",
+      "idx": 143,
+      "score": 2867.6712
+     },
+     {
+      "punkt": "N12",
+      "idx": 145,
+      "score": 2812.1495
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.00275506847538054,
+     0.0021224699448794127
+    ],
+    "B": [
+     0.002755599096417427,
+     0.00220737443305552
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 53% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3036.1665
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 2869.6435
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2813.1232
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 53% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3036.1843
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 2869.5957
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2813.0868
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 53% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3036.1552
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 2869.6271
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2813.0802
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0023657106794416904,
+     0.0036004388239234686
+    ],
+    "B": [
+     0.002381026977673173,
+     0.0035696602426469326
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 120,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 43% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3036.0772
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 2813.7687
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2813.1358
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 43% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3036.1007
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 2813.73
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2813.1121
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 43% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3036.0526
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 2813.8125
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2813.0804
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0023566929157823324,
+     0.00370543310418725
+    ],
+    "B": [
+     0.0023727312218397856,
+     0.003678583540022373
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 130,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 56% C2 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3091.9277
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 2813.6853
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2813.1008
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 56% C2 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3091.96
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 2813.6314
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2813.0841
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 56% C2 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 3091.9591
+     },
+     {
+      "punkt": "K10",
+      "idx": 180,
+      "score": 2813.6987
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2813.1582
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0022762620355933905,
+     0.0035653889644891024
+    ],
+    "B": [
+     0.002295156940817833,
+     0.0035259323194622993
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 140,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 67% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 2868.6396
+     },
+     {
+      "punkt": "M12",
+      "idx": 144,
+      "score": 2756.9076
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2756.7781
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 67% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 2868.6331
+     },
+     {
+      "punkt": "M12",
+      "idx": 144,
+      "score": 2756.9191
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2756.7777
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 67% C2 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L11",
+      "idx": 162,
+      "score": 2868.6131
+     },
+     {
+      "punkt": "M12",
+      "idx": 144,
+      "score": 2756.8431
+     },
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2756.742
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002701018238440156,
+     0.0028232792392373085
+    ],
+    "B": [
+     0.0027021029964089394,
+     0.002842135727405548
+    ]
+   }
+  },
+  {
+   "datei": "hand-455.sgf",
+   "bis": 150,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 41% C2 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2813.0126
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 2700.3396
+     },
+     {
+      "punkt": "K13",
+      "idx": 123,
+      "score": 2644.9626
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 41% C2 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2813.0154
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 2700.298
+     },
+     {
+      "punkt": "K13",
+      "idx": 123,
+      "score": 2644.9254
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C2",
+    "info": "MCTS 120 Sims · 41% C2 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "L14",
+      "idx": 105,
+      "score": 2812.9522
+     },
+     {
+      "punkt": "K15",
+      "idx": 85,
+      "score": 2700.3292
+     },
+     {
+      "punkt": "K13",
+      "idx": 123,
+      "score": 2644.9623
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002975746989250183,
+     0.002629654249176383
+    ],
+    "B": [
+     0.002984498394653201,
+     0.0025976079050451517
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 60,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 40% E16 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 2805.9342
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 2537.8636
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 2523.6975
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 41% E16 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 2805.967
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 2537.7452
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 2523.6646
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 40% E16 · Q 0.85",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 2805.9443
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 2537.8622
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 2523.7088
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0022585513070225716,
+     0.002958892146125436
+    ],
+    "B": [
+     0.002280196873471141,
+     0.0028889221139252186
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 70,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 40% E16 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 2804.6631
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2648.6678
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 2537.8464
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 39% E16 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 2804.7192
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2648.681
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 2537.7362
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "E16",
+    "info": "MCTS 120 Sims · 40% E16 · Q 0.92",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 2804.6932
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2648.6828
+     },
+     {
+      "punkt": "F15",
+      "idx": 81,
+      "score": 2537.8348
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0023322736378759146,
+     0.0023006426636129618
+    ],
+    "B": [
+     0.0023725980427116156,
+     0.002310751937329769
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 80,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 62% N18 · Q 0.97",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 2626.5792
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 2456.8418
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2449.8651
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 62% N18 · Q 0.97",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 2626.6968
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 2456.7837
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2449.9174
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 62% N18 · Q 0.97",
+    "kandidaten": [
+     {
+      "punkt": "E16",
+      "idx": 61,
+      "score": 2626.5485
+     },
+     {
+      "punkt": "F17",
+      "idx": 43,
+      "score": 2456.7869
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2449.859
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.002391072455793619,
+     0.002919252961874008
+    ],
+    "B": [
+     0.002464981283992529,
+     0.0028933717403560877
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 90,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "C16",
+    "info": "MCTS 120 Sims · 54% C16 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2308.1322
+     },
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2292.933
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2197.1904
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "C16",
+    "info": "MCTS 120 Sims · 54% C16 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2308.2056
+     },
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2292.876
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2197.1659
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "C16",
+    "info": "MCTS 120 Sims · 54% C16 · Q 0.98",
+    "kandidaten": [
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2308.1444
+     },
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2292.9312
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2197.1945
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0023959160316735506,
+     0.0033151195384562016
+    ],
+    "B": [
+     0.002444053767248988,
+     0.0032856559846550226
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 100,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "B14",
+    "info": "MCTS 120 Sims · 42% B14 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2348.6269
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2308.1186
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2252.8055
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "B14",
+    "info": "MCTS 120 Sims · 42% B14 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2348.57
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2308.1647
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2252.7914
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "B14",
+    "info": "MCTS 120 Sims · 42% B14 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2348.6234
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2308.1185
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2252.8712
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0032522454857826233,
+     0.0024279567878693342
+    ],
+    "B": [
+     0.0032127376180142164,
+     0.0024668164551258087
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 110,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 32% N18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2348.9668
+     },
+     {
+      "punkt": "N18",
+      "idx": 31,
+      "score": 2347.7678
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2253.275
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 32% N18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2348.8999
+     },
+     {
+      "punkt": "N18",
+      "idx": 31,
+      "score": 2347.7274
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2253.2609
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "N18",
+    "info": "MCTS 120 Sims · 32% N18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "J11",
+      "idx": 160,
+      "score": 2348.9054
+     },
+     {
+      "punkt": "N18",
+      "idx": 31,
+      "score": 2347.7694
+     },
+     {
+      "punkt": "J10",
+      "idx": 179,
+      "score": 2253.2847
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0032234794925898314,
+     0.002806407632306218
+    ],
+    "B": [
+     0.003185158595442772,
+     0.0027782502584159374
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 120,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "R8",
+    "info": "MCTS 120 Sims · 46% R8 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2140.7379
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2084.1165
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 2028.2437
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "R8",
+    "info": "MCTS 120 Sims · 46% R8 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2140.5941
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2084.1509
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 2028.28
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "R8",
+    "info": "MCTS 120 Sims · 46% R8 · Q 0.99",
+    "kandidaten": [
+     {
+      "punkt": "L10",
+      "idx": 181,
+      "score": 2140.7048
+     },
+     {
+      "punkt": "K11",
+      "idx": 161,
+      "score": 2084.0892
+     },
+     {
+      "punkt": "L9",
+      "idx": 200,
+      "score": 2028.2471
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0029307715594768524,
+     0.0023326468653976917
+    ],
+    "B": [
+     0.0028316036332398653,
+     0.0023514169733971357
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 130,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 35% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1328.9083
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1269.8545
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1269.0202
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 35% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1328.8817
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1269.637
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1269.0954
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 35% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1328.8944
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1269.8866
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1268.9998
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0033625513315200806,
+     0.0032224624883383512
+    ],
+    "B": [
+     0.003347960999235511,
+     0.003075738437473774
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 140,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "G18",
+    "info": "MCTS 120 Sims · 37% G18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1384.2914
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1270.1576
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1268.8239
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "G18",
+    "info": "MCTS 120 Sims · 37% G18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1384.2326
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1269.9062
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1268.9237
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "G18",
+    "info": "MCTS 120 Sims · 37% G18 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1384.3432
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1270.133
+     },
+     {
+      "punkt": "K3",
+      "idx": 313,
+      "score": 1268.8196
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0031299341935664415,
+     0.003360025817528367
+    ],
+    "B": [
+     0.0030902032740414143,
+     0.003190775867551565
+    ]
+   }
+  },
+  {
+   "datei": "hand-478.sgf",
+   "bis": 150,
+   "amZug": "S",
+   "blend": 0.3,
+   "A": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 42% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "D14",
+      "idx": 98,
+      "score": 5300.6471
+     },
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1327.8802
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1269.9208
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "B": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 42% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "D14",
+      "idx": 98,
+      "score": 5300.7296
+     },
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1327.8448
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1269.6985
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "C": {
+    "typ": "stone",
+    "punkt": "G16",
+    "info": "MCTS 120 Sims · 42% G16 · Q 1.00",
+    "kandidaten": [
+     {
+      "punkt": "D14",
+      "idx": 98,
+      "score": 5300.6595
+     },
+     {
+      "punkt": "L4",
+      "idx": 295,
+      "score": 1327.8618
+     },
+     {
+      "punkt": "M3",
+      "idx": 315,
+      "score": 1269.9457
+     }
+    ],
+    "blendWeight": 0.3
+   },
+   "wiederholbar": {
+    "A": true,
+    "B": true,
+    "C": true
+   },
+   "zugWechsel": false,
+   "rangWechsel": false,
+   "rangWechselTop3": false,
+   "cStelltHer": true,
+   "priorsGleichEingespeist": true,
+   "priorsTop2": {
+    "A": [
+     0.0022710824850946665,
+     0.0027819499373435974
+    ],
+    "B": [
+     0.0023247033823281527,
+     0.0027630480471998453
+    ]
+   }
+  }
+ ]
+}
