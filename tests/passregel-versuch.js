@@ -248,8 +248,16 @@ const BESTAND = {
   'auswertung/diagnose/wurzel-replay.js':         'waechter',
   'auswertung/lerner-pruefung.js':                'waechter',
   'auswertung/endspiel/passregel-fortsetzung.js': 'waechter',
-  /* setzt PARAMS nur aus DEFAULT plus festen Literalen und nennt den Schalter
-     nirgends -- allein deshalb sicher, weil der Standardwert 0 ist */
+  /* Klasse `feste-literale`: Die Datei kann den Schalter nicht einschalten.
+     Geprueft wird die Eigenschaft, auf der das beruht -- sie nennt
+     passNachGegnerpass nirgends -- und das traegt nur, weil es in keiner dieser
+     Dateien einen generischen Weg gibt, der beliebige Schluessel aus Argumenten
+     in PARAMS uebernimmt (wie ab-harness.js ihn hat, daher dort ein Waechter).
+     Praezisierung vom 23.11.2026: Die elf alten Dateien setzen PARAMS wirklich
+     nur aus DEFAULT plus festen Literalen; prior-reproduktion.js nimmt zwei
+     WERTE aus Argumenten (--sims, --blend), aber nur fuer namentlich genannte
+     Felder, unter denen der Schalter nicht ist. Der Klassenname ist der alte
+     geblieben, die gepruefte Eigenschaft ist dieselbe. */
   'auswertung/annaeherung.js':                    'feste-literale',
   'auswertung/endspiel/netz-kosten.js':           'feste-literale',
   'auswertung/endspiel/pass-stellungen.js':       'feste-literale',
@@ -260,7 +268,10 @@ const BESTAND = {
   'auswertung/zugwahl-grund.js':                  'feste-literale',
   'auswertung/zugwert-rang.js':                   'feste-literale',
   'auswertung/zugwert-suche.js':                  'feste-literale',
-  'distillation/collect.js':                      'feste-literale'
+  'distillation/collect.js':                      'feste-literale',
+  /* Neu am 23.11.2026, und T-PR1 hat die Datei selbst gemeldet, als sie
+     unverzeichnet dazukam (docs/prior-reproduktion-vorabfestlegung.md §8.5). */
+  'auswertung/diagnose/prior-reproduktion.js':    'feste-literale'
 };
 
 /* Dateien, die den Schalter nennen, ohne die Engine selbst zu rufen. */
@@ -289,7 +300,7 @@ test('T-PR1: der Bestand der Engine-Aufrufer ist geschlossen, jede Klasse haelt 
   pruefe(verschwunden.length === 0, verschwunden.length
     ? `verzeichnete Datei ruft die Engine nicht mehr an: ${verschwunden.join(', ')} -- BESTAND kuerzen`
     : 'keine verzeichnete Datei ist verschwunden');
-  pruefeGleich(ruft.length, 20, 'heute sind es 20 Dateien (§1.4)');
+  pruefeGleich(ruft.length, 21, 'heute sind es 21 Dateien (§1.4)');
 
   /* 2. Geschlossene Welt der Schalterstellen: auch eine Datei, die den
         Schalter anfasst, ohne die Engine zu rufen, soll auffallen. */
@@ -319,8 +330,8 @@ test('T-PR1: der Bestand der Engine-Aufrufer ist geschlossen, jede Klasse haelt 
              `${rel}: nennt den Schalter nicht (feste Literale, §1.4)`);
   }
   pruefeGleich(JSON.stringify(gezaehlt), JSON.stringify(
-    {versorgt: 2, 'versorgt-direkt': 2, waechter: 5, 'feste-literale': 11}),
-    'die vier Klassen sind 2 + 2 + 5 + 11 (§1.4)');
+    {versorgt: 2, 'versorgt-direkt': 2, waechter: 5, 'feste-literale': 12}),
+    'die vier Klassen sind 2 + 2 + 5 + 12 (§1.4)');
 });
 
 laufeTests('Versuchsregel Pass nach Gegnerpass').then(ok => process.exit(ok ? 0 : 1));
