@@ -1,0 +1,93 @@
+name: GNU Go und die positionelle Wiederholung
+
+# Manueller Lauf der Probe aus docs/gnugo-superko-vorabfestlegung.md: Lehnt
+# GNU Go 3.8 mit --chinese-rules einen Zug ab, der eine fruehere Brettstellung
+# wiederherstellt, wenn der einfache Ko-Punkt durch zwei Paesse nicht mehr gilt?
+#
+# Fuenf Proben, je ein eigener GNU-Go-Prozess, nie genmove -- GNU Go sucht hier
+# nicht. Die Antwort ist deshalb deterministisch, es gibt keinen Seed und keine
+# Streuung; §2 des Docs begruendet, warum McNemar und Clopper-Pearson hier
+# nicht greifen und stattdessen zwei Kontrollen als Gueltigkeitsbedingung
+# tragen (P1 Selbstmord, P2 einfaches Ko).
+#
+# Die Gueltigkeitsregel aus §4 steckt im Skript: ist der Lauf ungueltig, gibt
+# es KEIN Urteil, das Skript endet mit 1 und dieser Lauf wird rot. Ein Absturz
+# von GNU Go wird NICHT durch einen Neustart ueberspielt.
+#
+# Am Code aendert das Ergebnis nichts. Die Korrektur GTP-1 ist gemergt; der
+# Adapter lehnt die Wiederholung ab, egal wie GNU Go antwortet. Der Lauf
+# schliesst eine offene Aussage in docs/korrektur-gtp-vorabfestlegung.md §10.5.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: gnugo-superko
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+# ubuntu-24.04 statt ubuntu-latest, wie alle Messlaeufe hier: neuere Bilder
+# haben andere Paketstaende von GNU Go, und die Probe soll auf dem Stand
+# laufen, auf dem sie vorab festgelegt wurde.
+jobs:
+  probe:
+    name: Fuenf Proben gegen GNU Go
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+          gnugo --version | head -n 1
+          dpkg -l gnugo | tail -n 1 | cut -c1-80
+
+      # Die Gueltigkeitslogik selbst ist lokal gegen einen GTP-Stummel geprueft
+      # (tests/gnugo-superko.js); hier laeuft sie gegen das echte GNU Go.
+      - name: Gueltigkeitslogik pruefen
+        run: node tests/gnugo-superko.js
+
+      - name: Probe
+        id: probe
+        run: |
+          set -euo pipefail
+          mkdir -p ergebnisse
+          status=0
+          node auswertung/gnugo-superko.js --aus ergebnisse/ergebnis.json \
+            > ergebnisse/konsole.txt 2>&1 || status=$?
+          cat ergebnisse/konsole.txt
+          {
+            echo "## GNU Go und die positionelle Wiederholung"
+            echo
+            echo "Dispatch-Commit \`${GITHUB_SHA:0:7}\` · GNU Go aus dem Paketstand des Runners"
+            echo
+            if [ "$status" -eq 0 ]; then
+              echo "**Lauf gueltig.** Urteil:"
+            else
+              echo "**Lauf UNGUELTIG - kein Urteil** (Exitcode $status). Gruende im Protokoll:"
+            fi
+            echo
+            echo '```'
+            tail -n 20 ergebnisse/konsole.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - name: Ergebnis sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gnugo-superko
+          path: ergebnisse/
+          if-no-files-found: warn
+          retention-days: 90
