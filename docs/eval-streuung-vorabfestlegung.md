@@ -216,3 +216,114 @@ kein Versehen des Tests: sie zählt Mess- und Auswertungswerkzeuge, die die Engi
 **Was damit noch nicht belegt ist.** Der Test prüft Arithmetik an vier Stellen, nicht, dass eine ganze Partie mit
 `evalStreuung` 1 Zug für Zug wie vorher läuft. Das ist Schritt 3, der Engine-Vergleich in Actions. Zeigt er einen
 Unterschied, ist die Änderung falsch gebaut, und die Messläufe entfallen.
+
+## 10. Nachtrag: Präzisierung von §6 VOR dem Messlauf (23.11.2026)
+
+§6 hat zwei Dinge offen gelassen (Seeds, Zug-Limit) und eines nur scheinbar widersprüchlich gesetzt. Dieser
+Nachtrag füllt die Lücken und wendet §6 an; er ändert keine Vorgabe, die §6 getroffen hat. Er steht hier, **bevor**
+eine einzige Partie gespielt ist — der Merge dieses Nachtrags liegt in der Geschichte vor den Rohdaten, und das ist der Grund,
+warum es ein eigener Schritt ist und keine Fußnote in der Auswertung.
+
+### 10.1 Die Seeds (§6 nannte keine)
+
+§6 verlangt „4 Seeds × 90 Partien", ohne die Seeds zu nennen; `skalierung.md` §2 nennt seine (20261018–21).
+Nachgeholt:
+
+| Vergleich | Seeds |
+|---|---|
+| **S1** (`evalStreuung` 1 gegen 0) | 20261123, 20261124, 20261125, 20261126 |
+| **S2** (1 gegen 0,5) | 20261127, 20261128, 20261129, 20261130 |
+
+Die Seeds stehen hier, weil die Wahl nach den Daten keine Wahl mehr wäre.
+
+### 10.2 Zug-Limit 600 (§6 nannte keins)
+
+Mit Aufgabe aus laufen Partien länger, und das Default-Limit 400 von `ab-harness.js` würde die Partielänge deckeln —
+also ausgerechnet den Nebenendpunkt verfälschen, der sie messen soll. Der Vorgängerlauf mit `resignEnabled=0` nahm
+600 (`ab-harness.js` Z. 271). Dabei bleibt es: `--maxmoves 600`.
+
+### 10.3 Aufgabe aus; „Aufgaben je Arm" wird dadurch leer (§6 widersprach sich scheinbar)
+
+§6 verlangt im Bedingungssatz „Aufgabe aus" und nennt wenige Zeilen später „Aufgaben je Arm" als Nebenendpunkt.
+Das sieht wie ein Widerspruch aus, ist aber eine Rangfrage: Die Bedingung steht fest, der Endpunkt ist ihr
+nachgeordnet. Also `resignEnabled=0` in beiden Armen — und „Aufgaben je Arm" wird im Bericht **nicht gestrichen,
+sondern als 0 / 0 ausgewiesen**, mit dem Hinweis, dass die Bedingung ihn leer macht. Gestrichen würde eine
+vorab festgelegte Zahl verschwinden; so bleibt sichtbar, dass sie gefordert war und warum sie nichts sagt.
+
+Dass die Bedingung und nicht der Endpunkt gewinnt, hat einen sachlichen Grund und nicht nur einen formalen: Das
+Aufgabekriterium liest selbst die verrauschte Bewertung (`index.html` Z. 5297 prüft `Q` gegen die Schwelle). Mit
+`resignEnabled=1` erreichte der Rauschterm das Ergebnis über **zwei** Wege — die Zugwahl und den Zeitpunkt der
+Aufgabe — und die Siegrate könnte sich allein dadurch verschieben, dass ein Arm früher aufgibt. Genau diese
+Vermischung soll die Messung vermeiden. `skalierung.md`, das Vorbild aus §6, hatte die Aufgabe an und konnte sie
+deshalb ausweisen; dort war das Rauschen in beiden Armen gleich, hier ist es der Gegenstand.
+
+**Hazeberry kann das umdrehen.** Wer „Aufgaben je Arm" als echte Zahl haben will, braucht `resignEnabled=1` und
+nimmt den Störkanal in Kauf; das wäre ein eigener Lauf mit eigener Festlegung, nicht dieser.
+
+### 10.4 Woher Komi und Schiedsrichter kommen
+
+§6 beruft sich auf die Standardbedingungen aus `CLAUDE.md`. Die beschreiben Läufe **gegen GNU Go oder Fuego**
+(„GNU Go Stufe 1 als Schiedsrichter (Fläche)"). Dieser Lauf ist Selbstspiel über `ab-harness.js`; dort rechnet das
+Werkzeug selbst in Fläche ab, mit Komi 7,5 als Default (`ab-harness.js` Z. 49 und 760), und die Engine ist
+komi-blind — Komi ändert nur die Abrechnung, nie einen Zug. Die Bedingungen sind damit erfüllt, aber durch
+Übertragung, nicht wörtlich. Ohne Vorgabe spielt der Harness ohnehin.
+
+### 10.5 Die Befehle
+
+Je Vergleich vier Teilläufe über `ab-harness.yml` (ein Seed je Dispatch), Standardmodus (`paired = 0`):
+
+```
+--games 90  --seed <Seed>  --maxmoves 600  --paired 0
+--A mctsFixedSims=120,resignEnabled=0,evalStreuung=1
+--B mctsFixedSims=120,resignEnabled=0,evalStreuung=0        (S1; S2: evalStreuung=0.5)
+```
+
+Die Arme unterscheiden sich in genau einem `PARAMS`-Wert — Gültigkeitsregel Nr. 2 aus §6 ist damit konstruktiv
+erfüllt und wird am Bericht nachgeprüft.
+
+### 10.6 Vorprüfung im Container, damit der Lauf in Actions nicht ins Leere geht
+
+`ab-harness.js` setzt die `--A`/`--B`-Schlüssel mit
+`Object.assign(PARAMS, PARAMS_DEFAULT, …, cfg)` (Z. 1104) — **ungeprüft**. Ein Tippfehler im Schlüsselnamen würde
+stillschweigend gesetzt und nie gelesen; der Lauf sähe aus wie eine Messung und wäre keine. Deshalb vorher drei
+kurze Läufe im Container (4 Partien, `mctsFixedSims=30`, Zug-Limit 60, Seed 99), verglichen über die
+Endbrett-Hashes aus `--roh`:
+
+| Lauf | B-Arm | Endbrett-Hashes |
+|---|---|---|
+| X1 | `evalStreuung=1` | `cf033b7d…`, `e1485423…`, `bf1c7277…`, `d74a6577…` |
+| X2 | `evalStreuung=1` | byteidentisch zu X1 |
+| Y | `evalStreuung=0` | `00f5de0f…`, `1fb36fe6…`, `c9e02e6c…`, `1fb36fe6…` — alle vier anders als X |
+
+X1 gegen X2 belegt die Reproduzierbarkeit des Standardmodus mit `mctsFixedSims`, die der Workflow-Kopf behauptet.
+X gegen Y belegt, dass `evalStreuung` über `--B` bis in die Engine durchkommt.
+
+Ohne statistischen Anspruch, aber notiert: in Y tragen Partie 2 und 4 denselben Endbrett-Hash. Bei Zug-Limit 60 ist
+„Endbrett" nur die Stellung nach 60 Zügen, und vier Partien sind eine Anekdote. Die Richtung ist die, die §6 als
+Kostenseite erwartet; entschieden wird sie von den 360 Partien, nicht hiervon.
+
+### 10.7 Laufzeit und Zug-Limit, nachgemessen
+
+Gültigkeitsregel Nr. 3 aus §6 macht einen Lauf ungültig, der seine Partienzahl nicht erreicht, und
+`ab-harness.yml` bricht nach 300 Minuten ab. Ob 90 Partien mit Zug-Limit 600 hineinpassen, war geschätzt. Vier
+Partien unter den echten Bedingungen (`mctsFixedSims=120`, `resignEnabled=0`, Zug-Limit 600, Seed 4242) im
+Container:
+
+| Partie | Züge | Zeit |
+|---:|---:|---:|
+| 1 | 370 | 0,6 min |
+| 2 | 384 | 0,7 min |
+| 3 | 389 | 0,7 min |
+| 4 | 391 | 0,7 min |
+
+**Laufzeit:** 90 Partien × 0,7 min ≈ 63 Minuten im Container. Ein Hosted Runner ist langsamer, die Reserve bis 300
+Minuten ist aber groß. Das Limit ist damit geprüft und nicht angenommen.
+
+**Zug-Limit:** Die vier Partien liegen bei 370 bis 391 Zügen, also direkt an der 400er-Grenze. Mit dem Default 400
+wären Partien abgeschnitten worden — §10.2 stützte sich auf den Vorgängerlauf, jetzt steht eine eigene Zahl
+dahinter. Bei 600 ist das Limit in keiner der vier Partien gebunden; die Längenmessung ist also unverzerrt.
+
+**Nebenbefund zur Reproduzierbarkeit.** Der Harness schreibt in seinen Kopf „Budget: 250 ms/Zug (fest)", auch wenn
+`mctsFixedSims` gesetzt ist. Die Zeile ist kosmetisch: liefe die Suche wirklich nach Zeit, wären zwei Läufe mit
+gleichem Seed nicht byteidentisch — in §10.6 sind sie es. `mctsFixedSims` greift also, und die Kopfzeile ist nur
+irreführend.
