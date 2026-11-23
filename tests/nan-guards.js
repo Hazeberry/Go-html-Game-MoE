@@ -250,5 +250,87 @@ test('T-N5: ohne Sperre setzt reset() wie bisher zurück (Kontrolle)', () => {
   pruefe(KI.ablage.get('go_pnet') !== 'alter Stand', 'der alte Eintrag ist weg (save() schreibt den neuen)');
 });
 
+/* ══ NET-1, Folgeprüfung: vollständig blockierter Storage ═══════════
+   docs/korrektur-net1-vorabfestlegung.md §10. T-N1 und T-N2 oben sperren nur
+   removeItem, die Browser-Tests T-N3/T-N4 lassen getItem null liefern. Ein
+   Browser mit blockierten Site-Daten wirft dagegen bei getItem, setItem UND
+   removeItem. Zwei Dinge sind dort anders:
+
+   1. Der Fix trägt trotzdem, weil save() und load() schon vorher abgesichert
+      waren — das zeigt T-N6, und nichts im Repo zeigte es bisher.
+   2. Der Rollback-Zweig in trainGame ist strukturell unerreichbar: load() kann
+      nie gelingen, also greift immer reset(), und weil reset() _divergences auf
+      0 setzt, wird die Dreier-Schwelle nie erreicht. Jede Divergenz ist ein
+      Vollreset auf Zufallsgewichte (T-N7). */
+function still(fn) {
+  const sE = console.error, sW = console.warn, sL = console.log;
+  console.error = console.warn = console.log = () => {};
+  try { return fn(); }
+  finally { console.error = sE; console.warn = sW; console.log = sL; }
+}
+
+function mitBlockiertemStorage(fn) {
+  const ls = globalThis.localStorage;
+  const echt = {getItem: ls.getItem, setItem: ls.setItem, removeItem: ls.removeItem};
+  const wirf = () => { const e = new Error('storage blocked'); e.name = 'SecurityError'; throw e; };
+  ls.getItem = wirf; ls.setItem = wirf; ls.removeItem = wirf;
+  try { return still(fn); }
+  finally { ls.getItem = echt.getItem; ls.setItem = echt.setItem; ls.removeItem = echt.removeItem; }
+}
+
+/* Eine Divergenz erzwingen und melden, welcher Zweig gegriffen hat:
+   _divergences bleibt 1, wenn der Rollback griff — reset() setzt es auf 0. */
+function divergenzLauf(blockiert) {
+  netz.reset();
+  netz.gamesPlayed = 5; netz.wins = 3;
+  netz.save();                          /* ein gültiger Stand liegt in der Ablage */
+  netz._divergences = 0;
+  const inp    = netz.boardToInput(new Uint8Array(361), 1, null, null);
+  const hidden = new Float32Array(netz.HID).fill(0.5);
+  const probs  = new Float32Array(netz.OUT).fill(1 / netz.OUT);
+  netz._gameBuffer = [{inp, probs, hidden, moveIdx: 5}];
+  netz.W1[0] = NaN;                     /* Divergenz erzwingen */
+  let wurf = null;
+  const lauf = () => { try { netz.trainGame(1); } catch (e) { wurf = e; } };
+  if (blockiert) mitBlockiertemStorage(lauf); else still(lauf);
+  return {wurf, divergenzen: netz._divergences, spiele: netz.gamesPlayed};
+}
+
+test('T-N6: vollständig blockierter Storage — reset() wirft nicht, load() liefert nichts', () => {
+  netz.reset();
+  netz.gamesPlayed = 17; netz.wins = 9; netz._trained = true; netz.W1[0] = NaN;
+
+  let wurf = null;
+  mitBlockiertemStorage(() => { try { netz.reset(); } catch (e) { wurf = e; } });
+
+  pruefeGleich(wurf, null, 'reset() wirft nicht (save() und load() waren schon abgesichert)');
+  pruefeFinit(netz.W1, 'W1 nach dem Reset finit');
+  pruefeGleich(netz.gamesPlayed, 0, 'gamesPlayed zurückgesetzt');
+  pruefeGleich(netz.wins, 0, 'wins zurückgesetzt');
+  pruefeGleich(netz._healthy, true, 'das Netz gilt wieder als gesund');
+
+  /* Berichtigt §3: bei blockierten Site-Daten kommt KEIN alter Stand zurück. */
+  netz.reset(); netz.gamesPlayed = 11; netz.save();
+  let geladen = null;
+  mitBlockiertemStorage(() => { geladen = netz.load(); });
+  pruefeGleich(geladen, false, 'load() gibt false — kein alter Stand kommt zurück');
+});
+
+test('T-N7: blockierter Storage — jede Divergenz ist ein Vollreset, der Rollback ist unerreichbar', () => {
+  const frei = divergenzLauf(false);
+  pruefeGleich(frei.wurf, null, 'Kontrolle bei freiem Storage: trainGame wirft nicht');
+  pruefeGleich(frei.divergenzen, 1, 'Kontrolle: _divergences zählt auf 1 — der Rollback-Zweig griff');
+  pruefeGleich(frei.spiele, 5, 'Kontrolle: die 5 Spiele bleiben erhalten');
+  pruefeFinit(netz.W1, 'Kontrolle: W1 finit');
+
+  for (let i = 1; i <= 3; i++) {
+    const e = divergenzLauf(true);
+    pruefeGleich(e.wurf, null, `Lauf ${i}: trainGame wirft nicht`);
+    pruefeGleich(e.divergenzen, 0, `Lauf ${i}: _divergences steht wieder auf 0 — der reset()-Zweig griff`);
+    pruefeGleich(e.spiele, 0, `Lauf ${i}: die 5 Spiele sind weg`);
+    pruefeFinit(netz.W1, `Lauf ${i}: W1 finit`);
+  }
+});
+
 laufeTests('NaN-Schutz in MCTS/PUCT und Policy-Netz')
   .then(ok => process.exit(ok ? 0 : 1));
