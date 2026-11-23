@@ -78,6 +78,12 @@
     41. T-V1: ein Pass räumt die Marken der Zählvorschau vom Brett.
     42. T-V2: ein Zug räumt sie auch (Kontrolle).
 
+   Korrektur NET-1 (docs/korrektur-net1-vorabfestlegung.md, T-N3/T-N4; T-N1,
+   T-N2 und T-N5 stehen in tests/nan-guards.js):
+    43. T-N3: Divergenz beim Spielende mit gesperrtem localStorage bricht das
+        Spielende nicht ab.
+    44. T-N4: dasselbe im Aufgabe-Pfad.
+
    Aufruf:  node tests/browser-ui.js [pfad/zur/index.html] */
 'use strict';
 const {test, pruefe, pruefeGleich, laufeTests, STANDARD_HTML} = require('./rahmen');
@@ -1181,6 +1187,79 @@ test('T-V2: ein Zug räumt die Marken auch (Kontrolle)', async () => {
   pruefe(r.vorschauWeg, 'die Vorschau ist verworfen');
   pruefe(!r.gleichVorschau, 'das Bild zeigt die Marken nicht mehr');
   pruefe(r.gleichNeuaufbau, 'das Bild gleicht dem sauberen Neuaufbau');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+/* NET-1: reset() begann mit einem ungeschuetzten localStorage.removeItem.
+   trainGame ruft reset() im Divergenzpfad, und das steckt mitten im
+   Spielende — der Wurf brach deshalb den Aufrufer ab. Aufbau: removeItem
+   wirft, getItem liefert null (damit load() im Divergenzpfad false liefert
+   und reset() an die Reihe kommt), ein KI-Zug mit ECHTEN Netzeingaben fuellt
+   den Puffer, ein NaN im Gewicht erzwingt die Divergenz. */
+async function net1Vorbereiten(s) {
+  return s.evaluate(() => {
+    Storage.prototype.removeItem = function () { throw new DOMException('gesperrt', 'SecurityError'); };
+    Storage.prototype.getItem = function () { return null; };
+    state.aiEnabled = false; state.aiColor = 2;
+    const inp = policyNet.boardToInput(state.board, 2, null, null);
+    const {probs, hidden} = policyNet.forward(inp);
+    placeStone(3, 3);
+    state.currentPlayer = 2; state.aiRequestId = 1;
+    applyAIResult({type: 'stone', x: 15, y: 15}, 1, inp, probs, hidden);
+    policyNet.W1[0] = NaN;
+    return {puffer: policyNet._gameBuffer.length, w1Kaputt: !Number.isFinite(policyNet.W1[0])};
+  });
+}
+
+test('T-N3: Divergenz beim Spielende mit gesperrtem localStorage bricht nicht ab', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const v = await net1Vorbereiten(s);
+  const r = await s.evaluate(() => {
+    let wurf = null;
+    try {
+      state.currentPlayer = 1; state.consecutivePasses = 0;
+      pass(); pass();
+    } catch (e) { wurf = (e && e.name) || String(e); }
+    return {wurf, ende: state.gameOver,
+      anzeige: document.getElementById('final-score').textContent,
+      panel: document.getElementById('territory-panel').style.display,
+      w1endlich: Number.isFinite(policyNet.W1[0])};
+  });
+  await ctx.close();
+  pruefeGleich(v.puffer, 1, 'Vorbedingung: ein Zug im Trainingspuffer');
+  pruefe(v.w1Kaputt, 'Vorbedingung: ein Gewicht ist nicht endlich');
+  pruefeGleich(r.wurf, null, 'pass() wirft nicht');
+  pruefe(r.ende, 'das Spiel ist beendet');
+  pruefe(r.anzeige !== '–', `der Endstand steht da (${r.anzeige})`);
+  pruefeGleich(r.panel, 'flex', 'das Endstands-Panel ist sichtbar');
+  pruefe(r.w1endlich, 'der Reset hat gegriffen: W1[0] ist wieder endlich');
+  pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
+});
+
+test('T-N4: Divergenz im Aufgabe-Pfad mit gesperrtem localStorage bricht nicht ab', async () => {
+  if (!(await vorbereiten())) return 'skip';
+  const {s, ctx, fehler} = await seite();
+  const v = await net1Vorbereiten(s);
+  const r = await s.evaluate(() => {
+    let wurf = null;
+    try {
+      placeStone(3, 15);
+      state.currentPlayer = 2; state.aiRequestId = 2;
+      applyAIResult({type: 'resign', info: 'Test'}, 2, null, null, null);
+    } catch (e) { wurf = (e && e.name) || String(e); }
+    return {wurf, resign: state.resignedBy,
+      label: document.getElementById('final-label').textContent,
+      anzeige: document.getElementById('final-score').textContent,
+      panel: document.getElementById('territory-panel').style.display};
+  });
+  await ctx.close();
+  pruefe(v.w1Kaputt, 'Vorbedingung: ein Gewicht ist nicht endlich');
+  pruefeGleich(r.wurf, null, 'applyAIResult wirft nicht');
+  pruefeGleich(r.resign, 2, 'Weiß hat aufgegeben');
+  pruefeGleich(r.label, 'Aufgabe', 'das Label nennt die Aufgabe');
+  pruefe(/gewinnt/.test(r.anzeige), `die Anzeige nennt den Gewinner (${r.anzeige})`);
+  pruefeGleich(r.panel, 'flex', 'das Endstands-Panel ist sichtbar');
   pruefeGleich(fehler.length, 0, `keine Seitenfehler ${fehler[0] || ''}`);
 });
 
