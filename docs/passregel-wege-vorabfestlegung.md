@@ -199,4 +199,19 @@ drei Zeilen identischen Codes. Der wichtigste der vier, `ab-harness.js`, ist aus
 - **TRAIN-2** steht weiter im Code, ohne Vorabfestlegung.
 - Die Warnung in der Engine, die alle Aufrufer auf einmal abdecken würde (§3, erwogen und verworfen): bleibt eine
   eigene Festlegung, falls sie jemand will. Sie bräuchte einen Engine-Vergleich.
+  **Entschieden am 23.11.2026** in `docs/passregel-wege-nachtrag-vorabfestlegung.md`: **nicht in die Engine, aber
+  die Lücke wird anders geschlossen** (dort §1.5). Der verbleibende Einwand ist ein `throw` im heißen Pfad des
+  Produkts für eine Versicherung gegen einen Fall, von dem festgelegt ist, dass er nicht eintritt. Die Buchhaltung
+  wiegt dabei weniger, als hier zuerst stand: Eine neue Prüfsumme ist eingeübte Praxis, `policy-net` wurde durch
+  NET-1 und DASH-1 schon zweimal neu grundliniert (dort §1.3, Berichtigung). Statt der Engine-Warnung hält **T-PR1**
+  den Bestand der Aufrufer geschlossen — eine neue Datei, die die Engine anfasst, macht die CI rot, bis jemand sie
+  einordnet. Vorbehalt: T-PR1 prüft Text, nicht Verhalten. Der Entwurf für die Engine-Warnung liegt fertig, falls die
+  Versuchsregel je eingeschaltet wird; dann ist er der erste Schritt davor.
+  Beim Nachzählen kamen **20 Dateien** heraus, die die Engine antreiben, in vier Klassen (dort §1.4) — alle
+  abgedeckt. Zwei geben `extra` an `getAIMove` weiter, zwei rufen `passNachGegnerpassPruefung` direkt mit `extra` auf,
+  fünf haben einen Wächter, und elf setzen `PARAMS` nur aus `DEFAULT` plus festen Literalen und nennen den Schalter
+  nirgends — sie sind allein deshalb sicher, weil der Standardwert 0 ist. Die Zahl „elf Aufrufer mit festen
+  Literalen" aus §3 ist damit bestätigt; sie ist aber nicht der ganze Bestand.
+  Beim Prüfen dieser Frage fiel **BR-1** auf: Der Reproduktions-Schnappschuss des Fehlerberichts trägt `extra` nicht,
+  verspricht aber „1:1" — siehe dort §2.
 - Ob die Versuchsregel überhaupt eingeschaltet werden soll: unverändert nein, sie bleibt auf 0.
