@@ -301,3 +301,29 @@ X gegen Y belegt, dass `evalStreuung` über `--B` bis in die Engine durchkommt.
 Ohne statistischen Anspruch, aber notiert: in Y tragen Partie 2 und 4 denselben Endbrett-Hash. Bei Zug-Limit 60 ist
 „Endbrett" nur die Stellung nach 60 Zügen, und vier Partien sind eine Anekdote. Die Richtung ist die, die §6 als
 Kostenseite erwartet; entschieden wird sie von den 360 Partien, nicht hiervon.
+
+### 10.7 Laufzeit und Zug-Limit, nachgemessen
+
+Gültigkeitsregel Nr. 3 aus §6 macht einen Lauf ungültig, der seine Partienzahl nicht erreicht, und
+`ab-harness.yml` bricht nach 300 Minuten ab. Ob 90 Partien mit Zug-Limit 600 hineinpassen, war geschätzt. Vier
+Partien unter den echten Bedingungen (`mctsFixedSims=120`, `resignEnabled=0`, Zug-Limit 600, Seed 4242) im
+Container:
+
+| Partie | Züge | Zeit |
+|---:|---:|---:|
+| 1 | 370 | 0,6 min |
+| 2 | 384 | 0,7 min |
+| 3 | 389 | 0,7 min |
+| 4 | 391 | 0,7 min |
+
+**Laufzeit:** 90 Partien × 0,7 min ≈ 63 Minuten im Container. Ein Hosted Runner ist langsamer, die Reserve bis 300
+Minuten ist aber groß. Das Limit ist damit geprüft und nicht angenommen.
+
+**Zug-Limit:** Die vier Partien liegen bei 370 bis 391 Zügen, also direkt an der 400er-Grenze. Mit dem Default 400
+wären Partien abgeschnitten worden — §10.2 stützte sich auf den Vorgängerlauf, jetzt steht eine eigene Zahl
+dahinter. Bei 600 ist das Limit in keiner der vier Partien gebunden; die Längenmessung ist also unverzerrt.
+
+**Nebenbefund zur Reproduzierbarkeit.** Der Harness schreibt in seinen Kopf „Budget: 250 ms/Zug (fest)", auch wenn
+`mctsFixedSims` gesetzt ist. Die Zeile ist kosmetisch: liefe die Suche wirklich nach Zeit, wären zwei Läufe mit
+gleichem Seed nicht byteidentisch — in §10.6 sind sie es. `mctsFixedSims` greift also, und die Kopfzeile ist nur
+irreführend.
