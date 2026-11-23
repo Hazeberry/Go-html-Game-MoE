@@ -347,3 +347,68 @@ Regel aus …". Was §3 jetzt zusätzlich nennt, ist Ergänzung, keine Berichtig
 - GTP-3 wurde in dieser Durchsicht nur gelesen, nicht prototypisch gebaut.
 - Ob je ein Lauf den Adapter anders getrieben hat als über die drei in §2 genannten Aufrufer. Für diese drei ist die
   eingehende Richtung aus der Verdrahtung beantwortet, ohne Protokolle.
+
+## 11. Nachtrag: Umsetzung und Abnahme (23.11.2026)
+
+Hazeberry: „GTP-1 bis GTP-3 Go". Die Umsetzung folgt §5 und §7 ohne Abweichung in der Sache. Node v22.23.5, lokal;
+keine Partie, kein GNU Go, kein Fuego, kein Messlauf.
+
+### 11.1 Die sieben Abnahmepunkte
+
+1. **`index.html` ist unverändert**, Prüfsumme `4827da81e18b7f59500c027316eaba36e75296c9eb1a0136dcc313469b11482c`
+   (Abnahmepunkt 7 verlangt sie hier statt `pruefung.js`, das nur `index.html` prüft). **Abweichung von
+   Abnahmepunkt 1:** Geändert sind fünf Dateien, nicht vier — `gtp-ki.js`, `tests/pwa.js`, `tests/README.md`, dieses
+   Doc **und** `docs/bughunt-20261116.md` §3. Die fünfte verlangt §9 Nr. 2 ausdrücklich („eine Zeile in
+   `docs/bughunt-20261116.md` §3"); §8 Nr. 1 hatte sie nur nicht mitgezählt. Sie ist reine Dokumentation.
+2. **T-G1, T-G1b, T-G2, T-G3, T-G3b und T-G4 scheitern am alten Adapter und bestehen am neuen; T-G2b und T-G5
+   bestehen an beiden.** Gemessen durch zwei Läufe von `node tests/pwa.js`, einmal mit dem Adapter am Stand
+   `7382a19` an seiner Stelle: **alt 7 von 11 bestanden**, neu **11 von 11**. Die vier Fehlschläge am alten Stand
+   sind genau die vorhergesagten, mit diesen Meldungen:
+   - `Selbstmord abgelehnt: =` (der Block T-G1/T-G1b/T-G2 bricht beim ersten Fall ab)
+   - `zehn Argumente: erwartet 10, bekommen 9` (T-G3)
+   - `mit Schalter passt die Engine: erwartet = pass, bekommen = R4` (T-G3b)
+   - `Erfolgsantwort mit Nummer: erwartet =17 2, bekommen ? unbekannter Befehl` (T-G4)
+3. **Alle drei Verbote sind abgedeckt.** Am laufenden Adapter, mit den Zugfolgen aus §10.3:
+   `? Selbstmord verboten: A1`, `? Ko verboten: B2`, `? Stellungswiederholung verboten: B2`.
+4. **Bei einer Ablehnung bleibt der Zustand stehen.** Die Prüffunktion arbeitet auf einer Kopie, liest `hist` nur mit
+   `has` und wirft vor `setze`; `setze` selbst wirft bei besetztem Feld ebenfalls vor jeder Änderung. **Grenze der
+   Prüfung:** über GTP sind nur Brett und Weiterspielen beobachtbar — die Gefangenenzahl ist von außen nicht
+   abfragbar. Belegt ist daher: nach der abgelehnten Ko-Rücknahme steht das Brett unverändert, der Ko-Punkt gilt
+   weiter, und sobald die Stellung sich wirklich unterscheidet, ist derselbe Punkt erlaubt und schlägt (T-G1).
+5. **Die fünf bestehenden Tests in `tests/pwa.js` sind unverändert und bestehen** — auch der ältere
+   `gtp-ki.js`-Test mit `play b B1`, `play w A1`, `play b A2`, der den neuen Prüfungen nicht in die Quere kommt, weil
+   die schlagende Gruppe drei Freiheiten hat und kein Ko-Punkt entsteht.
+6. **`node tests/run.js` lokal: alle 60 Testdateien bestanden.** CI: siehe PR.
+7. Erledigt mit Punkt 1.
+
+### 11.2 Was über §7 hinaus gemessen wurde
+
+**T-G3b spielt 397 Züge einer echten Partie ein** (`tests/stellungen/hand-427.sgf`, dieselbe Stellung wie in
+`tests/passregel-versuch.js`) und prüft, dass **kein einziger** davon abgelehnt wird. Das ist die tragfähigste
+Gegenprobe gegen Fehlalarm, die zur Verfügung steht — stärker als die synthetischen Fälle in T-G2b, die daneben
+stehen bleiben. Danach: mit `--ki passNachGegnerpass=1` antwortet `genmove B` mit `pass`, ohne den Schalter mit einem
+Stein (`R4`). Am alten Adapter liefern **beide** Arme `R4` — der Schalter war wirkungslos, wie §3 es beschreibt.
+
+**T-G5 pinnt die Zugwahl auf eine Konstante.** Nach `set_random_seed 7` und `play b Q16` liefert `genmove w` den Zug
+`R17`, am alten wie am neuen Adapter nachgefahren. Die Konstante steht im Test, mit Herkunftsangabe.
+
+**T-G3 prüft Komi und Wertung ausdrücklich**, wie der Review-Auftrag es verlangt: eine Attrappe für `getAIMove`
+protokolliert vier Aufrufe — `argc` 10, `gegnerPasste` true, `wertung` `flaeche`, das über `komi 6.5` gesetzte Komi
+kommt als 6,5 an, nach `clear_board` wieder als 7,5, ein Steinzug löscht `letzterPass`, und ein Pass der eigenen
+Farbe gilt nicht als Gegnerpass.
+
+### 11.3 Umsetzung im Code
+
+`gtp-ki.js` wächst von 145 auf 178 Zeilen. Neu: `pruefeRegeln` nach `setze`, der Aufruf im `play`-Zweig, die Zustände
+`letzterPass` und `komi` samt Rücksetzen in `neu()`, die Zeile in `setze`, das zehnte Argument in `genmove`, die
+Kennung in `antworte` und an den drei Ausgabestellen, und der Kopfkommentar. Die Exportliste (Z. 49) ist unverändert
+— `floodFill`, `removeDeadGroups` und `computeZobrist` standen schon darin.
+
+### 11.4 Was offen bleibt
+
+- Ob **GNU Go 3.8** mit `--chinese-rules` eine positionelle Wiederholung ablehnt (§10.5). Unverändert offen; es
+  braucht einen Lauf in Actions und ein eigenes Go.
+- Die Versuchsregel auf den anderen drei Wegen (§3): eigene Festlegung, wie in §5 abgegrenzt.
+- Ob je ein Lauf den Adapter anders getrieben hat als über die drei Aufrufer aus §2.
+- Kein Messlauf: dass die Korrektur eine Messung verändert, ist nicht behauptet und nicht geprüft. T-G5 zeigt die
+  Zugwahl an einer Stellung unverändert, nicht an allen.
