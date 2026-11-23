@@ -207,8 +207,11 @@ drei Zeilen identischen Codes. Der wichtigste der vier, `ab-harness.js`, ist aus
   den Bestand der Aufrufer geschlossen — eine neue Datei, die die Engine anfasst, macht die CI rot, bis jemand sie
   einordnet. Vorbehalt: T-PR1 prüft Text, nicht Verhalten. Der Entwurf für die Engine-Warnung liegt fertig, falls die
   Versuchsregel je eingeschaltet wird; dann ist er der erste Schritt davor.
-  Beim Nachzählen kamen **elf** Pfade heraus, nicht sechs (dort §1.4) — alle abgedeckt; die drei
-  `passregel-*`-Werkzeuge setzen den Schalter wirklich auf 1 und rufen die Prüffunktion direkt mit `extra` auf.
+  Beim Nachzählen kamen **20 Dateien** heraus, die die Engine antreiben, in vier Klassen (dort §1.4) — alle
+  abgedeckt. Zwei geben `extra` an `getAIMove` weiter, zwei rufen `passNachGegnerpassPruefung` direkt mit `extra` auf,
+  fünf haben einen Wächter, und elf setzen `PARAMS` nur aus `DEFAULT` plus festen Literalen und nennen den Schalter
+  nirgends — sie sind allein deshalb sicher, weil der Standardwert 0 ist. Die Zahl „elf Aufrufer mit festen
+  Literalen" aus §3 ist damit bestätigt; sie ist aber nicht der ganze Bestand.
   Beim Prüfen dieser Frage fiel **BR-1** auf: Der Reproduktions-Schnappschuss des Fehlerberichts trägt `extra` nicht,
   verspricht aber „1:1" — siehe dort §2.
 - Ob die Versuchsregel überhaupt eingeschaltet werden soll: unverändert nein, sie bleibt auf 0.

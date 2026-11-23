@@ -12,10 +12,11 @@ hat zwei meiner eigenen Aussagen widerlegt — beide stehen berichtigt im Text, 
    grundliniert worden (NET-1, DASH-1); eine neue Grundlinie ist eingeübte Praxis.
 2. **§3:** „Ohne die Gewichte wäre der Bericht trotzdem nicht exakt" war falsch. Aufgezeichnete Priors ersetzen die
    Gewichte gerade. Der Grund, sie weglassen, ist jetzt ein gemessener Größenvergleich.
+3. **§1.4:** Meine erste Zählung „elf Pfade" war unvollständig. Es sind **20 Dateien**, die die Engine antreiben,
+   in vier Klassen. Abgedeckt sind sie alle — aber die Zahl war falsch, und mit ihr die Vorstellung vom Umfang.
 
 Die Empfehlung zu Frage A bleibt im Ergebnis, steht aber auf schmalerem Grund — und sie lässt die Lücke nicht mehr
-offen, sondern schließt sie anders (§1.5). Beim Nachzählen der Pfade kamen ausserdem **elf** statt sechs heraus
-(§1.4).
+offen, sondern schließt sie anders (§1.5).
 
 | Frage | Herkunft | Empfehlung |
 |---|---|---|
@@ -84,28 +85,34 @@ Was wirklich kostet:
   bleibt auf 0, und aus keinem Ergebnis folgt eine Aktivierung (`docs/passregel-vergleich.md`). Es ist eine
   Versicherung gegen einen Fall, von dem das Projekt festgelegt hat, dass er nicht eintritt.
 
-### 1.4 Alle Pfade, nachgezählt
+### 1.4 Der vollständige Bestand, nachgezählt
 
-Bevor die Empfehlung steht, der vollständige Bestand. Das Haupt-Doc sprach von sechs Wegen; nachgesehen am Quelltext
-sind es **elf**, und **jeder** ist abgedeckt:
+**Zweite Berichtigung (23.11.2026).** Hier stand zuerst eine Tabelle mit „elf Pfaden". Die war **unvollständig**:
+Sie zählte die Pfade, an denen der Schalter angehen *kann*, und übersah, dass noch weitere Dateien die Engine
+antreiben. Nachgezählt mit `git ls-files '*.js'` ohne `tests/`, gesucht nach `getAIMove(` oder
+`passNachGegnerpassPruefung(`: es sind **20 Dateien**. Dazu `index.html` selbst mit seinen drei Browser-Pfaden.
 
-| Pfad | Art |
-|---|---|
-| Browser, Worker-Weg (`d.extra` aus der Botschaft, Z. 6035 ff.; Aufbau Z. 6280) | versorgt |
-| Browser, `fallbackToMainThread` (Z. 6085) | versorgt |
-| Browser, Leicht/Mittel (Z. 6353; dort greift die Regel ohnehin nicht) | versorgt |
-| `gtp-ki.js` `genmove` (seit GTP-2) | versorgt |
-| `gnugo-duell.js` (seit `docs/passregel-wege-vorabfestlegung.md` §3) | versorgt |
-| `auswertung/endspiel/passregel-stellungen.js` — ruft `passNachGegnerpassPruefung` **direkt** mit `extra` (Z. 72) | versorgt |
-| `auswertung/endspiel/passregel-vorsprung.js` — ebenso (Z. 83) | versorgt |
-| `auswertung/endspiel/passregel-zaehldiagnose.js` — setzt den Schalter auf 1 (Z. 128) und geht über `pruefePartie` aus `passregel-stellungen.js`, also über den Pfad darüber | versorgt |
-| `ab-harness.js` (Z. 1111) | Wächter |
-| `auswertung/weiterspielen.js` (Z. 132), `auswertung/diagnose/wurzel-replay.js` (Z. 88), `auswertung/lerner-pruefung.js` (Z. 114) | Wächter |
-| `auswertung/endspiel/passregel-fortsetzung.js` (Z. 221, dazu die Default-Prüfung Z. 401) | Wächter |
+| Klasse | Zahl | Dateien |
+|---|---|---|
+| **versorgt** — gibt `extra` an `getAIMove` weiter | 2 | `gnugo-duell.js`, `gtp-ki.js` |
+| **versorgt direkt** — ruft `passNachGegnerpassPruefung` selbst mit `extra` auf, ohne `getAIMove` | 2 | `auswertung/endspiel/passregel-stellungen.js` (Z. 72), `auswertung/endspiel/passregel-vorsprung.js` (Z. 83) |
+| **Wächter** — bricht ab, wenn der Schalter an ist | 5 | `ab-harness.js` (Z. 1111), `auswertung/weiterspielen.js` (Z. 132), `auswertung/diagnose/wurzel-replay.js` (Z. 88), `auswertung/lerner-pruefung.js` (Z. 114), `auswertung/endspiel/passregel-fortsetzung.js` (Z. 221, dazu die Default-Prüfung Z. 401) |
+| **feste Literale** — kann den Schalter nicht einschalten | 11 | `auswertung/annaeherung.js`, `auswertung/endspiel/netz-kosten.js`, `auswertung/endspiel/pass-stellungen.js`, `auswertung/kritisch-rang.js`, `auswertung/lebensurteil-vergleich.js`, `auswertung/muster-endspiel-daten.js`, `auswertung/netz-zeit.js`, `auswertung/zugwahl-grund.js`, `auswertung/zugwert-rang.js`, `auswertung/zugwert-suche.js`, `distillation/collect.js` |
+| **Browser** — `passExtra()` auf allen drei Wegen | 3 Pfade in `index.html` | Worker-Weg (`d.extra`, Z. 6035 ff.; Aufbau Z. 6280), `fallbackToMainThread` (Z. 6085), Leicht/Mittel (Z. 6353) |
 
-Die drei `passregel-*`-Werkzeuge in der Mitte waren mir beim ersten Entwurf nicht bewusst; sie setzen den Schalter
-wirklich auf 1 und sind trotzdem richtig, weil sie die Prüffunktion direkt mit einem `extra` aufrufen und `getAIMove`
-dabei nicht benutzen. Die Lücke ist damit **genau eine**: ein Werkzeug, das es heute noch nicht gibt.
+2 + 2 + 5 + 11 = 20. **Jede Datei ist abgedeckt**, und für die elf mit festen Literalen ist nachgeprüft, woran das
+hängt: Sie setzen `PARAMS` ausschließlich aus `DEFAULT` beziehungsweise `PARAMS_DEFAULT` plus festen Literalen, unter
+denen `passNachGegnerpass` nicht vorkommt, und **keine der elf nennt den Schalter überhaupt** (geprüft mit
+`grep -l`). Sie sind also nur deshalb sicher, weil der Standardwert 0 ist — was `passregel-fortsetzung.js` Z. 401
+und die Tests festhalten.
+
+Eine Datei gehört noch dazu, die die Engine nicht selbst anfasst: `auswertung/endspiel/passregel-zaehldiagnose.js`
+setzt den Schalter auf 1 (Z. 128) und geht über `pruefePartie` aus `passregel-stellungen.js`, also über einen Pfad
+der zweiten Klasse. Das sah zuerst wie ein Widerspruch zum Wächter in `passregel-fortsetzung.js` aus; es ist keiner,
+nachgeprüft am Quelltext beider Dateien.
+
+Die Lücke ist damit weiterhin **genau eine**: eine Datei, die es heute noch nicht gibt. Aber die Zahl, über die man
+dabei redet, ist 20, nicht 6 und nicht 11 — und ohne diese Zählung hätte ich sie weiter falsch genannt.
 
 ### 1.5 Empfehlung: nicht in die Engine — aber die Lücke nicht offen lassen
 
@@ -117,15 +124,17 @@ Versicherung gegen einen Fall, von dem festgelegt ist, dass er nicht eintritt. D
 stillschweigend übergangen — lässt sich billiger und früher erreichen, als die Engine es kann: mit einem Test, der
 den Bestand aus §1.4 **geschlossen** hält.
 
-**T-PR1, Bestandsprüfung.** Der Test führt eine Liste aller Dateien, die die Engine antreiben können, je mit ihrer
-Art (`versorgt` oder `waechter`), und prüft dreierlei:
+**T-PR1, Bestandsprüfung.** Der Test führt den Bestand aus §1.4 als Liste, je Datei mit ihrer Klasse, und prüft:
 
-1. **Geschlossene Welt.** Die Menge der versionierten `.js`-Dateien außerhalb von `tests/`, die `getAIMove(` oder
-   `passNachGegnerpassPruefung(` enthalten, ist **genau** die Liste. Eine neue Datei, die die Engine anfasst, macht
-   den Test rot, bis jemand sie einordnet. Das ist der eigentliche Mechanismus.
-2. Jede als `versorgt` geführte Datei enthält an ihrem Aufruf ein `extra` (zehntes Argument bzw. das Objekt mit
-   `gegnerPasste`).
-3. Jede als `waechter` geführte Datei enthält die Abbruchbedingung auf `passNachGegnerpass`.
+1. **Geschlossene Welt der Aufrufer.** Die Menge der versionierten `.js`-Dateien außerhalb von `tests/`, die
+   `getAIMove(` oder `passNachGegnerpassPruefung(` enthalten, ist **genau** die Liste — heute 20. Eine neue Datei,
+   die die Engine anfasst, macht den Test rot, bis jemand sie einordnet. Das ist der eigentliche Mechanismus.
+2. **Geschlossene Welt der Schalterstellen.** Die Menge der Dateien, die `passNachGegnerpass` überhaupt nennen, ist
+   ebenfalls genau eine Liste. Damit fällt auch eine Datei auf, die den Schalter neu anfasst, ohne die Engine selbst
+   zu rufen — wie `passregel-zaehldiagnose.js`.
+3. Jede `versorgt`-Datei enthält an ihrem Aufruf ein `extra`, jede `waechter`-Datei ihre Abbruchbedingung, und jede
+   der elf `feste-literale`-Dateien nennt `passNachGegnerpass` **nicht** — das ist die Eigenschaft, auf der ihre
+   Sicherheit beruht, und sie ist prüfbar.
 
 **Was der Test besser kann als die Engine-Warnung:** Er schlägt in der CI zu, **bevor** ein Messlauf läuft, statt
 mitten darin; er kostet keine Zeile in der Engine, keine neue Prüfsumme, keinen Engine-Vergleich und kein `throw` im
