@@ -109,6 +109,11 @@ function pruefe(dateien, opt) {
       if (index++ % opt.jede !== opt.rest) continue;
       const zug = mitNetz => {
         Object.assign(E.PARAMS, DEFAULT, {mctsFixedSims: 120, adaptiveBudgetEnabled: 0, mctsTreeReuse: 0, resignEnabled: 0}, opt.ki);
+        /* Kein extra: Einzelstellungen, gegnerPasste ist nicht herleitbar
+           (docs/passregel-wege-vorabfestlegung.md §3). */
+        if (E.PARAMS.passNachGegnerpass >= 1)
+          throw new Error('passNachGegnerpass: dieses Werkzeug versorgt extra nicht, die Regel wuerde '
+            + 'still ausfallen (docs/passregel-wege-vorabfestlegung.md)');
         Object.assign(zustand, {letzt: s.letzt, vorletzt: s.vorletzt, ko: s.ko});
         globalThis.__lernerHaken = mitNetz ? h : null;
         Math.random = mulberry32((s.seed * 1000 + s.k) >>> 0);

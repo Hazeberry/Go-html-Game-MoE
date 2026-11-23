@@ -49,6 +49,10 @@
      --komi <f>        Komi für die Wertung (Default: 7.5).
                        Hinweis: Die Engine selbst ist komi-blind —
                        --komi ändert NUR die Abrechnung, nie einen Zug.
+                       Damit das so bleibt, gibt dieses Werkzeug der Engine
+                       kein extra mit und bricht ab, wenn ein Arm
+                       passNachGegnerpass=1 setzt (die Regel würde sonst
+                       still ausfallen; docs/passregel-wege-vorabfestlegung.md).
      --A k=v,k=v       PARAMS für Konfiguration A (Baseline)
      --B k=v,k=v       PARAMS für Konfiguration B (Kandidat)
                        Phasenabhängig: k@N=v setzt k AB Zug N. Beispiel
@@ -1099,6 +1103,14 @@ const driver = `
       const cfg = cfgAt(color === 1 ? cfgBlack : cfgWhite, mc);
       Object.assign(PARAMS, PARAMS_DEFAULT,
         {aiTimeBudget: AB.budget, adaptiveBudgetEnabled: 0}, cfg);
+      /* Dieses Werkzeug versorgt extra nicht, und es soll es auch nicht: --komi
+         aendert hier NUR die Abrechnung, nie einen Zug (Hilfe oben). extra.komi
+         wuerde das aufheben. Ohne extra fiele die Regel aber STILL aus, und der
+         Lauf saehe aus wie einer mit Regel -- deshalb Abbruch statt Warnung
+         (docs/passregel-wege-vorabfestlegung.md §3). */
+      if (PARAMS.passNachGegnerpass >= 1)
+        throw new Error('passNachGegnerpass: dieses Werkzeug versorgt extra nicht, die Regel wuerde '
+          + 'still ausfallen (docs/passregel-wege-vorabfestlegung.md)');
 
       const ms = modState[color];
       /* Phasenwechsel: gespeicherten Baum verwerfen. Ein wiederverwendeter

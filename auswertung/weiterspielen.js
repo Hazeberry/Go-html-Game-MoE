@@ -126,6 +126,12 @@ for (const p of aufgegeben) {
     const arm = farbe === 1 ? p.armSchwarz : p.armWeiss;
     Object.assign(E.PARAMS, DEFAULT, {aiTimeBudget: 250, adaptiveBudgetEnabled: 0,
       resignEnabled: 0, mctsTreeReuse: 0}, opt[arm]);
+    /* Kein extra: der Zaehler passes unten deckt Pass, Aufgabe UND besetztes Feld
+       in einem Zweig, gegnerPasste waere daraus nicht herleitbar
+       (docs/passregel-wege-vorabfestlegung.md §2). */
+    if (E.PARAMS.passNachGegnerpass >= 1)
+      throw new Error('passNachGegnerpass: dieses Werkzeug versorgt extra nicht, die Regel wuerde '
+        + 'still ausfallen (docs/passregel-wege-vorabfestlegung.md)');
     E.setzeKrisenDauer(null);
     const r = E.getAIMove(board, farbe, Array.from(hist), {...caps}, mc, 'hard', 1, ko, last);
     const i = r.type === 'stone' ? r.y * 19 + r.x : -1;

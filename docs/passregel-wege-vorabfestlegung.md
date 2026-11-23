@@ -140,3 +140,63 @@ Zwei Zustände, gültig oder ungültig. **Gültig** nur, wenn alles zutrifft:
 2. Umsetzung in einem eigenen PR: Code nach §3, Tests nach §4, Nachtrag hier mit den Ergebnissen aus §5 und eine
    Zeile in `docs/korrektur-gtp-vorabfestlegung.md` §3, wo der offene Punkt steht.
 3. CI grün, Merge, kurzer Bericht mit den löschbaren Branches.
+
+## 7. Nachtrag: Umsetzung und Abnahme (23.11.2026)
+
+Hazeberry: Go für die Liste und die PRs, autonom. Die Umsetzung folgt §3 ohne Abweichung in der Sache. Node
+v22.23.5, lokal; kein Messlauf.
+
+### 7.1 Die sechs Abnahmepunkte
+
+1. **`index.html` ist unverändert**, alle drei Engine-Blöcke byteidentisch (`54dfef2d…`, `f847c124…`,
+   `14cb39a1…`). Geändert sind fünf Werkzeuge und eine Testdatei.
+2. **Hier ist meine Vorhersage in §4 falsch gewesen, bei drei von fünf Tests.** Gemessen, zwei Läufe von
+   `tests/passregel-versuch.js`, einmal mit zurückgenommenen Änderungen: **alt 7 von 11, neu 11 von 11.**
+
+   | Test | §4 sagte | gemessen | warum |
+   |---|---|---|---|
+   | T-PW1 | scheitert alt | **scheitert alt** ✓ | — |
+   | T-PW2 | scheitert alt | **besteht an beiden** | Dass `paesse` in `gnugo-duell.js` sauber zählt, war **schon vorher** so — genau deshalb wurde dieses Werkzeug gewählt. Der Test ist eine Kontrolle, kein Änderungsnachweis. |
+   | T-PW3 | scheitert alt | **besteht an beiden** | `KOMI` gab es vorher. Auch eine Kontrolle. |
+   | T-PW4, T-PW4b | scheitert alt | **scheitert alt** ✓ | — |
+   | T-PW5 | besteht an beiden | **scheitert alt** | Der Test stellt den Stand vor der Korrektur her, indem er den neuen Ausdruck entfernt. Am alten Stand gibt es nichts zu entfernen, also meldet er seine fehlende Voraussetzung — richtig so, aber das Gegenteil der Vorhersage. |
+
+   Die Änderungsnachweise sind damit **T-PW1, T-PW4 und T-PW4b**; T-PW2 und T-PW3 sind Kontrollen, T-PW5 ist der
+   Bitgleich-Nachweis. Dieselbe Berichtigung gilt für §5 Nr. 2, die die Zahlen von §4 übernommen hatte.
+3. **Die fünf bestehenden Tests in `tests/passregel-versuch.js` sind unverändert und bestehen.** Geändert sind nur
+   der Kopfkommentar und die `require`-Zeile der Datei, nicht ein bestehender Test.
+4. **`node tests/run.js` lokal grün.** CI: siehe PR.
+5. **Die Hilfe von `ab-harness.js` nennt den Wächter** (bei `--komi`), damit die Zusage „komi-blind" nachprüfbar
+   bleibt. T-PW4b prüft diese Zeile mit.
+6. **Kein Messlauf**, und T-PW5 belegt, warum keiner nötig ist: ausgeführt, derselbe Seed gegen dieselbe Attrappe,
+   einmal mit dem Stand vor der Korrektur und einmal mit dem jetzigen — **Zug für Zug dieselben zwei Partien.**
+
+### 7.2 Was ausgeführt ist und was am Quelltext geprüft
+
+Offen benannt, weil §4 bei T-PW4 „brechen ab" schrieb und das Ausführung nahelegt:
+
+| Test | Ebene | Grund |
+|---|---|---|
+| T-PW1, T-PW2, T-PW4b | **Quelltext** | Der Aufruf und die Wächter sind je eine Zeile; dieselbe Prüfebene nutzt die Verdrahtungsprüfung für den Browser in derselben Datei schon. |
+| T-PW3 | ausgeführt | beide Zweige der Komi-Rechnung |
+| **T-PW4** | **ausgeführt** | `ab-harness.js --A passNachGegnerpass=1` → Exit **1** mit der Meldung |
+| **T-PW5** | **ausgeführt** | zwei Duelle gegen `tests/gtp-attrappe.js`, Zugfolgen verglichen |
+
+**Warum die drei Auswertungsskripte nicht ausgeführt geprüft sind:** Sie brauchen Archivdaten und brechen ohne
+Argumente ab, bevor der Wächter erreicht wird — gemessen: `weiterspielen.js` Exit 2, `wurzel-replay.js` Exit 2,
+`lerner-pruefung.js` Exit 1. Ihren Wächter auszuführen hätte bedeutet, Archivdaten in Testformat zu erfinden, für
+drei Zeilen identischen Codes. Der wichtigste der vier, `ab-harness.js`, ist ausgeführt.
+
+### 7.3 Geändert
+
+`gnugo-duell.js` (das zehnte Argument), `ab-harness.js` (Wächter und Hilfe), `auswertung/weiterspielen.js`,
+`auswertung/diagnose/wurzel-replay.js`, `auswertung/lerner-pruefung.js` (je ein Wächter),
+`tests/passregel-versuch.js` (T-PW1 bis T-PW5), dieses Doc und eine Zeile in
+`docs/korrektur-gtp-vorabfestlegung.md` §3.
+
+### 7.4 Was offen bleibt
+
+- **TRAIN-2** steht weiter im Code, ohne Vorabfestlegung.
+- Die Warnung in der Engine, die alle Aufrufer auf einmal abdecken würde (§3, erwogen und verworfen): bleibt eine
+  eigene Festlegung, falls sie jemand will. Sie bräuchte einen Engine-Vergleich.
+- Ob die Versuchsregel überhaupt eingeschaltet werden soll: unverändert nein, sie bleibt auf 0.
