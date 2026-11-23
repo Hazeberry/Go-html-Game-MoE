@@ -109,3 +109,63 @@ Beides wird als Nachtrag in jenem §10.5 und hier festgehalten. **Aus keinem Erg
 3. **Ankündigung des Laufs**, dann Start über `workflow_dispatch`.
 4. Ergebnis als Nachtrag hier und in `docs/korrektur-gtp-vorabfestlegung.md` §10.5, Rohdaten unter
    `docs/daten/gnugo-superko/`. Kurzer Bericht mit den löschbaren Branches.
+
+## 8. Nachtrag: Ergebnis des Laufs (23.11.2026)
+
+**Lauf 1, `workflow_dispatch` auf `main` bei `76a559b`.** Lauf-ID 45176376828, Dauer 26 Sekunden,
+`ubuntu-24.04`, GNU Go 3.8 aus dem Debian-Paket `3.8-11build2`. Rohdaten unter
+`docs/daten/gnugo-superko/`. Ankuendigung vor dem Start erfolgt, wie §7 Nr. 3 es verlangt.
+
+### 8.1 Der Lauf ist gültig
+
+Alle sechs Bedingungen aus §4, am Protokoll nachgelesen — nicht nur der Selbstauskunft des Skripts entnommen:
+
+| Bedingung | Befund |
+|---|---|
+| 1. P0 stimmt | `list_stones W` = `B4 A3 C3`, `list_stones B` = `B3 A2 C2 B1` — wie festgelegt, B2 leer |
+| 2. P1 lehnt ab | `play B A1` → **`? illegal move`** |
+| 3. P2 lehnt ab | `play W B2` → **`? illegal move`** |
+| 4. beide Pässe angenommen | `play W pass` → `=`, `play B pass` → `=`, danach Antwort auf den Zug |
+| 5. kein Absturz, keine Zeitgrenze | keine Probe abgebrochen |
+| 6. Version im Protokoll | `GNU Go 3.8`, `ii gnugo 3.8-11build2 amd64` |
+
+Dazu lief die Gültigkeitslogik vor der Probe im selben Job: **8 von 8**.
+
+### 8.2 Urteil: GNU Go nimmt die positionelle Wiederholung an
+
+| Probe | Antwort |
+|---|---|
+| **P3**, Ko-Aufbau, zwei Pässe, `play W B2` | **`=`** — angenommen; `list_stones W` = `B4 A3 C3 B2`, der Stein steht, B3 ist geschlagen |
+| **P4**, dasselbe ohne `--chinese-rules` | **`=`** — ebenfalls angenommen |
+
+Die Stellung nach P3 ist Stein für Stein die nach dem siebten Aufbauzug: W {A3, C3, B4, B2}, B {A2, B1, C2}.
+Es ist also wirklich eine Wiederholung, und sie wird angenommen. **Am Regelsatz hängt es nicht** — P4 ohne
+Regelflags antwortet gleich.
+
+**GNU Go 3.8 prüft einfaches Ko und Selbstmord, aber keine positionelle Wiederholung.** Das ist keine
+Überraschung für wen die Quellen kennt, aber es war für diesen Aufbau nicht geprüft, und die Kontrollen zeigen,
+dass es nicht an fehlender Regelprüfung überhaupt liegt: zwei von drei Verboten hält GNU Go ein.
+
+### 8.3 Was daraus für §10.5 der GTP-Festlegung folgt
+
+Von den beiden Lesarten, die §5 vorab benannt hat, trifft die zweite zu: **GNU Go hätte eine Wiederholung nicht
+gemeldet.** Vor der Korrektur GTP-1 hätte eine positionelle Wiederholung in beiden Richtungen still passieren
+können — der Adapter nahm sie an, und GNU Go hätte nicht widersprochen. Die Aussage „nicht gesichert, ob eine
+Messung betroffen war" bleibt offen, mit einem Grund mehr.
+
+**Eine Präzisierung, die daraus folgt und die bisher zu grob war:** Im `HANDOFF.md` §4 und in §2 der
+GTP-Festlegung steht, eingehende `play`-Züge seien „durch GNU Go vorgeschaltet geschützt". Das gilt jetzt genauer:
+**geschützt gegen Selbstmord und einfaches Ko, nicht gegen positionelle Wiederholung.** Der Schutz war also
+teilweise, nicht vollständig.
+
+**Am Code ändert das nichts**, wie §5 vorab festgelegt hat. GTP-1 ist gemergt, der Adapter lehnt alle drei Verbote
+ab. Es folgt keine Spieländerung und kein Schalter.
+
+### 8.4 Grenzen
+
+- **Ein Paketstand, eine Stellung.** Geprüft ist GNU Go 3.8 `3.8-11build2` auf `ubuntu-24.04` an der Ko-Stellung aus
+  `reproduce.cjs`. Andere Versionen, andere Wiederholungsformen (Dreifach-Ko, „sending two returning one") sind nicht
+  geprüft.
+- **Die Frage war rückblickend.** Sie sagt nichts darüber, ob eine bestimmte Archivpartie einen regelwidrigen Zug
+  enthielt; dafür bräuchte man die Befehlsfolgen jener Läufe.
+- Das Artefakt mit `ergebnis.json` liegt am Lauf (90 Tage); im Repo liegt der wörtliche Protokollauszug.

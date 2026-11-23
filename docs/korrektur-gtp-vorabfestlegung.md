@@ -339,10 +339,14 @@ Regel aus …". Was §3 jetzt zusätzlich nennt, ist Ergänzung, keine Berichtig
 
 ### 10.5 Was offen bleibt
 
-- Ob **GNU Go 3.8** mit `--chinese-rules` eine positionelle Wiederholung ablehnt. Nur davon hängt ab, ob GNU Go einen
-  regelwidrigen Adapterzug überhaupt meldet — bei Adapterzügen bekommt er ihn erst **nach** dem Adapter
-  (`gnugo-duell.js` Z. 483), ist dort also Melder und nicht Schutz. Das braucht einen Lauf in Actions und ein eigenes
-  Go.
+- Ob **GNU Go 3.8** mit `--chinese-rules` eine positionelle Wiederholung ablehnt. **Beantwortet am 23.11.2026:
+  nein.** Gemessen in Actions (`docs/gnugo-superko-vorabfestlegung.md` §8, Lauf 45176376828, GNU Go 3.8 aus dem
+  Paket `3.8-11build2`): GNU Go lehnt Selbstmord und die unmittelbare Ko-Rücknahme mit `? illegal move` ab, nimmt
+  die Wiederholung nach zwei Pässen aber mit `=` an — ohne `--chinese-rules` genauso. GNU Go hätte einen solchen
+  Adapterzug also **nicht gemeldet**; vor dieser Korrektur hätte eine Wiederholung in beiden Richtungen still
+  passieren können. Daraus folgt eine Präzisierung zu §2 und zum `HANDOFF.md` §4: eingehende `play`-Züge waren
+  durch GNU Go **gegen Selbstmord und einfaches Ko** vorgeschaltet geschützt, **nicht gegen positionelle
+  Wiederholung** — der Schutz war teilweise, nicht vollständig. Am Code ändert das nichts.
 - `node tests/pwa.js` am Prototyp (§6).
 - GTP-3 wurde in dieser Durchsicht nur gelesen, nicht prototypisch gebaut.
 - Ob je ein Lauf den Adapter anders getrieben hat als über die drei in §2 genannten Aufrufer. Für diese drei ist die
