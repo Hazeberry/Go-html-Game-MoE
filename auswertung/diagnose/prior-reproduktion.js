@@ -39,15 +39,24 @@ const htmlAnker = path.join(tmp, 'index-anker.html');
 fs.writeFileSync(htmlAnker, html.replace(ANKER,
   '  globalThis.__WURZEL = scored.slice(0, 3).map(s => ({idx: s.m.idx, score: s.score}));\n' + ANKER));
 
+const mulberry32 = seed => { let s = seed >>> 0; return () => { s |= 0; s = s + 0x6D2B79F5 | 0;
+  let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+  return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
+
+/* Der Generator MUSS vor dem Laden gesetzt sein. Der PolicyNet-Konstruktor
+   zieht die Startgewichte mit _rand, also mit Math.random, beim Auswerten des
+   policy-net-Blocks -- vor jeder Zeile, die dieses Werkzeug danach ausfuehrt.
+   Ohne das hat JEDER Prozess andere Startgewichte, damit andere Priors und
+   andere geblendete Punktwerte: gemessen wichen zwei Laeufe mit identischen
+   Argumenten um 0,05 bis 0,6 Punkte ab. Die Pruefung "zweimal derselbe Arm"
+   faellt darauf nicht herein, weil sie innerhalb EINES Prozesses laeuft. */
+Math.random = mulberry32(SEED);
+
 const {ladeKI} = require(path.join(wurzel, 'tests', 'rahmen.js'));
 const KI = ladeKI({htmlPfad: htmlAnker, mitNetz: true});
 const {BOARD_SIZE, removeDeadGroups, PARAMS, getAIMove, computeZobrist} = KI;
 const SPALTEN = 'ABCDEFGHJKLMNOPQRST';
 const zuGtp = i => i < 0 ? 'pass' : SPALTEN[i % 19] + (19 - Math.floor(i / 19));
-const mulberry32 = seed => { let s = seed >>> 0; return () => { s |= 0; s = s + 0x6D2B79F5 | 0;
-  let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-  return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
-
 function stellung(datei, bis) {
   const txt = fs.readFileSync(path.join(wurzel, 'tests', 'stellungen', datei), 'utf8');
   const re = /;([BW])\[([a-s]{0,2})\]/g, b = new Uint8Array(BOARD_SIZE), caps = {1: 0, 2: 0};
@@ -112,6 +121,15 @@ const zweimal = s => { const a = ruf(s), b = ruf(s);
 
 /* ── Hauptlauf ─────────────────────────────────────────────────────────── */
 PARAMS.mctsFixedSims = SIMS; PARAMS.adaptiveBudgetEnabled = 0; PARAMS.resignEnabled = 0;
+/* mctsTreeReuse MUSS aus. Im Default steht es auf 1, und dann traegt
+   _mctsSavedRoot den Suchbaum von Aufruf zu Aufruf weiter: Arm B erbte den
+   Baum, den Arm A gerade auf DEMSELBEN Brett gebaut hat, und die erste
+   Stellung einer Runde den Baum der letzten Stellung der vorigen. Die Arme
+   waeren dann nicht unabhaengig, und jeder Aufruf haengt an der ganzen
+   Aufrufgeschichte. Jedes andere Auswertungswerkzeug im Repo setzt es
+   deshalb auf 0 (annaeherung.js, kritisch-rang.js, lebensurteil-vergleich.js,
+   lerner-pruefung.js, muster-endspiel-daten.js). */
+PARAMS.mctsTreeReuse = 0;
 PARAMS.netWarmup = 2;                     /* §3.5: damit gamesPlayed 2 den vollen Blend gibt */
 PARAMS.netMaxBlend = 0;                   /* waehrend des Trainings aus */
 
