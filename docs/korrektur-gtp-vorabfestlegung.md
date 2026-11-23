@@ -349,8 +349,14 @@ Regel aus …". Was §3 jetzt zusätzlich nennt, ist Ergänzung, keine Berichtig
   passieren können. Daraus folgt eine Präzisierung zu §2 und zum `HANDOFF.md` §4: eingehende `play`-Züge waren
   durch GNU Go **gegen Selbstmord und einfaches Ko** vorgeschaltet geschützt, **nicht gegen positionelle
   Wiederholung** — der Schutz war teilweise, nicht vollständig. Am Code ändert das nichts.
-- `node tests/pwa.js` am Prototyp (§6).
-- GTP-3 wurde in dieser Durchsicht nur gelesen, nicht prototypisch gebaut.
+- `node tests/pwa.js` am Prototyp (§6). **Hinfällig seit der Umsetzung (23.11.2026).** Nicht nachgeholt,
+  sondern überholt: Den Prototyp aus §6 gibt es nicht mehr, und was der Lauf zeigen sollte, ist am ausgelieferten
+  Adapter gezeigt — §11.1 Nr. 2 nennt zwei volle Läufe von `node tests/pwa.js`, alt 7 von 11, neu 11 von 11. Am
+  23.11.2026 noch einmal lokal nachgefahren: **11 von 11 bestanden**.
+- GTP-3 wurde in dieser Durchsicht nur gelesen, nicht prototypisch gebaut. **Hinfällig seit der Umsetzung
+  (23.11.2026).** Der Prototypschritt ist übersprungen, nicht nachgeholt: GTP-3 steht direkt im Adapter — `antworte`
+  spaltet die Nummer ab (`gtp-ki.js` Z. 121 ff.) — und T-G4 prüft ihn mit sechs Prüfungen (Erfolgsantwort `=17 2`,
+  Fehlerantwort mit Nummer). Am alten Adapter scheiterte T-G4 mit `? unbekannter Befehl` (§11.1 Nr. 2).
 - Ob je ein Lauf den Adapter anders getrieben hat als über die drei in §2 genannten Aufrufer. Für diese drei ist die
   eingehende Richtung aus der Verdrahtung beantwortet, ohne Protokolle.
 
