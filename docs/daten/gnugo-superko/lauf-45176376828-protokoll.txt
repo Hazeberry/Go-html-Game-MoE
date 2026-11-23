@@ -1,0 +1,87 @@
+Auszug des Job-Protokolls, Lauf 45176376828, woertlich mit Zeitstempeln.
+Quelle: https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/45176376828/job/137698589700
+
+2026-11-23T12:39:47.6532142Z GNU Go 3.8
+2026-11-23T12:39:47.6661456Z ii  gnugo          3.8-11build2 amd64        play the game of Go
+2026-11-23T12:39:47.7040216Z GNU Go und die positionelle Wiederholung: Gültigkeitslogik
+2026-11-23T12:39:47.9431226Z   ✓  gueltig: lehnt der Stummel alles ab, lautet das Urteil „lehnt ab" (6 Prüfungen, 238 ms)
+2026-11-23T12:39:48.1848473Z   ✓  gueltig: ist nur Superko frei, lautet das Urteil „nimmt an" (3 Prüfungen, 242 ms)
+2026-11-23T12:39:48.4226863Z   ✓  ungueltig: freies Ko (P2) — kein Urteil, Exitcode 1 (4 Prüfungen, 238 ms)
+2026-11-23T12:39:48.6589170Z   ✓  ungueltig: freier Selbstmord (P1) — kein Urteil (3 Prüfungen, 236 ms)
+2026-11-23T12:39:48.8941378Z   ✓  ungueltig: Pass abgelehnt — P3 gar nicht durchgefuehrt (3 Prüfungen, 235 ms)
+2026-11-23T12:39:49.1298480Z   ✓  ungueltig: falscher Aufbau (P0) — kein Urteil (3 Prüfungen, 236 ms)
+2026-11-23T12:39:49.3635119Z   ✓  ungueltig: Prozess stirbt mitten im Lauf — kein Urteil, kein Neustart (3 Prüfungen, 234 ms)
+2026-11-23T12:39:49.4194168Z   ✓  Aufruf: falsche Optionen werden abgelehnt (2 Prüfungen, 56 ms)
+2026-11-23T12:39:49.4195058Z   8 bestanden · 0 fehlgeschlagen
+
+2026-11-23T12:39:49.4981961Z GNU Go über GTP: = 3.8
+2026-11-23T12:39:49.4982719Z [P0 Aufbau] --chinese-rules
+2026-11-23T12:39:49.4983028Z     boardsize 19           -> =
+2026-11-23T12:39:49.4983926Z     clear_board            -> =
+2026-11-23T12:39:49.4984237Z     komi 7.5               -> =
+2026-11-23T12:39:49.4984495Z     play W B2              -> =
+2026-11-23T12:39:49.4984777Z     play W A3              -> =
+2026-11-23T12:39:49.4985030Z     play W C3              -> =
+2026-11-23T12:39:49.4985313Z     play W B4              -> =
+2026-11-23T12:39:49.4985566Z     play B A2              -> =
+2026-11-23T12:39:49.4985816Z     play B B1              -> =
+2026-11-23T12:39:49.4986072Z     play B C2              -> =
+2026-11-23T12:39:49.4986322Z     play B B3              -> =
+2026-11-23T12:39:49.4986596Z     list_stones W          -> = B4 A3 C3
+2026-11-23T12:39:49.4986910Z     list_stones B          -> = B3 A2 C2 B1
+2026-11-23T12:39:49.4987284Z [P1 Selbstmord (Kontrolle)] --chinese-rules
+2026-11-23T12:39:49.4987603Z     boardsize 19           -> =
+2026-11-23T12:39:49.4987863Z     clear_board            -> =
+2026-11-23T12:39:49.4988117Z     komi 7.5               -> =
+2026-11-23T12:39:49.4988365Z     play W A2              -> =
+2026-11-23T12:39:49.4988615Z     play W B1              -> =
+2026-11-23T12:39:49.4988902Z     play B A1              -> ? illegal move
+2026-11-23T12:39:49.4989283Z [P2 Ko-Ruecknahme (Kontrolle)] --chinese-rules
+2026-11-23T12:39:49.4989596Z     boardsize 19           -> =
+2026-11-23T12:39:49.4989847Z     clear_board            -> =
+2026-11-23T12:39:49.4990148Z     komi 7.5               -> =
+2026-11-23T12:39:49.4990400Z     play W B2              -> =
+2026-11-23T12:39:49.4990644Z     play W A3              -> =
+2026-11-23T12:39:49.4990888Z     play W C3              -> =
+2026-11-23T12:39:49.4991135Z     play W B4              -> =
+2026-11-23T12:39:49.4991380Z     play B A2              -> =
+2026-11-23T12:39:49.4991628Z     play B B1              -> =
+2026-11-23T12:39:49.4991898Z     play B C2              -> =
+2026-11-23T12:39:49.4992146Z     play B B3              -> =
+2026-11-23T12:39:49.4992421Z     play W B2              -> ? illegal move
+2026-11-23T12:39:49.4992807Z [P3 Wiederholung nach zwei Paessen] --chinese-rules
+2026-11-23T12:39:49.4993682Z     boardsize 19           -> =
+2026-11-23T12:39:49.4993977Z     clear_board            -> =
+2026-11-23T12:39:49.4994239Z     komi 7.5               -> =
+2026-11-23T12:39:49.4994483Z     play W B2              -> =
+2026-11-23T12:39:49.4994728Z     play W A3              -> =
+2026-11-23T12:39:49.4994973Z     play W C3              -> =
+2026-11-23T12:39:49.4995220Z     play W B4              -> =
+2026-11-23T12:39:49.4995463Z     play B A2              -> =
+2026-11-23T12:39:49.4995713Z     play B B1              -> =
+2026-11-23T12:39:49.4995955Z     play B C2              -> =
+2026-11-23T12:39:49.4996197Z     play B B3              -> =
+2026-11-23T12:39:49.4996447Z     play W pass            -> =
+2026-11-23T12:39:49.4996702Z     play B pass            -> =
+2026-11-23T12:39:49.4996950Z     play W B2              -> =
+2026-11-23T12:39:49.4997220Z     list_stones W          -> = B4 A3 C3 B2
+2026-11-23T12:39:49.4997780Z [P4 wie P3, ohne --chinese-rules] (ohne Regelflags)
+2026-11-23T12:39:49.4998365Z     boardsize 19           -> =
+2026-11-23T12:39:49.4998808Z     clear_board            -> =
+2026-11-23T12:39:49.4999284Z     komi 7.5               -> =
+2026-11-23T12:39:49.4999720Z     play W B2              -> =
+2026-11-23T12:39:49.5000142Z     play W A3              -> =
+2026-11-23T12:39:49.5000545Z     play W C3              -> =
+2026-11-23T12:39:49.5000795Z     play W B4              -> =
+2026-11-23T12:39:49.5001127Z     play B A2              -> =
+2026-11-23T12:39:49.5001427Z     play B B1              -> =
+2026-11-23T12:39:49.5001786Z     play B C2              -> =
+2026-11-23T12:39:49.5002115Z     play B B3              -> =
+2026-11-23T12:39:49.5002489Z     play W pass            -> =
+2026-11-23T12:39:49.5003491Z     play B pass            -> =
+2026-11-23T12:39:49.5003941Z     play W B2              -> =
+2026-11-23T12:39:49.5004515Z     list_stones W          -> = B4 A3 C3 B2
+2026-11-23T12:39:49.5005046Z ============================================================
+2026-11-23T12:39:49.5005739Z GUELTIG. Urteil: GNU Go nimmt die positionelle Wiederholung an
+2026-11-23T12:39:49.5006196Z P3 antwortete: =
+2026-11-23T12:39:49.5006640Z Ohne --chinese-rules (P4, nur berichtet): nimmt an
