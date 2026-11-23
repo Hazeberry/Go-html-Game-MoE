@@ -357,6 +357,8 @@ in `index.html` sind acht echte Aufrufe — drei für `go_pnet` (Z. 7330, 7341, 
   dieser Korrektur eingeführt — aber `reset()` erreicht `save()` und `dashUpdate()` jetzt in genau der Umgebung, in der
   es vorher abbrach, und es ist dieselbe Fehlerklasse: eine Ausnahme im Spielende-Pfad. Geringe Schwere, die Elemente
   stehen im selben Markup. **Eine Änderung daran braucht eigene Vorabfestlegung und Go.**
+  **Nachtrag 23.11.2026:** Erledigt als Befund DASH-1, `docs/korrektur-dash1-vorabfestlegung.md`. Gemessen war
+  es schärfer als hier beschrieben: Der Wurf ließ die Anzeige zusätzlich **halb aktualisiert** zurück.
 - Ein echtes privates Browserfenster bleibt ungeprüft; die Sperre ist in allen Tests erzeugt.
 - Der Knopf bei Z. 7887 nutzt einen Inline-Handler. Bestehend, von dieser Korrektur nicht berührt; nur vermerkt, falls
   das Markup einmal angefasst wird.

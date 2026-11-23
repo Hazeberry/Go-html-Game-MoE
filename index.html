@@ -7408,12 +7408,21 @@ class PolicyNet {
 
   dashUpdate() {
     const el = id => document.getElementById(id);
-    if (!el('pn-games')) return;
-    el('pn-games').textContent = this.gamesPlayed;
+    /* Alle vier Pflichtfelder vorab holen: fehlt eines, wird gar nichts
+       geschrieben. Vorher prüfte nur pn-games, und ein fehlendes Geschwister
+       warf einen TypeError UND ließ die Anzeige halb aktualisiert zurück —
+       neue Spielzahl neben altem Siegestand, was richtig aussieht und es nicht
+       ist. Der Wurf nahm dazu den Aufrufer mit, und reset() wie der
+       Divergenzpfad von trainGame rufen hier mitten im Spielende (DASH-1,
+       docs/korrektur-dash1-vorabfestlegung.md). pn-health und pn-warmup-bar
+       bleiben optional: sie kamen später dazu und haben eigene Prüfungen. */
+    const spiele = el('pn-games'), siege = el('pn-wins'),
+          blend = el('pn-blend'), res = el('pn-result');
+    if (!spiele || !siege || !blend || !res) return;
+    spiele.textContent = this.gamesPlayed;
     const wr = this.gamesPlayed > 0 ? Math.round(this.wins/this.gamesPlayed*100) : 0;
-    el('pn-wins').textContent  = `${this.wins} (${wr}%)`;
-    el('pn-blend').textContent = `${(this.blendWeight*100).toFixed(0)}%`;
-    const res = el('pn-result');
+    siege.textContent  = `${this.wins} (${wr}%)`;
+    blend.textContent = `${(this.blendWeight*100).toFixed(0)}%`;
     res.textContent = this.lastResult===null ? '—' : this.lastResult>0 ? '✓ Sieg' : '✗ Niederlage';
     res.style.color = this.lastResult===null ? '' : this.lastResult>0 ? 'var(--green)' : 'var(--red)';
     /* Ein stillgelegtes Netz muss sichtbar sein: sonst sieht man nur, dass
