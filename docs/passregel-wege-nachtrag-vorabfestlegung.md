@@ -4,13 +4,23 @@
 §7.4. Beide drehen sich um dieselbe Sache: **welche Wege geben der Engine `extra` mit, und was passiert, wenn einer
 es nicht tut.**
 
-Hazeberry hat am 23.11.2026 autonomes Weiterarbeiten freigegeben. Dieses Doc enthält Vorgaben; er liest es vor dem
-Merge. Die Empfehlungen sind meine, mit den Gründen daneben, damit sie umkehrbar sind.
+**Stand der Fassung.** Hazeberry hat am 23.11.2026 autonomes Weiterarbeiten freigegeben und mir Frage A und BR-1
+ausdrücklich ins eigene Ermessen gestellt, mit der Einladung, noch einmal nachzudenken. Das habe ich getan, und es
+hat zwei meiner eigenen Aussagen widerlegt — beide stehen berichtigt im Text, nicht umgedeutet:
+
+1. **§1.3:** „gibt die einzige Invariante her" war falsch. Die Prüfsumme von `policy-net` ist schon zweimal neu
+   grundliniert worden (NET-1, DASH-1); eine neue Grundlinie ist eingeübte Praxis.
+2. **§3:** „Ohne die Gewichte wäre der Bericht trotzdem nicht exakt" war falsch. Aufgezeichnete Priors ersetzen die
+   Gewichte gerade. Der Grund, sie weglassen, ist jetzt ein gemessener Größenvergleich.
+
+Die Empfehlung zu Frage A bleibt im Ergebnis, steht aber auf schmalerem Grund — und sie lässt die Lücke nicht mehr
+offen, sondern schließt sie anders (§1.5). Beim Nachzählen der Pfade kamen ausserdem **elf** statt sechs heraus
+(§1.4).
 
 | Frage | Herkunft | Empfehlung |
 |---|---|---|
-| **A** — `passNachGegnerpassPruefung` meckert, wenn der Schalter an ist und `extra` fehlt | §3 und §7.4 des Haupt-Docs, dort erwogen und verworfen | **nicht umsetzen** (§2) |
-| **B** — **BR-1**, neu: der Reproduktions-Schnappschuss im Fehlerbericht trägt `extra` nicht, verspricht aber „1:1" | beim Prüfen von Frage A gefunden | **umsetzen** (§3 bis §6) |
+| **A** — `passNachGegnerpassPruefung` meckert, wenn der Schalter an ist und `extra` fehlt | §3 und §7.4 des Haupt-Docs, dort erwogen und verworfen | **nicht in die Engine; stattdessen ein Bestandstest** (§1.5) |
+| **B** — **BR-1**, neu: der Reproduktions-Schnappschuss im Fehlerbericht trägt `extra` nicht, verspricht aber „1:1" | beim Prüfen von Frage A gefunden | **umsetzen** (§2 bis §6) |
 
 Die Kennung **BR** steht für Bug-Report; `D` ist in dieser Reihe für das Dashboard belegt (D-1, D-2).
 
@@ -50,31 +60,88 @@ ebenfalls ab.
 
 ### 1.3 Was es kostet
 
-- **`worker-ai` verliert die Byteidentität.** Darauf beruft sich **jede** bisherige Korrektur in ihrem ersten
-  Abnahmepunkt („die drei Engine-Blöcke haben die Prüfsummen aus §1"). Nach dieser Änderung ist `f847c124…` nicht
-  mehr der Wert, und die Liste in `docs/korrektur-d1-w1-vorabfestlegung.md` §1 braucht einen neuen Nachtrag, auf den
-  sich alle späteren Docs beziehen müssen.
-- **Ein Engine-Vergleich in Actions wird nötig** (`ladeEngine` lädt diesen Block), nach eigenem Go. Er würde bei
-  Schalter aus „gleich" zeigen, denn die neuen Zeilen sind dann unerreichbar. Sein Wert liegt nicht im Nachweis der
-  Logik, sondern darin, dass sonst nichts im Block verrutscht ist.
+**Berichtigung meines ersten Entwurfs (23.11.2026).** Hier stand, die Änderung gebe „die einzige Invariante her, auf
+die sich die ganze Korrekturreihe stützt". **Das war überzogen und ist falsch.** Nachgesehen in
+`docs/korrektur-d1-w1-vorabfestlegung.md` §1: Die Prüfsumme von `policy-net` ist dort **schon zweimal** neu
+grundliniert worden — Nachtrag vom 22.11.2026 wegen NET-1 (`56a5d6c0…` → neuer Wert) und Nachtrag vom 23.11.2026
+wegen DASH-1 (→ `14cb39a1…`). Eine berechtigte Änderung an einem Engine-Block mit neuer Grundlinie ist in diesem
+Projekt also **eingeübte Praxis**, keine verlorene Invariante. Es bleiben Buchhaltungskosten: ein weiterer Nachtrag,
+auf den sich spätere Docs beziehen.
+
+Was wirklich kostet:
+
+- **Buchhaltung.** `f847c124…` ist nicht mehr der Wert für `worker-ai`; die Liste braucht einen Nachtrag. Nach der
+  Berichtigung oben: real, aber klein.
+- **Ein Engine-Vergleich in Actions** (`ladeEngine` lädt diesen Block). Er würde bei Schalter aus „gleich" zeigen,
+  denn die neuen Zeilen sind dann unerreichbar; sein Wert liegt nicht im Nachweis der Logik, sondern darin, dass
+  sonst nichts im Block verrutscht ist. Ein Workflow-Lauf, kein Messlauf — auch das ist klein, und Hazeberry zieht
+  Actions ausdrücklich vor.
+- **Ein `throw` im heißen Pfad des Produkts.** Das ist der Posten, der bleibt. `getAIMove` läuft im Browser, im
+  Worker, in `ladeEngine`, in `ab-harness.js` und in `gtp-ki.js`. Dass die Zeile heute unerreichbar ist, ist
+  abgeleitet (§1.2), nicht erzwungen: Sie wird erreichbar, sobald irgendwo der Schalter angeht und ein Aufrufer
+  `extra` vergisst — und dann bricht nicht ein Werkzeug ab, sondern möglicherweise ein Zug im Spiel.
 - **Der Nutzen ist heute null.** Die Warnung feuert nur, wenn jemand `passNachGegnerpass` einschaltet. Die Regel
   bleibt auf 0, und aus keinem Ergebnis folgt eine Aktivierung (`docs/passregel-vergleich.md`). Es ist eine
   Versicherung gegen einen Fall, von dem das Projekt festgelegt hat, dass er nicht eintritt.
 
-### 1.4 Empfehlung
+### 1.4 Alle Pfade, nachgezählt
 
-**Nicht umsetzen.** Der Tausch ist schlecht: Er gibt die einzige Invariante her, auf die sich die ganze
-Korrekturreihe stützt, und kauft dafür eine Versicherung gegen einen Fall, der nach eigener Festlegung nicht
-eintritt. Die vier Wächter decken jedes heute existierende Node-Werkzeug ab; ein künftiges schreibt jemand, der
-`CLAUDE.md` und die Passregel-Docs liest, und `docs/passregel-wege-vorabfestlegung.md` §3 nennt die Falle beim Namen.
+Bevor die Empfehlung steht, der vollständige Bestand. Das Haupt-Doc sprach von sechs Wegen; nachgesehen am Quelltext
+sind es **elf**, und **jeder** ist abgedeckt:
 
-**Was die Empfehlung umdrehen würde:** Sollte die Versuchsregel je eingeschaltet werden, ist dieser Wächter der
-**erste** Schritt davor und nicht mehr optional — dann feuert er nicht hypothetisch, sondern bei jedem Aufrufer, der
-nicht mitgezogen ist. Der Entwurf in §1.1 ist für diesen Fall fertig.
+| Pfad | Art |
+|---|---|
+| Browser, Worker-Weg (`d.extra` aus der Botschaft, Z. 6035 ff.; Aufbau Z. 6280) | versorgt |
+| Browser, `fallbackToMainThread` (Z. 6085) | versorgt |
+| Browser, Leicht/Mittel (Z. 6353; dort greift die Regel ohnehin nicht) | versorgt |
+| `gtp-ki.js` `genmove` (seit GTP-2) | versorgt |
+| `gnugo-duell.js` (seit `docs/passregel-wege-vorabfestlegung.md` §3) | versorgt |
+| `auswertung/endspiel/passregel-stellungen.js` — ruft `passNachGegnerpassPruefung` **direkt** mit `extra` (Z. 72) | versorgt |
+| `auswertung/endspiel/passregel-vorsprung.js` — ebenso (Z. 83) | versorgt |
+| `auswertung/endspiel/passregel-zaehldiagnose.js` — setzt den Schalter auf 1 (Z. 128) und geht über `pruefePartie` aus `passregel-stellungen.js`, also über den Pfad darüber | versorgt |
+| `ab-harness.js` (Z. 1111) | Wächter |
+| `auswertung/weiterspielen.js` (Z. 132), `auswertung/diagnose/wurzel-replay.js` (Z. 88), `auswertung/lerner-pruefung.js` (Z. 114) | Wächter |
+| `auswertung/endspiel/passregel-fortsetzung.js` (Z. 221, dazu die Default-Prüfung Z. 401) | Wächter |
 
-**Was ich nicht behaupte:** Dass die vier Wächter lückenlos sind. Sie decken die vier Werkzeuge ab, die `extra`
-weitergeben könnten und es nicht tun. Ein Werkzeug, das es morgen neu gibt, ist nicht abgedeckt — das ist der Preis
-dieser Empfehlung und kein Nebeneffekt.
+Die drei `passregel-*`-Werkzeuge in der Mitte waren mir beim ersten Entwurf nicht bewusst; sie setzen den Schalter
+wirklich auf 1 und sind trotzdem richtig, weil sie die Prüffunktion direkt mit einem `extra` aufrufen und `getAIMove`
+dabei nicht benutzen. Die Lücke ist damit **genau eine**: ein Werkzeug, das es heute noch nicht gibt.
+
+### 1.5 Empfehlung: nicht in die Engine — aber die Lücke nicht offen lassen
+
+**Die Warnung kommt nicht in die Engine.** Nach der Berichtigung in §1.3 steht die Empfehlung auf einem schmaleren,
+aber tragfähigen Grund: Der verbleibende Posten ist ein `throw` im heißen Pfad des Produkts, und er kauft eine
+Versicherung gegen einen Fall, von dem festgelegt ist, dass er nicht eintritt. Dafür ist der Preis zu hoch.
+
+**Die Lücke aus §1.4 bleibt aber nicht offen.** Was Frage A eigentlich wollte — ein künftiger Aufrufer wird nicht
+stillschweigend übergangen — lässt sich billiger und früher erreichen, als die Engine es kann: mit einem Test, der
+den Bestand aus §1.4 **geschlossen** hält.
+
+**T-PR1, Bestandsprüfung.** Der Test führt eine Liste aller Dateien, die die Engine antreiben können, je mit ihrer
+Art (`versorgt` oder `waechter`), und prüft dreierlei:
+
+1. **Geschlossene Welt.** Die Menge der versionierten `.js`-Dateien außerhalb von `tests/`, die `getAIMove(` oder
+   `passNachGegnerpassPruefung(` enthalten, ist **genau** die Liste. Eine neue Datei, die die Engine anfasst, macht
+   den Test rot, bis jemand sie einordnet. Das ist der eigentliche Mechanismus.
+2. Jede als `versorgt` geführte Datei enthält an ihrem Aufruf ein `extra` (zehntes Argument bzw. das Objekt mit
+   `gegnerPasste`).
+3. Jede als `waechter` geführte Datei enthält die Abbruchbedingung auf `passNachGegnerpass`.
+
+**Was der Test besser kann als die Engine-Warnung:** Er schlägt in der CI zu, **bevor** ein Messlauf läuft, statt
+mitten darin; er kostet keine Zeile in der Engine, keine neue Prüfsumme, keinen Engine-Vergleich und kein `throw` im
+Produkt; und er greift unabhängig davon, ob der Schalter an ist.
+
+**Was er schlechter kann, und das ist kein kleiner Vorbehalt:** Er prüft **Text, nicht Verhalten**. Eine Datei, die
+in der Liste als `versorgt` steht und später einen zweiten Codeweg bekommt, der `extra` vergisst, fällt ihm nicht
+auf. Genau das hätte die Engine-Warnung zur Laufzeit gefangen. Der Test ist also **kein Ersatz im strengen Sinn**,
+sondern deckt den wahrscheinlicheren der beiden Fälle ab (eine ganz neue Datei) und lässt den selteneren offen (ein
+zweiter Pfad in einer bekannten Datei). Beides sind Versicherungen gegen künftige Fehler; die billigere zuerst.
+
+**Was die Empfehlung umdrehen würde:** Sollte die Versuchsregel je eingeschaltet werden, ist der Wächter in der
+Engine der **erste** Schritt davor und nicht mehr optional — dann feuert er nicht hypothetisch, und der Vorbehalt
+oben („zweiter Pfad in einer bekannten Datei") wird von einer Möglichkeit zu einem Risiko. Der Entwurf in §1.1 ist
+für diesen Fall fertig; die Berichtigung in §1.3 hält fest, dass die Kosten dafür kleiner sind, als ich zuerst
+geschrieben habe.
 
 ## 2. Frage B, Befund BR-1: der Schnappschuss ist nicht der Worker-Request 1:1
 
@@ -160,9 +227,16 @@ exakt, solange die Gewichte dieselben sind — bei `netMaxBlend` 0 ohne Belang, 
 eingehen.
 
 **Bewusst so:**
-- **`netPriors` wird nicht aufgenommen.** 361 Zahlen je Zug im Fehlerbericht, den man in die Zwischenablage kopiert,
-  für einen Nutzen, der bei `netMaxBlend` 0 nicht existiert. Ohne die Gewichte wäre der Bericht trotzdem nicht
-  exakt — die aufzunehmen wären rund 2,2 MB. Die ehrliche Grenze im Kommentar ist hier mehr wert als ein halber Fix.
+- **`netPriors` wird nicht aufgenommen — mit berichtigter Begründung.** Hier stand zuerst: „Ohne die Gewichte wäre
+  der Bericht trotzdem nicht exakt." **Das war falsch.** Aufgezeichnete Priors ersetzen die Gewichte gerade: Der
+  Worker-Pfad rechnet sie nie selbst, er liest `d.netPriors` in einen Stummel (`index.html` Z. 6025 ff.), und ein
+  Nachstell-Rahmen, der diesen Stummel nachbaut, käme mit den aufgezeichneten Priors exakt hin, ohne die 2,2 MB
+  Gewichte. Der Grund, sie trotzdem weglassen, ist **gemessen**: Ein Fehlerbericht wiegt bei Zug 2 **8 106 Zeichen**
+  (`reproduktion.params` 3 058, `board` 723); die 361 Priors wären **7 775 Zeichen** — fast eine Verdopplung von
+  etwas, das man auf dem Handy in die Zwischenablage kopiert. `extra` und `reqId` zusammen sind dagegen **70
+  Zeichen**. Dazu entsteht der Nutzen nur bei `netMaxBlend` grösser 0 (Default 0, dann gehen die Priors nicht in die
+  Zugwahl ein) **und** nur mit einem Rahmen, der den Worker-Stummel nachbaut — den gibt es nicht. Die benannte Grenze
+  im Kommentar ist hier mehr wert als 7 775 Zeichen für einen doppelt bedingten Nutzen.
 - **`passExtra()` wird aufgerufen, nicht nachgebaut.** Derselbe Ausdruck wie am echten Aufruf; ein zweiter Aufbau
   könnte auseinanderlaufen.
 - **Der Schnappschuss behält `lastMsPerSim`.** Es gehört nicht zum Request, aber zur Diagnose, und niemand füttert
@@ -194,7 +268,18 @@ nachgebautes Objekt würde am alten wie am neuen Code dasselbe enthalten und nic
 | T-BR3 | Mit dem Default `passNachGegnerpass` 0 liefert die Nachstellung aus dem Schnappschuss denselben Zug wie der echte Aufruf (Kontrolle: die Änderung ändert im Normalbetrieb nichts) | besteht |
 | T-BR4 | `buildBugReport()` ist weiter gültiges JSON, `reproduktion.params` trägt `passNachGegnerpass`, und `reproduktion` trägt **kein** `netPriors` (Kontrolle zur bewussten Entscheidung in §3) | besteht bis auf `extra` — wird so geschrieben, dass es an beiden Ständen besteht |
 
-Jeder Test läuft auch am alten Stand; das Ergebnis gehört in den Nachtrag.
+Dazu der Test zu Frage A, in `tests/passregel-versuch.js`:
+
+| Test | Prüft | heute |
+|---|---|---|
+| T-PR1 | Bestandsprüfung nach §1.5: die Liste aller Dateien, die `getAIMove(` oder `passNachGegnerpassPruefung(` enthalten, ist geschlossen; jede `versorgt`-Datei hat ihr `extra`, jede `waechter`-Datei ihre Abbruchbedingung | besteht — er hält den Bestand, er behebt nichts |
+
+T-PR1 ist absichtlich **kein** Rot-nach-Grün-Test: Es gibt heute keine Lücke im Bestand (§1.4). Sein Wert liegt in
+der Zukunft. Damit das nicht nur behauptet ist, wird in der Umsetzung **gezeigt**, dass er anspringt: eine
+wegwerfbare Datei mit einem `getAIMove(`-Aufruf im Arbeitsbereich, Test rot, Datei weg, Test grün. Das Ergebnis
+gehört in den Nachtrag.
+
+Jeder BR-Test läuft auch am alten Stand; das Ergebnis gehört in den Nachtrag.
 
 ## 5. Abnahme
 
@@ -202,6 +287,8 @@ Zwei Zustände, gültig oder ungültig. **Gültig** nur, wenn alles zutrifft:
 
 1. Die drei Engine-Blöcke haben die Prüfsummen aus §3, `PARAMS_DEFAULT` ist unverändert.
 2. T-BR1 und T-BR2 scheitern am alten Code und bestehen am neuen; T-BR3 und T-BR4 bestehen an beiden.
+2a. T-PR1 besteht, und es ist **gezeigt**, dass er anspringt: mit einer wegwerfbaren Datei, die `getAIMove(`
+   enthält, wird er rot; ohne sie grün. Ausgabe beider Läufe in den Nachtrag.
 3. Die bestehenden Tests in `tests/browser-ui.js` bleiben unverändert und bestehen, darunter T-U1 bis T-U4 und
    T-W1 bis T-W4 — sie fassen `triggerAIMove` und den Rückfallweg an.
 4. `node tests/run.js` lokal grün, CI grün. Besonders zu beachten: `tests/zeit-zerlegung.js`, weil es
@@ -216,7 +303,9 @@ Zwei Zustände, gültig oder ungültig. **Gültig** nur, wenn alles zutrifft:
 
 - **Frage A ist nicht gemessen, sondern abgewogen.** Die Behauptungen über Unerreichbarkeit in §1.2 sind am Code
   gelesen, nicht ausgeführt; ein Engine-Vergleich ist bewusst nicht gelaufen, weil die Änderung nicht vorgeschlagen
-  wird.
+  wird. Der Bestand in §1.4 ist am Quelltext gelesen, nicht ausgeführt.
+- **T-PR1 prüft Text, nicht Verhalten** (§1.5). Er deckt eine neue Datei ab, nicht einen zweiten Codeweg in einer
+  bekannten. Dieser Rest bleibt offen, und die Engine-Warnung wäre dafür das Mittel.
 - **BR-1 ist in einer Umgebung gemessen** (Chromium über Playwright, Container) und in einer künstlichen Stellung.
   Dass der Zug selbst abweichen kann, ist geschlossen, nicht gemessen (§2.2).
 - **Kein Messlauf, keine Spielstärkeaussage.** Beide Fragen betreffen Diagnose und Werkzeuge, nicht die Zugwahl im
@@ -224,8 +313,10 @@ Zwei Zustände, gültig oder ungültig. **Gültig** nur, wenn alles zutrifft:
 
 ## 7. Ablauf
 
-1. Dieses Doc als PR, CI grün, **Hazeberry liest es**, Merge.
-2. Für Frage A ist damit nichts zu tun, wenn er der Empfehlung folgt; `docs/passregel-wege-vorabfestlegung.md` §7.4
-  bekommt einen Verweis hierher.
-3. BR-1 als eigener PR: Code nach §3, Tests nach §4, `tests/README.md`, Nachtrag hier mit den Ergebnissen aus §5.
-4. CI grün, Merge, `unsubscribe_pr_activity`, kurzer Bericht mit den löschbaren Branches.
+1. Dieses Doc als PR (#364), CI grün, Merge. Hazeberry hat Frage A und BR-1 ins eigene Ermessen gestellt; die
+   Entscheidungen stehen offen im Text und sind mit einem PR umkehrbar.
+2. Umsetzung als eigener PR: BR-1 nach §3, T-PR1 nach §1.5 und §4, Tests nach §4, `tests/README.md`,
+   `docs/passregel-wege-vorabfestlegung.md` §7.4 um das Ergebnis zu Frage A ergänzt, Nachtrag hier mit den
+   Ergebnissen aus §5.
+3. CI grün, Merge, `unsubscribe_pr_activity`, kurzer Bericht mit den löschbaren Branches.
+4. **In der Engine ändert sich nichts.** Kein Engine-Vergleich, kein Messlauf, keine neue Prüfsumme.
