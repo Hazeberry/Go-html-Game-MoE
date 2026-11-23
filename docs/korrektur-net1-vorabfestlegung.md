@@ -284,8 +284,10 @@ Kommentarkopf), `tests/README.md` (zwei Zeilen) sowie die beiden Doc-Berichtigun
    Code bestehen `nan-guards.js` 14 von 14 und `browser-ui.js` 44 von 44. Erfüllt.
 3. **Bestehende Tests:** unverändert übernommen; die 11 in `nan-guards.js` und die 42 in `browser-ui.js` bestehen am
    neuen Code. Erfüllt.
-4. **Testsuite:** vollständig gelaufen, Ergebnis unten.
-5. **Prüfskript:** Ergebnis unten.
+4. **Testsuite:** `node tests/run.js` vollständig — wegen des geänderten Engine-Blocks nicht nur die berührten
+   Dateien: **alle 60 Testdateien bestanden**, Exit 0. Die CI steht im PR. Erfüllt, sobald die CI grün ist.
+5. **Prüfskript:** `auswertung/bughunt-20261116/pruefung.js` am neuen Code: 1 von 13 reproduziert, nämlich B-2 — das
+   Soll. Daten: `docs/daten/bughunt-20261116/nach-net1.json`, Konsole `nach-net1-konsole.txt`. Erfüllt.
 6. **Prüfsummen-Nachtrag:** gesetzt in `docs/korrektur-d1-w1-vorabfestlegung.md` §1 — die Tabelle dort nennt für
    `policy-net` jetzt ausdrücklich, dass die alte Zahl bis NET-1 gilt und danach `b0040fe8…`. Erfüllt.
 7. **Ladeliste berichtigt** in `docs/bughunt-20261116.md` §7: Von den drei Werkzeugen lädt nur `ab-harness.js` auch
