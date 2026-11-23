@@ -97,10 +97,10 @@ antreiben. Nachgezählt mit `git ls-files '*.js'` ohne `tests/`, gesucht nach `g
 | **versorgt** — gibt `extra` an `getAIMove` weiter | 2 | `gnugo-duell.js`, `gtp-ki.js` |
 | **versorgt direkt** — ruft `passNachGegnerpassPruefung` selbst mit `extra` auf, ohne `getAIMove` | 2 | `auswertung/endspiel/passregel-stellungen.js` (Z. 72), `auswertung/endspiel/passregel-vorsprung.js` (Z. 83) |
 | **Wächter** — bricht ab, wenn der Schalter an ist | 5 | `ab-harness.js` (Z. 1111), `auswertung/weiterspielen.js` (Z. 132), `auswertung/diagnose/wurzel-replay.js` (Z. 88), `auswertung/lerner-pruefung.js` (Z. 114), `auswertung/endspiel/passregel-fortsetzung.js` (Z. 221, dazu die Default-Prüfung Z. 401) |
-| **feste Literale** — kann den Schalter nicht einschalten | 12 | `auswertung/annaeherung.js`, `auswertung/endspiel/netz-kosten.js`, `auswertung/endspiel/pass-stellungen.js`, `auswertung/kritisch-rang.js`, `auswertung/lebensurteil-vergleich.js`, `auswertung/muster-endspiel-daten.js`, `auswertung/netz-zeit.js`, `auswertung/zugwahl-grund.js`, `auswertung/zugwert-rang.js`, `auswertung/zugwert-suche.js`, `distillation/collect.js`, `auswertung/diagnose/prior-reproduktion.js` |
+| **feste Literale** — kann den Schalter nicht einschalten | 13 | `auswertung/annaeherung.js`, `auswertung/endspiel/netz-kosten.js`, `auswertung/endspiel/pass-stellungen.js`, `auswertung/kritisch-rang.js`, `auswertung/lebensurteil-vergleich.js`, `auswertung/muster-endspiel-daten.js`, `auswertung/netz-zeit.js`, `auswertung/zugwahl-grund.js`, `auswertung/zugwert-rang.js`, `auswertung/zugwert-suche.js`, `distillation/collect.js`, `auswertung/diagnose/prior-reproduktion.js`, `auswertung/diagnose/prior-seeds.js` |
 | **Browser** — `passExtra()` auf allen drei Wegen | 3 Pfade in `index.html` | Worker-Weg (`d.extra`, Z. 6035 ff.; Aufbau Z. 6280), `fallbackToMainThread` (Z. 6085), Leicht/Mittel (Z. 6353) |
 
-2 + 2 + 5 + 12 = 21. **Nachtrag vom 23.11.2026:** Die Zahl war 20; `auswertung/diagnose/prior-reproduktion.js`
+2 + 2 + 5 + 13 = 22. **Nachtrag vom 23.11.2026:** Die Zahl war 20, dann 21; `auswertung/diagnose/prior-reproduktion.js`
 kam mit der Prior-Messung dazu, und **T-PR1 hat das selbst gemeldet** — der Test, der hier an die Stelle der
 Engine-Warnung getreten ist, ist bei seiner ersten echten Gelegenheit angesprungen und hat eine Datei von mir
 gefangen, die ich nicht eingeordnet hatte (`docs/prior-reproduktion-vorabfestlegung.md` §8.5). Zur Klasse
@@ -149,6 +149,11 @@ den Bestand aus §1.4 **geschlossen** hält.
 **Was der Test besser kann als die Engine-Warnung:** Er schlägt in der CI zu, **bevor** ein Messlauf läuft, statt
 mitten darin; er kostet keine Zeile in der Engine, keine neue Prüfsumme, keinen Engine-Vergleich und kein `throw` im
 Produkt; und er greift unabhängig davon, ob der Schalter an ist.
+
+**Zweite Grenze, am 23.11.2026 bemerkt:** Er sieht nur **versionierte** Dateien (`git ls-files`). Eine neu
+geschriebene, noch nicht in den Index gelegte Datei lässt ihn grün bleiben — lokal also ein falsches Grün, bis
+jemand `git add` macht. In der CI greift er trotzdem immer, weil dort alles versioniert ist. Genau deshalb wurde er
+in §8.1 Nr. 2a mit `git add -N` vorgeführt und nicht mit einer bloß angelegten Datei.
 
 **Was er schlechter kann, und das ist kein kleiner Vorbehalt:** Er prüft **Text, nicht Verhalten**. Eine Datei, die
 in der Liste als `versorgt` steht und später einen zweiten Codeweg bekommt, der `extra` vergisst, fällt ihm nicht
