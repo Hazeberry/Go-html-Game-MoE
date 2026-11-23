@@ -312,3 +312,29 @@ besser da als zum Zeitpunkt ihrer Begründung — das war Glück, nicht Weitsich
   Messung, die sich auf sie beschränkt, hätte mehr Aussicht — und wäre eine eigene Festlegung.
 - **56 Stellungen aus sechs Handpartien**, keine Zufallsstichprobe. Node im Container, keine Browserprüfung.
 - **Kein Spielstärkeergebnis**, und alles nur unter `netMaxBlend` > 0, was nicht der ausgelieferte Standard ist.
+
+### 8.5 T-PR1 hat diese Messung selbst gemeldet
+
+Beim Push von §8 wurde die CI rot, und zwar an **T-PR1** — dem Test, der in
+`docs/passregel-wege-nachtrag-vorabfestlegung.md` §1.5 an die Stelle der verworfenen Engine-Warnung getreten ist:
+
+> NEUE Datei ruft die Engine an und ist nicht eingeordnet: auswertung/diagnose/prior-reproduktion.js — in BESTAND
+> aufnehmen (docs/passregel-wege-nachtrag-vorabfestlegung.md §1.4): versorgt, versorgt-direkt, waechter oder
+> feste-literale
+
+Das ist der Mechanismus bei seiner **ersten echten Gelegenheit**, und er hat eine Datei von mir gefangen, die ich
+nicht eingeordnet hatte. Vorher war nur gezeigt, dass er bei einer wegwerfbaren Probedatei anspringt
+(`docs/passregel-wege-nachtrag-vorabfestlegung.md` §8.1 Nr. 2a); hier war es keine Probe.
+
+Nachgeprüft statt geraten: Das Werkzeug nennt `passNachGegnerpass` **nirgends** (0 Treffer), setzt nur namentlich
+genannte `PARAMS`-Felder (`mctsFixedSims`, `adaptiveBudgetEnabled`, `resignEnabled`, `mctsTreeReuse`, `netWarmup`,
+`netMaxBlend`) und hat **keinen** generischen `PARAMS[…]`- oder `Object.assign(…, PARAMS)`-Weg. Es kann den Schalter
+also nicht einschalten → Klasse `feste-literale`. Der Bestand steht damit auf **21** Dateien, die Klasse auf 12.
+
+**Eine Präzisierung, die dabei nötig wurde:** Der Klassenname „feste Literale" trifft auf diese Datei wörtlich nicht
+— zwei ihrer **Werte** kommen aus Argumenten (`--sims`, `--blend`). Die **geprüfte** Eigenschaft ist aber dieselbe:
+kein generischer Schlüssel-Weg, und der Schalter wird nicht genannt. Beide Stellen (§1.4 dort, der Kommentar im Test)
+sagen das jetzt so; der Name ist der alte geblieben.
+
+**Was ich daraus mitnehme:** Ich hatte `node tests/run.js` vor diesem Push nicht laufen lassen, nur
+`tests/lizenz.js`. Der Fehler wäre lokal in zwei Minuten aufgefallen statt in der CI.

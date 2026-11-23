@@ -97,10 +97,20 @@ antreiben. Nachgezählt mit `git ls-files '*.js'` ohne `tests/`, gesucht nach `g
 | **versorgt** — gibt `extra` an `getAIMove` weiter | 2 | `gnugo-duell.js`, `gtp-ki.js` |
 | **versorgt direkt** — ruft `passNachGegnerpassPruefung` selbst mit `extra` auf, ohne `getAIMove` | 2 | `auswertung/endspiel/passregel-stellungen.js` (Z. 72), `auswertung/endspiel/passregel-vorsprung.js` (Z. 83) |
 | **Wächter** — bricht ab, wenn der Schalter an ist | 5 | `ab-harness.js` (Z. 1111), `auswertung/weiterspielen.js` (Z. 132), `auswertung/diagnose/wurzel-replay.js` (Z. 88), `auswertung/lerner-pruefung.js` (Z. 114), `auswertung/endspiel/passregel-fortsetzung.js` (Z. 221, dazu die Default-Prüfung Z. 401) |
-| **feste Literale** — kann den Schalter nicht einschalten | 11 | `auswertung/annaeherung.js`, `auswertung/endspiel/netz-kosten.js`, `auswertung/endspiel/pass-stellungen.js`, `auswertung/kritisch-rang.js`, `auswertung/lebensurteil-vergleich.js`, `auswertung/muster-endspiel-daten.js`, `auswertung/netz-zeit.js`, `auswertung/zugwahl-grund.js`, `auswertung/zugwert-rang.js`, `auswertung/zugwert-suche.js`, `distillation/collect.js` |
+| **feste Literale** — kann den Schalter nicht einschalten | 12 | `auswertung/annaeherung.js`, `auswertung/endspiel/netz-kosten.js`, `auswertung/endspiel/pass-stellungen.js`, `auswertung/kritisch-rang.js`, `auswertung/lebensurteil-vergleich.js`, `auswertung/muster-endspiel-daten.js`, `auswertung/netz-zeit.js`, `auswertung/zugwahl-grund.js`, `auswertung/zugwert-rang.js`, `auswertung/zugwert-suche.js`, `distillation/collect.js`, `auswertung/diagnose/prior-reproduktion.js` |
 | **Browser** — `passExtra()` auf allen drei Wegen | 3 Pfade in `index.html` | Worker-Weg (`d.extra`, Z. 6035 ff.; Aufbau Z. 6280), `fallbackToMainThread` (Z. 6085), Leicht/Mittel (Z. 6353) |
 
-2 + 2 + 5 + 11 = 20. **Jede Datei ist abgedeckt**, und für die elf mit festen Literalen ist nachgeprüft, woran das
+2 + 2 + 5 + 12 = 21. **Nachtrag vom 23.11.2026:** Die Zahl war 20; `auswertung/diagnose/prior-reproduktion.js`
+kam mit der Prior-Messung dazu, und **T-PR1 hat das selbst gemeldet** — der Test, der hier an die Stelle der
+Engine-Warnung getreten ist, ist bei seiner ersten echten Gelegenheit angesprungen und hat eine Datei von mir
+gefangen, die ich nicht eingeordnet hatte (`docs/prior-reproduktion-vorabfestlegung.md` §8.5). Zur Klasse
+`feste-literale` eine **Präzisierung**: Die elf alten Dateien setzen `PARAMS` wirklich nur aus `DEFAULT` plus festen
+Literalen. Die neue nimmt zwei **Werte** aus Argumenten (`--sims`, `--blend`), aber nur für namentlich genannte
+Felder, unter denen der Schalter nicht ist. Die geprüfte Eigenschaft ist in beiden Fällen dieselbe — sie nennen
+`passNachGegnerpass` nirgends, und keine hat einen generischen Weg, der beliebige Schlüssel aus Argumenten nach
+`PARAMS` übernimmt. Der Klassenname ist der alte geblieben.
+
+**Jede Datei ist abgedeckt**, und für die elf mit festen Literalen ist nachgeprüft, woran das
 hängt: Sie setzen `PARAMS` ausschließlich aus `DEFAULT` beziehungsweise `PARAMS_DEFAULT` plus festen Literalen, unter
 denen `passNachGegnerpass` nicht vorkommt, und **keine der elf nennt den Schalter überhaupt** (geprüft mit
 `grep -l`). Sie sind also nur deshalb sicher, weil der Standardwert 0 ist — was `passregel-fortsetzung.js` Z. 401
