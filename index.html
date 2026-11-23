@@ -6237,8 +6237,17 @@ function triggerAIMove() {
       histHashes: Array.from(state.boardHistory),
       captures:   {...state.captures},
       mc:         state.moveCount,
+      reqId,                                 /* BR-1: der echte Request hat sie */
       koPoint:    state.koPoint,
       lastMove:   state.lastMove,
+      /* BR-1: Ohne extra stellt man den Zug OHNE die Versuchsregel nach — der
+         echte Aufruf bekommt es über passExtra, der Schnappschuss bekam es
+         nicht. (Kein Aufruf im Klartext in diesem Kommentar: der Verdrahtungs-
+         test zählt die Vorkommen.) Gemessen in
+         docs/passregel-wege-nachtrag-vorabfestlegung.md §2.2: derselbe Zug lief
+         nachgestellt über einen anderen Zweig, mit anderem info und ohne
+         versuch-Feld. Dieselbe Funktion wie am echten Aufruf, nicht nachgebaut. */
+      extra:      passExtra(),
       params:     JSON.parse(JSON.stringify(PARAMS)),
       netBlend:   _netPriors ? policyNet.blendWeight : 0,
       lastMsPerSim: _lastMsPerSim
@@ -6337,9 +6346,14 @@ function triggerAIMove() {
         histHashes: Array.from(state.boardHistory),
         captures:   {...state.captures},
         mc:         state.moveCount,
+        reqId,                               /* BR-1, wie oben */
         koPoint:    state.koPoint,
         lastMove:   state.lastMove,
         difficulty: state.aiDifficulty,
+        /* BR-1: Hier greift die Versuchsregel nicht (sie prüft nur auf Schwer),
+           aber der Aufruf unten gibt extra trotzdem mit — sonst wandert die
+           Lücke nur eine Stufe weiter. */
+        extra:      passExtra(),
         params:     JSON.parse(JSON.stringify(PARAMS)),
         netBlend:   0,
         lastMsPerSim: _lastMsPerSim
@@ -6892,10 +6906,18 @@ document.getElementById('btn-copy-log').addEventListener('click', () => {
    - zugprotokoll: die menschenlesbare Zugliste (wie 📋)
    - kiDiagnose:   pro KI-Zug Sims/Q aus info, echte Dauer vs. Budget, ms/Sim
    - brett:        ASCII-Brett des AKTUELLEN Zustands (X=Schwarz, O=Weiß)
-   - reproduktion: der letzte Worker-Request 1:1 (Brett, Historie-Hashes,
-     Gefangene, Ko-Punkt, PARAMS) — getAIMove damit füttern reproduziert
-     exakt den Zug, bei dem es geklemmt hat. Genau das fehlte beim nicht
-     reproduzierbaren Hänger nach Zug 185. */
+   - reproduktion: der letzte Worker-Request (Brett, Historie-Hashes,
+     Gefangene, Ko-Punkt, reqId, extra, PARAMS) — getAIMove damit füttern
+     reproduziert den Zug, bei dem es geklemmt hat. Genau das fehlte beim nicht
+     reproduzierbaren Hänger nach Zug 185.
+     EINE GRENZE, benannt statt verschwiegen (BR-1,
+     docs/passregel-wege-nachtrag-vorabfestlegung.md §3): netPriors steht NICHT
+     im Bericht. Die 361 Zahlen wären 7775 Zeichen gegen 8106 des ganzen
+     Berichts, also fast eine Verdopplung. Eine Nachstellung rechnet die Priors
+     deshalb neu und trifft nur, solange die Gewichte dieselben sind — bei
+     netMaxBlend 0 (Default) ohne Belang, weil sie dann nicht in die Zugwahl
+     eingehen. Vorher stand hier „1:1" und „exakt"; das traf nicht zu, weil
+     reqId und extra ebenfalls fehlten. Die sind jetzt drin. */
 function buildBugReport() {
   const rows = [];
   for (let y = 0; y < SIZE; y++) {

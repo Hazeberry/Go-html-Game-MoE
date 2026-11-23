@@ -329,3 +329,85 @@ Zwei Zustände, gültig oder ungültig. **Gültig** nur, wenn alles zutrifft:
    Ergebnissen aus §5.
 3. CI grün, Merge, `unsubscribe_pr_activity`, kurzer Bericht mit den löschbaren Branches.
 4. **In der Engine ändert sich nichts.** Kein Engine-Vergleich, kein Messlauf, keine neue Prüfsumme.
+
+## 8. Nachtrag: Umsetzung und Abnahme (23.11.2026)
+
+Umgesetzt ist **Frage B (BR-1)** und der Ersatz für Frage A (**T-PR1**). In der Engine ändert sich nichts.
+
+### 8.1 Die Abnahmepunkte aus §5
+
+**1. Prüfsummen — erfüllt.** Nach der Änderung nachgerechnet: `shared-go-logic` `54dfef2d…`, `worker-ai`
+`f847c124…`, `policy-net` `14cb39a1…` — alle drei byteidentisch. `PARAMS_DEFAULT` unberührt. Kein
+Engine-Vergleich, kein Messlauf.
+
+**2. T-BR1 bis T-BR4 — erfüllt.**
+
+| Lauf | Ergebnis | T-BR1 | T-BR2 | T-BR3 | T-BR4 |
+|---|---|---|---|---|---|
+| alter Stand (`51c8cb4`) | 61 bestanden, **2 fehlgeschlagen** | **scheitert** | **scheitert** | besteht | besteht |
+| neuer Stand | **63 bestanden, 0 fehlgeschlagen** | besteht | besteht | besteht | besteht |
+
+Die Meldungen am alten Stand: „der Schnappschuss traegt extra — das ist der Befund" (T-BR1) und „er traegt extra"
+(T-BR2). Rohausgaben: `docs/daten/bughunt-20261116/browser-ui-br-alt.txt` und `browser-ui-br-neu.txt`.
+
+**2a. T-PR1 — erfüllt, und er springt an.** Er besteht mit 25 Prüfungen. Dass er nicht nur grün ist, sondern wirkt,
+ist **gezeigt**: Eine wegwerfbare Datei `auswertung/wegwerf-probe.js` mit einem `getAIMove(`-Aufruf, mit `git add -N`
+in den Index gelegt, macht ihn rot mit genau der Meldung, die der nächste Mensch braucht:
+
+> NEUE Datei ruft die Engine an und ist nicht eingeordnet: auswertung/wegwerf-probe.js — in BESTAND aufnehmen
+> (docs/passregel-wege-nachtrag-vorabfestlegung.md §1.4): versorgt, versorgt-direkt, waechter oder feste-literale
+
+Danach die Datei weg, Test grün (12 von 12). Die Wegwerfdatei ist nicht Teil des Commits.
+
+**3. Bestehende Tests — eine Abweichung, hier offen genannt.** §5 Nr. 3 verlangte, die bestehenden Tests bleiben
+**unverändert**. Ein Test musste geändert werden: „Verdrahtung: Hauptthread, Worker-Nachricht und Rückfall reichen
+gegnerPasste, Wertung und Komi weiter" zählt die Vorkommen von `passExtra()` in `index.html` und erwartete **4**. Die
+zwei Schnappschüsse machen daraus **6**. Geändert ist nur die Zahl, mit Begründung am Ort; sie bleibt eine **exakte
+Zahl** und wurde ausdrücklich **nicht** zu einer Mindestgrenze gelockert, damit ein versehentlich wegfallender Aufruf
+weiter auffällt. Das ist eine Anpassung an die Änderung, keine Abschwächung — aber es ist eine Abweichung von §5
+Nr. 3, und sie steht hier, statt in der Abnahme unterzugehen. Alle anderen Tests sind unverändert und grün, darunter
+T-U1 bis T-U4 und T-W1 bis T-W4, die `triggerAIMove` und den Rückfallweg anfassen.
+
+**4. `node tests/run.js` — erfüllt.** Alle 61 Testdateien bestanden, `tests/zeit-zerlegung.js` und
+`tests/passregel-versuch.js` eingeschlossen. CI: siehe PR.
+
+**5. `pruefung.js` — erfüllt.** Weiter **1 von 13** reproduziert (B-2). Ausgabe
+`docs/daten/bughunt-20261116/nach-br1.json`, Konsole `nach-br1-konsole.txt`.
+
+**6. Fehlerbericht weiter einlesbar — erfüllt** über `tests/zeit-zerlegung.js` in Punkt 4; zusätzlich prüft T-BR4
+direkt, dass `buildBugReport()` gültiges JSON bleibt.
+
+**Urteil: gültig**, mit der benannten Abweichung bei Punkt 3.
+
+### 8.2 Zwei Dinge, die erst beim Bauen auffielen
+
+- **Der Leicht/Mittel-Schnappschuss entsteht in einem `setTimeout`** (Z. 6332). Der erste Entwurf von T-BR2 las
+  `state.lastAIRequest` direkt nach `triggerAIMove()` und bekam `null`; der Test scheiterte an einem `Object.keys`
+  auf `null`, nicht am Befund. Er wartet jetzt, bis der Schnappschuss da ist (bis 5 s), und sagt es, wenn nicht.
+  Hätte ich den Test nur am neuen Stand laufen lassen, wäre das trotzdem aufgefallen — dass er am alten Stand aus dem
+  **richtigen** Grund scheitert, zeigt erst der Gegenlauf.
+- **Ein Kommentar kann einen Zähltest verfälschen.** Mein erster Kommentar an der Änderung enthielt `passExtra()` im
+  Klartext; der Verdrahtungstest zählte deshalb **7** statt 6. Der Kommentar nennt die Funktion jetzt ohne Klammern
+  und sagt, warum. Die Zahl im Test wäre sonst um einen Prosatreffer zu hoch gewesen — ein Fehler, der stillschweigend
+  zur neuen Wahrheit geworden wäre.
+
+### 8.3 Geändert
+
+- `index.html`: zwei Schnappschüsse (`reqId`, `extra`) und der Kommentar an `buildBugReport`. Sonst nichts; alle drei
+  Engine-Blöcke byteidentisch.
+- `tests/browser-ui.js`: `brInit` und T-BR1 bis T-BR4 angefügt.
+- `tests/passregel-versuch.js`: `BESTAND`, `SCHALTERSTELLEN` und T-PR1 angefügt; im Verdrahtungstest die Zahl 4 → 6
+  (§8.1 Nr. 3).
+- `tests/README.md`: die Zeilen zu `browser-ui.js` und `passregel-versuch.js` ergänzt.
+- `docs/daten/bughunt-20261116/`: `nach-br1.json`, `nach-br1-konsole.txt`, `browser-ui-br-alt.txt`,
+  `browser-ui-br-neu.txt`, vier Zeilen in `SHA256SUMS`.
+
+### 8.4 Was offen bleibt
+
+- **Die Warnung in der Engine ist nicht gebaut.** Der Entwurf steht in §1.1; der Vorbehalt zu T-PR1 (Text, nicht
+  Verhalten) bleibt damit bestehen und ist der Preis dieser Entscheidung.
+- **`netPriors` fehlt im Bericht weiter**, jetzt mit gemessener Begründung und benannt im Kommentar. Eine
+  Nachstellung mit eingeschaltetem Blend bleibt deshalb nicht exakt.
+- **Eine Umgebung** (Chromium über Playwright, Container), eine künstliche Stellung für T-BR1 und T-BR3.
+- **Dass der nachgestellte Zug ohne `extra` ein anderer sein kann**, bleibt geschlossen statt gemessen (§2.2).
+- **Kein Messlauf, keine Spielstärkeaussage.**
