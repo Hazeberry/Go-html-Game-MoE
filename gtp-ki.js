@@ -11,9 +11,16 @@
 
    Befehle: protocol_version, name, version, list_commands, known_command,
    boardsize 19, clear_board, komi, set_random_seed, play, genmove,
-   set_free_handicap, list_stones, quit. Der Zufall ist je Partie
-   geseedet: set_random_seed N setzt Math.random neu (mulberry32 wie in
-   gnugo-duell.js); ohne den Befehl gilt Seed 1.
+   set_free_handicap, list_stones, quit. Jedem Befehl darf eine Nummer
+   vorangehen; die Antwort traegt sie dann ebenfalls (GTP-3). Der Zufall ist
+   je Partie geseedet: set_random_seed N setzt Math.random neu (mulberry32
+   wie in gnugo-duell.js); ohne den Befehl gilt Seed 1.
+
+   play lehnt regelwidrige Zuege ab -- Ko, positionelle Wiederholung und
+   Selbstmord (GTP-1); bei einer Ablehnung bleibt der Zustand unveraendert.
+   genmove reicht extra an getAIMove weiter, damit die Versuchsregel
+   'Pass nach Gegnerpass' ueberhaupt ausloesen kann (GTP-2).
+   Alles nach docs/korrektur-gtp-vorabfestlegung.md.
 
    Aufruf:  node gtp-ki.js --html pfad/index.html [--ki k=v,...] */
 'use strict';
@@ -72,30 +79,55 @@ function vonGtp(s) {
 }
 const farbeVon = s => { const t = String(s || '').toLowerCase(); if (t === 'b' || t === 'black') return 1; if (t === 'w' || t === 'white') return 2; throw new Error('Farbe unlesbar: ' + s); };
 
-let board, caps, hist, ko, last, mc, vorgabe;
+let board, caps, hist, ko, last, mc, vorgabe, letzterPass, komi;
 function neu() {
   board = new Uint8Array(E.BOARD_SIZE); caps = {1: 0, 2: 0}; hist = new Set([E.computeZobrist(board)]);
-  ko = null; last = null; mc = 0; vorgabe = 0; E.neuePartie();
+  ko = null; last = null; mc = 0; vorgabe = 0; letzterPass = null; komi = 7.5; E.neuePartie();
 }
 neu();
 Math.random = mulberry32(1);
 
 /* Einen Zug anwenden wie gnugo-duell.js: schlagen, Ko-Punkt, Superko-Historie */
 function setze(i, f) {
-  if (i < 0) { ko = null; mc++; return; }
+  if (i < 0) { ko = null; letzterPass = f; mc++; return; }
   if (board[i]) throw new Error('Feld besetzt: ' + zuGtp(i));
   board[i] = f;
   const cap = E.removeDeadGroups(board, 3 - f, i);
   ko = null;
   if (cap === 1) { const ff = E.floodFill(board, i); if (ff.group.length === 1 && ff.liberties.length === 1) ko = ff.liberties[0]; }
-  caps[f] += cap; last = i; mc++;
+  caps[f] += cap; last = i; letzterPass = null; mc++;
   hist.add(E.computeZobrist(board));
+}
+
+/* GTP-1: Eingangsvalidierung fuer play. Nur hier, nicht in setze -- die Zuege
+   der eigenen Engine kommen aus getLegalMoves und sind schon geprueft; eine
+   Pruefung in setze koennte einen Messlauf mitten in der Partie abbrechen.
+   Wirft diese Funktion, hat noch nichts am Zustand gedreht: sie arbeitet auf
+   einer Kopie, liest hist nur mit has, und setze laeuft danach gar nicht.
+   Die Wiederholungsregel ist positional, wie die der Engine ueber histHashes. */
+function pruefeRegeln(i, f) {
+  if (i < 0) return;
+  if (ko !== null && i === ko) throw new Error('Ko verboten: ' + zuGtp(i));
+  if (board[i]) return;                        /* setze meldet das selbst */
+  const probe = Uint8Array.from(board);
+  probe[i] = f;
+  E.removeDeadGroups(probe, 3 - f, i);
+  if (E.floodFill(probe, i).liberties.length === 0) throw new Error('Selbstmord verboten: ' + zuGtp(i));
+  if (hist.has(E.computeZobrist(probe))) throw new Error('Stellungswiederholung verboten: ' + zuGtp(i));
 }
 
 const BEFEHLE = ['protocol_version', 'name', 'version', 'list_commands', 'known_command', 'boardsize', 'clear_board',
   'komi', 'set_random_seed', 'play', 'genmove', 'set_free_handicap', 'list_stones', 'quit'];
+/* GTP-3: Die optionale Nummer vor dem Befehl. Sie wird hier abgespalten und
+   gemerkt; die drei Ausgabestellen unten schreiben sie mit, im Erfolgs- wie im
+   Fehlerfall. Eine Zeile aus nur einer Zahl laesst befehl undefined und faellt
+   damit in default: '?17 unbekannter Befehl'. Sie stumm zu ueberspringen
+   wuerde einen Client haengen lassen, der auf eine Antwort wartet. */
+let kennung = '';
 function antworte(zeile) {
-  const [befehl, ...rest] = zeile.trim().split(/\s+/);
+  const worte = zeile.trim().split(/\s+/);
+  kennung = /^\d+$/.test(worte[0]) ? worte.shift() : '';
+  const [befehl, ...rest] = worte;
   switch (befehl) {
     case 'protocol_version': return '2';
     case 'name': return 'gtp-ki';
@@ -104,18 +136,19 @@ function antworte(zeile) {
     case 'known_command': return String(BEFEHLE.includes(rest[0]));
     case 'boardsize': if (rest[0] !== '19') throw new Error('nur 19×19'); return '';
     case 'clear_board': neu(); return '';
-    case 'komi': if (!Number.isFinite(+rest[0])) throw new Error('Komi unlesbar'); return '';
+    case 'komi': if (!Number.isFinite(+rest[0])) throw new Error('Komi unlesbar'); komi = +rest[0]; return '';
     case 'set_random_seed': {
       if (!/^\d+$/.test(rest[0] || '')) throw new Error('Seed unlesbar');
       Math.random = mulberry32(+rest[0]); return '';
     }
-    case 'play': setze(vonGtp(rest[1]), farbeVon(rest[0])); return '';
+    case 'play': { const pi = vonGtp(rest[1]), pf = farbeVon(rest[0]); pruefeRegeln(pi, pf); setze(pi, pf); return ''; }
     case 'set_free_handicap': for (const s of rest) { board[vonGtp(s)] = 1; } vorgabe = rest.length; hist.add(E.computeZobrist(board)); return '';
     case 'list_stones': { const f = farbeVon(rest[0]); const z = []; for (let i = 0; i < E.BOARD_SIZE; i++) if (board[i] === f) z.push(zuGtp(i)); return z.join(' '); }
     case 'genmove': {
       const f = farbeVon(rest[0]);
       Object.assign(E.PARAMS, DEFAULT, {adaptiveBudgetEnabled: 0}, 'vorgabeSteine' in DEFAULT ? {vorgabeSteine: vorgabe} : {}, opt.ki);
-      const r = E.getAIMove(board, f, Array.from(hist), {...caps}, mc, 'hard', 1, ko, last);
+      const r = E.getAIMove(board, f, Array.from(hist), {...caps}, mc, 'hard', 1, ko, last,
+        {gegnerPasste: letzterPass === 3 - f, wertung: 'flaeche', komi});
       if (r.type === 'resign') return 'resign';
       const i = r.type === 'stone' ? r.y * 19 + r.x : -1;
       setze(i, f);
@@ -137,9 +170,9 @@ process.stdin.on('data', d => {
     let aus;
     try {
       aus = antworte(zeile);
-      if (aus === null) { process.stdout.write('=\n\n'); process.exit(0); }
-      process.stdout.write('= ' + aus + '\n\n');
-    } catch (e) { process.stdout.write('? ' + e.message + '\n\n'); }
+      if (aus === null) { process.stdout.write('=' + kennung + '\n\n'); process.exit(0); }
+      process.stdout.write('=' + kennung + ' ' + aus + '\n\n');
+    } catch (e) { process.stdout.write('?' + kennung + ' ' + e.message + '\n\n'); }
   }
 });
 process.stdin.on('end', () => process.exit(0));

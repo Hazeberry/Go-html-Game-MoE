@@ -149,4 +149,163 @@ test('pwa-ergebnis.sh: Teile, Kontrolle, fehlende Teile', () => {
   pruefe(['m1', 'm2', 'k1', 'kontrolle'].every(n => fs.existsSync(path.join(ort, 'ergebnisse', `${n}.jsonl.gz`))), 'Rohdaten gepackt');
 });
 
+/* ══ Korrektur GTP-1 bis GTP-3 ═════════════════════════════════
+   docs/korrektur-gtp-vorabfestlegung.md, Tests nach §7. Die Zugfolgen sind die
+   aus auswertung/bughunt-20261107/reproduce.cjs in Hazeberry/codex (§10.3),
+   damit die Vorher-Nachher-Lage mit dem Lauf vom 07.11.2026 vergleichbar bleibt.
+
+   Hier laeuft index.html, nicht die PWA-Datei: vergleich/pwa-index.html kennt
+   weder passNachGegnerpass noch zaehlVorschau, --ki passNachGegnerpass=1 wuerde
+   dort mit Exit 2 abgelehnt. */
+const IDX = path.join(wurzel, 'index.html');
+const KI_KURZ = 'mctsFixedSims=20,resignEnabled=0';
+const KO_AUFBAU = ['play W B2', 'play W A3', 'play W C3', 'play W B4',
+                   'play B A2', 'play B B1', 'play B C2', 'play B B3'];
+
+/* wie gtp(), aber mit stderr — die Attrappe in T-G3 protokolliert dorthin */
+function gtpVoll(html, befehle, ki = KI_KURZ) {
+  const p = spawnSync(process.execPath, [GTP, '--html', html, '--ki', ki],
+    {input: befehle.join('\n') + '\nquit\n', encoding: 'utf8', timeout: 300000});
+  return {antworten: p.stdout.split('\n\n').filter(Boolean).map(a => a.trim()), stderr: p.stderr, status: p.status};
+}
+
+test('T-G1, T-G1b, T-G2: play lehnt Ko, Selbstmord und Wiederholung ab, ohne den Zustand zu aendern', () => {
+  /* T-G1b Selbstmord: A1 hat in der Ecke nur A2 und B1 als Nachbarn, beide Weiss,
+     und beide behalten eigene Freiheiten — es wird nichts geschlagen. */
+  const sm = gtp(IDX, ['play W A2', 'play W B1', 'play B A1', 'list_stones B', 'list_stones W'], KI_KURZ);
+  pruefe(sm[2].startsWith('?'), `Selbstmord abgelehnt: ${sm[2]}`);
+  pruefeGleich(sm[3], '=', 'Schwarz hat keinen Stein — A1 steht nicht auf dem Brett');
+  pruefeGleich(sm[4], '= A2 B1', 'Weiss unveraendert');
+
+  /* T-G1 Ko: B B3 schlaegt W B2, die unmittelbare Ruecknahme W B2 ist verboten. */
+  const ko = gtp(IDX, [...KO_AUFBAU, 'play W B2', 'list_stones W', 'list_stones B'], KI_KURZ);
+  pruefe(ko[8].startsWith('?'), `Ko-Ruecknahme abgelehnt: ${ko[8]}`);
+  pruefe(!ko[9].split(/\s+/).includes('B2'), `W B2 steht nicht: ${ko[9]}`);
+  pruefe(ko[10].split(/\s+/).includes('B3'), `B B3 ist noch da: ${ko[10]}`);
+
+  /* T-G2 Superko: nach zwei Paessen ist der Ko-Punkt frei, die Stellung aber
+     dieselbe wie vor dem Schlag — positionelle Wiederholung. */
+  const sk = gtp(IDX, [...KO_AUFBAU, 'play W pass', 'play B pass', 'play W B2', 'list_stones W'], KI_KURZ);
+  pruefe(sk[10].startsWith('?'), `Wiederholung abgelehnt: ${sk[10]}`);
+  pruefe(!sk[11].split(/\s+/).includes('B2'), `W B2 steht nicht: ${sk[11]}`);
+
+  /* Abnahmepunkt 4: eine Ablehnung aendert den Zustand nicht. Beobachtbar ist das
+     ueber GTP am Brett und am Weiterspielen; die Gefangenenzahl ist von aussen
+     nicht abfragbar. Nach der abgelehnten Ruecknahme steht das Brett unveraendert
+     und der Ko-Punkt gilt weiter, und sobald die Stellung sich wirklich
+     unterscheidet (W T19 dazwischen), ist derselbe Punkt erlaubt und schlaegt. */
+  const zu = gtp(IDX, [...KO_AUFBAU, 'play W B2', 'play W T19', 'play B pass', 'play W B2',
+                       'list_stones W', 'list_stones B'], KI_KURZ);
+  pruefe(zu[8].startsWith('?'), 'die Ruecknahme ist zuerst abgelehnt');
+  pruefeGleich(zu[11], '=', 'nach einem Zwischenzug ist derselbe Punkt erlaubt');
+  pruefe(zu[12].split(/\s+/).includes('B2'), `jetzt steht W B2: ${zu[12]}`);
+  pruefe(!zu[13].split(/\s+/).includes('B3'), `und B B3 ist geschlagen: ${zu[13]}`);
+});
+
+test('T-G2b: die neuen Pruefungen lehnen keinen legalen Zug ab (Gegenprobe gegen Fehlalarm)', () => {
+  /* Legaler Zug und Pass in der Ko-Stellung; dann derselbe Punkt nach einem
+     Zwischenzug. gnugo-duell.js verwirft jede Antwort ohne "=", eine zu scharfe
+     Pruefung wuerde dort einen Messlauf hart abbrechen. */
+  const a = gtp(IDX, [...KO_AUFBAU, 'play W T19', 'play B pass', 'play W B2'], KI_KURZ);
+  pruefeGleich(a.slice(8, 11).join('|'), '=|=|=', `legaler Zug, Pass und Ruecknahme danach: ${a.slice(8, 11)}`);
+
+  /* Der Ablauf des bestehenden Tests oben, Stein fuer Stein: B A2 schlaegt W A1.
+     Die schlagende Gruppe hat drei Freiheiten, es entsteht also kein Ko-Punkt. */
+  const b = gtp(IDX, ['play b B1', 'play w A1', 'play b A2', 'list_stones white', 'list_stones black'], KI_KURZ);
+  pruefeGleich(b.slice(0, 3).join('|'), '=|=|=', 'Aufbau und Schlag unveraendert angenommen');
+  pruefeGleich(b[3], '=', 'Weiss hat keinen Stein mehr');
+  pruefeGleich(b[4], '= A2 B1', 'Schwarz hat A2 und B1');
+
+  /* set_free_handicap wird nach §5 nicht geprueft und muss weiter durchgehen. */
+  const c = gtp(IDX, ['set_free_handicap D4 Q16 D16', 'list_stones B'], KI_KURZ);
+  pruefeGleich(c[0], '=', 'set_free_handicap angenommen');
+  pruefeGleich(c[1].split(/\s+/).slice(1).sort().join(' '), 'D16 D4 Q16', `Vorgabesteine stehen: ${c[1]}`);
+});
+
+test('T-G3: genmove reicht extra weiter — gegnerPasste, Wertung und das gesetzte Komi', () => {
+  /* Attrappe statt echter Suche: sie protokolliert, was an der Aufrufstelle ankommt. */
+  const html = fs.readFileSync(IDX, 'utf8');
+  const m = /<script id="worker-ai">([\s\S]*?)<\/script>/.exec(html);
+  pruefe(!!m, '<script id="worker-ai"> gefunden');
+  const attrappe = `
+getAIMove = function (board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove, extra) {
+  console.error('EXTRA ' + JSON.stringify({argc: arguments.length, gp: extra && extra.gegnerPasste,
+    w: extra && extra.wertung, k: extra && extra.komi}));
+  return {type: 'stone', x: 3, y: 3, requestId: reqId};
+};
+`;
+  const schnitt = m.index + m[0].length - '</script>'.length;
+  const kopie = path.join(ordner, 'attrappe.html');
+  fs.writeFileSync(kopie, html.slice(0, schnitt) + attrappe + html.slice(schnitt));
+
+  const r = gtpVoll(kopie, [
+    'boardsize 19', 'clear_board', 'komi 6.5', 'play W pass', 'genmove B',   /* 1: Gegnerpass, Komi 6,5 */
+    'clear_board', 'play W pass', 'genmove B',                              /* 2: clear_board setzt Komi zurueck */
+    'clear_board', 'play W pass', 'play B C3', 'genmove W',                  /* 3: ein Stein loescht letzterPass */
+    'clear_board', 'play W pass', 'genmove W'                               /* 4: Farbpruefung */
+  ], KI_KURZ);
+  const prot = r.stderr.split('\n').filter(z => z.startsWith('EXTRA ')).map(z => JSON.parse(z.slice(6)));
+  pruefeGleich(prot.length, 4, `vier Aufrufe protokolliert: ${r.stderr.slice(-300)}`);
+  pruefeGleich(prot[0].argc, 10, 'zehn Argumente — extra geht mit');
+  pruefeGleich(prot[0].gp, true, 'gegnerPasste true nach play W pass');
+  pruefeGleich(prot[0].w, 'flaeche', 'Wertung flaeche');
+  pruefeGleich(prot[0].k, 6.5, 'das ueber komi gesetzte Komi kommt an');
+  pruefeGleich(prot[1].k, 7.5, 'clear_board setzt Komi auf 7,5 zurueck');
+  pruefeGleich(prot[2].gp, false, 'ein Steinzug loescht letzterPass');
+  pruefeGleich(prot[3].gp, false, 'der Pass war Weiss, Weiss ist am Zug: kein Gegnerpass');
+});
+
+/* Zuege aus einem SGF als GTP-Befehle; Paesse uebersprungen, wie im Parser von
+   tests/passregel-versuch.js, damit dasselbe Brett entsteht. */
+function sgfAlsPlay(datei) {
+  const SP = 'ABCDEFGHJKLMNOPQRST', txt = fs.readFileSync(path.join(wurzel, 'tests', 'stellungen', datei), 'utf8');
+  const re = /;([BW])\[([a-s]{0,2})\]/g, zuege = []; let m;
+  while ((m = re.exec(txt))) {
+    if (!m[2]) continue;
+    zuege.push(`play ${m[1]} ${SP[m[2].charCodeAt(0) - 97]}${19 - (m[2].charCodeAt(1) - 97)}`);
+  }
+  return zuege;
+}
+
+test('T-G3b: Versuchsregel loest mit Schalter aus und ohne nicht (Partie 427, Schwarz fuehrt)', () => {
+  /* Dieselbe Stellung wie in tests/passregel-versuch.js: ausgespielt, geklaert,
+     grosser Vorsprung fuer Schwarz. Das Einspielen ist gleichzeitig die groesste
+     Fehlalarm-Gegenprobe, die es gibt: 397 Zuege einer echten Partie. */
+  const zuege = sgfAlsPlay('hand-427.sgf');
+  pruefeGleich(zuege.length, 397, 'alle Steinzuege der Partie');
+  const lauf = ki => {
+    const r = gtpVoll(IDX, [...zuege, 'play W pass', 'genmove B'], ki);
+    return {abgelehnt: r.antworten.filter(a => a.startsWith('?')), zug: r.antworten[zuege.length + 1]};
+  };
+  const an = lauf(KI_KURZ + ',passNachGegnerpass=1');
+  pruefeGleich(an.abgelehnt.length, 0, `kein Zug der echten Partie abgelehnt: ${an.abgelehnt.slice(0, 3)}`);
+  pruefeGleich(an.zug, '= pass', 'mit Schalter passt die Engine');
+
+  const aus = lauf(KI_KURZ);
+  pruefeGleich(aus.abgelehnt.length, 0, 'auch ohne Schalter kein Zug abgelehnt');
+  pruefe(/^= [A-HJ-T](1[0-9]|[1-9])$/.test(aus.zug), `ohne Schalter zieht sie: ${aus.zug}`);
+});
+
+test('T-G4: Befehlsnummern werden erkannt und zurueckgegeben, auch im Fehlerfall', () => {
+  const a = gtp(IDX, ['17 protocol_version', '18 name', '19 bloedsinn', '17', 'protocol_version'], KI_KURZ);
+  pruefeGleich(a[0], '=17 2', 'Erfolgsantwort mit Nummer');
+  pruefeGleich(a[1], '=18 gtp-ki', 'zweite Nummer');
+  pruefeGleich(a[2], '?19 unbekannter Befehl', 'Fehlerantwort mit Nummer');
+  pruefeGleich(a[3], '?17 unbekannter Befehl', 'eine Zeile aus nur einer Zahl: unbekannter Befehl mit Nummer');
+  pruefeGleich(a[4], '= 2', 'ohne Nummer unveraendert');
+  pruefeGleich(a[5], '=', 'quit ohne Nummer unveraendert');
+});
+
+test('T-G5: Kontrolle — gewoehnlicher Ablauf und Zugwahl unveraendert', () => {
+  const a = gtp(IDX, ['protocol_version', 'boardsize 19', 'clear_board', 'komi 7.5',
+    'set_random_seed 7', 'play b Q16', 'genmove w', 'list_stones b'], KI_KURZ);
+  pruefeGleich(a.slice(0, 5).join('|'), '= 2|=|=|=|=', 'Antworten der ersten Befehle unveraendert');
+  /* R17 ist der Zug, den der Adapter VOR der Korrektur auf diesem Seed lieferte
+     (am Stand 7382a19 nachgefahren). Die Zugwahl darf sich nicht aendern. */
+  pruefeGleich(a[6], '= R17', 'derselbe Zug wie am alten Adapter');
+  pruefeGleich(a[7], '= Q16', 'Schwarz steht auf Q16');
+  const b = gtp(IDX, ['boardsize 19', 'clear_board', 'set_random_seed 7', 'play b Q16', 'genmove w'], KI_KURZ);
+  pruefeGleich(b[4], a[6], 'gleicher Seed, gleicher Zug');
+});
+
 laufeTests('Vergleich mit der PWA').then(ok => { fs.rmSync(ordner, {recursive: true, force: true}); process.exit(ok ? 0 : 1); });
