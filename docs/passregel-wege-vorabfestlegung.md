@@ -199,4 +199,10 @@ drei Zeilen identischen Codes. Der wichtigste der vier, `ab-harness.js`, ist aus
 - **TRAIN-2** steht weiter im Code, ohne Vorabfestlegung.
 - Die Warnung in der Engine, die alle Aufrufer auf einmal abdecken würde (§3, erwogen und verworfen): bleibt eine
   eigene Festlegung, falls sie jemand will. Sie bräuchte einen Engine-Vergleich.
+  **Entschieden am 23.11.2026** in `docs/passregel-wege-nachtrag-vorabfestlegung.md` §1: **Empfehlung, sie nicht
+  umzusetzen** — sie gibt die Byteidentität von `worker-ai` her, auf die jede Korrektur dieser Reihe ihren ersten
+  Abnahmepunkt stützt, und kauft dafür eine Versicherung gegen einen Fall, von dem festgelegt ist, dass er nicht
+  eintritt. Der Entwurf liegt dort fertig, falls die Versuchsregel je eingeschaltet wird; dann ist er der erste
+  Schritt davor. Beim Prüfen dieser Frage fiel **BR-1** auf: Der Reproduktions-Schnappschuss des Fehlerberichts
+  trägt `extra` nicht, verspricht aber „1:1" — siehe dort §2.
 - Ob die Versuchsregel überhaupt eingeschaltet werden soll: unverändert nein, sie bleibt auf 0.
