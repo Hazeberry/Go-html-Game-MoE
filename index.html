@@ -789,6 +789,12 @@ globalThis.PARAMS = {
   openingMoves:      20,
   endgameMoves:      80,   /* gemessen gegen 150: 150 gewinnt 31,4 % (docs/endspielgrenze.md) */
   endgameEmpty:      50,
+  /* Bewertung, alle Phasen */
+  evalStreuung:    1.00,   // Faktor auf den Rauschterm der vier Bewertungsexperten
+                           // (evalOpening/Midgame/Endgame/Tsumego). 1 = heutiges
+                           // Verhalten, 0 = kein Rauschen. Zweck des Rauschens ist
+                           // Zugstreuung (Z. 1238); was es an Stärke kostet, misst
+                           // docs/eval-streuung-vorabfestlegung.md.
   /* Eröffnung */
   openEdge3:         40,
   /* Feinabstufung INNERHALB des openEdge3-Bands. Der Name sagt „dritte
@@ -3134,7 +3140,7 @@ function evalOpening(board, i, color, mc) {
       if (trifft) s += PARAMS.openContactResponse;
     }
   }
-  return s + Math.random() * 3;
+  return s + Math.random() * 3 * PARAMS.evalStreuung;
 }
 
 /* Gewichtung der Gruppenfreiheiten für evalMidgame. Zwei Regler, beide
@@ -3252,7 +3258,7 @@ function evalMidgame(board, i, color, mc) {
   }
   for (const n of NEIGHBORS[i])
     if (_evalScratch[n] === opp && countLiberties(_evalScratch, n, 2) === 1) s += PARAMS.midOppAtariNear;
-  return s + Math.random() * 4;
+  return s + Math.random() * 4 * PARAMS.evalStreuung;
 }
 
 const _areaVisited = new Int32Array(BOARD_SIZE);
@@ -3686,7 +3692,7 @@ function evalEndgame(board, i, color, mc) {
     const d = (tbBilanzNach(lsAktiv() ? lsNach(_evalScratch, i, color) : _evalScratch) - (lsAktiv() ? lsBasis(color) : _tbBilanz)) * (color === 1 ? 1 : -1);
     s += PARAMS.endTieBreak * Math.max(-1, Math.min(1, d / 20));
   }
-  return s + Math.random() * 0.5;
+  return s + Math.random() * 0.5 * PARAMS.evalStreuung;
 }
 
 const _crisisOwn = new Uint8Array(BOARD_SIZE);
@@ -3899,7 +3905,7 @@ function evalTsumego(board, i, color, mc) {
     if (dauer > _sunkMaxDauer) _sunkMaxDauer = dauer;
     if (dauer >= PARAMS.tsumegoSunkStreak) { s -= PARAMS.tsumegoSunkCost; _sunkGriff++; }
   }
-  return s * safetyMul + Math.random() * 3;
+  return s * safetyMul + Math.random() * 3 * PARAMS.evalStreuung;
 }
 
 /* ═══ MoE Soft-Gating ════════════════════════════════════════

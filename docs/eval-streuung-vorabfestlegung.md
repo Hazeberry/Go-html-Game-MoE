@@ -162,3 +162,57 @@ Siegrate. Dazu Anomalien je Arm, Partielänge, Aufgaben je Arm.
 3. **Engine-Vergleich in Actions**, nach eigenem Go. Bei `evalStreuung` 1 muss er „gleich" zeigen.
 4. **Messlauf S1 in Actions, nach eigenem Go.** Danach S2.
 5. Auswertung als Nachtrag hier, Rohdaten unter `docs/daten/eval-streuung/`, Urteil nach §6.
+
+## 9. Nachtrag: Umsetzung (23.11.2026)
+
+Schritt 2 des Ablaufs ist erledigt. Was tatsächlich im Code steht:
+
+**Der Parameter** sitzt in `PARAMS` unter der neuen Überschrift `/* Bewertung, alle Phasen */` direkt hinter den
+Phasen-Grenzen (Z. 792–797), nicht in einem der Phasenblöcke — er gilt für alle vier Experten. Default `1.00`.
+
+**Die vier Einfügungen** stehen genau an den in §2 genannten Stellen. Ihre Zeilennummern sind durch den neuen
+Parameterblock um sechs gewachsen:
+
+| Experte | Zeile vorher (§2) | Zeile jetzt | Term |
+|---|---|---|---|
+| `evalOpening` | 3137 | 3143 | `return s + Math.random() * 3 * PARAMS.evalStreuung;` |
+| `evalMidgame` | 3255 | 3261 | `return s + Math.random() * 4 * PARAMS.evalStreuung;` |
+| `evalEndgame` | 3689 | 3695 | `return s + Math.random() * 0.5 * PARAMS.evalStreuung;` |
+| `evalTsumego` | 3902 | 3908 | `return s * safetyMul + Math.random() * 3 * PARAMS.evalStreuung;` |
+
+Dieselbe Verschiebung gilt für die in §3 genannten Stellen, die **nicht** angefasst wurden: `quickEval` steht jetzt
+auf Z. 4073, der Gleichstandsbruch der Selbstschlag-Züge auf Z. 3670 und 3824. Geprüft ist das nicht nur gelesen,
+sondern getestet (siehe unten): beide streuen auch bei `evalStreuung` 0 weiter.
+
+**Prüfsumme.** `worker-ai` lautet jetzt
+`3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9` (vorher
+`f847c1247188d8a0c94d269581ae465b7428d601c13afb65dced683d69a366e9`). `shared-go-logic` und `policy-net` sind
+byteidentisch geblieben. Nachgetragen in `docs/korrektur-d1-w1-vorabfestlegung.md` §1.
+
+**Der Test** ist `tests/eval-streuung.js` (82 Prüfungen). Er belegt die Konstruktion aus §4 stärker als „Bitgleichheit
+bei 1,00": für jeden der vier Experten gilt bei festgehaltenem `Math.random() = r` bitgenau
+
+    Wert(1)   === Wert(0) + r·k        und        Wert(0,5) === Wert(0) + r·k·0,5
+
+mit k = 3 / 4 / 0,5 / 3. Das prüft zugleich **welcher** Faktor an **welchem** Experten hängt — ein Vertauschen der
+vier Stellen wäre aufgefallen. Zwei der drei r-Werte sind absichtlich unrund (0,1 · 3 = 0,30000000000000004,
+⅓ · 4), damit die Gleichung nicht an glatten Zahlen vorbeigeht. Dazu:
+
+- Bei 0 hängt der Wert nicht mehr von `Math.random` ab (fünf verschiedene r, bitgleich) — das Rauschen ist weg,
+  nicht klein. Auch über `evaluateMove` in allen drei reinen Phasen.
+- Der Zuschnitt aus §3 ist nicht versehentlich gewachsen: `quickEval` und der Selbstschlag-Bruch streuen bei 0 weiter.
+- `evalStreuung` steht in `PARAMS_DEFAULT` — sonst ließe das Dashboard ihn nicht zurücksetzen.
+
+**Zwei Ergänzungen am Rahmen**, beide nach der Regel in `CLAUDE.md`: `tests/rahmen.js` reicht jetzt `evalOpening`,
+`evalMidgame`, `evalEndgame` und `PARAMS_DEFAULT` heraus. Ohne die drei Experten hätte der Test nur über
+`evaluateMove` messen können, also durch die Phasenmischung hindurch; die Zuordnung von k zu Experte wäre damit
+nicht prüfbar gewesen.
+
+**Nicht im Bestand von T-PR1.** Die Bestandsprüfung der Engine-Aufrufer
+(`docs/passregel-wege-nachtrag-vorabfestlegung.md` §1.5) überspringt `tests/` und bleibt bei 22 Dateien. Das ist
+kein Versehen des Tests: sie zählt Mess- und Auswertungswerkzeuge, die die Engine fahren, nicht Testdateien, die
+`PARAMS` absichtlich verstellen und in der CI laufen.
+
+**Was damit noch nicht belegt ist.** Der Test prüft Arithmetik an vier Stellen, nicht, dass eine ganze Partie mit
+`evalStreuung` 1 Zug für Zug wie vorher läuft. Das ist Schritt 3, der Engine-Vergleich in Actions. Zeigt er einen
+Unterschied, ist die Änderung falsch gebaut, und die Messläufe entfallen.
