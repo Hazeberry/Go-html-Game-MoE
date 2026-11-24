@@ -491,3 +491,96 @@ Daran ändert der Rohdump nichts; er füllt nur eine Lücke, die sonst auch in S
 Das ist eine eigene Messung mit eigener Festlegung und keine Fortsetzung dieser Kette. Sie ist billig — zwei Läufe
 zu je rund 43 Minuten — und beantwortet die Frage, die §1 als zweites Argument für die ganze Messung genannt hat.
 Vorschlag, keine Beschlusslage: Hazeberry entscheidet, ob sie kommt.
+
+## 13. Nachtrag: Ergebnis von S2 und Abschluss der Kette (24.11.2026)
+
+**S2 trägt nach §6 keinen Anspruch**, weil S1 keinen Unterschied gezeigt hat: „S2 wird nur gelesen, wenn S1 einen
+Unterschied zeigt; sonst als beschreibend berichtet, ohne Anspruch." Die Zahlen stehen hier beschreibend.
+
+Vier Teilläufe auf `main` `e8bb351`, gestartet am 24.11.2026 um 00:57 UTC, mit `roh=1`, je 90 Partien.
+Rohwerte: `docs/daten/eval-streuung/s2-teilergebnisse.md`.
+
+| | |
+|---|---|
+| Siegrate von B (`evalStreuung` 0,5) | **184 von 360 = 51,11 %** |
+| Exakter zweiseitiger Binomialtest | p = 0,7122 |
+| Clopper-Pearson 95 % | [45,8 %; 56,4 %] |
+| Elo-Differenz | **+7,7** [−29,1; +44,6] |
+
+### 13.1 Das Dosisbild über beide Vergleiche
+
+| Rauschen | Siegrate gegen den Vollarm | Elo | Intervall |
+|---|---:|---:|---|
+| voll (Arm A, Bezug) | 50,00 % | 0 | — |
+| halbiert (S2) | 51,11 % | +7,7 | [−29,1; +44,6] |
+| aus (S1) | 49,72 % | −1,9 | [−38,8; +34,9] |
+
+**Kein Trend, keine Stufe.** §6 fragte, ob der Effekt „abgestuft oder ein Sprung" ist. Die Antwort lautet: beide
+Dosen liegen von 50 % nicht unterscheidbar weit weg, also ist nichts da, was abgestuft oder sprunghaft sein könnte.
+Ergänzend und in §6 nicht vorab festgelegt, daher ohne Anspruch: S2 und S1 unterscheiden sich um 1,4 Prozentpunkte
+(z = 0,37, p = 0,71).
+
+### 13.2 Eine Gegenprobe, die zwei Nullergebnisse erlauben
+
+Zwei unabhängige Nullvergleiche sind mehr als einer, weil sich an ihnen prüfen lässt, ob die Nebenzahlen
+reproduzieren. Sie tun es nicht, und das ist die nützliche Beobachtung:
+
+| Nebenzahl | S1 (1 gegen 0) | S2 (1 gegen 0,5) |
+|---|---|---|
+| Randanteil der Endstellung | A höher in 3 von 4 Teilen | **B** höher in 4 von 4 Teilen |
+| Gruppenverluste ab 5 Steinen | B niedriger in 3 von 4 | **B** höher in 4 von 4 |
+
+Beide Zahlen zeigen in den beiden Vergleichen in **entgegengesetzte** Richtungen. Hätte ich nur S2 gesehen, wäre
+„weniger Rauschen verliert mehr große Gruppen und klebt stärker am Rand" eine verführerische Geschichte gewesen —
+mit 4 von 4 Teilen in derselben Richtung. S1 widerlegt sie. Das ist der Grund, warum solche Zahlen in §6 als
+„sekundär, ohne statistischen Anspruch" stehen, und ein Beleg dafür, dass die Einschränkung nicht Zierde ist.
+
+### 13.3 Gültigkeitsregel für S2
+
+| Regel | Prüfung | Ergebnis |
+|---|---|---|
+| 1 Engine-Vergleich „gleich" | Lauf 45286526826 | erfüllt |
+| 2 Arme nur in `evalStreuung` verschieden | `PARAMS_A`/`PARAMS_B` aus allen vier `env`-Blöcken | erfüllt |
+| 3 Partienzahl, Seeds | je 90, Summe 360; Seeds 20261127–30 je einmal (Artefaktnamen und `env`) | erfüllt |
+| 4 `PARAMS_DEFAULT` unverändert | Blockprüfsummen von `index.html` | erfüllt |
+| 5 Anomalien ≤ 2 % | keine `⚠`-Zeile: 0 von 360 | erfüllt |
+
+Sims/Zug: A 110–111, B 110–113 — Parität, wie der Workflow sie verlangt.
+
+### 13.4 Die Kostenseite bleibt offen, jetzt aus einem anderen Grund
+
+Mit `roh=1` **existieren** die Rohdumps: jedes Artefakt trägt vier Dateien statt drei und ist rund 470 KB statt
+29 KB groß. Der Workflow-Eingang aus §12 funktioniert. Diese Session kann die Artefakte aber nicht herunterladen
+(HTTP 403 vom Egress-Proxy auf die Blob-Adresse von Actions). Die Zahl verschiedener Endstellungen bleibt daher
+**auch für S2 unberechnet** — nicht mehr, weil die Daten fehlen, sondern weil sie unerreichbar sind.
+
+Das Problem hatte zwei Hälften, und ich habe nur eine geschlossen: den fehlenden Workflow-Eingang. Die andere ist
+die Netzfreigabe dieser Session, und die ändere ich nicht. Zwei Wege führen weiter, beide ohne neuen Messlauf:
+
+1. **Hazeberry lädt die Artefakte herunter** (bis 22.02.2027 verfügbar, IDs und Prüfsummen stehen in der
+   Datendatei) und zählt mit `node auswertung/hashliste.js` die `final_board_hash` über die 360 Partien.
+2. **Der Workflow rechnet die Zahl selbst** und schreibt sie in die Zusammenfassung, die über die API lesbar ist.
+   Das wäre ein kleiner Schritt in `ab-harness.yml` — und die richtige Lehre aus §11.4: ein Endpunkt, der nur im
+   Artefakt steht, ist für eine Auswertung über die API kein Endpunkt.
+
+Nach §10.8 gilt die Zahl ohnehin nur für den ganzen Lauf, nicht je Arm. Die Vielfalt **je Arm** braucht getrennte
+Läufe A gegen A und B gegen B: eigene Messung, eigene Festlegung, rund zwei mal 43 Minuten. Vorschlag, kein
+Beschluss.
+
+### 13.5 Stand der Kette aus §8
+
+| Schritt | Stand |
+|---|---|
+| 1 Festlegung | gemergt (#370) |
+| 2 Umsetzung | gemergt (#371), `worker-ai` neu `3523535b…` |
+| 3 Engine-Vergleich | **GLEICH**, Lauf 45286526826 |
+| 4 S1 | **kein nachweisbarer Unterschied**, −1,9 Elo [−38,8; +34,9] (#374) |
+| 4 S2 | beschreibend, +7,7 Elo [−29,1; +44,6] |
+| 5 Auswertung und Rohdaten | dieses Dokument, `docs/daten/eval-streuung/` |
+
+**Was die Messung beantwortet hat.** Der Rauschterm der vier Bewertungsexperten kostet bei 120 Simulationen keine
+nachweisbare Spielstärke; die Schranke liegt bei rund ±39 Elo, und das gilt für beide geprüften Dosen. Der Default
+bleibt 1,00, wie §7 es vorab festgelegt hat, unabhängig vom Ergebnis.
+
+**Was sie nicht beantwortet hat.** Was die Zugstreuung an Vielfalt erkauft. Das war in §1 das zweite Argument für
+die Messung und ist nach vier Teilläufen in jedem Vergleich weiter unbekannt.
