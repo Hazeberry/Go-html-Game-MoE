@@ -584,3 +584,68 @@ bleibt 1,00, wie §7 es vorab festgelegt hat, unabhängig vom Ergebnis.
 
 **Was sie nicht beantwortet hat.** Was die Zugstreuung an Vielfalt erkauft. Das war in §1 das zweite Argument für
 die Messung und ist nach vier Teilläufen in jedem Vergleich weiter unbekannt.
+
+## 14. Nachtrag: Die Kostenseite, gemessen (24.11.2026)
+
+§13.4 hielt fest, dass die Zahl verschiedener Endstellungen unberechenbar bleibt, weil die Rohdumps nur im
+Artefakt liegen und eine Auswertung über die GitHub-API nicht an Artefakte herankommt. Das ist behoben, und zwar
+ohne neuen Messlauf: `.github/workflows/eval-streuung-bericht.yml` lädt die vorhandenen Artefakte **dort**, wo sie
+erreichbar sind, lässt `auswertung/eval-streuung-bericht.js` darauf laufen und schreibt das Ergebnis in die
+Zusammenfassung und ins Log, die beide über die API lesbar sind.
+
+Erster Lauf: [45396629430](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/45396629430), 29 Sekunden,
+auf den vier S2-Artefakten.
+
+### 14.1 Die Zahl
+
+**Verschiedene Endstellungen in S2: 360 von 360 Partien (100,0 %).** Kein einziger Wiederholer, und auch getrennt
+nach Farbzuordnung 180 von 180 je Seite.
+
+Das ist die Kostenseite, die §6 verlangt hat — für den Vergleich 1 gegen 0,5. Eine Vielfaltseinbuße ist nicht
+nur „nicht nachweisbar", sondern in diesen Daten **nicht vorhanden**: bei vollem Verlust an Streuung müsste man
+Wiederholungen sehen, und es gibt keine.
+
+### 14.2 Was die Zahl NICHT abdeckt, und das ist die wichtigere Hälfte
+
+Gemessen ist die Dosis, die **am wenigsten** am Rauschen ändert. Für S1 — `evalStreuung` ganz **aus** — gibt es
+die Zahl weiter nicht, weil jene vier Teilläufe vor der Workflow-Änderung liefen und keinen Rohdump schrieben
+(§12 kam danach). Der interessante Fall bleibt also offen:
+
+| Vergleich | Siegrate | Verschiedene Endstellungen |
+|---|---|---|
+| S2 (1 gegen 0,5) | 51,11 %, kein Unterschied | **360 / 360 = 100 %** |
+| S1 (1 gegen 0) | 49,72 %, kein Unterschied | **nicht gemessen** |
+
+Ein Nachlauf von S1 mit `roh=1` würde das schließen — allerdings erneut nur als **Laufzahl über das Gemisch**,
+nicht je Arm (§10.8). Wer die Vielfalt je Arm will, braucht nach wie vor getrennte Läufe A gegen A und B gegen B,
+und dort ist `evalStreuung` 0 der Arm, auf den es ankommt. Das bleibt der Vorschlag, nicht die Beschlusslage.
+
+### 14.3 Drei Korrekturen an eigenen Aussagen
+
+**Meine Anekdote aus §10.6 zeigte in die falsche Richtung.** Dort hatte ich notiert, dass in einem Vorprüflauf mit
+`evalStreuung` 0 zwei von vier Partien denselben Endbrett-Hash trugen, und dazu geschrieben, die Richtung sei die,
+die §6 als Kostenseite erwarte. Mit Zug-Limit 60 war „Endbrett" nur die Stellung nach 60 Zügen — das war die
+Ursache, nicht die verringerte Streuung. In 360 vollständigen Partien gibt es keinen einzigen Wiederholer. Die
+Einschränkung stand damals dabei; die Richtungsangabe hätte ich mir trotzdem sparen sollen.
+
+**Das Zug-Limit 400 hätte wirklich abgeschnitten, und jetzt steht die ganze Stichprobe dahinter.** §10.7 stützte
+sich auf vier Partien von 370 bis 391 Zügen und schloss, 400 wäre knapp. Über 360 Partien: Mittel 374,8, Median
+374, **Spanne 291 bis 446**. Die längste Partie liegt 46 Züge über dem alten Default — die Entscheidung für 600
+war richtig, und zwar nicht nur knapp.
+
+**Die Zahlen aus §13 sind unabhängig nachgerechnet.** Der Bericht in Actions kommt auf 184 : 176, p = 0,7122,
+Clopper-Pearson [45,8 %; 56,4 %], Elo 7,7 [−29,1; 44,6] — identisch zu dem, was ich in §13 aus den Aggregatzeilen
+der Logs von Hand gerechnet hatte. Zwei Wege, dieselben Zahlen; die Handrechnung war kein Flüchtigkeitsfehler.
+
+### 14.4 Warum der Workflow und nicht eine Netzfreigabe
+
+Der Download in diese Session scheitert am Egress-Proxy (`*.blob.core.windows.net`, CONNECT-Tunnel 403). Geprüft
+wurde, ob eine gezielte Freigabe trägt: Der Blob-Host ist **pro Artefakt fest** — dasselbe Artefakt liefert
+zweimal denselben Host, nur mit neuer Signatur —, aber über Artefakte hinweg verschieden; die vier S2-Artefakte
+liegen auf `sa16`, `sa5`, `sa30` und `sa32`. Eine Freigabe einzelner Hostnamen hätte also genau für diese vier
+Dateien gegolten und wäre beim nächsten Lauf wertlos. Der Umweg über `api.github.com` hilft nicht, weil der
+Endpunkt auf dieselben Blob-Hosts umleitet.
+
+Der Workflow trägt dauerhaft und ist die Lehre aus §11.4 in brauchbarer Form: **Ein Endpunkt, der nur im Artefakt
+steht, ist für eine Auswertung über die API kein Endpunkt.** Künftige Messungen brauchen die Zahl nicht mehr aus
+einem Download, sondern bekommen sie in die Zusammenfassung geschrieben.

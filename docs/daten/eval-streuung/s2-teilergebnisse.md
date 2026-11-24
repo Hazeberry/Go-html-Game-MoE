@@ -49,9 +49,20 @@ unberechnet, obwohl die Daten existieren. Kennungen und Prüfsummen, damit die D
 | 140 | 14881895706 | 473 093 B | `fbfd749c96c50ff61f9b98c8dd172bbf648682aac4f6c5eee759257535c5dac6` |
 | 141 | 14880807837 | 473 803 B | `65b654344937526db14e04c139e3140a38d96a36694e573904f1fecf56fd96cf` |
 
-Wer die Zahl haben will: Artefakt herunterladen, dann
-`node auswertung/hashliste.js roh-90p-seed<N>-run<M>.jsonl --lauf s2-<N>` je Teil, und die
-`final_board_hash` über alle 360 Partien zählen. Nach §10.8 gilt sie für den ganzen Lauf, nicht je Arm.
+**Nachtrag 24.11.2026:** Die Zahl liegt jetzt vor, ohne Download. `.github/workflows/eval-streuung-bericht.yml`
+lädt die Artefakte in Actions und rechnet dort; Lauf
+[45396629430](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/45396629430), 29 Sekunden:
+
+| Nebenendpunkt | Wert |
+|---|---|
+| Verschiedene Endstellungen | **360 von 360 (100,0 %)**, je Farbzuordnung 180 / 180 |
+| Partielänge | Mittel 374,8 · Median 374 · Spanne 291 bis 446 Züge |
+| Aufgaben | 0 (resignEnabled=0) |
+| Anomalien | 0 |
+
+Der primäre Endpunkt kam dabei unabhängig auf dieselben Zahlen wie die Handrechnung oben: 184 : 176,
+p = 0,7122, Clopper-Pearson [45,8 %; 56,4 %], Elo 7,7 [−29,1; +44,6]. Nach §10.8 gilt die Vielfaltszahl für den
+ganzen Lauf, nicht je Arm.
 
 Die Zahlen in den Tabellen oben stammen aus dem Aggregatblock der vier Job-Logs, die über die GitHub-API
 lesbar sind — dieselbe Ausgabe derselben Partien, aber eine andere Quelle als das JSON.
