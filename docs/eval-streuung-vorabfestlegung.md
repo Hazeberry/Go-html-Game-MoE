@@ -380,3 +380,114 @@ sind nicht neu geschrieben, sondern aus `auswertung/kandidaten-orakel/haupt-beri
 anschlägt — ein Auswertungsskript ohne Test ist die Stelle, an der ein stiller Fehler zur falschen Zahl im Dokument
 wird. Geprüft werden außerdem die Statistik an von Hand nachrechenbaren Werten, die Lesart in allen drei
 Richtungen und dass der Bericht bei KEIN URTEIL jeden Grund nennt und keine Zahl ausgibt.
+
+## 11. Nachtrag: Ergebnis von S1 (24.11.2026)
+
+**Urteil nach der Lesart in §6: GÜLTIG, kein nachweisbarer Unterschied.**
+
+Vier Teilläufe von `ab-harness.yml` auf `main` `c756763`, gestartet am 23.11.2026 um 23:30 UTC, je 90 Partien,
+zusammen 360. Rohwerte je Teillauf: `docs/daten/eval-streuung/s1-teilergebnisse.md`.
+
+| | |
+|---|---|
+| Siegrate von B (`evalStreuung` 0) | **179 von 360 = 49,72 %** |
+| Exakter zweiseitiger Binomialtest gegen 50 % | **p = 0,9580** (α = 0,05) |
+| Clopper-Pearson 95 % | **[44,4 %; 55,0 %]** |
+| Elo-Differenz | **−1,9** [−38,8; +34,9] |
+
+### 11.1 Was das heißt, und was nicht
+
+§6 hat diesen Fall vorab beschrieben: „p ≥ 0,05 → Kein nachweisbarer Unterschied in diesem Umfang. Die Vielfalt ist
+in diesem Rahmen gratis; das Clopper-Pearson-Intervall sagt, wie groß ein Effekt noch sein könnte, ohne
+aufzufallen." Genau das gilt.
+
+Das Intervall ist die eigentliche Auskunft: Der Effekt liegt zwischen **−39 und +35 Elo**. Das deckt sich mit der in
+§10.9 vorab gerechneten Auflösung von rund 39 Elo — wie es muss, denn beides ist dieselbe Rechnung von zwei Seiten.
+**Ein Rauschterm, der 100 Elo kostete, wäre hier aufgefallen. Einer, der 20 Elo kostet, nicht.** Wer „wirkungslos"
+daraus liest, liest mehr, als dasteht.
+
+Die Richtung ist nicht einmal eindeutig: −1,9 Elo heißt, der Arm **mit** Rauschen lag um zwei Partien vorn, was bei
+360 Partien nichts ist. Die in §7 offen gelassene Frage nach dem Vorzeichen bleibt offen.
+
+### 11.2 Streuung zwischen den Seeds, geprüft statt behauptet
+
+Die vier Teile gaben B 47, 46, 40 und 46 Siege. Der dritte fällt auf: dort gewann A mit 50 : 40. Das verleitet dazu,
+nach einer Ursache zu suchen — also nachgerechnet, wie wahrscheinlich eine solche Spanne bei echter Gleichheit ist:
+Eine Spanne von 7 oder mehr Siegen über vier Teilläufe zu je 90 Partien tritt in **76,7 %** der Fälle auf
+(200 000 Simulationen bei p = 0,5). Die Streuung ist also vollkommen gewöhnlich, und der dritte Teillauf ist kein
+Signal. Der Einzeltest dort gibt p = 0,34.
+
+### 11.3 Die Gültigkeitsregel, Punkt für Punkt
+
+| Regel | Prüfung | Ergebnis |
+|---|---|---|
+| 1 Engine-Vergleich „gleich" | Lauf 45286526826: GLEICH, 26 Läufe, 1328 KI-Abfragen | erfüllt |
+| 2 Arme nur in `evalStreuung` verschieden | `PARAMS_A`/`PARAMS_B` aus den `env`-Blöcken aller vier Logs | erfüllt |
+| 3 Partienzahl erreicht | je „Partie 90/90", Summe 360; Seeds 20261123–26, jeder genau einmal (Artefaktnamen und `env`) | erfüllt |
+| 4 `PARAMS_DEFAULT` unverändert | Blockprüfsummen von `index.html` gegen `docs/korrektur-d1-w1-vorabfestlegung.md` §1 | erfüllt |
+| 5 Anomalien ≤ 2 % | in keinem Log die Zeile `⚠ … illegale KI-Züge`; 0 von 360, erlaubt 7 | erfüllt |
+
+Dazu die Parität, auf die der Workflow selbst hinweist: Sims/Zug liegen je Lauf innerhalb von zwei Simulationen
+(A 111–113, B 111–112). Ein Unterschied in der Siegrate wäre also nicht der Rechenleistung zuzuschreiben gewesen.
+
+### 11.4 Was S1 NICHT geliefert hat, und warum — vierte Lücke in §6
+
+**Die Kostenseite fehlt vollständig.** §6 nennt als sekundären Endpunkt die Zahl verschiedener Endstellungen und
+sagt dazu: „das ist die Kostenseite". Diese Zahl steht nur im Rohdump (`--roh`), und **`ab-harness.yml` hat gar
+keine Eingabe dafür** — der Workflow schreibt ausschließlich `--json`. §10.5 habe ich die Befehlszeile aufgeschrieben,
+ohne zu prüfen, ob der Workflow sie so annimmt. Also:
+
+- **Verschiedene Endstellungen: nicht gemessen.** Nicht „null", nicht „unauffällig" — nicht gemessen.
+- **Partielänge: nur als Stichprobe.** Sie steht je Partie im JSON, nicht im Aggregatblock; aus den gelesenen
+  Logzeilen reicht sie von 315 bis 462 Zügen. Das Zug-Limit 600 war in keiner gesehenen Partie gebunden, die
+  Begründung aus §10.7 trägt also.
+- **Anomalien und Aufgaben: gemessen**, weil beide im Aggregatblock stehen.
+
+Erschwerend kam hinzu, dass diese Session die Artefakte nicht herunterladen kann: die Blob-Adresse von Actions ist
+nicht freigegeben (HTTP 403 vom Egress-Proxy, mit `[agent-proxy]`-Zeile). Die Zahlen oben stammen daher aus dem
+Aggregatblock der Job-Logs — dieselbe Ausgabe derselben Partien, aber eine andere Quelle als das JSON. Auch das
+hätte der Rohdump nicht gerettet; er wäre genauso unerreichbar gewesen. Der Fehler ist der fehlende
+Workflow-Eingang, nicht die Netzregel.
+
+**Das entwertet den primären Endpunkt nicht.** Die Siegrate steht im Aggregatblock, ist je Partie wohldefiniert und
+durch fünf Gültigkeitsregeln gedeckt. Es entwertet die Aussage „die Vielfalt ist gratis": gratis heißt hier nur
+„kostet keine nachweisbare Spielstärke", nicht „kostet keine Vielfalt". Was das Rauschen an Vielfalt **erkauft**,
+ist nach wie vor unbekannt — und nach §10.8 braucht die ehrliche Antwort darauf ohnehin getrennte Läufe A gegen A
+und B gegen B.
+
+### 11.5 Vier Fehler in einer Festlegung
+
+Zur Bilanz, weil sie zusammengehören. §6 war an vier Stellen nicht ausführbar: keine Seeds (§10.1), kein Zug-Limit
+(§10.2), drei Größen „je Arm" verlangt, die der Aufbau nicht je Arm hergibt (§10.8), und eine Befehlszeile, die der
+Workflow nicht annimmt (§11.4). Drei davon fielen beim Aufsetzen auf und wurden vor den Daten geschlossen; die
+vierte erst, als die Daten da waren und der Endpunkt fehlte.
+
+Der Grund ist in allen vier Fällen derselbe: Ich habe aufgeschrieben, **was** gemessen werden soll, ohne zu prüfen,
+**ob das Messgerät das kann**. Für den primären Endpunkt ging es gut — der war von Anfang an wohldefiniert und
+instrumentiert. Die Kostenseite ist daran gescheitert.
+
+## 12. Der fehlende Workflow-Eingang, geschlossen (24.11.2026)
+
+§11.4 hält fest, dass `ab-harness.yml` keine Eingabe für `--roh` hatte und die Kostenseite deshalb unmessbar war.
+Das ist jetzt behoben: eine Eingabe `roh` (Default `0`, also unverändertes Verhalten für jeden bisherigen Aufruf).
+Bei `roh=1` ruft der Workflow `--roh ergebnisse/roh-<LABEL>.jsonl` auf und legt die Datei ins Artefakt.
+
+**Geprüft, nicht angenommen, dass `--roh` das Spiel nicht verändert.** Zwei Läufe im Container mit gleichem Seed,
+gleicher Konfiguration und festen Simulationen, einer mit und einer ohne `--roh`: Partiezeilen und Aggregatblock
+sind identisch. Das war die Voraussetzung dafür, den Schalter überhaupt zwischen S1 und S2 einzuführen — sonst
+wären die beiden Vergleiche nicht mehr vergleichbar. Der Grund dahinter: `schreibeRoh` **liest** den
+Zufallszustand (`zufallHaupt.zustand()`), es verbraucht ihn nicht.
+
+Die Eingabe wird abgewiesen, wenn sie nicht `0` oder `1` ist, und ebenso bei `roh=1` zusammen mit `paired>0` —
+`ab-harness.js` schreibt den Rohdump nur im Standardmodus und bräche sonst mitten im Lauf ab. Lieber vor dem Start
+mit klarer Meldung scheitern.
+
+**Was das für S2 heißt.** S2 (`evalStreuung` 1 gegen 0,5, Seeds 20261127–30) läuft mit `roh=1` und liefert damit
+die Zahl verschiedener Endstellungen, die S1 nicht liefern konnte — allerdings weiter nur auf Laufebene, nicht je
+Arm (§10.8). Nach §6 wird S2 **beschreibend** berichtet, ohne Anspruch, weil S1 keinen Unterschied gezeigt hat.
+Daran ändert der Rohdump nichts; er füllt nur eine Lücke, die sonst auch in S2 geblieben wäre.
+
+**Was weiterhin offen bleibt.** Die Vielfalt **je Arm** braucht getrennte Läufe A gegen A und B gegen B (§10.8).
+Das ist eine eigene Messung mit eigener Festlegung und keine Fortsetzung dieser Kette. Sie ist billig — zwei Läufe
+zu je rund 43 Minuten — und beantwortet die Frage, die §1 als zweites Argument für die ganze Messung genannt hat.
+Vorschlag, keine Beschlusslage: Hazeberry entscheidet, ob sie kommt.
