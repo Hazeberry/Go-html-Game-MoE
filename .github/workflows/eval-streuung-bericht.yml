@@ -1,0 +1,166 @@
+name: Rauschterm-Bericht
+
+# Wertet FERTIGE Läufe von ab-harness.yml aus; messt selbst nichts nach.
+#
+# Anlass (docs/eval-streuung-vorabfestlegung.md §11.4, §13.4): Die Zahl verschiedener
+# Endstellungen steht nur im Rohdump im Artefakt. Eine Auswertung über die GitHub-API kommt
+# an Artefakte nicht heran — die Blob-Adressen von Actions sind dort nicht erreichbar. Ein
+# Endpunkt, der nur im Artefakt steht, ist für so eine Auswertung also kein Endpunkt.
+# Dieser Workflow dreht das um: er lädt die Artefakte DORT, wo sie erreichbar sind, lässt
+# auswertung/eval-streuung-bericht.js laufen und schreibt das Ergebnis in die
+# Zusammenfassung und ins Log, die beide über die API lesbar sind.
+#
+# Es wird nichts neu gespielt. Die Läufe, die man angibt, müssen mit roh=1 gelaufen sein,
+# sonst fehlt der Rohdump und der Schritt bricht mit klarer Meldung ab.
+#
+# Rot wird der Lauf, wenn der Bericht KEIN URTEIL sagt — das ist die Gültigkeitsregel aus
+# §6, und sie gehört sichtbar ins Ergebnis, nicht in eine Fußnote.
+
+on:
+  workflow_dispatch:
+    inputs:
+      laeufe:
+        description: 'Run-IDs der Teilläufe von ab-harness.yml, mit Komma (z. B. 45301310902,45301321706,…)'
+        required: true
+      name:
+        description: 'Name des Vergleichs für den Bericht (z. B. S2)'
+        required: true
+      partien:
+        description: 'Festgelegte Gesamtzahl der Partien'
+        required: false
+        default: '360'
+      seeds:
+        description: 'Vorab festgelegte Seeds, mit Komma'
+        required: true
+      streuung_a:
+        description: 'evalStreuung in Arm A'
+        required: false
+        default: '1'
+      streuung_b:
+        description: 'evalStreuung in Arm B'
+        required: true
+      engine_vergleich:
+        description: 'Run-ID des Engine-Vergleichs (Gültigkeitsregel Nr. 1, erklärte Voraussetzung)'
+        required: true
+
+concurrency:
+  group: eval-streuung-bericht
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  bericht:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      # Eingaben über env prüfen, nicht in die Shell-Zeile interpolieren.
+      - name: Eingaben prüfen
+        env:
+          IN_LAEUFE: ${{ inputs.laeufe }}
+          IN_NAME: ${{ inputs.name }}
+          IN_PARTIEN: ${{ inputs.partien }}
+          IN_SEEDS: ${{ inputs.seeds }}
+          IN_STREUUNG_A: ${{ inputs.streuung_a }}
+          IN_STREUUNG_B: ${{ inputs.streuung_b }}
+          IN_ENGINE_VERGLEICH: ${{ inputs.engine_vergleich }}
+        run: |
+          set -euo pipefail
+          ZAHLLISTE='^[0-9]+(,[0-9]+)*$'
+          printf '%s' "$IN_LAEUFE" | grep -Eq "$ZAHLLISTE" \
+            || { echo "::error::laeufe muss Run-IDs mit Komma sein: '$IN_LAEUFE'"; exit 2; }
+          printf '%s' "$IN_SEEDS" | grep -Eq "$ZAHLLISTE" \
+            || { echo "::error::seeds muss Zahlen mit Komma sein: '$IN_SEEDS'"; exit 2; }
+          printf '%s' "$IN_ENGINE_VERGLEICH" | grep -Eq '^[0-9]+$' \
+            || { echo "::error::engine_vergleich muss eine Run-ID sein: '$IN_ENGINE_VERGLEICH'"; exit 2; }
+          printf '%s' "$IN_PARTIEN" | grep -Eq '^[0-9]+$' \
+            || { echo "::error::partien muss eine Zahl sein: '$IN_PARTIEN'"; exit 2; }
+          printf '%s' "$IN_NAME" | grep -Eq '^[A-Za-z0-9_-]{1,32}$' \
+            || { echo "::error::name darf nur Buchstaben, Zahlen, - und _ enthalten: '$IN_NAME'"; exit 2; }
+          for v in A B; do
+            eval "s=\$IN_STREUUNG_$v"
+            printf '%s' "$s" | grep -Eq '^[0-9]+(\.[0-9]+)?$' \
+              || { echo "::error::streuung_$v muss eine nicht-negative Zahl sein: '$s'"; exit 2; }
+          done
+          {
+            echo "LAEUFE=$IN_LAEUFE"
+            echo "NAME=$IN_NAME"
+            echo "PARTIEN=$IN_PARTIEN"
+            echo "SEEDS=$IN_SEEDS"
+            echo "STREUUNG_A=$IN_STREUUNG_A"
+            echo "STREUUNG_B=$IN_STREUUNG_B"
+            echo "ENGINE_VERGLEICH=$IN_ENGINE_VERGLEICH"
+          } >> "$GITHUB_ENV"
+
+      # Hier ist das Netz offen, anders als in einer Auswertung über die API.
+      - name: Artefakte der Teilläufe holen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p artefakte
+          IFS=',' read -ra IDS <<< "$LAEUFE"
+          for id in "${IDS[@]}"; do
+            echo "::group::Lauf $id"
+            gh run download "$id" --repo "$GITHUB_REPOSITORY" --dir "artefakte/$id"
+            find "artefakte/$id" -type f | sort
+            echo "::endgroup::"
+          done
+
+      - name: Bericht
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra IDS <<< "$LAEUFE"
+          ARGS=(--name "$NAME" --partien "$PARTIEN" --seeds "$SEEDS"
+                --streuung-a "$STREUUNG_A" --streuung-b "$STREUUNG_B"
+                --engine-vergleich "$ENGINE_VERGLEICH" --markdown)
+          # Je Lauf genau eine Dreiergruppe aus JSON, Rohdump und Log. Fehlt eine Datei
+          # oder gibt es sie doppelt, bricht der Schritt ab: ein stilles Weglassen waere
+          # ein halber Bericht, der wie ein ganzer aussieht.
+          for id in "${IDS[@]}"; do
+            for art in json roh log; do
+              case "$art" in
+                json) muster='ab-*.json' ;;
+                roh)  muster='roh-*.jsonl' ;;
+                log)  muster='ab-*.log' ;;
+              esac
+              mapfile -t treffer < <(find "artefakte/$id" -type f -name "$muster" | sort)
+              if [ "${#treffer[@]}" -ne 1 ]; then
+                echo "::error::Lauf $id: ${#treffer[@]} Dateien passen auf $muster, erwartet genau eine."
+                if [ "$art" = roh ]; then
+                  echo "::error::Fehlt der Rohdump, lief der Teillauf ohne roh=1. Ohne ihn gibt es keine Zahl verschiedener Endstellungen."
+                fi
+                exit 2
+              fi
+              eval "P_$art=\${treffer[0]}"
+            done
+            ARGS+=(--teil "$P_json,$P_roh,$P_log")
+          done
+
+          mkdir -p ergebnis
+          status=0
+          node auswertung/eval-streuung-bericht.js "${ARGS[@]}" | tee "ergebnis/bericht-$NAME.md" || status=$?
+          {
+            echo "## Rauschterm-Bericht — $NAME"
+            echo
+            cat "ergebnis/bericht-$NAME.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - name: Bericht sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: rauschterm-bericht
+          path: ergebnis/
+          if-no-files-found: warn
