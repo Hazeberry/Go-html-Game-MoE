@@ -182,6 +182,7 @@ function pruefeShellZeilen(datei, mindestensRun, eingaben) {
   pruefe(nRun >= mindestensRun, 'run-Schritte gefunden');
   pruefeGleich(nEnv, eingaben, `${eingaben} Eingaben des Formulars, alle über env`);
 }
+test('Workflow eval-streuung-bericht.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('eval-streuung-bericht.yml', 3, 7));
 test('Workflow endspiel-dagger.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-dagger.yml', 15, 8));
 test('Workflow endspiel-messung.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-messung.yml', 6, 4));
 test('Workflow endspiel-orakel.yml: keine Ausdrücke in Shell-Zeilen', () => pruefeShellZeilen('endspiel-orakel.yml', 5, 2));
