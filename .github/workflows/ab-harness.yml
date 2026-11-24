@@ -44,6 +44,10 @@ on:
         description: 'Zug-Limit pro Partie. Höher setzen, wenn resignEnabled=0 — sonst deckelt das Limit die Längenmessung'
         required: false
         default: '400'
+      roh:
+        description: 'Rohdump je Partie schreiben (1 = ja, 0 = nein). Nur ohne paired. Nötig für final_board_hash, also für die Zahl verschiedener Partien'
+        required: false
+        default: '0'
       params_a:
         description: 'PARAMS für A, z. B. mctsValueScale=200,resignEnabled=0. Phasentausch: key@zug=wert'
         required: false
@@ -87,6 +91,7 @@ jobs:
           IN_SEED: ${{ inputs.seed }}
           IN_PAIRED: ${{ inputs.paired }}
           IN_MAXMOVES: ${{ inputs.maxmoves }}
+          IN_ROH: ${{ inputs.roh }}
           IN_A: ${{ inputs.params_a }}
           IN_B: ${{ inputs.params_b }}
         run: |
@@ -97,6 +102,14 @@ jobs:
           case "$IN_MAXMOVES" in ''|*[!0-9]*) echo "::error::maxmoves muss eine positive ganze Zahl sein: '$IN_MAXMOVES'"; exit 2;; esac
           [ "$IN_GAMES"    -ge 1 ] || { echo "::error::games muss ≥ 1 sein"; exit 2; }
           [ "$IN_MAXMOVES" -ge 1 ] || { echo "::error::maxmoves muss ≥ 1 sein"; exit 2; }
+
+          # roh nur 0 oder 1, und nicht zusammen mit paired: ab-harness.js bricht im
+          # gepaarten Modus mit --roh ab (Hilfe dort). Lieber hier mit klarer Meldung
+          # scheitern als nach dem Start des Laufs.
+          case "$IN_ROH" in 0|1) ;; *) echo "::error::roh muss 0 oder 1 sein: '$IN_ROH'"; exit 2;; esac
+          if [ "$IN_ROH" = 1 ] && [ "$IN_PAIRED" -gt 0 ]; then
+            echo "::error::roh=1 geht nur im Standardmodus (paired=0); ab-harness.js schreibt den Rohdump nur dort"; exit 2
+          fi
 
           # params_a/params_b landen als Argument in der Kommandozeile. Nur
           # schluessel=zahl bzw. schluessel@zug=zahl zulassen — alles andere
@@ -116,6 +129,7 @@ jobs:
             echo "SEED=$IN_SEED"
             echo "PAIRED=$IN_PAIRED"
             echo "MAXMOVES=$IN_MAXMOVES"
+            echo "ROH=$IN_ROH"
             echo "PARAMS_A=$IN_A"
             echo "PARAMS_B=$IN_B"
           } >> "$GITHUB_ENV"
@@ -159,6 +173,11 @@ jobs:
           if [ -n "$PARAMS_A" ]; then ARGS+=(--A "$PARAMS_A"); fi
           if [ -n "$PARAMS_B" ]; then ARGS+=(--B "$PARAMS_B"); fi
           ARGS+=(--json "ergebnisse/ab-${LABEL}.json")
+          # Der Rohdump traegt final_board_hash je Partie und damit die Zahl
+          # verschiedener Partien. GEPRUEFT, dass er das Spiel nicht aendert: mit und
+          # ohne --roh sind Partiezeilen und Aggregat identisch (gleicher Seed, feste
+          # Simulationen) -- schreibeRoh liest den Zufallszustand, verbraucht ihn nicht.
+          if [ "$ROH" = 1 ]; then ARGS+=(--roh "ergebnisse/roh-${LABEL}.jsonl"); fi
 
           # Die effektive Kommandozeile mit ins Artefakt, damit der Lauf ohne
           # das Actions-Log rekonstruierbar bleibt.
