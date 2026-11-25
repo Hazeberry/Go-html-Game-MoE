@@ -1,6 +1,6 @@
 # Korrektur TRAIN-1: Vorabfestlegung
 
-**Stand: 22.11.2026. Status: Entwurf, nicht umgesetzt.** Befund aus `docs/bughunt-wiederholung.md` §5 und §7
+**Stand: 22.11.2026. Status: umgesetzt (§8), Abnahme gültig, zwei Berichtigungen an §5 in §8.1.** Befund aus `docs/bughunt-wiederholung.md` §5 und §7
 (TRAIN-1), Varianten in `docs/bughunt-20261116.md` §7. Hazeberry hat am 22.11.2026 **Variante (a)** gewählt: „Das
 erste abgeschlossene Ergebnis gilt dauerhaft."
 

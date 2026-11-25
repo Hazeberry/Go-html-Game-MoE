@@ -1,6 +1,6 @@
 # Die Versuchsregel auf den Node-Wegen: Vorabfestlegung
 
-**Stand: 23.11.2026. Status: Entwurf, nicht umgesetzt.** Offener Punkt aus
+**Stand: 23.11.2026. Status: umgesetzt (§7), Abnahme gültig, Testvorhersagen aus §4 in §7.1 berichtigt.** Offener Punkt aus
 `docs/korrektur-gtp-vorabfestlegung.md` §3: Die Korrektur GTP-2 hat `gtp-ki.js` versorgt, „die anderen bleiben, wie
 sie sind". Go von Hazeberry am 23.11.2026, als Punkt 4 einer Liste von vier.
 
