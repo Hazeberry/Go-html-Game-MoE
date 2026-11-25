@@ -29,13 +29,13 @@ spielt jeder Arm **gegen sich selbst**, und damit ist Vielfalt je Arm definiert.
 Partien über 300 bis 450 Züge landen schon bei einem einzigen abweichenden Zug in verschiedenen Endstellungen —
 das Maß ist zu großzügig, um einen Unterschied zu zeigen.
 
-**Die Zahl verschiedener Eröffnungen kann ebenfalls sättigen.** Wenn beide Arme 180 von 180 verschiedene
-Zehn-Zug-Eröffnungen zeigen, ist die Messung ohne Aussage. Diese Gefahr ist vorab zu benennen, nicht
-hinterher.
+**Die Zahl verschiedener Eröffnungen kann ebenfalls sättigen.** Zeigen beide Arme 300 von 300 verschiedene
+Zehn-Zug-Eröffnungen, ist die Messung ohne Aussage. Diese Gefahr ist vorab zu benennen, nicht hinterher.
 
-**Deshalb ein Maß, das in jedem Fall Signal hat: die Konzentration der Zugwahl.** Für den ersten Zug gibt es 361
-Felder und 30 Partien je Block — dort entsteht Streuung oder sie entsteht nicht, unabhängig davon, ob irgendeine
-Eröffnung sich wiederholt. Gemessen als **Kollisionsrate**
+**Deshalb ein zweites Maß: die Konzentration der Zugwahl.** Die Kollisionsrate des ersten Zugs kann Unterschiede
+sichtbar machen, auch wenn alle Zehn-Zug-Präfixe verschieden sind — sie fragt nicht, ob eine ganze Eröffnung sich
+wiederholt, sondern wie ungleich die Wahl des ersten Punktes ausfällt. Für den ersten Zug gibt es 361 Felder und
+30 Partien je Block. Gemessen als **Kollisionsrate**
 
     q = Σ_k C(m_k, 2) / C(n, 2)
 
@@ -43,6 +43,11 @@ mit `m_k` der Häufigkeit des Feldes k unter den n ersten Zügen eines Blocks: d
 zufällig gezogene Partien desselben Blocks auf demselben Punkt eröffnen. `q` ist eine **Eigenschaft der
 Verteilung**, nicht der Stichprobengröße, und damit über Blöcke hinweg vergleichbar und mittelbar. Bei
 Gleichverteilung über 361 Punkte wäre q ≈ 0,0028, bei immer demselben Eröffnungszug q = 1.
+
+**Auch dieses Maß hat eine Untergrenze, und sie ist geregelt.** Tritt in einem Block keine einzige Kollision auf,
+ist q dort exakt 0; sind beide Arme in einem Block bei 0, ist die gepaarte Differenz 0. Das ist der erwartbare
+Fall und nicht der seltene, und §4.1 legt vorab fest, was dann gilt — bis zu vier solcher Gleichstände trägt der
+Aufbau, darüber lautet der primäre Endpunkt „kein Urteil".
 
 **Der Rohdump trägt das.** `ereignisse` enthält **jeden** Zug mit Nummer, Farbe und Feldindex; nachgesehen an
 einem echten Dump: 370 Ereignisse bei 370 Zügen.
@@ -216,7 +221,7 @@ geändert hat und warum.
 
 ### 10.1 Fisher und Clopper-Pearson auf die Zahl verschiedener Präfixe
 
-**Befund:** „Verschiedene Eröffnungen unter 180 Partien" ist eine Eigenschaft der ganzen Stichprobe. Ob eine
+**Befund:** „Verschiedene Eröffnungen unter 180 Partien" (so der damalige Umfang, 2 × 90) ist eine Eigenschaft der ganzen Stichprobe. Ob eine
 Partie als Wiederholung zählt, hängt von den übrigen ab. Die vier Tabellenwerte sind deshalb keine gewöhnliche
 Stichprobe unabhängiger Ja/Nein-Beobachtungen.
 
