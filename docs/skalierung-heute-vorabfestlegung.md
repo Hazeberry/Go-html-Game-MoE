@@ -2,8 +2,8 @@
 <!-- SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0 -->
 # Skalierung auf dem heutigen Default: Vorabfestlegung
 
-**Stand: 25.11.2026. Status: Stufe G gelaufen und gültig (§16): S = 2618,5, N = 2600, K3 = 2600 → 5200. Stufe 1
-und 2 offen, je mit eigenem Go.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
+**Stand: 25.11.2026. Status: Stufe G gültig (§16): S = 2618,5, N = 2600, K3 = 2600 → 5200. Stufe 1 gültig (§17):
+K1 +28,3 Elo, K2 +30,6 Elo, ein Unterschied ist nicht nachgewiesen. Stufe 2 offen, mit eigenem Go.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
 Hazeberry liest es vor dem Merge. Jede der drei Stufen braucht ein eigenes Go; der Merge dieses Docs ist keins.
 
 Festlegungen von Hazeberry am 25.11.2026: **1230 Partien je Vergleich, Aufgabe aus, Gerätemessung zuerst** — vor
@@ -552,3 +552,87 @@ Rundungsfehler stand in der Tabelle in §14.2 und ist dort korrigiert.
 Stufe 1 (K1 120 → 240, K2 240 → 480) braucht ein eigenes Go. Ihr Bericht schätzt mit `--n 2600` die Kosten von K3,
 und mit dieser Schätzung wird das Go für Stufe 2 erfragt (§7.3). Grobe Orientierung, ausdrücklich nur unter der
 Proportionalannahme aus §7.3: rund 300 Rechenstunden und 17 Stunden Wanduhrzeit für 2600 gegen 5200.
+
+## 17. Nachtrag: Stufe 1, Ergebnis vom 25.11.2026
+
+**Ablauf.** Go von Hazeberry am 25.11.2026 („Go für Stufe 1“). Die 30 Teilläufe nach §5.1 starteten um 20:21 UTC auf
+`claude/skalierung-stand` (`98aa1ad`): K1 mit den Seeds 11250001 bis 11250015, K2 mit 11250016 bis 11250030, je 82
+Partien. Alle endeten erfolgreich, K1 nach 47 bis 61 Minuten, K2 nach 80 bis 113 Minuten. Den Bericht erstellte
+`skalierung-bericht.yml` um 23:09 UTC (Lauf 45719087322), mit dem Werkzeug von `main`; dessen Dateien sind gleich wie
+an `98aa1ad`. Daten: [`daten/skalierung-heute/stufe-1-20261125/`](daten/skalierung-heute/stufe-1-20261125/README.md).
+
+### 17.1 Gültigkeit (§5.5 und §13.4): gültig
+
+Alle 30 Teilläufe sind vorhanden und richtig zugeordnet. Jeder hat 82 auswertbare Partien, 41 je Farbe. Die Arme
+unterscheiden sich nur in `mctsFixedSims`, die Aufgabe ist aus, Zuglimit 600, Komi 7,5, Standardmodus. Alle Läufe
+liefen auf `98aa1ad`, und die Engine-Blöcke tragen die Prüfsummen aus §6. Anomalien gab es keine.
+
+### 17.2 F1: Gewinn je Verdopplung
+
+| Vergleich | Siege B : A | Siegrate B (95 %) | p | Elo (95 %) |
+|---|---:|---|---:|---|
+| K1 120 → 240 | 665 : 565 | 54,1 % [51,2 %; 56,9 %] | 0,0047 | **+28,3** [+8,6; +48,1] |
+| K2 240 → 480 | 669 : 561 | 54,4 % [51,6 %; 57,2 %] | 0,0023 | **+30,6** [+10,8; +50,4] |
+
+- K1: **Eine Verdopplung von 120 auf 240 Simulationen bringt dem heutigen Default nachweisbar Stärke: +28,3 Elo
+  [+8,6; +48,1].**
+- K2: **Eine Verdopplung von 240 auf 480 Simulationen bringt dem heutigen Default nachweisbar Stärke: +30,6 Elo
+  [+10,8; +50,4].**
+
+### 17.3 F2: Abflachung
+
+D = Elo(K1) − Elo(K2) = −2,3 Elo, 95 % genähert [−29,8; +25,3]. Exakter Fisher-Test auf die Siege von B: p = 0,9034.
+
+**Ein Unterschied zwischen den beiden Gewinnen ist nicht nachgewiesen (−2,3 Elo [−29,8; +25,3]). Die Messung war so
+bemessen, dass sie eine Abflachung von 40 Elo mit rund 80 % erkannt hätte.**
+
+Das ist kein Nachweis gleicher Gewinne (§5.3). Das Intervall lässt eine Abflachung bis rund 25 Elo ebenso zu wie
+einen Anstieg bis rund 30 Elo.
+
+### 17.4 Vergleich mit dem 03.10., beschreibend (§3)
+
+| | 03.10. (360 Partien je Vergleich) | 25.11. (1230 Partien je Vergleich) |
+|---|---|---|
+| K1 120 → 240 | +75 [38; 112] | +28,3 [8,6; 48,1] |
+| K2 240 → 480 | +55 [19; 92] | +30,6 [10,8; 50,4] |
+
+Die Punktschätzungen liegen heute deutlich niedriger, die Intervalle überlappen in beiden Vergleichen. Seit dem 03.10.
+sind drei Bedingungen anders (§3): die Engine (Muster, Endspiel-Netz), die Aufgabe (damals an, heute aus) und das
+Zuglimit (400, heute 600). Welche davon den Unterschied trägt, lässt sich mit diesem Aufbau nicht trennen.
+
+### 17.5 Nebenmaße, beschreibend (§5.4)
+
+- **Partielänge:** im Mittel 373,5 (K1) und 377,7 Züge (K2). Keine Partie erreichte das Zuglimit.
+- **Laufzeit:** 0,62 (K1) und 1,06 Minuten (K2) je Partie.
+- **Simulationen je Zug:** im Mittel 93 % des festgelegten Werts (A 111,5 statt 120 in K1, B 446,8 statt 480 in K2).
+  Das ist eine Eigenschaft der Zählung, keine Abweichung der Suche: `ab-harness.js` teilt die Simulationen durch alle
+  KI-Entscheidungen, Pässe eingeschlossen, aber nur Steinzüge tragen Simulationen (Zeilen 1208 bis 1213). Im Teillauf
+  11250001 kamen rund 25 Pässe auf eine Partie, also rund 7 % der Entscheidungen; das passt zu 93 %.
+- **Farbe, nicht vorab festgelegt und nicht getestet:** In K1 gewann Schwarz 668 von 1230 Partien (54,3 %), in K2 554
+  (45,0 %). B gewann in K1 als Schwarz 359 von 615 und als Weiß 306, in K2 als Schwarz 304 und als Weiß 365. Hypothese,
+  nicht geprüft: Mit stärkerem Spiel verschiebt Komi 7,5 den Vorteil von Schwarz zu Weiß. Auf F1 und F2 wirkt das
+  nicht, weil jeder Teillauf beide Farben je zur Hälfte spielt.
+
+### 17.6 Kostenschätzung für Stufe 2 (§7.3)
+
+Aus K1 und K2: Laufzeit je Partie ≈ 0,183 + 2,443 · 10⁻³ · mittlere Simulationen je Zug (Minuten). Für K3 = 2600 gegen
+5200 (§16) ergibt das **9,71 Minuten je Partie, 10 Partien je Teillauf, 123 Teilläufe, rund 199 Rechenstunden und
+rund 11,3 Stunden Wanduhrzeit** bei 20 gleichzeitigen Jobs. Die ganze Tabelle steht im Bericht.
+
+Das ist eine Schätzung, kein Messwert. Sie schreibt eine Gerade von 180 und 360 mittleren Simulationen bis 3900 fort,
+also über mehr als das Zehnfache des gemessenen Bereichs. Wachsen die Kosten je Simulation mit der Baumgröße, wird es
+teurer. Bei doppelten Kosten bräuchte ein Teillauf rund 194 Minuten. Das läge knapp unter den 200 Minuten aus §7.2
+und deutlich unter der Zeitgrenze des Workflows von 300 Minuten.
+
+### 17.7 Daten und Aufbewahrung
+
+Im Repository liegen der Bericht im Wortlaut und die Liste der Teilläufe mit Run-IDs, Artefakt-IDs und SHA-256 der
+Artefakte. Die Daten je Partie (JSON, Rohdump, Log) liegen nur in den Artefakten, und GitHub löscht sie am
+**23.02.2027**. Vorschlag, eigener kleiner PR: Das Berichtswerkzeug schreibt zusätzlich eine Tabelle je Partie
+(Teillauf, Partie, Farbe von A, Sieger, Siegerfarbe, Stand, Züge, Simulationen, Dauer) ins Log. Daraus übernehme ich
+sie maschinell nach `docs/daten/`. Bis dahin lässt sich jede spätere Kopie der Artefakte an den Prüfsummen prüfen.
+
+### 17.8 Wie es weitergeht
+
+Stufe 2 (K3 = 2600 gegen 5200, Seeds ab 11260001, 10 Partien je Teillauf nach §7.2) braucht ein eigenes Go, auf
+Grundlage der Schätzung aus §17.6.
