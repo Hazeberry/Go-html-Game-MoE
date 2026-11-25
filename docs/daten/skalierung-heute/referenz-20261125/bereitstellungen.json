@@ -1,0 +1,146 @@
+[
+ {
+  "sha": "63ffb6ddc2bdb213a6c37a1f07578651f39b93b7",
+  "zeit": "2026-11-25T12:43:20.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "591e70e93e03c7a78a9cc8cdc21b5aa4810364d6",
+  "zeit": "2026-11-25T09:55:39.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "ecfe69c26d6ff698123292efdc0b72727a776320",
+  "zeit": "2026-11-25T09:48:30.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "8b4b0d63be41f25f795c6b265fab749899e88406",
+  "zeit": "2026-11-25T09:32:58.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "6290994e7f5653b561fa2cc0cc1d338fef06e964",
+  "zeit": "2026-11-25T09:09:12.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "590bb32e2ff38dbafcb9b75e778000c3d2266664",
+  "zeit": "2026-11-25T06:25:43.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "124d666202900abdf629dd9123c023dddc3082a9",
+  "zeit": "2026-11-25T02:27:59.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "bd9a5a7bf3166c83d4b68d4e67fc617ab7969498",
+  "zeit": "2026-11-25T02:10:36.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "6b1332d8954735a4ec5db925abe8f3b378e5c25d",
+  "zeit": "2026-11-25T01:47:22.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "c7a58d273bfe87c12bdaf01635ea74df456c5657",
+  "zeit": "2026-11-24T13:01:28.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "0be5f522e64c9c808dcad82afc0d1b372b52197d",
+  "zeit": "2026-11-24T12:45:26.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "c1d34b3845da0b621752e933834131c6a84c67d6",
+  "zeit": "2026-11-24T02:09:23.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "e8bb35195202b984a8660f86bf9f5969e51a3b23",
+  "zeit": "2026-11-24T00:57:07.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "cfea72a20740de014a1f83c2b237c274038fe43d",
+  "zeit": "2026-11-23T23:51:47.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "c75676396bc1841ad452cdf3840e71b2a057afd0",
+  "zeit": "2026-11-23T23:29:55.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ },
+ {
+  "sha": "3d2fe819577a1687331c5b82eb9ee7b29a557776",
+  "zeit": "2026-11-23T23:16:51.000Z",
+  "bloecke": {
+   "shared-go-logic": "54dfef2dd520309c5c785c65ff4f708f0ae0ccde90a79224543be614a92ebc66",
+   "worker-ai": "3523535bb70bc29e2fbb07081b2b1535a6aa4da56881ed9259c312f288bf7cb9",
+   "policy-net": "14cb39a13b0ee34b8bd838aacad64e1492dbf90768abfb99fd934da0c8703190"
+  }
+ }
+]

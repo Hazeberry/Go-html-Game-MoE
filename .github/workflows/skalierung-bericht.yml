@@ -1,0 +1,173 @@
+name: Skalierung-Bericht
+
+# Wertet FERTIGE Läufe von ab-harness.yml aus; misst selbst nichts nach.
+# Festlegung: docs/skalierung-heute-vorabfestlegung.md (§5, §7, §9).
+#
+# Warum in Actions und nicht in einer Session: Artefakte sind aus einer Session nicht
+# erreichbar (HTTP 403 auf die Blob-Adresse, docs/eval-streuung-vorabfestlegung.md §14.4).
+# Hier ist das Netz offen; die Zusammenfassung und das Log sind danach über die API lesbar.
+#
+# Der festgelegte Commit (§6) wird ausgecheckt und seine index.html gegen die Prüfsummen aus
+# §6 geprüft; jeder Teillauf muss auf genau diesem Commit gelaufen sein (konfig.commit).
+#
+# Rot wird der Lauf bei KEIN URTEIL nach §5.5. Das gehört sichtbar ins Ergebnis.
+
+on:
+  workflow_dispatch:
+    inputs:
+      stufe:
+        description: 'Stufe 1 (K1 und K2) oder 2 (K3)'
+        required: true
+        default: '1'
+      laeufe:
+        description: 'Run-IDs aller Teilläufe, mit Komma'
+        required: true
+      commit:
+        description: 'Festgelegter Commit aus §6, volle 40-stellige SHA'
+        required: true
+      n:
+        description: 'Stufe 2: N aus §7.1 (S auf volle Hundert); Stufe 1: optional, Kostenzeile für dieses N'
+        required: false
+        default: ''
+      partien_je_teil:
+        description: 'Nur Stufe 2: Partien je Teillauf aus §7.2'
+        required: false
+        default: ''
+      vergleich_vorstufe:
+        description: 'Nur Stufe 2, beschreibend: Siege von B und Partien in K2 als SiegeB:Partien'
+        required: false
+        default: ''
+
+concurrency:
+  group: skalierung-bericht
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  bericht:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Eingaben prüfen
+        env:
+          IN_STUFE: ${{ inputs.stufe }}
+          IN_LAEUFE: ${{ inputs.laeufe }}
+          IN_COMMIT: ${{ inputs.commit }}
+          IN_N: ${{ inputs.n }}
+          IN_PARTIEN: ${{ inputs.partien_je_teil }}
+          IN_VORSTUFE: ${{ inputs.vergleich_vorstufe }}
+        run: |
+          set -euo pipefail
+          case "$IN_STUFE" in
+            1|2) ;;
+            *) echo "::error::stufe muss 1 oder 2 sein: '$IN_STUFE'"; exit 2 ;;
+          esac
+          printf '%s' "$IN_LAEUFE" | grep -Eq '^[0-9]+(,[0-9]+)*$' \
+            || { echo "::error::laeufe muss Run-IDs mit Komma sein: '$IN_LAEUFE'"; exit 2; }
+          printf '%s' "$IN_COMMIT" | grep -Eq '^[0-9a-f]{40}$' \
+            || { echo "::error::commit muss eine volle 40-stellige SHA sein: '$IN_COMMIT'"; exit 2; }
+          if [ -n "$IN_N" ]; then
+            printf '%s' "$IN_N" | grep -Eq '^[1-9][0-9]*00$' \
+              || { echo "::error::n muss ein Vielfaches von 100 und mindestens 100 sein: '$IN_N'"; exit 2; }
+          fi
+          if [ "$IN_STUFE" = 2 ]; then
+            [ -n "$IN_N" ] || { echo "::error::Stufe 2 braucht n aus §7.1"; exit 2; }
+            printf '%s' "$IN_PARTIEN" | grep -Eq '^[0-9]+$' \
+              || { echo "::error::Stufe 2 braucht partien_je_teil als Zahl: '$IN_PARTIEN'"; exit 2; }
+            if [ -n "$IN_VORSTUFE" ]; then
+              printf '%s' "$IN_VORSTUFE" | grep -Eq '^[0-9]+:[0-9]+$' \
+                || { echo "::error::vergleich_vorstufe muss SiegeB:Partien sein: '$IN_VORSTUFE'"; exit 2; }
+            fi
+          fi
+          {
+            echo "STUFE=$IN_STUFE"
+            echo "LAEUFE=$IN_LAEUFE"
+            echo "COMMIT=$IN_COMMIT"
+            echo "NWERT=$IN_N"
+            echo "PARTIEN=$IN_PARTIEN"
+            echo "VORSTUFE=$IN_VORSTUFE"
+          } >> "$GITHUB_ENV"
+
+      - name: Stand des festgelegten Commits
+        run: |
+          set -euo pipefail
+          git cat-file -e "$COMMIT^{commit}" \
+            || { echo "::error::Commit $COMMIT gibt es in diesem Repository nicht."; exit 2; }
+          git show "$COMMIT:index.html" > stand.html
+          sha256sum stand.html
+
+      - name: Artefakte der Teilläufe holen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p artefakte
+          IFS=',' read -ra IDS <<< "$LAEUFE"
+          echo "${#IDS[@]} Teilläufe"
+          for id in "${IDS[@]}"; do
+            echo "::group::Lauf $id"
+            gh run download "$id" --repo "$GITHUB_REPOSITORY" --dir "artefakte/$id"
+            find "artefakte/$id" -type f | sort
+            echo "::endgroup::"
+          done
+
+      - name: Bericht
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra IDS <<< "$LAEUFE"
+          ARGS=(--stufe "$STUFE" --commit "$COMMIT" --html stand.html --markdown)
+          if [ -n "$NWERT" ]; then ARGS+=(--n "$NWERT"); fi
+          if [ "$STUFE" = 2 ]; then
+            ARGS+=(--partien-je-teil "$PARTIEN")
+            if [ -n "$VORSTUFE" ]; then ARGS+=(--k2 "$VORSTUFE"); fi
+          fi
+          # Je Lauf genau eine Dreiergruppe aus JSON, Rohdump und Log. Fehlt eine Datei oder gibt
+          # es sie doppelt, bricht der Schritt ab: ein stilles Weglassen waere ein halber Bericht,
+          # der wie ein ganzer aussieht.
+          for id in "${IDS[@]}"; do
+            for art in json roh log; do
+              case "$art" in
+                json) muster='ab-*.json' ;;
+                roh)  muster='roh-*.jsonl' ;;
+                log)  muster='ab-*.log' ;;
+              esac
+              mapfile -t treffer < <(find "artefakte/$id" -type f -name "$muster" | sort)
+              if [ "${#treffer[@]}" -ne 1 ]; then
+                echo "::error::Lauf $id: ${#treffer[@]} Dateien passen auf $muster, erwartet genau eine."
+                exit 2
+              fi
+              eval "P_$art=\${treffer[0]}"
+            done
+            ARGS+=(--teil "$P_json,$P_roh,$P_log")
+          done
+
+          mkdir -p ergebnis
+          status=0
+          node auswertung/skalierung-bericht.js "${ARGS[@]}" | tee ergebnis/skalierung-bericht.md || status=$?
+          {
+            echo "## Skalierung-Bericht, Stufe $STUFE"
+            echo
+            cat ergebnis/skalierung-bericht.md
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - name: Bericht sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: skalierung-bericht
+          path: ergebnis/
+          if-no-files-found: warn

@@ -1,0 +1,5116 @@
+{
+ "meta": {
+  "erstellt": "2026-11-25T13:16:46.125Z",
+  "userAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Mobile Safari/537.36",
+  "zug": 578,
+  "amZug": "Weiß",
+  "kiFarbe": "Weiß",
+  "kiStufe": "hard",
+  "kiDenkt": false,
+  "workerDeadReason": null,
+  "workerNeustarts": 0,
+  "spielVorbei": true,
+  "koPoint": null,
+  "gefangene": {
+   "1": 17,
+   "2": 229
+  },
+  "msProSim": 0.56
+ },
+ "kiDiagnose": [
+  {
+   "zug": 2,
+   "typ": "stone",
+   "info": "MCTS 2755 Sims · 15% C17 · Q -0.04",
+   "dauerMs": 2030,
+   "budgetMs": 1800,
+   "msProSim": 0.65,
+   "zeiten": {
+    "gesamtMs": 1891,
+    "vorMs": 90,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 1
+   },
+   "nachrichtMs": 97,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 4,
+   "typ": "stone",
+   "info": "MCTS 3026 Sims · 22% C11 · Q -0.04",
+   "dauerMs": 1840,
+   "budgetMs": 1800,
+   "msProSim": 0.59,
+   "zeiten": {
+    "gesamtMs": 1838,
+    "vorMs": 38,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 1
+  },
+  {
+   "zug": 6,
+   "typ": "stone",
+   "info": "MCTS 2932 Sims · 19% J16 · Q -0.04",
+   "dauerMs": 1864,
+   "budgetMs": 1800,
+   "msProSim": 0.61,
+   "zeiten": {
+    "gesamtMs": 1861,
+    "vorMs": 61,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 2
+  },
+  {
+   "zug": 8,
+   "typ": "stone",
+   "info": "MCTS 3130 Sims · 28% J10 · Q -0.04",
+   "dauerMs": 1839,
+   "budgetMs": 1800,
+   "msProSim": 0.58,
+   "zeiten": {
+    "gesamtMs": 1835,
+    "vorMs": 35,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 2
+  },
+  {
+   "zug": 10,
+   "typ": "stone",
+   "info": "MCTS 3076 Sims · 18% S6 · Q -0.04",
+   "dauerMs": 1839,
+   "budgetMs": 1800,
+   "msProSim": 0.59,
+   "zeiten": {
+    "gesamtMs": 1836,
+    "vorMs": 36,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 1
+  },
+  {
+   "zug": 12,
+   "typ": "stone",
+   "info": "MCTS 3078 Sims · 21% P17 · Q -0.03",
+   "dauerMs": 1857,
+   "budgetMs": 1800,
+   "msProSim": 0.58,
+   "zeiten": {
+    "gesamtMs": 1852,
+    "vorMs": 52,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 2
+  },
+  {
+   "zug": 14,
+   "typ": "stone",
+   "info": "MCTS 3074 Sims · 32% P11 · Q 0.00",
+   "dauerMs": 1843,
+   "budgetMs": 1800,
+   "msProSim": 0.59,
+   "zeiten": {
+    "gesamtMs": 1842,
+    "vorMs": 42,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 0
+  },
+  {
+   "zug": 16,
+   "typ": "stone",
+   "info": "MCTS 3059 Sims · 23% C5 · Q 0.05",
+   "dauerMs": 1845,
+   "budgetMs": 1800,
+   "msProSim": 0.59,
+   "zeiten": {
+    "gesamtMs": 1843,
+    "vorMs": 43,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 1
+  },
+  {
+   "zug": 18,
+   "typ": "stone",
+   "info": "MCTS 3062 Sims · 23% J4 · Q 0.11",
+   "dauerMs": 1844,
+   "budgetMs": 1800,
+   "msProSim": 0.59,
+   "zeiten": {
+    "gesamtMs": 1842,
+    "vorMs": 42,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 1
+  },
+  {
+   "zug": 20,
+   "typ": "stone",
+   "info": "MCTS 3072 Sims · 19% E2 · Q 0.18",
+   "dauerMs": 1847,
+   "budgetMs": 1800,
+   "msProSim": 0.59,
+   "zeiten": {
+    "gesamtMs": 1842,
+    "vorMs": 42,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 22,
+   "typ": "stone",
+   "info": "MCTS 3023 Sims · 20% O7 · Q 0.23",
+   "dauerMs": 1845,
+   "budgetMs": 1800,
+   "msProSim": 0.6,
+   "zeiten": {
+    "gesamtMs": 1840,
+    "vorMs": 40,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 24,
+   "typ": "stone",
+   "info": "MCTS 3033 Sims · 30% S15 · Q 0.29",
+   "dauerMs": 1840,
+   "budgetMs": 1800,
+   "msProSim": 0.59,
+   "zeiten": {
+    "gesamtMs": 1838,
+    "vorMs": 38,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 1
+  },
+  {
+   "zug": 26,
+   "typ": "stone",
+   "info": "MCTS 3024 Sims · 23% O2 · Q 0.34",
+   "dauerMs": 1835,
+   "budgetMs": 1800,
+   "msProSim": 0.6,
+   "zeiten": {
+    "gesamtMs": 1830,
+    "vorMs": 30,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 28,
+   "typ": "stone",
+   "info": "MCTS 3017 Sims · 49% B14 · Q 0.39",
+   "dauerMs": 1846,
+   "budgetMs": 1800,
+   "msProSim": 0.6,
+   "zeiten": {
+    "gesamtMs": 1841,
+    "vorMs": 41,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 30,
+   "typ": "stone",
+   "info": "MCTS 2849 Sims · 34% D14 · Q 0.38",
+   "dauerMs": 1844,
+   "budgetMs": 1800,
+   "msProSim": 0.63,
+   "zeiten": {
+    "gesamtMs": 1839,
+    "vorMs": 39,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 32,
+   "typ": "stone",
+   "info": "MCTS 2845 Sims · 30% F13 · Q 0.36",
+   "dauerMs": 1836,
+   "budgetMs": 1800,
+   "msProSim": 0.63,
+   "zeiten": {
+    "gesamtMs": 1832,
+    "vorMs": 32,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 2
+  },
+  {
+   "zug": 34,
+   "typ": "stone",
+   "info": "MCTS 2849 Sims · 81% D15 · Q 0.35",
+   "dauerMs": 1836,
+   "budgetMs": 1800,
+   "msProSim": 0.63,
+   "zeiten": {
+    "gesamtMs": 1831,
+    "vorMs": 31,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 36,
+   "typ": "stone",
+   "info": "MCTS 2821 Sims · 87% B15 · Q 0.35",
+   "dauerMs": 1855,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1853,
+    "vorMs": 53,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 1
+  },
+  {
+   "zug": 38,
+   "typ": "stone",
+   "info": "MCTS 2888 Sims · 31% F17 · Q 0.34",
+   "dauerMs": 1834,
+   "budgetMs": 1800,
+   "msProSim": 0.62,
+   "zeiten": {
+    "gesamtMs": 1828,
+    "vorMs": 28,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 40,
+   "typ": "stone",
+   "info": "MCTS 2830 Sims · 73% A15 · Q 0.42",
+   "dauerMs": 1842,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1837,
+    "vorMs": 37,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 42,
+   "typ": "stone",
+   "info": "MCTS 2885 Sims · 45% D12 · Q 0.38",
+   "dauerMs": 1837,
+   "budgetMs": 1800,
+   "msProSim": 0.62,
+   "zeiten": {
+    "gesamtMs": 1835,
+    "vorMs": 34,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 1
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 1
+  },
+  {
+   "zug": 44,
+   "typ": "stone",
+   "info": "MCTS 2904 Sims · 21% F18 · Q 0.38",
+   "dauerMs": 1838,
+   "budgetMs": 1800,
+   "msProSim": 0.62,
+   "zeiten": {
+    "gesamtMs": 1833,
+    "vorMs": 33,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 46,
+   "typ": "stone",
+   "info": "MCTS 2899 Sims · 23% E17 · Q 0.39",
+   "dauerMs": 1832,
+   "budgetMs": 1800,
+   "msProSim": 0.62,
+   "zeiten": {
+    "gesamtMs": 1826,
+    "vorMs": 26,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 48,
+   "typ": "stone",
+   "info": "MCTS 2838 Sims · 70% D16 · Q 0.46",
+   "dauerMs": 1832,
+   "budgetMs": 1800,
+   "msProSim": 0.63,
+   "zeiten": {
+    "gesamtMs": 1826,
+    "vorMs": 26,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 50,
+   "typ": "stone",
+   "info": "MCTS 2830 Sims · 86% D18 · Q 0.58",
+   "dauerMs": 1839,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1833,
+    "vorMs": 33,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 52,
+   "typ": "stone",
+   "info": "MCTS 2813 Sims · 28% H18 · Q 0.59",
+   "dauerMs": 1836,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1830,
+    "vorMs": 30,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 54,
+   "typ": "stone",
+   "info": "MCTS 2841 Sims · 56% H19 · Q 0.68",
+   "dauerMs": 1850,
+   "budgetMs": 1800,
+   "msProSim": 0.63,
+   "zeiten": {
+    "gesamtMs": 1843,
+    "vorMs": 43,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 56,
+   "typ": "stone",
+   "info": "MCTS 2837 Sims · 85% F16 · Q 0.69",
+   "dauerMs": 1844,
+   "budgetMs": 1800,
+   "msProSim": 0.63,
+   "zeiten": {
+    "gesamtMs": 1838,
+    "vorMs": 38,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 58,
+   "typ": "stone",
+   "info": "MCTS 2817 Sims · 46% E13 · Q 0.74",
+   "dauerMs": 1831,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1825,
+    "vorMs": 25,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 60,
+   "typ": "stone",
+   "info": "MCTS 2826 Sims · 81% G15 · Q 0.88",
+   "dauerMs": 1832,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1826,
+    "vorMs": 26,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 62,
+   "typ": "stone",
+   "info": "MCTS 2846 Sims · 96% F14 · Q 0.90",
+   "dauerMs": 1828,
+   "budgetMs": 1800,
+   "msProSim": 0.63,
+   "zeiten": {
+    "gesamtMs": 1824,
+    "vorMs": 24,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 2
+  },
+  {
+   "zug": 64,
+   "typ": "stone",
+   "info": "MCTS 2819 Sims · 33% H14 · Q 0.89",
+   "dauerMs": 1834,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1828,
+    "vorMs": 28,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 66,
+   "typ": "stone",
+   "info": "MCTS 2832 Sims · 42% J15 · Q 0.91",
+   "dauerMs": 1833,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1826,
+    "vorMs": 26,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 68,
+   "typ": "stone",
+   "info": "MCTS 2777 Sims · 66% J17 · Q 0.99",
+   "dauerMs": 1838,
+   "budgetMs": 1800,
+   "msProSim": 0.65,
+   "zeiten": {
+    "gesamtMs": 1832,
+    "vorMs": 32,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 70,
+   "typ": "stone",
+   "info": "MCTS 2739 Sims · 78% C19 · Q 1.00",
+   "dauerMs": 1837,
+   "budgetMs": 1800,
+   "msProSim": 0.66,
+   "zeiten": {
+    "gesamtMs": 1832,
+    "vorMs": 32,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 72,
+   "typ": "stone",
+   "info": "MCTS 2784 Sims · 34% D10 · Q 1.00",
+   "dauerMs": 1832,
+   "budgetMs": 1800,
+   "msProSim": 0.65,
+   "zeiten": {
+    "gesamtMs": 1826,
+    "vorMs": 26,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 74,
+   "typ": "stone",
+   "info": "MCTS 2791 Sims · 19% F10 · Q 1.00",
+   "dauerMs": 1832,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1825,
+    "vorMs": 25,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 76,
+   "typ": "stone",
+   "info": "MCTS 2799 Sims · 27% B11 · Q 1.00",
+   "dauerMs": 1849,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1844,
+    "vorMs": 44,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 78,
+   "typ": "stone",
+   "info": "MCTS 2811 Sims · 36% E10 · Q 0.99",
+   "dauerMs": 1853,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1847,
+    "vorMs": 47,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 80,
+   "typ": "stone",
+   "info": "MCTS 2804 Sims · 25% F11 · Q 0.99",
+   "dauerMs": 1850,
+   "budgetMs": 1800,
+   "msProSim": 0.64,
+   "zeiten": {
+    "gesamtMs": 1844,
+    "vorMs": 44,
+    "netzMs": 0,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 82,
+   "typ": "stone",
+   "info": "MCTS 2785 Sims · 62% G12 · Q 1.00",
+   "dauerMs": 2004,
+   "budgetMs": 1800,
+   "msProSim": 0.65,
+   "zeiten": {
+    "gesamtMs": 1997,
+    "vorMs": 197,
+    "netzMs": 142,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 84,
+   "typ": "stone",
+   "info": "MCTS 2790 Sims · 68% H13 · Q 1.00",
+   "dauerMs": 1959,
+   "budgetMs": 1800,
+   "msProSim": 0.65,
+   "zeiten": {
+    "gesamtMs": 1952,
+    "vorMs": 152,
+    "netzMs": 110,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 86,
+   "typ": "stone",
+   "info": "MCTS 2752 Sims · 47% G10 · Q 0.99",
+   "dauerMs": 1972,
+   "budgetMs": 1800,
+   "msProSim": 0.65,
+   "zeiten": {
+    "gesamtMs": 1964,
+    "vorMs": 164,
+    "netzMs": 118,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 88,
+   "typ": "stone",
+   "info": "MCTS 2769 Sims · 27% J12 · Q 0.99",
+   "dauerMs": 1951,
+   "budgetMs": 1800,
+   "msProSim": 0.65,
+   "zeiten": {
+    "gesamtMs": 1945,
+    "vorMs": 145,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 90,
+   "typ": "stone",
+   "info": "MCTS 2771 Sims · 27% O9 · Q 0.99",
+   "dauerMs": 1952,
+   "budgetMs": 1800,
+   "msProSim": 0.65,
+   "zeiten": {
+    "gesamtMs": 1945,
+    "vorMs": 145,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 92,
+   "typ": "stone",
+   "info": "MCTS 2733 Sims · 18% K11 · Q 0.99",
+   "dauerMs": 1951,
+   "budgetMs": 1800,
+   "msProSim": 0.66,
+   "zeiten": {
+    "gesamtMs": 1943,
+    "vorMs": 143,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 6
+  },
+  {
+   "zug": 94,
+   "typ": "stone",
+   "info": "MCTS 2738 Sims · 36% L12 · Q 0.99",
+   "dauerMs": 1954,
+   "budgetMs": 1800,
+   "msProSim": 0.66,
+   "zeiten": {
+    "gesamtMs": 1947,
+    "vorMs": 147,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 96,
+   "typ": "stone",
+   "info": "MCTS 2727 Sims · 38% K13 · Q 0.99",
+   "dauerMs": 1955,
+   "budgetMs": 1800,
+   "msProSim": 0.66,
+   "zeiten": {
+    "gesamtMs": 1948,
+    "vorMs": 148,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 98,
+   "typ": "stone",
+   "info": "MCTS 2725 Sims · 23% L11 · Q 0.99",
+   "dauerMs": 1952,
+   "budgetMs": 1800,
+   "msProSim": 0.66,
+   "zeiten": {
+    "gesamtMs": 1944,
+    "vorMs": 144,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 100,
+   "typ": "stone",
+   "info": "MCTS 2719 Sims · 31% M13 · Q 0.99",
+   "dauerMs": 1951,
+   "budgetMs": 1800,
+   "msProSim": 0.66,
+   "zeiten": {
+    "gesamtMs": 1943,
+    "vorMs": 143,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 102,
+   "typ": "stone",
+   "info": "MCTS 2720 Sims · 26% L14 · Q 0.99",
+   "dauerMs": 1951,
+   "budgetMs": 1800,
+   "msProSim": 0.66,
+   "zeiten": {
+    "gesamtMs": 1944,
+    "vorMs": 144,
+    "netzMs": 109,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 104,
+   "typ": "stone",
+   "info": "MCTS 2718 Sims · 27% M15 · Q 0.99",
+   "dauerMs": 1949,
+   "budgetMs": 1800,
+   "msProSim": 0.66,
+   "zeiten": {
+    "gesamtMs": 1943,
+    "vorMs": 143,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 106,
+   "typ": "stone",
+   "info": "MCTS 2716 Sims · 68% M14 · Q 0.99",
+   "dauerMs": 1952,
+   "budgetMs": 1800,
+   "msProSim": 0.66,
+   "zeiten": {
+    "gesamtMs": 1944,
+    "vorMs": 144,
+    "netzMs": 108,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 108,
+   "typ": "stone",
+   "info": "MCTS 2720 Sims · 21% L17 · Q 0.99",
+   "dauerMs": 1947,
+   "budgetMs": 1800,
+   "msProSim": 0.66,
+   "zeiten": {
+    "gesamtMs": 1941,
+    "vorMs": 141,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 110,
+   "typ": "stone",
+   "info": "MCTS 2664 Sims · 48% K18 · Q 0.99",
+   "dauerMs": 1948,
+   "budgetMs": 1800,
+   "msProSim": 0.68,
+   "zeiten": {
+    "gesamtMs": 1940,
+    "vorMs": 140,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 6
+  },
+  {
+   "zug": 112,
+   "typ": "stone",
+   "info": "MCTS 2678 Sims · 14% H10 · Q 0.99",
+   "dauerMs": 1948,
+   "budgetMs": 1800,
+   "msProSim": 0.67,
+   "zeiten": {
+    "gesamtMs": 1940,
+    "vorMs": 140,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 114,
+   "typ": "stone",
+   "info": "MCTS 2636 Sims · 42% M18 · Q 0.99",
+   "dauerMs": 1957,
+   "budgetMs": 1800,
+   "msProSim": 0.68,
+   "zeiten": {
+    "gesamtMs": 1946,
+    "vorMs": 146,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 116,
+   "typ": "stone",
+   "info": "MCTS 2644 Sims · 41% N17 · Q 0.99",
+   "dauerMs": 1950,
+   "budgetMs": 1800,
+   "msProSim": 0.68,
+   "zeiten": {
+    "gesamtMs": 1940,
+    "vorMs": 140,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 7
+  },
+  {
+   "zug": 118,
+   "typ": "stone",
+   "info": "MCTS 2608 Sims · 58% L19 · Q 0.99",
+   "dauerMs": 1954,
+   "budgetMs": 1800,
+   "msProSim": 0.69,
+   "zeiten": {
+    "gesamtMs": 1946,
+    "vorMs": 146,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 6
+  },
+  {
+   "zug": 120,
+   "typ": "stone",
+   "info": "MCTS 2593 Sims · 31% N18 · Q 0.99",
+   "dauerMs": 1946,
+   "budgetMs": 1800,
+   "msProSim": 0.69,
+   "zeiten": {
+    "gesamtMs": 1943,
+    "vorMs": 143,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 1
+  },
+  {
+   "zug": 122,
+   "typ": "stone",
+   "info": "MCTS 2597 Sims · 27% K19 · Q 0.99",
+   "dauerMs": 1949,
+   "budgetMs": 1800,
+   "msProSim": 0.69,
+   "zeiten": {
+    "gesamtMs": 1940,
+    "vorMs": 140,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 7
+  },
+  {
+   "zug": 124,
+   "typ": "stone",
+   "info": "MCTS 2546 Sims · 21% O16 · Q 0.99",
+   "dauerMs": 1978,
+   "budgetMs": 1800,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 1968,
+    "vorMs": 168,
+    "netzMs": 119,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 3,
+   "anwendenMs": 7
+  },
+  {
+   "zug": 126,
+   "typ": "stone",
+   "info": "MCTS 2520 Sims · 25% O15 · Q 0.99",
+   "dauerMs": 1953,
+   "budgetMs": 1800,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 1944,
+    "vorMs": 143,
+    "netzMs": 109,
+    "sucheMs": 1801,
+    "nachMs": 0
+   },
+   "nachrichtMs": 3,
+   "anwendenMs": 6
+  },
+  {
+   "zug": 128,
+   "typ": "stone",
+   "info": "MCTS 2567 Sims · 27% O14 · Q 0.99",
+   "dauerMs": 1945,
+   "budgetMs": 1800,
+   "msProSim": 0.7,
+   "zeiten": {
+    "gesamtMs": 1937,
+    "vorMs": 137,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 6
+  },
+  {
+   "zug": 130,
+   "typ": "stone",
+   "info": "MCTS 2619 Sims · 68% N13 · Q 0.99",
+   "dauerMs": 1948,
+   "budgetMs": 1800,
+   "msProSim": 0.69,
+   "zeiten": {
+    "gesamtMs": 1939,
+    "vorMs": 139,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 7
+  },
+  {
+   "zug": 132,
+   "typ": "stone",
+   "info": "MCTS 2631 Sims · 37% O13 · Q 0.99",
+   "dauerMs": 1944,
+   "budgetMs": 1800,
+   "msProSim": 0.68,
+   "zeiten": {
+    "gesamtMs": 1935,
+    "vorMs": 135,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 7
+  },
+  {
+   "zug": 134,
+   "typ": "stone",
+   "info": "MCTS 2624 Sims · 35% A10 · Q 0.99",
+   "dauerMs": 1948,
+   "budgetMs": 1800,
+   "msProSim": 0.69,
+   "zeiten": {
+    "gesamtMs": 1939,
+    "vorMs": 139,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 7
+  },
+  {
+   "zug": 136,
+   "typ": "stone",
+   "info": "MCTS 2514 Sims · 45% B9 · Q 0.99",
+   "dauerMs": 1956,
+   "budgetMs": 1800,
+   "msProSim": 0.72,
+   "zeiten": {
+    "gesamtMs": 1946,
+    "vorMs": 146,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 138,
+   "typ": "stone",
+   "info": "MCTS 2577 Sims · 60% C9 · Q 0.99",
+   "dauerMs": 1951,
+   "budgetMs": 1800,
+   "msProSim": 0.7,
+   "zeiten": {
+    "gesamtMs": 1940,
+    "vorMs": 140,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 140,
+   "typ": "stone",
+   "info": "MCTS 2595 Sims · 85% B10 · Q 0.99",
+   "dauerMs": 1946,
+   "budgetMs": 1800,
+   "msProSim": 0.69,
+   "zeiten": {
+    "gesamtMs": 1935,
+    "vorMs": 135,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 142,
+   "typ": "stone",
+   "info": "MCTS 2524 Sims · 42% B8 · Q 0.99",
+   "dauerMs": 1946,
+   "budgetMs": 1800,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 1936,
+    "vorMs": 136,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 8
+  },
+  {
+   "zug": 144,
+   "typ": "stone",
+   "info": "MCTS 2577 Sims · 35% C7 · Q 0.99",
+   "dauerMs": 1948,
+   "budgetMs": 1800,
+   "msProSim": 0.7,
+   "zeiten": {
+    "gesamtMs": 1938,
+    "vorMs": 138,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 8
+  },
+  {
+   "zug": 146,
+   "typ": "stone",
+   "info": "MCTS 2549 Sims · 51% B6 · Q 1.00",
+   "dauerMs": 1947,
+   "budgetMs": 1800,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 1935,
+    "vorMs": 135,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 148,
+   "typ": "stone",
+   "info": "MCTS 2546 Sims · 47% B4 · Q 1.00",
+   "dauerMs": 1949,
+   "budgetMs": 1800,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 1938,
+    "vorMs": 138,
+    "netzMs": 108,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 150,
+   "typ": "stone",
+   "info": "MCTS 2552 Sims · 62% A5 · Q 1.00",
+   "dauerMs": 1945,
+   "budgetMs": 1800,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 1934,
+    "vorMs": 134,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 8
+  },
+  {
+   "zug": 152,
+   "typ": "stone",
+   "info": "MCTS 2550 Sims · 15% M3 · Q 1.00",
+   "dauerMs": 1952,
+   "budgetMs": 1800,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 1941,
+    "vorMs": 141,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 154,
+   "typ": "stone",
+   "info": "MCTS 2553 Sims · 18% N9 · Q 1.00",
+   "dauerMs": 1944,
+   "budgetMs": 1800,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 1933,
+    "vorMs": 133,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 156,
+   "typ": "stone",
+   "info": "MCTS 2537 Sims · 21% M9 · Q 1.00",
+   "dauerMs": 1949,
+   "budgetMs": 1800,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 1938,
+    "vorMs": 138,
+    "netzMs": 111,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 158,
+   "typ": "stone",
+   "info": "MCTS 2542 Sims · 15% J18 · Q 1.00",
+   "dauerMs": 1945,
+   "budgetMs": 1800,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 1934,
+    "vorMs": 134,
+    "netzMs": 108,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 160,
+   "typ": "stone",
+   "info": "MCTS 2531 Sims · 40% L10 · Q 1.00",
+   "dauerMs": 1943,
+   "budgetMs": 1800,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 1934,
+    "vorMs": 134,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 7
+  },
+  {
+   "zug": 162,
+   "typ": "stone",
+   "info": "MCTS 2514 Sims · 33% N8 · Q 1.00",
+   "dauerMs": 1945,
+   "budgetMs": 1800,
+   "msProSim": 0.72,
+   "zeiten": {
+    "gesamtMs": 1935,
+    "vorMs": 135,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 8
+  },
+  {
+   "zug": 164,
+   "typ": "stone",
+   "info": "MCTS 2502 Sims · 34% O6 · Q 1.00",
+   "dauerMs": 1945,
+   "budgetMs": 1800,
+   "msProSim": 0.72,
+   "zeiten": {
+    "gesamtMs": 1935,
+    "vorMs": 135,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 8
+  },
+  {
+   "zug": 166,
+   "typ": "stone",
+   "info": "MCTS 2493 Sims · 57% N5 · Q 1.00",
+   "dauerMs": 1947,
+   "budgetMs": 1800,
+   "msProSim": 0.72,
+   "zeiten": {
+    "gesamtMs": 1936,
+    "vorMs": 136,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 168,
+   "typ": "stone",
+   "info": "MCTS 2153 Sims · 34% N4 · Q 1.00",
+   "dauerMs": 1944,
+   "budgetMs": 1800,
+   "msProSim": 0.84,
+   "zeiten": {
+    "gesamtMs": 1933,
+    "vorMs": 133,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 170,
+   "typ": "stone",
+   "info": "MCTS 2285 Sims · 51% M7 · Q 1.00",
+   "dauerMs": 1952,
+   "budgetMs": 1800,
+   "msProSim": 0.79,
+   "zeiten": {
+    "gesamtMs": 1947,
+    "vorMs": 147,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 172,
+   "typ": "stone",
+   "info": "MCTS 2262 Sims · 82% M6 · Q 1.00",
+   "dauerMs": 1941,
+   "budgetMs": 1800,
+   "msProSim": 0.8,
+   "zeiten": {
+    "gesamtMs": 1932,
+    "vorMs": 132,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 7
+  },
+  {
+   "zug": 174,
+   "typ": "stone",
+   "info": "MCTS 2287 Sims · 57% N1 · Q 1.00",
+   "dauerMs": 1944,
+   "budgetMs": 1800,
+   "msProSim": 0.79,
+   "zeiten": {
+    "gesamtMs": 1933,
+    "vorMs": 133,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 176,
+   "typ": "stone",
+   "info": "MCTS 2276 Sims · 26% N2 · Q 1.00",
+   "dauerMs": 1947,
+   "budgetMs": 1800,
+   "msProSim": 0.79,
+   "zeiten": {
+    "gesamtMs": 1936,
+    "vorMs": 136,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 178,
+   "typ": "stone",
+   "info": "MCTS 2274 Sims · 44% P12 · Q 1.00",
+   "dauerMs": 1946,
+   "budgetMs": 1800,
+   "msProSim": 0.79,
+   "zeiten": {
+    "gesamtMs": 1935,
+    "vorMs": 135,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 180,
+   "typ": "stone",
+   "info": "MCTS 2253 Sims · 33% Q12 · Q 1.00",
+   "dauerMs": 1947,
+   "budgetMs": 1800,
+   "msProSim": 0.8,
+   "zeiten": {
+    "gesamtMs": 1935,
+    "vorMs": 135,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 182,
+   "typ": "stone",
+   "info": "MCTS 2246 Sims · 49% R13 · Q 1.00",
+   "dauerMs": 1944,
+   "budgetMs": 1800,
+   "msProSim": 0.8,
+   "zeiten": {
+    "gesamtMs": 1933,
+    "vorMs": 133,
+    "netzMs": 109,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 184,
+   "typ": "stone",
+   "info": "MCTS 2235 Sims · 52% S13 · Q 1.00",
+   "dauerMs": 1935,
+   "budgetMs": 1800,
+   "msProSim": 0.81,
+   "zeiten": {
+    "gesamtMs": 1931,
+    "vorMs": 131,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 2
+  },
+  {
+   "zug": 186,
+   "typ": "stone",
+   "info": "MCTS 2209 Sims · 22% T12 · Q 1.00",
+   "dauerMs": 1938,
+   "budgetMs": 1800,
+   "msProSim": 0.81,
+   "zeiten": {
+    "gesamtMs": 1929,
+    "vorMs": 129,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 7
+  },
+  {
+   "zug": 188,
+   "typ": "stone",
+   "info": "MCTS 2224 Sims · 73% T13 · Q 1.00",
+   "dauerMs": 1944,
+   "budgetMs": 1800,
+   "msProSim": 0.81,
+   "zeiten": {
+    "gesamtMs": 1930,
+    "vorMs": 130,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 190,
+   "typ": "stone",
+   "info": "MCTS 2199 Sims · 65% R14 · Q 1.00",
+   "dauerMs": 1947,
+   "budgetMs": 1800,
+   "msProSim": 0.82,
+   "zeiten": {
+    "gesamtMs": 1935,
+    "vorMs": 135,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 192,
+   "typ": "stone",
+   "info": "MCTS 2191 Sims · 50% T15 · Q 1.00",
+   "dauerMs": 1939,
+   "budgetMs": 1800,
+   "msProSim": 0.82,
+   "zeiten": {
+    "gesamtMs": 1928,
+    "vorMs": 128,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 194,
+   "typ": "stone",
+   "info": "MCTS 2202 Sims · 43% Q13 · Q 1.00",
+   "dauerMs": 1943,
+   "budgetMs": 1800,
+   "msProSim": 0.82,
+   "zeiten": {
+    "gesamtMs": 1931,
+    "vorMs": 131,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 196,
+   "typ": "stone",
+   "info": "MCTS 2203 Sims · 19% G14 · Q 1.00",
+   "dauerMs": 1944,
+   "budgetMs": 1800,
+   "msProSim": 0.82,
+   "zeiten": {
+    "gesamtMs": 1931,
+    "vorMs": 131,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 198,
+   "typ": "stone",
+   "info": "MCTS 2157 Sims · 63% B16 · Q 1.00",
+   "dauerMs": 1943,
+   "budgetMs": 1800,
+   "msProSim": 0.83,
+   "zeiten": {
+    "gesamtMs": 1930,
+    "vorMs": 130,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 200,
+   "typ": "stone",
+   "info": "MCTS 2159 Sims · 48% B17 · Q 1.00",
+   "dauerMs": 1958,
+   "budgetMs": 1800,
+   "msProSim": 0.83,
+   "zeiten": {
+    "gesamtMs": 1944,
+    "vorMs": 144,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 202,
+   "typ": "stone",
+   "info": "MCTS 2108 Sims · 42% H11 · Q 1.00",
+   "dauerMs": 1950,
+   "budgetMs": 1800,
+   "msProSim": 0.85,
+   "zeiten": {
+    "gesamtMs": 1937,
+    "vorMs": 137,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 204,
+   "typ": "stone",
+   "info": "MCTS 2227 Sims · 46% K9 · Q 1.00",
+   "dauerMs": 1943,
+   "budgetMs": 1800,
+   "msProSim": 0.81,
+   "zeiten": {
+    "gesamtMs": 1930,
+    "vorMs": 130,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 206,
+   "typ": "stone",
+   "info": "MCTS 2279 Sims · 23% J7 · Q 1.00",
+   "dauerMs": 1947,
+   "budgetMs": 1800,
+   "msProSim": 0.79,
+   "zeiten": {
+    "gesamtMs": 1935,
+    "vorMs": 135,
+    "netzMs": 108,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 208,
+   "typ": "stone",
+   "info": "MCTS 2230 Sims · 36% L9 · Q 1.00",
+   "dauerMs": 1937,
+   "budgetMs": 1800,
+   "msProSim": 0.81,
+   "zeiten": {
+    "gesamtMs": 1926,
+    "vorMs": 126,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 210,
+   "typ": "stone",
+   "info": "MCTS 2213 Sims · 63% H7 · Q 1.00",
+   "dauerMs": 1942,
+   "budgetMs": 1800,
+   "msProSim": 0.81,
+   "zeiten": {
+    "gesamtMs": 1930,
+    "vorMs": 130,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 212,
+   "typ": "stone",
+   "info": "MCTS 2188 Sims · 43% H8 · Q 1.00",
+   "dauerMs": 1942,
+   "budgetMs": 1800,
+   "msProSim": 0.82,
+   "zeiten": {
+    "gesamtMs": 1928,
+    "vorMs": 128,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 214,
+   "typ": "stone",
+   "info": "MCTS 2195 Sims · 45% G9 · Q 1.00",
+   "dauerMs": 1946,
+   "budgetMs": 1800,
+   "msProSim": 0.82,
+   "zeiten": {
+    "gesamtMs": 1933,
+    "vorMs": 133,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 216,
+   "typ": "stone",
+   "info": "MCTS 2129 Sims · 69% K6 · Q 1.00",
+   "dauerMs": 1942,
+   "budgetMs": 1800,
+   "msProSim": 0.85,
+   "zeiten": {
+    "gesamtMs": 1929,
+    "vorMs": 128,
+    "netzMs": 107,
+    "sucheMs": 1801,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 218,
+   "typ": "stone",
+   "info": "MCTS 2144 Sims · 44% J5 · Q 1.00",
+   "dauerMs": 1937,
+   "budgetMs": 1800,
+   "msProSim": 0.84,
+   "zeiten": {
+    "gesamtMs": 1924,
+    "vorMs": 124,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 220,
+   "typ": "stone",
+   "info": "MCTS 2150 Sims · 36% L5 · Q 1.00",
+   "dauerMs": 1946,
+   "budgetMs": 1800,
+   "msProSim": 0.84,
+   "zeiten": {
+    "gesamtMs": 1931,
+    "vorMs": 131,
+    "netzMs": 108,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 222,
+   "typ": "stone",
+   "info": "MCTS 2156 Sims · 49% H6 · Q 1.00",
+   "dauerMs": 1941,
+   "budgetMs": 1800,
+   "msProSim": 0.83,
+   "zeiten": {
+    "gesamtMs": 1927,
+    "vorMs": 127,
+    "netzMs": 108,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 224,
+   "typ": "stone",
+   "info": "MCTS 2135 Sims · 66% K4 · Q 1.00",
+   "dauerMs": 1940,
+   "budgetMs": 1800,
+   "msProSim": 0.84,
+   "zeiten": {
+    "gesamtMs": 1928,
+    "vorMs": 128,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 226,
+   "typ": "stone",
+   "info": "MCTS 2141 Sims · 73% L3 · Q 1.00",
+   "dauerMs": 1941,
+   "budgetMs": 1800,
+   "msProSim": 0.84,
+   "zeiten": {
+    "gesamtMs": 1928,
+    "vorMs": 128,
+    "netzMs": 110,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 228,
+   "typ": "stone",
+   "info": "MCTS 2127 Sims · 28% B12 · Q 1.00",
+   "dauerMs": 1939,
+   "budgetMs": 1800,
+   "msProSim": 0.85,
+   "zeiten": {
+    "gesamtMs": 1927,
+    "vorMs": 127,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 230,
+   "typ": "stone",
+   "info": "MCTS 2173 Sims · 31% O4 · Q 1.00",
+   "dauerMs": 1945,
+   "budgetMs": 1800,
+   "msProSim": 0.83,
+   "zeiten": {
+    "gesamtMs": 1934,
+    "vorMs": 134,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 232,
+   "typ": "stone",
+   "info": "MCTS 2163 Sims · 18% P3 · Q 1.00",
+   "dauerMs": 1942,
+   "budgetMs": 1800,
+   "msProSim": 0.83,
+   "zeiten": {
+    "gesamtMs": 1931,
+    "vorMs": 131,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 234,
+   "typ": "stone",
+   "info": "MCTS 2149 Sims · 20% R16 · Q 1.00",
+   "dauerMs": 1940,
+   "budgetMs": 1800,
+   "msProSim": 0.84,
+   "zeiten": {
+    "gesamtMs": 1928,
+    "vorMs": 128,
+    "netzMs": 108,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 236,
+   "typ": "stone",
+   "info": "MCTS 2135 Sims · 52% Q17 · Q 1.00",
+   "dauerMs": 1940,
+   "budgetMs": 1800,
+   "msProSim": 0.84,
+   "zeiten": {
+    "gesamtMs": 1929,
+    "vorMs": 129,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 238,
+   "typ": "stone",
+   "info": "MCTS 2124 Sims · 47% S17 · Q 1.00",
+   "dauerMs": 1945,
+   "budgetMs": 1800,
+   "msProSim": 0.85,
+   "zeiten": {
+    "gesamtMs": 1933,
+    "vorMs": 133,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 240,
+   "typ": "stone",
+   "info": "MCTS 2125 Sims · 49% T16 · Q 1.00",
+   "dauerMs": 1937,
+   "budgetMs": 1800,
+   "msProSim": 0.85,
+   "zeiten": {
+    "gesamtMs": 1926,
+    "vorMs": 126,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 242,
+   "typ": "stone",
+   "info": "MCTS 2090 Sims · 56% R17 · Q 1.00",
+   "dauerMs": 1940,
+   "budgetMs": 1800,
+   "msProSim": 0.86,
+   "zeiten": {
+    "gesamtMs": 1929,
+    "vorMs": 129,
+    "netzMs": 108,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 244,
+   "typ": "stone",
+   "info": "MCTS 2003 Sims · 65% Q18 · Q 1.00",
+   "dauerMs": 1943,
+   "budgetMs": 1800,
+   "msProSim": 0.9,
+   "zeiten": {
+    "gesamtMs": 1931,
+    "vorMs": 131,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 246,
+   "typ": "stone",
+   "info": "MCTS 1971 Sims · 17% O19 · Q 1.00",
+   "dauerMs": 1933,
+   "budgetMs": 1800,
+   "msProSim": 0.91,
+   "zeiten": {
+    "gesamtMs": 1929,
+    "vorMs": 129,
+    "netzMs": 109,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 248,
+   "typ": "stone",
+   "info": "MCTS 1975 Sims · 22% P19 · Q 1.00",
+   "dauerMs": 1944,
+   "budgetMs": 1800,
+   "msProSim": 0.91,
+   "zeiten": {
+    "gesamtMs": 1930,
+    "vorMs": 130,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 250,
+   "typ": "stone",
+   "info": "MCTS 1990 Sims · 57% T18 · Q 1.00",
+   "dauerMs": 1940,
+   "budgetMs": 1800,
+   "msProSim": 0.91,
+   "zeiten": {
+    "gesamtMs": 1928,
+    "vorMs": 127,
+    "netzMs": 105,
+    "sucheMs": 1801,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 252,
+   "typ": "stone",
+   "info": "MCTS 1996 Sims · 27% P15 · Q 1.00",
+   "dauerMs": 1941,
+   "budgetMs": 1800,
+   "msProSim": 0.9,
+   "zeiten": {
+    "gesamtMs": 1928,
+    "vorMs": 128,
+    "netzMs": 109,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 254,
+   "typ": "stone",
+   "info": "MCTS 2021 Sims · 30% N19 · Q 1.00",
+   "dauerMs": 1938,
+   "budgetMs": 1800,
+   "msProSim": 0.89,
+   "zeiten": {
+    "gesamtMs": 1925,
+    "vorMs": 125,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 256,
+   "typ": "stone",
+   "info": "MCTS 1993 Sims · 26% S19 · Q 1.00",
+   "dauerMs": 1935,
+   "budgetMs": 1800,
+   "msProSim": 0.9,
+   "zeiten": {
+    "gesamtMs": 1923,
+    "vorMs": 123,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 10
+  },
+  {
+   "zug": 258,
+   "typ": "stone",
+   "info": "MCTS 1862 Sims · 14% P2 · Q 1.00",
+   "dauerMs": 1949,
+   "budgetMs": 1800,
+   "msProSim": 0.97,
+   "zeiten": {
+    "gesamtMs": 1936,
+    "vorMs": 135,
+    "netzMs": 109,
+    "sucheMs": 1800,
+    "nachMs": 1
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 260,
+   "typ": "stone",
+   "info": "MCTS 1838 Sims · 18% M4 · Q 1.00",
+   "dauerMs": 1935,
+   "budgetMs": 1800,
+   "msProSim": 0.98,
+   "zeiten": {
+    "gesamtMs": 1922,
+    "vorMs": 122,
+    "netzMs": 105,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 262,
+   "typ": "stone",
+   "info": "MCTS 1887 Sims · 26% L7 · Q 1.00",
+   "dauerMs": 1955,
+   "budgetMs": 1800,
+   "msProSim": 0.95,
+   "zeiten": {
+    "gesamtMs": 1942,
+    "vorMs": 142,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 264,
+   "typ": "stone",
+   "info": "MCTS 2005 Sims · 32% P4 · Q 1.00",
+   "dauerMs": 1929,
+   "budgetMs": 1800,
+   "msProSim": 0.9,
+   "zeiten": {
+    "gesamtMs": 1925,
+    "vorMs": 125,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 2
+  },
+  {
+   "zug": 266,
+   "typ": "stone",
+   "info": "MCTS 1991 Sims · 34% P7 · Q 1.00",
+   "dauerMs": 1937,
+   "budgetMs": 1800,
+   "msProSim": 0.9,
+   "zeiten": {
+    "gesamtMs": 1923,
+    "vorMs": 122,
+    "netzMs": 106,
+    "sucheMs": 1801,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 268,
+   "typ": "stone",
+   "info": "MCTS 1980 Sims · 61% M11 · Q 1.00",
+   "dauerMs": 1936,
+   "budgetMs": 1800,
+   "msProSim": 0.91,
+   "zeiten": {
+    "gesamtMs": 1923,
+    "vorMs": 123,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 270,
+   "typ": "stone",
+   "info": "MCTS 2005 Sims · 47% Q14 · Q 1.00",
+   "dauerMs": 1939,
+   "budgetMs": 1800,
+   "msProSim": 0.9,
+   "zeiten": {
+    "gesamtMs": 1926,
+    "vorMs": 126,
+    "netzMs": 108,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 272,
+   "typ": "stone",
+   "info": "MCTS 1957 Sims · 27% F2 · Q 1.00",
+   "dauerMs": 1938,
+   "budgetMs": 1800,
+   "msProSim": 0.92,
+   "zeiten": {
+    "gesamtMs": 1925,
+    "vorMs": 125,
+    "netzMs": 106,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 274,
+   "typ": "stone",
+   "info": "MCTS 1591 Sims · 33% G3 · Q 1.00",
+   "dauerMs": 1964,
+   "budgetMs": 1800,
+   "msProSim": 1.13,
+   "zeiten": {
+    "gesamtMs": 1950,
+    "vorMs": 150,
+    "netzMs": 130,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 276,
+   "typ": "stone",
+   "info": "MCTS 1806 Sims · 35% D3 · Q 1.00",
+   "dauerMs": 1940,
+   "budgetMs": 1800,
+   "msProSim": 1,
+   "zeiten": {
+    "gesamtMs": 1925,
+    "vorMs": 125,
+    "netzMs": 107,
+    "sucheMs": 1800,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 278,
+   "typ": "stone",
+   "info": "MCTS 1808 Sims · 48% C2 · Q 1.00",
+   "dauerMs": 1955,
+   "budgetMs": 1800,
+   "msProSim": 1.01,
+   "zeiten": {
+    "gesamtMs": 1940,
+    "vorMs": 122,
+    "netzMs": 107,
+    "sucheMs": 1818,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 280,
+   "typ": "stone",
+   "info": "MCTS 1836 Sims · 57% C1 · Q 1.00",
+   "dauerMs": 1995,
+   "budgetMs": 1800,
+   "msProSim": 1.01,
+   "zeiten": {
+    "gesamtMs": 1980,
+    "vorMs": 126,
+    "netzMs": 106,
+    "sucheMs": 1854,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 282,
+   "typ": "stone",
+   "info": "MCTS 1865 Sims · 59% F3 · Q 1.00",
+   "dauerMs": 2013,
+   "budgetMs": 1800,
+   "msProSim": 1,
+   "zeiten": {
+    "gesamtMs": 1998,
+    "vorMs": 126,
+    "netzMs": 109,
+    "sucheMs": 1872,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 284,
+   "typ": "stone",
+   "info": "MCTS 1891 Sims · 42% G1 · Q 1.00",
+   "dauerMs": 2042,
+   "budgetMs": 1800,
+   "msProSim": 1.01,
+   "zeiten": {
+    "gesamtMs": 2029,
+    "vorMs": 120,
+    "netzMs": 106,
+    "sucheMs": 1909,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 286,
+   "typ": "stone",
+   "info": "MCTS 1857 Sims · 47% H2 · Q 1.00",
+   "dauerMs": 2008,
+   "budgetMs": 1800,
+   "msProSim": 1.01,
+   "zeiten": {
+    "gesamtMs": 1994,
+    "vorMs": 122,
+    "netzMs": 105,
+    "sucheMs": 1872,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 288,
+   "typ": "stone",
+   "info": "MCTS 1904 Sims · 46% K14 · Q 1.00",
+   "dauerMs": 2035,
+   "budgetMs": 1800,
+   "msProSim": 1,
+   "zeiten": {
+    "gesamtMs": 2031,
+    "vorMs": 123,
+    "netzMs": 107,
+    "sucheMs": 1908,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 2
+  },
+  {
+   "zug": 290,
+   "typ": "stone",
+   "info": "MCTS 1947 Sims · 42% L13 · Q 1.00",
+   "dauerMs": 2065,
+   "budgetMs": 1800,
+   "msProSim": 1,
+   "zeiten": {
+    "gesamtMs": 2062,
+    "vorMs": 118,
+    "netzMs": 105,
+    "sucheMs": 1944,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 1
+  },
+  {
+   "zug": 292,
+   "typ": "stone",
+   "info": "MCTS 1964 Sims · 30% E4 · Q 1.00",
+   "dauerMs": 2098,
+   "budgetMs": 1800,
+   "msProSim": 1,
+   "zeiten": {
+    "gesamtMs": 2084,
+    "vorMs": 122,
+    "netzMs": 106,
+    "sucheMs": 1962,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 294,
+   "typ": "stone",
+   "info": "MCTS 1976 Sims · 47% D6 · Q 1.00",
+   "dauerMs": 2132,
+   "budgetMs": 1800,
+   "msProSim": 1.01,
+   "zeiten": {
+    "gesamtMs": 2118,
+    "vorMs": 120,
+    "netzMs": 106,
+    "sucheMs": 1998,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 296,
+   "typ": "stone",
+   "info": "MCTS 2022 Sims · 61% C3 · Q 1.00",
+   "dauerMs": 2197,
+   "budgetMs": 1800,
+   "msProSim": 1.02,
+   "zeiten": {
+    "gesamtMs": 2182,
+    "vorMs": 129,
+    "netzMs": 107,
+    "sucheMs": 2053,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 298,
+   "typ": "stone",
+   "info": "MCTS 2050 Sims · 72% A3 · Q 1.00",
+   "dauerMs": 2205,
+   "budgetMs": 1800,
+   "msProSim": 1.01,
+   "zeiten": {
+    "gesamtMs": 2191,
+    "vorMs": 121,
+    "netzMs": 106,
+    "sucheMs": 2070,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 11
+  },
+  {
+   "zug": 300,
+   "typ": "stone",
+   "info": "MCTS 2056 Sims · 52% E7 · Q 1.00",
+   "dauerMs": 2242,
+   "budgetMs": 1800,
+   "msProSim": 1.02,
+   "zeiten": {
+    "gesamtMs": 2227,
+    "vorMs": 121,
+    "netzMs": 107,
+    "sucheMs": 2106,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 302,
+   "typ": "stone",
+   "info": "MCTS 2077 Sims · 60% D7 · Q 1.00",
+   "dauerMs": 2273,
+   "budgetMs": 1800,
+   "msProSim": 1.03,
+   "zeiten": {
+    "gesamtMs": 2259,
+    "vorMs": 117,
+    "netzMs": 105,
+    "sucheMs": 2142,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 304,
+   "typ": "stone",
+   "info": "MCTS 2107 Sims · 29% G5 · Q 1.00",
+   "dauerMs": 2312,
+   "budgetMs": 1800,
+   "msProSim": 1.03,
+   "zeiten": {
+    "gesamtMs": 2297,
+    "vorMs": 119,
+    "netzMs": 107,
+    "sucheMs": 2178,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 306,
+   "typ": "stone",
+   "info": "MCTS 2138 Sims · 29% J1 · Q 1.00",
+   "dauerMs": 2348,
+   "budgetMs": 1800,
+   "msProSim": 1.04,
+   "zeiten": {
+    "gesamtMs": 2333,
+    "vorMs": 119,
+    "netzMs": 107,
+    "sucheMs": 2214,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 308,
+   "typ": "stone",
+   "info": "MCTS 2152 Sims · 49% H1 · Q 1.00",
+   "dauerMs": 2386,
+   "budgetMs": 1836,
+   "msProSim": 1.05,
+   "zeiten": {
+    "gesamtMs": 2370,
+    "vorMs": 120,
+    "netzMs": 107,
+    "sucheMs": 2250,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 310,
+   "typ": "stone",
+   "info": "MCTS 2178 Sims · 34% K2 · Q 1.00",
+   "dauerMs": 2423,
+   "budgetMs": 1872,
+   "msProSim": 1.05,
+   "zeiten": {
+    "gesamtMs": 2407,
+    "vorMs": 121,
+    "netzMs": 108,
+    "sucheMs": 2286,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 312,
+   "typ": "stone",
+   "info": "MCTS 2220 Sims · 32% E5 · Q 1.00",
+   "dauerMs": 2455,
+   "budgetMs": 1908,
+   "msProSim": 1.05,
+   "zeiten": {
+    "gesamtMs": 2440,
+    "vorMs": 118,
+    "netzMs": 107,
+    "sucheMs": 2322,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 314,
+   "typ": "stone",
+   "info": "MCTS 2248 Sims · 46% F6 · Q 1.00",
+   "dauerMs": 2489,
+   "budgetMs": 1926,
+   "msProSim": 1.05,
+   "zeiten": {
+    "gesamtMs": 2476,
+    "vorMs": 118,
+    "netzMs": 107,
+    "sucheMs": 2358,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 316,
+   "typ": "stone",
+   "info": "MCTS 2263 Sims · 42% F8 · Q 1.00",
+   "dauerMs": 2510,
+   "budgetMs": 1944,
+   "msProSim": 1.05,
+   "zeiten": {
+    "gesamtMs": 2494,
+    "vorMs": 118,
+    "netzMs": 106,
+    "sucheMs": 2376,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 318,
+   "typ": "stone",
+   "info": "MCTS 2278 Sims · 33% E8 · Q 1.00",
+   "dauerMs": 2547,
+   "budgetMs": 1962,
+   "msProSim": 1.06,
+   "zeiten": {
+    "gesamtMs": 2532,
+    "vorMs": 120,
+    "netzMs": 108,
+    "sucheMs": 2412,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 320,
+   "typ": "stone",
+   "info": "MCTS 2296 Sims · 52% F6 · Q 1.00",
+   "dauerMs": 2567,
+   "budgetMs": 1998,
+   "msProSim": 1.06,
+   "zeiten": {
+    "gesamtMs": 2550,
+    "vorMs": 120,
+    "netzMs": 108,
+    "sucheMs": 2430,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 322,
+   "typ": "stone",
+   "info": "MCTS 2296 Sims · 31% B2 · Q 1.00",
+   "dauerMs": 2577,
+   "budgetMs": 1998,
+   "msProSim": 1.07,
+   "zeiten": {
+    "gesamtMs": 2567,
+    "vorMs": 119,
+    "netzMs": 107,
+    "sucheMs": 2448,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 9
+  },
+  {
+   "zug": 324,
+   "typ": "stone",
+   "info": "MCTS 2306 Sims · 41% A6 · Q 1.00",
+   "dauerMs": 2583,
+   "budgetMs": 2016,
+   "msProSim": 1.06,
+   "zeiten": {
+    "gesamtMs": 2567,
+    "vorMs": 119,
+    "netzMs": 106,
+    "sucheMs": 2448,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 326,
+   "typ": "stone",
+   "info": "MCTS 2294 Sims · 39% G7 · Q 1.00",
+   "dauerMs": 2629,
+   "budgetMs": 2034,
+   "msProSim": 1.08,
+   "zeiten": {
+    "gesamtMs": 2612,
+    "vorMs": 128,
+    "netzMs": 109,
+    "sucheMs": 2484,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 328,
+   "typ": "stone",
+   "info": "MCTS 2184 Sims · 40% C5 · Q 1.00",
+   "dauerMs": 2637,
+   "budgetMs": 2052,
+   "msProSim": 1.15,
+   "zeiten": {
+    "gesamtMs": 2621,
+    "vorMs": 119,
+    "netzMs": 108,
+    "sucheMs": 2502,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 330,
+   "typ": "stone",
+   "info": "MCTS 2171 Sims · 29% B4 · Q 1.00",
+   "dauerMs": 2637,
+   "budgetMs": 2052,
+   "msProSim": 1.15,
+   "zeiten": {
+    "gesamtMs": 2622,
+    "vorMs": 120,
+    "netzMs": 106,
+    "sucheMs": 2502,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 332,
+   "typ": "stone",
+   "info": "MCTS 2390 Sims · 34% G5 · Q 1.00",
+   "dauerMs": 2656,
+   "budgetMs": 2070,
+   "msProSim": 1.05,
+   "zeiten": {
+    "gesamtMs": 2640,
+    "vorMs": 119,
+    "netzMs": 106,
+    "sucheMs": 2521,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 334,
+   "typ": "stone",
+   "info": "MCTS 2467 Sims · 72% H4 · Q 1.00",
+   "dauerMs": 2672,
+   "budgetMs": 2088,
+   "msProSim": 1.03,
+   "zeiten": {
+    "gesamtMs": 2656,
+    "vorMs": 118,
+    "netzMs": 106,
+    "sucheMs": 2538,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 336,
+   "typ": "stone",
+   "info": "MCTS 2467 Sims · 60% J3 · Q 1.00",
+   "dauerMs": 2661,
+   "budgetMs": 2052,
+   "msProSim": 1.03,
+   "zeiten": {
+    "gesamtMs": 2657,
+    "vorMs": 119,
+    "netzMs": 106,
+    "sucheMs": 2538,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 338,
+   "typ": "stone",
+   "info": "MCTS 2520 Sims · 66% A3 · Q 1.00",
+   "dauerMs": 2707,
+   "budgetMs": 2070,
+   "msProSim": 1.02,
+   "zeiten": {
+    "gesamtMs": 2691,
+    "vorMs": 117,
+    "netzMs": 108,
+    "sucheMs": 2574,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 340,
+   "typ": "stone",
+   "info": "MCTS 2584 Sims · 32% A1 · Q 1.00",
+   "dauerMs": 2745,
+   "budgetMs": 2070,
+   "msProSim": 1.01,
+   "zeiten": {
+    "gesamtMs": 2729,
+    "vorMs": 119,
+    "netzMs": 107,
+    "sucheMs": 2610,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 342,
+   "typ": "stone",
+   "info": "MCTS 2616 Sims · 85% N7 · Q 1.00",
+   "dauerMs": 2814,
+   "budgetMs": 2088,
+   "msProSim": 1.03,
+   "zeiten": {
+    "gesamtMs": 2797,
+    "vorMs": 115,
+    "netzMs": 106,
+    "sucheMs": 2682,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 344,
+   "typ": "stone",
+   "info": "MCTS 2590 Sims · 42% J13 · Q 1.00",
+   "dauerMs": 2833,
+   "budgetMs": 2106,
+   "msProSim": 1.04,
+   "zeiten": {
+    "gesamtMs": 2817,
+    "vorMs": 117,
+    "netzMs": 107,
+    "sucheMs": 2700,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 346,
+   "typ": "stone",
+   "info": "MCTS 2589 Sims · 51% D19 · Q 1.00",
+   "dauerMs": 2879,
+   "budgetMs": 2142,
+   "msProSim": 1.06,
+   "zeiten": {
+    "gesamtMs": 2875,
+    "vorMs": 121,
+    "netzMs": 107,
+    "sucheMs": 2754,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 2
+  },
+  {
+   "zug": 348,
+   "typ": "stone",
+   "info": "MCTS 2645 Sims · 82% B13 · Q 1.00",
+   "dauerMs": 2918,
+   "budgetMs": 2178,
+   "msProSim": 1.05,
+   "zeiten": {
+    "gesamtMs": 2904,
+    "vorMs": 114,
+    "netzMs": 106,
+    "sucheMs": 2790,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 350,
+   "typ": "stone",
+   "info": "MCTS 2773 Sims · 36% F1 · Q 1.00",
+   "dauerMs": 2948,
+   "budgetMs": 2214,
+   "msProSim": 1.02,
+   "zeiten": {
+    "gesamtMs": 2942,
+    "vorMs": 116,
+    "netzMs": 108,
+    "sucheMs": 2826,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 352,
+   "typ": "stone",
+   "info": "MCTS 2762 Sims · 24% A9 · Q 1.00",
+   "dauerMs": 2986,
+   "budgetMs": 2250,
+   "msProSim": 1.04,
+   "zeiten": {
+    "gesamtMs": 2981,
+    "vorMs": 119,
+    "netzMs": 108,
+    "sucheMs": 2862,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 354,
+   "typ": "stone",
+   "info": "MCTS 2770 Sims · 57% H12 · Q 1.00",
+   "dauerMs": 3019,
+   "budgetMs": 2286,
+   "msProSim": 1.05,
+   "zeiten": {
+    "gesamtMs": 3014,
+    "vorMs": 116,
+    "netzMs": 108,
+    "sucheMs": 2898,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 356,
+   "typ": "stone",
+   "info": "MCTS 2779 Sims · 45% L17 · Q 1.00",
+   "dauerMs": 3076,
+   "budgetMs": 2322,
+   "msProSim": 1.06,
+   "zeiten": {
+    "gesamtMs": 3072,
+    "vorMs": 138,
+    "netzMs": 110,
+    "sucheMs": 2934,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 358,
+   "typ": "stone",
+   "info": "MCTS 2802 Sims · 52% F12 · Q 1.00",
+   "dauerMs": 3121,
+   "budgetMs": 2358,
+   "msProSim": 1.07,
+   "zeiten": {
+    "gesamtMs": 3104,
+    "vorMs": 116,
+    "netzMs": 106,
+    "sucheMs": 2988,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 360,
+   "typ": "stone",
+   "info": "MCTS 2772 Sims · 35% D13 · Q 1.00",
+   "dauerMs": 3157,
+   "budgetMs": 2394,
+   "msProSim": 1.09,
+   "zeiten": {
+    "gesamtMs": 3141,
+    "vorMs": 117,
+    "netzMs": 107,
+    "sucheMs": 3024,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 362,
+   "typ": "stone",
+   "info": "MCTS 2864 Sims · 73% B19 · Q 1.00",
+   "dauerMs": 3194,
+   "budgetMs": 2430,
+   "msProSim": 1.07,
+   "zeiten": {
+    "gesamtMs": 3176,
+    "vorMs": 116,
+    "netzMs": 108,
+    "sucheMs": 3060,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 364,
+   "typ": "stone",
+   "info": "MCTS 2700 Sims · 34% L16 · Q 1.00",
+   "dauerMs": 3225,
+   "budgetMs": 2466,
+   "msProSim": 1.15,
+   "zeiten": {
+    "gesamtMs": 3209,
+    "vorMs": 113,
+    "netzMs": 106,
+    "sucheMs": 3096,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 366,
+   "typ": "stone",
+   "info": "MCTS 2740 Sims · 75% A18 · Q 1.00",
+   "dauerMs": 3263,
+   "budgetMs": 2502,
+   "msProSim": 1.14,
+   "zeiten": {
+    "gesamtMs": 3245,
+    "vorMs": 113,
+    "netzMs": 106,
+    "sucheMs": 3132,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 368,
+   "typ": "stone",
+   "info": "MCTS 2805 Sims · 52% G16 · Q 1.00",
+   "dauerMs": 3306,
+   "budgetMs": 2520,
+   "msProSim": 1.13,
+   "zeiten": {
+    "gesamtMs": 3289,
+    "vorMs": 121,
+    "netzMs": 111,
+    "sucheMs": 3168,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 370,
+   "typ": "stone",
+   "info": "MCTS 2839 Sims · 30% F19 · Q 1.00",
+   "dauerMs": 3325,
+   "budgetMs": 2556,
+   "msProSim": 1.13,
+   "zeiten": {
+    "gesamtMs": 3320,
+    "vorMs": 116,
+    "netzMs": 109,
+    "sucheMs": 3204,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 372,
+   "typ": "stone",
+   "info": "MCTS 2849 Sims · 21% A16 · Q 1.00",
+   "dauerMs": 3369,
+   "budgetMs": 2592,
+   "msProSim": 1.14,
+   "zeiten": {
+    "gesamtMs": 3353,
+    "vorMs": 113,
+    "netzMs": 106,
+    "sucheMs": 3240,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 374,
+   "typ": "stone",
+   "info": "MCTS 2850 Sims · 29% G19 · Q 1.00",
+   "dauerMs": 3410,
+   "budgetMs": 2610,
+   "msProSim": 1.15,
+   "zeiten": {
+    "gesamtMs": 3392,
+    "vorMs": 116,
+    "netzMs": 109,
+    "sucheMs": 3276,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 376,
+   "typ": "stone",
+   "info": "MCTS 2845 Sims · 18% A12 · Q 1.00",
+   "dauerMs": 3426,
+   "budgetMs": 2646,
+   "msProSim": 1.16,
+   "zeiten": {
+    "gesamtMs": 3408,
+    "vorMs": 114,
+    "netzMs": 106,
+    "sucheMs": 3294,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 378,
+   "typ": "stone",
+   "info": "MCTS 2849 Sims · 48% E16 · Q 1.00",
+   "dauerMs": 3480,
+   "budgetMs": 2682,
+   "msProSim": 1.18,
+   "zeiten": {
+    "gesamtMs": 3462,
+    "vorMs": 113,
+    "netzMs": 106,
+    "sucheMs": 3349,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 380,
+   "typ": "stone",
+   "info": "MCTS 2897 Sims · 12% K15 · Q 1.00",
+   "dauerMs": 3504,
+   "budgetMs": 2718,
+   "msProSim": 1.17,
+   "zeiten": {
+    "gesamtMs": 3497,
+    "vorMs": 113,
+    "netzMs": 106,
+    "sucheMs": 3384,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 5
+  },
+  {
+   "zug": 382,
+   "typ": "stone",
+   "info": "MCTS 2865 Sims · 15% K12 · Q 1.00",
+   "dauerMs": 3570,
+   "budgetMs": 2754,
+   "msProSim": 1.2,
+   "zeiten": {
+    "gesamtMs": 3553,
+    "vorMs": 115,
+    "netzMs": 108,
+    "sucheMs": 3438,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 384,
+   "typ": "stone",
+   "info": "MCTS 2881 Sims · 14% A7 · Q 1.00",
+   "dauerMs": 3587,
+   "budgetMs": 2772,
+   "msProSim": 1.2,
+   "zeiten": {
+    "gesamtMs": 3570,
+    "vorMs": 114,
+    "netzMs": 107,
+    "sucheMs": 3456,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 386,
+   "typ": "stone",
+   "info": "MCTS 2808 Sims · 13% E12 · Q 1.00",
+   "dauerMs": 3647,
+   "budgetMs": 2790,
+   "msProSim": 1.25,
+   "zeiten": {
+    "gesamtMs": 3628,
+    "vorMs": 118,
+    "netzMs": 111,
+    "sucheMs": 3510,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 388,
+   "typ": "stone",
+   "info": "MCTS 2803 Sims · 13% R19 · Q 1.00",
+   "dauerMs": 3676,
+   "budgetMs": 2826,
+   "msProSim": 1.27,
+   "zeiten": {
+    "gesamtMs": 3660,
+    "vorMs": 113,
+    "netzMs": 107,
+    "sucheMs": 3547,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 390,
+   "typ": "stone",
+   "info": "MCTS 2884 Sims · 15% M1 · Q 1.00",
+   "dauerMs": 3697,
+   "budgetMs": 2808,
+   "msProSim": 1.24,
+   "zeiten": {
+    "gesamtMs": 3679,
+    "vorMs": 115,
+    "netzMs": 109,
+    "sucheMs": 3564,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 392,
+   "typ": "stone",
+   "info": "MCTS 2814 Sims · 18% R2 · Q 1.00",
+   "dauerMs": 3581,
+   "budgetMs": 2718,
+   "msProSim": 1.23,
+   "zeiten": {
+    "gesamtMs": 3575,
+    "vorMs": 119,
+    "netzMs": 109,
+    "sucheMs": 3456,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 394,
+   "typ": "stone",
+   "info": "MCTS 2722 Sims · 48% R1 · Q 1.00",
+   "dauerMs": 3587,
+   "budgetMs": 2754,
+   "msProSim": 1.27,
+   "zeiten": {
+    "gesamtMs": 3568,
+    "vorMs": 112,
+    "netzMs": 106,
+    "sucheMs": 3456,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 396,
+   "typ": "stone",
+   "info": "MCTS 2707 Sims · 56% R3 · Q 1.00",
+   "dauerMs": 3591,
+   "budgetMs": 2790,
+   "msProSim": 1.28,
+   "zeiten": {
+    "gesamtMs": 3587,
+    "vorMs": 113,
+    "netzMs": 107,
+    "sucheMs": 3474,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 398,
+   "typ": "stone",
+   "info": "MCTS 2684 Sims · 38% R4 · Q 1.00",
+   "dauerMs": 3623,
+   "budgetMs": 2826,
+   "msProSim": 1.3,
+   "zeiten": {
+    "gesamtMs": 3605,
+    "vorMs": 113,
+    "netzMs": 108,
+    "sucheMs": 3492,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 400,
+   "typ": "stone",
+   "info": "MCTS 2669 Sims · 71% S3 · Q 1.00",
+   "dauerMs": 3678,
+   "budgetMs": 2862,
+   "msProSim": 1.33,
+   "zeiten": {
+    "gesamtMs": 3660,
+    "vorMs": 113,
+    "netzMs": 107,
+    "sucheMs": 3547,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 402,
+   "typ": "stone",
+   "info": "MCTS 2657 Sims · 57% T3 · Q 1.00",
+   "dauerMs": 3729,
+   "budgetMs": 2898,
+   "msProSim": 1.35,
+   "zeiten": {
+    "gesamtMs": 3711,
+    "vorMs": 129,
+    "netzMs": 120,
+    "sucheMs": 3582,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 404,
+   "typ": "stone",
+   "info": "MCTS 2635 Sims · 37% T2 · Q 1.00",
+   "dauerMs": 3739,
+   "budgetMs": 2934,
+   "msProSim": 1.37,
+   "zeiten": {
+    "gesamtMs": 3722,
+    "vorMs": 122,
+    "netzMs": 117,
+    "sucheMs": 3600,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 406,
+   "typ": "stone",
+   "info": "MCTS 2688 Sims · 65% S1 · Q 1.00",
+   "dauerMs": 3770,
+   "budgetMs": 2970,
+   "msProSim": 1.35,
+   "zeiten": {
+    "gesamtMs": 3752,
+    "vorMs": 115,
+    "netzMs": 110,
+    "sucheMs": 3637,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 408,
+   "typ": "stone",
+   "info": "MCTS 2590 Sims · 42% K1 · Q 1.00",
+   "dauerMs": 3802,
+   "budgetMs": 2988,
+   "msProSim": 1.42,
+   "zeiten": {
+    "gesamtMs": 3783,
+    "vorMs": 111,
+    "netzMs": 106,
+    "sucheMs": 3672,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 410,
+   "typ": "stone",
+   "info": "MCTS 2635 Sims · 55% L1 · Q 1.00",
+   "dauerMs": 3828,
+   "budgetMs": 3024,
+   "msProSim": 1.41,
+   "zeiten": {
+    "gesamtMs": 3822,
+    "vorMs": 114,
+    "netzMs": 108,
+    "sucheMs": 3708,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 412,
+   "typ": "stone",
+   "info": "MCTS 2646 Sims · 20% K3 · Q 1.00",
+   "dauerMs": 3857,
+   "budgetMs": 3060,
+   "msProSim": 1.41,
+   "zeiten": {
+    "gesamtMs": 3838,
+    "vorMs": 112,
+    "netzMs": 108,
+    "sucheMs": 3726,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 414,
+   "typ": "stone",
+   "info": "MCTS 2607 Sims · 15% O3 · Q 1.00",
+   "dauerMs": 3892,
+   "budgetMs": 3096,
+   "msProSim": 1.44,
+   "zeiten": {
+    "gesamtMs": 3873,
+    "vorMs": 110,
+    "netzMs": 106,
+    "sucheMs": 3763,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 416,
+   "typ": "stone",
+   "info": "MCTS 2666 Sims · 17% D1 · Q 1.00",
+   "dauerMs": 3910,
+   "budgetMs": 3114,
+   "msProSim": 1.42,
+   "zeiten": {
+    "gesamtMs": 3891,
+    "vorMs": 110,
+    "netzMs": 107,
+    "sucheMs": 3781,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 418,
+   "typ": "stone",
+   "info": "MCTS 2718 Sims · 16% A14 · Q 1.00",
+   "dauerMs": 3950,
+   "budgetMs": 3132,
+   "msProSim": 1.4,
+   "zeiten": {
+    "gesamtMs": 3931,
+    "vorMs": 114,
+    "netzMs": 110,
+    "sucheMs": 3817,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 420,
+   "typ": "stone",
+   "info": "MCTS 2781 Sims · 30% E9 · Q 1.00",
+   "dauerMs": 3969,
+   "budgetMs": 3150,
+   "msProSim": 1.39,
+   "zeiten": {
+    "gesamtMs": 3965,
+    "vorMs": 113,
+    "netzMs": 109,
+    "sucheMs": 3852,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 422,
+   "typ": "stone",
+   "info": "MCTS 2893 Sims · 17% C13 · Q 1.00",
+   "dauerMs": 4037,
+   "budgetMs": 3168,
+   "msProSim": 1.35,
+   "zeiten": {
+    "gesamtMs": 4018,
+    "vorMs": 112,
+    "netzMs": 108,
+    "sucheMs": 3906,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 424,
+   "typ": "stone",
+   "info": "MCTS 2675 Sims · 15% T14 · Q 1.00",
+   "dauerMs": 4059,
+   "budgetMs": 3204,
+   "msProSim": 1.47,
+   "zeiten": {
+    "gesamtMs": 4041,
+    "vorMs": 116,
+    "netzMs": 112,
+    "sucheMs": 3924,
+    "nachMs": 1
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 426,
+   "typ": "stone",
+   "info": "MCTS 2639 Sims · 14% M2 · Q 1.00",
+   "dauerMs": 4059,
+   "budgetMs": 3222,
+   "msProSim": 1.49,
+   "zeiten": {
+    "gesamtMs": 4040,
+    "vorMs": 115,
+    "netzMs": 112,
+    "sucheMs": 3925,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 428,
+   "typ": "stone",
+   "info": "MCTS 2493 Sims · 13% D4 · Q 1.00",
+   "dauerMs": 4080,
+   "budgetMs": 3240,
+   "msProSim": 1.58,
+   "zeiten": {
+    "gesamtMs": 4060,
+    "vorMs": 117,
+    "netzMs": 113,
+    "sucheMs": 3943,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 18
+  },
+  {
+   "zug": 430,
+   "typ": "stone",
+   "info": "MCTS 2575 Sims · 32% F5 · Q 1.00",
+   "dauerMs": 4096,
+   "budgetMs": 3222,
+   "msProSim": 1.54,
+   "zeiten": {
+    "gesamtMs": 4074,
+    "vorMs": 114,
+    "netzMs": 110,
+    "sucheMs": 3960,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 19
+  },
+  {
+   "zug": 432,
+   "typ": "stone",
+   "info": "MCTS 2733 Sims · 13% C8 · Q 1.00",
+   "dauerMs": 4114,
+   "budgetMs": 3240,
+   "msProSim": 1.46,
+   "zeiten": {
+    "gesamtMs": 4097,
+    "vorMs": 119,
+    "netzMs": 115,
+    "sucheMs": 3978,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 434,
+   "typ": "stone",
+   "info": "MCTS 2742 Sims · 24% D11 · Q 1.00",
+   "dauerMs": 4090,
+   "budgetMs": 3222,
+   "msProSim": 1.44,
+   "zeiten": {
+    "gesamtMs": 4073,
+    "vorMs": 113,
+    "netzMs": 109,
+    "sucheMs": 3960,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 436,
+   "typ": "stone",
+   "info": "MCTS 2801 Sims · 13% M8 · Q 1.00",
+   "dauerMs": 4069,
+   "budgetMs": 3186,
+   "msProSim": 1.41,
+   "zeiten": {
+    "gesamtMs": 4051,
+    "vorMs": 109,
+    "netzMs": 106,
+    "sucheMs": 3942,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 438,
+   "typ": "stone",
+   "info": "MCTS 2728 Sims · 77% K7 · Q 1.00",
+   "dauerMs": 3876,
+   "budgetMs": 2988,
+   "msProSim": 1.38,
+   "zeiten": {
+    "gesamtMs": 3871,
+    "vorMs": 109,
+    "netzMs": 105,
+    "sucheMs": 3762,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 440,
+   "typ": "stone",
+   "info": "MCTS 2807 Sims · 36% M5 · Q 1.00",
+   "dauerMs": 3912,
+   "budgetMs": 3024,
+   "msProSim": 1.35,
+   "zeiten": {
+    "gesamtMs": 3907,
+    "vorMs": 109,
+    "netzMs": 105,
+    "sucheMs": 3798,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 442,
+   "typ": "stone",
+   "info": "MCTS 2893 Sims · 26% K8 · Q 1.00",
+   "dauerMs": 3954,
+   "budgetMs": 3060,
+   "msProSim": 1.33,
+   "zeiten": {
+    "gesamtMs": 3948,
+    "vorMs": 114,
+    "netzMs": 109,
+    "sucheMs": 3834,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 444,
+   "typ": "stone",
+   "info": "MCTS 3048 Sims · 48% L6 · Q 1.00",
+   "dauerMs": 4021,
+   "budgetMs": 3096,
+   "msProSim": 1.28,
+   "zeiten": {
+    "gesamtMs": 4002,
+    "vorMs": 113,
+    "netzMs": 107,
+    "sucheMs": 3889,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 446,
+   "typ": "stone",
+   "info": "MCTS 3118 Sims · 14% J6 · Q 1.00",
+   "dauerMs": 4054,
+   "budgetMs": 3132,
+   "msProSim": 1.26,
+   "zeiten": {
+    "gesamtMs": 4034,
+    "vorMs": 110,
+    "netzMs": 107,
+    "sucheMs": 3924,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 448,
+   "typ": "stone",
+   "info": "MCTS 3098 Sims · 27% H9 · Q 1.00",
+   "dauerMs": 4079,
+   "budgetMs": 3168,
+   "msProSim": 1.28,
+   "zeiten": {
+    "gesamtMs": 4075,
+    "vorMs": 114,
+    "netzMs": 110,
+    "sucheMs": 3961,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 450,
+   "typ": "stone",
+   "info": "MCTS 3120 Sims · 13% K5 · Q 1.00",
+   "dauerMs": 4077,
+   "budgetMs": 3168,
+   "msProSim": 1.27,
+   "zeiten": {
+    "gesamtMs": 4071,
+    "vorMs": 111,
+    "netzMs": 106,
+    "sucheMs": 3960,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 452,
+   "typ": "stone",
+   "info": "MCTS 3281 Sims · 13% G4 · Q 1.00",
+   "dauerMs": 4125,
+   "budgetMs": 3186,
+   "msProSim": 1.22,
+   "zeiten": {
+    "gesamtMs": 4105,
+    "vorMs": 109,
+    "netzMs": 106,
+    "sucheMs": 3996,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 454,
+   "typ": "stone",
+   "info": "MCTS 3358 Sims · 15% P14 · Q 1.00",
+   "dauerMs": 4165,
+   "budgetMs": 3204,
+   "msProSim": 1.2,
+   "zeiten": {
+    "gesamtMs": 4145,
+    "vorMs": 113,
+    "netzMs": 110,
+    "sucheMs": 4032,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 456,
+   "typ": "stone",
+   "info": "MCTS 3239 Sims · 14% N16 · Q 1.00",
+   "dauerMs": 4180,
+   "budgetMs": 3204,
+   "msProSim": 1.25,
+   "zeiten": {
+    "gesamtMs": 4162,
+    "vorMs": 112,
+    "netzMs": 108,
+    "sucheMs": 4050,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 458,
+   "typ": "stone",
+   "info": "MCTS 3336 Sims · 20% R15 · Q 1.00",
+   "dauerMs": 4179,
+   "budgetMs": 3186,
+   "msProSim": 1.21,
+   "zeiten": {
+    "gesamtMs": 4160,
+    "vorMs": 128,
+    "netzMs": 125,
+    "sucheMs": 4032,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 460,
+   "typ": "stone",
+   "info": "MCTS 3393 Sims · 12% H17 · Q 1.00",
+   "dauerMs": 4182,
+   "budgetMs": 3204,
+   "msProSim": 1.19,
+   "zeiten": {
+    "gesamtMs": 4163,
+    "vorMs": 113,
+    "netzMs": 109,
+    "sucheMs": 4050,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 462,
+   "typ": "stone",
+   "info": "MCTS 3306 Sims · 12% Q19 · Q 1.00",
+   "dauerMs": 4155,
+   "budgetMs": 3186,
+   "msProSim": 1.22,
+   "zeiten": {
+    "gesamtMs": 4145,
+    "vorMs": 113,
+    "netzMs": 109,
+    "sucheMs": 4032,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 8
+  },
+  {
+   "zug": 464,
+   "typ": "stone",
+   "info": "MCTS 3374 Sims · 11% J2 · Q 1.00",
+   "dauerMs": 4186,
+   "budgetMs": 3204,
+   "msProSim": 1.2,
+   "zeiten": {
+    "gesamtMs": 4169,
+    "vorMs": 118,
+    "netzMs": 114,
+    "sucheMs": 4051,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 466,
+   "typ": "stone",
+   "info": "MCTS 3340 Sims · 16% L4 · Q 1.00",
+   "dauerMs": 4165,
+   "budgetMs": 3186,
+   "msProSim": 1.21,
+   "zeiten": {
+    "gesamtMs": 4145,
+    "vorMs": 112,
+    "netzMs": 109,
+    "sucheMs": 4033,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 19
+  },
+  {
+   "zug": 468,
+   "typ": "stone",
+   "info": "MCTS 3315 Sims · 13% J11 · Q 1.00",
+   "dauerMs": 4184,
+   "budgetMs": 3186,
+   "msProSim": 1.22,
+   "zeiten": {
+    "gesamtMs": 4162,
+    "vorMs": 111,
+    "netzMs": 108,
+    "sucheMs": 4051,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 20
+  },
+  {
+   "zug": 470,
+   "typ": "stone",
+   "info": "MCTS 3393 Sims · 13% D9 · Q 1.00",
+   "dauerMs": 4195,
+   "budgetMs": 3186,
+   "msProSim": 1.2,
+   "zeiten": {
+    "gesamtMs": 4178,
+    "vorMs": 109,
+    "netzMs": 106,
+    "sucheMs": 4069,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 472,
+   "typ": "stone",
+   "info": "MCTS 3430 Sims · 12% P16 · Q 1.00",
+   "dauerMs": 4218,
+   "budgetMs": 3186,
+   "msProSim": 1.19,
+   "zeiten": {
+    "gesamtMs": 4199,
+    "vorMs": 113,
+    "netzMs": 110,
+    "sucheMs": 4086,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 18
+  },
+  {
+   "zug": 474,
+   "typ": "stone",
+   "info": "MCTS 3446 Sims · 16% O17 · Q 1.00",
+   "dauerMs": 4197,
+   "budgetMs": 3168,
+   "msProSim": 1.18,
+   "zeiten": {
+    "gesamtMs": 4178,
+    "vorMs": 109,
+    "netzMs": 106,
+    "sucheMs": 4069,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 18
+  },
+  {
+   "zug": 476,
+   "typ": "stone",
+   "info": "MCTS 3459 Sims · 20% M17 · Q 1.00",
+   "dauerMs": 4181,
+   "budgetMs": 3150,
+   "msProSim": 1.17,
+   "zeiten": {
+    "gesamtMs": 4162,
+    "vorMs": 112,
+    "netzMs": 109,
+    "sucheMs": 4050,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 478,
+   "typ": "stone",
+   "info": "MCTS 3504 Sims · 24% K17 · Q 1.00",
+   "dauerMs": 4215,
+   "budgetMs": 3150,
+   "msProSim": 1.17,
+   "zeiten": {
+    "gesamtMs": 4196,
+    "vorMs": 110,
+    "netzMs": 107,
+    "sucheMs": 4086,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 480,
+   "typ": "stone",
+   "info": "MCTS 3613 Sims · 17% N15 · Q 1.00",
+   "dauerMs": 4220,
+   "budgetMs": 3150,
+   "msProSim": 1.14,
+   "zeiten": {
+    "gesamtMs": 4214,
+    "vorMs": 110,
+    "netzMs": 108,
+    "sucheMs": 4104,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 482,
+   "typ": "stone",
+   "info": "MCTS 3709 Sims · 28% Q16 · Q 1.00",
+   "dauerMs": 4286,
+   "budgetMs": 3186,
+   "msProSim": 1.12,
+   "zeiten": {
+    "gesamtMs": 4271,
+    "vorMs": 113,
+    "netzMs": 110,
+    "sucheMs": 4158,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 484,
+   "typ": "stone",
+   "info": "MCTS 3935 Sims · 19% G18 · Q 1.00",
+   "dauerMs": 4309,
+   "budgetMs": 3204,
+   "msProSim": 1.07,
+   "zeiten": {
+    "gesamtMs": 4304,
+    "vorMs": 110,
+    "netzMs": 107,
+    "sucheMs": 4194,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 486,
+   "typ": "stone",
+   "info": "MCTS 4073 Sims · 26% P18 · Q 1.00",
+   "dauerMs": 4348,
+   "budgetMs": 3222,
+   "msProSim": 1.04,
+   "zeiten": {
+    "gesamtMs": 4343,
+    "vorMs": 112,
+    "netzMs": 110,
+    "sucheMs": 4231,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 488,
+   "typ": "stone",
+   "info": "MCTS 4639 Sims · 58% K2 · Q 1.00",
+   "dauerMs": 4395,
+   "budgetMs": 3240,
+   "msProSim": 0.92,
+   "zeiten": {
+    "gesamtMs": 4377,
+    "vorMs": 111,
+    "netzMs": 108,
+    "sucheMs": 4266,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 490,
+   "typ": "stone",
+   "info": "MCTS 4299 Sims · 14% H15 · Q 1.00",
+   "dauerMs": 4415,
+   "budgetMs": 3240,
+   "msProSim": 1,
+   "zeiten": {
+    "gesamtMs": 4396,
+    "vorMs": 111,
+    "netzMs": 108,
+    "sucheMs": 4285,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 18
+  },
+  {
+   "zug": 492,
+   "typ": "stone",
+   "info": "MCTS 4861 Sims · 18% G13 · Q 1.00",
+   "dauerMs": 4430,
+   "budgetMs": 3240,
+   "msProSim": 0.89,
+   "zeiten": {
+    "gesamtMs": 4411,
+    "vorMs": 109,
+    "netzMs": 107,
+    "sucheMs": 4302,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 494,
+   "typ": "stone",
+   "info": "MCTS 5292 Sims · 54% G12 · Q 1.00",
+   "dauerMs": 4423,
+   "budgetMs": 3240,
+   "msProSim": 0.81,
+   "zeiten": {
+    "gesamtMs": 4416,
+    "vorMs": 114,
+    "netzMs": 111,
+    "sucheMs": 4302,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 496,
+   "typ": "stone",
+   "info": "MCTS 5333 Sims · 26% E14 · Q 1.00",
+   "dauerMs": 4447,
+   "budgetMs": 3240,
+   "msProSim": 0.81,
+   "zeiten": {
+    "gesamtMs": 4429,
+    "vorMs": 108,
+    "netzMs": 106,
+    "sucheMs": 4321,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 498,
+   "typ": "stone",
+   "info": "MCTS 5151 Sims · 40% D12 · Q 1.00",
+   "dauerMs": 4431,
+   "budgetMs": 3222,
+   "msProSim": 0.84,
+   "zeiten": {
+    "gesamtMs": 4412,
+    "vorMs": 109,
+    "netzMs": 107,
+    "sucheMs": 4303,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 18
+  },
+  {
+   "zug": 500,
+   "typ": "stone",
+   "info": "MCTS 5271 Sims · 46% C15 · Q 1.00",
+   "dauerMs": 4443,
+   "budgetMs": 3222,
+   "msProSim": 0.82,
+   "zeiten": {
+    "gesamtMs": 4427,
+    "vorMs": 107,
+    "netzMs": 105,
+    "sucheMs": 4320,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 502,
+   "typ": "stone",
+   "info": "MCTS 5730 Sims · 27% E18 · Q 1.00",
+   "dauerMs": 4484,
+   "budgetMs": 3204,
+   "msProSim": 0.76,
+   "zeiten": {
+    "gesamtMs": 4466,
+    "vorMs": 110,
+    "netzMs": 109,
+    "sucheMs": 4356,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 504,
+   "typ": "stone",
+   "info": "MCTS 5855 Sims · 44% B18 · Q 1.00",
+   "dauerMs": 4502,
+   "budgetMs": 3204,
+   "msProSim": 0.75,
+   "zeiten": {
+    "gesamtMs": 4486,
+    "vorMs": 112,
+    "netzMs": 108,
+    "sucheMs": 4374,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 506,
+   "typ": "stone",
+   "info": "MCTS 6190 Sims · 34% S18 · Q 1.00",
+   "dauerMs": 4523,
+   "budgetMs": 3204,
+   "msProSim": 0.71,
+   "zeiten": {
+    "gesamtMs": 4503,
+    "vorMs": 111,
+    "netzMs": 108,
+    "sucheMs": 4392,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 19
+  },
+  {
+   "zug": 508,
+   "typ": "stone",
+   "info": "MCTS 5820 Sims · 24% F15 · Q 1.00",
+   "dauerMs": 4540,
+   "budgetMs": 3204,
+   "msProSim": 0.76,
+   "zeiten": {
+    "gesamtMs": 4521,
+    "vorMs": 111,
+    "netzMs": 110,
+    "sucheMs": 4410,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 510,
+   "typ": "stone",
+   "info": "MCTS 8330 Sims · 39% J9 · Q 1.00",
+   "dauerMs": 4577,
+   "budgetMs": 3222,
+   "msProSim": 0.53,
+   "zeiten": {
+    "gesamtMs": 4557,
+    "vorMs": 110,
+    "netzMs": 109,
+    "sucheMs": 4447,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 19
+  },
+  {
+   "zug": 512,
+   "typ": "stone",
+   "info": "MCTS 4165 Sims · 100% R8 · Q 1.00",
+   "dauerMs": 4610,
+   "budgetMs": 3240,
+   "msProSim": 1.08,
+   "zeiten": {
+    "gesamtMs": 4589,
+    "vorMs": 107,
+    "netzMs": 107,
+    "sucheMs": 4482,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 18
+  },
+  {
+   "zug": 514,
+   "typ": "stone",
+   "info": "MCTS 4153 Sims · 52% R9 · Q 1.00",
+   "dauerMs": 4596,
+   "budgetMs": 3258,
+   "msProSim": 1.07,
+   "zeiten": {
+    "gesamtMs": 4576,
+    "vorMs": 112,
+    "netzMs": 111,
+    "sucheMs": 4464,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 18
+  },
+  {
+   "zug": 516,
+   "typ": "stone",
+   "info": "MCTS 4141 Sims · 50% R9 · Q 1.00",
+   "dauerMs": 4579,
+   "budgetMs": 3258,
+   "msProSim": 1.08,
+   "zeiten": {
+    "gesamtMs": 4573,
+    "vorMs": 109,
+    "netzMs": 108,
+    "sucheMs": 4464,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 4
+  },
+  {
+   "zug": 518,
+   "typ": "stone",
+   "info": "MCTS 4148 Sims · 100% R9 · Q 1.00",
+   "dauerMs": 4599,
+   "budgetMs": 3276,
+   "msProSim": 1.08,
+   "zeiten": {
+    "gesamtMs": 4594,
+    "vorMs": 112,
+    "netzMs": 111,
+    "sucheMs": 4482,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 3
+  },
+  {
+   "zug": 520,
+   "typ": "stone",
+   "info": "MCTS 3288 Sims · 23% S9 · Q 1.00",
+   "dauerMs": 3692,
+   "budgetMs": 2358,
+   "msProSim": 1.08,
+   "zeiten": {
+    "gesamtMs": 3675,
+    "vorMs": 111,
+    "netzMs": 106,
+    "sucheMs": 3564,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 522,
+   "typ": "stone",
+   "info": "MCTS 3328 Sims · 16% S7 · Q 1.00",
+   "dauerMs": 3710,
+   "budgetMs": 2376,
+   "msProSim": 1.08,
+   "zeiten": {
+    "gesamtMs": 3696,
+    "vorMs": 113,
+    "netzMs": 108,
+    "sucheMs": 3583,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 524,
+   "typ": "stone",
+   "info": "MCTS 3285 Sims · 20% R6 · Q 1.00",
+   "dauerMs": 3733,
+   "budgetMs": 2394,
+   "msProSim": 1.1,
+   "zeiten": {
+    "gesamtMs": 3717,
+    "vorMs": 117,
+    "netzMs": 111,
+    "sucheMs": 3600,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 13
+  },
+  {
+   "zug": 526,
+   "typ": "stone",
+   "info": "MCTS 3353 Sims · 26% T5 · Q 1.00",
+   "dauerMs": 3741,
+   "budgetMs": 2412,
+   "msProSim": 1.08,
+   "zeiten": {
+    "gesamtMs": 3731,
+    "vorMs": 113,
+    "netzMs": 108,
+    "sucheMs": 3618,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 8
+  },
+  {
+   "zug": 528,
+   "typ": "stone",
+   "info": "MCTS 3064 Sims · 28% N11 · Q 1.00",
+   "dauerMs": 3767,
+   "budgetMs": 2430,
+   "msProSim": 1.19,
+   "zeiten": {
+    "gesamtMs": 3751,
+    "vorMs": 115,
+    "netzMs": 109,
+    "sucheMs": 3636,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 530,
+   "typ": "stone",
+   "info": "MCTS 3109 Sims · 17% O11 · Q 1.00",
+   "dauerMs": 3781,
+   "budgetMs": 2448,
+   "msProSim": 1.18,
+   "zeiten": {
+    "gesamtMs": 3764,
+    "vorMs": 110,
+    "netzMs": 106,
+    "sucheMs": 3654,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 532,
+   "typ": "stone",
+   "info": "MCTS 3371 Sims · 18% P9 · Q 1.00",
+   "dauerMs": 3800,
+   "budgetMs": 2466,
+   "msProSim": 1.09,
+   "zeiten": {
+    "gesamtMs": 3783,
+    "vorMs": 111,
+    "netzMs": 106,
+    "sucheMs": 3672,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 534,
+   "typ": "stone",
+   "info": "MCTS 3323 Sims · 17% S11 · Q 1.00",
+   "dauerMs": 3818,
+   "budgetMs": 2484,
+   "msProSim": 1.11,
+   "zeiten": {
+    "gesamtMs": 3800,
+    "vorMs": 110,
+    "netzMs": 106,
+    "sucheMs": 3690,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 536,
+   "typ": "stone",
+   "info": "MCTS 3372 Sims · 29% T11 · Q 1.00",
+   "dauerMs": 3836,
+   "budgetMs": 2502,
+   "msProSim": 1.1,
+   "zeiten": {
+    "gesamtMs": 3818,
+    "vorMs": 110,
+    "netzMs": 106,
+    "sucheMs": 3708,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 538,
+   "typ": "stone",
+   "info": "MCTS 3383 Sims · 17% P1 · Q 1.00",
+   "dauerMs": 3857,
+   "budgetMs": 2520,
+   "msProSim": 1.1,
+   "zeiten": {
+    "gesamtMs": 3837,
+    "vorMs": 111,
+    "netzMs": 107,
+    "sucheMs": 3726,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 19
+  },
+  {
+   "zug": 540,
+   "typ": "stone",
+   "info": "MCTS 3457 Sims · 59% Q1 · Q 1.00",
+   "dauerMs": 3890,
+   "budgetMs": 2538,
+   "msProSim": 1.09,
+   "zeiten": {
+    "gesamtMs": 3874,
+    "vorMs": 112,
+    "netzMs": 108,
+    "sucheMs": 3762,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 14
+  },
+  {
+   "zug": 542,
+   "typ": "stone",
+   "info": "MCTS 3562 Sims · 18% T9 · Q 1.00",
+   "dauerMs": 3911,
+   "budgetMs": 2556,
+   "msProSim": 1.06,
+   "zeiten": {
+    "gesamtMs": 3894,
+    "vorMs": 114,
+    "netzMs": 110,
+    "sucheMs": 3780,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 544,
+   "typ": "stone",
+   "info": "MCTS 3711 Sims · 23% T7 · Q 1.00",
+   "dauerMs": 3925,
+   "budgetMs": 2574,
+   "msProSim": 1.02,
+   "zeiten": {
+    "gesamtMs": 3908,
+    "vorMs": 110,
+    "netzMs": 107,
+    "sucheMs": 3798,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 546,
+   "typ": "stone",
+   "info": "MCTS 3719 Sims · 35% T6 · Q 1.00",
+   "dauerMs": 3951,
+   "budgetMs": 2592,
+   "msProSim": 1.03,
+   "zeiten": {
+    "gesamtMs": 3933,
+    "vorMs": 117,
+    "netzMs": 113,
+    "sucheMs": 3816,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 548,
+   "typ": "stone",
+   "info": "MCTS 3715 Sims · 16% T4 · Q 1.00",
+   "dauerMs": 3966,
+   "budgetMs": 2610,
+   "msProSim": 1.03,
+   "zeiten": {
+    "gesamtMs": 3948,
+    "vorMs": 114,
+    "netzMs": 111,
+    "sucheMs": 3834,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 550,
+   "typ": "stone",
+   "info": "MCTS 3821 Sims · 18% Q6 · Q 1.00",
+   "dauerMs": 3978,
+   "budgetMs": 2628,
+   "msProSim": 1.01,
+   "zeiten": {
+    "gesamtMs": 3961,
+    "vorMs": 109,
+    "netzMs": 106,
+    "sucheMs": 3852,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 552,
+   "typ": "stone",
+   "info": "MCTS 3923 Sims · 20% Q5 · Q 1.00",
+   "dauerMs": 4000,
+   "budgetMs": 2646,
+   "msProSim": 0.99,
+   "zeiten": {
+    "gesamtMs": 3980,
+    "vorMs": 110,
+    "netzMs": 106,
+    "sucheMs": 3870,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 18
+  },
+  {
+   "zug": 554,
+   "typ": "stone",
+   "info": "MCTS 4100 Sims · 15% R5 · Q 1.00",
+   "dauerMs": 4017,
+   "budgetMs": 2664,
+   "msProSim": 0.95,
+   "zeiten": {
+    "gesamtMs": 3998,
+    "vorMs": 110,
+    "netzMs": 108,
+    "sucheMs": 3888,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 556,
+   "typ": "stone",
+   "info": "MCTS 4057 Sims · 15% S5 · Q 1.00",
+   "dauerMs": 4034,
+   "budgetMs": 2682,
+   "msProSim": 0.96,
+   "zeiten": {
+    "gesamtMs": 4016,
+    "vorMs": 109,
+    "netzMs": 106,
+    "sucheMs": 3907,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 558,
+   "typ": "stone",
+   "info": "MCTS 4263 Sims · 14% R11 · Q 1.00",
+   "dauerMs": 4085,
+   "budgetMs": 2700,
+   "msProSim": 0.93,
+   "zeiten": {
+    "gesamtMs": 4068,
+    "vorMs": 108,
+    "netzMs": 106,
+    "sucheMs": 3960,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 15
+  },
+  {
+   "zug": 560,
+   "typ": "stone",
+   "info": "MCTS 4143 Sims · 20% Q10 · Q 1.00",
+   "dauerMs": 4109,
+   "budgetMs": 2718,
+   "msProSim": 0.96,
+   "zeiten": {
+    "gesamtMs": 4089,
+    "vorMs": 111,
+    "netzMs": 109,
+    "sucheMs": 3978,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 18
+  },
+  {
+   "zug": 562,
+   "typ": "stone",
+   "info": "MCTS 4427 Sims · 20% Q9 · Q 1.00",
+   "dauerMs": 4141,
+   "budgetMs": 2736,
+   "msProSim": 0.91,
+   "zeiten": {
+    "gesamtMs": 4127,
+    "vorMs": 113,
+    "netzMs": 110,
+    "sucheMs": 4014,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 12
+  },
+  {
+   "zug": 564,
+   "typ": "stone",
+   "info": "MCTS 4556 Sims · 19% Q8 · Q 1.00",
+   "dauerMs": 4160,
+   "budgetMs": 2754,
+   "msProSim": 0.88,
+   "zeiten": {
+    "gesamtMs": 4142,
+    "vorMs": 110,
+    "netzMs": 108,
+    "sucheMs": 4032,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 566,
+   "typ": "stone",
+   "info": "MCTS 4991 Sims · 18% Q7 · Q 1.00",
+   "dauerMs": 4187,
+   "budgetMs": 2772,
+   "msProSim": 0.81,
+   "zeiten": {
+    "gesamtMs": 4167,
+    "vorMs": 117,
+    "netzMs": 113,
+    "sucheMs": 4050,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 18
+  },
+  {
+   "zug": 568,
+   "typ": "stone",
+   "info": "MCTS 4588 Sims · 19% T8 · Q 1.00",
+   "dauerMs": 4203,
+   "budgetMs": 2790,
+   "msProSim": 0.89,
+   "zeiten": {
+    "gesamtMs": 4184,
+    "vorMs": 115,
+    "netzMs": 113,
+    "sucheMs": 4069,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 16
+  },
+  {
+   "zug": 570,
+   "typ": "stone",
+   "info": "MCTS 5073 Sims · 13% O5 · Q 1.00",
+   "dauerMs": 4215,
+   "budgetMs": 2808,
+   "msProSim": 0.81,
+   "zeiten": {
+    "gesamtMs": 4195,
+    "vorMs": 109,
+    "netzMs": 107,
+    "sucheMs": 4086,
+    "nachMs": 0
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 572,
+   "typ": "stone",
+   "info": "MCTS 6187 Sims · 26% P5 · Q 1.00",
+   "dauerMs": 4240,
+   "budgetMs": 2826,
+   "msProSim": 0.66,
+   "zeiten": {
+    "gesamtMs": 4221,
+    "vorMs": 117,
+    "netzMs": 115,
+    "sucheMs": 4104,
+    "nachMs": 0
+   },
+   "nachrichtMs": 1,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 574,
+   "typ": "stone",
+   "info": "MCTS 6780 Sims · 19% Q4 · Q 1.00",
+   "dauerMs": 4274,
+   "budgetMs": 2844,
+   "msProSim": 0.61,
+   "zeiten": {
+    "gesamtMs": 4252,
+    "vorMs": 112,
+    "netzMs": 109,
+    "sucheMs": 4140,
+    "nachMs": 0
+   },
+   "nachrichtMs": 5,
+   "anwendenMs": 17
+  },
+  {
+   "zug": 576,
+   "typ": "stone",
+   "info": "MCTS 7438 Sims · 27% Q3 · Q 1.00",
+   "dauerMs": 4273,
+   "budgetMs": 2862,
+   "msProSim": 0.56,
+   "zeiten": {
+    "gesamtMs": 4266,
+    "vorMs": 108,
+    "netzMs": 106,
+    "sucheMs": 4158,
+    "nachMs": 0
+   },
+   "nachrichtMs": 0,
+   "anwendenMs": 6
+  },
+  {
+   "zug": 578,
+   "typ": "pass",
+   "info": "Pass — der Gegnerzug ist nicht abwendbar",
+   "dauerMs": 350,
+   "budgetMs": 2880,
+   "msProSim": 0.56,
+   "zeiten": {
+    "gesamtMs": 10,
+    "vorMs": null,
+    "netzMs": 0,
+    "sucheMs": null,
+    "nachMs": null
+   },
+   "nachrichtMs": 2,
+   "anwendenMs": 337
+  }
+ ],
+ "reproduktion": {
+  "aiColor": 2,
+  "mc": 577,
+  "reqId": 289,
+  "koPoint": null,
+  "lastMove": 319,
+  "extra": {
+   "gegnerPasste": true,
+   "wertung": "territory",
+   "komi": 7.5
+  },
+  "params": {
+   "openingMoves": 20,
+   "endgameMoves": 80,
+   "endgameEmpty": 50,
+   "evalStreuung": 1,
+   "openEdge3": 40,
+   "openLineWeight": 0,
+   "openEdge5": 25,
+   "openCenter": 8,
+   "openHoshiBonus": 30,
+   "openCornerBonus": 15,
+   "openCapBonus": 400,
+   "openNeighborBonus": 10,
+   "openContactResponse": 0,
+   "phaseNormalize": 0,
+   "midCapBonus": 800,
+   "midLibBonus": 30,
+   "midLibCap": 999,
+   "midLibSoft": 0,
+   "midLineWeight": 80,
+   "midAtariPenalty": 400,
+   "mid2LibPenalty": 60,
+   "midRescueAtari": 350,
+   "midRescue2Lib": 60,
+   "midOppAtari": 350,
+   "midOpp2Lib": 120,
+   "midOpp3Lib": 30,
+   "midEmptyNeighbor": 8,
+   "midOwnNeighborBonus": 15,
+   "midOwnGroup2": 40,
+   "midOwnGroup3": 60,
+   "midExtBonus": 6,
+   "midSafeBonus": 25,
+   "midOppAtariNear": 150,
+   "endAreaGain": 30,
+   "endCapBonus": 18,
+   "endAtariPenalty": 400,
+   "atariSizeWeight": 0,
+   "endOppAtari": 80,
+   "endLibPressure": 40,
+   "tsumegoCapBonus": 1200,
+   "tsumegoAtariSet": 500,
+   "tsumego2Lib": 150,
+   "tsumegoRescue3": 700,
+   "tsumegoRescue2": 400,
+   "tsumegoRescue1": 80,
+   "tsumegoRescue2to3": 150,
+   "tsumegoLibBonus": 40,
+   "tsumego2LibPenalty": 60,
+   "tsumegoEyeBonus": 100,
+   "tsumegoEyeMax": 300,
+   "tsumegoEyeOpenPenalty": 0,
+   "tsumegoNakade": 0.5,
+   "tsumegoWeaken": 300,
+   "tsumegoSafetyMul": 0.2,
+   "tsumegoSunkCost": 0,
+   "tsumegoSunkStreak": 3,
+   "crisisAtari": 100,
+   "crisisLarge2Lib": 80,
+   "crisisDragon3Lib": 50,
+   "crisisLargeSize": 4,
+   "crisisDragonSize": 8,
+   "passGainThreshold": 60,
+   "passMinMc40": -50,
+   "passMinMc80": 20,
+   "passMinMc120": 8,
+   "passMinMc150": 10,
+   "augenSchutz": 2,
+   "passUnabwendbar": 1,
+   "gegnerWert": 0,
+   "gegnerGebiet": 0,
+   "krisenKandidaten": 0,
+   "leseRettung": 0,
+   "leseVerzicht": 1,
+   "atariVerzicht": 0,
+   "aiTimeBudget": 1800,
+   "rolloutWeight": 0.65,
+   "scoreWeight": 0.35,
+   "rolloutSample": 32,
+   "candOpen": 8,
+   "rollOpen": 3,
+   "depthOpen": 10,
+   "candMid": 5,
+   "rollMid": 3,
+   "depthMid": 12,
+   "candMidMax": 12,
+   "rollMidMin": 2,
+   "depthMidMax": 30,
+   "candEnd": 8,
+   "rollEndMin": 4,
+   "rollEnd": 6,
+   "depthEnd": 20,
+   "depthEndMax": 50,
+   "crisisCand": 4,
+   "crisisRoll": 5,
+   "crisisDepth": 20,
+   "phaseBlendWidth": 8,
+   "useMCTS": 1,
+   "puctC": 1.4,
+   "mctsRootChildren": 16,
+   "mctsChildren": 8,
+   "mctsRolloutDepth": 24,
+   "mctsFixedSims": 0,
+   "mctsValueScale": 200,
+   "mctsMaxDepth": 60,
+   "raveEnabled": 1,
+   "raveK": 300,
+   "mctsTreeReuse": 1,
+   "wurzelFrisch": 1,
+   "quickRettung": 0,
+   "netMaxBlend": 0,
+   "netWarmup": 10,
+   "netLR": 0.001,
+   "netScoreScale": 5000,
+   "netGradClip": 1,
+   "netWeightDecay": 0.00001,
+   "netMaxNorm": 4,
+   "mctsFPU": 0.45,
+   "mctsPriorSharp": 3,
+   "localityBonus": 0,
+   "localityRadius": 4,
+   "influenceInvade": 0,
+   "influenceOwn": 0,
+   "endTieBreak": 1,
+   "raumGewicht": 0,
+   "raumZug": 0,
+   "gebietGewicht": 0,
+   "gebietZug": 80,
+   "gebietFreiheit": 0,
+   "gebietSicher": 0,
+   "musterGewicht": 200,
+   "musterAb": 0,
+   "musterOhneVorgabe": 1,
+   "musterWeissOhneVorgabe": 1,
+   "vorgabeSteine": 0,
+   "endspielNetz": 0.8,
+   "endspielNetzTop": 4,
+   "endspielNetzAb": 80,
+   "adaptiveBudgetEnabled": 1,
+   "adaptiveBudgetRefEmpty": 150,
+   "adaptiveBudgetMaxFactor": 2.5,
+   "adaptiveBudgetTargetMinSims": 80,
+   "bensonEval": 1,
+   "bensonEvalMaxEmpty": 160,
+   "bensonDeathTransfer": 0,
+   "deathDiscount": 0,
+   "deathDiscountSize": 6,
+   "deathTransfer": 1,
+   "transferTelemetrie": 0,
+   "bensonAliveExempt": 0,
+   "bensonMoveFilter": 1,
+   "captureWeight": 20,
+   "captureCap": 0,
+   "resignEnabled": 1,
+   "resignQ": 0.95,
+   "resignAreaMargin": -1,
+   "resignStreak": 5,
+   "passNachGegnerpass": 0,
+   "passMarge": 20,
+   "passSpanne": 2,
+   "passGemischt": 0.25,
+   "diagonalAugeEnde": 0,
+   "diagonalAugeSchluss": 0,
+   "resignMinMoves": 60,
+   "resignAllDeadStreak": 3
+  },
+  "netBlend": 0,
+  "lastMsPerSim": 0.5590212422694273
+ },
+ "_auszug": "Auszug aus dem Fehlerbericht vom 25.11.2026: meta, kiDiagnose, reproduktion ohne board/histHashes/captures; brett und zugprotokoll fehlen."
+}
