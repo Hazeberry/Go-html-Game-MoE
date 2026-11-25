@@ -23,6 +23,11 @@
        besteht die Regel je Arm sicher.
      - Das Zuglimit steht nicht im JSON, nur in der Kopfzeile des Logs („max N Züge“).
 
+   Jede Partie wird einzeln geprüft (§13.4, unter Regel 2): aIst, sieger und siegerFarbe aus
+   ihren Wertebereichen, sieger passend zu siegerFarbe und aIst, keine Aufgabe, ein Stand aus
+   zwei endlichen Zahlen, der siegerFarbe ergibt, und Züge von 1 bis zum Zuglimit. Sonst
+   zählte ein fehlender Sieger still als Niederlage von B, eine unbekannte Farbe als Weiß.
+
    Aufruf:
      node auswertung/skalierung-bericht.js --stufe 1 --commit <sha> --html stand.html \
           --teil t.json,t.jsonl,t.log  [--teil …]  [--n 2700]  [--markdown]
@@ -51,6 +56,30 @@ const BLOCKSUMMEN = {
 };
 
 const bereich = (start, n) => Array.from({length: n}, (_, i) => start + i);
+/* §13.4: Farbe von A als Kürzel, wie siegerFarbe sie schreibt. */
+const FARBE = new Map([['Schwarz', 'S'], ['Weiß', 'W']]);
+const zeige = v => v === undefined ? 'fehlt' : JSON.stringify(v);
+
+/* §13.4: Was eine Partie zählbar macht. Gibt null zurück oder den ersten Fehler. Der Harness
+   schreibt nur diese Werte (ab-harness.js, Standardmodus); die Prüfung schützt vor
+   beschädigten, bearbeiteten oder fremden Dateien und vor einem richtigen Wert am falschen Ort. */
+function partieFehler(x) {
+  if (!x || typeof x !== 'object') return 'kein Partie-Eintrag';
+  if (!FARBE.has(x.aIst)) return `aIst ${zeige(x.aIst)}, erlaubt sind Schwarz und Weiß`;
+  if (x.sieger !== 'A' && x.sieger !== 'B') return `sieger ${zeige(x.sieger)}, erlaubt sind A und B`;
+  if (x.siegerFarbe !== 'S' && x.siegerFarbe !== 'W') return `siegerFarbe ${zeige(x.siegerFarbe)}, erlaubt sind S und W`;
+  const soll = x.siegerFarbe === FARBE.get(x.aIst) ? 'A' : 'B';
+  if (x.sieger !== soll)
+    return `sieger ${x.sieger} passt nicht zu siegerFarbe ${x.siegerFarbe} bei A als ${x.aIst} (dann gewinnt ${soll})`;
+  if (x.aufgabe !== null) return `aufgabe ${zeige(x.aufgabe)}, bei Aufgabe aus verlangt ist null`;
+  const m = /^B (\S+) : W (\S+)$/.exec(typeof x.stand === 'string' ? x.stand : '');
+  const b = m ? Number(m[1]) : NaN, w = m ? Number(m[2]) : NaN;
+  if (!Number.isFinite(b) || !Number.isFinite(w)) return `Stand ${zeige(x.stand)} trägt keine zwei endlichen Zahlen`;
+  if ((b > w ? 'S' : 'W') !== x.siegerFarbe) return `Stand ${x.stand} ergibt nicht siegerFarbe ${x.siegerFarbe}`;
+  if (!(Number.isInteger(x.zuege) && x.zuege >= 1 && x.zuege <= ZUGLIMIT))
+    return `zuege ${zeige(x.zuege)}, verlangt ist eine ganze Zahl von 1 bis ${ZUGLIMIT}`;
+  return null;
+}
 /* §5.1: die beiden Vergleiche von Stufe 1, wörtlich. */
 const STUFE1 = [
   {name: 'K1', a: 120, b: 240, seeds: bereich(11250001, 15), partienJeTeil: 82},
@@ -193,9 +222,15 @@ function pruefe(a, vgl, teile) {
     const g = v.partienJeTeil, p = Array.isArray(t.daten.partien) ? t.daten.partien : [];
     if (!(t.daten.konfig || {}).abgeschlossen) gruende.push(`Regel 2: ${t.name} ist nicht abgeschlossen.`);
     if (p.length !== g) gruende.push(`Regel 2: ${t.name} hat ${p.length} Partien, festgelegt sind ${g}.`);
-    const aSchwarz = p.filter(x => x.aIst === 'Schwarz').length;
-    if (p.length === g && aSchwarz !== g / 2)
-      gruende.push(`Regel 2: ${t.name} — A spielt ${aSchwarz}-mal Schwarz und ${g - aSchwarz}-mal Weiß, verlangt sind je ${g / 2}.`);
+    const fehler = p.map((x, i) => [i, partieFehler(x)]).filter(([, f]) => f);
+    if (fehler.length)
+      gruende.push(`Regel 2: ${t.name} — ${fehler.length} ${fehler.length === 1 ? 'Partie ist' : 'Partien sind'} nicht auswertbar (§13.4): `
+        + fehler.slice(0, 3).map(([i, f]) => `Partie ${(p[i] && p[i].partie) || i + 1}: ${f}`).join('; ')
+        + (fehler.length > 3 ? `; und ${fehler.length - 3} weitere` : '') + '.');
+    const aSchwarz = p.filter(x => x && x.aIst === 'Schwarz').length;
+    const aWeiss = p.filter(x => x && x.aIst === 'Weiß').length;
+    if (p.length === g && (aSchwarz !== g / 2 || aWeiss !== g / 2))
+      gruende.push(`Regel 2: ${t.name} — A spielt ${aSchwarz}-mal Schwarz und ${aWeiss}-mal Weiß, verlangt sind je ${g / 2}.`);
     if (t.roh === null) gruende.push(`Regel 2: ${t.name} — kein Rohdump übergeben; der Lauf muss mit roh=1 laufen (§5.1).`);
     else if (t.roh.length !== p.length)
       gruende.push(`Regel 2: ${t.name} zählt ${p.length} Partien, der Rohdump ${t.roh.length}.`);
@@ -456,6 +491,6 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = {STUFE1, stufe2, gueltigesN, KOSTEN_N, TEILER, BLOCKSUMMEN, PARTIEN, ZUGLIMIT, KOMI,
+module.exports = {STUFE1, stufe2, gueltigesN, partieFehler, KOSTEN_N, TEILER, BLOCKSUMMEN, PARTIEN, ZUGLIMIT, KOMI,
                   fisherZweiseitig, elo, seElo, zuglimitAusLog, vergleiche, pruefe, rechne, abflachung, urteilF1,
                   urteilF2, kosten, lageZuK2, ergebnisse, auswerten, bericht, lies};

@@ -9,7 +9,8 @@
         aus der Entscheidung: S = 2749 → 2700 → 5400, S = 2750 → 2800 → 5600.
      2. Median und Perzentil wie im Kopf des Skripts beschrieben.
      3. Die Suchzeit kommt aus zeiten.sucheMs, nicht aus Simulationen × msProSim.
-     4. Jede der fünf Regeln aus §4.2 schlägt an, wenn sie verletzt ist.
+     4. Jede der fünf Regeln aus §4.2 schlägt an, wenn sie verletzt ist; Regel 4 auch bei einem
+        KI-Steinzug ohne Simulationszahl (§13.4), der vorher still aus S herausfiel.
      5. Ende zu Ende über die Befehlszeile.
 
    Aufruf:  node tests/arbeitspunkt.js */
@@ -123,9 +124,18 @@ test('Regel 3: Pages-Bereitstellungen im Fenster', () => {
   pruefe(regel(gruende(bericht({meta: {erstellt: '2026-11-26T07:00:00Z'}})), 3).some(g => /vor dem festgelegten Stand/.test(g)), 'Export vor dem Merge');
 });
 
-test('Regel 4: Worker', () => {
+test('Regel 4: Worker und Steinzüge ohne Simulationszahl', () => {
   pruefe(regel(gruende(bericht({meta: {workerNeustarts: 1}})), 4).length === 1, 'Neustart');
   pruefe(regel(gruende(bericht({meta: {workerDead: true}})), 4).length === 1, 'tot');
+  /* Ein Notzug nach einem KI-Fehler: typ stone, info null (index.html, applyAIResult). */
+  const not = bericht(); not.kiDiagnose[10].info = null;
+  const g = gruende(not);
+  pruefe(regel(g, 4).some(x => /1 KI-Steinzug ohne Simulationszahl \(Zug 20\)/.test(x)), `Notzug: ${g.join(' | ')}`);
+  pruefe(/KEIN URTEIL/.test(W.bericht(not.meta, null, g, true)), 'Bericht sagt KEIN URTEIL');
+  pruefeGleich(regel(g, 5).length, 0, 'Regel 5 bleibt erfüllt; der Grund ist allein der Notzug');
+  const anders = bericht(); anders.kiDiagnose[3].info = 'Eröffnung'; anders.kiDiagnose[7].info = undefined;
+  pruefe(regel(gruende(anders), 4).some(x => /2 KI-Steinzüge ohne Simulationszahl \(Zug 6, 14\)/.test(x)), 'zwei Züge');
+  pruefeGleich(regel(gruende(bericht()), 4).length, 0, 'sauber ohne Grund');
 });
 
 test('Regel 5: genug Steinzüge, davon genug nach Zug 80', () => {

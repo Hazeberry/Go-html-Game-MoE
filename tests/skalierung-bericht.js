@@ -8,6 +8,8 @@
         vorhandenen Funktionen.
      2. Die Zuordnung zu K1 und K2 kommt aus konfig.A/konfig.B, nicht aus der Reihenfolge.
      3. Jede der fünf Regeln aus §5.5 schlägt an, wenn sie verletzt ist; Regel 5 konservativ.
+        Dazu jede Partie einzeln (§13.4): Jeder Fehler in aIst, sieger, siegerFarbe, aufgabe,
+        Stand oder zuege ergibt KEIN URTEIL, auch wenn Partienzahl und Farbsumme stimmen.
      4. Eine extreme Siegrate in einem Teillauf ist KEIN Gültigkeitsgrund.
      5. Die Urteilssätze aus §5.3, wörtlich.
      6. Stufe 2: Seeds und Vergleich K3 = N gegen 2N aus N und Partien je Teillauf; N muss ein
@@ -39,16 +41,25 @@ const engineWieFestgelegt = () => {
 let TMP;
 const tmpdir = () => TMP || (TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'skalierung-')));
 
-/* Ein Teillauf: g Partien, die ersten `siegeB` gewinnt B, Farben abwechselnd wie im Harness. */
+/* Ein Teillauf: g Partien, die ersten `siegeB` gewinnt B, Farben abwechselnd wie im Harness.
+   siegerFarbe, aufgabe und Stand passen dazu wie beim Harness; opt.partie(x, i) darf eine
+   Partie danach verändern. */
 function teil(seed, a, b, opt = {}) {
   const g = opt.g === undefined ? 82 : opt.g, siegeB = opt.siegeB === undefined ? 50 : opt.siegeB;
   const armA = opt.armA || `mctsFixedSims=${a},resignEnabled=0`;
   const armB = opt.armB || `mctsFixedSims=${b},resignEnabled=0`;
-  const partien = Array.from({length: g}, (_, i) => ({
-    partie: i + 1, aIst: opt.aIst ? opt.aIst(i) : (i % 2 === 0 ? 'Schwarz' : 'Weiß'),
-    sieger: i < siegeB ? 'B' : 'A', zuege: opt.zuege ? opt.zuege(i) : 370,
-    simsA: a, simsB: b, dauerMin: opt.minJePartie === undefined ? 0.5 : opt.minJePartie
-  }));
+  const partien = Array.from({length: g}, (_, i) => {
+    const aIst = opt.aIst ? opt.aIst(i) : (i % 2 === 0 ? 'Schwarz' : 'Weiß');
+    const sieger = i < siegeB ? 'B' : 'A';
+    const aIstSchwarz = aIst === 'Schwarz';
+    const siegerFarbe = (sieger === 'A') === aIstSchwarz ? 'S' : 'W';
+    const x = {partie: i + 1, aIst, sieger, siegerFarbe, aufgabe: null,
+               stand: siegerFarbe === 'S' ? 'B 190 : W 177.5' : 'B 175 : W 192.5',
+               zuege: opt.zuege ? opt.zuege(i) : 370,
+               simsA: a, simsB: b, dauerMin: opt.minJePartie === undefined ? 0.5 : opt.minJePartie};
+    if (opt.partie) opt.partie(x, i);
+    return x;
+  });
   return {
     name: `ab-${seed}.json`,
     daten: {konfig: {A: armA, B: armB, komi: opt.komi === undefined ? 7.5 : opt.komi,
@@ -149,6 +160,41 @@ test('Regel 2: Partienzahl, Farben, Abschluss, Rohdump', () => {
   pruefe(g({roh: null}).some(x => /kein Rohdump/.test(x)), 'Rohdump fehlt');
   pruefe(g({rohN: 81}).some(x => /Rohdump 81/.test(x)), 'Rohdump kürzer');
   pruefeGleich(g({}).length, 0, 'unverändert gültig');
+});
+
+test('Jede Partie einzeln (§13.4): jeder Fehler ergibt KEIN URTEIL', () => {
+  /* Partie 1 (Index 0) spielt A als Schwarz und gewinnt B (siegeB 50): sieger B, siegerFarbe W. */
+  const keinUrteil = (aendern, muster, name, index = 0) => {
+    const t = stufe1().map(x => x.daten.konfig.seed === 11250003
+      ? teil(11250003, 120, 240, {partie: (p, i) => { if (i === index) aendern(p); }}) : x);
+    const gr = ohneRegel4(W.pruefe(A1, W.STUFE1, t).gruende);
+    pruefe(gr.length > 0 && regel(gr, 2).some(x => muster.test(x)), `${name}: ${gr.join(' | ') || 'kein Grund'}`);
+    pruefe(/KEIN URTEIL/.test(W.bericht(A1, W.STUFE1, null, gr)), `${name}: Bericht sagt KEIN URTEIL`);
+  };
+  /* Die beiden gemeldeten Fälle. Vorher zählte ein fehlender Sieger als Niederlage von B, und
+     eine unbekannte Farbe ging in der Farbprüfung als Weiß durch (41 Schwarz, 41 „nicht Schwarz“). */
+  keinUrteil(p => { delete p.sieger; }, /Partie 1: sieger fehlt/, 'sieger fehlt');
+  keinUrteil(p => { p.sieger = 'remis'; }, /sieger "remis"/, 'sieger unbekannt');
+  keinUrteil(p => { p.aIst = 'schwarz'; }, /Partie 1: aIst "schwarz"/, 'aIst unbekannt');
+  keinUrteil(p => { delete p.aIst; }, /aIst fehlt/, 'aIst fehlt');
+  /* Genau der gemeldete Fall: Partie 2 spielt A als Weiß; ihr Wert wird unbekannt. Die alte
+     Prüfung zählte nur „Schwarz“ und sah weiter 41 : 41. */
+  keinUrteil(p => { p.aIst = 'X'; }, /Partie 2: aIst "X"/, 'aIst unbekannt statt Weiß', 1);
+  /* Darüber hinaus: ein erlaubter, aber falscher Wert und die Kette Stand → Farbe → Arm. */
+  keinUrteil(p => { p.sieger = 'A'; }, /sieger A passt nicht zu siegerFarbe W bei A als Schwarz \(dann gewinnt B\)/, 'sieger vertauscht');
+  keinUrteil(p => { delete p.siegerFarbe; }, /siegerFarbe fehlt/, 'siegerFarbe fehlt');
+  keinUrteil(p => { p.aufgabe = 'S'; }, /aufgabe "S"/, 'Aufgabe trotz Aufgabe aus');
+  keinUrteil(p => { delete p.aufgabe; }, /aufgabe fehlt/, 'aufgabe fehlt');
+  keinUrteil(p => { p.stand = 'B NaN : W NaN'; }, /keine zwei endlichen Zahlen/, 'Stand NaN (der Harness bucht ihn als Sieg von Weiß)');
+  keinUrteil(p => { p.stand = 'B 190 : W 177.5'; }, /ergibt nicht siegerFarbe W/, 'Stand widerspricht der Farbe');
+  keinUrteil(p => { p.zuege = 601; }, /zuege 601/, 'mehr Züge als das Zuglimit');
+  keinUrteil(p => { delete p.zuege; }, /zuege fehlt/, 'zuege fehlt');
+  /* Viele fehlerhafte Partien: drei Beispiele und die Zahl der übrigen. */
+  const t = stufe1().map(x => x.daten.konfig.seed === 11250004
+    ? teil(11250004, 120, 240, {partie: p => { delete p.sieger; }}) : x);
+  const gr = regel(W.pruefe(A1, W.STUFE1, t).gruende, 2);
+  pruefe(gr.some(x => /82 Partien sind nicht auswertbar/.test(x) && /und 79 weitere/.test(x)), 'Zusammenfassung');
+  pruefeGleich(W.partieFehler(teil(11250001, 120, 240).daten.partien[5]), null, 'eine saubere Partie hat keinen Fehler');
 });
 
 test('Regel 3: Parameter, Aufgabe, Komi, Modus, Zuglimit', () => {

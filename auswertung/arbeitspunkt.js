@@ -8,7 +8,10 @@
      2. reproduktion.params gleicht PARAMS_DEFAULT des festgelegten Stands, Schlüssel für Schlüssel.
      3. Jede Pages-Bereitstellung zwischen --seit und meta.erstellt trägt die Prüfsummen aus §6
         (Liste aus --bereitstellungen, siehe unten). Ohne Liste ist die Regel ungeprüft.
-     4. Kein Neustart des Workers, Worker nicht tot.
+     4. Kein Neustart des Workers, Worker nicht tot, und jeder KI-Steinzug trägt eine
+        Simulationszahl (§13.4): Auf Schwer kommt jeder Steinzug aus der Suche; ohne Zahl bleibt
+        nur ein Notzug nach einem KI-Fehler oder der Rückfallweg, wenn die Suche keinen Zug
+        liefert. Bisher fiel ein solcher Zug still aus S heraus.
      5. Mindestens 120 KI-Steinzüge mit Simulationszahl und zeiten.sucheMs, davon 40 nach Zug 80.
    Bei KEIN URTEIL endet das Skript mit Status 1.
 
@@ -48,18 +51,18 @@ function perzentil(a, q) {
 
 /* KI-Steinzüge mit Simulationszahl (aus info, wie zeit-zerlegung.js) und gemessener Suchzeit. */
 function steinzuege(bericht) {
-  const alle = [], ohneSuche = [];
+  const alle = [], ohneSuche = [], ohneSims = [];
   for (const x of bericht.kiDiagnose || []) {
-    if (x.typ !== 'stone') continue;
-    const m = /(\d+)[^\d]*Sims/.exec(x.info || '');
-    if (!m) continue;
+    if (!x || x.typ !== 'stone') continue;
+    const m = /(\d+)[^\d]*Sims/.exec(typeof x.info === 'string' ? x.info : '');
+    if (!m) { ohneSims.push(x.zug); continue; }
     const z = x.zeiten || {};
     const zeile = {zug: x.zug, sims: +m[1], dauerMs: x.dauerMs,
                    sucheMs: typeof z.sucheMs === 'number' ? z.sucheMs : null,
                    netzMs: typeof z.netzMs === 'number' ? z.netzMs : null};
     (zeile.sucheMs === null || typeof zeile.dauerMs !== 'number' ? ohneSuche : alle).push(zeile);
   }
-  return {alle, ohneSuche};
+  return {alle, ohneSuche, ohneSims};
 }
 
 /* §7.1 (Fassung nach §15): Verdopplung AB dem Arbeitspunkt. N = S auf volle Hundert gerundet,
@@ -120,7 +123,11 @@ function pruefe(bericht, opt) {
     gruende.push(`Regel 4: Der Worker wurde neu gestartet (${meta.workerNeustarts || 0}) oder ist tot (${!!meta.workerDead}); `
       + 'dann rechnete zeitweise der Hauptthread.');
 
-  const {alle, ohneSuche} = steinzuege(bericht);
+  const {alle, ohneSuche, ohneSims} = steinzuege(bericht);
+  if (ohneSims.length)
+    gruende.push(`Regel 4: ${ohneSims.length} KI-${ohneSims.length === 1 ? 'Steinzug' : 'Steinzüge'} ohne Simulationszahl `
+      + `(Zug ${ohneSims.slice(0, 5).join(', ')}${ohneSims.length > 5 ? ', …' : ''}): Notzug nach einem KI-Fehler oder `
+      + 'Zug außerhalb der Suche (§13.4).');
   const nach = alle.filter(z => z.zug > GRENZE).length;
   if (alle.length < MIN_ZUEGE || nach < MIN_NACH_GRENZE)
     gruende.push(`Regel 5: ${alle.length} KI-Steinzüge mit Simulationszahl und zeiten.sucheMs, davon ${nach} nach Zug ${GRENZE}; `

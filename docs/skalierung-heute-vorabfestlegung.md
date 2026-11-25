@@ -351,6 +351,36 @@ Der Commit aus §6 ist der Merge-Commit dieses Werkzeug-PR. Nach dem Merge wird 
 `claude/skalierung-stand` angelegt und nicht mehr bewegt; die Prüfsummen der drei Engine-Blöcke werden dort noch
 einmal nachgerechnet, bevor ein Go erfragt wird.
 
+### 13.4 Was eine Partie und einen Zug zählbar macht (Hinweis Hazeberry, 25.11.2026)
+
+**Anlass.** Der Bericht zählte `sieger === 'B'` und wertete alles andere als Niederlage von B. Ein fehlendes Siegerfeld
+hätte den Elo-Wert verschoben, ohne den Lauf ungültig zu machen. Die Farbprüfung zählte nur `aIst === 'Schwarz'`; ein
+unbekannter Wert ging dort als Weiß durch. Eine Gegenprobe am vorigen Stand des Werkzeugs bestätigt beides: Mit einem
+fehlenden Sieger oder einem `aIst` „X“ statt „Weiß“ blieb der Lauf gültig, und 20 fehlende Sieger in einem Teillauf
+senkten die Siege von B in K1 still von 750 auf 730.
+
+**Stufe 1 und 2, unter §5.5 Nr. 2.** „Genau 82 Partien“ heißt 82 auswertbare Partien. Eine Partie ist auswertbar, wenn
+
+1. `aIst` Schwarz oder Weiß ist, `sieger` A oder B und `siegerFarbe` S oder W;
+2. `sieger` zu `siegerFarbe` und `aIst` passt;
+3. `aufgabe` null ist, wie bei Aufgabe aus zu erwarten;
+4. der Stand („B x : W y“) zwei endliche Zahlen trägt und x > y genau dann gilt, wenn `siegerFarbe` S ist;
+5. `zuege` eine ganze Zahl von 1 bis zum Zuglimit ist.
+
+Sonst gilt „kein Urteil“. Die Farbprüfung zählt Schwarz und Weiß getrennt.
+
+Der Harness schreibt im Standardmodus nur diese Werte (`ab-harness.js`). In einem sauberen Lauf schlägt die Prüfung
+also nie an; sie schützt vor beschädigten, bearbeiteten oder fremden Dateien. Nr. 2 und 4 gehen über den Wertebereich
+hinaus. Sie fangen auch einen erlaubten, aber falschen Wert ab, also genau den Aufbaufehler, den §5.3 als ersten
+Verdacht nennt. Außerdem schließt Nr. 4 eine Stelle im Harness: Er bucht einen Stand, der keine Zahl ist, als Sieg von
+Weiß (`score.b > score.w ? 1 : 2`).
+
+**Stufe G, unter §4.2 Nr. 4.** Jeder KI-Steinzug muss eine Simulationszahl tragen. Auf Schwer kommt jeder Steinzug aus
+der Suche (`MCTS n Sims`). Ohne Zahl bleiben im Spielcode nur zwei Fälle: der Notzug nach einem KI-Fehler und der
+Rückfallweg, wenn die Suche keinen Zug liefert. Bisher fiel ein solcher Zug still aus S heraus; jetzt gilt „kein
+Urteil“. In der Referenzpartie (§14) trugen alle 288 KI-Steinzüge eine Simulationszahl. Das ist eine Zählung der
+Einträge, keine neue Auswertung.
+
 ## 14. Nachtrag: Vorher-Referenz vom 25.11.2026 — keine formale Stufe G
 
 Hazeberry hat am 25.11.2026 um 13:16:46 UTC eine Partie auf dem A17 exportiert, vor dem Merge dieses Werkzeug-PR und
