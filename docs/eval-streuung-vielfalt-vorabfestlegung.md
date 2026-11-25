@@ -276,3 +276,94 @@ nach ihren Elo-Intervallen Vor- und Nachteile offen.
 Unterschied in der Konzentration des ersten Zugs nachweisen", dazu ausdrücklich, was daraus **nicht** folgt. Die
 Formulierung „Kandidat zum Abschalten" ist gestrichen; eine Entscheidung über den Standard bräuchte eine eigene
 Messung mit vorab festgelegter Gleichwertigkeitsgrenze. §5 und §8 sagen damit dasselbe.
+
+## 11. Nachtrag: Ergebnis (25.11.2026)
+
+**Urteil nach §5, wörtlich wie vorab festgelegt: „Über die Seed-Blöcke ließ sich kein konsistenter Unterschied in
+der Konzentration des ersten Zugs nachweisen."**
+
+Zwanzig Teilläufe (#142–#161) auf `main` `6b1332d`, je 30 Partien mit `roh=1`; ausgewertet über
+[Lauf 45531129203](https://github.com/Hazeberry/Go-html-Game-MoE/actions/runs/45531129203) in 33 Sekunden.
+Werte je Block: `docs/daten/eval-streuung-vielfalt/blockwerte.md`.
+
+| | V1 (`evalStreuung` 1) | V0 (`evalStreuung` 0) |
+|---|---:|---:|
+| Kollisionsrate q, Mittel über zehn Blöcke | 0,2444 | 0,2924 |
+| Richtung der gepaarten Differenzen | — | 8 von 10 höher in V0 |
+| Median der Differenzen | — | +0,0678 |
+| n_eff | — | 10 von 10, kein Gleichstand |
+| Exakter zweiseitiger Vorzeichentest | — | **p = 0,10938** |
+
+Die Richtung zeigt 8 : 2 ins Erwartete — ohne Rauschen eröffnet die Engine in acht von zehn Blöcken
+konzentrierter —, aber α = 0,05 ist nicht erreicht. Nach §4 und §5 ist das kein Nachweis, und die Richtung allein
+ist keiner. Bei 8 : 2 liegt der p-Wert bei 0,109; **für ein Urteil hätte es 9 : 1 gebraucht** (p = 0,021).
+
+### 11.1 Gültigkeit
+
+Alle sieben Gründe aus §6 sind erfüllt: je Block 30 Partien und je Arm zehn Blöcke mit genau den festgelegten
+Seeds, beide Seiten jedes Arms identisch, außerhalb von `evalStreuung` kein Unterschied, Zugereignisse passend zur
+Zugzahl in allen 600 Partien, Blockprüfsummen wie dokumentiert, null Anomalien. Die Armzuordnung hat das Werkzeug
+aus `konfig.A`/`konfig.B` gelesen, nicht aus der Reihenfolge.
+
+**Die Diagnose aus §6 ist eingetreten, und zwar dreimal.** Drei von zwanzig Blöcken hatten eine auffällige
+Siegrate (9 : 21, 21 : 9, 21 : 9, je p = 0,04277). Genau dafür steht sie nicht in der Gültigkeitsregel: beide
+Seiten eines Arms sind identisch, die Zuordnung zu A und B ist willkürlich, bei zwanzig Blöcken und α = 0,05 ist
+im Mittel einer zu erwarten, und drei liegen im Rahmen. Hätte ich die erste Fassung behalten, wäre der Lauf an
+dieser Stelle verworfen worden — mit gültigen Daten.
+
+### 11.2 Der Befund, der nicht gesucht war: die Engine eröffnet auf vier Punkten
+
+**In beiden Armen gibt es nur 4 verschiedene erste Züge unter 30 Partien** — in jedem der zwanzig Blöcke, ohne
+Ausnahme. Das ist keine Folge des Rauschens, sondern der Symmetrie: die Engine wählt den ersten Zug praktisch
+immer unter den vier gleichwertigen Punkten, und mehr Streuung gibt es dort nicht zu holen.
+
+**Das schlägt auf meine Begründung in §2 zurück.** Dort stand: „Für den ersten Zug gibt es 361 Felder und 30
+Partien je Block." Der *wirksame* Raum ist 4, nicht 361. Damit liegt die Kollisionsrate schon bei
+Gleichverteilung bei 1/4 = 0,25 — und beide Arme liegen dicht darüber (0,244 und 0,292). Der Spielraum für einen
+Unterschied ist strukturell eng, und das hätte vor dem Lauf in §2 stehen müssen statt danach hier. Die Zahl
+0,0028 für Gleichverteilung über 361 Punkte, die dort steht, ist für diese Engine ohne Bedeutung.
+
+### 11.3 Was die Nebenmaße zeigen — und warum das kein Befund ist
+
+| Maß, Mittel über zehn Blöcke | V1 | V0 |
+|---|---:|---:|
+| Anteil des häufigsten ersten Zugs | 32,0 % | 41,3 % |
+| verschiedene Präfixe über 10 Züge | 19,1 von 30 | 13,4 von 30 |
+| verschiedene Präfixe über 30 Züge | ≈ 29 | ≈ 28,6 |
+| verschiedene Endstellungen | 30,0 von 30 | 30,0 von 30 |
+| Median des Zugs der ersten Abweichung | 1,0 | 1,0 |
+
+Der Zehn-Zug-Präfix zeigt den deutlichsten Abstand: 19,1 gegen 13,4 verschiedene Eröffnungen. **Daraus wird hier
+kein Befund.** §4 legt vorab fest, dass die Nebenmaße ohne p-Wert und ohne Intervall berichtet werden und nicht
+entscheiden; den Primärtest nachträglich gegen das Maß zu tauschen, das besser aussieht, wäre genau der Griff, den
+die Festlegung verhindern soll. Der Vorgängerlauf liefert dazu die Mahnung: in `eval-streuung-vorabfestlegung.md`
+§13.2 zeigten Nebenzahlen in S2 vier von vier Blöcken in dieselbe Richtung — und in S1 in die entgegengesetzte.
+
+Die Endstellungen sind, wie in §2 vorhergesagt, **gesättigt** (30 von 30 in beiden Armen). Der Median der ersten
+Abweichung ist in beiden Armen 1,0, und das folgt direkt aus den vier Eröffnungspunkten: die meisten Partienpaare
+unterscheiden sich schon im ersten Zug.
+
+### 11.4 Was damit zur Ausgangsfrage gilt
+
+Die Frage war: kauft der Rauschterm Vielfalt? Nach dieser Messung ist das **nicht nachgewiesen**. Zusammen mit S1
+und S2 ergibt sich:
+
+| | Befund | Schranke |
+|---|---|---|
+| Spielstärke | kein nachweisbarer Unterschied | ±39 Elo (S1, S2) |
+| Vielfalt der Eröffnung | kein konsistenter Unterschied | keine Schranke behauptet (§8) |
+
+**Beides sind Nichtnachweise, keine Nullbefunde.** Der Rauschterm ist damit weder gerechtfertigt noch widerlegt:
+Für einen Nutzen fehlt der Nachweis, für einen Schaden ebenso. Wer den Standard ändern will, braucht nach §5 und
+§8 eine eigene Messung mit vorab festgelegter Gleichwertigkeitsgrenze — die Richtung 8 : 2 und der
+Zehn-Zug-Präfix sind Anlass für so eine Messung, aber kein Ersatz für sie.
+
+Der Default bleibt 1,00, wie §7 es vorab festgelegt hat.
+
+### 11.5 Woran eine nächste Messung ansetzen müsste
+
+Nicht am ersten Zug. Er ist durch die Symmetrie auf vier Punkte beschränkt (§11.2), und dort ist für Vielfalt
+strukturell wenig zu gewinnen. Die Unterschiede, soweit überhaupt sichtbar, liegen weiter hinten: beim
+Zehn-Zug-Präfix (19,1 gegen 13,4), nicht bei der Eröffnungswahl. Eine Messung, die das als **primären** Endpunkt
+vorab festlegt — mit Blöcken als Einheit, wie hier, und mit einer vorab definierten Toleranz — wäre der nächste
+sinnvolle Schritt. Sie ist nicht beschlossen und steht hier als Vorschlag.
