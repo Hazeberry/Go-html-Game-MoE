@@ -318,10 +318,23 @@ Ausnahme. Das ist keine Folge des Rauschens, sondern der Symmetrie: die Engine w
 immer unter den vier gleichwertigen Punkten, und mehr Streuung gibt es dort nicht zu holen.
 
 **Das schlägt auf meine Begründung in §2 zurück.** Dort stand: „Für den ersten Zug gibt es 361 Felder und 30
-Partien je Block." Der *wirksame* Raum ist 4, nicht 361. Damit liegt die Kollisionsrate schon bei
-Gleichverteilung bei 1/4 = 0,25 — und beide Arme liegen dicht darüber (0,244 und 0,292). Der Spielraum für einen
-Unterschied ist strukturell eng, und das hätte vor dem Lauf in §2 stehen müssen statt danach hier. Die Zahl
-0,0028 für Gleichverteilung über 361 Punkte, die dort steht, ist für diese Engine ohne Bedeutung.
+Partien je Block." Der *wirksame* Raum ist 4, nicht 361. Damit ist die Kollisionsrate schon bei Gleichverteilung
+über diese vier Punkte **im Erwartungswert** 1/4 = 0,25. Der Spielraum für einen Unterschied ist strukturell eng,
+und das hätte vor dem Lauf in §2 stehen müssen statt danach hier. Die Zahl 0,0028 für Gleichverteilung über 361
+Punkte, die dort steht, ist für diese Engine ohne Bedeutung.
+
+**0,25 ist ein Erwartungswert, keine Untergrenze — und nicht beide Arme liegen darüber.** V1 liegt mit 0,2444
+*darunter*, V0 mit 0,2924 darüber; in V1 liegen acht der zehn Blöcke unter 0,25 (0,2253 bis 0,2483), in V0 zwei.
+Bei 30 Partien je Block streut q um den Erwartungswert: 30 unabhängige gleichverteilte Züge auf vier Punkten
+ergeben eine Standardabweichung von 0,0207 je Block, einen Median von 0,2437 — die Verteilung ist rechtsschief —
+und 62 % der Blöcke unter 0,25 (vier Millionen Ziehungen, `sfc32` mit festem Startwert;
+nachzurechnen mit `docs/daten/eval-streuung-vielfalt/q-streuung.js`). Am Mittel aus zehn
+Blöcken gemessen (Standardabweichung 0,0066) liegt V1 0,85 davon unter dem Erwartungswert, V0 6,5 darüber.
+
+Das ist eine **Seitenrechnung zur Einordnung der Bezugszahl, kein Test.** Sie vergleicht gegen ein Modell mit vier
+gleich wahrscheinlichen Punkten und unabhängigen Partien; beides ist hier nicht geprüft — die Partien eines
+Blocks teilen den Seed-Strom, und ob die Engine die vier Punkte gleich häufig wählt, ist nicht gemessen. Der
+primäre Endpunkt bleibt der gepaarte Vorzeichentest aus §4, und das Urteil bleibt unverändert.
 
 ### 11.3 Was die Nebenmaße zeigen — und warum das kein Befund ist
 
@@ -348,12 +361,18 @@ unterscheiden sich schon im ersten Zug.
 Die Frage war: kauft der Rauschterm Vielfalt? Nach dieser Messung ist das **nicht nachgewiesen**. Zusammen mit S1
 und S2 ergibt sich:
 
-| | Befund | Schranke |
+| | Befund | Was die Zahlen zulassen |
 |---|---|---|
-| Spielstärke | kein nachweisbarer Unterschied | ±39 Elo (S1, S2) |
+| Spielstärke, S1 (`evalStreuung` 0 gegen 1) | kein nachweisbarer Unterschied | −1,9 Elo, [−38,8; +34,9] |
+| Spielstärke, S2 (`evalStreuung` 0,5 gegen 1) | beschreibend, ohne Anspruch (§6 dort) | +7,7 Elo, [−29,1; +44,6] |
 | Vielfalt der Eröffnung | kein konsistenter Unterschied | keine Schranke behauptet (§8) |
 
-**Beides sind Nichtnachweise, keine Nullbefunde.** Der Rauschterm ist damit weder gerechtfertigt noch widerlegt:
+Die beiden Vergleiche stehen getrennt, weil sie verschieden weit reichen: S1 lässt Effekte zwischen −38,8 und
++34,9 Elo offen, S2 zwischen −29,1 und +44,6. Eine zusammengefasste Angabe „±39 Elo" wäre falsch. Die ±39 aus
+`eval-streuung-vorabfestlegung.md` §10.9 sind die **Auflösung des Tests** bei einer Siegrate von genau 50 %, nicht
+ein beobachtetes Intervall — mit +44,6 reicht S2 darüber hinaus.
+
+**Spielstärke und Vielfalt sind beide Nichtnachweise, keine Nullbefunde.** Der Rauschterm ist damit weder gerechtfertigt noch widerlegt:
 Für einen Nutzen fehlt der Nachweis, für einen Schaden ebenso. Wer den Standard ändern will, braucht nach §5 und
 §8 eine eigene Messung mit vorab festgelegter Gleichwertigkeitsgrenze — die Richtung 8 : 2 und der
 Zehn-Zug-Präfix sind Anlass für so eine Messung, aber kein Ersatz für sie.
@@ -367,3 +386,17 @@ strukturell wenig zu gewinnen. Die Unterschiede, soweit überhaupt sichtbar, lie
 Zehn-Zug-Präfix (19,1 gegen 13,4), nicht bei der Eröffnungswahl. Eine Messung, die das als **primären** Endpunkt
 vorab festlegt — mit Blöcken als Einheit, wie hier, und mit einer vorab definierten Toleranz — wäre der nächste
 sinnvolle Schritt. Sie ist nicht beschlossen und steht hier als Vorschlag.
+
+### 11.6 Korrekturen an diesem Nachtrag (25.11.2026)
+
+Zwei Fehler der ersten Fassung von §11, beide von außen gemeldet und hier nachgerechnet:
+
+1. **§11.2 behauptete, beide Kollisionsraten lägen über 0,25.** V1 liegt mit 0,2444 darunter, und in acht der zehn
+   V1-Blöcke liegt q unter 0,25. Der Satz verwechselte den Erwartungswert mit einer Untergrenze. Korrigiert oben,
+   mit der Streuung von q als Zahl statt als Behauptung.
+2. **§11.4 fasste die beiden Elo-Intervalle zu „±39 Elo" zusammen.** Das nimmt die untere Schranke von S1 (−38,8)
+   und paart sie mit einem +39, das in keinem der beiden Intervalle steht; S2 reicht bis +44,6. Die Vergleiche
+   stehen jetzt getrennt. Dieselbe Verkürzung stand in §13.5 der S1/S2-Festlegung und ist dort mitkorrigiert.
+
+Beide Fehler gehen in dieselbe Richtung: eine Zahl, die als Zusammenfassung gefällig aussieht, aber so in der
+Rechnung nicht steht. Das Urteil nach §5 ändert sich durch keinen von beiden.
