@@ -66,7 +66,7 @@ Statusmeldungen kurz. Lizenz: PolyForm Noncommercial 1.0.0.
 
 ## Wichtige Dokumente
 
-`DOKU.md` (Stand und Grenzen), `docs/zeitbudget.md` (Zeit auf dem Handy; Ursache auf dem
+`DOKU.md` (die README des Projekts: Stand und Grenzen), `docs/zeitbudget.md` (Zeit auf dem Handy; Ursache auf dem
 A17 war der ausgeschaltete V8-Optimierer in Chrome), `docs/endspiel-abraeumen.md`,
 `docs/zaehlvorschau.md`, `docs/passregel-versuch.md`, `docs/skalierung.md` (mehr Suche bringt
 +75 und +55 Elo je Verdopplung: niedrigere Punktschätzung bei der zweiten Verdopplung, Abflachen
@@ -74,7 +74,8 @@ nicht gesichert; die Bewertung ist als Engpass vermutet, nicht nachgewiesen), `d
 (was welcher Teil bringt), `docs/fuego.md`, `docs/pwa-vergleich.md`. `HANDOFF.md`: Querverweis auf das Schwesterrepo
 `Hazeberry/codex` (was wo steht, Stand der Passregel); keine Regeln, kein Go.
 
-**`DOKU.md` statt `README.md`.** Die frühere `README.md` heißt jetzt `DOKU.md`: Sie war so lang
-geworden, dass die GitHub-App beim Öffnen abstürzte. Eine neue `README.md` wird erst angelegt, wenn
-das Projekt zuverlässig funktioniert; bis dahin keine anlegen. Ältere Docs, Commit-Texte und
-Code-Kommentare, die „README“ sagen, meinen `DOKU.md` (`tests/README.md` ist eine eigene Datei).
+**`DOKU.md` ist die README des Projekts.** Sie ist ein README-Derivat, umbenannt aus technischem
+Grund: Als `README.md` war sie so lang geworden, dass die GitHub-App beim Öffnen abstürzte. Eine neue
+`README.md` wird erst angelegt, wenn das Projekt zuverlässig funktioniert; bis dahin keine anlegen.
+Im Code darf sie weiter „README“ heißen. Docs, Commit-Texte und Code-Kommentare, die „README“ sagen,
+meinen `DOKU.md` (`tests/README.md` ist eine eigene Datei).
