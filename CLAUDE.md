@@ -13,7 +13,7 @@ Statusmeldungen kurz. Lizenz: PolyForm Noncommercial 1.0.0.
   der übliche Weg; bei Schalter aus muss das Verhalten bitgleich bleiben (Test).
 - **Ablauf je Punkt:** Vorabfestlegung (Doc, ggf. Workflow, Tests) → PR → grüne CI → Merge →
   `unsubscribe_pr_activity` → kurzer Bericht auf Deutsch mit den löschbaren Branches. Ergebnisse
-  kommen als Nachtrag ins Doc, Rohdaten unter `docs/daten/<thema>/`, in die README nur bei Bedarf.
+  kommen als Nachtrag ins Doc, Rohdaten unter `docs/daten/<thema>/`, in die `DOKU.md` nur bei Bedarf.
 - **Merge:** Merge-Methode `merge`, als `expectedHeadSha` die **volle 40-stellige** SHA des PR-Kopfs
   (aus dem Checkout oder `pull_request_read get`, kein Platzhalter). Hazeberry hat für PRs und
   Merges die Erlaubnis erteilt; Branches heißen `claude/<thema>`.
@@ -53,7 +53,7 @@ Statusmeldungen kurz. Lizenz: PolyForm Noncommercial 1.0.0.
   Exit-Codes mit `|| status=$?` abfangen.
 - Fremdcode: keine Übernahme von Code oder Gewichten aus Repos ohne klare Lizenz. Inspiration ja,
   Kopieren nein. GNU Go und Fuego laufen nur als Gegner und Schiedsrichter in Actions. Die Muster
-  und das Endspiel-Netz sind an GNU-Go-Zügen gelernt; das steht offen in der README.
+  und das Endspiel-Netz sind an GNU-Go-Zügen gelernt; das steht offen in der `DOKU.md`.
 
 ## Engine in Kürze
 
@@ -66,10 +66,15 @@ Statusmeldungen kurz. Lizenz: PolyForm Noncommercial 1.0.0.
 
 ## Wichtige Dokumente
 
-`README.md` (Stand und Grenzen), `docs/zeitbudget.md` (Zeit auf dem Handy; Ursache auf dem
+`DOKU.md` (Stand und Grenzen), `docs/zeitbudget.md` (Zeit auf dem Handy; Ursache auf dem
 A17 war der ausgeschaltete V8-Optimierer in Chrome), `docs/endspiel-abraeumen.md`,
 `docs/zaehlvorschau.md`, `docs/passregel-versuch.md`, `docs/skalierung.md` (mehr Suche bringt
 +75 und +55 Elo je Verdopplung: niedrigere Punktschätzung bei der zweiten Verdopplung, Abflachen
 nicht gesichert; die Bewertung ist als Engpass vermutet, nicht nachgewiesen), `docs/komponenten.md`
 (was welcher Teil bringt), `docs/fuego.md`, `docs/pwa-vergleich.md`. `HANDOFF.md`: Querverweis auf das Schwesterrepo
 `Hazeberry/codex` (was wo steht, Stand der Passregel); keine Regeln, kein Go.
+
+**`DOKU.md` statt `README.md`.** Die frühere `README.md` heißt jetzt `DOKU.md`: Sie war so lang
+geworden, dass die GitHub-App beim Öffnen abstürzte. Eine neue `README.md` wird erst angelegt, wenn
+das Projekt zuverlässig funktioniert; bis dahin keine anlegen. Ältere Docs, Commit-Texte und
+Code-Kommentare, die „README“ sagen, meinen `DOKU.md` (`tests/README.md` ist eine eigene Datei).
