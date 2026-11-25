@@ -1,0 +1,149 @@
+name: Vielfalt-Bericht
+
+# Wertet FERTIGE Läufe von ab-harness.yml aus; messt selbst nichts nach.
+# Festlegung: docs/eval-streuung-vielfalt-vorabfestlegung.md.
+#
+# Warum in Actions und nicht in einer Session: Die Zugereignisse stehen nur im Rohdump im
+# Artefakt, und Artefakte sind über die API nicht erreichbar (HTTP 403 auf die Blob-Adresse,
+# docs/eval-streuung-vorabfestlegung.md §14.4). Hier ist das Netz offen; die Zusammenfassung
+# und das Log sind danach über die API lesbar.
+#
+# Die angegebenen Läufe müssen mit roh=1 gelaufen sein, sonst fehlen die Züge und der Schritt
+# bricht mit klarer Meldung ab. Die Armzuordnung bestimmt das Werkzeug aus konfig.A und
+# konfig.B der Daten — der Artefaktname unterscheidet die Arme nicht.
+#
+# Rot wird der Lauf bei KEIN URTEIL, sei es aus der Gültigkeitsregel (§6) oder aus zu wenigen
+# von Null verschiedenen Blockdifferenzen (§4.1). Das gehört sichtbar ins Ergebnis.
+
+on:
+  workflow_dispatch:
+    inputs:
+      laeufe:
+        description: 'Run-IDs aller Teilläufe beider Arme, mit Komma'
+        required: true
+      seeds:
+        description: 'Vorab festgelegte Seeds, mit Komma'
+        required: true
+      partien_je_block:
+        description: 'Festgelegte Partienzahl je Block'
+        required: false
+        default: '30'
+      streuung_eins:
+        description: 'evalStreuung im Arm V1 (heutiger Standard)'
+        required: false
+        default: '1'
+      streuung_null:
+        description: 'evalStreuung im Arm V0'
+        required: false
+        default: '0'
+
+concurrency:
+  group: eval-streuung-vielfalt
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  bericht:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Eingaben prüfen
+        env:
+          IN_LAEUFE: ${{ inputs.laeufe }}
+          IN_SEEDS: ${{ inputs.seeds }}
+          IN_PARTIEN: ${{ inputs.partien_je_block }}
+          IN_STREUUNG_EINS: ${{ inputs.streuung_eins }}
+          IN_STREUUNG_NULL: ${{ inputs.streuung_null }}
+        run: |
+          set -euo pipefail
+          ZAHLLISTE='^[0-9]+(,[0-9]+)*$'
+          printf '%s' "$IN_LAEUFE" | grep -Eq "$ZAHLLISTE" \
+            || { echo "::error::laeufe muss Run-IDs mit Komma sein: '$IN_LAEUFE'"; exit 2; }
+          printf '%s' "$IN_SEEDS" | grep -Eq "$ZAHLLISTE" \
+            || { echo "::error::seeds muss Zahlen mit Komma sein: '$IN_SEEDS'"; exit 2; }
+          printf '%s' "$IN_PARTIEN" | grep -Eq '^[0-9]+$' \
+            || { echo "::error::partien_je_block muss eine Zahl sein: '$IN_PARTIEN'"; exit 2; }
+          printf '%s' "$IN_STREUUNG_EINS" | grep -Eq '^[0-9]+(\.[0-9]+)?$' \
+            || { echo "::error::streuung_eins muss eine nicht-negative Zahl sein: '$IN_STREUUNG_EINS'"; exit 2; }
+          printf '%s' "$IN_STREUUNG_NULL" | grep -Eq '^[0-9]+(\.[0-9]+)?$' \
+            || { echo "::error::streuung_null muss eine nicht-negative Zahl sein: '$IN_STREUUNG_NULL'"; exit 2; }
+          {
+            echo "LAEUFE=$IN_LAEUFE"
+            echo "SEEDS=$IN_SEEDS"
+            echo "PARTIEN=$IN_PARTIEN"
+            echo "STREUUNG_EINS=$IN_STREUUNG_EINS"
+            echo "STREUUNG_NULL=$IN_STREUUNG_NULL"
+          } >> "$GITHUB_ENV"
+
+      - name: Artefakte der Teilläufe holen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p artefakte
+          IFS=',' read -ra IDS <<< "$LAEUFE"
+          echo "${#IDS[@]} Teilläufe"
+          for id in "${IDS[@]}"; do
+            echo "::group::Lauf $id"
+            gh run download "$id" --repo "$GITHUB_REPOSITORY" --dir "artefakte/$id"
+            find "artefakte/$id" -type f | sort
+            echo "::endgroup::"
+          done
+
+      - name: Bericht
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra IDS <<< "$LAEUFE"
+          ARGS=(--partien-je-block "$PARTIEN" --seeds "$SEEDS"
+                --streuung-v1 "$STREUUNG_EINS" --streuung-v0 "$STREUUNG_NULL" --markdown)
+          # Je Lauf genau eine Dreiergruppe aus JSON, Rohdump und Log. Fehlt eine Datei oder gibt
+          # es sie doppelt, bricht der Schritt ab: ein stilles Weglassen waere ein halber Bericht,
+          # der wie ein ganzer aussieht.
+          for id in "${IDS[@]}"; do
+            for art in json roh log; do
+              case "$art" in
+                json) muster='ab-*.json' ;;
+                roh)  muster='roh-*.jsonl' ;;
+                log)  muster='ab-*.log' ;;
+              esac
+              mapfile -t treffer < <(find "artefakte/$id" -type f -name "$muster" | sort)
+              if [ "${#treffer[@]}" -ne 1 ]; then
+                echo "::error::Lauf $id: ${#treffer[@]} Dateien passen auf $muster, erwartet genau eine."
+                if [ "$art" = roh ]; then
+                  echo "::error::Fehlt der Rohdump, lief der Teillauf ohne roh=1. Ohne die Zuege gibt es den primaeren Endpunkt nicht."
+                fi
+                exit 2
+              fi
+              eval "P_$art=\${treffer[0]}"
+            done
+            ARGS+=(--teil "$P_json,$P_roh,$P_log")
+          done
+
+          mkdir -p ergebnis
+          status=0
+          node auswertung/eval-streuung-vielfalt.js "${ARGS[@]}" | tee ergebnis/vielfalt-bericht.md || status=$?
+          {
+            echo "## Vielfalt-Bericht"
+            echo
+            cat ergebnis/vielfalt-bericht.md
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - name: Bericht sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vielfalt-bericht
+          path: ergebnis/
+          if-no-files-found: warn
