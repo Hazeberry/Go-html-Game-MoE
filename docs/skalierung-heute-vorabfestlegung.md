@@ -6,7 +6,8 @@
 Hazeberry liest es vor dem Merge. Jede der drei Stufen braucht ein eigenes Go; der Merge dieses Docs ist keins.
 
 Festlegungen von Hazeberry am 25.11.2026: **1230 Partien je Vergleich, Aufgabe aus, Gerätemessung zuerst** — vor
-der Verdopplung am Arbeitspunkt der Geräte.
+der Verdopplung am Arbeitspunkt des Zielgeräts. **Zielgerät ist das Galaxy A17**, Hazeberrys aktuelles Telefon.
+Das Galaxy A20s (2019) ist ein altes Referenzgerät und wird nicht berücksichtigt.
 
 ## 1. Anlass
 
@@ -62,15 +63,14 @@ Der Vergleich mit den Zahlen vom 03.10. ist deshalb **beschreibend**, kein Test.
 
 ### 4.1 Durchführung (Hazeberry)
 
-- **Geräte:** Galaxy A17 mit Chrome, V8-Optimierer an; Galaxy A20s mit Chrome ([`zeitbudget.md`](zeitbudget.md)).
-  Je eine Partie.
+- **Gerät:** Galaxy A17 mit Chrome, V8-Optimierer an ([`zeitbudget.md`](zeitbudget.md)). Eine Partie.
 - Vor der Partie die Seite neu laden, nicht aus dem Cache, damit der aktuelle Stand von `main` läuft.
 - Stufe **Schwer**, Standardparameter (keine gespeicherten Abweichungen im Dashboard), Komi 7,5; die Wertung ist für
   die Zeiten gleichgültig.
-- Die Partie zu Ende spielen, dann den Fehlerbericht (🐞) exportieren. Dazu als Notiz: Gerät, Browser und beim A17
-  der Stand des V8-Schalters.
+- Die Partie zu Ende spielen, dann den Fehlerbericht (🐞) exportieren. Dazu als Notiz: Browser und Stand des
+  V8-Schalters.
 
-### 4.2 Gültigkeit je Gerät
+### 4.2 Gültigkeit
 
 Zwei Zustände. **Ungültig**, mit „kein Urteil“ und Grund, wenn:
 
@@ -82,17 +82,17 @@ Zwei Zustände. **Ungültig**, mit „kein Urteil“ und Grund, wenn:
    und die Zeiten wären andere.
 5. Weniger als 120 KI-Steinzüge mit Simulationszahl vorliegen oder weniger als 40 davon nach Zug 80.
 
-Eine ungültige Partie bleibt im Archiv. Eine neue Partie auf demselben Gerät ist erlaubt und wird als Wiederholung
+Eine ungültige Partie bleibt im Archiv. Eine neue Partie ist erlaubt und wird als Wiederholung
 berichtet.
 
 ### 4.3 Auswertung
 
-Je Gerät über alle KI-Steinzüge, und getrennt bis und ab Zug 80 (Grenze wie in `zeit-zerlegung.js`):
+Über alle KI-Steinzüge, und getrennt bis und ab Zug 80 (Grenze wie in `zeit-zerlegung.js`):
 
 - **Simulationen je Zug:** Median, 10. und 90. Perzentil.
 - **Zeiten:** Median der Zugdauer (`dauerMs`), der Suchzeit (Simulationen × `msProSim`) und des Rests außerhalb der
   Suche, darin das Endspiel-Netz (`zeiten.netzMs`).
-- **Arbeitspunkt S_d:** Median der Simulationen über alle KI-Steinzüge des Geräts d.
+- **Arbeitspunkt S:** Median der Simulationen über alle KI-Steinzüge.
 - **Zeitkosten einer Verdopplung**, gerechnet, nicht gemessen: Bei gleicher Zeit je Simulation verdoppelt sich die
   Suchzeit, ein Zug dauert also um den Median der Suchzeit länger. Umgekehrt bräuchte „doppelt so viele Simulationen
   in derselben Zeit“ eine doppelt so schnelle Suche.
@@ -197,19 +197,17 @@ gilt dieses Doc nicht für diesen Stand; dann braucht es eine neue Festlegung, k
 
 ### 7.1 Regel für die Stufen
 
-Für jedes gültig gemessene Gerät d: k_d = log2(S_d / 120), kaufmännisch gerundet (x,5 aufwärts).
+Aus dem gültig gemessenen Arbeitspunkt S: k = log2(S / 120), kaufmännisch gerundet (x,5 aufwärts).
 
-- **k_d ≤ 2** (S_d unter rund 679): Der Arbeitspunkt liegt im Bereich von Stufe 1, und deren Antwort gilt — K2 bei
-  k_d = 2, K1 bei k_d = 1. Bei k_d ≤ 0 arbeitet das Gerät unter 120 Simulationen; dafür gibt es keine passende
-  Messung. Für dieses Gerät gibt es keinen Lauf in Stufe 2.
-- **k_d ≥ 3:** Vergleich K3_d mit A = 120 · 2^k_d und B = 2 · A, sonst wie Stufe 1 (Aufgabe aus, Zuglimit 600,
-  `roh` 1, B mit doppelter Suche).
-
-Ergeben beide Geräte dasselbe k, gibt es einen gemeinsamen Vergleich.
+- **k ≤ 2** (S unter rund 679): Der Arbeitspunkt liegt im Bereich von Stufe 1, und deren Antwort gilt — K2 bei
+  k = 2, K1 bei k = 1. Bei k ≤ 0 arbeitet das Gerät unter 120 Simulationen; dafür gibt es keine passende Messung.
+  Stufe 2 entfällt.
+- **k ≥ 3:** Vergleich K3 mit A = 120 · 2^k und B = 2 · A, sonst wie Stufe 1 (Aufgabe aus, Zuglimit 600, `roh` 1,
+  B mit doppelter Suche).
 
 Erwartung, ausdrücklich **keine** Festlegung: Laut `zeitbudget.md` rechnete das A17 2662 Simulationen bei Zug 2,
-lag also weit über 480; das A20s brauchte rund 4 ms je Simulation und lag damit bei rund 450, also wohl im Bereich
-von Stufe 1. Gemessen ist das am heutigen Stand nicht, und die Zahl je Zug ändert sich über die Partie.
+lag also weit über 480; ein Lauf in Stufe 2 ist damit wahrscheinlich. Gemessen ist das am heutigen Stand nicht, und
+die Zahl je Zug ändert sich über die Partie.
 
 ### 7.2 Umfang und Seeds
 
@@ -221,7 +219,7 @@ für Teillauf j. Auch Stufe 2 läuft auf `claude/skalierung-stand`.
 ### 7.3 Kosten und Go
 
 Die Laufzeit je Partie wird aus Stufe 1 geschätzt: K1 und K2 liefern zwei Punkte für „Laufzeit = a + b · mittlere
-Simulationen je Zug“, daraus folgt die Schätzung für K3_d. Mit dieser Schätzung (Zahl der Teilläufe, Rechenstunden,
+Simulationen je Zug“, daraus folgt die Schätzung für K3. Mit dieser Schätzung (Zahl der Teilläufe, Rechenstunden,
 Wanduhrzeit bei 20 gleichzeitigen Jobs) wird das Go für Stufe 2 erfragt. **Ist sie zu teuer, wird Stufe 2 nicht
 verkleinert, sondern neu festgelegt.**
 
@@ -234,15 +232,15 @@ rund 11 Minuten je Partie, also rund 225 Rechenstunden für 1230 Partien und etw
 den Gewinn einer Verdopplung am Arbeitspunkt. Die Urteilssätze sind die aus §5.3 für F1.
 
 **Beschreibend:** die Differenz zum Gewinn von K2 mit genähertem Intervall, **ohne Test**: Zwischen K2 (bis 480)
-und K3_d (ab 960) bleibt mindestens eine Verdopplung ungemessen.
+und K3 (ab 960) bleibt mindestens eine Verdopplung ungemessen.
 
 **Gültigkeit:** wie §5.5, mit der Partienzahl je Teillauf und den Seeds aus §7.2.
 
 ## 8. Was die Ergebnisse für das Spiel bedeuten, vorab und ohne Entscheidung
 
-Je Gerät stehen am Ende zwei Zahlen nebeneinander:
+Für das A17 stehen am Ende zwei Zahlen nebeneinander:
 
-- der **Gewinn einer Verdopplung an seinem Arbeitspunkt**, mit Intervall (aus K1, K2 oder K3_d), und
+- der **Gewinn einer Verdopplung an seinem Arbeitspunkt**, mit Intervall (aus K1, K2 oder K3), und
 - die **Zeit, die eine Verdopplung auf diesem Gerät kostet** (§4.3).
 
 Damit lässt sich beurteilen, was eine längere Bedenkzeit oder eine schnellere Suche an Stärke brächte. Was eine
@@ -268,7 +266,8 @@ Vorabfestlegung.
 
 - **Selbstspiel.** Gewinne gegen die eigene Engine fallen gegen fremde Gegner oft kleiner aus; hier nicht gemessen.
 - **Feste Simulationszahl statt Wanduhr.** Im Spiel schwankt die Zahl je Zug; der Arbeitspunkt ist ein Median.
-- **Zwei Geräte, je eine Partie.** Für andere Geräte gilt nur, was sich an ihrer Simulationszahl ablesen lässt.
+- **Ein Gerät, eine Partie.** Für andere Geräte gilt nur, was sich an ihrer Simulationszahl ablesen lässt; das
+  A20s ist bewusst nicht berücksichtigt.
 - **Unabhängige Partien** sind angenommen, wie am 03.10.; Paare mit gleicher Eröffnung gibt es im Standardmodus nicht.
 - Die **Bemessung** (40 Elo, 80 %) setzt eine Siegrate um 59 % voraus.
 - Das **Intervall für D ist genähert**; der Test ist exakt.
@@ -279,8 +278,7 @@ Vorabfestlegung.
 1. Dieses Doc als PR; Hazeberry liest; Merge.
 2. Werkzeug-PR (§9), CI grün, Merge. Dessen Merge-Commit ist der Commit aus §6; darauf wird der Branch
    `claude/skalierung-stand` angelegt.
-3. **Stufe G**, nach Go: Hazeberry spielt je eine Partie auf A17 und A20s; Auswertung; Nachtrag mit den
-   Arbeitspunkten.
+3. **Stufe G**, nach Go: Hazeberry spielt eine Partie auf dem A17; Auswertung; Nachtrag mit dem Arbeitspunkt.
 4. **Stufe 1**, nach Go: 30 Teilläufe, Bericht über `skalierung-bericht.yml`, Nachtrag, Rohwerte unter
    `docs/daten/skalierung-heute/`. Stufe 1 hängt nicht von Stufe G ab.
 5. **Stufe 2**, nach Go mit der Kostenschätzung aus §7.3 und den Stufen aus §7.1: Teilläufe, Bericht, Nachtrag.
