@@ -8,9 +8,11 @@ vier Bewertungsexperten kostet bei 120 Simulationen **keine nachweisbare Spielst
 nennt den Zweck „Rauschterm zur Zugstreuung". Wenn er keine Stärke kostet und auch keine Streuung bringt, ist er
 entbehrlich.
 
-> **Zur Entstehung:** Eine erste Fassung dieser Festlegung hatte drei methodische Fehler, die Luna in einer
-> Durchsicht gefunden hat. §10 nennt sie einzeln und was daraus folgte. Die Fehler betrafen die Statistik, eine
-> unhaltbare Schrankenaussage und eine zu scharfe Gültigkeitsregel — nicht die Frage selbst.
+> **Zur Entstehung:** Diese Festlegung hat zwei Durchsichten von Luna hinter sich, die zusammen **fünf**
+> methodische Fehler gefunden haben. §10 nennt sie einzeln und was daraus folgte: unanwendbare Statistik, eine
+> unhaltbare Schrankenaussage, eine zu scharfe Gültigkeitsregel, ein Testaufbau, den ein einziger Gleichstand
+> unbrauchbar macht, und ein Urteilssatz, der mehr behauptete als die Daten tragen. Die Frage selbst ist
+> unberührt.
 
 ## 1. Die Frage
 
@@ -54,13 +56,18 @@ Zwei Arme, jeder **gegen sich selbst** (beide Seiten dieselbe Konfiguration):
 | **V1** | 1 (heutiger Standard) |
 | **V0** | 0 (ohne Rauschen) |
 
-**Sechs gepaarte Blöcke je Arm, je 30 Partien** — Seeds 20261201 bis 20261206, dieselben sechs in beiden Armen.
-Zusammen 180 Partien je Arm, zwölf Teilläufe von `ab-harness.yml` mit `roh=1`, je rund 15 Minuten.
+**Zehn gepaarte Blöcke je Arm, je 30 Partien** — Seeds 20261201 bis 20261210, dieselben zehn in beiden Armen.
+Zusammen 300 Partien je Arm, zwanzig Teilläufe von `ab-harness.yml` mit `roh=1`, je rund 15 Minuten.
 
-**Warum sechs Blöcke und nicht zwei:** Die unabhängig wiederholte Einheit ist der **Seed-Block**, nicht die
-Partie (§4). Mit zwei Blöcken ist der kleinste erreichbare p-Wert eines Vorzeichentests 0,50 — es bliebe nur
-Deskription. Mit sechs Blöcken, alle in dieselbe Richtung, ergibt er p = 0,031. Der Gesamtaufwand ist derselbe
-wie bei 2 × 90.
+**Warum zehn Blöcke:** Die unabhängig wiederholte Einheit ist der **Seed-Block**, nicht die Partie (§4). Mit zwei
+Blöcken ist der kleinste erreichbare p-Wert eines Vorzeichentests 0,50 — es bliebe nur Deskription. Sechs Blöcke
+reichen dafür zwar formal (6 : 0 ergibt p = 0,031), sind aber **brüchig**: ein einziger Gleichstand senkt die
+Zahl der von Null verschiedenen Differenzen auf fünf, und damit ist α = 0,05 unerreichbar (bestmöglich 0,0625).
+Gleichstände sind hier nicht exotisch, sondern erwartbar — die Kollisionsrate eines Blocks ist exakt 0, sobald
+dort keine Eröffnung doppelt vorkommt, und sind beide Arme in einem Block bei 0, ist die Differenz 0.
+
+Zehn Blöcke verkraften **bis zu vier Gleichstände** (§4). Das kostet acht zusätzliche Teilläufe und keine
+Wartezeit, weil sie parallel laufen.
 
 **Dieselben Seeds in beiden Armen:** Mit gleichem Seed und festen Simulationen starten beide Arme aus demselben
 Zufallsstrom; die Partien laufen allein deshalb auseinander, weil die Bewertung sich unterscheidet. Das erlaubt
@@ -80,9 +87,39 @@ Nachgerechnet statt behauptet: Simuliert man n = 180 Eröffnungen gleichverteilt
 Varianz der Wiederholerzahl bei 0,94 (K = 2000), 0,75 (K = 500) und **0,26** (K = 120) der Binomialvarianz. Die
 Abweichung wächst genau dort, wo Wiederholungen häufig sind — also im Fall, den ein Test erkennen soll.
 
-**Primär:** die Kollisionsrate `q` des ersten Zugs je Block. Verglichen werden die sechs **gepaarten
-Differenzen** d_i = q(V0, Seed i) − q(V1, Seed i) mit dem **Vorzeichentest**, zweiseitig, α = 0,05. Dazu alle
-sechs Differenzen einzeln im Bericht, mit Median.
+**Primär:** die Kollisionsrate `q` des ersten Zugs je Block. Verglichen werden die zehn **gepaarten
+Differenzen** d_i = q(V0, Seed i) − q(V1, Seed i) mit dem **exakten Vorzeichentest**, zweiseitig, α = 0,05. Alle
+zehn Differenzen stehen einzeln im Bericht, mit Median.
+
+### 4.1 Gleichstände, vorab geregelt
+
+Eine Differenz kann **exakt null** sein, und das ist hier nicht der Randfall, sondern erwartbar: `q` ist 0, sobald
+in einem Block keine Eröffnung doppelt vorkommt, und sind beide Arme dort bei 0, ist d_i = 0.
+
+Geregelt wird das so, und zwar **vorab und im Werkzeug**, nicht beim Ablesen:
+
+1. Differenzen mit d_i = 0 fallen aus dem Test heraus (übliche Behandlung des exakten Vorzeichentests). Die Zahl
+   der verbleibenden heißt **n_eff** und steht im Bericht, immer.
+2. Der Test läuft auf n_eff. Die erreichbaren p-Werte stehen hier, damit niemand sie nachrechnen muss:
+
+   | n_eff | bestes Ergebnis | p | zweitbestes | p |
+   |---:|---|---:|---|---:|
+   | 10 | 10 : 0 | 0,00195 | 9 : 1 | 0,02148 |
+   | 9 | 9 : 0 | 0,00391 | 8 : 1 | 0,03906 |
+   | 8 | 8 : 0 | 0,00781 | 7 : 1 | 0,07031 |
+   | 7 | 7 : 0 | 0,01563 | 6 : 1 | 0,12500 |
+   | 6 | 6 : 0 | 0,03125 | 5 : 1 | 0,21875 |
+   | 5 | 5 : 0 | 0,06250 | 4 : 1 | 0,37500 |
+
+3. **Bei n_eff < 6 lautet das Ergebnis des primären Endpunkts „kein Urteil"**, mit dem Grund „zu wenige von Null
+   verschiedene Blockdifferenzen (n_eff = …)". Dann ist α = 0,05 strukturell unerreichbar, und ein p-Wert über
+   0,05 wäre keine Information, sondern eine Eigenschaft des Umfangs. Die beschreibenden Maße werden trotzdem
+   vollständig berichtet.
+4. **Sind alle zehn Differenzen null** (n_eff = 0), lautet der Bericht genau das: in allen Blöcken dieselbe
+   Kollisionsrate. Trifft das zu, weil **beide** Arme in allen Blöcken keine einzige Kollision zeigen, steht dieser
+   Satz dort: „In beiden Armen trat in keinem Block eine Wiederholung des ersten Zugs auf." Das ist ein Befund
+   über die Messbarkeit, kein Befund über Gleichheit — §8.
+5. Bei n_eff ≥ 6 gilt das Urteil nach §5.
 
 **Sekundär, beschreibend, ohne Test** — eine Kurve statt einer Zahl, damit sichtbar wird, wo sich die Wege trennen:
 
@@ -101,20 +138,20 @@ Für diese Maße wird **kein** p-Wert und **kein** Intervall berichtet. Sie besc
 
 ## 5. Lesart, vorab festgelegt
 
-| Ergebnis des Vorzeichentests auf die sechs Differenzen | Folge |
+| Ergebnis des Vorzeichentests auf die gepaarten Differenzen | Folge |
 |---|---|
 | V0 hat die **höhere** Kollisionsrate, p < 0,05 | Ohne Rauschen eröffnet die Engine konzentrierter: das Rauschen kauft Streuung. Die Rate benennt, wie viel — und damit erstmals den Preis, den S1 und S2 nicht messen konnten. Ob er sich lohnt, entscheidet Hazeberry. |
-| p ≥ 0,05 | Kein nachweisbarer Unterschied in der Konzentration der Zugwahl. Zusammen mit S1 und S2: der Rauschterm kostet keine Stärke und bringt keine in diesem Aufbau messbare Streuung. Dann ist er ein Kandidat zum Abschalten — mit **eigener** Festlegung, nicht in diesem Lauf. Die Streuung käme in diesem Fall aus den Ausspielungen (`quickEval`, `sampleLegalMoves`), die hier in beiden Armen unangetastet bleiben. |
+| p ≥ 0,05 | **„Über die Seed-Blöcke ließ sich kein konsistenter Unterschied in der Konzentration des ersten Zugs nachweisen."** Das ist der ganze Urteilssatz. Er sagt nicht, dass die übrige Streuung aus den Ausspielungen stammt — `quickEval` wurde nicht variiert. Er sagt nicht, dass Abschalten praktisch gleichwertig wäre: die Elo-Intervalle aus S1 und S2 lassen Vor- **und** Nachteile offen ([−38,8; +34,9] und [−29,1; +44,6]). Eine Entscheidung über den Standard bräuchte eine eigene Messung mit vorab festgelegter Gleichwertigkeitsgrenze. |
 | V0 hat die **niedrigere** Kollisionsrate, p < 0,05 | Unerwartet: das Rauschen würde die Zugwahl zusammenziehen statt sie zu streuen. Wird berichtet wie gemessen, mit ausdrücklichem Hinweis, dass dafür keine Erklärung vorliegt. |
 
 ## 6. Gültigkeitsregel
 
 Zwei Zustände. **Ungültig**, mit „kein Urteil" und Grund, wenn:
 
-1. Ein Teillauf erreicht die 30 Partien nicht, oder ein Arm kommt nicht auf sechs Blöcke und 180 Partien.
+1. Ein Teillauf erreicht die 30 Partien nicht, oder ein Arm kommt nicht auf zehn Blöcke und 300 Partien.
 2. Innerhalb eines Arms unterscheiden sich die beiden Seiten in irgendeinem `PARAMS`-Wert.
 3. Die beiden Arme unterscheiden sich in irgendeinem `PARAMS`-Wert außer `evalStreuung`.
-4. Die Seeds 20261201 bis 20261206 kommen nicht in beiden Armen je genau einmal vor.
+4. Die Seeds 20261201 bis 20261210 kommen nicht in beiden Armen je genau einmal vor.
 5. Für eine Partie fehlen die Zugereignisse oder ihre Zahl weicht von `zuege` ab — ohne die Züge gibt es den
    primären Endpunkt nicht.
 6. `PARAMS_DEFAULT` ist verändert, geprüft über die Prüfsummen der drei Engine-Blöcke.
@@ -148,9 +185,13 @@ heißt, der Verlust ist kleiner als rund 3 Prozentpunkte". Diese Zahl stammte au
 beobachteten Vierfeldertafel Fishers Test unter 0,05 fällt — das beschreibt eine einzelne Tabelle und ist **keine**
 Schranke für einen Effekt (§10.2). Die Aussage ist gestrichen.
 
-Ein Nullergebnis lautet hier: **der Vorzeichentest über sechs gepaarte Blöcke zeigt keinen Unterschied**. Zeigen
-beide Arme in allen Blöcken keine einzige Wiederholung eines Zehn-Zug-Präfixes, lautet der Bericht genau das —
-„in beiden Stichproben trat keine Wiederholung auf" — und nicht, der Unterschied sei kleiner als irgendetwas.
+Ein Nullergebnis lautet hier genau der Satz aus §5: **über die Seed-Blöcke ließ sich kein konsistenter
+Unterschied in der Konzentration des ersten Zugs nachweisen** — und nichts darüber hinaus. Insbesondere folgt
+daraus nicht, woher die übrige Streuung kommt, und nicht, dass Abschalten gleichwertig wäre.
+
+Zeigen beide Arme in allen Blöcken keine einzige Wiederholung, lautet der Bericht „in beiden Stichproben trat
+keine Wiederholung auf" und der primäre Endpunkt „kein Urteil" (§4.1 Nr. 4) — nicht, der Unterschied sei kleiner
+als irgendetwas.
 
 Für eine belastbare Obergrenze bräuchte es eine **vorab definierte Toleranz** (ab welcher Ratendifferenz wäre der
 Verlust praktisch bedeutsam?) und eine dazu passende Auswertung, etwa einen Nichtunterlegenheitsvergleich mit
@@ -160,17 +201,18 @@ behauptet.
 ## 9. Ablauf
 
 1. Diese Festlegung als PR, CI grün, Merge.
-2. **Zwölf Teilläufe in Actions** (`ab-harness.yml`, `roh=1`): V1 und V0, je Seeds 20261201 bis 20261206, je 30
-   Partien. Je rund 15 Minuten.
+2. **Zwanzig Teilläufe in Actions** (`ab-harness.yml`, `roh=1`): V1 und V0, je Seeds 20261201 bis 20261210, je
+   30 Partien. Je rund 15 Minuten, parallel.
 3. Auswertungswerkzeug und Workflow für die Zählung, während die Läufe laufen — eigener PR, mit Test.
 4. Auswertung über Actions, weil die Artefakte aus einer Session nicht erreichbar sind
    (Vorgängerfestlegung §14.4). Ergebnis als Nachtrag hier, Rohwerte unter `docs/daten/eval-streuung-vielfalt/`.
 5. Urteil nach §5, Gültigkeit nach §6.
 
-## 10. Die drei Fehler der ersten Fassung
+## 10. Die fünf Fehler der ersten Fassungen
 
-Luna hat die erste Fassung durchgesehen und drei Stellen beanstandet. Alle drei treffen zu; sie stehen hier,
-damit nachvollziehbar bleibt, was sich geändert hat und warum.
+Luna hat zweimal durchgesehen und zusammen fünf Stellen beanstandet — §10.1 bis §10.3 nach der ersten Fassung,
+§10.4 und §10.5 nach der zweiten. Alle fünf treffen zu; sie stehen hier, damit nachvollziehbar bleibt, was sich
+geändert hat und warum.
 
 ### 10.1 Fisher und Clopper-Pearson auf die Zahl verschiedener Präfixe
 
@@ -183,8 +225,8 @@ Konzentration — und am weitesten daneben dort, wo Wiederholungen häufig sind.
 
 **Folge:** Fisher und Clopper-Pearson auf dieses Maß sind gestrichen. Die Zahl verschiedener Präfixe bleibt als
 beschreibende Messgröße. Die statistische Aussage läuft über **gepaarte Seed-Blöcke** als unabhängige Einheiten
-(§4). Weil zwei Blöcke dafür nicht reichen — kleinster p-Wert 0,50 —, sind es jetzt **sechs**, bei gleichem
-Gesamtaufwand (6 × 30 statt 2 × 90).
+(§4). Weil zwei Blöcke dafür nicht reichen — kleinster p-Wert 0,50 —, wurden es erst sechs und nach der zweiten
+Durchsicht **zehn** (§10.4).
 
 ### 10.2 Die Schranke „kleiner als rund 3 Prozentpunkte"
 
@@ -203,3 +245,29 @@ gesamten Lauf verwirft, sortiert gültige Vielfaltsdaten aus.
 
 **Folge:** Die Siegrate ist aus der Gültigkeitsregel entfernt und steht als Diagnose (§6). Verworfen wird erst
 bei einem nachgewiesenen Aufbaufehler, und der fällt dann ohnehin unter Grund 2 oder 3.
+
+### 10.4 Ein Gleichstand hätte den Test unbrauchbar gemacht
+
+**Befund:** Bei sechs Differenzen ergibt nur 6 : 0 ein zweiseitiges p < 0,05 (0,03125); schon 5 : 1 ergibt
+0,21875. Bei fünf gleichgerichteten Differenzen und einem Gleichstand fällt die Null-Differenz aus dem exakten
+Vorzeichentest heraus, und es bleibt p = 0,0625. Der Fall, dass alle Differenzen null sind, war gar nicht geregelt.
+
+**Warum das hier zählt und nicht Theorie ist:** Die Kollisionsrate eines Blocks ist **exakt 0**, sobald dort keine
+Eröffnung doppelt vorkommt. Sind beide Arme in einem Block bei 0, ist die Differenz 0. Gleichstände sind in diesem
+Aufbau also der erwartbare Fall, nicht der seltene — und ein einziger hätte bei sechs Blöcken gereicht, um α = 0,05
+unerreichbar zu machen.
+
+**Folge:** Zehn Blöcke statt sechs; sie verkraften bis zu vier Gleichstände. Die Behandlung steht als §4.1 fest, mit
+der Tabelle der erreichbaren p-Werte, der Regel „n_eff < 6 heißt kein Urteil" und dem ausdrücklich geregelten Fall,
+dass alle Differenzen null sind. Das gehört ins Werkzeug, nicht ins Ablesen.
+
+### 10.5 Der Urteilssatz bei einem Nullergebnis behauptete zu viel
+
+**Befund:** §8 zog die richtige Grenze, §5 ging darüber hinaus. Ein unauffälliger Test zeigt weder, dass die
+übrige Streuung aus `quickEval` stammt, noch dass Abschalten praktisch gleichwertig wäre. Auch S1 und S2 lassen
+nach ihren Elo-Intervallen Vor- und Nachteile offen.
+
+**Folge:** Die Nullzeile in §5 enthält jetzt nur noch den Satz „Über die Seed-Blöcke ließ sich kein konsistenter
+Unterschied in der Konzentration des ersten Zugs nachweisen", dazu ausdrücklich, was daraus **nicht** folgt. Die
+Formulierung „Kandidat zum Abschalten" ist gestrichen; eine Entscheidung über den Standard bräuchte eine eigene
+Messung mit vorab festgelegter Gleichwertigkeitsgrenze. §5 und §8 sagen damit dasselbe.
