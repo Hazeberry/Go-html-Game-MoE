@@ -38,6 +38,9 @@ const MIN_ZUEGE = 120;
 const MIN_NACH_GRENZE = 40;
 
 const zahl = (v, s = 0) => v.toFixed(s).replace('.', ',');
+/* Ein Median gerader Länge kann auf ,5 enden; dann mit einer Nachkommastelle, sonst würde
+   2618,5 als „2619“ angezeigt (§15, Werkzeug). */
+const zahlM = v => zahl(v, Number.isInteger(v) ? 0 : 1);
 function median(a) {
   if (!a.length) return NaN;
   const s = [...a].sort((x, y) => x - y), m = s.length >> 1;
@@ -178,12 +181,12 @@ function bericht(meta, r, gruende, md) {
   if (md) { L.push('| KI-Steinzüge | n | Sims Median [P10; P90] | Dauer | Suche (`zeiten.sucheMs`) | Rest | Netz |'); L.push('|---|---:|---|---:|---:|---:|---:|'); }
   for (const [name, k] of [['alle', r.gesamt], ['bis Zug 80', r.bis], ['ab Zug 81', r.ab]])
     L.push(md
-      ? `| ${name} | ${k.n} | ${zahl(k.simsMedian)} [${zahl(k.sims10)}; ${zahl(k.sims90)}] | ${zahl(k.dauerMedian)} ms | ${zahl(k.sucheMedian)} ms | ${zahl(k.restMedian)} ms | ${Number.isFinite(k.netzMedian) ? zahl(k.netzMedian) + ' ms' : '—'} |`
-      : `  ${name}: n ${k.n}, Sims ${zahl(k.simsMedian)} [${zahl(k.sims10)}; ${zahl(k.sims90)}], Dauer ${zahl(k.dauerMedian)} ms, `
-        + `Suche ${zahl(k.sucheMedian)} ms, Rest ${zahl(k.restMedian)} ms, Netz ${Number.isFinite(k.netzMedian) ? zahl(k.netzMedian) + ' ms' : '—'}`);
+      ? `| ${name} | ${k.n} | ${zahlM(k.simsMedian)} [${zahl(k.sims10)}; ${zahl(k.sims90)}] | ${zahlM(k.dauerMedian)} ms | ${zahlM(k.sucheMedian)} ms | ${zahlM(k.restMedian)} ms | ${Number.isFinite(k.netzMedian) ? zahlM(k.netzMedian) + ' ms' : '—'} |`
+      : `  ${name}: n ${k.n}, Sims ${zahlM(k.simsMedian)} [${zahl(k.sims10)}; ${zahl(k.sims90)}], Dauer ${zahlM(k.dauerMedian)} ms, `
+        + `Suche ${zahlM(k.sucheMedian)} ms, Rest ${zahlM(k.restMedian)} ms, Netz ${Number.isFinite(k.netzMedian) ? zahlM(k.netzMedian) + ' ms' : '—'}`);
   L.push('');
-  L.push(`${md ? '**' : ''}Arbeitspunkt S = ${zahl(r.S, Number.isInteger(r.S) ? 0 : 1)} Simulationen · N = ${r.stufe.N} → ${r.stufe.text}.${md ? '**' : ''}`);
-  L.push(`Zeitkosten einer Verdopplung, gerechnet aus der gemessenen Suchzeit: rund ${zahl(r.zeitkostenMs)} ms je Zug `
+  L.push(`${md ? '**' : ''}Arbeitspunkt S = ${zahlM(r.S)} Simulationen · N = ${r.stufe.N} → ${r.stufe.text}.${md ? '**' : ''}`);
+  L.push(`Zeitkosten einer Verdopplung, gerechnet aus der gemessenen Suchzeit: rund ${zahlM(r.zeitkostenMs)} ms je Zug `
     + '(bei gleicher Zeit je Simulation verdoppelt sich die Suchzeit).');
   return L.join('\n');
 }

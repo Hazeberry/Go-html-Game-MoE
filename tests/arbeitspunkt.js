@@ -161,6 +161,7 @@ test('Bericht: KEIN URTEIL nennt Gründe, GÜLTIG nennt den Arbeitspunkt', () =>
   const halb = bericht({sims: i => (i < 90 ? 2749 : 2750)});
   pruefe(W.bericht(halb.meta, W.auswerten(halb), [], true).includes('S = 2749,5 Simulationen · N = 2700 → Vergleich K3 in Stufe 2: 2700 → 5400'),
          'S = 2749,5 bleibt sichtbar unter der Grenze');
+  pruefe(/\| alle \| 180 \| 2749,5 \[/.test(W.bericht(halb.meta, W.auswerten(halb), [], true)), 'auch die Tabelle zeigt 2749,5, nicht 2750');
   const schlecht = W.bericht(b.meta, null, ['Regel 1: x'], true);
   pruefe(/KEIN URTEIL/.test(schlecht) && !/Arbeitspunkt S/.test(schlecht), 'ungültiger Bericht rechnet nichts');
 });

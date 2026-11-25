@@ -2,7 +2,8 @@
 <!-- SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0 -->
 # Skalierung auf dem heutigen Default: Vorabfestlegung
 
-**Stand: 25.11.2026. Status: Entwurf, nicht gelaufen.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
+**Stand: 25.11.2026. Status: Stufe G gelaufen und gültig (§16): S = 2618,5, N = 2600, K3 = 2600 → 5200. Stufe 1
+und 2 offen, je mit eigenem Go.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
 Hazeberry liest es vor dem Merge. Jede der drei Stufen braucht ein eigenes Go; der Merge dieses Docs ist keins.
 
 Festlegungen von Hazeberry am 25.11.2026: **1230 Partien je Vergleich, Aufgabe aus, Gerätemessung zuerst** — vor
@@ -413,9 +414,12 @@ Territory, KI Weiß auf Schwer, 578 Züge. Daten und Prüfung der Übertragung:
 
 | KI-Steinzüge | n | Simulationen je Zug, Median [P10; P90] | Zugdauer | Suche (`zeiten.sucheMs`) | Rest | Netz |
 |---|---:|---|---:|---:|---:|---:|
-| alle | 288 | 2726 [2056; 4057] | 2054 ms | 1927 ms | 133 ms | 106 ms |
-| bis Zug 80 | 40 | 2846 [2784; 3072] | 1839 ms | 1800 ms | 39 ms | 0 ms |
-| ab Zug 81 | 248 | 2645 [2005; 4143] | 2637 ms | 2502 ms | 135 ms | 107 ms |
+| alle | 288 | 2726 [2056; 4057] | 2053,5 ms | 1926,5 ms | 133 ms | 106 ms |
+| bis Zug 80 | 40 | 2845,5 [2784; 3072] | 1839 ms | 1800 ms | 39 ms | 0 ms |
+| ab Zug 81 | 248 | 2644,5 [2005; 4143] | 2637 ms | 2502 ms | 135 ms | 107 ms |
+
+Korrektur (§16): In der ersten Fassung dieser Tabelle waren vier Mediane, die auf ,5 enden, zur ganzen Zahl gerundet
+(2054, 1927, 2846, 2645). S = 2726 und alle Aussagen dieses Abschnitts bleiben unberührt.
 
 - Die Regeln aus §4.2 Nr. 1, 2, 4 und 5 sind erfüllt. Nr. 3 ist im vorgesehenen Fenster nicht anwendbar, weil die
   Partie davor lag. Die Herkunft ist ersatzweise belegt: `index.html` ist auf `main` seit #371 unverändert, und der
@@ -454,9 +458,9 @@ gestufte („stetige“) Regel ersetzt: **N = S auf volle Hundert gerundet, K3 =
 **Die frühere Regel:** k = log2(S / 120), kaufmännisch gerundet; k = 0 → K1, k = 1 → K2, k ≥ 2 → 120 · 2^k gegen
 das Doppelte.
 
-**Anlass, offen benannt: die Referenzpartie (§14).** Sie zeigte, dass das A17 genau an der Rastergrenze
-120 · 2^4,5 ≈ 2715,3 arbeitet: S = 2726, ohne die 75 KI-Züge nach dem ersten Pass von Schwarz 2590. Unter dem
-Raster hätte das Rauschen einer einzigen Partie entschieden, ob K3 1920 → 3840 oder 3840 → 7680 lautet. Beide Vergleiche liegen eine
+**Anlass, offen benannt: die Referenzpartie (§14).** Sie zeigte, dass das A17 genau an der Rastergrenze 120 · 2^4,5 ≈
+2715,3 arbeitet: S = 2726, ohne die 75 KI-Züge nach dem ersten Pass von Schwarz 2590. Unter dem Raster hätte das
+Rauschen einer einzigen Partie entschieden, ob K3 1920 → 3840 oder 3840 → 7680 lautet. Beide Vergleiche liegen eine
 halbe Verdopplung neben S, keiner beantwortet F4, und ihre Kosten unterscheiden sich um den Faktor zwei. In der
 Referenzpartie lagen 85 % der KI-Steinzüge zwischen 1920 und 3840 und nur 11 % darüber.
 
@@ -480,3 +484,71 @@ enden; S wird dann mit einer Nachkommastelle angezeigt, damit 2749,5 nicht als �
 `skalierung-bericht.js` und der Workflow nehmen `--n` (Eingabe `n`) statt `--k`; N muss ein Vielfaches von 100 und
 mindestens 100 sein, sonst Bedienfehler (Exit 2). In Stufe 1 ist `--n` freiwillig und ergänzt die Kostenschätzung um
 eine markierte Zeile für dieses N. Im beschreibenden Teil von Stufe 2 nennt der Bericht die Lage von K3 zu K2.
+
+## 16. Nachtrag: Stufe G, formale Partie vom 25.11.2026
+
+**Ablauf.** Go von Hazeberry am 25.11.2026 („Go für merge, Stufe G um 18:00 Uhr“). Der Werkzeug-PR #387 wurde um
+14:53:29 UTC gemergt; der Merge-Commit `98aa1ad` ist der Commit aus §6, seine Engine-Blöcke tragen die Prüfsummen. Die
+Partie lief am Abend auf dem A17, der Fehlerbericht ist um 20:05:28 UTC exportiert. Es ist die erste Partie nach Merge
+und Go, also die formale Stufe G (§14.1).
+
+**Gerät (§4.1), Notiz von Hazeberry:** Galaxy A17, Chrome 158.0.8127.42, V8-Optimierer an („Websites mit der
+V8-Engine von Chrome beschleunigen“), keine Ausnahme für eine Website. Das Bildschirmfoto der Einstellung stammt von
+19:32 UTC; dass sie während der Partie galt, beruht auf Hazeberrys Angabe. Der `userAgent` meldet
+„Chrome/158.0.0.0“: Die Hauptversion 158 ist damit belegt, die volle Nummer nicht.
+
+**Daten:** [`daten/skalierung-heute/stufe-g-20261125/`](daten/skalierung-heute/stufe-g-20261125/README.md), mit dem
+Fehlerbericht im Wortlaut, den Bereitstellungen und der Ausgabe des Werkzeugs.
+
+### 16.1 Gültigkeit (§4.2 und §13.4): gültig
+
+1. `meta.kiStufe` ist `hard`.
+2. `reproduktion.params` gleicht `PARAMS_DEFAULT` von `98aa1ad` in allen 164 Schlüsseln. Der Schnappschuss ist auch
+   mit dem der Referenzpartie identisch.
+3. Zwischen dem Merge und dem Export liegt genau eine Pages-Bereitstellung: Lauf 350, Commit `98aa1ad`,
+   14:53:33 UTC. Sie trägt die Prüfsummen aus §6.
+4. `workerNeustarts` ist 0, der Worker lief durch, und alle 228 KI-Steinzüge tragen eine Simulationszahl.
+5. 228 KI-Steinzüge mit Simulationszahl und `zeiten.sucheMs`, davon 188 nach Zug 80.
+
+Plausibilität, keine Gültigkeitsregel: In allen 228 Zeilen gilt `gesamtMs = vorMs + sucheMs + nachMs`, `msProSim`
+passt auf die Rundung genau zu `sucheMs` / Simulationen, und die Simulationen im Zugprotokoll stimmen mit
+`kiDiagnose` überein.
+
+### 16.2 Ergebnis (§4.3)
+
+| KI-Steinzüge | n | Simulationen je Zug, Median [P10; P90] | Zugdauer | Suche (`zeiten.sucheMs`) | Rest | Netz |
+|---|---:|---|---:|---:|---:|---:|
+| alle | 228 | 2618,5 [1986; 3494] | 1956 ms | 1800 ms | 133 ms | 106 ms |
+| bis Zug 80 | 40 | 2846,5 [2753; 3052] | 1842 ms | 1800 ms | 42 ms | 0 ms |
+| ab Zug 81 | 188 | 2559 [1911; 3584] | 2368 ms | 2232 ms | 136 ms | 106 ms |
+
+**Arbeitspunkt S = 2618,5 Simulationen. Nach §7.1 ist N = 2600, und K3 in Stufe 2 lautet 2600 gegen 5200.**
+
+**Zeitkosten einer Verdopplung: rund 1800 ms je Zug.** Das ist der Median der gemessenen Suchzeit; bei gleicher Zeit
+je Simulation verdoppelt sie sich. Gerechnet, nicht gemessen (§10).
+
+### 16.3 Beschreibend, ohne Folge für die Zuordnung
+
+- **Gegen die Referenzpartie (§14):** S 2618,5 gegen 2726, also N 2600 gegen 2700. Netzzeit 106 gegen 106 ms, Rest
+  133 gegen 133 ms, Simulationen bis Zug 80 2846,5 gegen 2845,5. Die Größen, die nicht vom Partieverlauf abhängen,
+  sind praktisch gleich.
+- **Die frühere Rasterregel:** Beide Partien liegen nur 4 % auseinander, aber auf verschiedenen Seiten ihrer Grenze
+  2715,3. Unter dem Raster hätte die formale Partie 1920 → 3840 ergeben, die Referenzpartie 3840 → 7680. Genau diese
+  Kante hat §15 vor der formalen Partie beseitigt.
+- **Nach dem ersten Pass von Schwarz** (Zug 385) spielte die KI noch 36 Steinzüge mit dem Median 3585 Simulationen;
+  das Brett war fast voll, Simulationen wurden billig (zuletzt 15 073). Ohne diese Phase läge der Median bei 2562,5
+  (192 Züge). Für die Zuordnung zählt S über alle Züge (§4.3).
+- **Verteilung:** 8,8 % der KI-Steinzüge unter 1920 Simulationen, 86,0 % zwischen 1920 und 3840, 5,3 % darüber.
+
+### 16.4 Werkzeug: Anzeige korrigiert
+
+Die Tabelle von `arbeitspunkt.js` rundete Mediane, die auf ,5 enden, zur ganzen Zahl: 2618,5 erschien als „2619“.
+Für die Zeile mit S war das schon behoben (§15), für die Tabelle nicht. Jetzt zeigt auch sie eine Nachkommastelle,
+mit Test. An Gültigkeit und Zuordnung ändert das nichts; N ist bei 2618,5 wie bei 2619 gleich 2600. Derselbe
+Rundungsfehler stand in der Tabelle in §14.2 und ist dort korrigiert.
+
+### 16.5 Wie es weitergeht
+
+Stufe 1 (K1 120 → 240, K2 240 → 480) braucht ein eigenes Go. Ihr Bericht schätzt mit `--n 2600` die Kosten von K3,
+und mit dieser Schätzung wird das Go für Stufe 2 erfragt (§7.3). Grobe Orientierung, ausdrücklich nur unter der
+Proportionalannahme aus §7.3: rund 300 Rechenstunden und 17 Stunden Wanduhrzeit für 2600 gegen 5200.
