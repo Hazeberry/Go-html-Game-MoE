@@ -394,9 +394,16 @@ Zwei Fehler der ersten Fassung von §11, beide von außen gemeldet und hier nach
 1. **§11.2 behauptete, beide Kollisionsraten lägen über 0,25.** V1 liegt mit 0,2444 darunter, und in acht der zehn
    V1-Blöcke liegt q unter 0,25. Der Satz verwechselte den Erwartungswert mit einer Untergrenze. Korrigiert oben,
    mit der Streuung von q als Zahl statt als Behauptung.
-2. **§11.4 fasste die beiden Elo-Intervalle zu „±39 Elo" zusammen.** Das nimmt die untere Schranke von S1 (−38,8)
-   und paart sie mit einem +39, das in keinem der beiden Intervalle steht; S2 reicht bis +44,6. Die Vergleiche
-   stehen jetzt getrennt. Dieselbe Verkürzung stand in §13.5 der S1/S2-Festlegung und ist dort mitkorrigiert.
+2. **§11.4 fasste die beiden Elo-Intervalle zu „±39 Elo" zusammen.** Die obere Intervallgrenze beträgt bei S1
+   +34,9 Elo und bei S2 +44,6 Elo. Die frühere Sammelangabe ±39 Elo gibt keines der beiden beobachteten Intervalle
+   korrekt wieder. Die Vergleiche stehen jetzt getrennt. Dieselbe Verkürzung stand in §13.5 der S1/S2-Festlegung
+   und ist dort mitkorrigiert.
 
 Beide Fehler gehen in dieselbe Richtung: eine Zahl, die als Zusammenfassung gefällig aussieht, aber so in der
 Rechnung nicht steht. Das Urteil nach §5 ändert sich durch keinen von beiden.
+
+*Nachtrag zu Punkt 2 (25.11.2026, ebenfalls von außen gemeldet):* Die erste Fassung dieses Punkts sagte, die
+Sammelangabe paare die untere Schranke von S1 „mit einem +39, das in keinem der beiden Intervalle steht". Das ist
+falsch: +39 liegt innerhalb des S2-Intervalls [−29,1; +44,6]. Gemeint war die obere Grenze. Der Satz ist durch die
+Angabe der beiden Obergrenzen ersetzt. Dieselbe Formulierung steht in der Commit-Nachricht `3fb870e`; die bleibt,
+weil `main` nicht umgeschrieben wird.
