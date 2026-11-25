@@ -10,8 +10,10 @@
      3. Jede der fünf Regeln aus §5.5 schlägt an, wenn sie verletzt ist; Regel 5 konservativ.
      4. Eine extreme Siegrate in einem Teillauf ist KEIN Gültigkeitsgrund.
      5. Die Urteilssätze aus §5.3, wörtlich.
-     6. Stufe 2: Seeds und Vergleich aus k und Partien je Teillauf; Bedienfehler sind Exit 2.
-     7. Die Kostenschätzung aus §7.3.
+     6. Stufe 2: Seeds und Vergleich K3 = N gegen 2N aus N und Partien je Teillauf; N muss ein
+        Vielfaches von 100 und mindestens 100 sein; Bedienfehler sind Exit 2. Die Lage von K3
+        zu K2 im beschreibenden Teil.
+     7. Die Kostenschätzung aus §7.3, mit fester Reihe und dem N aus Stufe G.
      8. Ende zu Ende über die Befehlszeile, gültig und ungültig.
 
    Aufruf:  node tests/skalierung-bericht.js */
@@ -186,18 +188,37 @@ test('Eine extreme Siegrate je Teillauf ist kein Gültigkeitsgrund', () => {
   pruefeGleich(ohneRegel4(W.pruefe(A1, W.STUFE1, t).gruende).length, 0, '82 : 0 in einem Teillauf bleibt gültig');
 });
 
-test('Stufe 2: Seeds aus §7.2, Bedienfehler werfen', () => {
-  const v = W.vergleiche({stufe: 2, k: 4, partienJeTeil: 10})[0];
-  pruefeGleich(v.a, 1920, 'A = 120 · 2^4'); pruefeGleich(v.b, 3840, 'B = 2 · A');
+test('Stufe 2: K3 = N gegen 2N, Seeds aus §7.2, Bedienfehler werfen', () => {
+  const v = W.vergleiche({stufe: 2, n: 2700, partienJeTeil: 10})[0];
+  pruefeGleich(v.name, 'K3', 'Name'); pruefeGleich(v.a, 2700, 'A = N'); pruefeGleich(v.b, 5400, 'B = 2N');
   pruefeGleich(v.seeds.length, 123, '1230 / 10 Teilläufe'); pruefeGleich(v.seeds[0], 11260001, 'erster Seed'); pruefeGleich(v.seeds[122], 11260123, 'letzter Seed');
-  pruefeGleich(W.vergleiche({stufe: 2, k: 2, partienJeTeil: 30})[0].a, 480, 'k = 2 beginnt bei 480');
+  const w = W.vergleiche({stufe: 2, n: 2800, partienJeTeil: 10})[0];
+  pruefe(w.a === 2800 && w.b === 5600, 'Grenztest aus §15: N = 2800 → 2800 → 5600');
+  pruefeGleich(W.vergleiche({stufe: 2, n: 100, partienJeTeil: 1230})[0].b, 200, 'kleinstes N');
+  pruefeGleich(W.vergleiche({stufe: 1, n: 2700}), W.STUFE1, 'Stufe 1 nimmt N nur für die Kosten');
   let geworfen = 0;
-  for (const x of [{stufe: 2, k: 1, partienJeTeil: 10}, {stufe: 2, k: 4, partienJeTeil: 12}, {stufe: 3}])
-    try { W.vergleiche(x); } catch (e) { geworfen++; }
-  pruefeGleich(geworfen, 3, 'k < 2, ungerader oder fremder Teiler, Stufe 3');
-  const t = v.seeds.map(s => teil(s, 1920, 3840, {g: 10, siegeB: 6}));
-  const p = W.pruefe({stufe: 2, commit: COMMIT, html: null}, [v], t);
+  const falsch = [{stufe: 2, n: 2750, partienJeTeil: 10}, {stufe: 2, n: 0, partienJeTeil: 10},
+                  {stufe: 2, n: NaN, partienJeTeil: 10}, {stufe: 2, partienJeTeil: 10}, {stufe: 2, n: 2700.5, partienJeTeil: 10},
+                  {stufe: 2, n: 2700, partienJeTeil: 12}, {stufe: 1, n: 150}, {stufe: 3}];
+  for (const x of falsch) try { W.vergleiche(x); } catch (e) { geworfen++; }
+  pruefeGleich(geworfen, falsch.length, 'kein Vielfaches von 100, unter 100, fehlend, ungerader Teiler, Stufe 3');
+  const t = v.seeds.map(s => teil(s, 2700, 5400, {g: 10, siegeB: 6}));
+  const a = {stufe: 2, n: 2700, commit: COMMIT, html: null, markdown: true, k2: {siege: 700, n: 1230}};
+  const p = W.pruefe(a, [v], t);
   pruefeGleich(ohneRegel4(p.gruende).length, 0, 'vollständige Stufe 2 gültig');
+  const erg = W.ergebnisse(a, [v], p.jeVergleich);
+  pruefe(erg.k2 && Number.isFinite(erg.k2.D) && erg.kosten === null && erg.f2 === null, 'Stufe 2: Abstand zu K2, kein F2, keine Kosten');
+  const text = W.bericht(a, [v], erg, []);
+  pruefe(text.includes('K3 2700 → 5400') && text.includes('2,49 Verdopplungen ungemessen'), 'Bericht nennt K3 und die Lücke zu K2');
+});
+
+test('Stufe 2: Lage von K3 zu K2 (§7.4)', () => {
+  pruefeGleich(W.lageZuK2(480), 'K3 schließt unmittelbar an K2 an.', 'N = 480');
+  pruefe(W.lageZuK2(960).includes('ein Abstand von 1 Verdopplung ungemessen'), 'N = 960: eine Verdopplung, Einzahl');
+  pruefe(W.lageZuK2(2700).includes('2,49 Verdopplungen'), 'N = 2700: log2(2700 / 480)');
+  pruefeGleich(W.lageZuK2(300), 'K3 überschneidet sich mit K2 (240 → 480).', 'N = 300');
+  pruefeGleich(W.lageZuK2(120), 'K3 endet dort, wo K2 beginnt.', 'N = 120');
+  pruefe(W.lageZuK2(100).includes('0,26 Verdopplungen'), 'N = 100: unterhalb von K2');
 });
 
 test('Kostenschätzung aus §7.3', () => {
@@ -205,12 +226,20 @@ test('Kostenschätzung aus §7.3', () => {
   const k = W.kosten(r1, r2);
   pruefeNah(k.b, 0.68 / 180, 1e-12, 'Steigung je Simulation');
   pruefe(k.belastbar, 'Steigung positiv');
-  const z = k.zeilen.find(x => x.k === 4);
-  pruefeNah(z.jePartie, k.a + k.b * 2880, 1e-12, 'Minuten je Partie bei 1920 → 3840');
+  pruefeGleich(k.zeilen.map(z => z.von).join(), W.KOSTEN_N.join(), 'feste Reihe ohne N');
+  pruefe(k.zeilen.every(z => z.bis === 2 * z.von && !z.ausStufeG), 'K3 = N → 2N, keine Zeile markiert');
+  const mitN = W.kosten(r1, r2, 2700);
+  pruefeGleich(mitN.zeilen.map(z => z.von).join(), '1000,1500,2000,2500,2700,3000,3500,4000', 'N aus Stufe G einsortiert');
+  pruefeGleich(mitN.zeilen.filter(z => z.ausStufeG).map(z => z.von).join(), '2700', 'genau diese Zeile markiert');
+  pruefeGleich(W.kosten(r1, r2, 3000).zeilen.length, W.KOSTEN_N.length, 'N aus der Reihe: keine doppelte Zeile');
+  const z = mitN.zeilen.find(x => x.von === 2700);
+  pruefeNah(z.jePartie, k.a + k.b * 4050, 1e-12, 'Minuten je Partie bei 2700 → 5400');
   pruefeGleich(z.g, 10, 'größter gerader Teiler mit höchstens 200 Minuten');
   pruefeGleich(z.teile, 123, 'Teilläufe');
   pruefeNah(z.rechenStunden, 1230 * z.jePartie / 60, 1e-9, 'Rechenstunden');
   pruefeNah(z.wanduhrStunden, 7 * 10 * z.jePartie / 60, 1e-9, 'sieben Wellen zu 20 Jobs');
+  const z1 = mitN.zeilen.find(x => x.von === 1000);
+  pruefeGleich(z1.g, 30, 'bei 1000 → 2000 passen 30 Partien in 200 Minuten');
   pruefe(!W.kosten({...r1, minJePartie: 2}, r2).belastbar, 'fallende Laufzeit ist nicht belastbar');
 });
 
@@ -240,8 +269,9 @@ test('Ende zu Ende: gültiger Lauf über die Befehlszeile', () => {
   if (!engineWieFestgelegt()) return 'skip';   /* Regel 4 lässt sich nur am Stand aus §6 positiv prüfen */
   const dir = fs.mkdtempSync(path.join(tmpdir(), 'gut-'));
   const args = schreibeTeile(stufe1(50, 47, {min1: 0.69, min2: 1.37}), dir);
-  const r = spawnSync(process.execPath, [SKRIPT, '--stufe', '1', '--commit', COMMIT, '--html', HTML, '--markdown', ...args], {encoding: 'utf8'});
+  const r = spawnSync(process.execPath, [SKRIPT, '--stufe', '1', '--commit', COMMIT, '--html', HTML, '--markdown', '--n', '2700', ...args], {encoding: 'utf8'});
   pruefeGleich(r.status, 0, 'Exit 0');
+  pruefe(r.stdout.includes('**2700 → 5400 (N aus Stufe G)**'), 'Kostenzeile für das N aus Stufe G');
   pruefe(/\*\*GÜLTIG\.\*\*/.test(r.stdout), 'GÜLTIG');
   pruefe(r.stdout.includes('Eine Verdopplung von 120 auf 240 Simulationen bringt dem heutigen Default nachweisbar Stärke'), 'F1-Satz für K1');
   pruefe(r.stdout.includes('Ein Unterschied zwischen den beiden Gewinnen ist nicht nachgewiesen'), 'F2-Satz');
@@ -255,8 +285,12 @@ test('Ende zu Ende: ungültiger Lauf endet mit Exit 1 und rechnet nichts', () =>
   pruefeGleich(r.status, 1, 'Exit 1');
   pruefe(/KEIN URTEIL/.test(r.stdout) && /Regel 1/.test(r.stdout), 'KEIN URTEIL mit Regel 1');
   pruefe(!/F2: Abflachung/i.test(r.stdout), 'keine Rechnung');
-  const bedien = spawnSync(process.execPath, [SKRIPT, '--stufe', '2', '--k', '1', '--partien-je-teil', '10', ...args], {encoding: 'utf8'});
-  pruefeGleich(bedien.status, 2, 'Bedienfehler: Exit 2');
+  for (const n of ['2750', '50', '2700.5', '']) {
+    const bedien = spawnSync(process.execPath, [SKRIPT, '--stufe', '2', '--n', n, '--partien-je-teil', '10', ...args], {encoding: 'utf8'});
+    pruefeGleich(bedien.status, 2, `Bedienfehler --n '${n}': Exit 2`);
+  }
+  const alt = spawnSync(process.execPath, [SKRIPT, '--stufe', '2', '--k', '4', '--partien-je-teil', '10', ...args], {encoding: 'utf8'});
+  pruefeGleich(alt.status, 2, 'die alte Option --k gibt es nicht mehr: Exit 2');
 });
 
 laufeTests('Skalierungsbericht').then(ok => {

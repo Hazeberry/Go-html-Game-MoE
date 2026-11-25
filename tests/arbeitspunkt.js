@@ -4,8 +4,9 @@
    docs/skalierung-heute-vorabfestlegung.md §4 und §7.1).
 
    Geprüft wird:
-     1. Die Regel aus §7.1 an allen Grenzen: Verdopplung AB dem Arbeitspunkt, k kaufmännisch
-        gerundet; k = 0 → K1, k = 1 → K2, k ≥ 2 → eigener Vergleich ab 120 · 2^k.
+     1. Die Regel aus §7.1 (Fassung nach §15) an den Grenzen: N = S auf volle Hundert
+        gerundet, x50 aufwärts; K3 = N gegen 2N; unter N = 100 entfällt Stufe 2. Grenztest
+        aus der Entscheidung: S = 2749 → 2700 → 5400, S = 2750 → 2800 → 5600.
      2. Median und Perzentil wie im Kopf des Skripts beschrieben.
      3. Die Suchzeit kommt aus zeiten.sucheMs, nicht aus Simulationen × msProSim.
      4. Jede der fünf Regeln aus §4.2 schlägt an, wenn sie verletzt ist.
@@ -53,16 +54,25 @@ function bericht(opt = {}) {
 const gruende = (b, o = {}) => W.pruefe(b, {...OK, ...o});
 const regel = (g, n) => g.filter(x => x.startsWith(`Regel ${n}:`));
 
-test('Regel aus §7.1: Verdopplung ab dem Arbeitspunkt, an allen Grenzen', () => {
-  const fall = [[84.85, -1, null], [84.86, 0, 'K1'], [120, 0, 'K1'], [169.7, 0, 'K1'], [169.71, 1, 'K2'], [240, 1, 'K2'],
-                [339.41, 1, 'K2'], [339.42, 2, 'K3'], [480, 2, 'K3'], [1000, 3, 'K3'], [2662, 4, 'K3']];
-  for (const [S, k, v] of fall) {
+test('Regel aus §7.1: N = S auf volle Hundert, K3 = N gegen 2N, an den Grenzen', () => {
+  /* Grenztest aus der Entscheidung (§15): 2749 und 2750. Dazu die halben Werte, die ein Median
+     ganzer Zahlen annehmen kann, die Referenzpartie (§14) und die untere Grenze. */
+  const fall = [[2749, 2700], [2750, 2800], [2749.5, 2700], [2750.5, 2800], [2726, 2700], [2590, 2600],
+                [2662, 2700], [2650, 2700], [2649.5, 2600], [1895, 1900], [149.5, 100], [150, 200],
+                [50, 100], [49.5, 0], [0, 0]];
+  for (const [S, N] of fall) pruefeGleich(W.stufeAusS(S).N, N, `N bei S = ${S}`);
+  const a = W.stufeAusS(2749), b = W.stufeAusS(2750);
+  pruefe(a.vergleich === 'K3' && a.von === 2700 && a.bis === 5400, 'S = 2749 → 2700 → 5400');
+  pruefe(b.vergleich === 'K3' && b.von === 2800 && b.bis === 5600, 'S = 2750 → 2800 → 5600');
+  pruefe(/2700 → 5400/.test(a.text) && /2800 → 5600/.test(b.text), 'Text nennt den Vergleich');
+  pruefeGleich(W.stufeAusS(50).bis, 200, 'S = 50: kleinster Vergleich 100 → 200');
+  for (const S of [49.5, 0]) {
     const r = W.stufeAusS(S);
-    pruefeGleich(r.k, k, `k bei S = ${S}`); pruefeGleich(r.vergleich, v, `Vergleich bei S = ${S}`);
+    pruefe(r.vergleich === null && /entfällt/.test(r.text), `S = ${S}: Stufe 2 entfällt`);
   }
-  pruefeGleich(W.stufeAusS(240).von, 240, 'S = 240: Verdopplung ab 240, also K2 (nicht K1)');
-  pruefeGleich(W.stufeAusS(480).von, 480, 'S = 480: ab 480 …'); pruefeGleich(W.stufeAusS(480).bis, 960, '… bis 960 (nicht K2)');
-  pruefeGleich(W.stufeAusS(2662).von, 1920, 'S = 2662: ab 1920');
+  /* Jeder Wert zwischen 2650 und 2749,5 in Halbschritten ergibt dieselbe Stufe: kein Sprung
+     um eine ganze Verdopplung innerhalb eines Hunderters. */
+  for (let S = 2650; S < 2750; S += 0.5) if (W.stufeAusS(S).N !== 2700) pruefe(false, `S = ${S} nicht bei 2700`);
 });
 
 test('Median und Perzentil', () => {
@@ -80,7 +90,7 @@ test('Suchzeit aus zeiten.sucheMs, nicht aus Simulationen × msProSim', () => {
   pruefeNah(r.gesamt.restMedian, 200, 1e-9, 'Rest = dauerMs − sucheMs');
   pruefeGleich(r.ab.netzMedian, 106, 'Netz ab Zug 81');
   pruefeNah(r.S, W.median(Array.from({length: 180}, (_, i) => 1000 + 10 * i)), 1e-9, 'S = Median der Simulationen');
-  pruefeGleich(r.stufe.vergleich, 'K3', 'S ≈ 1895 → k = 4 → K3');
+  pruefe(r.stufe.vergleich === 'K3' && r.stufe.N === 1900, 'S = 1895 → N = 1900 → K3');
   pruefeGleich(r.bis.n + r.ab.n, 180, 'bis und ab Zug 80 vollständig');
 });
 
@@ -135,7 +145,12 @@ test('Regel 5: genug Steinzüge, davon genug nach Zug 80', () => {
 test('Bericht: KEIN URTEIL nennt Gründe, GÜLTIG nennt den Arbeitspunkt', () => {
   const b = bericht();
   const gut = W.bericht(b.meta, W.auswerten(b), [], true);
-  pruefe(/\*\*GÜLTIG\.\*\*/.test(gut) && /Arbeitspunkt S = /.test(gut) && /1920 → 3840/.test(gut), 'gültiger Bericht');
+  pruefe(/\*\*GÜLTIG\.\*\*/.test(gut) && /Arbeitspunkt S = 1895 Simulationen · N = 1900 → Vergleich K3 in Stufe 2: 1900 → 3800/.test(gut), 'gültiger Bericht');
+  /* Ein halber Median an der Grenze wird nicht zur ganzen Zahl gerundet angezeigt: S = 2749,5
+     darf nicht als „2750“ neben N = 2700 stehen. */
+  const halb = bericht({sims: i => (i < 90 ? 2749 : 2750)});
+  pruefe(W.bericht(halb.meta, W.auswerten(halb), [], true).includes('S = 2749,5 Simulationen · N = 2700 → Vergleich K3 in Stufe 2: 2700 → 5400'),
+         'S = 2749,5 bleibt sichtbar unter der Grenze');
   const schlecht = W.bericht(b.meta, null, ['Regel 1: x'], true);
   pruefe(/KEIN URTEIL/.test(schlecht) && !/Arbeitspunkt S/.test(schlecht), 'ungültiger Bericht rechnet nichts');
 });

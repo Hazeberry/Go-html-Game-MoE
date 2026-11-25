@@ -10,9 +10,10 @@
          der Siege und Niederlagen von B in K1 und K2 — Elo ist streng monoton in der
          Siegrate, „gleicher Gewinn“ heißt also genau „gleiche Siegrate“. Das Intervall für D
          ist genähert (Delta-Methode) und nur Beschreibung.
-     Dazu die Laufzeit je Partie und daraus die Kostenschätzung für Stufe 2 (§7.3).
-   Stufe 2: ein Vergleich K3 ab 120 · 2^k (§7.1), F1 wie oben; die Differenz zu K2 nur
-     beschreibend, ohne Test (§7.4).
+     Dazu die Laufzeit je Partie und daraus die Kostenschätzung für Stufe 2 (§7.3), für eine
+     feste Reihe von N und, mit --n, zusätzlich für das N aus Stufe G.
+   Stufe 2: ein Vergleich K3 = N gegen 2N (§7.1, Fassung nach §15: N ist S auf volle Hundert
+     gerundet), F1 wie oben; die Differenz zu K2 nur beschreibend, ohne Test (§7.4).
 
    Gültigkeit nach §5.5, zwei Zustände. Bei KEIN URTEIL endet das Skript mit Status 1.
 
@@ -24,9 +25,10 @@
 
    Aufruf:
      node auswertung/skalierung-bericht.js --stufe 1 --commit <sha> --html stand.html \
-          --teil t.json,t.jsonl,t.log  [--teil …]  [--markdown]
-     node auswertung/skalierung-bericht.js --stufe 2 --k 4 --partien-je-teil 10 \
-          --commit <sha> --html stand.html [--k2 <SiegeB>:<Partien>] --teil …  [--markdown] */
+          --teil t.json,t.jsonl,t.log  [--teil …]  [--n 2700]  [--markdown]
+     node auswertung/skalierung-bericht.js --stufe 2 --n 2700 --partien-je-teil 10 \
+          --commit <sha> --html stand.html [--k2 <SiegeB>:<Partien>] --teil …  [--markdown]
+   --n ist ein Vielfaches von 100, mindestens 100 (arbeitspunkt.js nennt es). */
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -54,11 +56,15 @@ const STUFE1 = [
   {name: 'K1', a: 120, b: 240, seeds: bereich(11250001, 15), partienJeTeil: 82},
   {name: 'K2', a: 240, b: 480, seeds: bereich(11250016, 15), partienJeTeil: 82}
 ];
-/* §7.1 und §7.2: der Vergleich von Stufe 2. */
-function stufe2(k, g) {
-  const a = 120 * 2 ** k;
-  return [{name: 'K3', a, b: 2 * a, seeds: bereich(11260001, PARTIEN / g), partienJeTeil: g}];
+/* §7.1 und §7.2: der Vergleich von Stufe 2, K3 = N gegen 2N. */
+function stufe2(n, g) {
+  return [{name: 'K3', a: n, b: 2 * n, seeds: bereich(11260001, PARTIEN / g), partienJeTeil: g}];
 }
+/* §7.1: N ist S auf volle Hundert gerundet, also ein Vielfaches von 100; unter 100 entfällt
+   Stufe 2. */
+const gueltigesN = n => Number.isInteger(n) && n >= 100 && n % 100 === 0;
+/* §7.3: feste Reihe für die Kostenschätzung, um den erwarteten Arbeitspunkt herum. */
+const KOSTEN_N = [1000, 1500, 2000, 2500, 3000, 3500, 4000];
 
 const zahl = (v, s = 1) => v.toFixed(s).replace('.', ',');
 const mitVz = (v, s = 1) => (v > 0 ? '+' : v < 0 ? '−' : '±') + zahl(Math.abs(v), s);
@@ -90,13 +96,13 @@ function fisherZweiseitig(a, b, c, d) {
 }
 
 function argumente(argv) {
-  const a = {stufe: null, k: null, partienJeTeil: null, commit: null, html: null, k2: null,
+  const a = {stufe: null, n: null, partienJeTeil: null, commit: null, html: null, k2: null,
              teile: [], markdown: false};
   for (let i = 2; i < argv.length; i++) {
     const s = argv[i], v = argv[i + 1];
     switch (s) {
       case '--stufe': a.stufe = parseInt(v, 10); i++; break;
-      case '--k': a.k = parseInt(v, 10); i++; break;
+      case '--n': a.n = /^\d+$/.test(String(v)) ? Number(v) : NaN; i++; break;
       case '--partien-je-teil': a.partienJeTeil = parseInt(v, 10); i++; break;
       case '--commit': a.commit = String(v); i++; break;
       case '--html': a.html = v; i++; break;
@@ -118,12 +124,14 @@ function argumente(argv) {
 /* Die erwarteten Vergleiche aus der Stufe. Ein Bedienfehler ist kein Urteil über die Messung:
    dafür Exit 2, nicht Exit 1. */
 function vergleiche(a) {
+  if (a.n !== null && a.n !== undefined && !gueltigesN(a.n))
+    throw new Error(`--n muss ein Vielfaches von 100 und mindestens 100 sein (§7.1), bekommen ${a.n}.`);
   if (a.stufe === 1) return STUFE1;
   if (a.stufe === 2) {
-    if (!(Number.isInteger(a.k) && a.k >= 2)) throw new Error('Stufe 2 braucht --k ≥ 2 (§7.1).');
+    if (!gueltigesN(a.n)) throw new Error('Stufe 2 braucht --n: S auf volle Hundert gerundet, mindestens 100 (§7.1).');
     if (!TEILER.includes(a.partienJeTeil))
       throw new Error(`--partien-je-teil muss ein gerader Teiler von 1230 sein (${TEILER.join(', ')}), §7.2.`);
-    return stufe2(a.k, a.partienJeTeil);
+    return stufe2(a.n, a.partienJeTeil);
   }
   throw new Error('--stufe muss 1 oder 2 sein.');
 }
@@ -298,22 +306,33 @@ function urteilF2(f) {
     + 'Die Messung war so bemessen, dass sie eine Abflachung von 40 Elo mit rund 80 % erkannt hätte.';
 }
 
-/* §7.3: Laufzeit = a + b · mittlere Simulationen je Zug, aus K1 und K2; daraus je k die
+/* §7.3: Laufzeit = a + b · mittlere Simulationen je Zug, aus K1 und K2; daraus je N die
    Partien je Teillauf (größter gerader Teiler von 1230 mit höchstens 200 Minuten je Teillauf),
-   Rechenstunden und Wanduhrzeit bei 20 gleichzeitigen Jobs. */
-function kosten(r1, r2) {
+   Rechenstunden und Wanduhrzeit bei 20 gleichzeitigen Jobs. Mit n kommt das N aus Stufe G
+   als eigene, markierte Zeile dazu. */
+function kosten(r1, r2, n = null) {
   const m1 = (r1.a + r1.b) / 2, m2 = (r2.a + r2.b) / 2;
   const b = (r2.minJePartie - r1.minJePartie) / (m2 - m1), a0 = r1.minJePartie - b * m1;
-  const zeilen = [];
-  for (let k = 2; k <= 5; k++) {
-    const lo = 120 * 2 ** k, m = (lo + 2 * lo) / 2, jePartie = a0 + b * m;
+  const liste = [...new Set([...KOSTEN_N, ...(n === null ? [] : [n])])].sort((x, y) => x - y);
+  const zeilen = liste.map(von => {
+    const m = (von + 2 * von) / 2, jePartie = a0 + b * m;
     const g = [...TEILER].reverse().find(x => x * jePartie <= 200) || null;
     const teile = g ? PARTIEN / g : null;
-    zeilen.push({k, von: lo, bis: 2 * lo, jePartie, g, teile,
-                 rechenStunden: PARTIEN * jePartie / 60,
-                 wanduhrStunden: g ? Math.ceil(teile / 20) * g * jePartie / 60 : null});
-  }
+    return {von, bis: 2 * von, ausStufeG: von === n, jePartie, g, teile,
+            rechenStunden: PARTIEN * jePartie / 60,
+            wanduhrStunden: g ? Math.ceil(teile / 20) * g * jePartie / 60 : null};
+  });
   return {a: a0, b, belastbar: b > 0, zeilen};
+}
+
+/* §7.4: wie K3 (N → 2N) zu K2 (240 → 480) liegt, für den beschreibenden Abstand. */
+function lageZuK2(n) {
+  const vd = x => { const s = zahl(x, 2).replace(/,00$/, ''); return s === '1' ? '1 Verdopplung' : `${s} Verdopplungen`; };
+  if (n === 480) return 'K3 schließt unmittelbar an K2 an.';
+  if (n > 480) return `Zwischen K2 (endet bei 480) und K3 (beginnt bei ${n}) bleibt ein Abstand von ${vd(Math.log2(n / 480))} ungemessen.`;
+  if (2 * n > 240) return 'K3 überschneidet sich mit K2 (240 → 480).';
+  if (2 * n === 240) return 'K3 endet dort, wo K2 beginnt.';
+  return `Zwischen K3 (endet bei ${2 * n}) und K2 (beginnt bei 240) bleibt ein Abstand von ${vd(Math.log2(240 / (2 * n)))} ungemessen.`;
 }
 
 function bericht(a, vgl, ergebnis, gruende) {
@@ -359,7 +378,7 @@ function bericht(a, vgl, ergebnis, gruende) {
     h('Beschreibend: Abstand zu K2, ohne Test (§7.4)', 2);
     L.push('');
     L.push(`Elo(K2) − Elo(K3) = ${mitVz(d.D)} Elo, 95 % genähert [${mitVz(d.ci[0])}; ${mitVz(d.ci[1])}]. `
-      + (a.k === 2 ? 'K3 schließt unmittelbar an K2 an.' : 'Zwischen K2 und K3 bleibt mindestens eine Verdopplung ungemessen.'));
+      + lageZuK2(a.n));
     L.push('');
   }
   h('Nebenmaße, beschreibend (§5.4)', 2);
@@ -382,12 +401,15 @@ function bericht(a, vgl, ergebnis, gruende) {
     L.push('');
     L.push(`Laufzeit je Partie ≈ ${zahl(k.a, 3)} + ${zahl(k.b * 1000, 3)} · 10⁻³ · mittlere Simulationen je Zug (Minuten).`
       + (k.belastbar ? '' : ' **Nicht belastbar: Die Steigung ist nicht positiv.**'));
-    if (md) { L.push('', '| k | Vergleich | min je Partie | Partien je Teillauf | Teilläufe | Rechenstunden | Wanduhr bei 20 Jobs |'); L.push('|---:|---|---:|---:|---:|---:|---:|'); }
-    for (const z of k.zeilen)
+    if (md) { L.push('', '| K3 = N → 2N | min je Partie | Partien je Teillauf | Teilläufe | Rechenstunden | Wanduhr bei 20 Jobs |'); L.push('|---|---:|---:|---:|---:|---:|'); }
+    for (const z of k.zeilen) {
+      const name = `${z.von} → ${z.bis}${z.ausStufeG ? ' (N aus Stufe G)' : ''}`;
       L.push(md
-        ? `| ${z.k} | ${z.von} → ${z.bis} | ${zahl(z.jePartie, 2)} | ${z.g || '—'} | ${z.teile || '—'} | ${zahl(z.rechenStunden)} | ${z.wanduhrStunden === null ? '—' : zahl(z.wanduhrStunden) + ' h'} |`
-        : `  k=${z.k} ${z.von} → ${z.bis}: ${zahl(z.jePartie, 2)} min je Partie, ${z.g || '—'} je Teillauf, ${z.teile || '—'} Teilläufe, `
+        ? `| ${z.ausStufeG ? '**' + name + '**' : name} | ${zahl(z.jePartie, 2)} | ${z.g || '—'} | ${z.teile || '—'} | ${zahl(z.rechenStunden)} | ${z.wanduhrStunden === null ? '—' : zahl(z.wanduhrStunden) + ' h'} |`
+        : `  ${name}: ${zahl(z.jePartie, 2)} min je Partie, ${z.g || '—'} je Teillauf, ${z.teile || '—'} Teilläufe, `
           + `${zahl(z.rechenStunden)} Rechenstunden, Wanduhr ${z.wanduhrStunden === null ? '—' : zahl(z.wanduhrStunden) + ' h'}`);
+    }
+    L.push('', 'Eine Schätzung, kein Messwert (§7.3). Ist sie zu teuer, wird Stufe 2 neu festgelegt, nicht verkleinert.');
     L.push('');
   }
   h('Teilläufe', 2);
@@ -407,7 +429,7 @@ function ergebnisse(a, vgl, jeVergleich) {
     ohneLimit[v.name] = {n: p.length, siege: p.filter(x => x.sieger === 'B').length};
   }
   const ergebnis = {f1, jeVergleich, ohneLimit, f2: null, kosten: null, k2: null};
-  if (a.stufe === 1) { ergebnis.f2 = abflachung(f1[0], f1[1]); ergebnis.kosten = kosten(f1[0], f1[1]); }
+  if (a.stufe === 1) { ergebnis.f2 = abflachung(f1[0], f1[1]); ergebnis.kosten = kosten(f1[0], f1[1], a.n ?? null); }
   if (a.stufe === 2 && a.k2) {
     const r2 = {elo: elo(a.k2.siege / a.k2.n), rate: a.k2.siege / a.k2.n, n: a.k2.n};
     const D = r2.elo - f1[0].elo, se = Math.hypot(seElo(r2.rate, r2.n), seElo(f1[0].rate, f1[0].n));
@@ -434,6 +456,6 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = {STUFE1, stufe2, TEILER, BLOCKSUMMEN, PARTIEN, ZUGLIMIT, KOMI, fisherZweiseitig, elo, seElo,
-                  zuglimitAusLog, vergleiche, pruefe, rechne, abflachung, urteilF1, urteilF2, kosten, ergebnisse,
-                  auswerten, bericht, lies};
+module.exports = {STUFE1, stufe2, gueltigesN, KOSTEN_N, TEILER, BLOCKSUMMEN, PARTIEN, ZUGLIMIT, KOMI,
+                  fisherZweiseitig, elo, seElo, zuglimitAusLog, vergleiche, pruefe, rechne, abflachung, urteilF1,
+                  urteilF2, kosten, lageZuK2, ergebnisse, auswerten, bericht, lies};

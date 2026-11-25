@@ -62,14 +62,14 @@ function steinzuege(bericht) {
   return {alle, ohneSuche};
 }
 
-/* §7.1: Verdopplung AB dem Arbeitspunkt. k kaufmännisch gerundet (x,5 aufwärts). */
+/* §7.1 (Fassung nach §15): Verdopplung AB dem Arbeitspunkt. N = S auf volle Hundert gerundet,
+   x50 aufwärts; K3 = N gegen 2N. Feiner gestuft als das frühere Raster, aber diskret:
+   S = 2749 ergibt 2700 → 5400, S = 2750 ergibt 2800 → 5600. S ist ein Median ganzer Zahlen,
+   also ganz oder x,5; S / 100 + 0,5 ist an jeder Grenze exakt darstellbar. */
 function stufeAusS(S) {
-  const k = Math.floor(Math.log2(S / 120) + 0.5);
-  if (k < 0) return {k, vergleich: null, text: 'keine passende Messung; Stufe 2 entfällt'};
-  if (k === 0) return {k, vergleich: 'K1', von: 120, bis: 240, text: 'K1 aus Stufe 1; Stufe 2 entfällt'};
-  if (k === 1) return {k, vergleich: 'K2', von: 240, bis: 480, text: 'K2 aus Stufe 1; Stufe 2 entfällt'};
-  const von = 120 * 2 ** k;
-  return {k, vergleich: 'K3', von, bis: 2 * von, text: `eigener Vergleich K3 in Stufe 2: ${von} → ${2 * von}`};
+  const N = 100 * Math.floor(S / 100 + 0.5);
+  if (!(N >= 100)) return {N, vergleich: null, text: 'N unter 100, keine sinnvolle Messung; Stufe 2 entfällt'};
+  return {N, vergleich: 'K3', von: N, bis: 2 * N, text: `Vergleich K3 in Stufe 2: ${N} → ${2 * N}`};
 }
 
 function pruefe(bericht, opt) {
@@ -175,7 +175,7 @@ function bericht(meta, r, gruende, md) {
       : `  ${name}: n ${k.n}, Sims ${zahl(k.simsMedian)} [${zahl(k.sims10)}; ${zahl(k.sims90)}], Dauer ${zahl(k.dauerMedian)} ms, `
         + `Suche ${zahl(k.sucheMedian)} ms, Rest ${zahl(k.restMedian)} ms, Netz ${Number.isFinite(k.netzMedian) ? zahl(k.netzMedian) + ' ms' : '—'}`);
   L.push('');
-  L.push(`${md ? '**' : ''}Arbeitspunkt S = ${zahl(r.S)} Simulationen · k = ${r.stufe.k} → ${r.stufe.text}.${md ? '**' : ''}`);
+  L.push(`${md ? '**' : ''}Arbeitspunkt S = ${zahl(r.S, Number.isInteger(r.S) ? 0 : 1)} Simulationen · N = ${r.stufe.N} → ${r.stufe.text}.${md ? '**' : ''}`);
   L.push(`Zeitkosten einer Verdopplung, gerechnet aus der gemessenen Suchzeit: rund ${zahl(r.zeitkostenMs)} ms je Zug `
     + '(bei gleicher Zeit je Simulation verdoppelt sich die Suchzeit).');
   return L.join('\n');

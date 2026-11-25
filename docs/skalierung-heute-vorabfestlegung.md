@@ -36,8 +36,7 @@ Default im relevanten Browser-Bereich verbessern.
   Unsicherheitsintervall.
 - **F2:** Flacht der Gewinn von K1 zu K2 ab? Maßgeblich ist die Differenz der beiden Gewinne.
 - **F3:** Bei welcher Simulationszahl arbeiten die Zielgeräte, und was kostet dort eine Verdopplung an Zeit?
-- **F4:** Was bringt eine Verdopplung am Arbeitspunkt S des A17, also von S auf 2S, wenn Stufe 1 sie nicht schon
-  misst?
+- **F4:** Was bringt eine Verdopplung am Arbeitspunkt des A17, also von N ≈ S auf 2N (§7.1)?
 
 **Nicht beantwortet:** ob das Spiel geändert wird. Mehr Simulationen pro Zug und dieselbe Zahl Simulationen in
 kürzerer Zeit sind für Spieler **zwei verschiedene Verbesserungen**. Diese Messung bewertet die erste (Elo je
@@ -199,24 +198,22 @@ gilt dieses Doc nicht für diesen Stand; dann braucht es eine neue Festlegung, k
 
 ## 7. Stufe 2: Verdopplung am Arbeitspunkt
 
-### 7.1 Regel für die Stufen
+### 7.1 Regel für Stufe 2
 
-Gefragt ist die Verdopplung **ab** dem Arbeitspunkt, also von S auf 2S. Aus dem gültig gemessenen S:
-k = log2(S / 120), kaufmännisch gerundet (x,5 aufwärts); 120 · 2^k ist dann die Stufe am nächsten bei S, und der
-gesuchte Vergleich beginnt dort.
+Gefragt ist die Verdopplung **ab** dem Arbeitspunkt, also von S auf 2S. Aus dem gültig gemessenen S der formalen
+Partie (§14.1):
 
-| k | S (gerundet) | Vergleich ab 120 · 2^k | Herkunft |
-|---|---|---|---|
-| k < 0 | unter rund 85 | — | keine passende Messung; Stufe 2 entfällt |
-| k = 0 | rund 85 bis unter 170 | 120 → 240 | **K1** aus Stufe 1; Stufe 2 entfällt |
-| k = 1 | rund 170 bis unter 340 | 240 → 480 | **K2** aus Stufe 1; Stufe 2 entfällt |
-| k ≥ 2 | ab rund 340 | 120 · 2^k → 120 · 2^(k+1) | **K3**, eigener Vergleich in Stufe 2 |
+**N = S, auf volle Hundert gerundet (x50 aufwärts); K3 = N gegen 2N.**
 
-K3 läuft mit A = 120 · 2^k und B = 2 · A, sonst wie Stufe 1 (Aufgabe aus, Zuglimit 600, `roh` 1, B mit doppelter
-Suche).
+K3 läuft mit A = N und B = 2N, sonst wie Stufe 1 (Aufgabe aus, Zuglimit 600, `roh` 1, B mit doppelter Suche). Ist
+N kleiner als 100 (S unter 50), gibt es keine sinnvolle Messung, und Stufe 2 entfällt.
+
+Die Regel ist feiner gestuft als das frühere Raster, mathematisch bleibt sie diskret: Bei S = 2749 ergibt sie
+2700 → 5400, bei S = 2750 ergibt sie 2800 → 5600. Was entfällt, ist die Verdopplung des ganzen Vergleichs an einer
+einzigen Schwelle. Die frühere Rasterregel und der Anlass der Änderung stehen in §15.
 
 Erwartung, ausdrücklich **keine** Festlegung: Laut `zeitbudget.md` rechnete das A17 2662 Simulationen bei Zug 2,
-lag also weit über 480; ein Lauf in Stufe 2 ist damit wahrscheinlich. Gemessen ist das am heutigen Stand nicht, und
+die Referenzpartie (§14) ergab S = 2726. K3 läge damit bei 2700 → 5400. Maßgeblich ist allein die formale Partie;
 die Zahl je Zug ändert sich über die Partie.
 
 ### 7.2 Umfang und Seeds
@@ -229,21 +226,24 @@ für Teillauf j. Auch Stufe 2 läuft auf `claude/skalierung-stand`.
 ### 7.3 Kosten und Go
 
 Die Laufzeit je Partie wird aus Stufe 1 geschätzt: K1 und K2 liefern zwei Punkte für „Laufzeit = a + b · mittlere
-Simulationen je Zug“, daraus folgt die Schätzung für K3. Mit dieser Schätzung (Zahl der Teilläufe, Rechenstunden,
-Wanduhrzeit bei 20 gleichzeitigen Jobs) wird das Go für Stufe 2 erfragt. **Ist sie zu teuer, wird Stufe 2 nicht
-verkleinert, sondern neu festgelegt.**
+Simulationen je Zug“, daraus folgt die Schätzung für K3. Der Bericht von Stufe 1 rechnet sie für eine feste Reihe
+N = 1000 bis 4000 in Schritten von 500 und, mit dem N aus Stufe G, zusätzlich für dieses. Mit dieser Schätzung
+(Zahl der Teilläufe, Rechenstunden, Wanduhrzeit bei 20 gleichzeitigen Jobs) wird das Go für Stufe 2 erfragt.
+**Ist sie zu teuer, wird Stufe 2 nicht verkleinert, sondern neu festgelegt.**
 
-Grobe Orientierung heute, ausdrücklich eine Schätzung: Bei voll proportionaler Rechenzeit kostet 1920 gegen 3840
-rund 11 Minuten je Partie, also rund 225 Rechenstunden für 1230 Partien und etwa elf Stunden Wanduhrzeit.
+Grobe Orientierung heute, ausdrücklich eine Schätzung und nur ein Beispiel: Bei voll proportionaler Rechenzeit
+kostet 2700 gegen 5400 rund 15 Minuten je Partie, also rund 316 Rechenstunden für 1230 Partien und etwa 18 Stunden
+Wanduhrzeit.
 
 ### 7.4 Endpunkt, Urteil, Gültigkeit
 
 **Primär:** wie §5.2 für F1, also Siegrate von B, Binomialtest, Clopper-Pearson und Elo mit Intervall. Das ergibt
 den Gewinn einer Verdopplung am Arbeitspunkt. Die Urteilssätze sind die aus §5.3 für F1.
 
-**Beschreibend:** die Differenz zum Gewinn von K2 mit genähertem Intervall, **ohne Test**. Bei k = 2 schließt K3
-(480 → 960) unmittelbar an K2 an, bei k ≥ 3 bleibt mindestens eine Verdopplung dazwischen ungemessen. Ein Test auf
-Abflachung ist für Stufe 2 nicht vorab festgelegt und wird nachträglich nicht hinzugefügt.
+**Beschreibend:** die Differenz zum Gewinn von K2 mit genähertem Intervall, **ohne Test**. K3 schließt nur bei
+N = 480 unmittelbar an K2 (240 → 480) an; liegt N darüber, bleibt der Abstand dazwischen ungemessen, und der Bericht
+nennt ihn in Verdopplungen. Ein Test auf Abflachung ist für Stufe 2 nicht vorab festgelegt und wird nachträglich
+nicht hinzugefügt.
 
 **Gültigkeit:** wie §5.5, mit der Partienzahl je Teillauf und den Seeds aus §7.2.
 
@@ -251,7 +251,7 @@ Abflachung ist für Stufe 2 nicht vorab festgelegt und wird nachträglich nicht 
 
 Für das A17 stehen am Ende zwei Zahlen nebeneinander:
 
-- der **Gewinn einer Verdopplung an seinem Arbeitspunkt**, mit Intervall (aus K1, K2 oder K3), und
+- der **Gewinn einer Verdopplung an seinem Arbeitspunkt**, mit Intervall (aus K3), und
 - die **Zeit, die eine Verdopplung auf diesem Gerät kostet** (§4.3).
 
 Damit lässt sich beurteilen, was eine längere Bedenkzeit oder eine schnellere Suche an Stärke brächte. Was eine
@@ -370,6 +370,9 @@ ohne eigenes Go für Stufe G.
 - Bei der formalen Partie werden **Gerät und V8-Einstellung kurz notiert** (§4.1). Das kostet einen Satz und erspart
   später die Herleitung aus genau den Messwerten, die verglichen werden sollen.
 
+Die Rasterregel, auf die sich diese Begründung bezieht, ist vor der formalen Partie durch eine feiner gestufte
+ersetzt (§15). Für die Zuordnung zählt weiterhin allein die formale Partie.
+
 Mein Vorschlag, das Fenster für diese Partie ab dem Merge von #371 zu setzen, ist damit verworfen. Er kam, nachdem der
 Bericht und damit S bekannt war.
 
@@ -412,3 +415,38 @@ wächst, wenn das Brett sich füllt, und in dieser Partie blieb es wegen vieler 
 
 Für spätere Vorher-Nachher-Vergleiche auf dem Gerät taugen deshalb die Größen, die nicht vom Partieverlauf abhängen —
 Netzzeit, Rest, Zeit je Simulation —, nicht die Zugdauer und nicht der Median der Simulationen über die ganze Partie.
+
+## 15. Nachtrag: feiner gestufte Regel für Stufe 2 (25.11.2026)
+
+**Entscheidung (Hazeberry, 25.11.2026):** Die Rasterregel in §7.1 wird vor der formalen Stufe G durch eine feiner
+gestufte („stetige“) Regel ersetzt: **N = S auf volle Hundert gerundet, K3 = N gegen 2N.**
+
+**Die frühere Regel:** k = log2(S / 120), kaufmännisch gerundet; k = 0 → K1, k = 1 → K2, k ≥ 2 → 120 · 2^k gegen
+das Doppelte.
+
+**Anlass, offen benannt: die Referenzpartie (§14).** Sie zeigte, dass das A17 genau an der Rastergrenze
+120 · 2^4,5 ≈ 2715,3 arbeitet: S = 2726, ohne die 75 KI-Züge nach dem ersten Pass von Schwarz 2590. Unter dem
+Raster hätte das Rauschen einer einzigen Partie entschieden, ob K3 1920 → 3840 oder 3840 → 7680 lautet. Beide Vergleiche liegen eine
+halbe Verdopplung neben S, keiner beantwortet F4, und ihre Kosten unterscheiden sich um den Faktor zwei. In der
+Referenzpartie lagen 85 % der KI-Steinzüge zwischen 1920 und 3840 und nur 11 % darüber.
+
+**Warum das keine rückwirkende Anpassung ist:** §14.1 schließt aus, das Gültigkeitsfenster bei bekanntem Ergebnis
+rückwirkend zu verschieben. Diese Änderung betrifft nicht die Gültigkeit einer Partie, sondern die Zuordnung von S zu
+einem Vergleich. Sie fällt vor der formalen Partie und wählt keine Seite der alten Grenze, sondern schafft die große
+Kante ab. Angestoßen hat sie trotzdem ein bekanntes Ergebnis; deshalb steht sie hier.
+
+**Präzisierung (Hazeberry):** Die neue Regel ist feiner gestuft, mathematisch bleibt sie diskret. Bei S = 2749 ergibt
+sie 2700 → 5400, bei S = 2750 ergibt sie 2800 → 5600. Das ist zugleich ein Grenztest für das Werkzeug. Die
+problematische Verdopplung des gesamten Vergleichs an einer einzigen Schwelle entfällt.
+
+**Was verloren geht:** die Kette 120 · 2^k und die Sonderfälle K1 und K2 für sehr kleine S. Der Abstand zu K2 war
+ohnehin nur beschreibend (§7.4).
+
+**Was gleich bleibt:** Umfang, Seeds, Teillauf-Regel, Gültigkeit und das eigene Go für Stufe 2 (§7.2 bis §7.4). Für die
+Zuordnung zählt allein die formale Partie (§14.1).
+
+**Werkzeug (#387):** `arbeitspunkt.js` nennt N statt k. Ein Median aus einer geraden Zahl von Zügen kann auf ,5
+enden; S wird dann mit einer Nachkommastelle angezeigt, damit 2749,5 nicht als „2750“ neben N = 2700 steht.
+`skalierung-bericht.js` und der Workflow nehmen `--n` (Eingabe `n`) statt `--k`; N muss ein Vielfaches von 100 und
+mindestens 100 sein, sonst Bedienfehler (Exit 2). In Stufe 1 ist `--n` freiwillig und ergänzt die Kostenschätzung um
+eine markierte Zeile für dieses N. Im beschreibenden Teil von Stufe 2 nennt der Bericht die Lage von K3 zu K2.

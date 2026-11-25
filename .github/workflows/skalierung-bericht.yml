@@ -25,8 +25,8 @@ on:
       commit:
         description: 'Festgelegter Commit aus §6, volle 40-stellige SHA'
         required: true
-      k:
-        description: 'Nur Stufe 2: k aus §7.1'
+      n:
+        description: 'Stufe 2: N aus §7.1 (S auf volle Hundert); Stufe 1: optional, Kostenzeile für dieses N'
         required: false
         default: ''
       partien_je_teil:
@@ -66,7 +66,7 @@ jobs:
           IN_STUFE: ${{ inputs.stufe }}
           IN_LAEUFE: ${{ inputs.laeufe }}
           IN_COMMIT: ${{ inputs.commit }}
-          IN_K: ${{ inputs.k }}
+          IN_N: ${{ inputs.n }}
           IN_PARTIEN: ${{ inputs.partien_je_teil }}
           IN_VORSTUFE: ${{ inputs.vergleich_vorstufe }}
         run: |
@@ -79,9 +79,12 @@ jobs:
             || { echo "::error::laeufe muss Run-IDs mit Komma sein: '$IN_LAEUFE'"; exit 2; }
           printf '%s' "$IN_COMMIT" | grep -Eq '^[0-9a-f]{40}$' \
             || { echo "::error::commit muss eine volle 40-stellige SHA sein: '$IN_COMMIT'"; exit 2; }
+          if [ -n "$IN_N" ]; then
+            printf '%s' "$IN_N" | grep -Eq '^[1-9][0-9]*00$' \
+              || { echo "::error::n muss ein Vielfaches von 100 und mindestens 100 sein: '$IN_N'"; exit 2; }
+          fi
           if [ "$IN_STUFE" = 2 ]; then
-            printf '%s' "$IN_K" | grep -Eq '^[0-9]+$' \
-              || { echo "::error::Stufe 2 braucht k als Zahl: '$IN_K'"; exit 2; }
+            [ -n "$IN_N" ] || { echo "::error::Stufe 2 braucht n aus §7.1"; exit 2; }
             printf '%s' "$IN_PARTIEN" | grep -Eq '^[0-9]+$' \
               || { echo "::error::Stufe 2 braucht partien_je_teil als Zahl: '$IN_PARTIEN'"; exit 2; }
             if [ -n "$IN_VORSTUFE" ]; then
@@ -93,7 +96,7 @@ jobs:
             echo "STUFE=$IN_STUFE"
             echo "LAEUFE=$IN_LAEUFE"
             echo "COMMIT=$IN_COMMIT"
-            echo "KWERT=$IN_K"
+            echo "NWERT=$IN_N"
             echo "PARTIEN=$IN_PARTIEN"
             echo "VORSTUFE=$IN_VORSTUFE"
           } >> "$GITHUB_ENV"
@@ -126,8 +129,9 @@ jobs:
           set -euo pipefail
           IFS=',' read -ra IDS <<< "$LAEUFE"
           ARGS=(--stufe "$STUFE" --commit "$COMMIT" --html stand.html --markdown)
+          if [ -n "$NWERT" ]; then ARGS+=(--n "$NWERT"); fi
           if [ "$STUFE" = 2 ]; then
-            ARGS+=(--k "$KWERT" --partien-je-teil "$PARTIEN")
+            ARGS+=(--partien-je-teil "$PARTIEN")
             if [ -n "$VORSTUFE" ]; then ARGS+=(--k2 "$VORSTUFE"); fi
           fi
           # Je Lauf genau eine Dreiergruppe aus JSON, Rohdump und Log. Fehlt eine Datei oder gibt
