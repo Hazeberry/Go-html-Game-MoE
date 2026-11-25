@@ -350,3 +350,65 @@ und werden nicht über die Befehlszeile übergeben.
 Der Commit aus §6 ist der Merge-Commit dieses Werkzeug-PR. Nach dem Merge wird darauf der Branch
 `claude/skalierung-stand` angelegt und nicht mehr bewegt; die Prüfsummen der drei Engine-Blöcke werden dort noch
 einmal nachgerechnet, bevor ein Go erfragt wird.
+
+## 14. Nachtrag: Vorher-Referenz vom 25.11.2026 — keine formale Stufe G
+
+Hazeberry hat am 25.11.2026 um 13:16:46 UTC eine Partie auf dem A17 exportiert, vor dem Merge dieses Werkzeug-PR und
+ohne eigenes Go für Stufe G.
+
+### 14.1 Entscheidung (Hazeberry, 25.11.2026)
+
+- Die 578-Züge-Partie bleibt als **Vorher-Referenz** im Bericht.
+- **Für die formale Stufe G gilt die erste gültige Partie nach dem Merge des Werkzeug-PR und dem eigenen Go.**
+  §13.2 bleibt wie festgelegt. Eine Partie im vorgesehenen Zeitfenster braucht keine neue Festlegung. Eine gemeinsame
+  Auswertung beider Partien wäre eine andere Frage.
+- **Grund ist die Stufengrenze.** Sie liegt bei 120 · 2^4,5 ≈ 2715,3 Simulationen. Die Referenzpartie ergibt
+  S = 2726, nur 10,7 Simulationen oder rund 0,4 % darüber. Damit entscheidet die Zuordnung zwischen 1920 → 3840 und
+  3840 → 7680. Wenn das Ergebnis schon bekannt ist und die Entscheidung den Rechenaufwand in dieser Größenordnung
+  beeinflusst, wird das Gültigkeitsfenster nicht rückwirkend verschoben. Für die spätere Zuordnung zählt die formale
+  Partie, auf welcher Seite der Grenze sie auch landet.
+- Bei der formalen Partie werden **Gerät und V8-Einstellung kurz notiert** (§4.1). Das kostet einen Satz und erspart
+  später die Herleitung aus genau den Messwerten, die verglichen werden sollen.
+
+Mein Vorschlag, das Fenster für diese Partie ab dem Merge von #371 zu setzen, ist damit verworfen. Er kam, nachdem der
+Bericht und damit S bekannt war.
+
+### 14.2 Die Referenzpartie, beschreibend
+
+Territory, KI Weiß auf Schwer, 578 Züge. Daten und Prüfung der Übertragung:
+[`daten/skalierung-heute/referenz-20261125/`](daten/skalierung-heute/referenz-20261125/README.md).
+
+| KI-Steinzüge | n | Simulationen je Zug, Median [P10; P90] | Zugdauer | Suche (`zeiten.sucheMs`) | Rest | Netz |
+|---|---:|---|---:|---:|---:|---:|
+| alle | 288 | 2726 [2056; 4057] | 2054 ms | 1927 ms | 133 ms | 106 ms |
+| bis Zug 80 | 40 | 2846 [2784; 3072] | 1839 ms | 1800 ms | 39 ms | 0 ms |
+| ab Zug 81 | 248 | 2645 [2005; 4143] | 2637 ms | 2502 ms | 135 ms | 107 ms |
+
+- Die Regeln aus §4.2 Nr. 1, 2, 4 und 5 sind erfüllt. Nr. 3 ist im vorgesehenen Fenster nicht anwendbar, weil die
+  Partie davor lag. Die Herkunft ist ersatzweise belegt: `index.html` ist auf `main` seit #371 unverändert, und der
+  Parameter-Schnappschuss enthält `evalStreuung`.
+- Über die Stufengrenze kommt S nur durch die 75 KI-Züge nach dem ersten Pass von Schwarz (ab Zug 427, Median 3562,
+  das Brett war fast voll). Ohne sie läge der Median bei 2590. Das ist Beschreibung, keine Umwertung: Diese Phase
+  gehört zum Spiel, und für die Zuordnung zählt allein die formale Partie (§14.1).
+
+### 14.3 Vergleich mit dem A17-Lauf vom 31.10. („Chrome, V8-Optimierer an“, `zeitbudget.md`)
+
+Nur die dort dokumentierten Werte, keine neue Rechnung auf dem Archiv; die heutigen Werte nach derselben Definition.
+
+| Median | 31.10. (358 Züge) | 25.11. (578 Züge) |
+|---|---:|---:|
+| Endspiel-Netz ab Zug 81 | 106 ms | 107 ms (bis Zug 358: 106 ms) |
+| Rest außerhalb der Suche ab Zug 81 | 137 ms | 135 ms (bis Zug 358: 141 ms) |
+| ms je Simulation, nur Zug 2 | 0,68 | 0,65 |
+| Simulationen, nur Zug 2 | 2662 | 2755 |
+| Zugdauer ab Zug 81 | 2241 ms | 2637 ms (bis Zug 358: 1949 ms) — **nicht vergleichbar** |
+
+**Die dokumentierten Vergleichswerte beider Partien sind ähnlich. Ein deutlicher Geschwindigkeitsverlust ist darin
+nicht erkennbar.** Besonders aussagekräftig ist die Netzzeit mit 106 gegenüber 107 ms. Die Werte je Simulation stammen
+nur aus Zug 2. Aus zwei verschiedenen Partien lässt sich weder eine allgemeine Aussage über sämtliche Engine-Änderungen
+seit dem 31.10. noch eine belastbare Nachweisgrenze ableiten. Die Zugdauer hängt am Partieverlauf: Das Zeitbudget
+wächst, wenn das Brett sich füllt, und in dieser Partie blieb es wegen vieler geschlagener Steine bis etwa Zug 306 bei
+1,8 s.
+
+Für spätere Vorher-Nachher-Vergleiche auf dem Gerät taugen deshalb die Größen, die nicht vom Partieverlauf abhängen —
+Netzzeit, Rest, Zeit je Simulation —, nicht die Zugdauer und nicht der Median der Simulationen über die ganze Partie.
