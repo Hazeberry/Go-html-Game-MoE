@@ -27,9 +27,12 @@ nichts zu installieren.
 
 ## Stand: was funktioniert, was offen ist
 
-**Dokumentationsstand: 02.11.2026.** Die Übersicht unten fasst die Ergebnisse
-bis 31.10. zusammen. Die spätere Versuchschronik enthält ältere Engine-Stände
-und damalige Hypothesen. „Default“ bezeichnet dort den Default des jeweiligen
+**Dokumentationsstand: 25.11.2026.** Die Übersicht unten fasst die Ergebnisse
+bis 25.11. zusammen. Was nach dem 31.10. dazukam, steht vor allem unter
+„Bereits untersucht“, „Bedienung, Zählung, Passregel und Laufzeit“ und „Was
+tatsächlich offen bleibt“, dazu der Punkt zum Zufallsterm der Bewertung.
+Die spätere Versuchschronik enthält ältere Engine-Stände und damalige
+Hypothesen. „Default“ bezeichnet dort den Default des jeweiligen
 Laufs, nicht automatisch den heutigen.
 
 Vor einer neuen Untersuchung die verlinkten Ergebnisnachträge lesen:
@@ -58,8 +61,8 @@ Abschnitt sie noch als nächsten Schritt nennt.
   Das Netz läuft vor dem Suchbudget und verlängert die gesamte Zugdauer.
   Gerätemessungen und die A17-Auflösung stehen unten und in
   [`docs/zeitbudget.md`](docs/zeitbudget.md) §5.
-  Nicht zu verwechseln mit dem Policy-Netz hinter `netMaxBlend`, das nicht
-  in bisherigen Stärkemessungen keinen Vorteil brachte und auf 0 steht.
+  Nicht zu verwechseln mit dem Policy-Netz hinter `netMaxBlend`, das in
+  bisherigen Stärkemessungen keinen Vorteil brachte und auf 0 steht.
 - Aufgabe bei aussichtsloser Stellung, sowohl über Q als auch strukturell
   („alle legalen Züge wären todgeboren")
 - Worker-Fallback-Kette `data:` → `blob:` → Hauptthread, damit die KI auch
@@ -118,6 +121,17 @@ Abschnitt sie noch als nächsten Schritt nennt.
   getestet. Der Default bleibt 1 nach der vorab festgelegten Regel;
   ein Vorteil bei 600 ist nicht gesichert, die Browser-Laufzeit war kein
   Endpunkt ([`baum-uebernahme.md`](docs/baum-uebernahme.md) §9).
+- **Der Zufallsterm der Bewertung ist nachgemessen, ohne Befund.** Die vier
+  Bewertungsexperten addieren ein Rauschen, das der Schalter `evalStreuung`
+  (Standard 1,00) skaliert. Im Selbstspiel bei 120 Simulationen, je 360
+  Partien gegen den Default: Rauschen aus −1,9 Elo [−38,8; +34,9], halbiert
+  +7,7 Elo [−29,1; +44,6]; kein nachweisbarer Stärkeunterschied. Die Vielfalt
+  des ersten Zugs unterscheidet sich über zehn gepaarte Seed-Blöcke nicht
+  konsistent (8 : 2, p = 0,109). Nebenbefund: In allen zwanzig Blöcken kamen
+  nur vier verschiedene erste Züge vor. Beides sind Nichtnachweise, keine
+  Nullbefunde; der Default bleibt 1,00.
+  [Rauschterm §§11–14](docs/eval-streuung-vorabfestlegung.md) ·
+  [Vielfalt §11](docs/eval-streuung-vielfalt-vorabfestlegung.md).
 - **Komi: Kalibrierung samt Gegenproben abgeschlossen, Eingriff offen.**
   In der Fuego-Siegquotenmessung gewinnt D als Weiß 60,6 %, als Schwarz
   35,4 %. Dass fehlendes Komi-Bewusstsein die Ursache ist, ist eine Hypothese.
@@ -179,7 +193,28 @@ nicht beantwortet. Eine Wiederholung unter diesen Bedingungen wäre eine
 Ein Verlust vor oder nach Zug 81 beweist für sich allein nicht, welche
 Architekturänderung hilft.
 
-### Bedienung, Passregel und Laufzeit
+**Kandidaten-Orakel (03.11.), ohne Vorgabe, 120 Simulationen, gegen GNU Go und
+Fuego mit 100 Spielen je Zug.** Als Messmittel bekam die Suche an Stellen, an
+denen GNU Gos Zug unter ihren Kandidaten fehlte oder nicht den größten Prior
+hatte, diesen Zug als Wurzelkind mit Spitzenprior. Das hob den Endstand um
++24,7 [+19,9; +29,5] Punkte gegen GNU Go und +36,0 [+30,1; +42,0] gegen
+Fuego (je rund 480 Paare, 97,5 %). Der Vier-Arm-Versuch trennt das teilweise:
+
+| Vergleich (99,17 %) | GNU Go | Fuego | Lesart |
+|---|---|---|---|
+| Zug nur aufnehmen, natürlicher Prior (N − A) | +0,7 [−5,2; +6,6] | −0,9 [−6,9; +5,1] | kein nachgewiesener Unterschied |
+| aufnehmen und Prior anheben (S − N) | **+26,3** [+19,9; +32,6] | **+30,4** [+23,3; +37,5] | die Anhebung trägt |
+| nur schon vorhandene Orakelzüge anheben (P − A) | **+13,8** [+8,2; +19,5] | **+11,7** [+5,5; +18,0] | auch dort Spielraum |
+
+Unter diesen Bedingungen bringt das bloße Anbieten des Zugs keinen
+nachgewiesenen Gewinn, die Anhebung seines Priors dagegen schon, auch bei
+Zügen, die schon Kandidat waren. Das Orakel steht im Spiel nicht zur
+Verfügung; wie sich das ohne Orakel nutzen ließe, ist offen. Dass Orakel,
+Netz, Muster und Schiedsrichter alle auf GNU Go zurückgehen, kann mitwirken
+(Hypothese). [Orakel §13](docs/kandidaten-orakel.md) ·
+[Vier Arme §14](docs/kandidaten-orakel-vierarm.md).
+
+### Bedienung, Zählung, Passregel und Laufzeit
 
 - **Zählvorschau umgesetzt**, einschließlich Territory: „Mit Annahmen“ und
   „Nur Bewiesenes“, ohne Einfluss auf die KI. Seki und offenes Ko werden nicht
@@ -193,9 +228,23 @@ Architekturänderung hilft.
   sich die Bilanz nach dem ersten Gegnerpass um 14 Punkte.
   [Endspiel-Abräumen §§6–13](docs/endspiel-abraeumen.md).
   Der Versuchsschalter `passNachGegnerpass` ist gebaut, **Standard 0**.
-  Sein gepaarter Vergleich ist laut Protokoll noch nicht gestartet; ein
-  Sicherheits- oder Stärkegewinn ist nicht nachgewiesen.
   [Passregel-Versuch §§3–5](docs/passregel-versuch.md).
+- **Passregel-Vergleich gelaufen (06.–08.11.), der Schalter bleibt aus.** An
+  563 Archivstellungen nach einem Gegnerpass wurde „sofort passen“ gegen
+  „weiterspielen“ ausgezählt. Verlorene Siege durch sofortiges Passen: 0 von
+  561 Auslösungen (Fläche) und 0 von 520 (Territory), obere 95-%-Grenze
+  0,66 % und 0,71 %, unter der Annahme unabhängiger Einheiten. Punkte,
+  beschreibend: in Fläche kein Unterschied (+0,1 [−0,3; +0,5]), in Territory
+  bringt Weiterspielen im Mittel −15,1 [−16,1; −14,1] Punkte, in der
+  festgelegten Zählvariante. Das gilt für diese Archivstellungen und Gegner,
+  nicht für Menschen; eine Aktivierung bräuchte eine eigene Festlegung.
+  Seit 23.11. reichen `gtp-ki.js` und `gnugo-duell.js` die Regel weiter; vier
+  Werkzeuge, die das nicht können, brechen bei eingeschalteter Regel mit
+  einem Fehler ab, statt sie still auszulassen, und ein Bestandstest meldet
+  neue Aufrufer der Engine.
+  [Passregel-Vergleich §15](docs/passregel-vergleich.md) ·
+  [Node-Wege §7](docs/passregel-wege-vorabfestlegung.md) ·
+  [Bestandstest §1.5](docs/passregel-wege-nachtrag-vorabfestlegung.md).
 - **A17-Laufzeitproblem aufgelöst:** Chrome lief mit ausgeschaltetem
   V8-Optimierer. Nach Einschalten: 2662 statt 453 Simulationen in 1,8 s
   bei Zug 2; Endspiel-Netz ab Zug 81 im Median 106 statt 1635 ms;
@@ -205,18 +254,72 @@ Architekturänderung hilft.
   Endspiel-Netzes geplant**. Ein Hinweis auf langsame Ausführung bleibt
   eine Idee, kein eingebautes Merkmal.
   [Zeitbudget §§5–6](docs/zeitbudget.md).
+- **Zählvorschau gegen GNU Go: Abweichungen beschrieben, Ursachen offen.**
+  In 18 von 561 Auslösungen (Fläche) sah die Vorschau einen ausreichenden
+  Vorsprung, wo GNU Go die Stellung als verloren zählt. Die ganze Differenz
+  liegt dort zwischen Vorschau und GNU Gos Tot-Liste: 76 Gruppen der KI-Farbe
+  führt GNU Go als tot, die Vorschau nicht (von Hand gezählt). Ob GNU Gos
+  Urteil stimmt, ist offen. Getrennt davon weicht die Flächenzählung mit
+  GNU Gos Tot-Liste bei 15 Einheiten von GNU Gos `final_score` ab (−29 bis
+  +10 Punkte); ein Fehler der App-Zählung ist nicht belegt.
+  [Vorsprung §9](docs/passregel-vorsprung.md) ·
+  [Zählung, Mechanismus §§5–6](docs/zaehlung-mechanismus.md).
+- **Diagonalprüfung bei Ein-Punkt-Augen: kein Urteil, Schalter aus.**
+  `diagonalAugeEnde` und `diagonalAugeSchluss` stehen auf 0. Eingeschaltet
+  stimmt die Schlusszählung häufiger mit GNU Go überein (in 657 von 658
+  betroffenen Stellungen nur behobene Abweichungen). Übereinstimmung ist
+  nicht Richtigkeit; die Beurteilung darauf wurde am 14.11. beendet und für
+  die Schlusszählung allein am 16.11. ohne Bogen abgebrochen.
+  [Diagonalprüfung §18.11](docs/diagonalpruefung-vorabfestlegung.md) ·
+  [Schlusszählung §8](docs/diagonal-schluss-vorabfestlegung.md).
+- **Alle Befunde der Bug Hunts sind behoben (16.–23.11.).** Die Wiederholung
+  vom 07./08.11. bestätigte UI-1 bis UI-3, TRAIN-1, TRAIN-2 und NET-1; der
+  Bug Hunt vom 16.11. fand D-1, D-2, W-1, K-1, K-2, L-1, R-1 und B-1 bis B-3;
+  dazu kamen H-1 und DASH-1 aus zwei Nachprüfungen. Jede Korrektur hat eine
+  eigene Vorabfestlegung mit Abnahme. Geprüft nur in Chromium headless.
+  [Bug Hunt §§2–3](docs/bughunt-20261116.md) ·
+  [Wiederholung](docs/bughunt-wiederholung.md).
+- **GTP-Adapter korrigiert (23.11.).** `play` in `gtp-ki.js` prüft jetzt selbst
+  Ko, positionelle Wiederholung und Selbstmord, `genmove` reicht `extra`
+  weiter, Befehlsnummern kommen zurück. GNU Go 3.8 lässt eine positionelle
+  Wiederholung zu (Lauf 45176376828); der frühere Schutz durch GNU Go als
+  Gegenüber war also nur teilweise.
+  [GTP §11](docs/korrektur-gtp-vorabfestlegung.md) ·
+  [Superko §8](docs/gnugo-superko-vorabfestlegung.md).
+- **Fehlerbericht (🐞) stellt den Worker-Request jetzt mit `extra` nach
+  (BR-1, 23.11.).** Die Priors des Policy-Netzes (`netPriors`) fehlen weiter,
+  mit gemessener Begründung: Ein anderer Trainingsstand änderte an 56
+  Stellungen keinen Zug (0 von 112) und an 13 Stellungen über 20 Seeds
+  ebenfalls keinen (0 von 260). Es bräuchte eine rund 32-mal größere
+  Prior-Verschiebung, bevor ein Zug betroffen sein kann. Das betrifft nur
+  `netMaxBlend` > 0; der Standard ist 0.
+  [BR-1 §8](docs/passregel-wege-nachtrag-vorabfestlegung.md) ·
+  [Prior-Reproduktion §8](docs/prior-reproduktion-vorabfestlegung.md) ·
+  [Prior-Seeds §9](docs/prior-seeds-vorabfestlegung.md).
 
 ### Was tatsächlich offen bleibt
 
-- Wo der heutige Default ohne Vorgabe Stärke verliert: Kandidatenauswahl,
-  Suchverteilung, Rollout-Politik und Blattbewertung sind noch nicht als
-  Ursachen getrennt. Ein einzelner dominanter Engpass ist nicht belegt.
+- Wo der heutige Default ohne Vorgabe Stärke verliert. Kandidatenauswahl,
+  Suchverteilung, Rollout-Politik und Blattbewertung sind nicht vollständig
+  als Ursachen getrennt. Das Kandidaten-Orakel zeigt unter seinen
+  Bedingungen Spielraum bei der Gewichtung der Kandidaten (oben); wie die
+  Suche ihn ohne Orakel nutzen könnte, ist offen. Vorbereitungen dazu
+  („Prior-Anhebung ohne Orakel“) stehen im Schwesterrepo `Hazeberry/codex`
+  (laut `HANDOFF.md` §2, hier nicht nachgeprüft). Ein einzelner dominanter
+  Engpass ist nicht belegt.
 - Wie stark zusätzliche Simulationen den heutigen Default im relevanten
-  Browser-Bereich verbessern; die alte Skalierung beantwortet das nicht.
+  Browser-Bereich verbessern; die alte Skalierung vom 03.10. beantwortet das
+  nicht.
 - Ob und wie ein Komi-Eingriff hilft, nachdem die gewählte Kalibrierung
   keinen tragfähigen Faktor geliefert hat.
-- Ob die neue Pass-Versuchsregel Siege oder Punkte kostet. Die Vorschau
-  und die Einzelrechnung ersetzen den vorgesehenen Vergleich nicht.
+- Ob `passNachGegnerpass` eingeschaltet werden soll. Verlorene Siege sind an
+  den Archivstellungen nicht beobachtet; offen sind die Punkte in Territory
+  und das Verhalten gegen Menschen.
+- Zählung: die Ursache der 15 Abweichungen zu GNU Gos `final_score`, ob GNU
+  Gos Tot-Liste in den 76 Gruppen recht hat, und ein Urteil zur
+  Diagonalprüfung.
+- Im GTP-Adapter prüft niemand die von der Engine selbst erzeugten
+  `genmove`-Züge; die Engine sorgt für Legalität, geprüft ist das nicht.
 
 Das sind offene Fragen, keine neu beschlossenen Versuche. Vorhandene Werkzeuge
 und Ergebnisse zuerst nutzen; neue Läufe brauchen einen klaren Unterschied
