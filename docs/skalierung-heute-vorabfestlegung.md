@@ -308,3 +308,45 @@ Drei Änderungen am Entwurf, bevor irgendeine Zahl vorlag:
    k ≥ 2 → K3. Daraus folgen F4 in §2 und der Satz in §7.4, der eine Lücke zwischen K2 und K3 immer annahm.
 3. **Suchzeit §4.3, gemeldet:** Die Suchzeit kommt direkt aus `zeiten.sucheMs`, nicht aus Simulationen ×
    `msProSim`, weil `msProSim` im Bericht gerundet ist. §4.2 Nr. 5 verlangt das Feld deshalb je gezähltem Zug.
+
+## 13. Nachtrag: Umsetzung des Werkzeugs (25.11.2026)
+
+Gebaut nach §9, vor jeder Zahl: `auswertung/skalierung-bericht.js` (Stufe 1 und 2), `auswertung/arbeitspunkt.js`
+(Stufe G), `.github/workflows/skalierung-bericht.yml`, dazu `tests/skalierung-bericht.js` (16 Fälle) und
+`tests/arbeitspunkt.js` (11 Fälle), jede Gültigkeitsregel einzeln ausgelöst, die Urteilssätze wörtlich. Die
+Konstanten aus §5.1, §6 und §7.2 (Seeds, Stufen, Partienzahl, Zuglimit, Komi, Prüfsummen) stehen im Werkzeug fest
+und werden nicht über die Befehlszeile übergeben.
+
+### 13.1 Wo das Werkzeug den Wortlaut nur so weit prüft, wie der Harness es hergibt
+
+1. **§5.5 Nr. 5, Anomalien „eines Arms“.** `ab-harness.js` zählt abgefangene illegale Züge nur je Teillauf und
+   schreibt sie als Warnzeile ins Log, nicht je Arm (wie schon `eval-streuung-vorabfestlegung.md` §10.8). Geprüft
+   wird deshalb **konservativ**: die Summe beider Arme höchstens 2 % der Partien des Vergleichs. Was das besteht,
+   besteht die Regel je Arm sicher. Umgekehrt kann eine Summe über 2 % einen Lauf ungültig machen, in dem kein
+   einzelner Arm über 2 % lag. Das nehme ich in Kauf: Bisher lagen alle Läufe bei 0, und die Alternative wäre eine
+   Änderung am Harness vor der Messung.
+   Dieser Fehler lag in meiner Festlegung, nicht im Werkzeug: Ich habe „je Arm“ geschrieben, ohne zu prüfen, ob der
+   Harness das liefert — dieselbe Falle wie bei `evalStreuung`.
+2. **§5.5 Nr. 3, Zuglimit.** Das Zuglimit steht nicht im JSON des Harness, nur in der Kopfzeile des Logs
+   („max 600 Züge“). Das Werkzeug liest es dort; fehlt die Zeile, ist die Regel nicht erfüllt.
+3. **§5.5 Nr. 4, Commit.** Der Harness schreibt `GITHUB_SHA` als `konfig.commit`. Bei einem Dispatch auf
+   `claude/skalierung-stand` ist das genau der Commit aus §6. Der Workflow checkt diesen Commit aus und prüft dessen
+   `index.html` gegen die Prüfsummen.
+
+### 13.2 Was §4 offen ließ und jetzt festgelegt ist
+
+- **Median und Perzentile (§4.3):** Median als Mittel der beiden mittleren Werte bei gerader Zahl, wie in
+  `zeit-zerlegung.js`; Perzentile nach dem Rangverfahren (kleinster Wert, unter dem mindestens der Anteil q liegt).
+- **§4.2 Nr. 3, Pages:** Die Liste der Bereitstellungen entsteht aus den Actions-Läufen „pages build and
+  deployment“ (Commit und Zeit) und den Prüfsummen von `index.html` an diesen Commits. Das Fenster beginnt mit dem
+  Merge dieses Werkzeug-PR. Mindestens eine Bereitstellung muss im Fenster liegen, alle darin müssen stimmen.
+- **§4.2 Nr. 5:** Die Teilbedingung „40 nach Zug 80“ folgt in einer echten Partie aus „120 Steinzüge“, weil die KI
+  bis Zug 80 höchstens 40 Steinzüge macht. Sie bleibt stehen; sie schadet nicht.
+- **§4.2 Nr. 2:** `PARAMS_DEFAULT` hat am Stand `591e70e` 164 Schlüssel. Verglichen wird Schlüssel für Schlüssel,
+  fehlende und zusätzliche Schlüssel eingeschlossen.
+
+### 13.3 Commit und Branch
+
+Der Commit aus §6 ist der Merge-Commit dieses Werkzeug-PR. Nach dem Merge wird darauf der Branch
+`claude/skalierung-stand` angelegt und nicht mehr bewegt; die Prüfsummen der drei Engine-Blöcke werden dort noch
+einmal nachgerechnet, bevor ein Go erfragt wird.
