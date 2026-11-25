@@ -579,8 +579,13 @@ Beschluss.
 | 5 Auswertung und Rohdaten | dieses Dokument, `docs/daten/eval-streuung/` |
 
 **Was die Messung beantwortet hat.** Der Rauschterm der vier Bewertungsexperten kostet bei 120 Simulationen keine
-nachweisbare Spielstärke; die Schranke liegt bei rund ±39 Elo, und das gilt für beide geprüften Dosen. Der Default
-bleibt 1,00, wie §7 es vorab festgelegt hat, unabhängig vom Ergebnis.
+nachweisbare Spielstärke. Die beiden Intervalle stehen getrennt, weil sie verschieden weit reichen: S1 lässt
+−38,8 bis +34,9 Elo offen, S2 −29,1 bis +44,6. Die ±39 aus §10.9 sind die Auflösung des Tests bei einer Siegrate
+von genau 50 %, keine Schranke für beide Dosen — S2 reicht mit +44,6 darüber hinaus. Der Default bleibt 1,00, wie
+§7 es vorab festgelegt hat, unabhängig vom Ergebnis.
+
+*(Berichtigt am 25.11.2026. Die erste Fassung schrieb „die Schranke liegt bei rund ±39 Elo, und das gilt für beide
+geprüften Dosen" und verwechselte damit die vorab gerechnete Auflösung mit den beobachteten Intervallen.)*
 
 **Was sie nicht beantwortet hat.** Was die Zugstreuung an Vielfalt erkauft. Das war in §1 das zweite Argument für
 die Messung und ist nach vier Teilläufen in jedem Vergleich weiter unbekannt.
