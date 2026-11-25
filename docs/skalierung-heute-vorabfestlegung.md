@@ -36,7 +36,8 @@ Default im relevanten Browser-Bereich verbessern.
   Unsicherheitsintervall.
 - **F2:** Flacht der Gewinn von K1 zu K2 ab? Maßgeblich ist die Differenz der beiden Gewinne.
 - **F3:** Bei welcher Simulationszahl arbeiten die Zielgeräte, und was kostet dort eine Verdopplung an Zeit?
-- **F4:** Was bringt eine Verdopplung am Arbeitspunkt eines Geräts, das oberhalb von Stufe 1 arbeitet?
+- **F4:** Was bringt eine Verdopplung am Arbeitspunkt S des A17, also von S auf 2S, wenn Stufe 1 sie nicht schon
+  misst?
 
 **Nicht beantwortet:** ob das Spiel geändert wird. Mehr Simulationen pro Zug und dieselbe Zahl Simulationen in
 kürzerer Zeit sind für Spieler **zwei verschiedene Verbesserungen**. Diese Messung bewertet die erste (Elo je
@@ -80,7 +81,8 @@ Zwei Zustände. **Ungültig**, mit „kein Urteil“ und Grund, wenn:
    `meta.erstellt` einen Commit trägt, dessen Engine-Blöcke nicht den Prüfsummen aus §6 entsprechen.
 4. `meta.workerNeustarts` größer als 0 oder `meta.workerDead` wahr ist. Dann rechnete zeitweise der Hauptthread,
    und die Zeiten wären andere.
-5. Weniger als 120 KI-Steinzüge mit Simulationszahl vorliegen oder weniger als 40 davon nach Zug 80.
+5. Weniger als 120 KI-Steinzüge mit Simulationszahl und `zeiten.sucheMs` vorliegen oder weniger als 40 davon nach
+   Zug 80.
 
 Eine ungültige Partie bleibt im Archiv. Eine neue Partie ist erlaubt und wird als Wiederholung
 berichtet.
@@ -90,11 +92,13 @@ berichtet.
 Über alle KI-Steinzüge, und getrennt bis und ab Zug 80 (Grenze wie in `zeit-zerlegung.js`):
 
 - **Simulationen je Zug:** Median, 10. und 90. Perzentil.
-- **Zeiten:** Median der Zugdauer (`dauerMs`), der Suchzeit (Simulationen × `msProSim`) und des Rests außerhalb der
-  Suche, darin das Endspiel-Netz (`zeiten.netzMs`).
+- **Zeiten:** Median der Zugdauer (`dauerMs`), der Suchzeit (`zeiten.sucheMs`, von der Engine direkt gemessen) und
+  des Rests außerhalb der Suche (`dauerMs` − `zeiten.sucheMs`), darin das Endspiel-Netz (`zeiten.netzMs`). Die
+  Suchzeit wird **nicht** aus Simulationen × `msProSim` zurückgerechnet: `msProSim` steht im Bericht auf zwei
+  Nachkommastellen gerundet, die Rückrechnung brächte vermeidbare Rundungsabweichungen.
 - **Arbeitspunkt S:** Median der Simulationen über alle KI-Steinzüge.
-- **Zeitkosten einer Verdopplung**, gerechnet, nicht gemessen: Bei gleicher Zeit je Simulation verdoppelt sich die
-  Suchzeit, ein Zug dauert also um den Median der Suchzeit länger. Umgekehrt bräuchte „doppelt so viele Simulationen
+- **Zeitkosten einer Verdopplung**, gerechnet aus der gemessenen Suchzeit: Bei gleicher Zeit je Simulation
+  verdoppelt sich die Suchzeit, ein Zug dauert also um den Median von `zeiten.sucheMs` länger. Umgekehrt bräuchte „doppelt so viele Simulationen
   in derselben Zeit“ eine doppelt so schnelle Suche.
 
 ## 5. Stufe 1: Wiederholung bei 120, 240 und 480
@@ -197,13 +201,19 @@ gilt dieses Doc nicht für diesen Stand; dann braucht es eine neue Festlegung, k
 
 ### 7.1 Regel für die Stufen
 
-Aus dem gültig gemessenen Arbeitspunkt S: k = log2(S / 120), kaufmännisch gerundet (x,5 aufwärts).
+Gefragt ist die Verdopplung **ab** dem Arbeitspunkt, also von S auf 2S. Aus dem gültig gemessenen S:
+k = log2(S / 120), kaufmännisch gerundet (x,5 aufwärts); 120 · 2^k ist dann die Stufe am nächsten bei S, und der
+gesuchte Vergleich beginnt dort.
 
-- **k ≤ 2** (S unter rund 679): Der Arbeitspunkt liegt im Bereich von Stufe 1, und deren Antwort gilt — K2 bei
-  k = 2, K1 bei k = 1. Bei k ≤ 0 arbeitet das Gerät unter 120 Simulationen; dafür gibt es keine passende Messung.
-  Stufe 2 entfällt.
-- **k ≥ 3:** Vergleich K3 mit A = 120 · 2^k und B = 2 · A, sonst wie Stufe 1 (Aufgabe aus, Zuglimit 600, `roh` 1,
-  B mit doppelter Suche).
+| k | S (gerundet) | Vergleich ab 120 · 2^k | Herkunft |
+|---|---|---|---|
+| k < 0 | unter rund 85 | — | keine passende Messung; Stufe 2 entfällt |
+| k = 0 | rund 85 bis unter 170 | 120 → 240 | **K1** aus Stufe 1; Stufe 2 entfällt |
+| k = 1 | rund 170 bis unter 340 | 240 → 480 | **K2** aus Stufe 1; Stufe 2 entfällt |
+| k ≥ 2 | ab rund 340 | 120 · 2^k → 120 · 2^(k+1) | **K3**, eigener Vergleich in Stufe 2 |
+
+K3 läuft mit A = 120 · 2^k und B = 2 · A, sonst wie Stufe 1 (Aufgabe aus, Zuglimit 600, `roh` 1, B mit doppelter
+Suche).
 
 Erwartung, ausdrücklich **keine** Festlegung: Laut `zeitbudget.md` rechnete das A17 2662 Simulationen bei Zug 2,
 lag also weit über 480; ein Lauf in Stufe 2 ist damit wahrscheinlich. Gemessen ist das am heutigen Stand nicht, und
@@ -231,8 +241,9 @@ rund 11 Minuten je Partie, also rund 225 Rechenstunden für 1230 Partien und etw
 **Primär:** wie §5.2 für F1, also Siegrate von B, Binomialtest, Clopper-Pearson und Elo mit Intervall. Das ergibt
 den Gewinn einer Verdopplung am Arbeitspunkt. Die Urteilssätze sind die aus §5.3 für F1.
 
-**Beschreibend:** die Differenz zum Gewinn von K2 mit genähertem Intervall, **ohne Test**: Zwischen K2 (bis 480)
-und K3 (ab 960) bleibt mindestens eine Verdopplung ungemessen.
+**Beschreibend:** die Differenz zum Gewinn von K2 mit genähertem Intervall, **ohne Test**. Bei k = 2 schließt K3
+(480 → 960) unmittelbar an K2 an, bei k ≥ 3 bleibt mindestens eine Verdopplung dazwischen ungemessen. Ein Test auf
+Abflachung ist für Stufe 2 nicht vorab festgelegt und wird nachträglich nicht hinzugefügt.
 
 **Gültigkeit:** wie §5.5, mit der Partienzahl je Teillauf und den Seeds aus §7.2.
 
@@ -255,7 +266,8 @@ Vorabfestlegung.
   Bericht. Exit 1 bei „kein Urteil“. Binomialtest und Clopper-Pearson kommen aus den vorhandenen Funktionen
   (`auswertung/messung-zusatz.js`, `auswertung/kandidaten-orakel/haupt-bericht.js`), der Fisher-Test ist neu.
 - **`auswertung/arbeitspunkt.js`:** liest Fehlerberichte, prüft §4.2 Nr. 1, 2, 4 und 5, rechnet §4.3 und wendet die
-  Regel aus §7.1 an. §4.2 Nr. 3 prüft der Bericht anhand der Actions-Läufe „pages build and deployment“.
+  Regel aus §7.1 an. Die Suchzeit liest es aus `zeiten.sucheMs`, nicht als Simulationen × `msProSim` wie
+  `zeit-zerlegung.js`. §4.2 Nr. 3 prüft der Bericht anhand der Actions-Läufe „pages build and deployment“.
 - **`.github/workflows/skalierung-bericht.yml`:** lädt die Artefakte in Actions herunter (aus einer Session sind
   sie nicht erreichbar, `eval-streuung-vorabfestlegung.md` §14), prüft die Engine-Blöcke am `headSha` der
   Teilläufe und ruft das Werkzeug auf.
@@ -271,7 +283,8 @@ Vorabfestlegung.
 - **Unabhängige Partien** sind angenommen, wie am 03.10.; Paare mit gleicher Eröffnung gibt es im Standardmodus nicht.
 - Die **Bemessung** (40 Elo, 80 %) setzt eine Siegrate um 59 % voraus.
 - Das **Intervall für D ist genähert**; der Test ist exakt.
-- Die **Zeitkosten einer Verdopplung** sind gerechnet (lineare Suchzeit), nicht gemessen.
+- Die **Zeitkosten einer Verdopplung** sind gerechnet (doppelte Suchzeit bei gleicher Zeit je Simulation), nicht
+  gemessen; gemessen ist nur die Suchzeit selbst.
 
 ## 11. Ablauf
 
@@ -282,3 +295,16 @@ Vorabfestlegung.
 4. **Stufe 1**, nach Go: 30 Teilläufe, Bericht über `skalierung-bericht.yml`, Nachtrag, Rohwerte unter
    `docs/daten/skalierung-heute/`. Stufe 1 hängt nicht von Stufe G ab.
 5. **Stufe 2**, nach Go mit der Kostenschätzung aus §7.3 und den Stufen aus §7.1: Teilläufe, Bericht, Nachtrag.
+
+## 12. Änderungen vor dem Merge
+
+Drei Änderungen am Entwurf, bevor irgendeine Zahl vorlag:
+
+1. **Nur das Galaxy A17** (Hazeberry): Das A20s (2019) ist ein altes Referenzgerät und wird nicht berücksichtigt.
+2. **Regel §7.1, gemeldet:** Der erste Entwurf ordnete den Arbeitspunkt um eine Verdopplung versetzt zu. Bei k ≥ 3
+   begann der Vergleich am Arbeitspunkt, bei k = 1 und 2 aber nahm er den Vergleich, der dort **endet**: K1 für
+   S ≈ 240, K2 für S ≈ 480. Gefragt ist die Verdopplung ab S. Für das A17 hätte das bei S ≈ 480 den Gewinn von
+   240 → 480 statt 480 → 960 berichtet. Jetzt gilt durchgehend „Vergleich ab 120 · 2^k“: k = 0 → K1, k = 1 → K2,
+   k ≥ 2 → K3. Daraus folgen F4 in §2 und der Satz in §7.4, der eine Lücke zwischen K2 und K3 immer annahm.
+3. **Suchzeit §4.3, gemeldet:** Die Suchzeit kommt direkt aus `zeiten.sucheMs`, nicht aus Simulationen ×
+   `msProSim`, weil `msProSim` im Bericht gerundet ist. §4.2 Nr. 5 verlangt das Feld deshalb je gezähltem Zug.
