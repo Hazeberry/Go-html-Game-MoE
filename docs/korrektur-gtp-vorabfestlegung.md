@@ -1,6 +1,6 @@
 # Korrektur GTP-1 bis GTP-3: Vorabfestlegung
 
-**Stand: 23.11.2026. Status: Entwurf, nicht umgesetzt.** Befunde aus `docs/bughunt-wiederholung.md` §5 (GTP-1 bis
+**Stand: 23.11.2026. Status: umgesetzt (§11), Abnahme gültig, eine Abweichung von Abnahmepunkt 1 in §11.1.** Befunde aus `docs/bughunt-wiederholung.md` §5 (GTP-1 bis
 GTP-3), dort mit `reproduce.cjs` reproduziert. Go von Hazeberry am 22.11.2026: „die Vorabfestlegung für GTP-1 bis
 GTP-3 vorbereiten und das ist ein go für den GTP PR".
 

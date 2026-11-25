@@ -1,6 +1,6 @@
 # Versuchsregel, Nachtrag: die Warnung in der Engine und der Schnappschuss (BR-1)
 
-**Stand: 23.11.2026. Status: Entwurf, nicht umgesetzt.** Zwei Fragen aus `docs/passregel-wege-vorabfestlegung.md`
+**Stand: 23.11.2026. Status: Frage B (BR-1) und T-PR1 umgesetzt (§8), Abnahme gültig, eine Abweichung von §5 Nr. 3 in §8.1; die Engine-Warnung aus Frage A ist bewusst nicht gebaut.** Zwei Fragen aus `docs/passregel-wege-vorabfestlegung.md`
 §7.4. Beide drehen sich um dieselbe Sache: **welche Wege geben der Engine `extra` mit, und was passiert, wenn einer
 es nicht tut.**
 

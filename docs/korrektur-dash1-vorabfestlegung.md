@@ -1,6 +1,6 @@
 # Korrektur DASH-1: Vorabfestlegung
 
-**Stand: 23.11.2026. Status: Entwurf, nicht umgesetzt.** Befund aus
+**Stand: 23.11.2026. Status: umgesetzt (§8), Abnahme gültig, eine Abweichung von §7 in §8.2.** Befund aus
 `docs/korrektur-net1-vorabfestlegung.md` §10.4, dort bei der Folgeprüfung zu NET-1 aufgefallen und als „braucht
 eigene Vorabfestlegung und Go" vermerkt. Go von Hazeberry am 23.11.2026, als Punkt 2 einer Liste von vier.
 
