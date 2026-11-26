@@ -636,3 +636,19 @@ sie maschinell nach `docs/daten/`. Bis dahin lässt sich jede spätere Kopie der
 
 Stufe 2 (K3 = 2600 gegen 5200, Seeds ab 11260001, 10 Partien je Teillauf nach §7.2) braucht ein eigenes Go, auf
 Grundlage der Schätzung aus §17.6.
+
+## 18. Ergebnis der Stufe 2 vom 26.11.2026
+
+**Deutung offen, Aufbauprüfung nach §5.3 ausstehend**
+
+Im [Originalbericht](daten/skalierung-heute/stufe-2-20261126/skalierung-bericht.md) lautet das vorab festgelegte Urteil im Wortlaut:
+
+> K3: **Die doppelte Suche verliert nachweisbar.**
+
+B (5200) gewann 577 von 1230 Partien gegen A (2600), entsprechend 46,9 % [44,1 %; 49,7 %], p = 0,0324 und −21,5 Elo [−41,3; −1,8]. B gewann als Schwarz 239/615, als Weiß 338/615. Der Abstand K2–K3 ist nach §7.4 rein beschreibend. Die Ursache des negativen Ergebnisses ist offen.
+
+### Kontrolle an den vorhandenen Artefakten
+
+Die SHA-256 der 123 Laufarchive und des Berichts stimmen mit dem [Laufverzeichnis](daten/skalierung-heute/stufe-2-20261126/laeufe.csv) überein. Alle 123 Konfigurationen melden Abschluss, denselben Commit wie im Bericht, Komi 7,5, Aufgabe aus und A/B in der vorgesehenen Budgetreihenfolge. Pro Seed liegen zehn nummerierte Partien vor. Für jede Partie stimmen Seed, Partienummer, Zugzahl, Armfarbe, Siegerfarbe und daraus abgeleiteter Siegerarm zwischen Ergebnisdatei und Rohdump überein. Die nachgezählten Arm-Siege ergeben 577 : 653. Diese Kontrollen prüfen die gespeicherten Angaben. Die Übergabe an die laufende Engine ist Gegenstand der Aufbauprüfung.
+
+Die [Einzelwerte für K3](daten/skalierung-heute/stufe-2-20261126/k3-partien.csv) enthalten auch den Hash des Schlussbretts aus dem Rohdump. Die entsprechenden Tabellen für [K1](daten/skalierung-heute/stufe-1-20261125/k1-partien.csv) und [K2](daten/skalierung-heute/stufe-1-20261125/k2-partien.csv) sichern die Daten je Partie aus §17.7. Die vollständigen ursprünglichen Laufarchive einschließlich Zugereignissen sind zusätzlich in den beiden ZIP-Sicherungen enthalten.
