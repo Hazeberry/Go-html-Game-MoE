@@ -1,25 +1,148 @@
+<!-- Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE) -->
+<!-- SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0 -->
 # Aufbauprüfung zu K3 nach §5.3
 
-Festlegung nach Kenntnis des K3-Ergebnisses, vor einer neuen Partie und vor der Auswertung der Zugverläufe. Gegenstand ist der Messaufbau des Commits 98aa1ad586c9de23f64ca76c26af1d7b199b7b3a. Der beobachtete K3-Effekt bleibt bis zum Abschluss offen.
+**Stand: 27.11.2026. Status: festgelegt, nichts gelaufen.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
+Hazeberry liest es vor dem Merge. Jeder Lauf in Actions braucht ein eigenes Go; der Merge dieses Docs ist keins.
+
+Festlegung nach Kenntnis des K3-Ergebnisses ([`skalierung-heute-vorabfestlegung.md`](skalierung-heute-vorabfestlegung.md)
+§5.3 und §18), vor einer neuen Partie und vor der Auswertung der Zugverläufe. Gegenstand ist der Messaufbau des Commits
+98aa1ad586c9de23f64ca76c26af1d7b199b7b3a. Der beobachtete K3-Effekt bleibt bis zum Abschluss offen.
+
+## 0. Was läuft, wo, mit welchem Go
+
+| Teil | Was | Wo | Go |
+|---|---|---|---|
+| 1a | Weg der Parameter, aus dem Code | in diesem Doc, ohne Lauf | keins nötig |
+| 1b | Durchsicht des gemeinsamen Engine-Zustands, aus dem Code | Nachtrag in diesem Doc, ohne Lauf | keins nötig |
+| 1c | Simulationen je Zug und Konfiguration aus den 123 K3-Artefakten | GitHub Actions | eigenes Go |
+| 3 | Beschreibende Diagnose der K3-Artefakte, mit GNU Go als Bewerter | GitHub Actions | eigenes Go |
+
+Teil 1c und 3 spielen keine Partie; sie lesen die vorhandenen Artefakte, die GitHub am 23. und 24.02.2027 löscht. Das
+Auswertungswerkzeug kommt mit Tests in einem eigenen PR (je Fehlerfall ein Test mit erwartetem „KEIN URTEIL“ bzw.
+„Aufbaufehler gefunden“); dieser PR nennt vor dem Go die erwartete Laufzeit. Ein neuer Messlauf (§2) braucht eine
+eigene Festlegung.
+
+**Gültigkeit.** Wie im Haupt-Doc kennt jeder Teil nur gültig oder ungültig. Ungültig heißt „kein Urteil“ mit Grund,
+und der Lauf wird rot: Ein Artefakt fehlt, eine Prüfsumme weicht von
+[`laeufe.csv`](daten/skalierung-heute/stufe-2-20261126/laeufe.csv) ab, ein Ergebnis-JSON oder Rohdump ist nicht
+vollständig lesbar, oder eine der 1230 Partien fehlt. Ein gültiger Teil endet mit „kein Aufbaufehler gefunden“ oder
+„Aufbaufehler gefunden“. Der zweite Fall macht den Lauf ebenfalls rot und nennt die betroffenen Partien.
 
 ## 1. Übergabe und Zuordnung
 
-In Actions am Messcommit den Weg beider Parameter vom Workflow über die Armwahl bis zum Worker sowie die Rückübersetzung der Siegerfarbe prüfen. Für jede Farbe und jeden Arm Sollwert und tatsächlich übernommenen Wert protokollieren. Die K3-Steinzüge nach Arm auf ihre gemeldeten Simulationen prüfen, Pässe getrennt zählen. Abweichungen anhand der Zählerdefinition klären. Bei falscher Zuordnung, abweichendem Engine-Stand oder ungeklärter Parameterübergabe stoppen, betroffene Partien benennen und vor einem Wiederholungslauf neu festlegen.
+Bei falscher Zuordnung, abweichendem Engine-Stand oder ungeklärter Parameterübergabe: stoppen, betroffene Partien
+benennen und vor einem Wiederholungslauf neu festlegen.
 
-## 2. A/A-Kontrolle
+### 1a. Weg der Parameter, aus dem Code
 
-Nur nach bestandener Übergabeprüfung. K3-Konfiguration unverändert übernehmen, allein A von 2600 auf 5200 setzen. Seeds 11260001 bis 11260123, zehn Partien je Seed in derselben Reihenfolge und Farbzuordnung, insgesamt 1230. Keine Zwischenentscheidung, keine Ersetzung nach Ergebnis. Fehlgeschlagene Jobs mit identischer Konfiguration wiederholen und beide Run-IDs dokumentieren. Je Seed genau einen vollständigen Datensatz auswerten.
+Im Harness gibt es keinen Worker: Beide Arme ziehen im selben Node-Prozess. `ab-harness.js` und `index.html` sind seit
+dem Messcommit unverändert; die Zeilenangaben gelten dort und auf `main`.
 
-Primärgröße ist der Anteil der Siege von B, erwartet werden 50 %. Wie bei K3 zweiseitiger exakter Binomialtest gegen 0,5 mit α = 0,05 und 95-%-Intervall wie im Hauptbericht. Zusätzlich die 123 Siegzahlen je Seed und nach Farbe berichten. Eine Auffälligkeit löst die Prüfung von Armreihenfolge, Zufallsstrom und Ergebniszuordnung aus. Auch ein korrektes System kann die Schwelle zufällig überschreiten. Ein unauffälliger Befund allein schließt einen Fehler bei ungleichen Budgets nicht aus.
+1. `--A` und `--B` laufen durch denselben Parser `kv()` in `AB.A` und `AB.B` (`ab-harness.js:798–799`).
+2. Je Partie legt `aIsBlack = g % 2 === 0` die Farbe von A fest; `playGame` bekommt die beiden Parametersätze für
+   Schwarz und Weiß (`ab-harness.js:1887–1889`). A ist also in den ungeraden Partien Schwarz.
+3. Vor jedem Zug setzt `Object.assign(PARAMS, PARAMS_DEFAULT, {aiTimeBudget, adaptiveBudgetEnabled: 0}, cfg)` die
+   Parameter der ziehenden Farbe (`ab-harness.js:1104`).
+4. In der Stufe „hard“ mit `useMCTS` 1 (Standard) gibt `_getAIMoveKern` (`index.html:5268`) Steinzüge nur über
+   `mctsPUCT` zurück; jeder andere Ausgang ist Pass oder Aufgabe. `mctsPUCT` (`index.html:4604`) liest
+   `PARAMS.mctsFixedSims`. Ist der Wert größer als 0, sind beide Zeitgrenzen unendlich, und die Suchschleife endet erst
+   bei `sims === mctsFixedSims`.
+5. Die Meldung `MCTS n Sims · … · Q q` liest der Harness mit `SIMS_RE` (`ab-harness.js:941`) und schreibt `n` und `q`
+   in das Zugereignis des Rohdumps; ein Pass hat dort `idx` −1 und keine Simulationen.
+6. Siegerfarbe aus `finalScore` mit Komi (`ab-harness.js:907`, Aufruf in `playGame`), Siegerarm aus der Farbe von A
+   (`raw.partien`, `ab-harness.js:1893`).
+
+Daraus folgt das Kriterium für 1c: Jeder Steinzug von A meldet genau 2600, jeder Steinzug von B genau 5200
+Simulationen; jede Entscheidung ohne Meldung ist ein Pass.
+
+### 1b. Gemeinsamer Engine-Zustand
+
+Weil beide Arme im selben Prozess ziehen, kann Zustand, der einen Zug überdauert, die Suche des einen Arms in die des
+anderen tragen. Diese Fehlerklasse erkennt keine Prüfung mit gleichen Parametern auf beiden Seiten (§2). Der Harness
+führt fünf Zustände je Farbe und spielt sie vor jedem Zug ein: `_mctsSavedRoot`, `_hopelessStreak`, `_allDeadStreak`,
+`_lastMsPerSim` und die Krisendauer (`ab-harness.js:1124–1136`, zurück ab `:1205`).
+
+Festgelegt wird eine vollständige Liste aller veränderlichen Zustände auf Modulebene in `shared-go-logic`, `worker-ai`
+und `policy-net` am Messcommit: `let` und `var`, dazu `const`-Objekte, Maps und Typed Arrays mit veränderlichem Inhalt
+(Beispiel: `_enEigen`, der letzte eigene Zug je Farbe). Jeder Eintrag kommt in genau eine Klasse:
+
+1. vor Gebrauch in jedem Zug neu gesetzt oder ungültig gemacht;
+2. Zähler oder Wächter ohne Wirkung auf die Zugwahl;
+3. je Farbe getrennt, im Harness oder in der Engine selbst;
+4. überdauert einen Zug, wirkt auf die Zugwahl und ist nicht je Farbe getrennt.
+
+Ein Eintrag in Klasse 4 ist ein Befund „Aufbaufehler möglich“ mit Variable, Wirkweg und Codezeilen. Eine erste,
+unvollständige Durchsicht am 27.11.2026 fand keinen solchen Eintrag; sie ersetzt die Liste nicht. Die Liste kommt als
+Nachtrag in dieses Doc.
+
+### 1c. Prüfung an den K3-Artefakten, in Actions
+
+Für alle 123 Teilläufe und 1230 Partien:
+
+- Prüfsumme jedes Artefakts gegen `laeufe.csv`; Konfiguration A `mctsFixedSims=2600,resignEnabled=0`, B
+  `mctsFixedSims=5200,resignEnabled=0`; Commit `98aa1ad`; `params_hash` in allen 123 Rohdumps gleich.
+- Je Zugereignis: Farbe → Arm über `armSchwarz`/`armWeiss` des Rohdumps. Jeder Steinzug meldet genau den Sollwert
+  seines Arms (2600 bzw. 5200). Jede Entscheidung ohne Meldung hat `idx` −1.
+- Je Partie: Zahl der Zugereignisse gleich `zuege`; Siegerfarbe und Siegerarm wie in `raw.partien`.
+
+Berichtet werden je Arm und Farbe: Steinzüge, davon mit Sollwert, Pässe. Jede Abweichung ist „Aufbaufehler gefunden“
+mit Liste der Partien und Züge.
+
+## 2. A/A-Kontrolle: entfällt
+
+Erwogen war eine A/A-Kontrolle: K3-Konfiguration mit 5200 gegen 5200, Seeds 11260001 bis 11260123, 1230 Partien. Sie
+entfällt aus zwei Gründen.
+
+- **Sie prüft hier nichts Neues.** Im Harness sind die Arme nur Parametersätze (§1a, Punkte 1 bis 3). Die Farbe hängt
+  an der Partienummer, der Zufallsstrom ist einer für den ganzen Lauf (`ab-harness.js:833`). Bei gleichen Parametern
+  spielt der Harness dieselben Partien, gleich welcher Arm „A“ heißt. Die Bezeichnung wirkt nur auf die Buchführung,
+  also Farbe von A und Siegerarm, und die ist für alle 1230 K3-Partien schon je Partie geprüft (Haupt-Doc §18 und
+  §13.4). Armreihenfolge und Zufallsstrom hängen nicht an der Bezeichnung. Gemeinsamen Zustand (§1b) sieht die
+  A/A-Kontrolle nicht, weil beide Seiten dieselbe Suche machen.
+- **Sie ist schwach und teuer.** Der exakte zweiseitige Test bei 1230 Partien schlägt erst bei höchstens 580 oder
+  mindestens 650 Siegen von B an. Eine Verzerrung in der vollen Größe des K3-Effekts (−21,5 Elo) fände er mit rund 58 %.
+  Nach dem Kostenmodell aus §7.3 wären es rund 12 Minuten je Partie und etwa 247 Rechenstunden.
+
+Bleibt nach Teil 1 ein Verdacht auf gemeinsamen Zustand, oder braucht die Deutung eine Wiederholung, dann: K3 mit neuen
+Seeds, jeder Arm in einem eigenen Engine-Prozess. Das braucht einen Schalter im Harness (Standard aus, bei aus
+bitgleich getestet) und eine eigene Festlegung. Ein solcher Lauf prüft den Aufbau und wiederholt den Vergleich
+zugleich.
 
 ## 3. Beschreibende Diagnose der bestehenden K3-Dumps in Actions
 
-Alle 1230 Partien einschließen. Passzahl je 100 Entscheidungen, erster Pass und Anteil der Partien ohne eigenen Pass getrennt nach Arm und Farbe berichten. Für den ersten Pass nur Partien mit eigenem Pass verwenden und den Nenner angeben.
+Alle 1230 Partien einschließen. Passzahl je 100 Entscheidungen, erster Pass und Anteil der Partien ohne eigenen Pass
+getrennt nach Arm und Farbe berichten. Für den ersten Pass nur Partien mit eigenem Pass verwenden und den Nenner
+angeben. Weil Steinzüge nur aus der Suche kommen (§1a), sind die Pässe genau die Entscheidungen ohne Simulationen.
+Grob aus den Mitteln der Berichte gerechnet, nicht gezählt: In K3 entschied A rund 5,5 % seiner Züge ohne Suche
+(1 − 2457,2/2600), B rund 6,5 % (1 − 4860,1/5200); in K1 und K2 lagen beide Arme bei rund 7,0 %. Die Auswertung zählt
+das genau.
 
-Zugphasen vorab auf 1–100, 101–200, 201–300 und ab 301 festlegen. Je Arm und Phase Anzahl beobachteter Partien sowie Median der je Partie gemittelten q-Werte eigener Steinzüge angeben. Zuvor Perspektive und Skala von q im Harness prüfen. Als beschreibenden Kipppunkt den ersten Phasenanfang ausweisen, ab dem der spätere Verlierer in jeder verbleibenden beobachteten Phase auf seinen Steinzügen im Mittel unter der neutralen q-Schwelle liegt. Partien ohne bestimmbaren Kipppunkt gesondert zählen. Der Wert beschreibt die Suchbewertung, keine gesicherte Verluststellung.
+Zugphasen vorab auf 1–100, 101–200, 201–300 und ab 301 festlegen. Je Arm, Farbe und Phase Anzahl beobachteter
+Partien sowie Median der je Partie gemittelten q-Werte eigener Steinzüge angeben. Perspektive und Skala von q laut
+Code: Wert des gewählten Wurzelkindes aus Sicht der ziehenden Seite, `tanh(Bewertung / mctsValueScale)`, also
+zwischen −1 und 1. Die Engine kennt kein Komi; q = 0 heißt „ausgeglichen ohne Komi“, bei Komi 7,5 liegt Schwarz dort
+zurück. Die q-Werte werden deshalb nur getrennt nach Farbe berichtet und nicht an einer gemeinsamen Schwelle gemessen.
+Außerdem stammen sie aus verschieden tiefer Suche; sie beschreiben die Suche jedes Arms, keinen gemeinsamen Maßstab.
 
-Baumwiederverwendung nur aus einem im Harness belegten direkten Zähler für übernommene Besuche oder erfolgreiche Wiederverwendung auswerten. Zählerdefinition, Nenner und Abdeckung angeben. Fehlt er, lautet der Befund „mit vorhandenen Dumps nicht messbar“. Eine instrumentierte Neumessung braucht eine eigene Festlegung.
+Den beschreibenden Kipppunkt bestimmt deshalb ein fester Bewerter, der für beide Arme gleich ist und Komi kennt: GNU Go
+3.8 mit `estimate_score`, chinesische Regeln, Komi 7,5, wie in `auswertung/aufgabe-gnugo.js`. Die Züge jeder Partie
+werden aus dem Rohdump nachgespielt; Messpunkte sind die Stellungen nach Zug 100, 200 und 300, soweit die Partie so
+lang ist. Kipppunkt ist der erste Messpunkt, ab dem GNU Go den späteren Verlierer an jedem folgenden Messpunkt hinten
+sieht (Schätzung unter 0 aus seiner Sicht). Partien ohne bestimmbaren Kipppunkt gesondert zählen, ebenso Schätzungen,
+die GNU Go nicht liefert. Berichtet wird die Verteilung je Arm des Verlierers. GNU Gos Schätzung ist grob, einige
+Punkte Rauschen; der Wert beschreibt eine Schätzung, keine gesicherte Verluststellung.
+
+Baumwiederverwendung: Der Harness liest die Zähler der Engine (`leseWurzelWaechter`, `index.html:4564`: Suchen,
+Wiederverwendungen, übernommene und verworfene Wurzelkinder) am Messcommit nicht aus. Der Befund lautet daher schon
+jetzt „mit vorhandenen Dumps nicht messbar“. Eine instrumentierte Neumessung braucht eine eigene Festlegung.
 
 ## 4. Abschluss
 
-Konfigurationen, Kommando, Auswertungscode, Job-IDs, Daten je Partie und Prüfsummen veröffentlichen. K3 nur bei belegtem Fehler im Aufbau als fehlerhaft kennzeichnen. Bei unauffälliger Kontrolle den Umfang der geprüften Fehlerquellen nennen. Die Phasenanalyse dient der Hypothesenbildung. Änderungen an der Spiel-Engine sind kein Bestandteil dieser Prüfung.
+Konfigurationen, Kommando, Auswertungscode, Job-IDs, Daten je Partie und Prüfsummen veröffentlichen: Ergebnisse als
+Nachtrag in diesem Doc, Rohdaten unter `docs/daten/skalierung-heute/aufbaupruefung-<Datum>/`. K3 nur bei belegtem
+Fehler im Aufbau als fehlerhaft kennzeichnen. Ohne Befund den Umfang der geprüften Fehlerquellen nennen: Teil 1a bis 1c
+schließen falsche Übergabe von `mctsFixedSims`, falsche Zuordnung von Farbe und Sieger und Zustand in Klasse 4 aus,
+soweit die Liste aus 1b vollständig ist; einen Fehler, der nur bei ungleichen Budgets und ohne solchen Zustand wirkt,
+schließen sie nicht aus. Die Phasenanalyse dient der Hypothesenbildung. Änderungen an der Spiel-Engine sind kein
+Bestandteil dieser Prüfung.
