@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0 -->
 # Aufbauprüfung zu K3 nach §5.3
 
-**Stand: 27.11.2026. Status: festgelegt, nichts gelaufen.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
+**Stand: 27.11.2026. Status: Teil 1c gültig, kein Aufbaufehler gefunden (§5). Teil 1b und 3 offen.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
 Hazeberry liest es vor dem Merge. Jeder Lauf in Actions braucht ein eigenes Go; der Merge dieses Docs ist keins.
 
 Festlegung nach Kenntnis des K3-Ergebnisses ([`skalierung-heute-vorabfestlegung.md`](skalierung-heute-vorabfestlegung.md)
@@ -146,3 +146,31 @@ schließen falsche Übergabe von `mctsFixedSims`, falsche Zuordnung von Farbe un
 soweit die Liste aus 1b vollständig ist; einen Fehler, der nur bei ungleichen Budgets und ohne solchen Zustand wirkt,
 schließen sie nicht aus. Die Phasenanalyse dient der Hypothesenbildung. Änderungen an der Spiel-Engine sind kein
 Bestandteil dieser Prüfung.
+
+## 5. Nachtrag: Teil 1c vom 27.11.2026
+
+**Gültig. Kein Aufbaufehler gefunden.** Workflow `k3-uebergabe.yml`, Lauf 46002282339, auf `main` (`d3a5767`,
+Werkzeug aus #392), gestartet nach Hazeberrys Go um 12:52 UTC, Dauer rund 3 Minuten. Bericht im Wortlaut:
+[`k3-uebergabe.md`](daten/skalierung-heute/aufbaupruefung-20261127/k3-uebergabe.md).
+
+| Arm | Farbe | Soll | Partien | Entscheidungen | Steinzüge | davon genau Soll | Abweichungen | Pässe | Pässe mit Meldung |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| A | Schwarz | 2600 | 615 | 115 483 | 109 042 | 109 042 | 0 | 6 441 | 0 |
+| A | Weiß | 2600 | 615 | 114 130 | 107 537 | 107 537 | 0 | 6 593 | 0 |
+| B | Schwarz | 5200 | 615 | 114 437 | 106 942 | 106 942 | 0 | 7 495 | 0 |
+| B | Weiß | 5200 | 615 | 115 163 | 107 157 | 107 157 | 0 | 8 006 | 0 |
+
+Alle 123 Prüfsummen stimmen mit GitHub und mit `laeufe.csv`; Konfiguration in allen 123 Läufen wie festgelegt;
+`params_hash` in allen 1230 Partien gleich; Commit und Engine-Blöcke wie am Messcommit. Die 459 213 Entscheidungen
+ergeben im Mittel 373,3 je Partie, wie im K3-Bericht.
+
+**Was das belegt:** Alle 430 678 Steinzüge suchten mit genau der Simulationszahl ihres Arms, in beiden Farben. Farbe
+von A, Arm je Farbe, Siegerfarbe und die Zählung im JSON stimmen. Eine falsche Übergabe von `mctsFixedSims` und
+vertauschte Arme erklären das K3-Ergebnis nicht.
+
+**Was es nicht belegt:** gemeinsamen Zustand beider Arme im selben Prozess (Teil 1b) und ein Verhalten der Engine,
+das nur bei größerem Budget auftritt. Das K3-Ergebnis bleibt offen.
+
+**Beschreibend, ohne Deutung:** B passt häufiger als A, in beiden Farben: A 13 034 Pässe in 229 613 Entscheidungen
+(5,7 %, 10,6 je Partie), B 15 501 in 229 600 (6,8 %, 12,6 je Partie). Ob das mit den Niederlagen von B zusammenhängt,
+ist eine Hypothese für Teil 3.
