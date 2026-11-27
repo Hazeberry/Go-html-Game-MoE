@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0 -->
 # Aufbauprüfung zu K3 nach §5.3
 
-**Stand: 27.11.2026. Status: Teil 1c gültig, kein Aufbaufehler gefunden (§5). Teil 1b: kein Eintrag in Klasse 4 (§6). Teil 3 offen.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
+**Stand: 27.11.2026. Status: Teil 1c gültig, kein Aufbaufehler gefunden (§5). Teil 1b: kein Hinweis auf Suchzustand, der von einem Arm zum anderen gelangt (§6). Teil 3 offen.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
 Hazeberry liest es vor dem Merge. Jeder Lauf in Actions braucht ein eigenes Go; der Merge dieses Docs ist keins.
 
 Festlegung nach Kenntnis des K3-Ergebnisses ([`skalierung-heute-vorabfestlegung.md`](skalierung-heute-vorabfestlegung.md)
@@ -177,7 +177,9 @@ ist eine Hypothese für Teil 3.
 
 ## 6. Nachtrag: Teil 1b vom 27.11.2026
 
-**Kein Eintrag in Klasse 4.** Durchsicht der Blöcke `shared-go-logic`, `worker-ai` und `policy-net` am Messcommit
+**Die Durchsicht am Messcommit ergab keinen Hinweis darauf, dass Suchzustand von einem Arm zum anderen gelangt.**
+Kein Eintrag in Klasse 4. Das ist ein Befund aus dem Lesen des Codes, kein Beweis: Ein Weg, den die Durchsicht
+übersehen hat, bliebe möglich. Durchsicht der Blöcke `shared-go-logic`, `worker-ai` und `policy-net` am Messcommit
 `98aa1ad`, aus dem Code, ohne Lauf. Erfasst sind alle Deklarationen auf oberster Ebene mit `let` und `var`, alle
 `const` mit veränderlichem Inhalt (Typed Arrays, Objekte, Arrays, Sets) und die beiden globalen Objekte `PARAMS`
 und `policyNet`. Zeilen beziehen sich auf `index.html` am Messcommit.
@@ -224,7 +226,7 @@ und `policyNet`. Zeilen beziehen sich auf `index.html` am Messcommit.
 (`ab-harness.js:833`), und wie viel ein Zug verbraucht, hängt an der Suche. Das ist so gebaut und trägt keine
 Suchergebnisse von einem Arm zum anderen; dass ein Arm dadurch systematisch bevorzugt wird, ist nicht zu erkennen.
 
-**Umfang:** Teil 1b und 1c zusammen schließen aus, dass `mctsFixedSims` falsch übergeben wurde, die Arme vertauscht
-sind oder Zustand der Suche von einem Arm zum anderen gelangt. Nicht ausgeschlossen ist ein Verhalten der Engine, das
-erst bei größerem Budget auftritt. Damit ist das K3-Ergebnis nach §5.3 nicht als Aufbaufehler gekennzeichnet; die
+**Umfang:** Teil 1c schließt an den Daten aus, dass `mctsFixedSims` falsch übergeben wurde oder die Arme vertauscht
+sind. Teil 1b ergab keinen Hinweis darauf, dass Suchzustand von einem Arm zum anderen gelangt; gemessen ist das nicht.
+Nicht ausgeschlossen ist ein Verhalten der Engine, das erst bei größerem Budget auftritt. Damit ist das K3-Ergebnis nach §5.3 nicht als Aufbaufehler gekennzeichnet; die
 Deutung bleibt offen und ist Gegenstand von Teil 3.
