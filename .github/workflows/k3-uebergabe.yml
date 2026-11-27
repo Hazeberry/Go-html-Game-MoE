@@ -1,0 +1,146 @@
+# Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+#
+# Aufbauprüfung zu K3, Schritt 1 (docs/skalierung-aufbaupruefung-vorabfestlegung.md §1c):
+# Hat die Suche je Arm und Farbe die festgelegte Simulationszahl übernommen, A 2600 und B 5200?
+#
+# Liest die vorhandenen Artefakte der 123 K3-Teilläufe; es wird keine Partie gespielt. Jedes
+# Artefakt wird als ZIP geladen, seine SHA-256 gegen die Angabe von GitHub geprüft und, wenn
+# docs/daten/skalierung-heute/stufe-2-20261126/laeufe.csv im Stand liegt, auch dagegen. Dann
+# prüft auswertung/k3-uebergabe.js jede Partie und jeden Zug.
+#
+# Rot bei KEIN URTEIL (Ausgang 1), Bedienfehler (2) und bei „Aufbaufehler gefunden“ (3).
+# Start nur nach Hazeberrys Go.
+
+name: K3-Übergabe
+
+on:
+  workflow_dispatch:
+    inputs:
+      laeufe:
+        description: 'Run-IDs der 123 K3-Teilläufe, mit Komma'
+        required: true
+      commit:
+        description: 'Messcommit, volle 40-stellige SHA'
+        required: true
+        default: '98aa1ad586c9de23f64ca76c26af1d7b199b7b3a'
+
+concurrency:
+  group: k3-uebergabe
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  pruefung:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Eingaben prüfen
+        env:
+          IN_LAEUFE: ${{ inputs.laeufe }}
+          IN_COMMIT: ${{ inputs.commit }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$IN_LAEUFE" | grep -Eq '^[0-9]+(,[0-9]+)*$' \
+            || { echo "::error::laeufe muss Run-IDs mit Komma sein: '$IN_LAEUFE'"; exit 2; }
+          printf '%s' "$IN_COMMIT" | grep -Eq '^[0-9a-f]{40}$' \
+            || { echo "::error::commit muss eine volle 40-stellige SHA sein: '$IN_COMMIT'"; exit 2; }
+          { echo "LAEUFE=$IN_LAEUFE"; echo "COMMIT=$IN_COMMIT"; } >> "$GITHUB_ENV"
+
+      - name: Stand des Messcommits
+        run: |
+          set -euo pipefail
+          git cat-file -e "$COMMIT^{commit}" \
+            || { echo "::error::Commit $COMMIT gibt es in diesem Repository nicht."; exit 2; }
+          git show "$COMMIT:index.html" > stand.html
+          sha256sum stand.html
+
+      # Je Lauf genau ein Artefakt. Die ZIP-Datei wird über die API geladen, damit ihre SHA-256
+      # mit dem Digest von GitHub und mit laeufe.csv vergleichbar ist. Ob sie stimmt, entscheidet
+      # das Werkzeug; hier wird nur gesammelt. Fehlt ein Artefakt, steht der Lauf nicht in der
+      # Liste, und das Werkzeug meldet KEIN URTEIL.
+      - name: Artefakte der Teilläufe holen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p artefakte zips ergebnis
+          : > ergebnis/pruefsummen.tsv
+          IFS=',' read -ra IDS <<< "$LAEUFE"
+          echo "${#IDS[@]} Teilläufe"
+          for id in "${IDS[@]}"; do
+            mapfile -t art < <(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$id/artifacts" \
+              --jq '.artifacts[] | [.id, .name, (.digest // "-"), .expired] | map(tostring) | join("|")')
+            if [ "${#art[@]}" -ne 1 ]; then
+              echo "::warning::Lauf $id hat ${#art[@]} Artefakte, erwartet genau eines."
+              continue
+            fi
+            IFS='|' read -r aid name digest abgelaufen <<< "${art[0]}"
+            if [ "$abgelaufen" = true ]; then
+              echo "::warning::Artefakt $name von Lauf $id ist abgelaufen."
+              continue
+            fi
+            curl -sSfL -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' \
+              -o "zips/$id.zip" "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$aid/zip"
+            sha=$(sha256sum "zips/$id.zip" | cut -d' ' -f1)
+            printf '%s\t%s\t%s\t%s\t%s\n' "$id" "$aid" "$name" "$sha" "$digest" >> ergebnis/pruefsummen.tsv
+            mkdir -p "artefakte/$id"
+            unzip -q "zips/$id.zip" -d "artefakte/$id"
+          done
+          echo "$(wc -l < ergebnis/pruefsummen.tsv) Artefakte geladen"
+
+      - name: Prüfung
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra IDS <<< "$LAEUFE"
+          ARGS=(--commit "$COMMIT" --html stand.html --pruefsummen ergebnis/pruefsummen.tsv)
+          LISTE=docs/daten/skalierung-heute/stufe-2-20261126/laeufe.csv
+          if [ -f "$LISTE" ]; then ARGS+=(--laeufe "$LISTE"); else echo "$LISTE liegt nicht im Stand, nur GitHub-Digest."; fi
+          # Je geladenem Lauf genau ein JSON und ein Rohdump. Fehlt eine Datei oder gibt es sie
+          # doppelt, bricht der Schritt ab: ein stilles Weglassen wäre eine halbe Prüfung.
+          for id in "${IDS[@]}"; do
+            [ -d "artefakte/$id" ] || continue
+            for art in json roh; do
+              case "$art" in
+                json) muster='ab-*.json' ;;
+                roh)  muster='roh-*.jsonl' ;;
+              esac
+              mapfile -t treffer < <(find "artefakte/$id" -type f -name "$muster" | sort)
+              if [ "${#treffer[@]}" -ne 1 ]; then
+                echo "::error::Lauf $id: ${#treffer[@]} Dateien passen auf $muster, erwartet genau eine."
+                exit 1
+              fi
+              eval "P_$art=\${treffer[0]}"
+            done
+            ARGS+=(--teil "$id,$P_json,$P_roh")
+          done
+
+          status=0
+          node auswertung/k3-uebergabe.js "${ARGS[@]}" | tee ergebnis/k3-uebergabe.md || status=$?
+          {
+            cat ergebnis/k3-uebergabe.md
+            echo
+            echo "Ausgang des Werkzeugs: $status (0 kein Aufbaufehler · 3 Aufbaufehler gefunden · 1 KEIN URTEIL · 2 Bedienfehler)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - name: Ergebnis sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: k3-uebergabe
+          path: ergebnis/
+          if-no-files-found: warn
