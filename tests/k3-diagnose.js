@@ -38,7 +38,8 @@ let TMP;
 const tmpdir = () => TMP || (TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'k3-diagnose-')));
 
 /* Nachgebautes GNU Go: zählt die play-Befehle, antwortet auf estimate_score mit dem Wert aus
-   FAKE_WERTE („100:W+5.5,200:B+3“) und lehnt den play-Befehl Nummer FAKE_FEHLER ab. */
+   FAKE_WERTE („100:W+5.5,200:B+3“) und den Schranken aus FAKE_SCHRANKEN („100:oben:unten“, aus
+   Sicht von Weiß, sonst 1.0 und -1.0) und lehnt den play-Befehl Nummer FAKE_FEHLER ab. */
 function fakeGnugo() {
   const p = path.join(tmpdir(), 'gnugo-fake.sh');
   if (!fs.existsSync(p)) {
@@ -51,7 +52,9 @@ while IFS= read -r z; do
       if [ -n "$FAKE_FEHLER" ] && [ "$n" = "$FAKE_FEHLER" ]; then printf '? illegal move\\n\\n'; else printf '= \\n\\n'; fi ;;
     estimate_score)
       v=$(printf '%s' "$FAKE_WERTE" | tr ',' '\\n' | grep "^$n:" | cut -d: -f2)
-      printf '= %s (upper bound: 1.0, lower: -1.0)\\n\\n' "\${v:-B+1.0}" ;;
+      g=$(printf '%s' "$FAKE_SCHRANKEN" | tr ',' '\\n' | grep "^$n:" | cut -d: -f2-)
+      o=$(printf '%s' "\${g:-1.0:-1.0}" | cut -d: -f1); u=$(printf '%s' "\${g:-1.0:-1.0}" | cut -d: -f2)
+      printf '= %s (upper bound: %s, lower: %s)\\n\\n' "\${v:-B+1.0}" "$o" "$u" ;;
     quit) printf '= \\n\\n'; exit 0 ;;
     *) printf '= \\n\\n' ;;
   esac
@@ -145,6 +148,33 @@ test('Kipppunkt nach der Festlegung', () => {
   pruefeGleich(D.kipppunkt(w(-1, null, -3)), 'fehlt', 'Schätzung fehlt');
 });
 
+test('Strenge Zählung: günstigste Schranke für den Verlierer, aus Sicht von Weiß', () => {
+  pruefeGleich(D.sicherHinten({wert: 5, oben: -1, unten: -9}, 'W'), true, 'Weiß verliert, obere Schranke < 0');
+  pruefeGleich(D.sicherHinten({wert: 5, oben: 2, unten: -9}, 'W'), false, 'Weiß verliert, obere Schranke ≥ 0');
+  pruefeGleich(D.sicherHinten({wert: -5, oben: 9, unten: 3}, 'S'), true, 'Schwarz verliert, untere Schranke > 0');
+  pruefeGleich(D.sicherHinten({wert: -5, oben: 9, unten: -1}, 'S'), false, 'Schwarz verliert, untere Schranke < 0');
+  pruefeGleich(D.sicherHinten({wert: -5, oben: null, unten: null}, 'S'), null, 'ohne Schranken');
+  pruefeGleich(D.sicherHinten(null, 'S'), null, 'ohne Schätzung');
+  const w = (...s) => s.map((streng, i) => ({zug: 100 * (i + 1), sicht: -1, streng}));
+  pruefeGleich(D.kipppunkt(w(false, true, true), 'streng'), 200, 'streng ab 200');
+  pruefeGleich(D.kipppunkt(w(true, true, false), 'streng'), 'kein', 'streng: am Ende nicht sicher');
+  pruefeGleich(D.kipppunkt(w(true, null, true), 'streng'), 'fehlt', 'streng: Schranken fehlen');
+  pruefeGleich(D.kipppunkt(w(false, true, true)), 100, 'dieselben Werte nach der Schätzung: ab 100');
+});
+
+test('Strenge Zählung mit nachgebautem GNU Go weicht von der Zählung nach dem Wert ab', async () => {
+  /* Partie 3: Verlierer A als Schwarz. Werte W+5.5, W+3, W+12 → nach dem Wert ab 100. Schranken
+     (Sicht Weiß) unten −2, +1, +4 → für Schwarz günstigste 2, −1, −4 → streng ab 200. */
+  process.env.FAKE_WERTE = '100:W+5.5,200:W+3.0,300:W+12.0';
+  process.env.FAKE_SCHRANKEN = '100:9:-2,200:8:1,300:20:4';
+  const ps = D.partienAus([{daten: {konfig: {seed: 1}, partien: [partie(1, 3).json]}, roh: [partie(1, 3).roh]}]);
+  const bew = await D.bewerte(ps, {gnugo: fakeGnugo(), parallel: 1});
+  delete process.env.FAKE_SCHRANKEN;
+  pruefeGleich(bew[0].kipp, 100, 'nach dem Wert');
+  pruefeGleich(bew[0].kippStreng, 200, 'streng');
+  pruefeGleich(D.kippTabelle(ps, bew, 'kippStreng').AS[200], 1, 'Tabelle streng');
+});
+
 /* ── 3. Pässe und q ────────────────────────────────────────────── */
 
 test('Pässe je Arm und Farbe, erster Pass, Partien ohne eigenen Pass', () => {
@@ -200,7 +230,8 @@ test('Sicht des Verlierers und Tabelle je Arm und Farbe', async () => {
   pruefeGleich(k.A.verluste + k.B.verluste, 2, 'Verluste gesamt');
   const c = D.csv(ps, bew).trim().split('\n');
   pruefeGleich(c.length, 3, 'CSV: Kopf und zwei Partien');
-  pruefe(c[2].endsWith(',300'), `CSV-Zeile: ${c[2]}`);
+  pruefe(c[2].endsWith(',300,kein'), `CSV-Zeile mit beiden Kipppunkten: ${c[2]}`);
+  pruefeGleich(bew[0].kippStreng, 'kein', 'Schranken [−1; 1]: nie sicher hinten');
   pruefe(c[1].includes(',-5.5,1,-1,'), `Wert aus Sicht von Schwarz mit Schranken: ${c[1]}`);
 });
 
@@ -243,7 +274,7 @@ test('Ende zu Ende: 123 Teilläufe, nachgebautes GNU Go → Ausgang 0 mit allen 
   process.env.FAKE_WERTE = '100:B+1.0,200:B+2.0,300:B+3.0';
   const r = befehlszeile({gnugo: fakeGnugo()});
   pruefeGleich(r.status, 0, `Ausgang; ${r.stdout.slice(0, 300)} ${r.stderr.slice(0, 200)}`);
-  for (const t of ['## 1. Pässe', '## 2. q je Arm', '## 3. Kipppunkt', '## 4. Baumwiederverwendung', '**Gültig.**'])
+  for (const t of ['## 1. Pässe', '## 2. q je Arm', '## 3. Kipppunkt', '### Streng', '## 4. Baumwiederverwendung', '**Gültig.**'])
     pruefe(r.stdout.includes(t), `Bericht enthält ${t}`);
   /* Alle Schätzungen B+: Verlierer Schwarz nie hinten (kein), Verlierer Weiß ab 100 hinten. */
   pruefe(/\| A als Schwarz \| \d+ \| 0 \(0,0 %\) \| 0 \(0,0 %\) \| 0 \(0,0 %\) \| \d+ \(100,0 %\)/.test(r.stdout), 'Schwarz verliert: kein');
@@ -281,7 +312,12 @@ test('Echtes GNU Go: kurze Harness-Partie nachgespielt, Schätzung an jedem Mess
   const soll = D.MESSPUNKTE.filter(z => z <= r.zuege).length;
   pruefe(soll >= 1, `Partie zu kurz für einen Messpunkt: ${r.zuege} Züge`);
   pruefeGleich(bew[0].werte.length, soll, 'Messpunkte');
-  for (const w of bew[0].werte) pruefe(w.s && Number.isFinite(w.s.wert), `Schätzung nach Zug ${w.zug}: ${JSON.stringify(w.s)}`);
+  for (const w of bew[0].werte) {
+    pruefe(w.s && Number.isFinite(w.s.wert), `Schätzung nach Zug ${w.zug}: ${JSON.stringify(w.s)}`);
+    /* Schranken aus Sicht von Weiß: der Wert aus Sicht von Weiß liegt dazwischen. */
+    if (w.s && w.s.oben !== null)
+      pruefe(w.s.unten <= -w.s.wert && -w.s.wert <= w.s.oben, `Schranken aus Sicht von Weiß nach Zug ${w.zug}: ${JSON.stringify(w.s)}`);
+  }
 });
 
 laufeTests('K3-Diagnose (Aufbauprüfung, Teil 3)').then(ok => process.exit(ok ? 0 : 1));

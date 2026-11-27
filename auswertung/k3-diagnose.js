@@ -15,7 +15,9 @@
       lang ist. Kipppunkt ist der erste Messpunkt, ab dem GNU Go den späteren Verlierer an jedem
       folgenden Messpunkt hinten sieht (Schätzung unter 0 aus seiner Sicht). Ohne Messpunkt, ohne
       Kipppunkt und mit fehlender Schätzung wird gesondert gezählt. Verteilung je Arm und Farbe des
-      Verlierers. Die Schranken, die GNU Go mitliefert, stehen in den Einzelwerten.
+      Verlierers. Dazu die strenge Zählung (§3, vor dem Lauf ergänzt): Ein Messpunkt gilt dort nur
+      als „hinten“, wenn auch die für den Verlierer günstigste Schranke von GNU Go unter 0 liegt;
+      ohne Schranken zählt er als fehlend. Werte und Schranken stehen in den Einzelwerten.
    4. Baumwiederverwendung: am Messcommit liest der Harness die Zähler nicht aus; der Befund steht
       fest („mit vorhandenen Dumps nicht messbar“).
 
@@ -159,13 +161,23 @@ function messwerte(stdout, befehle, mess) {
   });
 }
 
-/* Kipppunkt aus den Messwerten aus Sicht des Verlierers. */
-function kipppunkt(werte) {
+/* Kipppunkt aus den Messwerten aus Sicht des Verlierers. `feld` wählt die Zählung: „sicht“ (Wert
+   unter 0) oder „streng“ (auch die günstigste Schranke unter 0); null heißt fehlend. */
+function kipppunkt(werte, feld = 'sicht') {
   if (!werte.length) return 'ohne';
-  if (werte.some(w => w.sicht === null)) return 'fehlt';
+  if (werte.some(w => w[feld] === null || w[feld] === undefined)) return 'fehlt';
+  const hinten = w => feld === 'sicht' ? w.sicht < 0 : w[feld] === true;
   for (let m = 0; m < werte.length; m++)
-    if (werte.slice(m).every(w => w.sicht < 0)) return werte[m].zug;
+    if (werte.slice(m).every(hinten)) return werte[m].zug;
   return 'kein';
+}
+
+/* Strenge Zählung: Die Schranken stehen aus Sicht von Weiß. Verliert Weiß, ist seine günstigste
+   Schranke die obere; verliert Schwarz, ist es die untere (aus Sicht von Weiß), also −unten aus
+   seiner Sicht. „Sicher hinten“ heißt: auch diese Schranke liegt unter 0. */
+function sicherHinten(s, verliererFarbe) {
+  if (!s || s.oben === null || s.unten === null) return null;
+  return verliererFarbe === 'W' ? s.oben < 0 : -s.unten < 0;
 }
 
 function gnugoLaeuft(gnugo) {
@@ -195,15 +207,16 @@ async function bewerte(partien, {gnugo, parallel, komi = KOMI}) {
       const {befehle, mess} = gtpBefehle(p.ereignisse, komi);
       const out = await sitzung(gnugo, befehle.join('\n') + '\n');
       const werte = messwerte(out, befehle, mess).map(({zug, s}) => ({
-        zug, s, sicht: s === null ? null : (p.verliererFarbe === 'S' ? s.wert : -s.wert)}));
-      ergebnis[i] = {werte, kipp: kipppunkt(werte)};
+        zug, s, sicht: s === null ? null : (p.verliererFarbe === 'S' ? s.wert : -s.wert),
+        streng: sicherHinten(s, p.verliererFarbe)}));
+      ergebnis[i] = {werte, kipp: kipppunkt(werte), kippStreng: kipppunkt(werte, 'streng')};
     }
   }
   await Promise.all(Array.from({length: Math.min(parallel, partien.length)}, arbeiter));
   return ergebnis;
 }
 
-function kippTabelle(partien, bew) {
+function kippTabelle(partien, bew, schluessel = 'kipp') {
   const zeilen = {};
   const neu = () => ({verluste: 0, 100: 0, 200: 0, 300: 0, kein: 0, ohne: 0, fehlt: 0, schaetzungenFehlend: 0});
   for (const [a, f] of U.ZELLEN) zeilen[a + f] = neu();
@@ -211,7 +224,7 @@ function kippTabelle(partien, bew) {
   partien.forEach((p, i) => {
     for (const k of [p.verliererArm + p.verliererFarbe, p.verliererArm]) {
       const z = zeilen[k];
-      z.verluste++; z[bew[i].kipp]++;
+      z.verluste++; z[bew[i][schluessel]]++;
       z.schaetzungenFehlend += bew[i].werte.filter(w => w.sicht === null).length;
     }
   });
@@ -221,7 +234,7 @@ function kippTabelle(partien, bew) {
 const zahl = (v, s = 1) => v === null || v === undefined ? '–' : v.toFixed(s).replace('.', ',');
 const proz = (a, b) => b ? zahl(100 * a / b) + ' %' : '–';
 
-function bericht({e, pass, q, kipp, partien, bew, commit, kein}) {
+function bericht({e, pass, q, kipp, kippStreng, partien, bew, commit, kein}) {
   const L = [];
   L.push('# Aufbauprüfung K3, Teil 3: beschreibende Diagnose', '');
   if (kein.length) {
@@ -258,15 +271,20 @@ function bericht({e, pass, q, kipp, partien, bew, commit, kein}) {
   L.push('Je Verlierer: erster Messpunkt, ab dem GNU Go ihn an jedem folgenden Messpunkt hinten sieht. „kein“: am letzten '
     + 'Messpunkt nicht hinten. „ohne“: Partie kürzer als 100 Züge. „fehlt“: mindestens eine Schätzung fehlt. GNU Gos '
     + 'Schätzung ist grob; der Wert beschreibt eine Schätzung, keine gesicherte Verluststellung.', '');
-  L.push('| Verlierer | Verluste | ab Zug 100 | ab Zug 200 | ab Zug 300 | kein | ohne | fehlt |');
-  L.push('|---|---:|---:|---:|---:|---:|---:|---:|');
   const zeile = (name, z) => `| ${name} | ${z.verluste} | ${z[100]} (${proz(z[100], z.verluste)}) | ${z[200]} (${proz(z[200], z.verluste)}) | `
     + `${z[300]} (${proz(z[300], z.verluste)}) | ${z.kein} (${proz(z.kein, z.verluste)}) | ${z.ohne} | ${z.fehlt} |`;
+  const kopf = ['| Verlierer | Verluste | ab Zug 100 | ab Zug 200 | ab Zug 300 | kein | ohne | fehlt |',
+                '|---|---:|---:|---:|---:|---:|---:|---:|'];
+  L.push('### Nach dem Wert der Schätzung', '', ...kopf);
   for (const [a, f] of U.ZELLEN) L.push(zeile(`${a} als ${FARBNAME[f]}`, kipp[a + f]));
   L.push(zeile('**A gesamt**', kipp.A), zeile('**B gesamt**', kipp.B));
+  L.push('', '### Streng: auch die günstigste Schranke für den Verlierer unter 0', '', ...kopf);
+  for (const [a, f] of U.ZELLEN) L.push(zeile(`${a} als ${FARBNAME[f]}`, kippStreng[a + f]));
+  L.push(zeile('**A gesamt**', kippStreng.A), zeile('**B gesamt**', kippStreng.B));
   const fehlend = bew.reduce((s, b) => s + b.werte.filter(w => w.sicht === null).length, 0);
+  const ohneSchranken = bew.reduce((s, b) => s + b.werte.filter(w => w.sicht !== null && w.streng === null).length, 0);
   const alle = bew.reduce((s, b) => s + b.werte.length, 0);
-  L.push('', `Messpunkte ${alle}, davon ohne Schätzung ${fehlend}.`, '');
+  L.push('', `Messpunkte ${alle}, davon ohne Schätzung ${fehlend}, mit Schätzung aber ohne Schranken ${ohneSchranken}.`, '');
 
   L.push('## 4. Baumwiederverwendung', '');
   L.push('Mit vorhandenen Dumps nicht messbar: Der Harness liest die Zähler der Engine (leseWurzelWaechter) am Messcommit '
@@ -281,13 +299,13 @@ function bericht({e, pass, q, kipp, partien, bew, commit, kein}) {
 
 function csv(partien, bew) {
   const kopf = ['seed', 'partie', 'zuege', 'armSchwarz', 'armWeiss', 'verliererArm', 'verliererFarbe',
-    ...MESSPUNKTE.flatMap(z => [`s_gnugo${z}`, `w_oben${z}`, `w_unten${z}`]), 'kipppunkt'];
+    ...MESSPUNKTE.flatMap(z => [`s_gnugo${z}`, `w_oben${z}`, `w_unten${z}`]), 'kipppunkt', 'kipppunkt_streng'];
   const z = [kopf.join(',')];
   partien.forEach((p, i) => {
     const w = MESSPUNKTE.map(m => bew[i].werte.find(x => x.zug === m));
     z.push([p.seed, p.partie, p.zuege, p.armVon.S, p.armVon.W, p.verliererArm, p.verliererFarbe,
       ...w.flatMap(x => !x ? ['', '', ''] : x.s === null ? ['fehlt', '', ''] : [x.s.wert, x.s.oben ?? '', x.s.unten ?? '']),
-      bew[i].kipp].join(','));
+      bew[i].kipp, bew[i].kippStreng].join(','));
   });
   return z.join('\n') + '\n';
 }
@@ -322,11 +340,12 @@ async function main() {
   const partien = partienAus(teile);
   const bew = await bewerte(partien, {gnugo: a.gnugo, parallel: a.parallel});
   if (a.csv) fs.writeFileSync(a.csv, csv(partien, bew));
-  console.log(bericht({e, pass: passMasse(partien), q: qPhasen(partien), kipp: kippTabelle(partien, bew), partien, bew,
+  console.log(bericht({e, pass: passMasse(partien), q: qPhasen(partien), kipp: kippTabelle(partien, bew),
+                       kippStreng: kippTabelle(partien, bew, 'kippStreng'), partien, bew,
                        commit: a.commit, kein}));
   process.exit(0);
 }
 
 if (require.main === module) main();
 module.exports = {MESSPUNKTE, PHASEN, argumente, partienAus, passMasse, qPhasen, gtpBefehle, schaetzungAus, messwerte,
-                  kipppunkt, bewerte, kippTabelle, bericht, csv, zuGtp};
+                  kipppunkt, sicherHinten, bewerte, kippTabelle, bericht, csv, zuGtp};
