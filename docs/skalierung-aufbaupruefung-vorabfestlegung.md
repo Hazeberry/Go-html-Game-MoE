@@ -133,6 +133,14 @@ sieht (Schätzung unter 0 aus seiner Sicht). Partien ohne bestimmbaren Kipppunkt
 die GNU Go nicht liefert. Berichtet wird die Verteilung je Arm des Verlierers. GNU Gos Schätzung ist grob, einige
 Punkte Rauschen; der Wert beschreibt eine Schätzung, keine gesicherte Verluststellung.
 
+**Strenge Zählung, ergänzt vor dem Lauf am 27.11.2026 (Hazeberry).** Zusätzlich zur Zählung nach dem Wert der
+Schätzung: Ein Messpunkt gilt nur dann als „hinten“, wenn auch die für den Verlierer günstigste Schranke, die GNU Go mit
+`estimate_score` ausgibt, unter 0 liegt. GNU Go 3.8 gibt die Schranken aus Sicht von Weiß aus; verliert Weiß, zählt die
+obere Schranke, verliert Schwarz, die untere mit umgekehrtem Vorzeichen. Fehlen die Schranken, zählt der Messpunkt in
+der strengen Zählung als fehlend. Der Kipppunkt wird sonst gleich bestimmt. Beide Zählungen werden berichtet, die
+Schranken stehen in den Einzelwerten. Anlass: In einer Testpartie (Harness, 60 Simulationen, nicht K3) lagen die
+Schranken nach Zug 100 bei −49 und +84, nach Zug 200 bei −104 und +2, nach Zug 300 fielen sie mit dem Wert zusammen.
+
 Baumwiederverwendung: Der Harness liest die Zähler der Engine (`leseWurzelWaechter`, `index.html:4564`: Suchen,
 Wiederverwendungen, übernommene und verworfene Wurzelkinder) am Messcommit nicht aus. Der Befund lautet daher schon
 jetzt „mit vorhandenen Dumps nicht messbar“. Eine instrumentierte Neumessung braucht eine eigene Festlegung.
