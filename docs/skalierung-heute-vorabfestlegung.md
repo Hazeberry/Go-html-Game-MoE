@@ -2,8 +2,10 @@
 <!-- SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0 -->
 # Skalierung auf dem heutigen Default: Vorabfestlegung
 
-**Stand: 25.11.2026. Status: Stufe G gültig (§16): S = 2618,5, N = 2600, K3 = 2600 → 5200. Stufe 1 gültig (§17):
-K1 +28,3 Elo, K2 +30,6 Elo, ein Unterschied ist nicht nachgewiesen. Stufe 2 offen, mit eigenem Go.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
+**Stand: 27.11.2026. Status: Stufe G gültig (§16): S = 2618,5, N = 2600, K3 = 2600 → 5200. Stufe 1 gültig (§17):
+K1 +28,3 Elo, K2 +30,6 Elo, ein Unterschied ist nicht nachgewiesen. Stufe 2 gültig (§18): K3 −21,5 Elo [−41,3; −1,8],
+„Die doppelte Suche verliert nachweisbar.“ Deutung offen, Aufbauprüfung nach §5.3 ausstehend.** Dieses Doc enthält
+Vorgaben für Werkzeug und Läufe.
 Hazeberry liest es vor dem Merge. Jede der drei Stufen braucht ein eigenes Go; der Merge dieses Docs ist keins.
 
 Festlegungen von Hazeberry am 25.11.2026: **1230 Partien je Vergleich, Aufgabe aus, Gerätemessung zuerst** — vor
@@ -636,3 +638,55 @@ sie maschinell nach `docs/daten/`. Bis dahin lässt sich jede spätere Kopie der
 
 Stufe 2 (K3 = 2600 gegen 5200, Seeds ab 11260001, 10 Partien je Teillauf nach §7.2) braucht ein eigenes Go, auf
 Grundlage der Schätzung aus §17.6.
+
+## 18. Ergebnis der Stufe 2 vom 26.11.2026
+
+**Deutung offen, Aufbauprüfung nach §5.3 ausstehend**
+
+Im [Originalbericht](daten/skalierung-heute/stufe-2-20261126/skalierung-bericht.md) lautet das vorab festgelegte
+Urteil im Wortlaut:
+
+> K3: **Die doppelte Suche verliert nachweisbar.**
+
+B (5200) gewann 577 von 1230 Partien gegen A (2600), entsprechend 46,9 % [44,1 %; 49,7 %], p = 0,0324 und −21,5 Elo
+[−41,3; −1,8]. B gewann als Schwarz 239/615, als Weiß 338/615. Der Abstand K2–K3 ist nach §7.4 rein beschreibend.
+Die Ursache des negativen Ergebnisses ist offen.
+
+### Kontrolle an den vorhandenen Artefakten
+
+Die SHA-256 der 123 Laufarchive und des Berichts stimmen mit dem
+[Laufverzeichnis](daten/skalierung-heute/stufe-2-20261126/laeufe.csv) überein. Alle 123 Konfigurationen melden
+Abschluss, denselben Commit wie im Bericht, Komi 7,5, Aufgabe aus und A/B in der vorgesehenen Budgetreihenfolge. Pro
+Seed liegen zehn nummerierte Partien vor. Für jede Partie stimmen Seed, Partienummer, Zugzahl, Armfarbe, Siegerfarbe
+und daraus abgeleiteter Siegerarm zwischen Ergebnisdatei und Rohdump überein. Die nachgezählten Arm-Siege ergeben
+577 : 653. Diese Kontrollen prüfen die gespeicherten Angaben. Die Übergabe an die laufende Engine ist Gegenstand der
+Aufbauprüfung.
+
+Die [Einzelwerte für K3](daten/skalierung-heute/stufe-2-20261126/k3-partien.csv) enthalten auch den Hash des
+Schlussbretts aus dem Rohdump. Die entsprechenden Tabellen für
+[K1](daten/skalierung-heute/stufe-1-20261125/k1-partien.csv) und
+[K2](daten/skalierung-heute/stufe-1-20261125/k2-partien.csv) sichern die Daten je Partie aus §17.7. Die
+vollständigen ursprünglichen Laufarchive einschließlich Zugereignissen liegen zusätzlich außerhalb des Repos in zwei
+ZIP-Sicherungen. Jedes Laufarchiv darin lässt sich über die SHA-256 in den Laufverzeichnissen von
+[Stufe 1](daten/skalierung-heute/stufe-1-20261125/laeufe.csv) und
+[Stufe 2](daten/skalierung-heute/stufe-2-20261126/laeufe.csv) prüfen. Spalten und Herkunft der Tabellen stehen in den
+READMEs der beiden Datenordner.
+
+### Gegenprüfung in der Sitzung (27.11.2026)
+
+Unabhängig von der Kontrolle oben nachgezählt, nur Größen, die in den Berichten schon stehen:
+
+- **Einzelwerte:** K1, K2 und K3 haben je 1230 Zeilen, jeder Seed alle Partienummern, keine Partie doppelt. Die
+  Lauf-IDs passen zu den Laufverzeichnissen. Die Prüfkette aus §13.4 findet in keiner der 3690 Partien einen Fehler,
+  soweit die Tabellen ihre Felder enthalten (das Feld `aufgabe` fehlt; die Berichte haben es geprüft).
+  Siege, Farben, Partielängen und Simulationen stimmen mit den Berichten aus §17 und §18 überein, die Simulationen bis
+  auf die Rundung der Einzelwerte.
+- **Prüfsummen:** Drei der 124 Werte im Laufverzeichnis von Stufe 2 (erster und letzter Teillauf, Bericht) stimmen mit
+  der Prüfsumme, die GitHub für das Artefakt angibt. Die 123 Lauf-IDs stimmen mit den beim Start notierten überein.
+- **Bericht:** `skalierung-bericht.md` ist zeichengleich mit dem Job-Log des Berichtslaufs (Zeitstempel entfernt).
+- **Nebenbefund K1:** Seed 11250006 Partie 75 und Seed 11250008 Partie 77 haben denselben Schlussbrett-Hash, dieselben
+  370 Züge, denselben Stand und dieselben Simulationen. Vermutlich ist es zweimal dieselbe Partie; belegt ist nur das
+  gleiche Endbrett. Auf das Ergebnis wirkt es nicht (1 von 1230).
+
+Die Aufbauprüfung hat eine eigene Festlegung:
+[`skalierung-aufbaupruefung-vorabfestlegung.md`](skalierung-aufbaupruefung-vorabfestlegung.md).

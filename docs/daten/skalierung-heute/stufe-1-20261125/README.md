@@ -12,6 +12,7 @@ Unterschied zwischen den beiden Gewinnen ist nicht nachgewiesen (D = −2,3 Elo 
 |---|---|
 | `skalierung-bericht.md` | der Bericht des Werkzeugs im Wortlaut |
 | `laeufe.csv` | die 30 Teilläufe: Vergleich, Seed, Run-Nummer und -ID, Artefakt mit SHA-256 und Größe, Laufzeit, Ablaufdatum des Artefakts |
+| `k1-partien.csv`, `k2-partien.csv` | die je 1230 Partien von K1 und K2 einzeln (nachgetragen mit §18) |
 
 **Herkunft von `skalierung-bericht.md`:** Der Text ist maschinell aus dem Job-Log des Berichtslaufs übernommen,
 nicht abgetippt. Nur die Zeitstempel am Zeilenanfang sind entfernt. Die Zahlen sind aus den Siegzahlen nachgerechnet:
@@ -21,10 +22,16 @@ Siegrate, Clopper-Pearson, Binomialtest, Elo, Fisher-Test und das Intervall für
 (`ab-harness-82p-seed<Seed>-run<Nummer>`), die Laufzeiten aus dem Bericht. Alle 30 Artefakte tragen den Commit
 `98aa1ad`.
 
-**Daten je Partie:** Sie liegen nur in den Artefakten der Läufe (JSON, Rohdump, Log). GitHub löscht sie am
-**23.02.2027**. Aus einer Sitzung sind Artefakte nicht erreichbar (`docs/eval-streuung-vorabfestlegung.md` §14.4).
-Mit den Prüfsummen in `laeufe.csv` lässt sich jede spätere Kopie prüfen. Der Vorschlag zur dauerhaften Sicherung
-steht in §17.7 der Festlegung.
+**Daten je Partie:** `k1-partien.csv` und `k2-partien.csv` enthalten je Partie Seed, Lauf-ID, Farbe von A, Sieger,
+Endstand, Zugzahl, Simulationen je Entscheidung, Laufzeit und den Hash des Endbretts. Spalten und Herkunft beschreibt
+[`../stufe-2-20261126/README.md`](../stufe-2-20261126/README.md); sie sind dort und hier gleich. Nachgezählt am
+27.11.2026: Siege, Farben, Partielängen und Simulationen ergeben die Werte des Berichts, die Lauf-IDs passen zu
+`laeufe.csv`. Die Tabelle, die §17.7 vorgeschlagen hat, liegt damit vor; sie kommt nicht aus dem Log des
+Berichtswerkzeugs, sondern aus den Artefakten selbst.
+
+Die vollständigen Artefakte (JSON, Rohdump mit Zugereignissen, Log) löscht GitHub am **23.02.2027**; aus einer
+Sitzung sind sie nicht erreichbar (`docs/eval-streuung-vorabfestlegung.md` §14.4). Sie liegen zusätzlich außerhalb des
+Repos in den ZIP-Sicherungen aus §18 der Festlegung. Mit den Prüfsummen in `laeufe.csv` lässt sich jede Kopie prüfen.
 
 **Nachrechnen** (in Actions, Werkzeug auf `main`; die Werkzeugdateien sind gleich wie an `98aa1ad`): den Workflow
 „Skalierung-Bericht“ mit `stufe` 1, `commit` `98aa1ad586c9de23f64ca76c26af1d7b199b7b3a`, `n` 2600 und den 30 Run-IDs
