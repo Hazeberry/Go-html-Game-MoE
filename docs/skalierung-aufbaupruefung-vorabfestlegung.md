@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0 -->
 # Aufbauprüfung zu K3 nach §5.3
 
-**Stand: 27.11.2026. Status: festgelegt, nichts gelaufen.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
+**Stand: 27.11.2026. Status: Teil 1c gültig, kein Aufbaufehler gefunden (§5). Teil 1b: kein Hinweis auf Suchzustand, der von einem Arm zum anderen gelangt (§6). Teil 3 offen.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
 Hazeberry liest es vor dem Merge. Jeder Lauf in Actions braucht ein eigenes Go; der Merge dieses Docs ist keins.
 
 Festlegung nach Kenntnis des K3-Ergebnisses ([`skalierung-heute-vorabfestlegung.md`](skalierung-heute-vorabfestlegung.md)
@@ -146,3 +146,87 @@ schließen falsche Übergabe von `mctsFixedSims`, falsche Zuordnung von Farbe un
 soweit die Liste aus 1b vollständig ist; einen Fehler, der nur bei ungleichen Budgets und ohne solchen Zustand wirkt,
 schließen sie nicht aus. Die Phasenanalyse dient der Hypothesenbildung. Änderungen an der Spiel-Engine sind kein
 Bestandteil dieser Prüfung.
+
+## 5. Nachtrag: Teil 1c vom 27.11.2026
+
+**Gültig. Kein Aufbaufehler gefunden.** Workflow `k3-uebergabe.yml`, Lauf 46002282339, auf `main` (`d3a5767`,
+Werkzeug aus #392), gestartet nach Hazeberrys Go um 12:52 UTC, Dauer rund 3 Minuten. Bericht im Wortlaut:
+[`k3-uebergabe.md`](daten/skalierung-heute/aufbaupruefung-20261127/k3-uebergabe.md).
+
+| Arm | Farbe | Soll | Partien | Entscheidungen | Steinzüge | davon genau Soll | Abweichungen | Pässe | Pässe mit Meldung |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| A | Schwarz | 2600 | 615 | 115 483 | 109 042 | 109 042 | 0 | 6 441 | 0 |
+| A | Weiß | 2600 | 615 | 114 130 | 107 537 | 107 537 | 0 | 6 593 | 0 |
+| B | Schwarz | 5200 | 615 | 114 437 | 106 942 | 106 942 | 0 | 7 495 | 0 |
+| B | Weiß | 5200 | 615 | 115 163 | 107 157 | 107 157 | 0 | 8 006 | 0 |
+
+Alle 123 Prüfsummen stimmen mit GitHub und mit `laeufe.csv`; Konfiguration in allen 123 Läufen wie festgelegt;
+`params_hash` in allen 1230 Partien gleich; Commit und Engine-Blöcke wie am Messcommit. Die 459 213 Entscheidungen
+ergeben im Mittel 373,3 je Partie, wie im K3-Bericht.
+
+**Was das belegt:** Alle 430 678 Steinzüge suchten mit genau der Simulationszahl ihres Arms, in beiden Farben. Farbe
+von A, Arm je Farbe, Siegerfarbe und die Zählung im JSON stimmen. Eine falsche Übergabe von `mctsFixedSims` und
+vertauschte Arme erklären das K3-Ergebnis nicht.
+
+**Was es nicht belegt:** gemeinsamen Zustand beider Arme im selben Prozess (Teil 1b) und ein Verhalten der Engine,
+das nur bei größerem Budget auftritt. Das K3-Ergebnis bleibt offen.
+
+**Beschreibend, ohne Deutung:** B passt häufiger als A, in beiden Farben: A 13 034 Pässe in 229 613 Entscheidungen
+(5,7 %, 10,6 je Partie), B 15 501 in 229 600 (6,8 %, 12,6 je Partie). Ob das mit den Niederlagen von B zusammenhängt,
+ist eine Hypothese für Teil 3.
+
+## 6. Nachtrag: Teil 1b vom 27.11.2026
+
+**Die Durchsicht am Messcommit ergab keinen Hinweis darauf, dass Suchzustand von einem Arm zum anderen gelangt.**
+Kein Eintrag in Klasse 4. Das ist ein Befund aus dem Lesen des Codes, kein Beweis: Ein Weg, den die Durchsicht
+übersehen hat, bliebe möglich. Durchsicht der Blöcke `shared-go-logic`, `worker-ai` und `policy-net` am Messcommit
+`98aa1ad`, aus dem Code, ohne Lauf. Erfasst sind alle Deklarationen auf oberster Ebene mit `let` und `var`, alle
+`const` mit veränderlichem Inhalt (Typed Arrays, Objekte, Arrays, Sets) und die beiden globalen Objekte `PARAMS`
+und `policyNet`. Zeilen beziehen sich auf `index.html` am Messcommit.
+
+**Klasse 1, vor Gebrauch in jedem Zug neu gesetzt oder ungültig gemacht:**
+
+- *Arbeitsspeicher mit Epochenstempel:* `_ffVisited`/`_ffEpoch`, `_bnChainId`, `_bnRegionId`, `_bnChainMark`,
+  `_bnAlive`, `_bnDead`, `_bnBornDead`/`_bnEpoch`, `_areaVisited`/`_areaEpoch`, `_tbBesucht`/`_tbStempel`,
+  `_evalBoardSeen`/`_evalSeenEpoch`. Jeder Lesezugriff auf die Benson-Stempel vergleicht mit der Epoche, die ein
+  `bensonClassify` in derselben Funktion zurückgibt (Z. 627, 735, 4165, 4834, 5134, 5280); ein Stempel aus einem
+  früheren Zug passt nie.
+- *Puffer, die vor Gebrauch überschrieben werden:* `_groupQueue`, `_rdgChecked`, `_bnAdjTmp`, `_legalScratch`,
+  `_evalScratch`, `_quickScratch`, `_rolloutScratch`, `_simScratch`, `_tsumegoScratch`, `_mctsScratch`, `_infA`,
+  `_infB`, `_tbEbenen`, `_tbBrett`, `_tbAkt`, `_tbListe`, `_tbWert`, `_lsWurzel`, `_lsNb`, `_geA`, `_geB`,
+  `_gzScratch`, `_raumK3`, `_raumBrett`, `_raA`, `_raB`, `_raInKette`, `_raGesehen`, `_raScratch`, `_krisenFlag`,
+  `_krisenGesehen`, `_vzScratch`, `_puBrett`, `_puProbe`, `_ggScratch`, `_enPuffer`.
+- *Caches an der Wurzel:* `_areaCache…` wird in jedem Zug an der Wurzel gefüllt (Z. 5325) und vor der Suche
+  ungültig (Z. 5421); `_tbBilanz`/`_tbValid` ebenso (Z. 5327, ungültig Z. 5434 oder 5468), `_lsBasis…` mit
+  (Z. 3465); `_infMap`/`_infValid` nur bei `influenceInvade`/`influenceOwn` > 0, beide 0, also nie gefüllt;
+  `_raumValid`/`_raumKetten` nur bei `raumGewicht`/`raumZug` > 0, beide 0, und dann in jedem Zug neu (Z. 5328);
+  `_crisisOwn`/`_crisisOpp` leert `buildCrisisMap` vor jedem Füllen (Z. 3702).
+- *Je Aufruf gesetzt:* `_lastMoveIdx` (Z. 5269, aus dem Argument), `_kandOrakel`/`_kandProt`, `_mctsNonFinite`.
+- *PARAMS:* setzt der Harness vor jedem Zug vollständig aus `PARAMS_DEFAULT` und dem Arm (`ab-harness.js:1104`);
+  `PARAMS_DEFAULT` ist eingefroren.
+- *Unverändert nach dem Laden:* `NEIGHBORS`, `ZOBRIST_LO`/`_HI`, `HOSHI_…`, die Tabellen (`MUSTER_TABELLE`,
+  `RAUM_RISIKO`, `OPEN_LINIE`, `MID_LINIE`, `PHASE_SPAN`, `GEBIET_FREIHEIT`, `STERBE_RAMPE`, `_MU_…`),
+  `ENDSPIEL_NETZ`/`_enNetz`, `_emptyHashes` (nur gelesen), `_lebensUrteil` (bleibt null; gesetzt nur über
+  `setzeLebensurteil`, das der Harness nicht aufruft).
+- *policyNet:* Gewichte unverändert (kein Training im Lauf), `gamesPlayed` 0, also `blendWeight` 0: die Priors
+  werden je Zug neu gerechnet, gehen aber nicht in die Zugwahl ein (Z. 5400ff.).
+
+**Klasse 2, Zähler und Wächter ohne Wirkung auf die Zugwahl:** `_bodenGriff`, `_letzterFaktor`/`_letztesArgument`,
+`_atari…`, `_druck…`, `_augen…`, `_sunk…`, `_deckel…`, `_tr…`, `_raumGriff`, `_wurzelSuchen`/`…Wieder`/
+`…Uebernommen`/`…Verworfen`, `_aufgabeQRufe`/`…GebietBlock`/`…MaxLuecke`, `_zeit`.
+
+**Klasse 3, je Farbe getrennt:** `_mctsSavedRoot`, `_hopelessStreak`, `_allDeadStreak`, `_lastMsPerSim` und
+`_krisenDauer` tauscht der Harness je Farbe und Partie (`ab-harness.js:1124–1136`, zurück ab `:1205`);
+`_enEigen` führt die Engine selbst je Farbe und liest es nur, wenn der eigene Zug genau zwei Züge zurückliegt
+(Z. 5192), also nie über eine Partiegrenze.
+
+**Klasse 4:** kein Eintrag.
+
+**Nicht Zustand der Suche, aber geteilt:** der Zufallsstrom. Beide Arme ziehen aus demselben seedabhängigen Strom
+(`ab-harness.js:833`), und wie viel ein Zug verbraucht, hängt an der Suche. Das ist so gebaut und trägt keine
+Suchergebnisse von einem Arm zum anderen; dass ein Arm dadurch systematisch bevorzugt wird, ist nicht zu erkennen.
+
+**Umfang:** Teil 1c schließt an den Daten aus, dass `mctsFixedSims` falsch übergeben wurde oder die Arme vertauscht
+sind. Teil 1b ergab keinen Hinweis darauf, dass Suchzustand von einem Arm zum anderen gelangt; gemessen ist das nicht.
+Nicht ausgeschlossen ist ein Verhalten der Engine, das erst bei größerem Budget auftritt. Damit ist das K3-Ergebnis nach §5.3 nicht als Aufbaufehler gekennzeichnet; die
+Deutung bleibt offen und ist Gegenstand von Teil 3.
