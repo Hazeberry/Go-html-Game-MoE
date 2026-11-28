@@ -5,7 +5,9 @@ diesem Repo? Workflow `engine-vergleich.yml`, [Lauf 46158521878](https://github.
 auf `main` (`950c504`), gestartet nach Hazeberrys Go am 28.11.2026 um 15:11 UTC, Dauer rund 2 Minuten.
 
 **Ergebnis: GLEICH.** 26 Läufe, 1328 KI-Abfragen, alle mit Wurzelkindern; gewählter Zug, Wurzelkinder, Priors je
-Wurzelkind und Protokollfelder identisch.
+Wurzelkind und Protokollfelder identisch. Die 26 Replays sind zwei Referenzläufe (Arm „-“, je Partie einer) und 24
+Varianten des Kandidaten-Orakels (Arme A, S, ZS, Ränge 5, 16, 17, 30, je Partie). Jedes Replay endet bei der ersten
+Abweichung vom Archivzug, spätestens bei Zug 130.
 
 | Datei | Inhalt |
 |---|---|

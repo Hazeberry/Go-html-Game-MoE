@@ -30,11 +30,15 @@ Workflow `engine-vergleich.yml`, Lauf 46158521878, am 28.11.2026: codex `0ab23b9
 Priors und Protokollfelder identisch, Abdeckung erfüllt. Bericht, Eingaben und Herkunft:
 [`daten/engine-vergleich-codex-20261128/`](daten/engine-vergleich-codex-20261128/README.md).
 
+Auf den geprüften Stellungen der beiden Archivpartien lieferten die beiden Engine-Stände bei denselben Einstellungen
+identische Züge, Wurzelkinder und Priors. Die 26 Replays umfassten zwei Referenzläufe und 24 Varianten des
+Kandidaten-Orakels (A, S, ZS). Jedes Replay endete bei der ersten Abweichung vom Archivzug, spätestens bei Zug 130.
+
 ## 4. Grenzen
 
-- Geprüft sind zwei Archivpartien bis Zug 130 mit Standardparametern. Spätere Spielphasen und andere Einstellungen
-  deckt der Vergleich nicht ab.
+- Geprüft sind die Stellungen, die die Replays der beiden Archivpartien bis zur ersten Abweichung vom Archivzug,
+  spätestens bis Zug 130, erreichen, mit Standardparametern. Spätere Spielphasen, weitere Stellungen und andere
+  Einstellungen deckt der Vergleich nicht ab.
 - Der H/R-Eingriff selbst (`extra.priorOhneOrakel`) ist nicht verglichen; er gibt es hier nicht.
-- Daraus folgt, dass der Arm A des H/R-Laufs bei Standardwerten wie die Engine hier entscheidet. Dass H und R hier
-  dasselbe bewirken wie in codex, ist eine Hypothese; gemessen wäre es erst mit einem eigenen Lauf, der eine
-  Vorabfestlegung und ein Go braucht.
+- Ob die Prior-Anhebung H oder R im Spiel-Repo dieselbe Wirkung hätte wie in codex, bleibt offen. Gemessen wäre es erst
+  mit einem eigenen Lauf, der eine Vorabfestlegung und ein Go braucht.
