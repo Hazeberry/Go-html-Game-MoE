@@ -16,6 +16,7 @@ Stand 12.11.2026, `main` dieses Repos bei `a229458` (Merge von #297; davor `0887
 | Thema | Repo | Fundstelle |
 |---|---|---|
 | Prior-Anhebung ohne Orakel, H/R-Hauptlauf (Vorbereitung) | codex | `HANDOFF.md`, `docs/prior-anhebung-ohne-orakel.md` |
+| Engine-Vergleich codex `0ab23b9` gegen dieses Repo (GLEICH bei Standardwerten): Messung vom 28.11.2026 | dieses Repo | `docs/engine-vergleich-codex.md`, `docs/daten/engine-vergleich-codex-20261128/` |
 | Diagnose Laufzeit und GNU-Go-Absturz | codex | `HANDOFF.md`, `docs/diagnose-laufzeit-absturz.md` |
 | Einzelfall-Diagnosen: Aufgabe nach Zug 113, `deathTransfer`, Gefangenenwert und Rollouts, Gefangenendeckel-Fortsetzungen | codex | `HANDOFF.md`; `docs/untersuchung-aufgabe-113.md`, `docs/death-transfer-diagnose.md`, `docs/gefangene-rollout-aufgabe.md`, `docs/gefangenendeckel-fortsetzungen.md` |
 | Bughunts: neun Prüfaufträge (UI, TRAIN, NET, GTP) und deren Verifikation (PR #20) | codex | `HANDOFF.md`; `docs/bughunt-verifikation.md`, `docs/bughunt-browser.md` auf dem Branch `claude/bughunt-verifikation` (Merge-Stand von PR #20 nicht geprüft) |
