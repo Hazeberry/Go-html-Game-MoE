@@ -595,11 +595,7 @@ function bensonClassify(board) {
    einem), die lebende Randsteine entfernte und jeden Punkt eines
    Zwei-Punkte-Auges als eigenes Auge zählte (docs/zaehlung.md).
    Seki erkennt die Regel nicht: Von zwei Gruppen ohne zwei Augen, die
-   sich Freiheiten teilen, stirbt die schwächere.
-   diagAuge (Standard aus, PARAMS.diagonalAugeEnde, docs/diagonalpruefung-vorabfestlegung.md):
-   Aus ist das Verhalten bit-gleich zu vorher. An zählt ein Ein-Punkt-Auge nur,
-   wenn _diagIsTrueEye es bestätigt (falsche Augen zählen nicht). Regionen mit
-   zwei oder mehr Punkten bleiben unverändert. */
+   sich Freiheiten teilen, stirbt die schwächere. */
 const AUGE_GROSS = 6, OFFEN_GROSS = 40;
 /* Ein Auge mit 4 oder 5 Punkten teilt der Besitzer in zwei, auch wenn der
    Gegner zuerst hineinsetzt -- außer bei den Nakade-Formen: Quadrat und
@@ -622,7 +618,7 @@ function augeTeilbar(punkte) {
   }
   return true;
 }
-function toteSteineAmEnde(board, augeGross = AUGE_GROSS, offenGross = OFFEN_GROSS, diagAuge = false) {
+function toteSteineAmEnde(board, augeGross = AUGE_GROSS, offenGross = OFFEN_GROSS) {
   const N = BOARD_SIZE, tot = new Uint8Array(N);
   const ep = bensonClassify(board);
   for (let i = 0; i < N; i++) if (board[i] && _bnDead[i] === ep) tot[i] = 1;
@@ -687,7 +683,6 @@ function toteSteineAmEnde(board, augeGross = AUGE_GROSS, offenGross = OFFEN_GROS
     for (const r of regionen) {
       if ((r.rand !== 1 && r.rand !== 2) || r.kette < 0) continue;
       const V = verb.get(wurzel(r.kette));
-      if (diagAuge && r.groesse === 1 && !_diagIsTrueEye(b, r.punkte[0], r.rand)) continue;
       V.augen++; if (r.groesse >= augeGross || (r.eineKette && r.leer && augeTeilbar(r.punkte))) V.gross = true;
     }
     let schwach = null;
@@ -728,9 +723,7 @@ function zaehlVorschau(board, komi = 7.5, opt = {}) {
   /* Wertung: 'flaeche' (Standard, Area) oder 'territory' (Gefangene + umschlossene
      freie Punkte, wie finalTerritoryScore). opt.gefangen = bisher geschlagene
      Steine {1, 2}; die als tot angenommenen Steine kommen wie bei der
-     Schlusszählung (resolveLifeAndDeath) als Gefangene des Gegners dazu.
-     opt.diagonalAuge (Standard aus): Diagonalprüfung bei Ein-Punkt-Augen, siehe
-     toteSteineAmEnde. */
+     Schlusszählung (resolveLifeAndDeath) als Gefangene des Gegners dazu. */
   const territory = opt.modus === 'territory', gefBisher = opt.gefangen || {1: 0, 2: 0};
   const ep = bensonClassify(board);
   const bewiesenTot = new Uint8Array(N), bewiesenLebend = new Uint8Array(N);
@@ -739,7 +732,7 @@ function zaehlVorschau(board, komi = 7.5, opt = {}) {
     if (_bnDead[i] === ep) bewiesenTot[i] = 1;
     else if (_bnAlive[i] === ep) bewiesenLebend[i] = 1;
   }
-  const tot = toteSteineAmEnde(board, undefined, undefined, !!opt.diagonalAuge);
+  const tot = toteSteineAmEnde(board);
   const geschaetztTot = new Uint8Array(N), unbewiesen = new Uint8Array(N);
   for (let i = 0; i < N; i++) {
     if (!board[i]) continue;
@@ -789,12 +782,6 @@ globalThis.PARAMS = {
   openingMoves:      20,
   endgameMoves:      80,   /* gemessen gegen 150: 150 gewinnt 31,4 % (docs/endspielgrenze.md) */
   endgameEmpty:      50,
-  /* Bewertung, alle Phasen */
-  evalStreuung:    1.00,   // Faktor auf den Rauschterm der vier Bewertungsexperten
-                           // (evalOpening/Midgame/Endgame/Tsumego). 1 = heutiges
-                           // Verhalten, 0 = kein Rauschen. Zweck des Rauschens ist
-                           // Zugstreuung (Z. 1238); was es an Stärke kostet, misst
-                           // docs/eval-streuung-vorabfestlegung.md.
   /* Eröffnung */
   openEdge3:         40,
   /* Feinabstufung INNERHALB des openEdge3-Bands. Der Name sagt „dritte
@@ -2920,13 +2907,6 @@ globalThis.PARAMS = {
   passMarge:       20,    /* Punkte Vorsprung, auch im ungünstigeren der beiden Stände */
   passSpanne:      2,     /* höchstens so weit dürfen „mit Annahmen“ und „nur Bewiesenes“ auseinanderliegen */
   passGemischt:    0.25,  /* höchstens so viel Anteil freier Punkte in gemischten Regionen */
-  /* Diagonalprüfung bei Ein-Punkt-Augen in der Zählung (toteSteineAmEnde, docs/diagonalpruefung-vorabfestlegung.md).
-     AUS (0): das Verhalten ist dann bit-gleich zu vorher. Bei 1 zählt in der Schlusszählung und in der Zählvorschau ein
-     Ein-Punkt-Auge nur, wenn _diagIsTrueEye es bestätigt. Versuchsschalter, kein Nachweis, dass 1 besser ist. */
-  diagonalAugeEnde: 0,
-  /* Dieselbe Diagonalprüfung NUR in der Schlusszählung (resolveLifeAndDeath, docs/diagonal-schluss-vorabfestlegung.md): nicht in der
-     Zählvorschau, nicht im Worker, nicht in der KI. AUS (0): bit-gleich zu vorher. diagonalAugeEnde = 1 schaltet weiterhin beides. */
-  diagonalAugeSchluss: 0,
   resignMinMoves: 60,
   /* Strukturelle Aufgabe: so viele Züge in Folge, in denen JEDER legale Zug
      todgeboren wäre. Anders als resignQ ist das bewiesen, nicht geschätzt —
@@ -3140,7 +3120,7 @@ function evalOpening(board, i, color, mc) {
       if (trifft) s += PARAMS.openContactResponse;
     }
   }
-  return s + Math.random() * 3 * PARAMS.evalStreuung;
+  return s + Math.random() * 3;
 }
 
 /* Gewichtung der Gruppenfreiheiten für evalMidgame. Zwei Regler, beide
@@ -3258,7 +3238,7 @@ function evalMidgame(board, i, color, mc) {
   }
   for (const n of NEIGHBORS[i])
     if (_evalScratch[n] === opp && countLiberties(_evalScratch, n, 2) === 1) s += PARAMS.midOppAtariNear;
-  return s + Math.random() * 4 * PARAMS.evalStreuung;
+  return s + Math.random() * 4;
 }
 
 const _areaVisited = new Int32Array(BOARD_SIZE);
@@ -3692,7 +3672,7 @@ function evalEndgame(board, i, color, mc) {
     const d = (tbBilanzNach(lsAktiv() ? lsNach(_evalScratch, i, color) : _evalScratch) - (lsAktiv() ? lsBasis(color) : _tbBilanz)) * (color === 1 ? 1 : -1);
     s += PARAMS.endTieBreak * Math.max(-1, Math.min(1, d / 20));
   }
-  return s + Math.random() * 0.5 * PARAMS.evalStreuung;
+  return s + Math.random() * 0.5;
 }
 
 const _crisisOwn = new Uint8Array(BOARD_SIZE);
@@ -3905,7 +3885,7 @@ function evalTsumego(board, i, color, mc) {
     if (dauer > _sunkMaxDauer) _sunkMaxDauer = dauer;
     if (dauer >= PARAMS.tsumegoSunkStreak) { s -= PARAMS.tsumegoSunkCost; _sunkGriff++; }
   }
-  return s * safetyMul + Math.random() * 3 * PARAMS.evalStreuung;
+  return s * safetyMul + Math.random() * 3;
 }
 
 /* ═══ MoE Soft-Gating ════════════════════════════════════════
@@ -4543,7 +4523,112 @@ function _mctsKidsOrakelKern(list, K, o) {
   return kids;
 }
 function _mctsWurzelKinder(list) {
-  return _kandOrakel ? _mctsKidsOrakel(list, PARAMS.mctsRootChildren, _kandOrakel) : _mctsKids(list, PARAMS.mctsRootChildren);
+  const kids = _kandOrakel ? _mctsKidsOrakel(list, PARAMS.mctsRootChildren, _kandOrakel) : _mctsKids(list, PARAMS.mctsRootChildren);
+  if (_priorKontext) {
+    const k = _priorKontext;
+    const werte = k.mc >= 80 && kids.length >= 2 ? _priorQuickWerte(k.board, k.color, kids) : null;
+    Object.assign(_priorProt, _priorAnwenden(kids, werte, k));
+    _priorProt.neu = true;
+  }
+  return kids;
+}
+
+/* Messpfad für docs/prior-anhebung-ohne-orakel.md. Ausschließlich über extra;
+   kein PARAMS-Schalter und keine Oberfläche. Bei fehlendem Kontext keine Bewertung,
+   kein zusätzlicher Zufall und keine Änderung eines Kindes. */
+let _priorKontext = null, _priorProt = null;
+function lesePriorOhneOrakel() { return _priorProt; }
+function _priorOptionen(o, mc) {
+  if (!o || !['A', 'H', 'R'].includes(o.arm) || !['g', 'f'].includes(o.gegner)
+      || !Number.isSafeInteger(o.seed) || o.seed < 0 || !Number.isSafeInteger(o.nr) || o.nr < 1
+      || !Number.isSafeInteger(mc) || mc < 0) throw new Error('priorOhneOrakel: ungültiger Messkontext');
+  return {arm: o.arm, seed: o.seed, gegner: o.gegner, nr: o.nr, mc};
+}
+function _priorSeed(o) {
+  const s = `prior-ohne-orakel-v1|${o.seed}|${o.gegner}|${o.nr}|${o.mc}`;
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0;
+  return h;
+}
+function _priorMulberry(seed) {
+  let s = seed >>> 0;
+  return () => { s |= 0; s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function _priorZieheIndex(n, zufall) {
+  if (!Number.isInteger(n) || n < 1) throw new Error('priorOhneOrakel: leere Zufallsauswahl');
+  const grenze = Math.floor(4294967296 / n) * n;
+  let u, verworfen = 0;
+  do { u = Math.floor(zufall() * 4294967296); if (u >= grenze) verworfen++; } while (u >= grenze);
+  return {index: u % n, verworfen};
+}
+function _priorArbeitsstand() {
+  return {epoch: _ffEpoch, besucht: _ffVisited.slice(), geprueft: _rdgChecked.slice(),
+          queue: _groupQueue.slice(), scratch: _quickScratch.slice()};
+}
+function _priorQuickWerte(board, color, kids) {
+  const alt = _priorArbeitsstand(), zufall = Math.random;
+  try {
+    /* quickEval hat nur für Gleichstände Math.random()*5. Die Messregel nutzt
+       den unveränderten Heuristikwert mit Rauschanteil null und Brettindex-Tie-Break.
+       Der Suchstrom und auch die Arbeitsfelder bei Epochenüberlauf bleiben erhalten. */
+    Math.random = () => 0;
+    return kids.map(k => quickEval(board, k.idx, color));
+  } finally {
+    Math.random = zufall;
+    _ffEpoch = alt.epoch; _ffVisited.set(alt.besucht); _rdgChecked.set(alt.geprueft);
+    _groupQueue.set(alt.queue); _quickScratch.set(alt.scratch);
+  }
+}
+function _priorAnwenden(kids, werte, o) {
+  const p = {grund: 'vor-zug81', gelegenheit: false, angehoben: false,
+    auswahl: null, ziel: null, rSeed: null, verworfen: 0, fehler: [],
+    kinder: kids.map((k, i) => ({idx: k.idx, pVor: k.P, pNach: k.P,
+                               wert: werte ? werte[i] : null, n: null, w: null}))};
+  const P = kids.map(k => k.P), summe = P.reduce((s, v) => s + v, 0);
+  if (P.some(v => !Number.isFinite(v) || v < 0) || (kids.length && Math.abs(summe - 1) > 1e-9))
+    p.fehler.push('ungültige Basispriors');
+  if (new Set(kids.map(k => k.idx)).size !== kids.length
+      || kids.some(k => !Number.isInteger(k.idx) || k.idx < 0 || k.idx >= BOARD_SIZE)) p.fehler.push('ungültige Kinder');
+  p.summe = summe;
+  if (p.fehler.length) { p.grund = 'fehler'; return p; }
+  if (o.mc < 80) return p;
+  if (kids.length < 2) { p.grund = 'weniger-als-zwei'; return p; }
+  if (!Array.isArray(werte) || werte.length !== kids.length || werte.some(v => !Number.isFinite(v))) {
+    p.grund = 'fehler'; p.fehler.push('nicht endliche Auswahlwerte'); return p;
+  }
+  let c = 0;
+  for (let i = 1; i < kids.length; i++)
+    if (werte[i] > werte[c] || (werte[i] === werte[c] && kids[i].idx < kids[c].idx)) c = i;
+  p.auswahl = kids[c].idx;
+  if (!_kandMax(P, c).ok) { p.grund = 'auswahl-schon-maximal'; return p; }
+  p.grund = 'gelegenheit'; p.gelegenheit = true;
+  if (o.arm === 'A') return p;
+  if (o.arm === 'R') {
+    const max = Math.max(...P);
+    const moeglich = kids.map((k, i) => i).filter(i => P[i] < max).sort((i, j) => kids[i].idx - kids[j].idx);
+    p.rSeed = _priorSeed(o);
+    const z = _priorZieheIndex(moeglich.length, _priorMulberry(p.rSeed));
+    p.verworfen = z.verworfen; c = moeglich[z.index];
+  }
+  const Q = _kandAnheben(P, c);
+  for (let i = 0; i < kids.length; i++) { kids[i].P = Q[i]; p.kinder[i].pNach = Q[i]; }
+  p.ziel = kids[c].idx; p.angehoben = true; p.summe = Q.reduce((s, v) => s + v, 0);
+  if (Q.some(v => !Number.isFinite(v) || v < 0) || Math.abs(p.summe - 1) > 1e-9) p.fehler.push('ungültige Ergebnispriors');
+  return p;
+}
+function _priorBesuche(root) {
+  if (!_priorKontext) return;
+  if (!_priorProt.neu) {
+    _priorProt.grund = 'wurzel-uebernommen';
+    _priorProt.kinder = root.kids.map(k => ({idx: k.idx, pVor: k.P, pNach: k.P, wert: null, n: null, w: null}));
+    _priorProt.summe = root.kids.reduce((s, k) => s + k.P, 0);
+  }
+  for (const k of _priorProt.kinder || []) {
+    const kind = root.kids.find(x => x.idx === k.idx);
+    if (kind) { k.n = kind.N; k.w = kind.W; }
+  }
 }
 function _kandBesuche(root, bm) {
   const p = _kandProt, N = i => { const k = root.kids.find(k => k.idx === i); return k ? k.N : null; };
@@ -4602,6 +4687,7 @@ function _tryReuseSubtree(savedBoard, aiColor, savedNode, currentBoard) {
 }
 
 function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
+  if (_priorKontext) _priorProt.suche = true;
   const _simStart = Date.now();
   _zeit.simStart = _simStart;
   _mctsNonFinite = 0;
@@ -4664,6 +4750,7 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
   _wurzelSuchen++;
   if (root) {
     _wurzelWieder++;
+    if (_priorKontext) _priorProt.wieder = true;
     if (PARAMS.wurzelFrisch >= 1) root = _frischeWurzel(root, rootScored);
   }
   if (!root) root = {N: 0, W: 0, kids: _mctsWurzelKinder(rootScored)};
@@ -4776,6 +4863,7 @@ function mctsPUCT(board, aiColor, captures, rootScored, koPoint) {
   let bm = root.kids[0], bn = -1;
   for (const k of root.kids) if (k.N > bn) { bn = k.N; bm = k; }
   if (_kandProt) _kandBesuche(root, bm);
+  if (_priorKontext) _priorBesuche(root);
 
   /* Feedback für den nächsten Zug: tatsächliche ms/Sim messen, unabhängig
      davon was die Kosten verursacht hat (Randkampf, große Gruppen, egal). */
@@ -5231,7 +5319,7 @@ function zeitenLesen() {
 function passNachGegnerpassPruefung(board, aiColor, captures, extra) {
   if (!(PARAMS.passNachGegnerpass >= 1) || !extra || !extra.gegnerPasste) return null;
   const wertung = extra.wertung === 'territory' ? 'territory' : 'flaeche';
-  const v = zaehlVorschau(board, extra.komi === undefined ? 7.5 : extra.komi, {modus: wertung, gefangen: captures, diagonalAuge: PARAMS.diagonalAugeEnde >= 1});
+  const v = zaehlVorschau(board, extra.komi === undefined ? 7.5 : extra.komi, {modus: wertung, gefangen: captures});
   const sicht = aiColor === 1 ? 1 : -1;
   const mit = sicht * v.mitSchaetzung.stand, nur = sicht * v.nurBewiesen.stand;
   const spanne = Math.abs(mit - nur), gemischt = v.nurBewiesen.gemischtAnteil;
@@ -5252,17 +5340,33 @@ function getAIMove(board, aiColor, histHashes, captures, mc, diff, reqId, koPoin
   const vp = diff === 'hard' ? passNachGegnerpassPruefung(board, aiColor, captures, extra) : null;
   _kandProt = null;
   _kandOrakel = (diff === 'hard' && extra && extra.kandidatenOrakel) ? extra.kandidatenOrakel : null;   /* Messmittel, docs/kandidaten-orakel.md */
-  if (vp && vp.pass) {
-    r = {type: 'pass', requestId: reqId,
-         info: `Pass — Gegner hat gepasst, Vorsprung ${vp.mit.toFixed(1)}/${vp.nur.toFixed(1)} (Versuchsregel)`};
-  } else {
-    r = _getAIMoveKern(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove);
-  }
-  if (vp) r.versuch = vp;
-  _kandOrakel = null;
-  _zeit.tEnde = Date.now();
-  endspielNetzMerke(aiColor, r && r.type === 'stone' ? r.y * 19 + r.x : -1, mc);
-  return r;
+  _priorKontext = null; _priorProt = null;
+  try {
+    if (diff === 'hard' && extra && extra.priorOhneOrakel) {
+      if (_kandOrakel) throw new Error('priorOhneOrakel und kandidatenOrakel schließen sich aus');
+      const o = _priorOptionen(extra.priorOhneOrakel, mc);
+      _priorKontext = {...o, board, color: aiColor};
+      _priorProt = {...o, version: 1, farbe: aiColor === 1 ? 'S' : 'W', hash: computeZobrist(board),
+        fenster: mc >= 80, suche: false, neu: false, wieder: false, grund: 'keine-suche',
+        gelegenheit: false, angehoben: false, auswahl: null, ziel: null, rSeed: null,
+        verworfen: 0, kinder: null, summe: null, fehler: [], gespielt: null};
+    }
+    if (vp && vp.pass) {
+      r = {type: 'pass', requestId: reqId,
+           info: `Pass — Gegner hat gepasst, Vorsprung ${vp.mit.toFixed(1)}/${vp.nur.toFixed(1)} (Versuchsregel)`};
+    } else {
+      r = _getAIMoveKern(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove);
+    }
+    if (vp) r.versuch = vp;
+    if (_priorProt) {
+      _priorProt.gespielt = r.type === 'stone' ? r.y * 19 + r.x : r.type === 'resign' ? -2 : -1;
+      if (!_priorProt.suche && r.type === 'pass') _priorProt.grund = 'pass-vor-suche';
+    }
+    _kandOrakel = null;
+    _zeit.tEnde = Date.now();
+    endspielNetzMerke(aiColor, r && r.type === 'stone' ? r.y * 19 + r.x : -1, mc);
+    return r;
+  } finally { _priorKontext = null; _kandOrakel = null; }
 }
 
 function _getAIMoveKern(board, aiColor, histHashes, captures, mc, diff, reqId, koPoint, lastMove) {
@@ -5659,9 +5763,8 @@ const state = {
      reicht nicht (Ko, Gefangene, Superko-Historie gehen verloren). */
   aiDiag: [], lastAIRequest: null, aiReqT0: 0, aiReqBudget: 0,
   workerDeadReason: null,
-  workerNeustarts: 0,   /* Worker neu gestartet, weil während der Rechnung eine neue Anfrage kam (W-1) */
   aiEnabled: false, aiColor: 2, aiDifficulty: 'easy',
-  aiThinking: false, aiRequestId: 0, aiWorker: null, aiWorkerCtx: null, deadStones: new Set(), deadFarben: new Map(), undoStack: [],
+  aiThinking: false, aiRequestId: 0, aiWorker: null, aiWorkerCtx: null, deadStones: new Set(), undoStack: [],
   vorschau: null   /* Zählvorschau: {schluessel, v}; nur Anzeige, nie Teil des Spiels */
 };
 
@@ -5676,7 +5779,8 @@ function saveUndoState() {
     captures: {...state.captures}, currentHash: state.currentHash,
     consecutivePasses: state.consecutivePasses, moveCount: state.moveCount,
     gameOver: state.gameOver, logLength: state.log.length,
-    deadStones: new Set(state.deadStones), deadFarben: new Map(state.deadFarben), lastMove: state.lastMove,
+    aiDiagLength: state.aiDiag.length,
+    deadStones: new Set(state.deadStones), lastMove: state.lastMove,
     sgfLen: state.sgfMoves.length,
     koPoint: state.koPoint,                 // Fix 7
     hashLen: state.hashListe.length,
@@ -5694,18 +5798,12 @@ function undo() {
   state.board = prev.board; state.currentPlayer = prev.currentPlayer;
   state.captures = prev.captures; state.currentHash = prev.currentHash;
   state.consecutivePasses = prev.consecutivePasses; state.moveCount = prev.moveCount;
-  state.gameOver = prev.gameOver; state.deadStones = prev.deadStones; state.deadFarben = prev.deadFarben;
+  state.gameOver = prev.gameOver; state.deadStones = prev.deadStones;
   state.lastMove = prev.lastMove; pendingTouch = null;
   state.koPoint = prev.koPoint;            // Fix 7
   state.sgfMoves.length = prev.sgfLen;     // SGF-Zugliste mit zurückrollen
   state.log.splice(prev.logLength);
-  /* Die Partie ist beim ersten Abschluss gelernt und bleibt es; was jetzt
-     folgt, geht nicht mehr ins Training (TRAIN-1, Variante a). Die Zeile steht
-     nach JEDEM Undo einer gelernten Partie: undo kürzt das Protokoll auf
-     prev.logLength, und ein nur einmal geschriebener Hinweis wäre beim nächsten
-     Undo wieder weg, obwohl die Festlegung weiter gilt. */
-  if (globalThis.policyNet && policyNet._trained)
-    state.log.push('! Partie ist bereits gelernt — die Fortsetzung geht nicht ins Training.');
+  state.aiDiag.length = prev.aiDiagLength;
   state.hashListe.length = prev.hashLen;
   state.boardHistory = new Set(state.hashListe);
   if (globalThis.policyNet && policyNet._gameBuffer && policyNet._gameBuffer.length > prev.netBufLen)
@@ -5773,12 +5871,6 @@ function pass() {
     state.gameOver = true; state.log.push('— Spiel beendet (2× Pass) —');
     resolveLifeAndDeath(); showFinalScore();
   } else state.currentPlayer = opp;
-  /* Wie placeStone: der Cache muss den neuen Zustand zeigen, sonst bleiben die
-     Marken der Zählvorschau nach einem Pass sichtbar — drawStateToCache ruft
-     selbst vorschauAbgleichen und malt sie nur bei gültiger Vorschau (UI-3).
-     Bei zwei Pässen zeichnet resolveLifeAndDeath schon; der Aufruf hängt allein
-     am Zustand und liefert dasselbe Bild. */
-  drawStateToCache();
   updateUndoButton();
 }
 
@@ -5787,7 +5879,6 @@ function resetGame() {
   cleanupWorker();
   state.workerDead = false;   /* Neues Spiel = neuer Versuch */
   state.workerDeadReason = null;
-  state.workerNeustarts = 0;
   state.vorschau = null; vorschauPanelAktualisieren();
   if (globalThis.policyNet) { policyNet._trained=false; policyNet._gameBuffer=[]; }
   state.aiRequestId++;
@@ -5799,7 +5890,7 @@ function resetGame() {
     koPoint: null,                         // Fix 7
     sgfMoves: [],
     resignedBy: null, finalMargin: null,
-    log: [], aiThinking: false, deadStones: new Set(), deadFarben: new Map(), undoStack: [],
+    log: [], aiThinking: false, deadStones: new Set(), undoStack: [],
     aiDiag: [], lastAIRequest: null, aiReqT0: 0, aiReqBudget: 0
   });
   _hopelessStreak = 0;   /* Hauptthread-Kopien der Aufgabe-Serien zurücksetzen
@@ -5816,15 +5907,10 @@ function resolveLifeAndDeath() {
      lebende Randsteine und zählte jeden Punkt eines Zwei-Punkte-Auges als
      eigenes Auge (docs/zaehlung.md). */
   state.deadStones = new Set();
-  /* Farbe je entferntem Stein, nur für die Anzeige (B-2,
-     docs/korrektur-b1-b3-vorabfestlegung.md): drawStateToCache zeichnet sie
-     blass mit rotem Kreuz, das Brett bleibt an diesen Punkten leer. */
-  state.deadFarben = new Map();
-  const tot = toteSteineAmEnde(state.board, undefined, undefined, PARAMS.diagonalAugeEnde >= 1 || PARAMS.diagonalAugeSchluss >= 1);
+  const tot = toteSteineAmEnde(state.board);
   for (let i = 0; i < BOARD_SIZE; i++) if (tot[i]) state.deadStones.add(i);
   for (const i of state.deadStones) {
     const color = state.board[i];
-    if (color) state.deadFarben.set(i, color);
     state.board[i] = 0;
     if (color) state.captures[color === 1 ? 2 : 1]++;
   }
@@ -5877,7 +5963,7 @@ function finalTerritoryScore() {
   return territory;
 }
 
-function endstandAnzeigen() {
+function showFinalScore() {
   let scoreB, scoreW, winner, diff, label;
   if (state.scoringMode === 'territory') {
     const t = finalTerritoryScore();
@@ -5896,13 +5982,6 @@ function endstandAnzeigen() {
   document.getElementById('final-label').textContent = label;
   document.getElementById('final-score').textContent = state.finalMargin;
   document.getElementById('territory-panel').style.display = 'flex';
-}
-
-/* Spielende: zuerst die Anzeige, dann einmal je Partie das Training. Getrennt,
-   damit ein Wertungswechsel nur die Anzeige neu rechnet (UI-2,
-   docs/korrektur-ui2-ui3-vorabfestlegung.md §4). */
-function showFinalScore() {
-  endstandAnzeigen();
   /* PolicyNet-Training bleibt bewusst auf Area-Scoring — das Netz wurde
      durchgängig darauf kalibriert; ein Wechsel der Anzeige-Wertung soll
      die gelernte Skala nicht verschieben. */
@@ -5936,9 +6015,7 @@ function applyAIResult(result, reqId, netInp, netPriors, netHidden) {
     /* Erst nach dem gelungenen Zug in den Trainingspuffer: placeStone hat
        dabei den Undo-Eintrag mit der Pufferlänge davor angelegt, und ein
        abgelehnter Zug gehört nicht ins Training. */
-    /* Nach dem ersten Abschluss dieser Partie wird nicht mehr gelernt
-       (TRAIN-1, Variante a) — dann auch nicht mehr gesammelt. */
-    if (r.ok && netPriors && globalThis.policyNet && !policyNet._trained) {
+    if (r.ok && netPriors && globalThis.policyNet) {
       policyNet._gameBuffer.push({
         inp: netInp, probs: netPriors, hidden: netHidden,
         moveIdx: idx(result.x, result.y)
@@ -5967,7 +6044,7 @@ function applyAIResult(result, reqId, netInp, netPriors, netHidden) {
        Gefangene, Tote und Protokoll exakt wiederherstellen. */
     const _bSave = cloneBoard(state.board);
     const _cSave = {...state.captures};
-    const _dSave = state.deadStones, _fSave = state.deadFarben;
+    const _dSave = state.deadStones;
     const _logLen = state.log.length;
     /* PolicyNet: Die KI hat aufgegeben, also verloren -- wie die Fläche
        gerade steht, spielt keine Rolle. Vor showFinalScore, das sonst nach
@@ -5976,7 +6053,7 @@ function applyAIResult(result, reqId, netInp, netPriors, netHidden) {
     resolveLifeAndDeath();
     showFinalScore();
     const stand = state.finalMargin;
-    state.board = _bSave; state.captures = _cSave; state.deadStones = _dSave; state.deadFarben = _fSave;
+    state.board = _bSave; state.captures = _cSave; state.deadStones = _dSave;
     state.log.length = _logLen;          /* "tote Steine entfernt" zurücknehmen */
     drawStateToCache();
     const gewinner = state.aiColor === 1 ? 'Weiß' : 'Schwarz';
@@ -6081,11 +6158,6 @@ function passExtra() {
 function fallbackToMainThread(reqId, netInp, netPriors, netHidden) {
   setTimeout(() => {
     if (reqId !== state.aiRequestId) return;
-    /* Der Weg über onerror übergibt die AKTUELLE Kennung, die Prüfung
-       darüber kann dort nie greifen. Ohne das hier rechnet der Hauptthread
-       für eine abgeschaltete KI und setzt ihren Zug (UI-1,
-       docs/korrektur-ui1-vorabfestlegung.md §2). */
-    if (!state.aiEnabled) { state.aiThinking = false; updateAIStatus(); updateUndoButton(); return; }
     let r;
     try {
       r = getAIMove(state.board, state.aiColor,
@@ -6120,17 +6192,14 @@ function erzeugeWorker(art) {
     url = URL.createObjectURL(new Blob([workerSrc], {type: 'application/javascript'}));
   }
   state.aiWorker = new Worker(url);
-  state.aiWorkerCtx = {url, art, antwort: false, laeuft: null, letzteAnfrage: null, netInp: null, netPriors: null, netHidden: null};
+  state.aiWorkerCtx = {url, art, antwort: false, letzteAnfrage: null, netInp: null, netPriors: null, netHidden: null};
   attachWorkerHandlers();
 }
 
 function attachWorkerHandlers() {
   state.aiWorker.onmessage = function(e) {
     const ctx = state.aiWorkerCtx;
-    /* laeuft zuerst zurücksetzen: applyAIResult kann selbst triggerAIMove
-       rufen, und das soll die eben beantwortete Anfrage nicht für laufend
-       halten (docs/korrektur-d1-w1-vorabfestlegung.md §3). */
-    if (ctx) { ctx.antwort = true; ctx.laeuft = null; }   /* der Worker läuft; ein späterer Fehler ist ein echter Absturz */
+    if (ctx) ctx.antwort = true;   /* der Worker läuft; ein späterer Fehler ist ein echter Absturz */
     /* Messwert des Workers in die Hauptthread-Kopie übernehmen — der
        Watchdog in triggerAIMove nutzt getAdaptiveTimeBudget und rechnete
        sonst für immer mit _lastMsPerSim === null (worker-ai läuft in
@@ -6171,7 +6240,6 @@ function attachWorkerHandlers() {
         Object.assign(state.aiWorkerCtx, netz, {letzteAnfrage: anfrage});
         state.log.push('! data:-Worker abgelehnt → blob:-Worker');
         state.aiWorker.postMessage(anfrage);
-        state.aiWorkerCtx.laeuft = anfrage.reqId;
         return;
       } catch (e2) {
         console.warn('[Worker] blob:-URL ebenfalls fehlgeschlagen:', e2.message || e2);
@@ -6243,34 +6311,14 @@ function triggerAIMove() {
       histHashes: Array.from(state.boardHistory),
       captures:   {...state.captures},
       mc:         state.moveCount,
-      reqId,                                 /* BR-1: der echte Request hat sie */
       koPoint:    state.koPoint,
       lastMove:   state.lastMove,
-      /* BR-1: Ohne extra stellt man den Zug OHNE die Versuchsregel nach — der
-         echte Aufruf bekommt es über passExtra, der Schnappschuss bekam es
-         nicht. (Kein Aufruf im Klartext in diesem Kommentar: der Verdrahtungs-
-         test zählt die Vorkommen.) Gemessen in
-         docs/passregel-wege-nachtrag-vorabfestlegung.md §2.2: derselbe Zug lief
-         nachgestellt über einen anderen Zweig, mit anderem info und ohne
-         versuch-Feld. Dieselbe Funktion wie am echten Aufruf, nicht nachgebaut. */
-      extra:      passExtra(),
       params:     JSON.parse(JSON.stringify(PARAMS)),
       netBlend:   _netPriors ? policyNet.blendWeight : 0,
       lastMsPerSim: _lastMsPerSim
     };
     if (state.workerDead) { fallbackToMainThread(reqId, _netInp, _netPriors, _netHidden); return; }
     try {
-      /* Liegt noch eine Anfrage beim Worker, nicht dahinter anstellen: Der
-         Worker arbeitet nacheinander ab, der Watchdog dieser Anfrage zählt
-         aber ab jetzt und lief ab, bevor sie dran war (W-1,
-         docs/korrektur-d1-w1-vorabfestlegung.md). Stattdessen neu starten,
-         mit derselben Art wie bisher. */
-      if (state.aiWorker && state.aiWorkerCtx && state.aiWorkerCtx.laeuft != null) {
-        const art = state.aiWorkerCtx.art;
-        cleanupWorker();
-        state.workerNeustarts++;
-        try { erzeugeWorker(art); } catch (e) { erzeugeWorker('blob'); }
-      }
       if (!state.aiWorker) {
         try { erzeugeWorker('data'); }
         catch (e1) {
@@ -6300,7 +6348,6 @@ function triggerAIMove() {
       state.aiWorkerCtx.letzteAnfrage = anfrage;   /* für den Wechsel data: → blob: in onerror */
       state.aiReqSend = Date.now();
       state.aiWorker.postMessage(anfrage);
-      state.aiWorkerCtx.laeuft = reqId;
 
       /* Watchdog: falls der Worker durch eine echte Endlosschleife hängt
          (kein try/catch der Welt hilft dagegen), erzwinge nach großzügiger
@@ -6352,35 +6399,18 @@ function triggerAIMove() {
         histHashes: Array.from(state.boardHistory),
         captures:   {...state.captures},
         mc:         state.moveCount,
-        reqId,                               /* BR-1, wie oben */
         koPoint:    state.koPoint,
         lastMove:   state.lastMove,
         difficulty: state.aiDifficulty,
-        /* BR-1: Hier greift die Versuchsregel nicht (sie prüft nur auf Schwer),
-           aber der Aufruf unten gibt extra trotzdem mit — sonst wandert die
-           Lücke nur eine Stufe weiter. */
-        extra:      passExtra(),
         params:     JSON.parse(JSON.stringify(PARAMS)),
         netBlend:   0,
         lastMsPerSim: _lastMsPerSim
       };
-      /* Derselbe Schutz wie in fallbackToMainThread (R-1,
-         docs/korrektur-r1-vorabfestlegung.md): wirft getAIMove oder liefert es
-         kein Objekt, blieb aiThinking hier für immer true und die KI hing. Jetzt
-         Protokollzeile, Notzug oder Pass, und weiter über applyAIResult. */
-      let r;
-      try {
-        r = getAIMove(state.board, state.aiColor,
-          Array.from(state.boardHistory), {...state.captures},
-          state.moveCount, state.aiDifficulty, reqId,
-          state.koPoint, state.lastMove, passExtra());      /* Fix 7 + Lokalitätsterm + Versuchsregel */
-        r.zeiten = zeitenLesen();
-      } catch (e) {
-        console.error('[Leicht/Mittel] getAIMove gescheitert:', e);
-        state.log.push(`! KI-Fehler (${{easy: 'Leicht', medium: 'Mittel'}[state.aiDifficulty]}): ${(e && e.message) || e} → Notzug`);
-        const fb = findAnyLegalMove(state.aiColor);
-        r = fb ? {type: 'stone', x: fb.x, y: fb.y, requestId: reqId} : {type: 'pass', requestId: reqId};
-      }
+      const r = getAIMove(state.board, state.aiColor,
+        Array.from(state.boardHistory), {...state.captures},
+        state.moveCount, state.aiDifficulty, reqId,
+        state.koPoint, state.lastMove, passExtra());      /* Fix 7 + Lokalitätsterm + Versuchsregel */
+      r.zeiten = zeitenLesen();
       applyAIResult(r, reqId, null, null, null);
     }, 50);
   }
@@ -6519,14 +6549,8 @@ function drawBoardToCache() {
   }
 }
 
-function drawStoneTo(ct, x, y, color, isDead, nurKreuz) {
+function drawStoneTo(ct, x, y, color, isDead) {
   const {MARGIN:M, CELL:C} = layout, cx = M+x*C, cy = M+y*C, r = C*0.46;
-  if (nurKreuz) {   /* nur das rote Kreuz, für entfernte tote Steine (B-2) */
-    ct.strokeStyle='#c0392b'; ct.lineWidth=3; ct.beginPath();
-    ct.moveTo(cx-r*.6,cy-r*.6); ct.lineTo(cx+r*.6,cy+r*.6);
-    ct.moveTo(cx+r*.6,cy-r*.6); ct.lineTo(cx-r*.6,cy+r*.6); ct.stroke();
-    return;
-  }
   ct.beginPath(); ct.arc(cx, cy, r, 0, Math.PI*2);
   if (color === 1) {
     const g = ct.createRadialGradient(cx-r*.3, cy-r*.3, r*.05, cx, cy, r);
@@ -6557,15 +6581,6 @@ function drawStateToCache() {
   sCtx.drawImage(boardCache, 0, 0);
   for (let i = 0; i < BOARD_SIZE; i++)
     if (state.board[i]) drawStoneTo(sCtx, xOf(i), yOf(i), state.board[i], state.deadStones.has(i));
-  /* Am Spielende entfernte tote Steine: blass (Deckkraft 0,45 wie in der PWA)
-     mit rotem Kreuz an ihrem Punkt. Nur Anzeige, Zählung und Brett unberührt. */
-  for (const [i, farbe] of state.deadFarben) {
-    if (state.board[i]) continue;
-    sCtx.save(); sCtx.globalAlpha = 0.45;
-    drawStoneTo(sCtx, xOf(i), yOf(i), farbe, false);
-    sCtx.restore();
-    drawStoneTo(sCtx, xOf(i), yOf(i), farbe, true, true);
-  }
   /* Letzter-Zug-Markierung */
   const lm = state.lastMove;
   if (lm !== null && state.board[lm]) {
@@ -6585,7 +6600,7 @@ function drawStateToCache() {
    deadStones. Gilt nur für genau die Stellung, für die sie berechnet wurde
    (Zugzähler und Hash); jeder Zug, Pass, Rückgängig oder Neues Spiel blendet
    sie aus. */
-function vorschauSchluessel() { return state.moveCount + ':' + state.currentHash + ':' + state.scoringMode + ':' + (PARAMS.diagonalAugeEnde >= 1 ? 1 : 0); }
+function vorschauSchluessel() { return state.moveCount + ':' + state.currentHash + ':' + state.scoringMode; }
 function vorschauStandText(stand) {
   return stand >= 0 ? `Schwarz +${stand.toFixed(1)}` : `Weiß +${(-stand).toFixed(1)}`;
 }
@@ -6619,16 +6634,9 @@ function vorschauSchliessen() {
 function vorschauOeffnen() {
   if (state.gameOver) return;
   state.vorschau = {schluessel: vorschauSchluessel(),
-    v: zaehlVorschau(state.board, KOMI, {modus: state.scoringMode, gefangen: state.captures, diagonalAuge: PARAMS.diagonalAugeEnde >= 1})};
+    v: zaehlVorschau(state.board, KOMI, {modus: state.scoringMode, gefangen: state.captures})};
   vorschauPanelAktualisieren();
   drawStateToCache(); render();
-}
-/* Ändert sich der Schalter PARAMS.diagonalAugeEnde (Dashboard, Reset, Preset), gehört eine geöffnete Vorschau sonst zur alten
-   Einstellung (Zahlen und Markierungen): neu berechnen und neu zeichnen. Ist keine offen, bleibt sie zu. */
-function vorschauNeuBerechnen() {
-  if (!state.vorschau) return;
-  if (state.gameOver) { vorschauSchliessen(); return; }
-  vorschauOeffnen();
 }
 /* Bewiesen tot: rotes Kreuz (wie bei der Schlusszählung); geschätzt tot:
    oranges Kreuz mit Fragezeichen. Unbewiesene Steine bleiben unmarkiert. */
@@ -6659,28 +6667,6 @@ function resizeCanvas() {
 resizeCanvas();
 
 function render() { ctx.drawImage(stateCache, 0, 0); }
-
-/* Fenstergröße geändert (L-1, docs/korrektur-l1-vorabfestlegung.md): Brett in
-   der neuen Größe aus state neu zeichnen. Gebündelt (150 ms nach dem letzten
-   resize), nur wenn sich die Brettgröße wirklich ändert, und nicht, solange ein
-   Eingabefeld den Fokus hat: Auf manchen Handys verkleinert die
-   Bildschirmtastatur das Fenster, das Brett würde sonst beim Tippen springen.
-   Dann wird beim Verlassen des Feldes nachgeholt. */
-let _groesseUhr = 0, _groesseNachFokus = false;
-function brettGroesseAnpassen() {
-  const el = document.activeElement;
-  if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) {
-    if (!_groesseNachFokus) {
-      _groesseNachFokus = true;
-      document.addEventListener('focusout', () => { _groesseNachFokus = false; setTimeout(brettGroesseAnpassen, 0); }, {once: true});
-    }
-    return;
-  }
-  if (computeLayout().S === layout.S) return;
-  resizeCanvas(); render();
-  if (pendingTouch) drawGhost(pendingTouch.col, pendingTouch.row);
-}
-addEventListener('resize', () => { clearTimeout(_groesseUhr); _groesseUhr = setTimeout(brettGroesseAnpassen, 150); });
 
 function drawGhost(col, row) {
   const {MARGIN:M, CELL:C} = layout;
@@ -6713,8 +6699,7 @@ function updateUI(msg='') {
   const isB = state.currentPlayer===1;
   elStone.className=isB?'black':'white'; elLabel.textContent=isB?'Schwarz':'Weiß';
   elCapB.textContent=state.captures[1]; elCapW.textContent=state.captures[2];
-  /* Eine übergebene Meldung gilt auch nach Spielende (B-3), etwa „Beide gepasst.“ */
-  elMsg.textContent=state.gameOver?(msg||'Spiel beendet'):(msg||'–');
+  elMsg.textContent=state.gameOver?'Spiel beendet':(msg||'–');
   /* Als Text, nicht als HTML: das Log nimmt auch Fehlermeldungen des Workers
      auf, und nichts davon soll je als Markup gelesen werden. */
   elLog.textContent = '';
@@ -6792,43 +6777,19 @@ document.getElementById('btn-ai-toggle').addEventListener('click',function(){
   state.aiEnabled=!state.aiEnabled;
   this.textContent=state.aiEnabled?'KI deaktivieren':'KI aktivieren';
   this.classList.toggle('active-mode',state.aiEnabled);
-  /* Abschalten verwirft die laufende Anfrage: ohne das erhöhte aiRequestId
-     gilt ihre Antwort als aktuell und setzt noch einen Stein, und ohne
-     aiThinking=false bleibt Rückgängig gesperrt, während die Anzeige
-     schon "KI ist deaktiviert" sagt (UI-1,
-     docs/korrektur-ui1-vorabfestlegung.md). */
-  if(!state.aiEnabled){state.aiRequestId++;state.aiThinking=false;updateUndoButton();}
   updateAIStatus();
   if(state.aiEnabled&&!state.gameOver&&!humanTurn())triggerAIMove();
 });
 
 document.querySelectorAll('.diff-btn').forEach(btn=>btn.addEventListener('click',function(){
-  /* Gleiche Wahl während der Rechnung: keine weitere Anfrage (W-1) */
-  if(this.dataset.diff===state.aiDifficulty&&state.aiThinking)return;
   document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
   this.classList.add('active');state.aiDifficulty=this.dataset.diff;updateAIStatus();
   if(state.aiEnabled&&!state.gameOver&&!humanTurn()){state.aiRequestId++;triggerAIMove();}
 }));
 
 document.querySelectorAll('.color-btn').forEach(btn=>btn.addEventListener('click',function(){
-  const neu=parseInt(this.dataset.color);
-  if(neu===state.aiColor&&state.aiThinking)return;
-  /* Farbwechsel mitten in der Partie: Die bisher gesammelten Beispiele sind
-     Züge der ALTEN Farbe, den Reward holt showFinalScore am Ende aber aus
-     state.aiColor — sie bekämen das Vorzeichen der NEUEN Farbe. Gemessen in
-     docs/korrektur-train2-vorabfestlegung.md §6: ein Zug der Siegerfarbe, mit
-     advantage -1 bestraft, obwohl seine Farbe gewonnen hatte. Darum werden sie
-     verworfen (TRAIN-2, Variante a); die Beispiele der neuen Farbe sammelt
-     applyAIResult danach normal weiter. Nur bei ECHTEM Wechsel: Der Handler
-     läuft auch beim Klick auf die schon aktive Farbe (die Rückkehr oben greift
-     nur zusammen mit aiThinking), und dann gibt es nichts zu verwerfen. */
-  if(neu!==state.aiColor&&globalThis.policyNet&&policyNet._gameBuffer&&policyNet._gameBuffer.length){
-    state.log.push(`! Farbwechsel — ${policyNet._gameBuffer.length} gesammelte KI-Züge der alten Farbe gehen nicht ins Training.`);
-    policyNet._gameBuffer=[];
-    updateUI();   /* zeichnet das Protokoll; sonst stünde die Zeile nur in state.log */
-  }
   document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));
-  this.classList.add('active');state.aiColor=neu;updateAIStatus();
+  this.classList.add('active');state.aiColor=parseInt(this.dataset.color);updateAIStatus();
   if(state.aiEnabled&&!state.gameOver&&!humanTurn()){state.aiRequestId++;triggerAIMove();}
 }));
 
@@ -6836,11 +6797,6 @@ document.querySelectorAll('.scoring-btn').forEach(btn=>btn.addEventListener('cli
   document.querySelectorAll('.scoring-btn').forEach(b=>b.classList.remove('active'));
   this.classList.add('active');state.scoringMode=this.dataset.scoring;
   vorschauSchliessen();   /* Zählvorschau gilt nur für die Wertung, mit der sie gerechnet wurde */
-  /* Nach Spielende die angezeigte Endpunktzahl in der neuen Wertung neu
-     rechnen; buildSGF tut das ohnehin bei jedem Aufruf (UI-2). Bei Aufgabe
-     nicht: dort steht im SGF RE[+R] ohne Wertungsrechnung, und der angezeigte
-     Stand gehört zu der Wertung, mit der er gerechnet wurde. */
-  if (state.gameOver && !state.resignedBy) endstandAnzeigen();
 }));
 
 document.getElementById('btn-pass').addEventListener('click',()=>{
@@ -6864,42 +6820,20 @@ document.getElementById('btn-reset').addEventListener('click',()=>{
   if(state.aiEnabled&&!humanTurn())triggerAIMove();
 });
 
-/* In die Zwischenablage kopieren, mit Rückfall (K-1, docs/korrektur-k1-k2-vorabfestlegung.md).
-   writeText läuft INNERHALB des Promise: Fehlt navigator.clipboard (kein
-   sicherer Kontext, etwa http:// im LAN) oder wirft der Aufruf, landet das im
-   Rückfall statt als Seitenfehler. Ergebnis: true nur, wenn wirklich kopiert
-   wurde; execCommand('copy') zählt nur bei Rückgabe true. */
-function inZwischenablage(text) {
-  const rueckfall = () => {
-    let ta = null;
-    try {
-      ta = document.createElement('textarea');
-      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      return document.execCommand('copy') === true;
-    } catch (e) { return false; }
-    finally { if (ta && ta.parentNode) ta.parentNode.removeChild(ta); }
-  };
-  return Promise.resolve()
-    .then(() => navigator.clipboard.writeText(text))
-    .then(() => true, rueckfall);
-}
-
-/* Rückmeldung auf genau diesem Knopf (K-2): Erfolg grün, Misserfolg rot, nach
-   1,5 s zurück zur FESTEN Ruhebeschriftung. Vorher merkten sich die Knöpfe die
-   gerade angezeigte Beschriftung als Original; zwei schnelle Klicks ließen so
-   „✓ Gespeichert“ dauerhaft stehen. Ein neuer Aufruf hebt den alten Zeitgeber auf. */
-const _rueckmeldungUhr = new Map();
-function zeigeRueckmeldung(btn, ok, okText, ruheText, fehlerText) {
-  if (!btn) return;
-  clearTimeout(_rueckmeldungUhr.get(btn));
-  btn.textContent = ok ? okText : fehlerText;
-  btn.style.color = ok ? 'var(--green)' : 'var(--red)';
-  _rueckmeldungUhr.set(btn, setTimeout(() => { btn.textContent = ruheText; btn.style.color = ''; }, 1500));
-}
-
 function copyWithFeedback(text, btnId, idleLabel) {
-  return inZwischenablage(text).then(ok => zeigeRueckmeldung(document.getElementById(btnId), ok, '✓', idleLabel, '✗'));
+  const done = () => {
+    const btn = document.getElementById(btnId);
+    btn.textContent = '✓'; btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = idleLabel; btn.style.color = ''; }, 1500);
+  };
+  navigator.clipboard.writeText(text).then(done).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    done();
+  });
 }
 
 document.getElementById('btn-sgf').addEventListener('click', downloadSGF);
@@ -6912,18 +6846,10 @@ document.getElementById('btn-copy-log').addEventListener('click', () => {
    - zugprotokoll: die menschenlesbare Zugliste (wie 📋)
    - kiDiagnose:   pro KI-Zug Sims/Q aus info, echte Dauer vs. Budget, ms/Sim
    - brett:        ASCII-Brett des AKTUELLEN Zustands (X=Schwarz, O=Weiß)
-   - reproduktion: der letzte Worker-Request (Brett, Historie-Hashes,
-     Gefangene, Ko-Punkt, reqId, extra, PARAMS) — getAIMove damit füttern
-     reproduziert den Zug, bei dem es geklemmt hat. Genau das fehlte beim nicht
-     reproduzierbaren Hänger nach Zug 185.
-     EINE GRENZE, benannt statt verschwiegen (BR-1,
-     docs/passregel-wege-nachtrag-vorabfestlegung.md §3): netPriors steht NICHT
-     im Bericht. Die 361 Zahlen wären 7775 Zeichen gegen 8106 des ganzen
-     Berichts, also fast eine Verdopplung. Eine Nachstellung rechnet die Priors
-     deshalb neu und trifft nur, solange die Gewichte dieselben sind — bei
-     netMaxBlend 0 (Default) ohne Belang, weil sie dann nicht in die Zugwahl
-     eingehen. Vorher stand hier „1:1" und „exakt"; das traf nicht zu, weil
-     reqId und extra ebenfalls fehlten. Die sind jetzt drin. */
+   - reproduktion: der letzte Worker-Request 1:1 (Brett, Historie-Hashes,
+     Gefangene, Ko-Punkt, PARAMS) — getAIMove damit füttern reproduziert
+     exakt den Zug, bei dem es geklemmt hat. Genau das fehlte beim nicht
+     reproduzierbaren Hänger nach Zug 185. */
 function buildBugReport() {
   const rows = [];
   for (let y = 0; y < SIZE; y++) {
@@ -6943,7 +6869,6 @@ function buildBugReport() {
       kiDenkt:    state.aiThinking,
       workerDead: state.workerDead,
       workerDeadReason: state.workerDeadReason || null,
-      workerNeustarts: state.workerNeustarts,
       spielVorbei: state.gameOver,
       koPoint:    state.koPoint,
       gefangene:  {...state.captures},
@@ -7429,14 +7354,7 @@ class PolicyNet {
   }
 
   reset() {
-    /* localStorage kann gesperrt sein (privates Fenster, blockierte
-       Site-Daten). Ungeschützt brach der Wurf hier den AUFRUFER ab:
-       trainGame ruft reset() im Divergenzpfad, und das steckt mitten im
-       Spielende — vor resolveLifeAndDeath und der Endstandsanzeige (NET-1).
-       Der Reset im Speicher läuft trotzdem; nur der gespeicherte Stand bleibt
-       dann liegen, und save() unten lehnt still ab. */
-    try { localStorage.removeItem('go_pnet'); }
-    catch (e) { console.warn('[PolicyNet] localStorage nicht löschbar:', (e && e.message) || e); }
+    localStorage.removeItem('go_pnet');
     const he = n => Math.sqrt(2/n);
     this.W1=this._rand(this.HID*this.IN, he(this.IN));
     this.b1=new Float32Array(this.HID);
@@ -7451,21 +7369,12 @@ class PolicyNet {
 
   dashUpdate() {
     const el = id => document.getElementById(id);
-    /* Alle vier Pflichtfelder vorab holen: fehlt eines, wird gar nichts
-       geschrieben. Vorher prüfte nur pn-games, und ein fehlendes Geschwister
-       warf einen TypeError UND ließ die Anzeige halb aktualisiert zurück —
-       neue Spielzahl neben altem Siegestand, was richtig aussieht und es nicht
-       ist. Der Wurf nahm dazu den Aufrufer mit, und reset() wie der
-       Divergenzpfad von trainGame rufen hier mitten im Spielende (DASH-1,
-       docs/korrektur-dash1-vorabfestlegung.md). pn-health und pn-warmup-bar
-       bleiben optional: sie kamen später dazu und haben eigene Prüfungen. */
-    const spiele = el('pn-games'), siege = el('pn-wins'),
-          blend = el('pn-blend'), res = el('pn-result');
-    if (!spiele || !siege || !blend || !res) return;
-    spiele.textContent = this.gamesPlayed;
+    if (!el('pn-games')) return;
+    el('pn-games').textContent = this.gamesPlayed;
     const wr = this.gamesPlayed > 0 ? Math.round(this.wins/this.gamesPlayed*100) : 0;
-    siege.textContent  = `${this.wins} (${wr}%)`;
-    blend.textContent = `${(this.blendWeight*100).toFixed(0)}%`;
+    el('pn-wins').textContent  = `${this.wins} (${wr}%)`;
+    el('pn-blend').textContent = `${(this.blendWeight*100).toFixed(0)}%`;
+    const res = el('pn-result');
     res.textContent = this.lastResult===null ? '—' : this.lastResult>0 ? '✓ Sieg' : '✗ Niederlage';
     res.style.color = this.lastResult===null ? '' : this.lastResult>0 ? 'var(--green)' : 'var(--red)';
     /* Ein stillgelegtes Netz muss sichtbar sein: sonst sieht man nur, dass
@@ -7810,10 +7719,6 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
          tip:'VERSUCH, Standard 0 = aus. 1 = die KI passt, wenn der Gegner gerade gepasst hat und die Zählvorschau in der eingestellten Wertung einen klaren, geklärten Vorsprung zeigt. Kein Sicherheitsnachweis (Seki/Ko, unbewiesene Gruppen) und keine Aussage, ob weitere Züge sinnvoll wären. docs/passregel-versuch.md'},
         {key:'passMarge', label:'Pass-Marge (Punkte)', step:5, min:5, max:200,
          tip:'Nur für den Versuch Pass nach Gegnerpass: Vorsprung in Punkten, den auch der ungünstigere der beiden Stände der Zählvorschau erreichen muss.'},
-        {key:'diagonalAugeEnde', label:'Diagonalprüfung (Zählung)', step:1, min:0, max:1,
-         tip:'VERSUCH, Standard 0 = aus (Verhalten bit-gleich zu vorher). 1 = in der Schlusszählung und in der Zählvorschau zählt ein Ein-Punkt-Auge nur, wenn die Diagonalregel es bestätigt (falsche Augen zählen nicht). Kein Nachweis, dass 1 besser ist (docs/diagonalpruefung-vorabfestlegung.md).'},
-        {key:'diagonalAugeSchluss', label:'Diagonalprüfung (nur Schlusszählung)', step:1, min:0, max:1,
-         tip:'VERSUCH, Standard 0 = aus (Verhalten bit-gleich zu vorher). 1 = nur in der Schlusszählung am Spielende zählt ein Ein-Punkt-Auge nur, wenn die Diagonalregel es bestätigt. Die Zählvorschau und die KI bleiben unverändert. Kein Nachweis, dass 1 besser ist (docs/diagonal-schluss-vorabfestlegung.md).'},
         {key:'adaptiveBudgetTargetMinSims', label:'Ziel-Min-Sims', step:10, min:20, max:300, main:true,
          tip:'⭐ HAUPTHEBEL. Direkte Messkorrektur — wenn letzter Zug weniger Sims schaffte, wird automatisch mehr Zeit gegeben, unabhängig von der Ursache (Randkampf, große Gruppen etc.)'},
         {key:'rolloutSample',     label:'Rollout-Sample',   step:8,   min:0,   max:200,
@@ -7850,7 +7755,7 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     },
     {
       id:'polnet', label:'🧠 Policy-Netz',
-      hint:'3971→128→361 Netz, REINFORCE. Score = (1−blend)·MoE + blend·Prior·scale, mit blend = netMaxBlend × min(1, Spiele/netWarmup), erst ab 2 Spielen und nur bei gesundem Netz. Mit netMaxBlend 0 (Default) lernt das Netz nur mit und steuert nie. Gewichte in localStorage. Gradienten-Deckel 0 = aus — dann divergiert das Training (siehe Kommentar bei netGradClip).',
+      hint:'3971→128→361 Netz, REINFORCE. Score = (1−blend)·MoE + blend·Prior·scale. Blend wächst automatisch: nach 5 Spielen ~30% Einfluss. Gewichte in localStorage. Gradienten-Deckel 0 = aus — dann divergiert das Training (siehe Kommentar bei netGradClip).',
       custom:'pnet'
     },
   ];
@@ -7976,10 +7881,6 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     } else {
       for (const p of sec.params) {
         const cls = p.main ? 'pd-row pd-haupthebel' : p.warn ? 'pd-row pd-warn' : 'pd-row';
-        /* Gebrochen liest, wer float trägt ODER einen gebrochenen Schritt hat.
-           Vorher fehlte bei vier Feldern das Kennzeichen, und parseInt machte
-           aus 0,5 eine 0 (docs/bughunt-20261116.md, D-1). */
-        const gebrochen = !!p.float || !Number.isInteger(p.step);
         const tipId = 'pdtip-' + p.key;
         html += `
           <div class="${cls}">
@@ -7988,8 +7889,8 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
             <input class="pd-input" type="number" id="pd-${p.key}"
               step="${p.step}" min="${p.min}" max="${p.max}"
               value="${PARAMS[p.key]}"
-              onchange="dashUpdate('${p.key}', this, ${gebrochen})"
-              oninput="dashUpdate('${p.key}', this, ${gebrochen})">
+              onchange="dashUpdate('${p.key}', this, ${!!p.float})"
+              oninput="dashUpdate('${p.key}', this, ${!!p.float})">
           </div>
           ${p.tip ? `<div class="pd-tip-text" id="${tipId}">${p.tip}</div>` : ''}`;
       }
@@ -8000,23 +7901,13 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
   html += `
       <div class="pd-reset-row">
         <button class="pd-reset-btn" onclick="dashReset()">↺ Reset</button>
-        <button class="pd-export-btn" id="pd-btn-speichern" onclick="dashSave()">💾 Speichern</button>
-        <button class="pd-export-btn" id="pd-btn-export" onclick="dashExport()">⬇ Export</button>
+        <button class="pd-export-btn" onclick="dashSave()">💾 Speichern</button>
+        <button class="pd-export-btn" onclick="dashExport()">⬇ Export</button>
       </div>
     </div>`;
 
   panel.innerHTML = html;
   sidebar.appendChild(panel);
-  /* Nach der Eingabe (change, nicht bei jedem Tastendruck) zeigt das Feld den
-     Wert, mit dem die Engine rechnet: begrenzt auf min/max, bei ganzzahligen
-     Feldern ganzzahlig (B-1, docs/korrektur-b1-b3-vorabfestlegung.md). */
-  panel.addEventListener('change', e => {
-    const el = e.target;
-    if (!el || !el.id || el.id.indexOf('pd-') !== 0) return;
-    const key = el.id.slice(3);
-    if (!(key in PARAMS_DEFAULT) || typeof PARAMS[key] !== 'number') return;
-    if (el.value !== String(PARAMS[key])) el.value = PARAMS[key];
-  });
 
   const PRESETS = {
     ausgeglichen: {
@@ -8071,31 +7962,20 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     }
   };
 
-  /* Alle Schlüssel, die irgendein Preset setzt. Vor jedem Preset gehen sie auf
-     den Standard, damit nichts vom vorher gewählten Preset stehen bleibt
-     (docs/korrektur-d2-vorabfestlegung.md). Aus PRESETS abgeleitet, nicht von
-     Hand gepflegt. */
-  const PRESET_SCHLUESSEL = [...new Set(Object.values(PRESETS).flatMap(p => p.values ? Object.keys(p.values) : []))];
-
   window.dashApplyPreset = function(name) {
     const preset = PRESETS[name];
     if (!preset) return;
     if (preset.values === null) {
       dashReset();
     } else {
-      const diagVorher = PARAMS.diagonalAugeEnde;
-      const werte = {};
-      for (const k of PRESET_SCHLUESSEL) werte[k] = PARAMS_DEFAULT[k];
-      Object.assign(werte, preset.values);
-      Object.assign(PARAMS, werte);
-      for (const [k,v] of Object.entries(werte)) {
+      Object.assign(PARAMS, preset.values);
+      for (const [k,v] of Object.entries(preset.values)) {
         const inp = document.getElementById('pd-' + k);
         if (inp) {
           inp.value = v;
           inp.classList.toggle('changed', Math.abs(v - PARAMS_DEFAULT[k]) > 1e-9);
         }
       }
-      if (PARAMS.diagonalAugeEnde !== diagVorher) vorschauNeuBerechnen();
     }
     document.querySelectorAll('.pd-preset-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('pd-preset-' + name)?.classList.add('active');
@@ -8146,7 +8026,6 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     PARAMS[key] = raw;
     const changed = Math.abs(raw - PARAMS_DEFAULT[key]) > 1e-9;
     input.classList.toggle('changed', changed);
-    if (key === 'diagonalAugeEnde') vorschauNeuBerechnen();
     if (key === 'rolloutWeight' || key === 'scoreWeight') {
       /* Bidirektionaler Sync: egal welcher der beiden geändert wird,
          der jeweils andere folgt, sodass die Summe immer 1 bleibt.
@@ -8201,7 +8080,11 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     let ok = true;
     try { localStorage.setItem(PD_STORE, JSON.stringify({version: PD_VERSION, abweichungen: dashAbweichungen()})); }
     catch (e) { console.warn('[Dashboard] Speichern fehlgeschlagen:', e); ok = false; }
-    zeigeRueckmeldung(document.getElementById('pd-btn-speichern'), ok, '✓ Gespeichert', '💾 Speichern', '✗ Fehler');
+    const btn = document.querySelectorAll('.pd-export-btn')[0];
+    const orig = btn.textContent;
+    btn.textContent = ok ? '✓ Gespeichert' : '✗ Fehler';
+    btn.style.color = ok ? 'var(--green)' : 'var(--red)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
   };
 
   /* Beim Seitenaufbau einspielen. Nur Schlüssel, die es wirklich gibt, und
@@ -8236,7 +8119,6 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
 
   window.dashReset = function() {
     try { localStorage.removeItem(PD_STORE); } catch (e) {}
-    const diagVorher = PARAMS.diagonalAugeEnde;
     Object.assign(PARAMS, PARAMS_DEFAULT);
     for (const key of Object.keys(PARAMS_DEFAULT)) {
       const inp = document.getElementById('pd-' + key);
@@ -8247,7 +8129,6 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
         const inp = document.getElementById('pd-' + p.key);
         if (inp) { inp.value = PARAMS[p.key]; inp.classList.remove('changed'); }
       }
-    if (PARAMS.diagonalAugeEnde !== diagVorher) vorschauNeuBerechnen();
     document.querySelectorAll('.pd-preset-btn').forEach(b=>b.classList.remove('active'));
     dashRefreshPhase();
   };
@@ -8262,9 +8143,11 @@ console.info(`Go – 囲碁 · © 2026 Hazeberry · PolyForm Noncommercial 1.0.0
     for (const [k,v] of Object.entries(PARAMS)) lines.push(`  ${k}: ${v},`);
     lines.push('};');
     const txt = lines.join('\n');
-    /* Kopieren mit Rückfall, Rückmeldung auf dem Export-Knopf selbst (K-1, K-2) */
-    return inZwischenablage(txt).then(ok =>
-      zeigeRueckmeldung(document.getElementById('pd-btn-export'), ok, '✓ Kopiert', '⬇ Export', '✗ Fehler'));
+    navigator.clipboard.writeText(txt).catch(()=>{});
+    const btn = document.querySelector('.pd-export-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Kopiert'; btn.style.color='var(--green)';
+    setTimeout(()=>{ btn.textContent=orig; btn.style.color=''; },1500);
   };
 
   const origUpdateUI = window.updateUI;
