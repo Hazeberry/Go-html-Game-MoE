@@ -245,7 +245,12 @@ Deutung bleibt offen und ist Gegenstand von Teil 3.
 der strengen Zählung), gestartet nach Hazeberrys Go um 18:22 UTC, Dauer rund 10 Minuten, davon knapp 8 für GNU Go.
 Vorab dieselben Prüfungen wie in Teil 1c, ohne Befund. Bericht im Wortlaut:
 [`k3-diagnose.md`](daten/skalierung-heute/aufbaupruefung-20261127/k3-diagnose.md). Die Einzelwerte je Partie
-(Schätzungen, Schranken, beide Kipppunkte) liegen nur im Artefakt des Laufs; GitHub löscht es nach 90 Tagen.
+([`k3-diagnose-partien.csv`](daten/skalierung-heute/aufbaupruefung-20261127/k3-diagnose-partien.csv): Schätzungen,
+Schranken, beide Kipppunkte) stammen aus dem Artefakt des Laufs, das GitHub nach 90 Tagen löscht, und sind hier
+gesichert. Gegenprüfung am 28.11.2026: Bericht und Tabellen stimmen mit der CSV überein (1230 Partien, 3686 von 3690
+Messpunkten, die übrigen vier liegen in Partien unter 300 Zügen); beide Kipppunkte, aus Werten und Schranken neu
+bestimmt, weichen in keiner Zeile ab; an allen 3686 Messpunkten liegt der Wert aus Sicht von Weiß zwischen den
+Schranken, sie stehen also wie angenommen aus Sicht von Weiß.
 
 **Pässe:** B passt in beiden Farben häufiger als A (6,55 und 6,95 gegen 5,58 und 5,78 je 100 Entscheidungen) und
 beginnt im Median etwas früher (erster eigener Pass Zug 329 und 332 gegen 339 und 334). Jede Seite passt in jeder
