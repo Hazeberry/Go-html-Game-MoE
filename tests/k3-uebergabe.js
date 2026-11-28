@@ -279,7 +279,7 @@ const engineWieFestgelegt = () => {
 };
 
 test('Ende zu Ende: richtiger Satz → Ausgang 0, Bericht mit Tabelle', () => {
-  if (!engineWieFestgelegt()) return 'skip';
+  if (!engineWieFestgelegt()) return {skip: 'Engine-Blöcke nicht mehr wie in §6 der Skalierungsfestlegung'};
   const r = befehlszeile();
   pruefeGleich(r.status, 0, `Ausgang; stderr: ${r.stderr.slice(0, 200)}`);
   pruefe(r.stdout.includes('Kein Aufbaufehler gefunden'), 'Urteilszeile');
@@ -287,7 +287,7 @@ test('Ende zu Ende: richtiger Satz → Ausgang 0, Bericht mit Tabelle', () => {
 });
 
 test('Ende zu Ende: ein falscher Wert → Ausgang 3 mit Ort', () => {
-  if (!engineWieFestgelegt()) return 'skip';
+  if (!engineWieFestgelegt()) return {skip: 'Engine-Blöcke nicht mehr wie in §6 der Skalierungsfestlegung'};
   const r = befehlszeile(s => { s.teile[0].roh[0].ereignisse[0].sims = 2400;
     s.teile[0].daten.partien[0].simsA = Math.round((13 * 2600 + 2400) / 15); });
   pruefeGleich(r.status, 3, 'Ausgang');

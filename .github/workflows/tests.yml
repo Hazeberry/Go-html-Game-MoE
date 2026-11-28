@@ -10,11 +10,22 @@ name: Tests
 # grundlos rot oder wäre so weit gelockert, dass es nichts mehr fängt. Die
 # Tests hier prüfen stattdessen Invarianten: finit, beschränkt, kein Absturz.
 #
-# Zwei Jobs, weil sie verschieden teuer sind. `node` braucht nichts außer Node
-# und ist in etwa einer halben Minute durch — das ist die Rückmeldung, auf die
-# man wartet. `browser` installiert erst Chromium und läuft deshalb getrennt,
-# damit ein Fehler im schnellen Teil nicht hinter der Browser-Installation
-# wartet.
+# Drei Jobs, weil sie verschieden teuer sind. `node` braucht nichts außer Node —
+# das ist die Rückmeldung, auf die man wartet. `browser` installiert erst
+# Chromium und `gnugo` erst GNU Go (und braucht über drei Minuten); beide laufen
+# deshalb getrennt, damit ein Fehler im schnellen Teil nicht hinter einer
+# Installation wartet.
+#
+# Die Liste der Suiten lebt NUR in tests/run.js. Jeder Job ruft den Runner mit
+# einem Schalter auf (--ohne-browser --ohne-gnugo / --nur-browser / --nur-gnugo)
+# und nennt keine Datei: Eine neue Suite landet damit in genau einem Job.
+# tests/testlauf.js prüft das.
+#
+# Übersprungenes bleibt sichtbar: Der Runner gibt Anzahl und Liste mit Grund als
+# Ausgabe des Jobs weiter, `ergebnis` zeigt sie in der Übersicht. Ob ein
+# fehlendes Programm ein Fehler ist, entscheidet REQUIRE_BROWSER und
+# REQUIRE_GNUGO: In CI sind beide gesetzt, ein fehlendes Programm macht den Job
+# rot.
 
 on:
   push:
@@ -39,9 +50,14 @@ permissions:
 # auf dem sie vorab festgelegt und bisher gespielt wurden.
 jobs:
   node:
+    # Der Name bleibt, weil Prüfungen an ihm hängen können; gemeint ist: alle
+    # Suiten außer den Gruppen Browser und GNU Go, die eigene Jobs haben.
     name: Node (alle Suiten außer Browser)
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    outputs:
+      uebersprungen: ${{ steps.tests.outputs.uebersprungen }}
+      liste: ${{ steps.tests.outputs.liste }}
     steps:
       - uses: actions/checkout@v7
 
@@ -59,13 +75,46 @@ jobs:
       # Fassung listete die Dateien hier auf und driftete prompt: beim
       # Hinzufügen von resign-criterion.js wurde die Liste nicht mitgepflegt,
       # der Job blieb grün und prüfte den neuen Test nicht. Die Suite-Liste
-      # lebt jetzt nur in tests/run.js; --ohne-browser lässt genau den Teil
-      # weg, der einen eigenen Job mit Chromium hat.
+      # lebt jetzt nur in tests/run.js; die Schalter lassen genau die Teile
+      # weg, die einen eigenen Job haben (Chromium, GNU Go).
       #
       # Der Harness läuft dabei nur als Rauchtest mit, nicht als Messlauf:
       # sein Zeitbudget ist Wall-Clock und damit als Ja/Nein-Prüfung untauglich.
-      - name: Tests (ohne Browser)
-        run: node tests/run.js --ohne-browser
+      - name: Tests (ohne Browser, ohne GNU Go)
+        id: tests
+        run: node tests/run.js --ohne-browser --ohne-gnugo
+
+  gnugo:
+    name: GNU Go (Brücke und Diagnose)
+    # Eigener Job: Die GNU-Go-Brücke braucht über drei Minuten und ein
+    # installiertes GNU Go. Im Node-Job lief sie bisher gar nicht — die Datei
+    # beendete sich ohne GNU Go still mit Erfolg. Jetzt ist ein fehlendes
+    # GNU Go hier ein Fehlschlag (REQUIRE_GNUGO).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      uebersprungen: ${{ steps.tests.outputs.uebersprungen }}
+      liste: ${{ steps.tests.outputs.liste }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: GNU Go installieren
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gnugo
+          /usr/games/gnugo --version | head -n 1
+
+      - name: Tests mit echtem GNU Go
+        id: tests
+        env:
+          REQUIRE_GNUGO: '1'
+        run: node tests/run.js --nur-gnugo
 
   browser:
     name: Browser (Worker + localStorage)
@@ -74,6 +123,9 @@ jobs:
     # („Playwright does not support chromium on ubuntu26.04-x64“).
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    outputs:
+      uebersprungen: ${{ steps.tests.outputs.uebersprungen }}
+      liste: ${{ steps.tests.outputs.liste }}
     steps:
       - uses: actions/checkout@v7
 
@@ -101,38 +153,55 @@ jobs:
       # überspringt sich der Test, wenn er Chromium nicht findet, und der Lauf
       # bliebe grün, ohne etwas geprüft zu haben. In CI muss das ein
       # Fehlschlag sein.
+      #
+      # Die Suiten kommen aus tests/run.js (--nur-browser), nicht aus einer
+      # zweiten Liste hier. Die frühere Fassung führte die sechs Dateien einzeln
+      # auf; eine siebte, nur im Runner ergänzte hätte der Node-Job wegen
+      # --ohne-browser übersprungen und dieser Job nie gestartet — beide grün.
       - name: Ende-zu-Ende im Browser
+        id: tests
         env:
           REQUIRE_BROWSER: '1'
-        run: |
-          node tests/browser-nan.js
-          node tests/browser-ui.js
-          node tests/browser-zaehlvorschau.js
-          node tests/browser-passregel.js
-          node tests/browser-diagonalauge.js
-          node tests/browser-zeiten.js
+        run: node tests/run.js --nur-browser
 
   ergebnis:
     name: Zusammenfassung
     runs-on: ubuntu-24.04
-    needs: [node, browser]
+    needs: [node, gnugo, browser]
     if: always()
     steps:
       - name: In die Run-Übersicht schreiben
         env:
           NODE_ERGEBNIS: ${{ needs.node.result }}
+          GNUGO_ERGEBNIS: ${{ needs.gnugo.result }}
           BROWSER_ERGEBNIS: ${{ needs.browser.result }}
+          NODE_UEB: ${{ needs.node.outputs.uebersprungen }}
+          GNUGO_UEB: ${{ needs.gnugo.outputs.uebersprungen }}
+          BROWSER_UEB: ${{ needs.browser.outputs.uebersprungen }}
+          NODE_LISTE: ${{ needs.node.outputs.liste }}
+          GNUGO_LISTE: ${{ needs.gnugo.outputs.liste }}
+          BROWSER_LISTE: ${{ needs.browser.outputs.liste }}
         run: |
           set -euo pipefail
           sym() { case "$1" in success) echo '✅';; failure) echo '❌';; cancelled) echo '⚪';; *) echo '⚠️';; esac; }
+          # Übersprungen: leer heißt, der Job hat keine Zahl geliefert (z. B. vor dem Runner gescheitert).
+          ueb() { if [ -z "$1" ]; then echo '–'; elif [ "$1" = 0 ]; then echo 0; else echo "⚠️ $1"; fi; }
           {
             echo "## Regressionstests"
             echo
-            echo "| Ebene | Ergebnis |"
-            echo "|---|---|"
-            echo "| Node — alle Suiten außer Browser | $(sym "$NODE_ERGEBNIS") $NODE_ERGEBNIS |"
-            echo "| Browser — Worker + localStorage | $(sym "$BROWSER_ERGEBNIS") $BROWSER_ERGEBNIS |"
+            echo "| Ebene | Ergebnis | Übersprungen |"
+            echo "|---|---|---|"
+            echo "| Node — alle Suiten außer Browser und GNU Go | $(sym "$NODE_ERGEBNIS") $NODE_ERGEBNIS | $(ueb "$NODE_UEB") |"
+            echo "| GNU Go — Brücke und Diagnose mit echtem GNU Go | $(sym "$GNUGO_ERGEBNIS") $GNUGO_ERGEBNIS | $(ueb "$GNUGO_UEB") |"
+            echo "| Browser — Worker + localStorage | $(sym "$BROWSER_ERGEBNIS") $BROWSER_ERGEBNIS | $(ueb "$BROWSER_UEB") |"
+            for e in "Node:$NODE_UEB:$NODE_LISTE" "GNU Go:$GNUGO_UEB:$GNUGO_LISTE" "Browser:$BROWSER_UEB:$BROWSER_LISTE"; do
+              name=${e%%:*}; rest=${e#*:}; zahl=${rest%%:*}; liste=${rest#*:}
+              if [ -n "$zahl" ] && [ "$zahl" != 0 ]; then
+                echo
+                echo "**Übersprungen, nicht geprüft ($name, $zahl):** $liste"
+              fi
+            done
             echo
             echo "Details in [\`tests/README.md\`](tests/README.md)."
           } >> "$GITHUB_STEP_SUMMARY"
-          [ "$NODE_ERGEBNIS" = success ] && [ "$BROWSER_ERGEBNIS" = success ]
+          [ "$NODE_ERGEBNIS" = success ] && [ "$GNUGO_ERGEBNIS" = success ] && [ "$BROWSER_ERGEBNIS" = success ]

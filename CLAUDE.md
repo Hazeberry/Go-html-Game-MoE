@@ -34,10 +34,14 @@ Statusmeldungen kurz. Lizenz: PolyForm Noncommercial 1.0.0.
 
 ## Code und Tests
 
-- `node tests/run.js` führt alle Testdateien aus (rund zwei Minuten); `--ohne-browser` lässt die
-  Browser-Tests weg. Eine neue Testdatei gehört in die Liste `ALLE` in `tests/run.js`, in die
-  Tabelle `tests/README.md` und, wenn sie einen Browser braucht, in den Job „Browser“ von
-  `.github/workflows/tests.yml`.
+- `node tests/run.js` führt alle Testdateien aus (über zehn Minuten, mit GNU Go); `--ohne-browser`,
+  `--nur-browser`, `--ohne-gnugo` und `--nur-gnugo` wählen Gruppen, die in CI eigene Jobs haben.
+  Eine neue Testdatei gehört in die Liste `ALLE` in `tests/run.js` und in die Tabelle
+  `tests/README.md`; sonst nirgends: Der Workflow nennt keine einzelne Datei (`tests/testlauf.js`
+  prüft das). Eine Suite `browser-*.js` landet von selbst im Browser-Job, eine Suite mit echtem GNU Go
+  gehört zusätzlich in `GNUGO_SUITEN` in `tests/run.js`. Ein übersprungener Test nennt seinen Grund
+  (`{skip: 'Grund'}`); `REQUIRE_BROWSER=1` und `REQUIRE_GNUGO=1` machen ein fehlendes Programm zum
+  Fehlschlag, in CI sind beide gesetzt.
 - `tests/rahmen.js` schneidet die `<script>`-Blöcke aus `index.html` und reicht eine feste Liste
   interner Namen heraus. **Neue interne Funktionen, die ein Test braucht, dort ergänzen.**
 - Browser-Tests laufen mit Playwright (Chromium ist vorinstalliert).

@@ -27,7 +27,7 @@ test('LICENSE enthält die Zeile „Required Notice:“', () => {
 test('jede Quelldatei trägt Required Notice und SPDX-Kennung', () => {
   let dateien;
   try { dateien = execFileSync('git', ['ls-files'], {cwd: wurzel, encoding: 'utf8'}).split('\n'); }
-  catch { return 'skip'; }
+  catch { return {skip: 'git ls-files nicht ausführbar (kein Git-Verzeichnis)'}; }
   dateien = dateien.filter(f => /\.(html|js|py|sh)$/.test(f));
   pruefe(dateien.length > 0, 'Quelldateien gefunden');
   for (const f of dateien) {

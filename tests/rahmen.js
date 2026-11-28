@@ -111,6 +111,28 @@ function pruefeFinit(feld, was) {
   pruefe(true, was);
 }
 
+/* Ein Test, der ein Programm braucht (GNU Go, Chromium). Fehlt es, hängt das Ergebnis an der Pflicht-Variable
+   REQUIRE_<NAME>=1, die der CI-Job setzt: dann ist das ein Fehlschlag, sonst ein sichtbares Überspringen mit
+   Grund. Ohne diese Trennung bliebe ein Lauf ohne das Programm grün, ohne etwas geprüft zu haben. */
+function braucht(name, vorhanden, grund) {
+  if (vorhanden) return true;
+  if (process.env[`REQUIRE_${name}`] === '1') throw new Error(`REQUIRE_${name}=1, aber ${grund}`);
+  return false;
+}
+
+/* Ein übersprungener Test meldet 'skip' oder {skip: 'Grund'}. Der Grund gehört dazu: ohne ihn ist in der
+   Zusammenfassung nicht zu sehen, warum etwas nicht geprüft wurde. Läuft der Test unter tests/run.js, steht
+   TESTS_UEBERSPRUNGEN auf eine Datei; jede Übersprungene kommt als JSON-Zeile hinein und landet am Ende
+   in der Zusammenfassung des Runners. */
+function meldeUebersprungen(name, grund) {
+  const ziel = process.env.TESTS_UEBERSPRUNGEN;
+  if (!ziel) return;
+  const datei = require.main && require.main.filename ? path.basename(require.main.filename) : '?';
+  try { fs.appendFileSync(ziel, JSON.stringify({datei, test: name, grund: grund || 'Grund nicht angegeben'}) + '\n'); }
+  catch (e) { console.log(`  (Übersprungenes nicht gemeldet: ${e.message})`); }
+}
+const istSkip = r => r === 'skip' || (r !== null && typeof r === 'object' && typeof r.skip === 'string');
+
 async function laufeTests(titel) {
   console.log(`\n${titel}`);
   console.log('─'.repeat(titel.length));
@@ -121,7 +143,12 @@ async function laufeTests(titel) {
     try {
       const r = await f.fn();
       const ms = Date.now() - t0;
-      if (r === 'skip') { uebersprungen++; console.log(`  ○  ${f.name} — übersprungen`); }
+      if (istSkip(r)) {
+        uebersprungen++;
+        const grund = r === 'skip' ? '' : r.skip;
+        console.log(`  ○  ${f.name} — übersprungen${grund ? `: ${grund}` : ''}`);
+        meldeUebersprungen(f.name, grund);
+      }
       else { ok++; console.log(`  ✓  ${f.name} (${_aktuell.pruefungen} Prüfungen, ${ms} ms)`); }
     } catch (e) {
       kaputt++;
@@ -136,4 +163,4 @@ async function laufeTests(titel) {
 }
 
 module.exports = {ladeKI, schneide, STANDARD_HTML,
-                 test, pruefe, pruefeGleich, pruefeNah, pruefeFinit, laufeTests};
+                 test, pruefe, pruefeGleich, pruefeNah, pruefeFinit, laufeTests, braucht, meldeUebersprungen, istSkip};

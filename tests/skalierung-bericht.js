@@ -312,7 +312,7 @@ function schreibeTeile(t, dir) {
 }
 
 test('Ende zu Ende: gültiger Lauf über die Befehlszeile', () => {
-  if (!engineWieFestgelegt()) return 'skip';   /* Regel 4 lässt sich nur am Stand aus §6 positiv prüfen */
+  if (!engineWieFestgelegt()) return {skip: 'Engine-Blöcke nicht mehr wie in §6 der Skalierungsfestlegung'};   /* Regel 4 lässt sich nur am Stand aus §6 positiv prüfen */
   const dir = fs.mkdtempSync(path.join(tmpdir(), 'gut-'));
   const args = schreibeTeile(stufe1(50, 47, {min1: 0.69, min2: 1.37}), dir);
   const r = spawnSync(process.execPath, [SKRIPT, '--stufe', '1', '--commit', COMMIT, '--html', HTML, '--markdown', '--n', '2700', ...args], {encoding: 'utf8'});
