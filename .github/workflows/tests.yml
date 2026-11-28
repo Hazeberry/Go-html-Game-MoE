@@ -52,7 +52,7 @@ jobs:
   node:
     # Der Name bleibt, weil Prüfungen an ihm hängen können; gemeint ist: alle
     # Suiten außer den Gruppen Browser und GNU Go, die eigene Jobs haben.
-    name: Node (alle Suiten außer Browser)
+    name: Node (ohne Browser und GNU Go)
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
