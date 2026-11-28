@@ -28,7 +28,7 @@
 'use strict';
 const fs = require('fs'), path = require('path'), os = require('os');
 const {execFileSync} = require('child_process');
-const {test, pruefe, pruefeGleich, laufeTests} = require('./rahmen');
+const {test: rahmenTest, pruefe, pruefeGleich, laufeTests, braucht} = require('./rahmen');
 
 const GNUGO = '/usr/games/gnugo';
 const WERKZEUG = path.join(__dirname, '..', 'gnugo-duell.js');
@@ -41,10 +41,16 @@ function partie(extra, basis = ['--partien', '1', '--seed', '3', '--stufe', '1',
   return r;
 }
 
-if (!fs.existsSync(GNUGO)) {
-  console.log('\nGNU-Go-Brücke\n─────────────\n  übersprungen: GNU Go nicht installiert');
-  process.exit(0);
-}
+/* Ohne GNU Go ein sichtbar übersprungener Test mit Grund, nicht ein stilles Ende der Datei. Mit REQUIRE_GNUGO=1
+   (CI-Job „GNU Go“) ist ein fehlendes GNU Go ein Fehlschlag. */
+let GNUGO_DA = false, GNUGO_FEHLER = null;
+try { GNUGO_DA = braucht('GNUGO', fs.existsSync(GNUGO), `${GNUGO} fehlt`); } catch (e) { GNUGO_FEHLER = e; }
+const test = (name, fn) => { if (GNUGO_DA) rahmenTest(name, fn); };
+if (!GNUGO_DA)
+  rahmenTest('GNU Go ist installiert (alle Prüfungen der Brücke brauchen es)', () => {
+    if (GNUGO_FEHLER) throw GNUGO_FEHLER;
+    return {skip: `GNU Go nicht installiert (${GNUGO})`};
+  });
 
 test('Partie ohne Vorgabe läuft durch, Datensatz vollständig', () => {
   const r = partie([]);

@@ -13,8 +13,7 @@
         Phase an kleinen, von Hand nachgerechneten Partien.
      4. Mit einem nachgebauten GNU Go: Sicht des Verlierers (Schwarz: Wert, Weiß: −Wert), Tabelle je
         Arm und Farbe, Ende zu Ende über die Befehlszeile mit Ausgang 0, 1 und 2.
-     5. Mit dem echten GNU Go, wenn installiert: eine echte, kurze Harness-Partie wird nachgespielt
-        und an jedem Messpunkt geschätzt (sonst übersprungen).
+     5. Mit dem echten GNU Go: siehe tests/k3-diagnose-gnugo.js (GNU-Go-Gruppe, eigener CI-Job).
 
    Aufruf:  node tests/k3-diagnose.js */
 'use strict';
@@ -22,7 +21,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
-const {spawnSync, execFileSync} = require('child_process');
+const {spawnSync} = require('child_process');
 const {test, pruefe, pruefeGleich, laufeTests, STANDARD_HTML} = require('./rahmen');
 const D = require('../auswertung/k3-diagnose.js');
 const U = require('../auswertung/k3-uebergabe.js');
@@ -31,8 +30,6 @@ const {blocksummen} = require('../auswertung/eval-streuung-bericht.js');
 
 const COMMIT = '98aa1ad586c9de23f64ca76c26af1d7b199b7b3a';
 const SKRIPT = path.join(__dirname, '..', 'auswertung', 'k3-diagnose.js');
-const HARNESS = path.join(__dirname, '..', 'ab-harness.js');
-const ECHT = '/usr/games/gnugo';
 const sha = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 let TMP;
 const tmpdir = () => TMP || (TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'k3-diagnose-')));
@@ -270,7 +267,7 @@ const engineWieFestgelegt = () => {
 };
 
 test('Ende zu Ende: 123 Teilläufe, nachgebautes GNU Go → Ausgang 0 mit allen Teilen', () => {
-  if (!engineWieFestgelegt()) return 'skip';
+  if (!engineWieFestgelegt()) return {skip: 'Engine-Blöcke nicht mehr wie in §6 der Skalierungsfestlegung'};
   process.env.FAKE_WERTE = '100:B+1.0,200:B+2.0,300:B+3.0';
   const r = befehlszeile({gnugo: fakeGnugo()});
   pruefeGleich(r.status, 0, `Ausgang; ${r.stdout.slice(0, 300)} ${r.stderr.slice(0, 200)}`);
@@ -284,40 +281,21 @@ test('Ende zu Ende: 123 Teilläufe, nachgebautes GNU Go → Ausgang 0 mit allen 
 });
 
 test('Ende zu Ende: Befund aus Teil 1c → KEIN URTEIL (Ausgang 1)', () => {
-  if (!engineWieFestgelegt()) return 'skip';
+  if (!engineWieFestgelegt()) return {skip: 'Engine-Blöcke nicht mehr wie in §6 der Skalierungsfestlegung'};
   const r = befehlszeile({gnugo: fakeGnugo(), zuege: 30, aendere: t => { t[0].roh[0].ereignisse[0].sims = 2599; }});
   pruefeGleich(r.status, 1, 'Ausgang');
   pruefe(r.stdout.includes('KEIN URTEIL') && r.stdout.includes('Befunde'), 'Grund genannt');
 });
 
 test('Ende zu Ende: GNU Go fehlt → KEIN URTEIL; Bedienfehler → Ausgang 2', () => {
-  if (!engineWieFestgelegt()) return 'skip';
+  if (!engineWieFestgelegt()) return {skip: 'Engine-Blöcke nicht mehr wie in §6 der Skalierungsfestlegung'};
   const r = befehlszeile({gnugo: path.join(tmpdir(), 'gibt-es-nicht'), zuege: 30});
   pruefeGleich(r.status, 1, 'Ausgang ohne GNU Go');
   pruefe(r.stdout.includes('GNU Go startet nicht'), 'Grund');
   pruefeGleich(spawnSync(process.execPath, [SKRIPT, '--parallel', '0'], {encoding: 'utf8'}).status, 2, 'Bedienfehler');
 });
 
-/* ── 5. Echtes GNU Go ──────────────────────────────────────────── */
-
-test('Echtes GNU Go: kurze Harness-Partie nachgespielt, Schätzung an jedem Messpunkt', async () => {
-  if (!fs.existsSync(ECHT)) return 'skip';
-  const ziel = path.join(tmpdir(), 'echt.jsonl');
-  execFileSync(process.execPath, [HARNESS, '--html', STANDARD_HTML, '--games', '1', '--maxmoves', '205', '--seed', '7',
-    '--A', 'mctsFixedSims=30,resignEnabled=0', '--B', 'mctsFixedSims=30,resignEnabled=0', '--roh', ziel], {stdio: 'ignore'});
-  const r = JSON.parse(fs.readFileSync(ziel, 'utf8').trim().split('\n')[0]);
-  const p = {seed: 7, partie: 1, zuege: r.zuege, armVon: {S: r.armSchwarz, W: r.armWeiss},
-             verliererFarbe: r.sieger === 'S' ? 'W' : 'S', verliererArm: 'A', ereignisse: r.ereignisse};
-  const bew = await D.bewerte([p], {gnugo: ECHT, parallel: 1});
-  const soll = D.MESSPUNKTE.filter(z => z <= r.zuege).length;
-  pruefe(soll >= 1, `Partie zu kurz für einen Messpunkt: ${r.zuege} Züge`);
-  pruefeGleich(bew[0].werte.length, soll, 'Messpunkte');
-  for (const w of bew[0].werte) {
-    pruefe(w.s && Number.isFinite(w.s.wert), `Schätzung nach Zug ${w.zug}: ${JSON.stringify(w.s)}`);
-    /* Schranken aus Sicht von Weiß: der Wert aus Sicht von Weiß liegt dazwischen. */
-    if (w.s && w.s.oben !== null)
-      pruefe(w.s.unten <= -w.s.wert && -w.s.wert <= w.s.oben, `Schranken aus Sicht von Weiß nach Zug ${w.zug}: ${JSON.stringify(w.s)}`);
-  }
-});
+/* Der Test mit dem echten GNU Go steht in tests/k3-diagnose-gnugo.js: er gehört zur GNU-Go-Gruppe von
+   tests/run.js und läuft im CI-Job „GNU Go“. */
 
 laufeTests('K3-Diagnose (Aufbauprüfung, Teil 3)').then(ok => process.exit(ok ? 0 : 1));

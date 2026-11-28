@@ -3,8 +3,11 @@
 Regressionstests zum NaN-Bug in `mctsPUCT` ([#49](https://github.com/Hazeberry/Go-html-Game-MoE/pull/49)).
 
 ```
-node tests/run.js                     # alles
-node tests/run.js --ohne-browser      # alles außer dem Browser-Test
+node tests/run.js                     # alles (über zehn Minuten, mit GNU Go)
+node tests/run.js --ohne-browser      # alles außer den Browser-Suiten
+node tests/run.js --nur-browser       # nur die Browser-Suiten
+node tests/run.js --ohne-gnugo        # alles außer den Suiten mit echtem GNU Go
+node tests/run.js --nur-gnugo         # nur diese (gnugo-bruecke.js, k3-diagnose-gnugo.js)
 node tests/regeln.js                  # Regeln und Grundformen (< 1 s)
 node tests/nan-guards.js              # nur die Schutzschichten (~4 s)
 node tests/resign-criterion.js        # nur das Aufgabe-Kriterium (< 1 s)
@@ -13,29 +16,50 @@ node tests/harness-smoke.js           # nur der Harness-Rauchtest (< 1 s)
 node tests/browser-nan.js             # nur Ende-zu-Ende im Browser (~45 s)
 ```
 
-Keine `node_modules` nötig — bis auf den Browser-Test, der sich ohne
-Playwright selbst überspringt und den Gesamtlauf grün lässt.
+Keine `node_modules` nötig — bis auf die Browser-Suiten (Playwright) und die
+GNU-Go-Suiten (`/usr/games/gnugo`). Fehlt das Programm, überspringen sie sich
+**sichtbar mit Grund**: Der Runner listet am Ende jeden übersprungenen Test mit
+Datei und Grund, und der Schlusssatz lautet dann „Alle N Testdateien bestanden,
+aber M Tests übersprungen.“ Mit `REQUIRE_BROWSER=1` bzw. `REQUIRE_GNUGO=1` ist
+ein fehlendes Programm stattdessen ein Fehlschlag; in CI sind beide gesetzt.
 
 ## In CI
 
 `.github/workflows/tests.yml` fährt die Tests bei jedem Push und jedem Pull
-Request auf `main`, in zwei Jobs: `node` (alle Suiten außer Browser, keine
-Abhängigkeiten, ~30 s) und `browser` (installiert Chromium, deshalb getrennt).
+Request auf `main`, in drei Jobs, weil sie verschieden teuer sind: `node` (alle
+Suiten außer Browser und GNU Go, keine Abhängigkeiten, ~5 Minuten), `gnugo`
+(installiert GNU Go; allein die Brücke braucht über drei Minuten) und `browser`
+(installiert Chromium). Eine vierte Stelle, `ergebnis`, fasst die drei zusammen.
 
-Der Node-Job ruft `node tests/run.js --ohne-browser` auf — **einen** Befehl,
-nicht eine Liste von Einzelaufrufen. Das ist kein Stilentscheid: die frühere
-Fassung listete die Dateien im Workflow auf, und beim Hinzufügen von
-`resign-criterion.js` wurde die Liste dort nicht mitgepflegt. Der Job blieb
-grün und prüfte den neuen Test nicht. Die Suite-Liste lebt jetzt nur in
-`tests/run.js` und kann nicht mehr davon abdriften.
+Jeder Job ruft `node tests/run.js` mit **einem** Schalter auf (`--ohne-browser
+--ohne-gnugo`, `--nur-gnugo`, `--nur-browser`), nicht eine Liste von
+Einzelaufrufen. Das ist kein Stilentscheid: die frühere Fassung listete die
+Dateien im Workflow auf, und beim Hinzufügen von `resign-criterion.js` wurde die
+Liste dort nicht mitgepflegt. Der Job blieb grün und prüfte den neuen Test
+nicht. Der Browser-Job führte seine sechs Suiten außerdem noch einmal einzeln
+auf; eine siebte nur im Runner hätte der Node-Job wegen `--ohne-browser`
+übersprungen und der Browser-Job nie gestartet, beide grün. Die Suite-Liste lebt
+jetzt nur in `tests/run.js`; `tests/testlauf.js` prüft, dass jede Suite darin
+steht, dass die drei Jobs sie ohne Rest und ohne Überschneidung teilen und dass
+der Workflow keine einzelne Datei nennt. Eine neue Suite `browser-*.js` landet
+damit von selbst im Browser-Job; eine GNU-Go-Suite gehört zusätzlich in
+`GNUGO_SUITEN` in `tests/run.js`.
+
+**Übersprungenes bleibt sichtbar.** Jeder Job gibt Anzahl und Liste mit Grund als
+Ausgabe weiter, der Runner schreibt sie in die Zusammenfassung des Jobs und
+setzt eine Warnung, und `ergebnis` zeigt in der Übersicht eine Spalte
+„Übersprungen“ mit der Liste. Vorher stand im Node-Log „GNU Go nicht
+installiert“, der Runner zählte nur die Exitcodes („Alle 63 Testdateien
+bestanden“), und die Übersicht zeigte nur success.
+
 Der A/B-Harness läuft dort bewusst **nicht** mit — sein Zeitbudget ist
 Wall-Clock, das Ergebnis also nicht reproduzierbar, und ein Messwerkzeug ohne
 festes Ergebnis taugt nicht als Ja/Nein-Prüfung.
 
-Der Browser-Job setzt `REQUIRE_BROWSER=1`. Ohne die Variable überspringt sich
-der Test, wenn er Chromium nicht findet — in CI wäre der Lauf dann grün, ohne
-irgendetwas geprüft zu haben. Mit ihr ist eine fehlende Installation ein
-Fehlschlag.
+Der Browser-Job setzt `REQUIRE_BROWSER=1`, der GNU-Go-Job `REQUIRE_GNUGO=1`.
+Ohne die Variable überspringt sich ein Test, wenn er sein Programm nicht findet
+— in CI wäre der Lauf dann grün, ohne irgendetwas geprüft zu haben. Mit ihr ist
+eine fehlende Installation ein Fehlschlag.
 
 Das ist kein hypothetisches Risiko: die erste Fassung suchte Chromium unter
 `PLAYWRIGHT_BROWSERS_PATH` mit Rückfall auf einen festen Pfad. Auf einem
@@ -78,14 +102,16 @@ niemand ausliefert.
 | `eval-streuung-vielfalt.js` | Messwerkzeug | `auswertung/eval-streuung-vielfalt.js` (`docs/eval-streuung-vielfalt-vorabfestlegung.md`): Kernrechnungen an nachrechenbaren Werten (Kollisionsrate, erste Abweichung, Median, Zugfolge mit Pass); die Armzuordnung kommt aus `konfig.A`/`konfig.B` und ist reihenfolgeunabhängig; jeder der sieben Gültigkeitsgründe aus §6 schlägt einzeln an; die Siegrate ist **kein** Ausschlussgrund (ein Block mit 30:0 bleibt gültig, und der Bericht sagt es); die Gleichstandsregeln aus §4.1 (n_eff, Schwelle 6, alle Differenzen null mit dem Satz zur Messbarkeit); die drei Urteile aus §5 wörtlich; Sekundärmaße zählen, was sie behaupten, und der Bericht nennt bei KEIN URTEIL jeden Grund und rechnet nichts |
 | `skalierung-bericht.js` | Messwerkzeug | `auswertung/skalierung-bericht.js` (`docs/skalierung-heute-vorabfestlegung.md` §5, §7, §13): Fisher-Test an drei bekannten Werten, Binomialtest, Clopper-Pearson und Elo wie die vorhandenen Funktionen; die Zuordnung zu K1 und K2 kommt aus `konfig.A`/`konfig.B`; jede der fünf Regeln aus §5.5 schlägt einzeln an, Regel 5 konservativ als Summe beider Arme; jede Partie einzeln (§13.4): ein Fehler in `aIst`, `sieger`, `siegerFarbe`, `aufgabe`, Stand oder `zuege` ergibt KEIN URTEIL, auch der gemeldete Fall einer unbekannten Farbe statt Weiß; eine extreme Siegrate je Teillauf ist kein Gültigkeitsgrund; die Urteilssätze aus §5.3 wörtlich; Stufe 2 als K3 = N gegen 2N mit Seeds, gültigem N (Vielfaches von 100, mindestens 100) und der Lage von K3 zu K2; die Kostenschätzung aus §7.3 mit fester Reihe und dem N aus Stufe G; Ende zu Ende mit Exit 0, 1 und 2 (der gültige Durchlauf meldet sich als übersprungen, wenn die Engine nicht mehr den Prüfsummen aus §6 entspricht) |
 | `k3-uebergabe.js` | Messwerkzeug | `auswertung/k3-uebergabe.js` (`docs/skalierung-aufbaupruefung-vorabfestlegung.md` §1): ein echter, kurzer Harness-Lauf am heutigen `index.html` (zwei Partien zu zwei Zügen, A 2600, B 5200) meldet für jeden Arm in beiden Farben genau den Sollwert; ein vollständiger, richtiger Satz aus 123 Teilläufen ist gültig ohne Befund, mit der Zählung je Arm und Farbe; jeder Fehler, den Schritt 1 finden soll (falscher Simulationswert, Steinzug ohne Meldung, Pass mit Meldung, vertauschte Arme, falsche Farbe von A, falsche Konfiguration, verschiedene `params_hash`, falsche Zählung im JSON, abweichende Siegerfarbe), ergibt „Aufbaufehler gefunden“ (Exit 3); jeder Daten- oder Strukturfehler (fehlender oder doppelter Teillauf, Prüfsumme gegen GitHub oder `laeufe.csv`, Artefaktname, Commit, Engine-Block, unlesbare Datei, Zugzahl, Zugfolge, Feld, Partie nach §13.4, Komi) ergibt KEIN URTEIL (Exit 1); Bedienfehler Exit 2; Ende zu Ende mit Exit 0 und 3 (übersprungen, wenn die Engine nicht mehr den Prüfsummen aus §6 entspricht) |
-| `k3-diagnose.js` | Messwerkzeug | `auswertung/k3-diagnose.js` (`docs/skalierung-aufbaupruefung-vorabfestlegung.md` §3): GTP-Koordinaten ohne I, Schätzung nach Zug 100, 200 und 300, Lesen von `B+x`, `W+x`, `0` und der Schranken, ein abgelehnter Zug macht jede spätere Schätzung zu „fehlt“; Kipppunkt nach der Festlegung mit „kein“, „ohne“, „fehlt“, auch in der strengen Zählung (günstigste Schranke für den Verlierer, Schranken aus Sicht von Weiß, mit dem echten GNU Go geprüft); Pässe je Arm und Farbe (erster Pass, ohne eigenen Pass) und q je Phase an kleinen Partien; mit nachgebautem GNU Go die Sicht des Verlierers, die Tabelle je Arm und Farbe und Ende zu Ende mit Exit 0, 1 (Befund aus Teil 1c, GNU Go fehlt) und 2; mit echtem GNU Go eine kurze Harness-Partie (übersprungen, wenn `/usr/games/gnugo` fehlt) |
+| `k3-diagnose.js` | Messwerkzeug | `auswertung/k3-diagnose.js` (`docs/skalierung-aufbaupruefung-vorabfestlegung.md` §3): GTP-Koordinaten ohne I, Schätzung nach Zug 100, 200 und 300, Lesen von `B+x`, `W+x`, `0` und der Schranken, ein abgelehnter Zug macht jede spätere Schätzung zu „fehlt“; Kipppunkt nach der Festlegung mit „kein“, „ohne“, „fehlt“, auch in der strengen Zählung (günstigste Schranke für den Verlierer, Schranken aus Sicht von Weiß, mit dem echten GNU Go geprüft); Pässe je Arm und Farbe (erster Pass, ohne eigenen Pass) und q je Phase an kleinen Partien; mit nachgebautem GNU Go die Sicht des Verlierers, die Tabelle je Arm und Farbe und Ende zu Ende mit Exit 0, 1 (Befund aus Teil 1c, GNU Go fehlt) und 2; der Test mit echtem GNU Go steht in `k3-diagnose-gnugo.js` |
+| `k3-diagnose-gnugo.js` | Messwerkzeug | `auswertung/k3-diagnose.js` mit dem echten GNU Go (GNU-Go-Gruppe von `run.js`, CI-Job `gnugo`): eine echte, kurze Harness-Partie wird nachgespielt, GNU Go schätzt an jedem Messpunkt, und seine Schranken stehen aus Sicht von Weiß (der Wert aus Sicht von Weiß liegt dazwischen), worauf die strenge Zählung beruht; ohne GNU Go sichtbar übersprungen, mit `REQUIRE_GNUGO=1` ein Fehlschlag |
 | `endspiel-zerlegung.js` | Messwerkzeug | `auswertung/endspiel-zerlegung.js` (`docs/endspiel-b-vorabfestlegung.md` Stufe 1): an erfundenen Datensätzen mit bekannter Wirkung die Zerlegung des Endstands aus Sicht von B (dieselbe Veränderung aus Sicht von Schwarz ist für B als Schwarz ein Gewinn und als Weiß ein Verlust, die vier Abschnitte ergeben den Endstand), Nullen im Vorzeichentest, die vier Urteilssätze für den Abschnitt ab Zug 301 wörtlich (Verlust, Gewinn, nicht nachgewiesen, Widerspruch von Vorzeichentest und Mittelwert), Partien unter 300 Zügen nur in den Abschnitten, für die ihre Messpunkte reichen; jeder Eingabefehler (fehlende oder doppelte Partie, Farbe von A, Arme, Zugzahl, Endstand, Verlierer, Messpunkt fehlt oder steht bei kurzer Partie) ergibt KEIN URTEIL; die archivierten Dateien bestehen die Prüfung der Eingabe (nur Gültigkeit); Ende zu Ende mit Exit 0, 1 und 2 |
+| `testlauf.js` | Testwerkzeug | Runner und Workflow (`tests/run.js`, `tests/rahmen.js`, `.github/workflows/tests.yml`): die drei CI-Auswahlen (`--ohne-browser --ohne-gnugo`, `--nur-browser`, `--nur-gnugo`) teilen `ALLE` ohne Rest und ohne Überschneidung, jede Suite in `tests/` steht in `ALLE`, Bedienfehler ergeben Exit 2; der Workflow nennt keine einzelne Testdatei, ruft je Job den Runner mit dem richtigen Schalter auf, installiert GNU Go nur im GNU-Go-Job, setzt `REQUIRE_BROWSER` und `REQUIRE_GNUGO` und wertet Anzahl und Liste des Übersprungenen in der Zusammenfassung aus; `skip` und `{skip: Grund}` kommen mit Test und Grund beim Runner an, ein Browser-Skip ohne Text bekommt den Standardgrund, gleiche Gründe werden zusammengefasst, der Schlusssatz nennt sie; `braucht()` mit und ohne `REQUIRE_<NAME>=1`; ein fehlendes Programm ist übersprungen mit Grund, mit der Variable ein Fehlschlag |
 | `arbeitspunkt.js` | Messwerkzeug | `auswertung/arbeitspunkt.js` (`docs/skalierung-heute-vorabfestlegung.md` §4, §7.1): die Regel „N = S auf volle Hundert, K3 = N gegen 2N“ an den Grenzen, darunter 2749 → 2700 → 5400 und 2750 → 2800 → 5600; Median und Perzentil; die Suchzeit kommt aus `zeiten.sucheMs`, nicht aus Simulationen × `msProSim`; jede der fünf Regeln aus §4.2 schlägt einzeln an, Regel 4 auch bei einem KI-Steinzug ohne Simulationszahl (§13.4); Ende zu Ende über die Befehlszeile |
 | `resign-criterion.js` | Aufgabe | gibt die KI nur noch auf, wenn auch das Gebiet verloren sagt |
 | `training-stability.js` | Training | Regularisierungs-Parameter, Gradienten-Deckel, Max-Norm-Projektion, Advantage-Dämpfung, dazu der ursprüngliche Repro-Lauf |
 | `harness-smoke.js` | Messwerkzeug | läuft `ab-harness.js` einmal winzig durch — misst nichts, prüft nur, dass er noch anläuft |
 | `endspiel-netz.js` | Endspiel-Netz | Schalter `endspielNetz` in `index.html` (`docs/endspiel-netz.md`, `docs/netz-dosis.md`): Default 0,8, bei 0 bleiben die Kandidaten unberührt; Ebenen wie `auswertung/lerner-merkmale.js`; eingebettete Float32-Gewichte geben die Wahrscheinlichkeiten des geprüften Netzes; mit 0,5 dieselben Züge wie in der Offline-Prüfung |
-| `gnugo-bruecke.js` | Messwerkzeug | kurze Partien gegen GNU Go über GTP, mit und ohne Vorgabe; mit `--gnugo-aufgabe 0` läuft eine Partie weiter, die GNU Go sonst aufgibt; `--orakel-zug` (Orakel-Test, `docs/muster-endspiel-orakel.md`): eine nicht erreichte Schwelle ändert nichts, bei Anteil 1 ersetzt das Orakel jeden Zug ab AB, mit Anteil 0,5 einen Teil, falsche Angaben werden abgelehnt; `auswertung/orakel-nachspiel.js` spielt eine aufgezeichnete Partie aus `docs/daten/endspiel-orakel/lauf1/` nach und kommt auf denselben Endstand; Phasenstufen in `--ki` (`name@N=wert`, `docs/prior-nachmessung.md`): eine nicht erreichte Stufe ändert nichts, `@0` spielt wie ohne `@`, eine Stufe mitten in der Partie lässt die Züge davor gleich und zählt einen Wechsel. Ohne GNU Go übersprungen |
+| `gnugo-bruecke.js` | Messwerkzeug | kurze Partien gegen GNU Go über GTP, mit und ohne Vorgabe; mit `--gnugo-aufgabe 0` läuft eine Partie weiter, die GNU Go sonst aufgibt; `--orakel-zug` (Orakel-Test, `docs/muster-endspiel-orakel.md`): eine nicht erreichte Schwelle ändert nichts, bei Anteil 1 ersetzt das Orakel jeden Zug ab AB, mit Anteil 0,5 einen Teil, falsche Angaben werden abgelehnt; `auswertung/orakel-nachspiel.js` spielt eine aufgezeichnete Partie aus `docs/daten/endspiel-orakel/lauf1/` nach und kommt auf denselben Endstand; Phasenstufen in `--ki` (`name@N=wert`, `docs/prior-nachmessung.md`): eine nicht erreichte Stufe ändert nichts, `@0` spielt wie ohne `@`, eine Stufe mitten in der Partie lässt die Züge davor gleich und zählt einen Wechsel. Ohne GNU Go übersprungen; GNU-Go-Gruppe von `run.js` (CI-Job `gnugo`): ohne GNU Go sichtbar übersprungen mit Grund, mit `REQUIRE_GNUGO=1` ein Fehlschlag |
 | `gnugo-superko.js` | Messwerkzeug | Gültigkeitslogik von `auswertung/gnugo-superko.js` (`docs/gnugo-superko-vorabfestlegung.md` §4): gegen einen umschaltbaren GTP-Stummel wird geprüft, dass ein Lauf nur mit bestandenen Kontrollen ein Urteil liefert — freies Ko (P2), freier Selbstmord (P1), abgelehnter Pass, falscher Aufbau (P0) und Prozesstod führen je zu „kein Urteil“ mit Grund und Exitcode 1; GNU Go selbst ist dabei NICHT geprüft, das ist der Zweck des Laufs in Actions |
 | `fuego-gegner.js` | Messwerkzeug | `gnugo-duell.js --gegner fuego` (`docs/fuego.md` §8), ohne GNU Go und ohne Fuego: `tests/gtp-attrappe.js` spielt beide Rollen über GTP und schreibt jeden Befehl mit. Geprüft: Fuego bekommt die Einrichtung in der geprüften Reihenfolge (Vorgabesteine des Schiedsrichters mit `set_free_handicap`, Spiele je Zug, Aufgabe aus, `deterministic_mode`, dann `set_random_seed` mit dem Seed der Partie), zieht für den Gegner (`genmove`) und bekommt die Züge der KI (`play`); der Schiedsrichter bekommt jeden Zug als `play` und zieht nie; gleiche Angaben geben dieselbe Partie; ohne die Option bleibt alles wie bisher (kein Feld `gegner`); ein vom Schiedsrichter zurückgewiesener Zug zählt als abgebrochene Partie; falsche Angaben werden mit Fehlercode 2 abgelehnt |
 | `komponenten.js` | Messwerkzeug | Stufe A der Komponentenmessung (`docs/komponenten.md`): jeder Parameter der Arme steht mit Default in `index.html` und wird abgeschaltet, B schaltet genau die neun Zusätze aus, die übrigen Arme sind Teile davon; Arme, Partienzahlen, Teile, Kontrollen und Seed stimmen in Dokument, Workflow und Skripten überein; D und N0 spielen bei gleichem Seed die ersten 80 Züge gleich, gegen GNU Go und gegen Fuego (beide als `tests/gtp-attrappe.js`), B weicht vorher ab; der Bericht rechnet Intervalle mit alpha 0,05/5, die Wechselwirkung je Partienummer mit alpha 0,05/2 und den Unterschied der Gegner nach Welch, lässt abgebrochene Partien samt Partner weg und urteilt nicht; `spielen.sh` lehnt falsche Eingaben ab; Stufe B (`docs/komponenten-b.md`): in `arme-b.sh` schaltet jeder Einzelarm genau einen der sieben Zusätze ab, O7 alle sieben, D und R0 wie in Stufe A; Dokument, Workflow (fester Seed 220, keine Eingaben) und Ergebnisskript stimmen überein; der Bericht rechnet mit alpha 0,05/8, die Wechselwirkung über die sieben und die erste Abweichung von D; Muster-Eröffnung (`docs/muster-eroeffnung.md`): Arme in `arme-m.sh`, Schalter `musterAb` mit Default 0, Dokument, Workflow (fester Seed 220, Selbstspiel ohne Aufgabe) und Ergebnisskript stimmen überein, der Bericht rechnet mit alpha 0,05/2, prüft A40 und A80 gegen M0 und urteilt über M1; Baum-Übernahme (`docs/baum-uebernahme.md`): Arme in `arme-t.sh`, `SIMS` in `spielen.sh`, Teile und Seeds in Dokument, Workflow und Ergebnisskript, Nichtunterlegenheit mit Grenze −10 (bei 600 Simulationen −20 und Mittelwert über −5); Diagnose der Selbstspiel-Niederlagen (`auswertung/komponenten/selbstspiel-diagnose.js`: Sicht von B, Komi, knappe Niederlagen, Farbe, Verlauf; die Tabellen in `docs/muster-eroeffnung.md` §9 sind genau die Ausgabe des Skripts); leeres Brett (`docs/leeres-brett.md`): Arme in `arme-l.sh`, `VORGABE` in `spielen.sh`, Dokument, Workflow (Seed 222, `VORGABE` 0) und Ergebnisskript stimmen überein, ohne Vorgabe wechseln die Farben, N0 spielt die ersten 80 Züge wie D und A80 wie M0, jeder Datensatz nennt die geschlagenen Steine (Attrappe), der Bericht rechnet mit alpha 0,05/3, zeigt Verteilung und Unterschied der Bedingungen und urteilt nach der vorab festgelegten Regel, das Ergebnisskript fügt Teile, Bedingung mit sechs Steinen und Kontrolle zusammen; Muster ohne Vorgabe (`docs/muster-ohne-vorgabe.md`): Schalter `musterOhneVorgabe`, `musterWeissOhneVorgabe` und `vorgabeSteine` mit Default in `index.html`, Arme in `arme-o.sh`, Dokument, Workflow (Seed 226, `VORGABE` 0, Seeds des Selbstspiels) und Ergebnisskript stimmen überein, mit sechs Vorgabesteinen spielt M0 wie D und ohne Vorgabe nicht, MW0 spielt als Schwarz wie D (Attrappe), der Bericht urteilt nur über M0 und M50 und zeigt die Wirkung je Farbe; Siege gegen Fuego (`docs/muster-fuego-siege.md`): `siege-gepaart.js` zählt die Paare und urteilt nach McNemar, die Tabelle in `docs/muster-ohne-vorgabe.md` §10 ist genau seine Ausgabe, `gerade-wahl.js` wählt die Spielzahl nach der vorab festgelegten Regel, `FUEGO_SPIELE` in `spielen.sh`, Dokument, Workflow und Ergebnisskript des Prüfstands stimmen überein; Zuglimit (`docs/zuglimit-zaehlung.md`): `bericht.js` zählt Partien mit `gewonnen` null als Zuglimit und lässt sie samt Partner aus den Intervallen und Siegen heraus |

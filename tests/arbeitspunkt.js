@@ -168,7 +168,7 @@ test('Bericht: KEIN URTEIL nennt Gründe, GÜLTIG nennt den Arbeitspunkt', () =>
 
 test('Ende zu Ende über die Befehlszeile', () => {
   const ist = blocksummen(HTML);
-  if (!Object.entries(BLOCKSUMMEN).every(([b, s]) => ist[b] === s)) return 'skip';
+  if (!Object.entries(BLOCKSUMMEN).every(([b, s]) => ist[b] === s)) return {skip: 'Engine-Blöcke nicht mehr wie in §6 der Skalierungsfestlegung'};
   const {ladeKI} = require('./rahmen');
   const defaults = ladeKI({mitNetz: false}).PARAMS_DEFAULT;
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'arbeitspunkt-'));
