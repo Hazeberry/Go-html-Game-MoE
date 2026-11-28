@@ -1,0 +1,68 @@
+# Required Notice: Copyright (c) 2026 Hazeberry (https://github.com/Hazeberry/Go-html-Game-MoE)
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+#
+# Endspiel-Hypothese bei B, Stufe 1 (docs/endspiel-b-vorabfestlegung.md): Zerlegung des Endstands von K3 aus Sicht
+# von B in die Abschnitte bis Zug 100, 101–200, 201–300 und ab 301. Rechnet nur auf den archivierten Einzelwerten im
+# Repo (k3-partien.csv, k3-diagnose-partien.csv), spielt keine Partie und braucht keine Artefakte. Vorher werden die
+# Prüfsummen beider Datenordner gegen ihre SHA256SUMS geprüft; weichen sie ab, bricht der Lauf ab.
+#
+# Rot bei KEIN URTEIL (Ausgang 1) und Bedienfehler (2). Start erst nach Merge der Festlegung und mit Hazeberrys Go.
+
+name: Endspiel-Zerlegung
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: endspiel-zerlegung
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  zerlegung:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Prüfsummen der Daten
+        run: |
+          set -euo pipefail
+          for d in docs/daten/skalierung-heute/stufe-2-20261126 docs/daten/skalierung-heute/aufbaupruefung-20261127; do
+            (cd "$d" && sha256sum -c SHA256SUMS)
+          done
+          git rev-parse HEAD
+
+      - name: Zerlegung
+        run: |
+          set -euo pipefail
+          mkdir -p ergebnis
+          status=0
+          node auswertung/endspiel-zerlegung.js \
+            --partien docs/daten/skalierung-heute/stufe-2-20261126/k3-partien.csv \
+            --diagnose docs/daten/skalierung-heute/aufbaupruefung-20261127/k3-diagnose-partien.csv \
+            | tee ergebnis/endspiel-zerlegung.md || status=$?
+          {
+            echo "Stand: $(git rev-parse HEAD)"
+            echo
+            cat ergebnis/endspiel-zerlegung.md
+            echo
+            echo "Ausgang des Werkzeugs: $status (0 gültig · 1 KEIN URTEIL · 2 Bedienfehler)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - name: Ergebnis sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: endspiel-zerlegung
+          path: ergebnis/
+          if-no-files-found: warn
