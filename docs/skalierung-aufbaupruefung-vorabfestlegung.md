@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0 -->
 # Aufbauprüfung zu K3 nach §5.3
 
-**Stand: 27.11.2026. Status: Teil 1c gültig, kein Aufbaufehler gefunden (§5). Teil 1b: kein Hinweis auf Suchzustand, der von einem Arm zum anderen gelangt (§6). Teil 3 offen.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
+**Stand: 28.11.2026. Status: abgeschlossen. Teil 1c gültig, kein Aufbaufehler gefunden (§5). Teil 1b: kein Hinweis auf Suchzustand, der von einem Arm zum anderen gelangt (§6). Teil 3 gültig, beschreibend (§7). K3 ist nicht als Aufbaufehler gekennzeichnet; die Ursache bleibt offen.** Dieses Doc enthält Vorgaben für Werkzeug und Läufe.
 Hazeberry liest es vor dem Merge. Jeder Lauf in Actions braucht ein eigenes Go; der Merge dieses Docs ist keins.
 
 Festlegung nach Kenntnis des K3-Ergebnisses ([`skalierung-heute-vorabfestlegung.md`](skalierung-heute-vorabfestlegung.md)
@@ -238,3 +238,51 @@ Suchergebnisse von einem Arm zum anderen; dass ein Arm dadurch systematisch bevo
 sind. Teil 1b ergab keinen Hinweis darauf, dass Suchzustand von einem Arm zum anderen gelangt; gemessen ist das nicht.
 Nicht ausgeschlossen ist ein Verhalten der Engine, das erst bei größerem Budget auftritt. Damit ist das K3-Ergebnis nach §5.3 nicht als Aufbaufehler gekennzeichnet; die
 Deutung bleibt offen und ist Gegenstand von Teil 3.
+
+## 7. Nachtrag: Teil 3 vom 27.11.2026
+
+**Gültig, beschreibend.** Workflow `k3-diagnose.yml`, Lauf 46048978573, auf `main` (`950c504`, Werkzeug aus #394 mit
+der strengen Zählung), gestartet nach Hazeberrys Go um 18:22 UTC, Dauer rund 10 Minuten, davon knapp 8 für GNU Go.
+Vorab dieselben Prüfungen wie in Teil 1c, ohne Befund. Bericht im Wortlaut:
+[`k3-diagnose.md`](daten/skalierung-heute/aufbaupruefung-20261127/k3-diagnose.md). Die Einzelwerte je Partie
+(Schätzungen, Schranken, beide Kipppunkte) liegen nur im Artefakt des Laufs; GitHub löscht es nach 90 Tagen.
+
+**Pässe:** B passt in beiden Farben häufiger als A (6,55 und 6,95 gegen 5,58 und 5,78 je 100 Entscheidungen) und
+beginnt im Median etwas früher (erster eigener Pass Zug 329 und 332 gegen 339 und 334). Jede Seite passt in jeder
+Partie mindestens einmal; das Passen liegt im Endspiel (Partielänge im Mittel 373).
+
+**q je Zugphase** (Median der Mittel je Partie, nur innerhalb einer Farbe vergleichbar):
+
+| | 1–100 | 101–200 | 201–300 | ab 301 |
+|---|---:|---:|---:|---:|
+| A Schwarz | 0,047 | 0,006 | 0,126 | 0,247 |
+| B Schwarz | 0,100 | 0,152 | 0,153 | 0,039 |
+| A Weiß | −0,071 | −0,107 | −0,103 | 0,038 |
+| B Weiß | −0,019 | 0,030 | −0,074 | −0,123 |
+
+In beiden Farben liegt q von B bis Zug 200 über dem von A und ab Zug 301 deutlich darunter. q stammt aus verschieden
+tiefer Suche und ist kein gemeinsamer Maßstab.
+
+**Kipppunkt nach GNU Go** (Anteil der Verluste je Arm des Verlierers):
+
+| Verlierer | Verluste | ab 100 | ab 200 | ab 300 | kein |
+|---|---:|---:|---:|---:|---:|
+| A, nach dem Wert | 577 | 44,5 % | 26,3 % | 23,2 % | 5,9 % |
+| B, nach dem Wert | 653 | 48,1 % | 21,0 % | 25,6 % | 5,4 % |
+| A, streng | 577 | 23,9 % | 29,3 % | 38,1 % | 8,7 % |
+| B, streng | 653 | 25,3 % | 25,3 % | 40,9 % | 8,6 % |
+
+Die Verteilungen von A und B sind in beiden Zählungen ähnlich. Deutlich ist der Unterschied nach Farbe: Verluste als
+Schwarz kippen streng gezählt zu rund einem Drittel bis Zug 100, als Weiß zu 11 bis 15 % (Tabelle je Farbe im
+Bericht); das passt zu Komi 7,5. Von 3690 möglichen Messpunkten lagen 3686 innerhalb der Partien, alle mit Wert und
+Schranken.
+
+**Baumwiederverwendung:** mit vorhandenen Dumps nicht messbar.
+
+**Einordnung:** Die Daten zeigen kein Bild, in dem B früher verloren steht als A. Auffällig bei B sind mehr und etwas
+frühere Pässe und ein im Spätspiel deutlich niedrigeres q. Dass B im Endspiel Punkte verliert, ist eine Hypothese;
+getestet ist nichts. Eine Messung dazu bräuchte eine eigene Festlegung.
+
+**Abschluss nach §4:** Teil 1c schließt eine falsche Übergabe von `mctsFixedSims` und vertauschte Arme an den Daten
+aus; Teil 1b ergab keinen Hinweis auf geteilten Suchzustand; Teil 3 beschreibt, wo sich die Arme unterscheiden. K3 ist
+nicht als Aufbaufehler gekennzeichnet. Die Ursache des negativen K3-Ergebnisses bleibt offen.

@@ -1,4 +1,4 @@
-# Aufbauprüfung K3, Teil 1c, 27.11.2026
+# Aufbauprüfung K3, Teil 1c und Teil 3, 27.11.2026
 
 Teil 1c nach `docs/skalierung-aufbaupruefung-vorabfestlegung.md` §1 und §5: Hat die Suche je Arm und Farbe die
 festgelegte Simulationszahl übernommen? Workflow `k3-uebergabe.yml`, Lauf 46002282339, auf `main` (`d3a5767`), mit
@@ -8,10 +8,15 @@ den 123 Lauf-IDs aus `../stufe-2-20261126/laeufe.csv` und dem Messcommit `98aa1a
 
 | Datei | Inhalt |
 |---|---|
-| `k3-uebergabe.md` | der Bericht des Werkzeugs im Wortlaut |
+| `k3-uebergabe.md` | Teil 1c: der Bericht von `auswertung/k3-uebergabe.js` im Wortlaut |
+| `k3-diagnose.md` | Teil 3: der Bericht von `auswertung/k3-diagnose.js` im Wortlaut (Lauf 46048978573, Job 140675270631, `main` `950c504`) |
 
 **Herkunft:** maschinell aus dem Job-Log des Laufs (Job 140516703833) übernommen, Zeitstempel am Zeilenanfang
 entfernt. Die Zeilen der Tabelle sind nachgerechnet: Steinzüge plus Pässe ergeben je Zeile die Entscheidungen.
 
 **Nachrechnen** (in Actions, solange die K3-Artefakte bestehen, bis 23./24.02.2027): den Workflow „K3-Übergabe“ mit
 den 123 Lauf-IDs aus `../stufe-2-20261126/laeufe.csv` und `commit` `98aa1ad586c9de23f64ca76c26af1d7b199b7b3a` starten.
+
+**Teil 3** (§3 und §7 der Festlegung): Workflow `k3-diagnose.yml`, Lauf 46048978573, gültig, beschreibend. Der Bericht
+ist ebenso maschinell aus dem Job-Log übernommen, Zeitstempel entfernt, ohne die Zeile mit der Dauer. Die Einzelwerte
+je Partie liegen nur im Artefakt des Laufs (`k3-diagnose-partien.csv`).
